@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/docs/</loc>
+<loc>https://cortexjs.io/docs/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/guides/getting-started/</loc>
+<loc>https://cortexjs.io/guides/getting-started/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/guides/</loc>
+<loc>https://cortexjs.io/guides/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/</loc>
+<loc>https://cortexjs.io/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/mathfield/</loc>
+<loc>https://cortexjs.io/mathfield/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/docs/mathlive</loc>
+<loc>https://cortexjs.io/docs/mathlive</loc>
 </url>
 </urlset>
