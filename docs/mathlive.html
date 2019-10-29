@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Mathlive API Reference - CortexJS</title>
+<meta name="description" content="Web components for scientific computing.">
+
+
+  <meta name="author" content="Your Name">
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="CortexJS">
+<meta property="og:title" content="Mathlive API Reference">
+<meta property="og:url" content="http://localhost:4000/docs/mathlive">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/docs/mathlive">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "CortexJS",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <link rel="stylesheet" href="/assets/css/typescript_doc.css">
+    <!-- <link crossorigin href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed:700&display=swap" rel="stylesheet"> -->
+<link crossorigin href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,400i,700,700i|IBM+Plex+Sans:400,400i,700,700i&display=swap" rel="stylesheet">
+<!-- <link crossorigin href="https://fonts.googleapis.com/css?family=Fira+Code:400,700&display=swap" rel="stylesheet"> -->
+<link crossorigin rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tonsky/FiraCode@2/distr/fira_code.css">
+
+  </head>
+
+  <body class="layout--typescript_doc">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          CortexJS
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/guides/" >Guides</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortexjs" >GitHub</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+  
+    
+      
+      
+      
+      
+    
+    
+      
+
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">Toggle Menu</label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Mathlive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+
+            
+            
+
+            <li><a href="/docs/mathlive/" class="">API Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+
+            
+            
+
+            <li><a href="/docs/contributing" class="">How to contribute</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Mathlive API Reference">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Mathlive API Reference
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p><em class="red modifier-tag">deprecated</em> <em class="orange modifier-tag">experimental</em></p>
+
+<p>This is the top level documentation for the package.</p>
+
+<dl>
+  <dt><span class="tag-name">copyright</span></dt>
+  <dd>2020</dd>
+</dl>
+
+<section class="notice--danger">
+  <h4>deprecated</h4>
+
+  <p>This package will be renamed in version 2.0</p>
+</section>
+
+<h2><em>Module</em> <strong>mathlive</strong></h2>
+<p>To “invoke” the ‘‘functions’’ in this it’s easy module, import the MathLive module.
+This modules exports the MathLive entry points.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// To invoke the ''functions'' in this it's easy module, import the MathLive module.</span>
+
+<span class="k">import</span> <span class="nx">MathLive</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">dist/mathlive.mjs</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">markup</span> <span class="o">=</span> <span class="nx">MathLive</span><span class="p">.</span><span class="nx">latexToMarkup</span><span class="p">(</span><span class="dl">'</span><span class="s1">e^{i</span><span class="se">\\</span><span class="s1">pi}+1=0</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2><em>module mathlive</em> Functions</h2>
+<ul class="tsd-index-list">
+  <li><a href="#mathlive.astToLatex">astToLatex()</a></li>
+  <li><a href="#mathlive.getOriginalContent">getOriginalContent()</a></li>
+  <li><a href="#mathlive.highlightAtomID">highlightAtomID()</a></li>
+  <li><a href="#mathlive.latexToAST">latexToAST()</a></li>
+  <li><a href="#mathlive.latexToMarkup">latexToMarkup()</a></li>
+  <li><a href="#mathlive.latexToMathML">latexToMathML()</a></li>
+  <li><a href="#mathlive.latexToSpeakableText">latexToSpeakableText()</a></li>
+  <li><a href="#mathlive.makeMathField">makeMathField()</a></li>
+  <li><a href="#mathlive.pauseReadAloud">pauseReadAloud()</a></li>
+  <li><a href="#mathlive.playReadAloud">playReadAloud()</a></li>
+  <li><a href="#mathlive.readAloudStatus">readAloudStatus()</a></li>
+  <li><a href="#mathlive.renderMathInDocument">renderMathInDocument()</a></li>
+  <li><a href="#mathlive.renderMathInElement">renderMathInElement()</a></li>
+  <li><a href="#mathlive.resumeReadAloud">resumeReadAloud()</a></li>
+  <li><a href="#mathlive.revertToOriginalContent">revertToOriginalContent()</a></li>
+</ul>
+
+<section class="card">
+
+  <h3 id="mathlive.astToLatex">function mathlive.<strong>astToLatex</strong>(<em>ast</em>: any,
+    <em>options</em>): string</h3>
+  <p>Convert an Abstract Syntax Tree to a LaTeX string.</p>
+
+  <p><strong>See:</strong> <a href="MASTON">MASTON</a></p>
+
+  <dl>
+    <dt><em><strong>ast</strong></em>: any</dt>
+    <dd>The Abstract Syntax Tree as a JavaScript object.</dd>
+    <dt><em><strong>options</strong></em></dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>beginRepeatingDigits</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>decimalMarker</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>endRepeatingDigits</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>exponentMarker</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>exponentProduct</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>groupSeparator</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>precision</strong>?: number</dt>
+    <dd>Number of digits used in the representation of numbers. <strong>Default=</strong> 14.</dd>
+    <dt><em>options</em>.<strong>product</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>scientificNotation</strong>?: string</dt>
+    <dd></dd>
+    <dt>→: string</dt>
+    <dd>The LaTeX representation of the Abstract Syntax Tree, if valid.</dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.getOriginalContent">function mathlive.<strong>getOriginalContent</strong>(<em>element</em>: string | HTMLElement | MathField,
+    <em>options</em>?): string</h3>
+  <p>After calling <a href="#mathlive.renderMathInElement"><code class="highlighter-rouge">renderMathInElement</code></a>
+or <a href="#mathlive.makeMathField"><code class="highlighter-rouge">makeMathField</code></a> the original content
+can be retrived by calling this function.</p>
+
+  <p>Given the following markup:</p>
+  <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">'equation'</span><span class="nt">&gt;</span>$$f(x)=sin(x)$$<span class="nt">&lt;/span&gt;</span>
+</code></pre></div>  </div>
+  <p>The following code:</p>
+  <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">MathLive</span><span class="p">.</span><span class="nx">renderMathInElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">equation</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">MathLive</span><span class="p">.</span><span class="nx">getOriginalContent</span><span class="p">(</span><span class="dl">'</span><span class="s1">equation</span><span class="dl">'</span><span class="p">));</span>
+</code></pre></div>  </div>
+  <p>will output:</p>
+  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$$f(x)=sin(x)$$
+</code></pre></div>  </div>
+
+  <dl>
+    <dt><em><strong>element</strong></em>: string | HTMLElement | MathField</dt>
+    <dd>A DOM element ID, a DOM
+element or a MathField.</dd>
+    <dt><em><strong>options</strong></em>?</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>namespace</strong>?: string</dt>
+    <dd></dd>
+    <dt>→: string</dt>
+    <dd>the original content of the element.</dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.highlightAtomID">function mathlive.<strong>highlightAtomID</strong>(<em>atomID</em>: string): void</h3>
+  <p>Highlight the span corresponding to the specified atomID
+This is used for TTS with synchronized highlighting (read aloud)</p>
+
+  <dl>
+    <dt><em><strong>atomID</strong></em>: string</dt>
+    <dd></dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.latexToAST">function mathlive.<strong>latexToAST</strong>(<em>latex</em>: string,
+    <em>options</em>): any</h3>
+  <p>Convert a LaTeX string to an Abstract Syntax Tree</p>
+
+  <p><strong>See:</strong> <a href="MASTON">MASTON</a></p>
+
+  <dl>
+    <dt><em><strong>latex</strong></em>: string</dt>
+    <dd>A string of valid LaTeX. It does not have to start
+with a mode token such as a <code class="highlighter-rouge">$$</code> or <code class="highlighter-rouge">\(</code>.</dd>
+    <dt><em><strong>options</strong></em></dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>macros</strong>?: any</dt>
+    <dd></dd>
+    <dt>→: any</dt>
+    <dd>The Abstract Syntax Tree as a JavaScript object.</dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.latexToMarkup">function mathlive.<strong>latexToMarkup</strong>(<em>text</em>: string,
+    <em>mathstyle</em>: string,
+    <em>format</em>?: string): string</h3>
+  <p>Convert a ‘‘LaTeX’’ string to a string of HTML markup. It’s easy.</p>
+
+  <dl>
+    <dt><em><strong>text</strong></em>: string</dt>
+    <dd>A string of valid LaTeX. It does not have to start
+with a mode token such as <code class="highlighter-rouge">$$</code> or <code class="highlighter-rouge">\(</code>.</dd>
+    <dt><em><strong>mathstyle</strong></em>: string</dt>
+    <dd>If <code class="highlighter-rouge">'displaystyle'</code> the “display” mode of TeX
+is used to typeset the formula, which is most appropriate for formulas that are
+displayed in a standalone block. If <code class="highlighter-rouge">'textstyle'</code> is used, the “text” mode
+of TeX is used, which is most appropriate when displaying math “inline”
+with other text (on the same line).</dd>
+    <dt><em><strong>format</strong></em>?: string</dt>
+    <dd></dd>
+    <dt>→: string</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.latexToMathML">function mathlive.<strong>latexToMathML</strong>(<em>latex</em>: string,
+    <em>options</em>): string</h3>
+  <p>Convert a LaTeX string to a string of MathML markup.</p>
+
+  <dl>
+    <dt><em><strong>latex</strong></em>: string</dt>
+    <dd>A string of valid LaTeX. It does not have to start
+with a mode token such as a <code class="highlighter-rouge">$$</code> or <code class="highlighter-rouge">\(</code>.</dd>
+    <dt><em><strong>options</strong></em></dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>generateID</strong>?: boolean</dt>
+    <dd></dd>
+    <dt>→: string</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.latexToSpeakableText">function mathlive.<strong>latexToSpeakableText</strong>(<em>latex</em>: string,
+    <em>options</em>): string</h3>
+  <p>Convert a LaTeX string to a textual representation ready to be spoken</p>
+
+  <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">MathLive</span><span class="p">.</span><span class="nx">latexToSpeakableText</span><span class="p">(</span><span class="dl">'</span><span class="se">\\</span><span class="s1">frac{1}{2}</span><span class="dl">'</span><span class="p">));</span>
+<span class="c1">// ➡︎'half'</span>
+</code></pre></div>  </div>
+
+  <dl>
+    <dt><em><strong>latex</strong></em>: string</dt>
+    <dd>A string of valid LaTeX. It does not have to start
+with a mode token such as a <code class="highlighter-rouge">$$</code> or <code class="highlighter-rouge">\(</code>.</dd>
+    <dt><em><strong>options</strong></em></dt>
+    <dd>-</dd>
+    <dt><em>options</em>.<strong>textToSpeechMarkup</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>textToSpeechRules</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>textToSpeechRulesOptions</strong>?: [key: string]: any</dt>
+    <dd></dd>
+    <dt><em>textToSpeechRulesOptions.</em>.[key: string]: any</dt>
+    <dt>→: string</dt>
+    <dd>The spoken representation of the input LaTeX.</dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.makeMathField">function mathlive.<strong>makeMathField</strong>(<em>element</em>: HTMLElement | string,
+    <em>config</em>?: MathFieldConfig): MathField</h3>
+  <p>Convert a DOM element into an editable math field.</p>
+
+  <p>After the DOM element has been created, the value <code class="highlighter-rouge">element.mathfield</code> will
+return a reference to the mathfield object. This value is also returned
+by <code class="highlighter-rouge">makeMathField</code></p>
+
+  <dl>
+    <dt><em><strong>element</strong></em>: HTMLElement | string</dt>
+    <dd>A DOM element, for example as obtained
+by <code class="highlighter-rouge">document.getElementById()</code>, or the ID of a DOM element as a string.</dd>
+    <dt><em><strong>config</strong></em>?: MathFieldConfig</dt>
+    <dd></dd>
+    <dt>→: MathField</dt>
+    <dd>Given the HTML markup:
+      <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">'equation'</span><span class="nt">&gt;</span>$f(x)=sin(x)$<span class="nt">&lt;/span&gt;</span>
+</code></pre></div>      </div>
+      <p>The following code will turn the span into an editable mathfield.</p>
+      <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import MathLive from 'dist/mathlive.mjs';
+MathLive.makeMathField('equation');
+</code></pre></div>      </div>
+    </dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.pauseReadAloud">function mathlive.<strong>pauseReadAloud</strong>(): void</h3>
+  <p>If a Read Aloud operation is in progress, stop it.</p>
+
+  <p><strong>See</strong> <a href="#editor%2Fmathfield.speak"><code class="highlighter-rouge">speak</code></a></p>
+
+  <dl>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.playReadAloud">function mathlive.<strong>playReadAloud</strong>(<em>token</em>: string,
+    <em>count</em>?: number): void</h3>
+  <p>If a Read Aloud operation is in progress, read from a specified token</p>
+
+  <p><strong>See</strong> <a href="#editor-mathfield.speak"><code class="highlighter-rouge">speak</code></a></p>
+
+  <dl>
+    <dt><em><strong>token</strong></em>: string</dt>
+    <dd></dd>
+    <dt><em><strong>count</strong></em>?: number</dt>
+    <dd></dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.readAloudStatus">function mathlive.<strong>readAloudStatus</strong>(): string</h3>
+  <p>Return the status of a Read Aloud operation (reading with synchronized
+highlighting).</p>
+
+  <p>Possible values include:</p>
+  <ul>
+    <li><code class="highlighter-rouge">ready</code></li>
+    <li><code class="highlighter-rouge">playing</code></li>
+    <li><code class="highlighter-rouge">paused</code></li>
+    <li><code class="highlighter-rouge">unavailable</code></li>
+  </ul>
+
+  <p><strong>See</strong> <a href="#editor-mathfield.speak"><code class="highlighter-rouge">speak</code></a></p>
+
+  <dl>
+    <dt>→: string</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.renderMathInDocument">function mathlive.<strong>renderMathInDocument</strong>(<em>options</em>?): void</h3>
+  <p>Transform all the elements in the document body that contain LaTeX code
+into typeset math.</p>
+
+  <p class="notice--info"><strong>Note:</strong> This is a very expensive call, as it needs to parse the entire
+DOM tree to determine which elements need to be processed. In most cases
+this should only be called once per document, once the DOM has been loaded.
+To render a specific element, use <a href="#mathlive.renderMathInElement"><code class="highlighter-rouge">renderMathInElement()</code></a></p>
+
+  <p><strong>See:</strong> <a href="USAGE_GUIDE">USAGE_GUIDE</a></p>
+
+  <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">MathLive</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">dist/mathlive.mjs</span><span class="dl">'</span><span class="p">;</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">"</span><span class="s2">load</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">MathLive</span><span class="p">.</span><span class="nx">renderMathInDocument</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div>  </div>
+
+  <dl>
+    <dt><em><strong>options</strong></em>?: [key: string]: any</dt>
+    <dd></dd>
+    <dt><em>options.</em>.[key: string]: any</dt>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.renderMathInElement">function mathlive.<strong>renderMathInElement</strong>(<em>element</em>: HTMLElement | string,
+    <em>options</em>?,
+    <em>renderToMarkup</em>?,
+    <em>renderToMathML</em>?,
+    <em>renderToSpeakableText</em>?): void</h3>
+  <p>Transform all the children of <code class="highlighter-rouge">element</code>, recursively, that contain LaTeX code
+into typeset math.</p>
+
+  <p><strong>See:</strong> <a href="USAGE_GUIDE">Usage Guide</a></p>
+
+  <dl>
+    <dt><em><strong>element</strong></em>: HTMLElement | string</dt>
+    <dd>An HTML DOM element, or a string containing
+the ID of an element.</dd>
+    <dt><em><strong>options</strong></em>?</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>ignoreClass</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>macros</strong>?: object[]</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>namespace</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>preserveOriginalContent</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>processClass</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>processScriptType</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>readAloud</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>renderAccessibleContent</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>skipTags</strong>?: string[]</dt>
+    <dd></dd>
+    <dt><em><strong>renderToMarkup</strong></em>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><em><strong>renderToMathML</strong></em>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><em><strong>renderToSpeakableText</strong></em>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.resumeReadAloud">function mathlive.<strong>resumeReadAloud</strong>(): void</h3>
+  <p>If a Read Aloud operation is paused, resume it</p>
+
+  <p><strong>See</strong> <a href="#editor-mathfield.speak"><code class="highlighter-rouge">speak</code></a></p>
+
+  <dl>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="mathlive.revertToOriginalContent">function mathlive.<strong>revertToOriginalContent</strong>(<em>element</em>: string | HTMLElement | MathField,
+    <em>options</em>?): void</h3>
+
+  <dl>
+    <dt><em><strong>element</strong></em>: string | HTMLElement | MathField</dt>
+    <dd></dd>
+    <dt><em><strong>options</strong></em>?</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>namespace</strong>: string</dt>
+    <dd>The namespace used for the <code class="highlighter-rouge">data-</code>
+attributes. If you used a namespace with <code class="highlighter-rouge">renderMathInElement</code>, you must
+use the same namespace here.</dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<h2><em>Class</em> <strong>MathField</strong></h2>
+<section class="tsd-index-list">
+
+  <h3>Selection</h3>
+
+  <ul>
+    <li><a href="#MathField.%24latex">$latex()</a></li>
+    <li><a href="#MathField.%24selectionAtEnd">$selectionAtEnd()</a></li>
+    <li><a href="#MathField.%24selectionAtStart">$selectionAtStart()</a></li>
+    <li><a href="#MathField.%24selectionDepth">$selectionDepth()</a></li>
+    <li><a href="#MathField.%24selectionIsCollapsed">$selectionIsCollapsed()</a></li>
+  </ul>
+
+  <h3>Other</h3>
+
+  <ul>
+    <li><a href="#MathField.%24applyStyle">$applyStyle()</a></li>
+    <li><a href="#MathField.%24el">$el()</a></li>
+    <li><a href="#MathField.%24insert">$insert()</a></li>
+    <li><a href="#MathField.%24keystroke">$keystroke()</a></li>
+    <li><a href="#MathField.%24perform">$perform()</a></li>
+    <li><a href="#MathField.%24selectedText">$selectedText()</a></li>
+    <li><a href="#MathField.%24setConfig">$setConfig()</a></li>
+    <li><a href="#MathField.%24typedText">$typedText()</a></li>
+    <li><a href="#MathField.speak_">speak_()</a></li>
+    <li><a href="#MathField.%24revertToOriginalContent">$revertToOriginalContent()</a></li>
+  </ul>
+</section>
+
+<h2 class="category-title"><em>class MathField</em> Selection</h2>
+<section class="card">
+
+  <h3 id="MathField.%24latex">function MathField.<strong>$latex</strong>(<em>text</em>: string,
+    <em>options</em>): string</h3>
+  <p>If <code class="highlighter-rouge">text</code> is not empty, sets the content of the mathfield to the
+text interpreted as a LaTeX expression.
+If <code class="highlighter-rouge">text</code> is empty (or omitted), return the content of the mahtfield as a
+LaTeX expression.</p>
+
+  <dl>
+    <dt><em><strong>text</strong></em>: string</dt>
+    <dd></dd>
+    <dt><em><strong>options</strong></em></dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>suppressChangeNotifications</strong>: boolean</dt>
+    <dd>If true, the
+handlers for the contentWillChange and contentDidChange notifications will
+not be invoked. Default <code class="highlighter-rouge">false</code>.</dd>
+    <dt>→: string</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24selectionAtEnd">function MathField.<strong>$selectionAtEnd</strong>(): boolean</h3>
+
+  <p><em class="red modifier-tag">internal</em></p>
+
+  <p>Return true if the selection extends to the end of the selection group.</p>
+
+  <dl>
+    <dt>→: boolean</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24selectionAtStart">function MathField.<strong>$selectionAtStart</strong>(): boolean</h3>
+  <p>Return true if the selection starts at the beginning of the selection group.</p>
+
+  <dl>
+    <dt>→: boolean</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24selectionDepth">function MathField.<strong>$selectionDepth</strong>(): number</h3>
+
+  <p><em class="orange modifier-tag">alpha</em> <em class="orange modifier-tag">beta</em> <em class="modifier-tag">sealed</em></p>
+
+  <p>Return the depth of the selection group. If the selection is at the root level,
+returns 0. If the selection is a portion of the numerator of a fraction
+which is at the root level, return 1. Note that in that case, the numerator
+would be the “selection group”.</p>
+
+  <section class="notice--info">
+    <h4>sealed</h4>
+
+    <p>blah blah</p>
+  </section>
+
+  <dl>
+    <dt>→: number</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24selectionIsCollapsed">function MathField.<strong>$selectionIsCollapsed</strong>(): boolean</h3>
+  <p>Return true if the length of the selection is 0, that is, if it is a single
+insertion point.</p>
+
+  <dl>
+    <dt><span class="tag-name">see</span></dt>
+    <dd><a href="MathField#$selectionDepth]($selectionIsCollapsed)">and [MathField#$selectionDepth]($selectionIsCollapsed</a> for more details.</dd>
+    <dt>→: boolean</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<h2 class="category-title"><em>class MathField</em> Other</h2>
+<section class="card">
+
+  <h3 id="MathField.%24applyStyle">function MathField.<strong>$applyStyle</strong>(<em>style</em>): void</h3>
+  <p>Apply a style (color, bold, italic, etc…).</p>
+
+  <p>If there is a selection, the style is applied to the selection</p>
+
+  <p>If the selection already has this style, remove it. If the selection
+has the style partially applied (i.e. only some sections), remove it from
+those sections, and apply it to the entire selection.</p>
+
+  <p>If there is no selection, the style will apply to the next character typed.</p>
+
+  <dl>
+    <dt><em><strong>style</strong></em></dt>
+    <dd>an object with the following properties. All the
+properties are optional, but they can be combined.</dd>
+    <dt><em>style</em>.<strong>backgroundColor</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>style</em>.<strong>color</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>style</em>.<strong>fontFamily</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>style</em>.<strong>mode</strong>?: string</dt>
+    <dd>Either <code class="highlighter-rouge">'math'</code>, <code class="highlighter-rouge">'text'</code> or ‘<code class="highlighter-rouge">command</code>’</dd>
+    <dt><em>style</em>.<strong>series</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>style</em>.<strong>shape</strong>?: string</dt>
+    <dd></dd>
+    <dt><em>style</em>.<strong>size</strong>?: string</dt>
+    <dd>The font size:  ‘size1’…‘size10’
+‘size5’ is the default size</dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24el">function MathField.<strong>$el</strong>(): HTMLElement</h3>
+  <p>Return the DOM element associated with this mathfield.</p>
+
+  <p>Note that <code class="highlighter-rouge">this.$el().mathfield = this</code></p>
+
+  <dl>
+    <dt>→: HTMLElement</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24insert">function MathField.<strong>$insert</strong>(<em>s</em>: string,
+    <em>options</em>?): void</h3>
+  <p>This method can be invoked as a selector with <a href="MathField#$perform"><code class="highlighter-rouge">$perform("insert")</code></a>
+or called explicitly.</p>
+
+  <p>It will insert the specified block of text at the current insertion point,
+according to the insertion mode specified.</p>
+
+  <p>After the insertion, the selection will be set according to the <code class="highlighter-rouge">selectionMode</code>.</p>
+
+  <dl>
+    <dt><em><strong>s</strong></em>: string</dt>
+    <dd>The text to be inserted</dd>
+    <dt><em><strong>options</strong></em>?</dt>
+    <dd></dd>
+    <dt><em>options</em>.<strong>feedback</strong>: boolean</dt>
+    <dd>If true, provide audio and haptic feedback</dd>
+    <dt><em>options</em>.<strong>focus</strong>: boolean</dt>
+    <dd>If true, the mathfield will be focused after
+the insertion</dd>
+    <dt><em>options</em>.<strong>format</strong>: “auto” | “latex”</dt>
+    <dd>The format of the string <code class="highlighter-rouge">s</code>:
+      <ul>
+        <li><code class="highlighter-rouge">'auto'</code>: the string is interpreted as a latex fragment or command)
+(default)</li>
+        <li><code class="highlighter-rouge">'latex'</code>: the string is interpreted strictly as a latex fragment</li>
+      </ul>
+    </dd>
+    <dt><em>options</em>.<strong>mode</strong>: “text” | “math” | “”</dt>
+    <dd>‘text’ or ‘math’. If empty, the current mode
+is used (default)</dd>
+    <dt><em>options</em>.<strong>resetStyle</strong>: boolean</dt>
+    <dd>If true, the style after the insertion
+is the same as the style before (if false, the style after the
+insertion is the style of the last inserted atom).</dd>
+    <dt><em>options</em>.<strong>selectionMode</strong>: “placeholder” | “after” | “before” | “item”</dt>
+    <dd>Describes where the selection
+will be after the insertion:
+
+      <table>
+        <tbody>
+          <tr>
+            <td><code class="highlighter-rouge">'placeholder'</code></td>
+            <td>the selection will be the first available placeholder in the item that has been inserted (default)</td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">'after'</code></td>
+            <td>the selection will be an insertion point after the item that has been inserted</td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">'before'</code></td>
+            <td>the selection will be an insertion point before the item that has been inserted</td>
+          </tr>
+          <tr>
+            <td><code class="highlighter-rouge">'item'</code></td>
+            <td>the item that was inserted will be selected</td>
+          </tr>
+        </tbody>
+      </table>
+    </dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24keystroke">function MathField.<strong>$keystroke</strong>(<em>keys</em>: string,
+    <em>evt</em>: Event): boolean</h3>
+
+  <dl>
+    <dt><em><strong>keys</strong></em>: string</dt>
+    <dd>A string representation of a key combination.
+
+      <p>For example <code class="highlighter-rouge">'Alt-KeyU'</code>.</p>
+
+      <p>See <a href="https://www.w3.org/TR/uievents/#code-virtual-keyboards">W3C UIEvents</a></p>
+    </dd>
+    <dt><em><strong>evt</strong></em>: Event</dt>
+    <dd></dd>
+    <dt>→: boolean</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24perform" class="deprecated">function MathField.<strong>$perform</strong>(<em>command</em>: string | string[]): void</h3>
+
+  <p><em class="red modifier-tag">deprecated</em></p>
+
+  <section class="notice--danger">
+    <h4>deprecated</h4>
+
+    <p>Will be removed in next major release</p>
+  </section>
+
+  <dl>
+    <dt><em><strong>command</strong></em>: string | string[]</dt>
+    <dd>A selector, or an array whose first element
+is a selector, and whose subsequent elements are arguments to the selector.
+Note that selectors do not include a final “_”. They can be passed either
+in camelCase or kebab-case. So:
+      <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">mf</span><span class="p">.</span><span class="nx">$perform</span><span class="p">(</span><span class="dl">'</span><span class="s1">selectAll</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">mf</span><span class="p">.</span><span class="nx">$perform</span><span class="p">(</span><span class="dl">'</span><span class="s1">select-all</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div>      </div>
+      <p>both calls are valid and invoke the same selector.</p>
+    </dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24selectedText">function MathField.<strong>$selectedText</strong>(<em>format</em>?: string): string</h3>
+  <p>Return a textual representation of the selection in the mathfield.</p>
+
+  <dl>
+    <dt><span class="tag-name">throws</span></dt>
+    <dd><a href="Error">Error</a> if something goes wrong</dd>
+    <dt><em><strong>format</strong></em>?: string</dt>
+    <dd></dd>
+    <dt>→: string</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24setConfig">function MathField.<strong>$setConfig</strong>(<em>config</em>?: MathFieldConfig): void</h3>
+  <p>Update the configuration options for this mathfield.</p>
+
+  <dl>
+    <dt><em><strong>config</strong></em>?: MathFieldConfig</dt>
+    <dd></dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.%24typedText">function MathField.<strong>$typedText</strong>(<em>text</em>: string): void</h3>
+  <p>Simulate a user typing the keys indicated by text.</p>
+
+  <dl>
+    <dt><em><strong>text</strong></em>: string</dt>
+    <dd>A sequence of one or more characters.</dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="MathField.speak_">function MathField.<strong>speak_</strong>(<em>amount</em>: string,
+    <em>speakOptions</em>): void</h3>
+  <p>Speak some part of the expression, either with or without synchronized highlighting.</p>
+
+  <dl>
+    <dt><em><strong>amount</strong></em>: string</dt>
+    <dd>(all, selection, left, right, group, parent)</dd>
+    <dt><em><strong>speakOptions</strong></em></dt>
+    <dd></dd>
+    <dt><em>speakOptions</em>.<strong>withHighlighting</strong>: boolean</dt>
+    <dd>If true, synchronized highlighting of speech will happen (if possible). Default is false.</dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+  <p><em class="modifier-tag">static</em></p>
+  <h3 id="MathField.%24revertToOriginalContent">function MathField.<strong>$revertToOriginalContent</strong>(): void</h3>
+  <p>Revert this math field to its original content. After this method has been
+called, no other methods can be called on the MathField object. To turn the
+element back into a MathField, call <code class="highlighter-rouge">MathLive.makeMathField()</code> on the
+element again to get a new math field object.</p>
+
+  <dl>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<h2><em>Global</em> Types</h2>
+
+<section class="card">
+
+  <h3>declare type <strong>MathFieldCallback</strong> = (<em>mf</em>: MathField) =&gt; void</h3>
+
+  <p>This callback is used frequently.</p>
+
+  <p>Don’t abuse it.</p>
+
+</section>
+
+<section class="card">
+
+  <h3>declare type <strong>MathFieldConfig</strong></h3>
+
+  <dl>
+    <dt><strong>customVirtualKeyboardLayers</strong>?: [key: string]: string</dt>
+    <dd></dd>
+    <dt><em>customVirtualKeyboardLayers.</em>.[key: string]: string</dt>
+    <dt><strong>customVirtualKeyboards</strong>?: [key: string]: object</dt>
+    <dd></dd>
+    <dt><em>customVirtualKeyboards.</em>.[key: string]: object</dt>
+    <dt><strong>defaultMode</strong>?: “math” | “text”</dt>
+    <dd></dd>
+    <dt><strong>handleReadAloud</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>handleSpeak</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>horizontalSpacingScale</strong>?: number</dt>
+    <dd>asldkjf lkj asdlkjh</dd>
+    <dt><strong>ignoreSpacebarInMathMode</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>inlineShortcutTimeout</strong>?: number</dt>
+    <dd></dd>
+    <dt><strong>inlineShortcuts</strong>?: [key: string]: string</dt>
+    <dd></dd>
+    <dt><em>inlineShortcuts.</em>.[key: string]: string</dt>
+    <dt><strong>keypressSound</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>keypressVibration</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>locale</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>namespace</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>onAnnounce</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onBlur</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onContentDidChange</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onContentWillChange</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onFocus</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onKeystroke</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onModeChange</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onMoveOutOf</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onReadAloudStatus</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onSelectionDidChange</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onSelectionWillChange</strong>?: MathFieldCallback</dt>
+    <dd></dd>
+    <dt><strong>onTabOutOf</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onUndoStateDidChange</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onUndoStateWillChange</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>onVirtualKeyboardToggle</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>overrideDefaultInlineShortcuts</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>plonkSound</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>removeExtraneousParentheses</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>scriptDepth</strong>?: number</dt>
+    <dd></dd>
+    <dt><strong>smartFence</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>smartSuperscript</strong>?: boolean</dt>
+    <dd></dd>
+    <dt><strong>speechEngine</strong>?: “local” | “amazon”</dt>
+    <dd></dd>
+    <dt><strong>speechEngineRate</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>speechEngineVoice</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>strings</strong>?: [key: string]: string</dt>
+    <dd></dd>
+    <dt><em>strings.</em>.[key: string]: string</dt>
+    <dt><strong>substituteTextArea</strong>?: (…<em>params</em>: any[]) =&gt; any</dt>
+    <dd></dd>
+    <dt><strong>textToSpeechMarkup</strong>?: “ssml” | “mac”</dt>
+    <dd></dd>
+    <dt><strong>textToSpeechRules</strong>?: “mathlive” | “sre”</dt>
+    <dd></dd>
+    <dt><strong>textToSpeechRulesOptions</strong>?: any</dt>
+    <dd></dd>
+    <dt><strong>virtualKeyboardMode</strong>?: “manual” | “onfocus” | “off”</dt>
+    <dd></dd>
+    <dt><strong>virtualKeyboardRomanLayout</strong>?: “qwerty” | “azerty” | “qwertz” | “dvorak” | “colemak”</dt>
+    <dd></dd>
+    <dt><strong>virtualKeyboardTheme</strong>?: “material” | “apple” | “”</dt>
+    <dd></dd>
+    <dt><strong>virtualKeyboardToggleGlyph</strong>?: string</dt>
+    <dd></dd>
+    <dt><strong>virtualKeyboards</strong>?: “all” | “numeric” | “roman” | “greek” | “functions” | “command” | string</dt>
+    <dd></dd>
+  </dl>
+
+</section>
+
+<h2><em>Global</em> Functions</h2>
+<ul class="tsd-index-list">
+  <li><a href="#startsWithString">startsWithString()</a></li>
+  <li><a href="#validateShortcut">validateShortcut()</a></li>
+</ul>
+
+<section class="card">
+
+  <h3 id="startsWithString">function <strong>startsWithString</strong>(<em>s</em>: string,
+    <em>config</em>: any): string[]</h3>
+  <p>Return an array of potential shortcuts</p>
+
+  <dl>
+    <dt><em><strong>s</strong></em>: string</dt>
+    <dd></dd>
+    <dt><em><strong>config</strong></em>: any</dt>
+    <dd></dd>
+    <dt>→: string[]</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+<section class="card">
+
+  <h3 id="validateShortcut">function <strong>validateShortcut</strong>(<em>mode</em>: string,
+    <em>siblings</em>: object[],
+    <em>shortcut</em>: string): void</h3>
+
+  <dl>
+    <dt><em><strong>mode</strong></em>: string</dt>
+    <dd></dd>
+    <dt><em><strong>siblings</strong></em>: object[]</dt>
+    <dd>atoms preceding this potential shortcut</dd>
+    <dt><em><strong>shortcut</strong></em>: string</dt>
+    <dd></dd>
+    <dt>→: void</dt>
+    <dd></dd>
+  </dl>
+</section>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+
+</div>
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>
+
+
