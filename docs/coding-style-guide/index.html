@@ -4,24 +4,24 @@
     fontSize = <span class=hljs-number>12</span>,
     lineSpacing = <span class=hljs-number>1.2</span>,
     style = <span class=hljs-string>''</span>
-</span>);
-<span class=hljs-title>renderText</span>(<span class=hljs-params><span class=hljs-string>"hello world"</span>, <span class=hljs-string>"Helvetica"</span>, <span class=hljs-number>18</span>, <span class=hljs-number>1.5</span>, <span class=hljs-string>"bold"</span></span>);
+</span>)</span>;
+renderText(<span class=hljs-string>"hello world"</span>, <span class=hljs-string>"Helvetica"</span>, <span class=hljs-number>18</span>, <span class=hljs-number>1.5</span>, <span class=hljs-string>"bold"</span>);
 
-// 👍
-<span class=hljs-title>function</span> <span class=hljs-title>renderText</span>(<span class=hljs-params>text: string, {
+<span class=hljs-comment>// 👍</span>
+<span class=hljs-function><span class=hljs-keyword>function</span> <span class=hljs-title>renderText</span>(<span class=hljs-params>text: string, {
     fontFamily = <span class=hljs-string>'Helvetica'</span>,
     fontSize = <span class=hljs-number>12</span>,
     lineSpacing = <span class=hljs-number>1.2</span>,
     style = <span class=hljs-string>''</span>
-}</span>);
-<span class=hljs-title>renderText</span>(<span class=hljs-params><span class=hljs-string>"hello world"</span></span>);
-<span class=hljs-title>renderText</span>(<span class=hljs-params><span class=hljs-string>"hello world"</span>, {
-    fontFamily: <span class=hljs-string>"Helvetica"</span>,
-    fontSize: <span class=hljs-number>18</span>,
-    lineSpacing: <span class=hljs-number>1.5</span>,
-    style: <span class=hljs-string>"bold"</span>
-}</span>);
-</span></code></pre><ul><li>Avoid providing an explicit type when the compiler can infer it.</ul><pre><code class=language-javascript><span class=hljs-comment>// 💩</span>
+}</span>)</span>;
+renderText(<span class=hljs-string>"hello world"</span>);
+renderText(<span class=hljs-string>"hello world"</span>, {
+    <span class=hljs-attr>fontFamily</span>: <span class=hljs-string>"Helvetica"</span>,
+    <span class=hljs-attr>fontSize</span>: <span class=hljs-number>18</span>,
+    <span class=hljs-attr>lineSpacing</span>: <span class=hljs-number>1.5</span>,
+    <span class=hljs-attr>style</span>: <span class=hljs-string>"bold"</span>
+});
+</code></pre><ul><li>Avoid providing an explicit type when the compiler can infer it.</ul><pre><code class=language-javascript><span class=hljs-comment>// 💩</span>
 <span class=hljs-keyword>let</span> action: string = <span class=hljs-string>'fly'</span>;
 <span class=hljs-keyword>let</span> distance: number = <span class=hljs-number>100</span>;
 
