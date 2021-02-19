@@ -2,18 +2,18 @@
 
 <span class=hljs-keyword>const</span> expr = parse(<span class=hljs-string>'\\frac{\\pi}{2}'</span>);
 <span class=hljs-built_in>console</span>.log(expr);
-<span class=hljs-comment>// -> ["Divide", "Pi", 2]</span>
+<span class=hljs-comment>// ➔ ["Divide", "Pi", 2]</span>
 
 <span class=hljs-keyword>const</span> latex = serialize(expr);
 <span class=hljs-built_in>console</span>.log(latex);
-<span class=hljs-comment>// -> \frac{\pi}{2}</span>
+<span class=hljs-comment>// ➔ \frac{\pi}{2}</span>
 </code></pre><p>The behavior of parse and serialize can be customized by passing an optional argument:<pre><code class=language-javascript><span class=hljs-keyword>import</span> {  serialize } <span class=hljs-keyword>from</span> <span class=hljs-string>'math-json'</span>;
 
 <span class=hljs-built_in>console</span>.log(serialize(<span class=hljs-number>1</span>/<span class=hljs-number>3</span>, {
     <span class=hljs-attr>precision</span>: <span class=hljs-number>3</span>,
     <span class=hljs-attr>decimalMarker</span>: <span class=hljs-string>","</span>
 }););
-<span class=hljs-comment>// -> 0,333</span>
+<span class=hljs-comment>// ➔ 0,333</span>
 </code></pre><h2>Advanced Usage</h2><p>To improve performance, particularly when calling <code>parse()</code>/<code>serialize()</code> repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is constructed, the dictionaries defining the syntax are compiled, and subsequent invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.<pre><code class=language-javascript><span class=hljs-keyword>import</span> { LatexSyntax } <span class=hljs-keyword>from</span> <span class=hljs-string>'math-json'</span>;
 <span class=hljs-keyword>const</span> latexSyntax = <span class=hljs-keyword>new</span> LatexSyntax();
 <span class=hljs-keyword>const</span> expr = latexSyntax.parse(<span class=hljs-string>'\\frac{\\pi}{2}'</span>);
@@ -30,5 +30,5 @@
 });
 <span class=hljs-keyword>const</span> expr = rawLatex.parse(<span class=hljs-string>'\\frac{\\pi}{2}'</span>);
 <span class=hljs-built_in>console</span>.log(expr);
-<span class=hljs-comment>// -> ["Latex", "\frac", "&lt;{>", "\pi", "&lt;}>", "&lt;{>",  2, "&lt;}>"]</span>
-</code></pre></section><footer class=page__meta><meta content="February 19, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Fri Feb 19 2021 11:45:53 GMT+0100 (Central European Standard Time)">February 19, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+<span class=hljs-comment>// ➔ ["Latex", "\frac", "&lt;{>", "\pi", "&lt;}>", "&lt;{>",  2, "&lt;}>"]</span>
+</code></pre></section><footer class=page__meta><meta content="February 19, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Fri Feb 19 2021 16:31:18 GMT+0100 (Central European Standard Time)">February 19, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
