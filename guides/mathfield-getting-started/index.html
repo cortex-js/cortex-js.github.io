@@ -1,71 +1,706 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><link href=/assets/css/main.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img alt=""src=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><span class=nav__sub-title>MathLive</span><ul><li><a href=/guides/mathfield-getting-started/ class=active>Getting Started</a><li><a href=/docs/mathlive/ >SDK Reference</a></ul><li><span class=nav__sub-title>MathLive Guides</span><ul><li><a href=/mathlive/guides/introduction>Introduction</a><li><a href=/mathlive/guides/interacting>Interacting</a><li><a href=/mathlive/guides/customizing>Customize</a><li><a href=/mathlive/guides/commands>Commands</a><li><a href=/mathlive/guides/macros>Macros</a><li><a href=/mathlive/guides/shortcuts>Shortcuts</a><li><a href=/mathlive/guides/speech>Speech</a><li><a href=/mathlive/guides/static>Static</a><li><a href=/mathlive/guides/virtual-keyboards>Virtual Keyboards</a><li><a href=/mathlive/guides/lifecycle>Lifecycle</a></ul><li><a href=/math-json/ ><span class=nav__sub-title>MathJSON</span></a><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><h1>Let’s Get Started</h1><p>In this section we’ll look into how to load the Mathlive SDK in your project in order to use a mathfield in a page.<p>We’ll start with a step-by-step guide using a CDN, which is the simplest approach. The Advanced Setup section will discuss other options.<h2>Mathfield Web Component</h2><ol><li>Load the MathLive library<li>Use the <code>&lt;math-field></code> tag to create a mathfield<li>Use properties and methods of the mathfield element to interact with it</ol><pre><code class=language-html><span class=hljs-meta>&lt;!DOCTYPE <span class=hljs-meta-keyword>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>body</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>math-field</span>></span>f(x)<span class=hljs-tag>&lt;/<span class=hljs-name>math-field</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>src</span>=<span class=hljs-string>'https://unpkg.com/mathlive/dist/mathlive.min.js'</span>></span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span>></span><span class=javascript>
-        <span class=hljs-built_in>document</span>.querySelector(<span class=hljs-string>'math-field'</span>).addEventListener(<span class=hljs-string>'input'</span>, <span class=hljs-function>(<span class=hljs-params>ev</span>) =></span> {
-            <span class=hljs-built_in>console</span>.log(ev.target.value):
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="active">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <h1>Let’s Get Started</h1>
+<p>In this section we’ll look into how to load the Mathlive SDK in your
+project in order to use a mathfield in a page.</p>
+<p>We’ll start with a step-by-step guide using a CDN, which is the simplest
+approach. The Advanced Setup section will discuss other options.</p>
+<h2>Mathfield Web Component</h2>
+<ol>
+<li>Load the MathLive library</li>
+<li>Use the <code>&lt;math-field&gt;</code> tag to create a mathfield</li>
+<li>Use properties and methods of the mathfield element to interact with it</li>
+</ol>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>f(x)<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.js&#x27;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+        <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&#x27;math-field&#x27;</span>).addEventListener(<span class="hljs-string">&#x27;input&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+            <span class="hljs-built_in">console</span>.log(ev.target.value):
         });
-    </span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>body</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>html</span>></span>
-</code></pre><p class=notice--warning>Note that the HTML quirks mode is not supported. This means that the host page must use the strict mode, indicated by a <code>&lt;!DOCTYPE html></code> directive at the top of the page.<p>You can also programmatically create mathfield elements:<pre><code class=language-javascript><span class=hljs-keyword>const</span> mfe = <span class=hljs-keyword>new</span> MathfieldElement();
-mfe.value = <span class=hljs-string>'\\frac{\\pi}{2}'</span>;
-<span class=hljs-built_in>document</span>.body.appendChild(mfe);
-</code></pre><p>See the <a href=http://localhost:8080/docs/mathlive/#(%22mathfield-element%22%3Amodule)>MathfieldElement</a> documentation in the <a href=/docs/mathlive/ >SDK Reference</a> for more details about the attributes, properties, methods and events supported.<hr><h1>Advanced Setup</h1><p>The instructions above are sufficient in many cases. They allow you to create mathfield elements using markup or programmatically and to interact with them.<p>Howeve more complex configurations are supported as well.<h2>Using MathLive API with JavaScript Modules</h2><p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions such as <code>renderMathInDocument()</code>. To access those functions you will need to import the MathLive module.<p>JavaScript modules offer several benefits (asynchronous, deterministics loading, no pollution of the global namespace, etc…). They are the recommended approach to use MathLive APIS in your project.<p>To use MathLive as a JavaScript module:<ol><li>Include a <code>&lt;script></code> tag, with a <code>type="module"</code> attribute<li>In the body of this <code>&lt;script></code> tag, use an <code>import</code> directive pointing to a CDN URL for Mathlive<li>Invoke a MathLive API, such as <code>makeMathField()</code> to create a mathfield</ol><p>With this setup, MathLive will dynamically insert one or more stylesheets in the page, as needed, for example when the mathfield is created. MathLive will also dynamically download the required fonts from the CDN as well.<pre><code class=language-html><span class=hljs-meta>&lt;!DOCTYPE <span class=hljs-meta-keyword>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>body</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>p</span>></span>$$\frac{\pi}{2}<span class=hljs-tag>&lt;/<span class=hljs-name>p</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>type</span>=<span class=hljs-string>"module"</span>></span><span class=javascript>
-        <span class=hljs-keyword>import</span> { renderMathInDocument } <span class=hljs-keyword>from</span> <span class=hljs-string>'https://unpkg.com/mathlive/dist/mathlive.min.mjs'</span>;
+    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p class="notice--warning">Note that the HTML quirks mode is not supported. This means that the host page
+must use the strict mode, indicated by a <code>&lt;!DOCTYPE html&gt;</code> directive at the top
+of the page.</p>
+<p>You can also programmatically create mathfield elements:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
+mfe.value = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
+<span class="hljs-built_in">document</span>.body.appendChild(mfe);
+</code></pre>
+<p>See the <a href="http://localhost:8080/docs/mathlive/#(%22mathfield-element%22%3Amodule)">MathfieldElement</a>
+documentation in the <a href="/docs/mathlive/">SDK Reference</a> for more details about the attributes, properties, methods and
+events supported.</p>
+<hr>
+<h1>Advanced Setup</h1>
+<p>The instructions above are sufficient in many cases. They allow you to create
+mathfield elements using markup or programmatically and to interact
+with them.</p>
+<p>Howeve more complex configurations are supported as well.</p>
+<h2>Using MathLive API with JavaScript Modules</h2>
+<p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions
+such as <code>renderMathInDocument()</code>. To access those functions you will need
+to import the MathLive module.</p>
+<p>JavaScript modules offer several benefits (asynchronous, deterministics loading,
+no pollution of the global namespace, etc…). They are the recommended approach
+to use MathLive APIS in your project.</p>
+<p>To use MathLive as a JavaScript module:</p>
+<ol>
+<li>Include a <code>&lt;script&gt;</code> tag, with a <code>type=&quot;module&quot;</code> attribute</li>
+<li>In the body of this <code>&lt;script&gt;</code> tag, use an <code>import</code> directive pointing to a CDN URL for Mathlive</li>
+<li>Invoke a MathLive API, such as <code>makeMathField()</code> to create a mathfield</li>
+</ol>
+<p>With this setup, MathLive will dynamically insert one or more stylesheets in
+the page, as needed, for example when the mathfield is created. MathLive will
+also dynamically download the required fonts from the CDN as well.</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
+        <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
         renderMathInDocument();
-    </span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>body</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>html</span>></span>
-</code></pre><p>If this option works for you, you can move on to the MathLive SDK reference to find out how to customize mathfields, receive change notifications, define keyboard shortcuts, use custom macros and more.<p>The section below discuss aditional options to load MathLive for more complex configurations.<h2>Using <code>&lt;script></code> tags</h2><p>If you need to support browsers that don’t support JavaScript modules, you can use a <code>&lt;script></code> tag to load the MathLive library.<p>A few things to note:<ol><li>Use the <code>.min.js</code> version, not the <code>.min.mjs</code> one. The later one only works with modules.<li>After loading the script, the global <code>MathLive</code> object will provide access to the MathLive API. Unlike with modules, you may run into situations where the scripts are loaded out of order therefore the <code>MathLive</code> global may be <code>undefined</code> by the time your script is run.<li>Just like with modules, the necessary stylesheets and fonts will be loaded when required.</ol><pre><code class=language-html><span class=hljs-meta>&lt;!DOCTYPE <span class=hljs-meta-keyword>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>body</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>p</span>></span>$$\frac{\pi}{2}<span class=hljs-tag>&lt;/<span class=hljs-name>p</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>src</span>=<span class=hljs-string>"https://unpkg.com/mathlive/dist/mathlive.min.js"</span>></span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span>></span>
+    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>If this option works for you, you can move on to the MathLive SDK reference
+to find out how to customize mathfields, receive change notifications, define
+keyboard shortcuts, use custom macros and more.</p>
+<p>The section below discuss aditional options to load MathLive for more complex
+configurations.</p>
+<h2>Using <code>&lt;script&gt;</code> tags</h2>
+<p>If you need to support browsers that don’t support JavaScript modules, you
+can use a <code>&lt;script&gt;</code> tag to load the MathLive library.</p>
+<p>A few things to note:</p>
+<ol>
+<li>Use the <code>.min.js</code> version, not the <code>.min.mjs</code> one. The later one only works
+with modules.</li>
+<li>After loading the script, the global <code>MathLive</code> object will provide access
+to the MathLive API. Unlike with modules, you may run into situations where the
+scripts are loaded out of order therefore the <code>MathLive</code> global may be
+<code>undefined</code> by the time your script is run.</li>
+<li>Just like with modules, the necessary stylesheets and fonts will be loaded
+when required.</li>
+</ol>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span>
         MathLive.renderMathInDocument();
-    <span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>body</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>html</span>></span>
-</code></pre><h2>Using NPM</h2><p>If you need:<ul><li>to use MathLive with TypeScript<li>to bundle MathLive with other code<li>to integrate MathLive with your asset pipeline<li>to support older browsers<li>more control over network caching of the MathLive library and its assets</ul><p>then you should use a version of MathLive installed from NPM instead of from a CDN.<p>To add a local version of MathLive to your project, use the following command:<pre><code class=language-bash>$ npm install --save mathlive
-</code></pre><p>The version of MathLive installed in the <code>node_modules</code> directory essentially corresponds to the content of the <code>/dist/</code> directory in the MathLive project on GitHub.<p>After you’ve completed this step, you can use MathLive as any other modules in your project:<pre><code class=language-javascript><span class=hljs-keyword>import</span> { MathfieldElement} <span class=hljs-keyword>from</span> <span class=hljs-string>'mathlive'</span>;
-<span class=hljs-keyword>const</span> mfe = <span class=hljs-keyword>new</span> MathfieldElement();
-</code></pre><p>Your bundler/transpiler (for example <code>Rollup</code>, <code>WebPack</code>, <code>Babel</code>, <code>TypeScript</code>) will locate the MathLive library in the <code>node_modules</code> directory and apply the necessary transformations to it, as per the settings in your project.<h2>Controlling the location of the <code>fonts</code> folder</h2><p>In order to display formulas correctly MathLive needs access to specialized math fonts. Those fonts are provided as part of the MathLive SDK and they are located in a folder called <code>fonts</code> which is located next to the MathLive library.<p>If the global setup of your project requires a different organization, for example locating all the static assets in a <code>/assets/</code> directory and all the JavaScript code in a <code>/js/</code> directory, you can specify where those assets can be found using the <code>fontsDirectory</code> configutation option.<pre><code class=language-javascript><span class=hljs-keyword>import</span> { MathfieldElement} <span class=hljs-keyword>from</span> <span class=hljs-string>'mathlive'</span>;
-<span class=hljs-keyword>const</span> mfe = <span class=hljs-keyword>new</span> MathfieldElement();
+    <span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<h2>Using NPM</h2>
+<p>If you need:</p>
+<ul>
+<li>to use MathLive with TypeScript</li>
+<li>to bundle MathLive with other code</li>
+<li>to integrate MathLive with your asset pipeline</li>
+<li>to support older browsers</li>
+<li>more control over network caching of the MathLive library and its assets</li>
+</ul>
+<p>then you should use a version of MathLive installed from NPM instead of from
+a CDN.</p>
+<p>To add a local version of MathLive to your project, use the following command:</p>
+<pre><code class="language-bash">$ npm install --save mathlive
+</code></pre>
+<p>The version of MathLive installed in the <code>node_modules</code> directory essentially
+corresponds to the content of the <code>/dist/</code> directory in the MathLive project
+on GitHub.</p>
+<p>After you’ve completed this step, you can use MathLive as any other modules
+in your project:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { MathfieldElement} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
+</code></pre>
+<p>Your bundler/transpiler (for example <code>Rollup</code>, <code>WebPack</code>, <code>Babel</code>, <code>TypeScript</code>)
+will locate the MathLive library in the <code>node_modules</code> directory and apply
+the necessary transformations to it, as per the settings in your project.</p>
+<h2>Controlling the location of the <code>fonts</code> folder</h2>
+<p>In order to display formulas correctly MathLive needs access to specialized
+math fonts. Those fonts are provided as part of the MathLive SDK and they are
+located in a folder called <code>fonts</code> which is located next to the MathLive
+library.</p>
+<p>If the global setup of your project requires a different organization,
+for example locating all the static assets in a <code>/assets/</code> directory and all the
+JavaScript code in a <code>/js/</code> directory, you can specify where those assets can
+be found using the <code>fontsDirectory</code> configutation option.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { MathfieldElement} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
 mfe.setOptions({
-    <span class=hljs-attr>fontsDirectory</span>: <span class=hljs-string>'../assets/mathlive-fonts'</span>
+    <span class="hljs-attr">fontsDirectory</span>: <span class="hljs-string">&#x27;../assets/mathlive-fonts&#x27;</span>
 });
-</code></pre><p>The path used by <code>fontsDirectory</code> is a path relative to the bundled runtime location of the directory containting the MathLive library. So in the example above, if the MathLive library is in a <code>/js/</code> directory and the MathLive fonts are in a <code>/assets/mathlive-fonts/</code> directory, then the relative path from the JavaScript directory to the fonts directory is <code>../assets/mathlive-fonts</code><p class=notice--info>The <code>fontsDirectory</code> option affects all the mathfield on the page. It is not necessary to apply it to all mathfields, although it’s not harmful. Once the fonts have been loaded once, they will not get loaded again.<h2>Integrating with an Asset Pipeline</h2><p>In some cases, simply pointing MathLive to the directory where the fonts can be located might not be enough. For example, some bundlers, such as WebPack, can modify the names of the files containting assets, including a hash string in order to provide more control of the caching of those assets.<p>In this case, you should include the stylesheet <code>mathlive-fonts.css</code> to your project. You can find this stylesheet in the <code>dist</code> folder on GitHub or in the <code>mathlive</code> folder in your <code>node_modules</code> directory.<p>This stylesheet will explicitly load the required font files. Because your bundler will be able to parse it, it will do the necessary changes to the font files such as renaming them with the appropriate hash string and adapting the path to reflect their actual location after processing by the asset pipeline.<p>The MathLive library will detect if you include the <code>mathlive-fonts.css</code> stylesheet in your page and will not attempt to dynamically load the fonts, relying instead on the regular process to do so. This may result in some redrawing of formulas, or incorrect drawing while the browser completes the font loading.<pre><code class=language-html><span class=hljs-meta>&lt;!DOCTYPE <span class=hljs-meta-keyword>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>head</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>link</span> <span class=hljs-attr>rel</span>=<span class=hljs-string>"stylesheet"</span> <span class=hljs-attr>href</span>=<span class=hljs-string>"mathlive-fonts.css"</span> /></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>head</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>body</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>math-field</span>></span>\tan(x) = \frac{\sin \tetha}{\cos \tetha}<span class=hljs-tag>&lt;/<span class=hljs-name>math-field</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>src</span>=<span class=hljs-string>'./vendor/mathlive.min.js'</span>></span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>body</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>html</span>></span>
-</code></pre><h2>Displaying Formulas Without JavaScript</h2><p>While MathLive is primarily an editor for formulas, it can also be used to render “static” formulas in a web page, along the lines of what MathJax or KaTeX provide.<p>You can render a non-editable formula using <code>MathLive.renderMathInDocument()</code> or generate markup for a formula using <code>MathLive.latexToMarkup()</code>. In the later case, you may save the output or return it from a server-side process.<p>To correctly display this markup, you will need an appropriate stylesheet.<p>If you have some editable mathfield in that page, the stylesheet for the editable mathfield will be sufficient to correctly render the static formulas.<p>However, if you need to render the markup for a static formula without the MathLive library being loaded, you can use the <code>mathlive-static.css</code> stylesheet which can be found in the <code>/dist/</code> directory on GitHub or in the <code>node_modules/mathlive</code> directory via NPM.<pre><code class=language-html><span class=hljs-meta>&lt;!DOCTYPE <span class=hljs-meta-keyword>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>head</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>link</span> <span class=hljs-attr>rel</span>=<span class=hljs-string>"stylesheet"</span> <span class=hljs-attr>href</span>=<span class=hljs-string>"https://unpkg.com/mathlive/dist/mathlive-static.css"</span> /></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>head</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>html</span>></span>
-<span class=hljs-tag>&lt;<span class=hljs-name>body</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>div</span> <span class=hljs-attr>id</span>=<span class=hljs-string>"formula"</span>></span><span class=hljs-tag>&lt;/<span class=hljs-name>div</span>></span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>type</span>=<span class=hljs-string>"module"</span>></span><span class=javascript>
-        <span class=hljs-keyword>import</span> {convertLatexToMarkup} <span class=hljs-keyword>from</span> <span class=hljs-string>'https://unpkg.com/mathlive/dist/mathlive.min.mjs'</span>;
-        <span class=hljs-built_in>window</span>.onload = <span class=hljs-function><span class=hljs-keyword>function</span>(<span class=hljs-params></span>) </span>{
-            <span class=hljs-built_in>document</span>.getElementById(<span class=hljs-string>"formula"</span>).innerHTML = convertLatexToMarkup(
-            <span class=hljs-string>`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>
+</code></pre>
+<p>The path used by <code>fontsDirectory</code> is a path relative to the bundled runtime
+location of the directory containting the MathLive library. So in the example
+above, if the MathLive library is in a <code>/js/</code> directory and the MathLive fonts
+are in a <code>/assets/mathlive-fonts/</code> directory, then the relative path from
+the JavaScript directory to the fonts directory is <code>../assets/mathlive-fonts</code></p>
+<p class="notice--info">The <code>fontsDirectory</code> option affects all the mathfield on the page. It is
+not necessary to apply it to all mathfields, although it’s not harmful. Once
+the fonts have been loaded once, they will not get loaded again.</p>
+<h2>Integrating with an Asset Pipeline</h2>
+<p>In some cases, simply pointing MathLive to the directory where the fonts can
+be located might not be enough. For example, some bundlers, such as WebPack,
+can modify the names of the files containting assets, including a hash string
+in order to provide more control of the caching of those assets.</p>
+<p>In this case, you should include the stylesheet <code>mathlive-fonts.css</code> to your
+project. You can find this stylesheet in the <code>dist</code> folder on GitHub or in the
+<code>mathlive</code> folder in your <code>node_modules</code> directory.</p>
+<p>This stylesheet will explicitly load the required font files. Because your
+bundler will be able to parse it, it will do the necessary changes to the font
+files such as renaming them with the appropriate hash string and adapting
+the path to reflect their actual location after processing by the asset
+pipeline.</p>
+<p>The MathLive library will detect if you include the <code>mathlive-fonts.css</code>
+stylesheet in your page and will not attempt to dynamically load the fonts,
+relying instead on the regular process to do so. This may result in some
+redrawing of formulas, or incorrect drawing while the browser completes the
+font loading.</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;mathlive-fonts.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>\tan(x) = \frac{\sin \tetha}{\cos \tetha}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;./vendor/mathlive.min.js&#x27;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<h2>Displaying Formulas Without JavaScript</h2>
+<p>While MathLive is primarily an editor for formulas, it can also be used
+to render “static” formulas in a web page, along the lines of what MathJax or
+KaTeX provide.</p>
+<p>You can render a non-editable formula using <code>MathLive.renderMathInDocument()</code> or
+generate markup for a formula using <code>MathLive.latexToMarkup()</code>. In the later
+case, you may save the output or return it from a server-side process.</p>
+<p>To correctly display this markup, you will need an appropriate stylesheet.</p>
+<p>If you have some editable mathfield in that page, the stylesheet for the editable
+mathfield will be sufficient to correctly render the static formulas.</p>
+<p>However, if you need to render the markup for a static formula without the
+MathLive library being loaded, you can use the <code>mathlive-static.css</code> stylesheet
+which can be found in the <code>/dist/</code> directory on GitHub or in the
+<code>node_modules/mathlive</code> directory via NPM.</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive-static.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
+        <span class="hljs-keyword">import</span> {convertLatexToMarkup} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
+        <span class="hljs-built_in">window</span>.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;formula&quot;</span>).innerHTML = convertLatexToMarkup(
+            <span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>
             );
         };
-    </span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>body</span>></span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>html</span>></span>
-</code></pre></section><footer class=page__meta><meta content="April 03, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 09:58:10 GMT+0200 (Central European Summer Time)">April 03, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 03, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 09:58:10 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,10 +1,582 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><link href=/assets/css/main.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img src=""alt=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><a href=/guides/mathfield-getting-started/ ><span class=nav__sub-title>MathLive</span></a><li><span class=nav__sub-title>MathJSON</span><ul><li><a href=/math-json/ class=active>Introduction</a><li><a href=/guides/math-json-format/ >MathJSON Format</a><li><a href=/docs/mathjson/ >SDK Reference</a><li><a href=/guides/math-json-dictionary/ >Dictionary</a></ul><li><span class=nav__sub-title>Compute Engine</span><ul><li><a href=/compute-engine/ >Introduction</a><li><a href=/docs/compute-engine/ >SDK Reference</a></ul><li><span class=nav__sub-title>Dictionary</span><ul><li><a href=/guides/compute-engine-arithmetic/ >Arithmetic</a><li><a href=/guides/compute-engine-calculus/ >Calculus</a><li><a href=/guides/compute-engine-core/ >Core</a><li><a href=/guides/compute-engine-domains/ >Domains</a><li><a href=/guides/compute-engine-forms/ >Forms</a><li><a href=/guides/compute-engine-logic/ >Logic</a><li><a href=/guides/compute-engine-sets/ >Sets</a><li><a href=/guides/compute-engine-trigonometry/ >Trigonometry</a></ul><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><script type=module>import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.mjs';
-    renderMathInDocument();</script><h1>MathJSON</h1><img src=/assets/MathJSON-1.png style="margin-bottom:2em;border-radius:8px;border:1px solid #203346"><p>The MathJSON format is a lightweight data interchange format for mathematical notation.<table><thead><tr><th style=text-align:left>Math<th style=text-align:left>MathJSON<tbody><tr><td style=text-align:left><math>$$\frac{n}{1+n}$$</math><td style=text-align:left><code>["Divide", "n", ["Add", 1, "n"]]</code><tr><td style=text-align:left>$$e^{\imaginaryI \pi }+1=0$$<td style=text-align:left><code>["Equal", ["Add", ["Power", "ExponentialE", ["Multiply", "Pi", "ImaginaryI"], 1]], 0]</code><tr><td style=text-align:left>$$\sin^{-1}^\prime(x)$$<td style=text-align:left><code>[["Derivative", 1, ["InverseFunction", "Sin"]], "x"]</code></table><p>The MathJSON library for Typescript/Javascript can be used to manipulate MathJSON expressions.<pre><code class=language-js><span class=hljs-keyword>import</span> { parse, serialize } <span class=hljs-keyword>from</span> <span class=hljs-string>'math-json'</span>;
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
 
-<span class=hljs-built_in>console</span>.log(parse(<span class=hljs-string>'\\frac{\\pi}{2}'</span>));
-<span class=hljs-comment>// ➔ ["Divide", "Pi", 2]</span>
 
-<span class=hljs-built_in>console</span>.log(serialize([[<span class=hljs-string>"InverseFunction"</span>, <span class=hljs-string>"Sin"</span>], <span class=hljs-string>"x"</span>));
-<span class=hljs-comment>// ➔ \sin^{-1}x</span>
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
 
-</code></pre><h2>Next</h2><ul><li><a href=/guides/math-json-format>MathJSON format</a><li><a href=/docs/mathjson>MathJSON API</a><li><a href=/guides/math-json-dictionary>MathJSON Default Dictionary</a></ul></section><footer class=page__meta><meta content="February 23, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Tue Feb 23 2021 15:45:39 GMT+0100 (Central European Standard Time)">February 23, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/guides/mathfield-getting-started/"><span class="nav__sub-title">MathLive</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathJSON</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/math-json/" class="active">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathjson/" class="">SDK Reference</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-dictionary/" class="">Dictionary</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Compute Engine</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/compute-engine/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/compute-engine/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Dictionary</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-arithmetic/" class="">Arithmetic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-calculus/" class="">Calculus</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-core/" class="">Core</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-domains/" class="">Domains</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-forms/" class="">Forms</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-logic/" class="">Logic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-sets/" class="">Sets</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-trigonometry/" class="">Trigonometry</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.mjs';
+    renderMathInDocument();
+</script>
+<h1>MathJSON</h1>
+<img src='/assets/MathJSON-1.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
+<p>The MathJSON format is a lightweight data interchange format for mathematical
+notation.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Math</th>
+<th style="text-align:left">MathJSON</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><math>$$\frac{n}{1+n}$$</math></td>
+<td style="text-align:left"><code>[&quot;Divide&quot;, &quot;n&quot;, [&quot;Add&quot;, 1, &quot;n&quot;]]</code></td>
+</tr>
+<tr>
+<td style="text-align:left">$$e^{\imaginaryI \pi }+1=0$$</td>
+<td style="text-align:left"><code>[&quot;Equal&quot;,  [&quot;Add&quot;, [&quot;Power&quot;, &quot;ExponentialE&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryI&quot;], 1]], 0]</code></td>
+</tr>
+<tr>
+<td style="text-align:left">$$\sin^{-1}^\prime(x)$$</td>
+<td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
+</tr>
+</tbody>
+</table>
+<p>The MathJSON library for Typescript/Javascript can be used to manipulate
+MathJSON expressions.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+
+<span class="hljs-built_in">console</span>.log(parse(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>));
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
+
+<span class="hljs-built_in">console</span>.log(serialize([[<span class="hljs-string">&quot;InverseFunction&quot;</span>, <span class="hljs-string">&quot;Sin&quot;</span>], <span class="hljs-string">&quot;x&quot;</span>));
+<span class="hljs-comment">// ➔ \sin^{-1}x</span>
+
+</code></pre>
+<h2>Next</h2>
+<ul>
+<li><a href="/guides/math-json-format">MathJSON format</a></li>
+<li><a href="/docs/mathjson">MathJSON API</a></li>
+<li><a href="/guides/math-json-dictionary">MathJSON Default Dictionary</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="February 23, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Feb 23 2021 15:45:39 GMT+0100 (Central European Standard Time)">February 23, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

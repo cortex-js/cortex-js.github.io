@@ -1,5 +1,639 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js></script><script crossorigin=anonymous src=/assets/js/code-playground.js type=module></script><link href=/assets/css/main.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img alt=""src=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><span class=nav__sub-title>MathLive</span><ul><li><a href=/guides/mathfield-getting-started/ >Getting Started</a><li><a href=/docs/mathlive/ >SDK Reference</a></ul><li><span class=nav__sub-title>MathLive Guides</span><ul><li><a href=/mathlive/guides/introduction>Introduction</a><li><a href=/mathlive/guides/interacting>Interacting</a><li><a href=/mathlive/guides/customizing>Customize</a><li><a href=/mathlive/guides/commands>Commands</a><li><a href=/mathlive/guides/macros>Macros</a><li><a href=/mathlive/guides/shortcuts>Shortcuts</a><li><a href=/mathlive/guides/speech>Speech</a><li><a href=/mathlive/guides/static>Static</a><li><a href=/mathlive/guides/virtual-keyboards>Virtual Keyboards</a><li><a href=/mathlive/guides/lifecycle>Lifecycle</a></ul><li><a href=/math-json/ ><span class=nav__sub-title>MathJSON</span></a><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><script>moduleMap = {
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script>
+    moduleMap = {
         mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
-    };</script><h1>Commands</h1><p>User initiated commands that control the mathfield can be dispatched using <a href=///docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)><code>executeCommand()</code></a>. Commands are identified by a string called the <strong>selector</strong>. Most commands take no parameters. When a command does have a parameter, an array made up of the selector and the commands arguments can be passed to <code>executeCommand()</code>. For example:<pre><code class=language-js>mf.executeCommand([<span class=hljs-string>'insert'</span>, <span class=hljs-string>'(#0)'</span>]);
-</code></pre><p>will insert an open and close parenthesis around the selection (the <code>#0</code> sequence is replaced with the current selection).<h2>Editing</h2><ul><li><code>insert</code>. This selector takes two arguments. The first one is required and is the content to be inserted, as a string. The second one is an optional set of key value pairs:<ul><li><code>insertionMode</code>: one of <code>"replaceSelection"</code>, <code>"replaceAll"</code>, <code>"insertBefore"</code> or <code>"insertAfter"</code>.<li><code>selectionMode</code>: one of <code>"placeholder"</code> (the selection will be the first available placeholder in the item that has been inserted), <code>"after"</code> (the selection will be an insertion point after the item that has been inserted), <code>"before"</code> (the selection will be an insertion point before the item that has been inserted) or <code>"item"</code> (the item that was inserted will be selected).</ul><li><code>delete</code> synonym for <code>deleteNextChar</code><li><code>deleteBackward</code>, <code>deleteForward</code><li><code>deleteNextWord</code>, <code>deletePreviousWord</code><li><code>deleteToGroupStart</code>, <code>deleteToGroupEnd</code><li><code>deleteToMathFieldEnd</code><li><code>transpose</code></ul><h2>Edit Menu</h2><ul><li><code>undo</code><li><code>redo</code><li><code>cutToClipboard</code><li><code>copyToClipboard</code><li><code>pasteFromClipboard</code></ul><h2>User Interface</h2><ul><li><code>switchMode</code><li><code>complete</code> exit command mode and insert result<li><code>nextSuggestion</code> and <code>previousSuggestion</code> when the popover panel is selected, display the next/previous suggestion<li><code>toggleKeystrokeCaption</code> show/hide the keystroke caption panel. This panel displays the keys being typed, including the shortcuts. Great for demos!<li><code>toggleVirtualKeyboard</code> show/hide the virtual keyboard</ul><h2>Scrolling</h2><ul><li><code>scrollToStart</code><li><code>scrollToEnd</code><li><code>scrollIntoView</code></ul><h2>Navigating</h2><ul><li><code>moveToNextChar</code>, <code>moveToPreviousChar</code><li><code>moveToNextPlaceholder</code>, <code>moveToPreviousPlaceholder</code><li><code>moveToNextWord</code>, <code>moveToPreviousWord</code><li><code>moveToGroupStart</code>, <code>moveToGroupEnd</code><li><code>moveToMathFieldStart</code>, <code>moveToMathFieldEnd</code><li><code>moveUp</code>, <code>moveDown</code><li><code>moveToSuperscript</code>, <code>moveToSubscript</code><li><code>moveToOpposite</code><li><code>moveBeforeParent</code>, <code>moveAfterParent</code></ul><h2>Extending the Selection</h2><ul><li><code>selectGroup</code><li><code>selectAll</code><li><code>extendToNextChar</code>, <code>extendToPreviousChar</code><li><code>extendToNextWord</code>, <code>extendToPreviousWord</code><li><code>extendUp</code>, <code>extendDown</code><li><code>extendToNextBoundary</code>, <code>extendToPreviousBoundary</code><li><code>extendToGroupStart</code>, <code>extendToGroupEnd</code><li><code>extendToMathFieldStart</code>, <code>extendToMathFieldEnd</code></ul><h2>Arrays</h2><ul><li><code>addRowAfter</code>, <code>addRowBefore</code><li><code>addColumnAfter</code>, <code>addColumnBefore</code></ul><h2>Speech</h2><ul><li><code>speak</code> This selector takes two arguments. The first argument is a string that determines what should be spoken. The valid values are:<ul><li><code>all</code><li><code>left</code><li><code>right</code><li><code>selection</code><li><code>parent</code><li><code>group</code> The second parameter determines whether what is being spoken should be highlighted. It is an object: <code>{withHighlighting: boolean}</code> (default is false). Note: highlighting currently only works when connected to Amazon’s AWS speech synthesizer.</ul></ul></section><footer class=page__meta><meta content="April 03, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:11:54 GMT+0200 (Central European Summer Time)">April 03, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+    };
+</script>
+<h1>Commands</h1>
+<p>User initiated commands that control the mathfield can be dispatched using
+<a href="///docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)"><code>executeCommand()</code></a>. Commands are
+identified by a string called the <strong>selector</strong>. Most commands take no
+parameters. When a command does have a parameter, an array made up of the
+selector and the commands arguments can be passed to
+<code>executeCommand()</code>. For example:</p>
+<pre><code class="language-js">mf.executeCommand([<span class="hljs-string">&#x27;insert&#x27;</span>, <span class="hljs-string">&#x27;(#0)&#x27;</span>]);
+</code></pre>
+<p>will insert an open and close parenthesis around the selection (the <code>#0</code>
+sequence is replaced with the current selection).</p>
+<h2>Editing</h2>
+<ul>
+<li><code>insert</code>. This selector takes two arguments. The first one is required and is
+the content to be inserted, as a string. The second one is an optional set of
+key value pairs:
+<ul>
+<li><code>insertionMode</code>: one of <code>&quot;replaceSelection&quot;</code>, <code>&quot;replaceAll&quot;</code>,
+<code>&quot;insertBefore&quot;</code> or <code>&quot;insertAfter&quot;</code>.</li>
+<li><code>selectionMode</code>: one of <code>&quot;placeholder&quot;</code> (the selection will be the first
+available placeholder in the item that has been inserted), <code>&quot;after&quot;</code> (the
+selection will be an insertion point after the item that has been inserted),
+<code>&quot;before&quot;</code> (the selection will be an insertion point before the item that
+has been inserted) or <code>&quot;item&quot;</code> (the item that was inserted will be
+selected).</li>
+</ul>
+</li>
+<li><code>delete</code> synonym for <code>deleteNextChar</code></li>
+<li><code>deleteBackward</code>, <code>deleteForward</code></li>
+<li><code>deleteNextWord</code>, <code>deletePreviousWord</code></li>
+<li><code>deleteToGroupStart</code>, <code>deleteToGroupEnd</code></li>
+<li><code>deleteToMathFieldEnd</code></li>
+<li><code>transpose</code></li>
+</ul>
+<h2>Edit Menu</h2>
+<ul>
+<li><code>undo</code></li>
+<li><code>redo</code></li>
+<li><code>cutToClipboard</code></li>
+<li><code>copyToClipboard</code></li>
+<li><code>pasteFromClipboard</code></li>
+</ul>
+<h2>User Interface</h2>
+<ul>
+<li><code>switchMode</code></li>
+<li><code>complete</code> exit command mode and insert result</li>
+<li><code>nextSuggestion</code> and <code>previousSuggestion</code> when the popover panel is selected,
+display the next/previous suggestion</li>
+<li><code>toggleKeystrokeCaption</code> show/hide the keystroke caption panel. This panel
+displays the keys being typed, including the shortcuts. Great for demos!</li>
+<li><code>toggleVirtualKeyboard</code> show/hide the virtual keyboard</li>
+</ul>
+<h2>Scrolling</h2>
+<ul>
+<li><code>scrollToStart</code></li>
+<li><code>scrollToEnd</code></li>
+<li><code>scrollIntoView</code></li>
+</ul>
+<h2>Navigating</h2>
+<ul>
+<li><code>moveToNextChar</code>, <code>moveToPreviousChar</code></li>
+<li><code>moveToNextPlaceholder</code>, <code>moveToPreviousPlaceholder</code></li>
+<li><code>moveToNextWord</code>, <code>moveToPreviousWord</code></li>
+<li><code>moveToGroupStart</code>, <code>moveToGroupEnd</code></li>
+<li><code>moveToMathFieldStart</code>, <code>moveToMathFieldEnd</code></li>
+<li><code>moveUp</code>, <code>moveDown</code></li>
+<li><code>moveToSuperscript</code>, <code>moveToSubscript</code></li>
+<li><code>moveToOpposite</code></li>
+<li><code>moveBeforeParent</code>, <code>moveAfterParent</code></li>
+</ul>
+<h2>Extending the Selection</h2>
+<ul>
+<li><code>selectGroup</code></li>
+<li><code>selectAll</code></li>
+<li><code>extendToNextChar</code>, <code>extendToPreviousChar</code></li>
+<li><code>extendToNextWord</code>, <code>extendToPreviousWord</code></li>
+<li><code>extendUp</code>, <code>extendDown</code></li>
+<li><code>extendToNextBoundary</code>, <code>extendToPreviousBoundary</code></li>
+<li><code>extendToGroupStart</code>, <code>extendToGroupEnd</code></li>
+<li><code>extendToMathFieldStart</code>, <code>extendToMathFieldEnd</code></li>
+</ul>
+<h2>Arrays</h2>
+<ul>
+<li><code>addRowAfter</code>, <code>addRowBefore</code></li>
+<li><code>addColumnAfter</code>, <code>addColumnBefore</code></li>
+</ul>
+<h2>Speech</h2>
+<ul>
+<li><code>speak</code> This selector takes two arguments. The first argument is a string that
+determines what should be spoken. The valid values are:
+<ul>
+<li><code>all</code></li>
+<li><code>left</code></li>
+<li><code>right</code></li>
+<li><code>selection</code></li>
+<li><code>parent</code></li>
+<li><code>group</code> The second parameter determines whether what is being spoken should
+be highlighted. It is an object: <code>{withHighlighting: boolean}</code> (default is
+false). Note: highlighting currently only works when connected to Amazon’s
+AWS speech synthesizer.</li>
+</ul>
+</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 03, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:11:54 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

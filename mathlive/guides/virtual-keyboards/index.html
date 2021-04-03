@@ -1,106 +1,837 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js></script><script crossorigin=anonymous src=/assets/js/code-playground.js type=module></script><link href=/assets/css/main.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img alt=""src=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><span class=nav__sub-title>MathLive</span><ul><li><a href=/guides/mathfield-getting-started/ >Getting Started</a><li><a href=/docs/mathlive/ >SDK Reference</a></ul><li><span class=nav__sub-title>MathLive Guides</span><ul><li><a href=/mathlive/guides/introduction>Introduction</a><li><a href=/mathlive/guides/interacting>Interacting</a><li><a href=/mathlive/guides/customizing>Customize</a><li><a href=/mathlive/guides/commands>Commands</a><li><a href=/mathlive/guides/macros>Macros</a><li><a href=/mathlive/guides/shortcuts>Shortcuts</a><li><a href=/mathlive/guides/speech>Speech</a><li><a href=/mathlive/guides/static>Static</a><li><a href=/mathlive/guides/virtual-keyboards>Virtual Keyboards</a><li><a href=/mathlive/guides/lifecycle>Lifecycle</a></ul><li><a href=/math-json/ ><span class=nav__sub-title>MathJSON</span></a><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><script>moduleMap = {
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script>
+    moduleMap = {
         mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
-    };</script><h1>Virtual Keyboards</h1><p>Typing math formulas require access to many special symbols. While <a href=/mathlive/guides/shortcuts>keyboard shortcuts and inline shortcuts</a> can help, mobile devices require another solution. A virtual keyboard is a keyboard displayed on screen that can be customized with specialized symbols for math input.<p><img alt=""src=/assets/images/mathfield/virtual-keyboard.png><p>The mathfield virtual keyboard panel can display multiple keyboards. The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>, <strong>roman letters</strong> and <strong>greek letters</strong>.<p>These keyboards include the most common math symbols and they can be customized to fit your specific needs. For example you can remove some keyboards, or create new ones.<p>Touch and hold a key to display variants related to the key. Not all keys have variants, though.<p><img alt=""src=/assets/images/mathfield/alt-keys.png class=max-w-md><p><img alt=""src=/assets/images/mathfield/more-alt-keys.png class=max-w-md><h2>Controlling when the virtual keyboard panel is displayed</h2><p>The default behavior of the virtual keyboard panel is to only be displayed on touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when a matfield is focused.<p><img alt=""src=/assets/images/mathfield/mobile-virtual-keyboard.png class=max-w-md><p>This behavior can be changed with the <code>virtualKeyboardMode</code> configuration property:<ul><li><code>"auto"</code>: this is the default behavior: on touch-enabled devices, show the virtual keyboard panel when the mathfield is focused, otherwise, don’t show it.<li><code>"manual"</code>: a toggle button to control the virtual keyboard panel is displayed in the mathfield<li><code>"onfocus"</code>: the virtual keyboard panel is displayed when the mathfield is focused<li><code>"off"</code>: never show the virtual keyboard panel</ul><p class=notice--info>There is only one virtual keyboard panel displayed at a time, but each mathfield can specify different virtual keyboard panel configurations.<h2>Customizing the appearance of the virtual keyboard toggle</h2><p>By specifying a CSS rule for the <code>.ML__virtual-keyboard-toggle</code> selector the appearance of the virtual keyboard toggle can be modified.<p class=notice--warning>Make sure the rule has sufficient CSS specificity to be applied. Add a <code>!important</code> directive or prefix the selector with the id of your mathfield.</p><code-playground class="m-lg w-full-lg"layout=stack><div slot=javascript>import MathLive from 'mathlive'; MathLive.makeMathField(document.getElementById('mathfield'), { virtualKeyboardMode: 'manual' });</div><div slot=html>&lt;style> .ML__virtual-keyboard-toggle { color: red !important; } &lt;/style> &lt;div id="mathfield">x=\frac{-b\pm \sqrt{b^2-4ac}}{2a} &lt;/div></div></code-playground><p>The icon of the virtual keyboard toggle can be changed using the <code>virtualKeyboardToggleGlyph</code> configuration property.</p><code-playground class="m-lg w-full-lg"layout=stack><div slot=javascript>import MathLive from 'mathlive'; MathLive.makeMathField(document.getElementById('mathfield'), { virtualKeyboardMode: "manual", virtualKeyboardToggleGlyph: `&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path fill="currentColor" d="M192 288H32c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-29 140c3 3 3 8 0 12l-11 11c-4 3-9 3-12 0l-28-28-28 28c-3 3-8 3-12 0l-11-11c-3-4-3-9 0-12l28-28-28-28c-3-3-3-8 0-12l11-11c4-3 9-3 12 0l28 28 28-28c3-3 8-3 12 0l11 11c3 4 3 9 0 12l-28 28 28 28zM480 0H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8h-40v40c0 4-4 8-8 8h-16c-4 0-8-4-8-8v-40h-40c-4 0-8-4-8-8v-16c0-4 4-8 8-8h40V56c0-4 4-8 8-8h16c4 0 8 4 8 8v40h40c4 0 8 4 8 8v16zm16 168H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-16 152c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zm0-64c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zM192 0H32C14 0 0 14 0 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8H56c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16z"/>&lt;/svg>` });</div><div slot=html>&lt;style> div.ML__virtual-keyboard-toggle{ color: #555; } div.ML__virtual-keyboard-toggle:hover { background: transparent; color: var(--primary); box-shadow: none; } &lt;/style> &lt;div id="mathfield">x=\frac{-b\pm \sqrt{b^2-4ac}}{2a} &lt;/div></div></code-playground><h2>Changing the arrangement of alphabetical keys</h2><p>By default, the layout of the alphabetic virtual keyboard is determined based on the locale (QWERTY for english speaking countries, AZERTY for french speaking countries, etc…).<p>To select a different alphabetic keyboard layouts, such as DVORAK and COLEMAK, use the <code>virtualKeyboardLayout</code> configuration property.</p><code-playground class="m-lg w-full-lg"layout=stack><div slot=javascript>import MathLive from 'mathlive'; MathLive.makeMathField(document.getElementById('mathfield'), { virtualKeyboardMode: "manual", virtualKeyboardLayout: 'dvorak' });</div><div slot=html>&lt;div id="mathfield">x=\frac{-b\pm \sqrt{b^2-4ac}}{2a} &lt;/div></div></code-playground><h2>Controling which keyboards are displayed</h2><p>The virtual keyboard panel displays multiple keyboards which can be toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code> and <code>greek</code>.<p>To choose which keyboards are available, use the <code>virtualKeyboards</code> configuration property. The value of this property is a space-separated string of the name of the keyboards that should be displayed.</p><code-playground class="m-lg w-full-lg"layout=stack><div slot=javascript>import MathLive from 'mathlive'; MathLive.makeMathField(document.getElementById('mathfield'), { virtualKeyboardMode: "manual", virtualKeyboards: 'numeric symbols' });</div><div slot=html>&lt;div id="mathfield">x=\frac{-b\pm \sqrt{b^2-4ac}}{2a} &lt;/div></div></code-playground><h2>Defining custom keyboards</h2><p>A keyboard is made up of one or more “layers”. A keyboard layer is a set of keys that can be toggled using another key. For example, the <code>roman</code> keyboard has a regular layer and a layer for symbols. Most keyboards have a single layer.<h2>JSON keyboard layout</h2><p>Virtual Keyboards can be defined with a JSON structure.<p>First, let’s define a layer, which we’ll call <code>"college-layer"</code>.<p>A layer is an array of rows, a row is an array of keycaps. Each keycap can have the following properties:<ul><li><p><code>class</code>: the CSS classes to style this keycap. The classes can be custom defined (see below about the <code>styles</code> layer property), or be one of the default ones:<ul><li><code>keycap</code>: a standard-width keycap, using the system font for its label<li><code>keycap tex</code>: a standard-width keycap, using the TeX font for its label<li><code>modifier</code>: a modifier (shift/option, etc…) keycap<li><code>keycap small</code>: display the label in a smaller size<li><code>action</code>: an “action” keycap (for arrows, return, etc…)<li><code>separator w5</code>: a half-width blank used as a separator. Other widths include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used for the space bar).<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</ul><li><p><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided, the <code>latex</code><li><p><code>latex</code>: a Latex fragment used as a label<li><p><code>key</code>: a key, such as “9”<li><p><code>aside</code>: an optional small label displayed below the keycap. This label may not be displayed if the space available is too small.<li><p><code>insert</code>: a Latex fragment to insert when the keycap is pressed<li><p><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is long-pressed.<li><p><code>command</code>: the command to perform when the keycap is pressed.<li><p><code>shifted</code>: the HTML markup to display as the label of the keycap when the shift key is pressed<li><p><code>shiftedCommand</code>: the command to perform when the keycap is pressed with the shift key.</ul><p>The following properties, in order, are used to determine how to display they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.<p>When the keycap is pressed, the following properties are used, in order, to determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.<p>To associate a CSS stylesheet with this layer, use the <code>styles</code> property of the layer.<p>The appearance of the layer can be further customized by providing a CSS class name for the <code>backdrop</code> and <code>container</code> properties of the layer.<pre><code class=language-js>    <span class=hljs-keyword>const</span> COLLEGE_KEYBOARD_LAYER = {
-      <span class=hljs-string>"college-layer"</span>: {
-        <span class=hljs-attr>rows</span>: [
+    };
+</script>
+<h1>Virtual Keyboards</h1>
+<p>Typing math formulas require access to many special symbols. While <a href="/mathlive/guides/shortcuts">keyboard
+shortcuts and inline shortcuts</a> can help, mobile devices require another
+solution. A virtual keyboard is a keyboard displayed on screen that can be
+customized with specialized symbols for math input.</p>
+<p><img src="/assets/images/mathfield/virtual-keyboard.png" alt=""></p>
+<p>The mathfield virtual keyboard panel can display multiple keyboards.
+The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>,
+<strong>roman letters</strong> and <strong>greek letters</strong>.</p>
+<p>These keyboards  include the most common math symbols and
+they can be customized to fit your specific needs. For example you can remove
+some keyboards, or create new ones.</p>
+<p>Touch and hold a key to display variants related to the key. Not all keys have
+variants, though.</p>
+<p><img src="/assets/images/mathfield/alt-keys.png" alt="" class="max-w-md"></p>
+<p><img src="/assets/images/mathfield/more-alt-keys.png" alt="" class="max-w-md"></p>
+<h2>Controlling when the virtual keyboard panel is displayed</h2>
+<p>The default behavior of the virtual keyboard panel is to only be displayed on
+touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
+a matfield is focused.</p>
+<p><img src="/assets/images/mathfield/mobile-virtual-keyboard.png" alt="" class="max-w-md"></p>
+<p>This behavior can be changed with the <code>virtualKeyboardMode</code> configuration property:</p>
+<ul>
+<li><code>&quot;auto&quot;</code>:  this is the default behavior: on touch-enabled devices, show the
+virtual keyboard panel when the mathfield is focused, otherwise, don’t show it.</li>
+<li><code>&quot;manual&quot;</code>: a toggle button to control the virtual keyboard panel is displayed in the
+mathfield</li>
+<li><code>&quot;onfocus&quot;</code>: the virtual keyboard panel is displayed when the mathfield is focused</li>
+<li><code>&quot;off&quot;</code>: never show the virtual keyboard panel</li>
+</ul>
+<p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
+can specify different virtual keyboard panel configurations.</p>
+<h2>Customizing the appearance of the virtual keyboard toggle</h2>
+<p>By specifying a CSS rule for the <code>.ML__virtual-keyboard-toggle</code> selector the
+appearance of the virtual keyboard toggle can be modified.</p>
+<p class="notice--warning">Make sure the rule has sufficient CSS specificity to be applied. Add a <code>!important</code>
+directive or prefix the selector with the id of your mathfield.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'),  {
+  virtualKeyboardMode: 'manual'
+});
+</div>
+    <div slot="html">&lt;style&gt;
+  .ML__virtual-keyboard-toggle {
+    color: red !important;
+  }
+&lt;/style&gt;
+&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<p>The icon of the virtual keyboard toggle can be changed using the <code>virtualKeyboardToggleGlyph</code>
+configuration property.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'),  {
+  virtualKeyboardMode: "manual",
+  virtualKeyboardToggleGlyph: `&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path fill="currentColor" d="M192 288H32c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-29 140c3 3 3 8 0 12l-11 11c-4 3-9 3-12 0l-28-28-28 28c-3 3-8 3-12 0l-11-11c-3-4-3-9 0-12l28-28-28-28c-3-3-3-8 0-12l11-11c4-3 9-3 12 0l28 28 28-28c3-3 8-3 12 0l11 11c3 4 3 9 0 12l-28 28 28 28zM480 0H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8h-40v40c0 4-4 8-8 8h-16c-4 0-8-4-8-8v-40h-40c-4 0-8-4-8-8v-16c0-4 4-8 8-8h40V56c0-4 4-8 8-8h16c4 0 8 4 8 8v40h40c4 0 8 4 8 8v16zm16 168H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-16 152c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zm0-64c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zM192 0H32C14 0 0 14 0 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8H56c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16z"/&gt;&lt;/svg&gt`
+});
+</div>
+    <div slot="html">&lt;style&gt;
+  div.ML__virtual-keyboard-toggle{
+    color: #555;
+  }
+  div.ML__virtual-keyboard-toggle:hover {
+    background: transparent;
+    color: var(--primary);
+    box-shadow:  none;
+  }
+&lt;/style&gt;
+&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<h2>Changing the arrangement of alphabetical keys</h2>
+<p>By default, the layout of the alphabetic virtual keyboard is determined based
+on the locale (QWERTY for english speaking countries, AZERTY for french speaking
+countries, etc…).</p>
+<p>To select a different alphabetic keyboard layouts, such as DVORAK and COLEMAK,
+use the <code>virtualKeyboardLayout</code> configuration property.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'),  {
+  virtualKeyboardMode: "manual",
+  virtualKeyboardLayout: 'dvorak'
+});
+</div>
+    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<h2>Controling which keyboards are displayed</h2>
+<p>The virtual keyboard panel displays multiple keyboards which can be
+toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
+and <code>greek</code>.</p>
+<p>To choose which keyboards are available, use the <code>virtualKeyboards</code>
+configuration property. The value of this property is a space-separated string
+of the name of the keyboards that should be displayed.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'),  {
+  virtualKeyboardMode: "manual",
+  virtualKeyboards: 'numeric symbols'
+});
+</div>
+    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<h2>Defining custom keyboards</h2>
+<p>A keyboard is made up of one or more “layers”. A keyboard layer is a set of
+keys that can be toggled using another key. For example, the <code>roman</code> keyboard
+has a regular layer and a layer for symbols. Most keyboards have a single layer.</p>
+<h2>JSON keyboard layout</h2>
+<p>Virtual Keyboards can be defined with a JSON structure.</p>
+<p>First, let’s define a layer, which we’ll call <code>&quot;college-layer&quot;</code>.</p>
+<p>A layer is an array of rows, a row is an array of keycaps. Each keycap
+can have the following properties:</p>
+<ul>
+<li>
+<p><code>class</code>: the CSS classes to style this keycap. The classes can be custom
+defined (see below about the <code>styles</code> layer property), or be one of the default
+ones:</p>
+<ul>
+<li><code>keycap</code>: a standard-width keycap, using the system font for its label</li>
+<li><code>keycap tex</code>: a standard-width keycap, using the TeX font for its label</li>
+<li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
+<li><code>keycap small</code>: display the label in a smaller size</li>
+<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
+<li><code>separator w5</code>: a half-width blank used as a separator. Other widths
+include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
+for the space bar).</li>
+<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
+</ul>
+</li>
+<li>
+<p><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
+the <code>latex</code></p>
+</li>
+<li>
+<p><code>latex</code>: a Latex fragment used as a label</p>
+</li>
+<li>
+<p><code>key</code>: a key, such as “9”</p>
+</li>
+<li>
+<p><code>aside</code>: an optional small label displayed below the keycap. This label
+may not be displayed if the space available is too small.</p>
+</li>
+<li>
+<p><code>insert</code>: a Latex fragment to insert when the keycap is pressed</p>
+</li>
+<li>
+<p><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
+long-pressed.</p>
+</li>
+<li>
+<p><code>command</code>: the command to perform when the keycap is pressed.</p>
+</li>
+<li>
+<p><code>shifted</code>: the HTML markup to display as the label of the keycap when the
+shift key is pressed</p>
+</li>
+<li>
+<p><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
+the shift key.</p>
+</li>
+</ul>
+<p>The following properties, in order, are used to determine how to display
+they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
+<p>When the keycap is pressed, the following properties are used, in order, to
+determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.</p>
+<p>To associate a CSS stylesheet with this layer, use the <code>styles</code> property of the
+layer.</p>
+<p>The appearance of the layer can be further customized by providing a CSS class
+name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
+<pre><code class="language-js">    <span class="hljs-keyword">const</span> COLLEGE_KEYBOARD_LAYER = {
+      <span class="hljs-string">&quot;college-layer&quot;</span>: {
+        <span class="hljs-attr">rows</span>: [
           [
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>a&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>x&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>key</span>: <span class=hljs-string>"7"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"8"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"9"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"\\div"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;a&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;x&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;9&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>,
-              <span class=hljs-attr>insert</span>: <span class=hljs-string>"$$#@^{2}$$"</span>,
-              <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;span>&lt;i>x&lt;/i>&ampthinsp;²&lt;/span>"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{2}$$&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>
             },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>,
-              <span class=hljs-attr>insert</span>: <span class=hljs-string>"$$#@^{}$$"</span>,
-              <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;span>&lt;i>x&lt;/i>&lt;sup>&ampthinsp;&lt;i>n&lt;/i>&lt;/sup>&lt;/span>"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{}$$&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;&amp;thinsp;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;&lt;/span&gt;&quot;</span>
             },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>,
-              <span class=hljs-attr>insert</span>: <span class=hljs-string>"$$\\sqrt{#0}$$"</span>,
-              <span class=hljs-attr>latex</span>: <span class=hljs-string>"\\sqrt{#0}"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$\\sqrt{#0}$$&quot;</span>,
+              <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>
             }
           ],
           [
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>b&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>y&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"4"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"6"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"\\times"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"\\frac{#0}{#0}"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w6"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w6"</span> }
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;b&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;y&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;4&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;6&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w6&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w6&quot;</span> }
           ],
           [
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>c&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;i>z&lt;/i>"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"1"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"2"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"3"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"-"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w6"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w6"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w6"</span> }
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;1&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;2&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;3&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w6&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w6&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w6&quot;</span> }
           ],
           [
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>"("</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>label</span>: <span class=hljs-string>")"</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;(&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;)&quot;</span> },
 
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"0"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>","</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap tex"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"\\pi"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"keycap"</span>, <span class=hljs-attr>latex</span>: <span class=hljs-string>"+"</span> },
-            { <span class=hljs-attr>class</span>: <span class=hljs-string>"separator w5"</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;0&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;,&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"action"</span>,
-              <span class=hljs-attr>command</span>: [<span class=hljs-string>"performWithFeedback"</span>, <span class=hljs-string>"moveToPreviousChar"</span>],
-              <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;svg>&lt;use xlink:href='#svg-arrow-left' />&lt;/svg>"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>],
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>
             },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"action"</span>,
-              <span class=hljs-attr>command</span>: [<span class=hljs-string>"performWithFeedback"</span>, <span class=hljs-string>"moveToNextChar"</span>],
-              <span class=hljs-attr>label</span>: <span class=hljs-string>"&lt;svg>&lt;use xlink:href='#svg-arrow-right' />&lt;/svg>"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToNextChar&quot;</span>],
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-right&#x27; /&gt;&lt;/svg&gt;&quot;</span>
             },
             {
-              <span class=hljs-attr>class</span>: <span class=hljs-string>"action font-glyph bottom right"</span>,
-              <span class=hljs-attr>command</span>: [<span class=hljs-string>"performWithFeedback"</span>, <span class=hljs-string>"deleteBackward"</span>],
-              <span class=hljs-attr>label</span>: <span class=hljs-string>"&amp#x232b;"</span>
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action font-glyph bottom right&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;deleteBackward&quot;</span>],
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&amp;#x232b;&quot;</span>
             }
           ]
         ]
       }
     };
     
-</code></pre><pre><code class=language-js>  <span class=hljs-string>"customVirtualKeyboards"</span>: {
-  <span class=hljs-string>"keyboard-name"</span>: {
-    <span class=hljs-string>"label"</span>: <span class=hljs-string>"College"</span>, <span class=hljs-comment>// Label displayed in the Virtual Keyboard Switcher</span>
-    <span class=hljs-string>"tooltip"</span>: <span class=hljs-string>"College Level"</span>, <span class=hljs-comment>// Tooltip when hovering over the label</span>
-    <span class=hljs-string>"layer"</span>: <span class=hljs-string>"layer-name"</span>
+</code></pre>
+<pre><code class="language-js">  <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: {
+  <span class="hljs-string">&quot;keyboard-name&quot;</span>: {
+    <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;College&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
+    <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;College Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
+    <span class="hljs-string">&quot;layer&quot;</span>: <span class="hljs-string">&quot;layer-name&quot;</span>
   }
 }
-</code></pre><pre><code class=language-js><span class=hljs-keyword>const</span> COLLEGE_KEYBOARD = {
-  <span class=hljs-string>"college"</span>: {
-    <span class=hljs-string>"label"</span>: <span class=hljs-string>"College"</span>, <span class=hljs-comment>// Label displayed in the Virtual Keyboard Switcher</span>
-    <span class=hljs-string>"tooltip"</span>: <span class=hljs-string>"College Level"</span>, <span class=hljs-comment>// Tooltip when hovering over the label</span>
-    <span class=hljs-string>"layer"</span>: <span class=hljs-string>"layer-name"</span>
+</code></pre>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> COLLEGE_KEYBOARD = {
+  <span class="hljs-string">&quot;college&quot;</span>: {
+    <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;College&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
+    <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;College Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
+    <span class="hljs-string">&quot;layer&quot;</span>: <span class="hljs-string">&quot;layer-name&quot;</span>
   }
 }
-</code></pre><pre><code class=language-js>  <span class=hljs-string>"customVirtualKeyboardLayers"</span>: COLLEGE_KEYBOARD_LAYER
-  <span class=hljs-string>"customVirtualKeyboards"</span>: COLLEGE_KEYBOARD,
-  <span class=hljs-string>"virtualKeyboards"</span>: <span class=hljs-string>"college"</span>
+</code></pre>
+<pre><code class="language-js">  <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: COLLEGE_KEYBOARD_LAYER
+  <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: COLLEGE_KEYBOARD,
+  <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;college&quot;</span>
 }
-</code></pre><code-playground class="m-lg w-full-lg"layout=stack><div slot=javascript>import MathLive from 'mathlive'; MathLive.makeMathField(document.getElementById('mathfield'));</div><div slot=html>&lt;div id="mathfield" style=" font-size: 32px; padding: 8px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, .3); box-shadow: 0 0 8px rgba(0, 0, 0, .2)" >x=\frac{-b\pm \sqrt{b^2-4ac}}{2a} &lt;/div></div></code-playground><h2>See Also</h2><ul><li><a href=/docs/mathlive/ >MathLive SDK<span class=ml-sm><i class="fas fa-chevron-right navigation"></i><span></span></span></a></ul></section><footer class=page__meta><meta content="April 03, 2021"itemprop=datePublished><p class=page__date><strong><i class="fas fa-calendar-alt fa-fw"aria-hidden=true></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:02:37 GMT+0200 (Central European Summer Time)">April 03, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+</code></pre>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'));
+</div>
+    <div slot="html">&lt;div id="mathfield" style="
+        font-size: 32px; 
+        padding: 8px; 
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, .3); 
+        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
+&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<h2>See Also</h2>
+<ul>
+<li><a href="/docs/mathlive/">MathLive SDK<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 03, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:02:37 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

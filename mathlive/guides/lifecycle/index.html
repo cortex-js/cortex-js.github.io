@@ -1,19 +1,644 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js></script><script crossorigin=anonymous src=/assets/js/code-playground.js type=module></script><link href=/assets/css/main.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img alt=""src=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><span class=nav__sub-title>MathLive</span><ul><li><a href=/guides/mathfield-getting-started/ >Getting Started</a><li><a href=/docs/mathlive/ >SDK Reference</a></ul><li><span class=nav__sub-title>MathLive Guides</span><ul><li><a href=/mathlive/guides/introduction>Introduction</a><li><a href=/mathlive/guides/interacting>Interacting</a><li><a href=/mathlive/guides/customizing>Customize</a><li><a href=/mathlive/guides/commands>Commands</a><li><a href=/mathlive/guides/macros>Macros</a><li><a href=/mathlive/guides/shortcuts>Shortcuts</a><li><a href=/mathlive/guides/speech>Speech</a><li><a href=/mathlive/guides/static>Static</a><li><a href=/mathlive/guides/virtual-keyboards>Virtual Keyboards</a><li><a href=/mathlive/guides/lifecycle>Lifecycle</a></ul><li><a href=/math-json/ ><span class=nav__sub-title>MathJSON</span></a><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><script>moduleMap = {
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script>
+    moduleMap = {
         mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
-    };</script><h1>Web Component Lifecycle</h1><p>A mathfield web component goes through various stages during its lifecycle.<p>In most cases, this is something you don’t have to pay much attention to. Just remember these guidelines:<ul><li>Once a component is attached to the DOM attributes (key/value pairs attached to the <code>&lt;math-field></code> tag and properties (key/value pairs attached to a <code>MathfieldElement</code> object) are kept in sync, or <em>reflected</em>. You can also call the methods of <code>MathfieldElement</code> without limitations. You can be notified of this state by listening for a <code>mount</code> event on the element.<li>Before the component is attached to the DOM or even before the <code>MathfieldElement</code> class has been registered, you can still interact with the element, but with some limitations. The <code>value</code>, <code>selection</code>, <code>options</code> and <code>disabled</code> properties and related attributes are safe to set, but the values you read back may be different than once the component is mounted.</ul><h2>Initialization</h2><p>The element has been created from markup, but the code registering the <code>&lt;math-field></code> tag with the <code>MathfieldElement</code> class has not been executed yet. This could happen if the scripts are loaded in an unexpected order or if there is a temporary networking issue.<p>At this stage:<ul><li>you can read and change the <code>disabled</code>, <code>value</code>, <code>options</code>, <code>selection</code> and <code>position</code> properties on the element.</ul><pre><code class=language-javascript><span class=hljs-built_in>document</span>.querySelector(<span class=hljs-string>'math-field'</span>).value = <span class=hljs-string>'\\sin x'</span>;
-</code></pre><p>However, some of those properties behave in limited way. For example, the <code>options</code> property usually return the default value for the options. However, at this stage, it will only return the values you have set.<ul><li>you can change/add/remove attributes on the element. At this stage, the attributes and the properties are independent, so if you set for example the <code>virtual-keyboard-mode</code> attribute, it will not be reflected in `options.virtualKeyboardMode.<li>the only methods on the element that can be invoked are those of <code>HTMLElement</code> since the element has not been upgraded yet.</ul><p>To be notified when the registration takes place, use the <code>whenDefined()</code> method.<pre><code class=language-javascript>customElements.whenDefined(<span class=hljs-string>'math-field'</span>).then(<span class=hljs-function>() =></span> {
-  <span class=hljs-built_in>console</span>.log(<span class=hljs-string>'&lt;math-field> is defined'</span>);
+    };
+</script>
+<h1>Web Component Lifecycle</h1>
+<p>A mathfield web component goes through various stages during its lifecycle.</p>
+<p>In most cases, this is something you don’t have to pay much attention to. Just
+remember these guidelines:</p>
+<ul>
+<li>Once a component is attached to the DOM attributes (key/value pairs
+attached to the <code>&lt;math-field&gt;</code> tag and properties (key/value pairs attached
+to a <code>MathfieldElement</code> object) are kept in sync, or <em>reflected</em>. You can also
+call the methods of <code>MathfieldElement</code> without limitations. You can be notified
+of this state by listening for a <code>mount</code> event on the element.</li>
+<li>Before the component is attached to the DOM or even before the <code>MathfieldElement</code>
+class has been registered, you can still interact with the element, but with
+some limitations. The <code>value</code>, <code>selection</code>, <code>options</code> and <code>disabled</code> properties
+and related attributes are safe to set, but the values you read back may be
+different than once the component is mounted.</li>
+</ul>
+<h2>Initialization</h2>
+<p>The element has been created from markup, but the code registering
+the <code>&lt;math-field&gt;</code> tag with the <code>MathfieldElement</code> class has not been executed
+yet. This could happen if the scripts are loaded in an unexpected order or
+if there is a temporary networking issue.</p>
+<p>At this stage:</p>
+<ul>
+<li>you can read and change the <code>disabled</code>, <code>value</code>, <code>options</code>, <code>selection</code> and
+<code>position</code> properties on the element.</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&#x27;math-field&#x27;</span>).value = <span class="hljs-string">&#x27;\\sin x&#x27;</span>;
+</code></pre>
+<p>However, some of those properties behave in limited way. For example, the <code>options</code>
+property usually return the default value for the options. However, at this stage,
+it will only return the values you have set.</p>
+<ul>
+<li>you can change/add/remove attributes on the element. At this stage, the
+attributes and the properties are independent, so if you set for example the
+<code>virtual-keyboard-mode</code> attribute, it will not be reflected in
+`options.virtualKeyboardMode.</li>
+<li>the only methods on the element that can be invoked are those of <code>HTMLElement</code>
+since the element has not been upgraded yet.</li>
+</ul>
+<p>To be notified when the registration takes place, use the <code>whenDefined()</code> method.</p>
+<pre><code class="language-javascript">customElements.whenDefined(<span class="hljs-string">&#x27;math-field&#x27;</span>).then(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;&lt;math-field&gt; is defined&#x27;</span>);
 });
-</code></pre><p>If all goes well, the element will be constructed next.<h2>Constructed</h2><p>This stage occurs either after the previous one (i.e. an element created from markup) or when an element is created programmatically with <code>new MathfieldElement()</code>.<p>The <code>HTMLElement</code> object exist, but it is not yet attached to the DOM. You can interact with the object, but its operations are limited.<p>At this stage:<ul><li>you can read and change the properties as before. However, doing so will be reflected on attributes as well. That is calling <code>mf.setOptions({ virtualKeyboardMode: "manual"})</code> will result in <code>mf.getAttribute('virtual-keyboard-mode')</code> to return <code>"manual"</code>.<li>you can read and change the attributes as before, however they will now be reflected on properties as well, that is calling <code>mf.setAttribute('virtual-keyboard-mode', 'manual')</code> will result in <code>mf.getOption('virtualKeyboardMode')</code> to return <code>"manual"</code>.<li>you can change/add/remove attributes on the element<li>you can invoke all methods specific to <code>MathfieldElement</code>, however some may have some limitations. For example <code>setValue()</code> will ignore any options provided including formats other than Latex, <code>executeCommand()</code> will do nothing, etc… These commands required the element to be attached to the DOM to function properly.</ul><h2>Attached/Mounted</h2><p>This stage occurs after the previous one. The transition to this stage happens automatically for elements created from markup after the <code>MathfieldElement</code> class has been registered to handle the <code>&lt;math-field></code> tag. If the element was created programatically, this stage is reached when the element is explicitly attached to the DOM, for example using <code>appendChild()</code>.<p>At this stage:<ul><li>you can read and change properties and attributes and they will reflect each other (changing an attribute will update the corresponding property and vice versa).<li>you can invoke all properties of <code>MathfieldElement</code> without limitations</ul><p>To be notified when this stage is reached, listen for the <code>mount</code> event on the element:<pre><code class=language-javascript>md.addEventListener(<span class=hljs-string>'mount'</span>)(<span class=hljs-function>(<span class=hljs-params>ev</span>) =></span> {
-  <span class=hljs-built_in>console</span>.log(<span class=hljs-string>'mf is mounted'</span>);
-  <span class=hljs-comment>// You can now read default options value for example, or </span>
-  <span class=hljs-comment>//call `setValue()` with format options other than Latex.</span>
-  <span class=hljs-built_in>console</span>.log(ev.target.getOption(<span class=hljs-string>'macros'</span>));
+</code></pre>
+<p>If all goes well, the element will be constructed next.</p>
+<h2>Constructed</h2>
+<p>This stage occurs either after the previous one (i.e. an element created
+from markup) or when an element is created programmatically with <code>new MathfieldElement()</code>.</p>
+<p>The <code>HTMLElement</code> object exist, but it is not yet attached to the DOM. You can
+interact with the object, but its operations are limited.</p>
+<p>At this stage:</p>
+<ul>
+<li>you can read and change the properties as before. However, doing so will
+be reflected on attributes as well. That is calling <code>mf.setOptions({ virtualKeyboardMode: &quot;manual&quot;})</code>
+will result in <code>mf.getAttribute('virtual-keyboard-mode')</code> to return <code>&quot;manual&quot;</code>.</li>
+<li>you can read and change the attributes as before, however they will now
+be reflected on properties as well, that is calling <code>mf.setAttribute('virtual-keyboard-mode', 'manual')</code>
+will result in <code>mf.getOption('virtualKeyboardMode')</code> to return <code>&quot;manual&quot;</code>.</li>
+<li>you can change/add/remove attributes on the element</li>
+<li>you can invoke all methods specific to <code>MathfieldElement</code>, however some may
+have some limitations. For example <code>setValue()</code> will ignore any options provided
+including formats other than Latex, <code>executeCommand()</code> will do nothing, etc…
+These commands required the element to be attached to the DOM to function properly.</li>
+</ul>
+<h2>Attached/Mounted</h2>
+<p>This stage occurs after the previous one. The transition to this stage happens
+automatically for elements created from markup after the <code>MathfieldElement</code>
+class has been registered to handle the <code>&lt;math-field&gt;</code> tag. If the element
+was created programatically, this stage is reached when the element is explicitly
+attached to the DOM, for example using <code>appendChild()</code>.</p>
+<p>At this stage:</p>
+<ul>
+<li>you can read and change properties and attributes and they will reflect
+each other (changing an attribute will update the corresponding property and
+vice versa).</li>
+<li>you can invoke all properties of <code>MathfieldElement</code> without limitations</li>
+</ul>
+<p>To be notified when this stage is reached, listen for the <code>mount</code> event on
+the element:</p>
+<pre><code class="language-javascript">md.addEventListener(<span class="hljs-string">&#x27;mount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;mf is mounted&#x27;</span>);
+  <span class="hljs-comment">// You can now read default options value for example, or </span>
+  <span class="hljs-comment">//call `setValue()` with format options other than Latex.</span>
+  <span class="hljs-built_in">console</span>.log(ev.target.getOption(<span class="hljs-string">&#x27;macros&#x27;</span>));
 });
-</code></pre><h2>Detached/Unmounted</h2><p>This stage can be reached if the element is explicitly removed from the DOM, for example with <code>ChildNode.remove()</code>.<p>This stage is not reached when the page is closed: in that case the element is immediately disposed of.<p>Once this stage is reached, the same limitations as in the Constructed stage apply.<p>Note that the next stage could be either for element to be disposed of or to be re-attached.<p>To be notified when this stage is reached, listen for the <code>unmount</code> event on the element:<pre><code class=language-javascript>md.addEventListener(<span class=hljs-string>'unmount'</span>)(<span class=hljs-function>(<span class=hljs-params>ev</span>) =></span> {
-  <span class=hljs-built_in>console</span>.log(<span class=hljs-string>'mf is about to be unmounted'</span>);
-  <span class=hljs-comment>// Last change to interact with the mathfield</span>
-  <span class=hljs-built_in>console</span>.log(ev.target.getValue(<span class=hljs-string>'ASCIIMath'</span>));
+</code></pre>
+<h2>Detached/Unmounted</h2>
+<p>This stage can be reached if the element is explicitly removed from the DOM,
+for example with <code>ChildNode.remove()</code>.</p>
+<p>This stage is not reached when the page is closed: in that case the element
+is immediately disposed of.</p>
+<p>Once this stage is reached, the same limitations as in the Constructed stage
+apply.</p>
+<p>Note that the next stage could be either for element to be disposed of
+or to be re-attached.</p>
+<p>To be notified when this stage is reached, listen for the <code>unmount</code> event on
+the element:</p>
+<pre><code class="language-javascript">md.addEventListener(<span class="hljs-string">&#x27;unmount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;mf is about to be unmounted&#x27;</span>);
+  <span class="hljs-comment">// Last change to interact with the mathfield</span>
+  <span class="hljs-built_in">console</span>.log(ev.target.getValue(<span class="hljs-string">&#x27;ASCIIMath&#x27;</span>));
 });
-</code></pre><h2>Next</h2><dl><dt><a href=/mathlive/guides//customizing>Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></span></a><dd>How to customize the behavior and appearance of a mathfield.</dl></section><footer class=page__meta><meta content="October 11, 2020"itemprop=datePublished><p class=page__date><strong><i class="fas fa-calendar-alt fa-fw"aria-hidden=true></i> Updated:</strong> <time datetime="Sun Oct 11 2020 15:29:26 GMT+0200 (Central European Summer Time)">October 11, 2020</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+</code></pre>
+<h2>Next</h2>
+<dl>
+<dt><a href="/mathlive/guides//customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
+<dd>How to customize the behavior and appearance of a mathfield.</dd>
+</dl>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="October 11, 2020">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun Oct 11 2020 15:29:26 GMT+0200 (Central European Summer Time)">October 11, 2020</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,26 +1,755 @@
-<!doctype html><html class=no-js lang=en><meta charset=utf-8><title>CortexJS</title><meta content=""name=description><link href=/feed.xml rel=alternate title="CortexJS Feed"type=application/atom+xml><meta content="width=device-width,initial-scale=1"name=viewport><meta content=strict-origin name=referrer><script>document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';</script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js></script><script crossorigin=anonymous src=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js></script><script crossorigin=anonymous src=/assets/js/code-playground.js type=module></script><link href=/assets/css/main.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css rel=stylesheet><link href=/assets/js/ui.css rel=stylesheet><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"rel=stylesheet crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"rel=stylesheet crossorigin><script crossorigin=anonymous src=https://kit.fontawesome.com/523e3eb8bb.js></script><body class=layout--single><nav class=skip-links><h2 class=screen-reader-text>Skip links</h2><ul><li><a href=#site-nav class=screen-reader-shortcut>Skip to primary navigation</a><li><a href=#main class=screen-reader-shortcut>Skip to content</a><li><a href=#footer class=screen-reader-shortcut>Skip to footer</a></ul></nav><!--[if lt IE 9]><div class="notice--danger align-center"style=margin:0>You are using an <strong>outdated</strong> browser. Please <a href=https://browsehappy.com/ >upgrade your browser</a> to improve your experience.</div><![endif]--><div class=masthead><div class=masthead__inner-wrap><div class=masthead__menu><nav class=greedy-nav id=site-nav><a href=/ class=site-logo><img alt=""src=""></a><a href=/ class=site-title>Cortex<em>JS</em></a><ul class=visible-links><li class=masthead__menu-item><a href=/mathlive/ >MathLive</a><li class=masthead__menu-item><a href=/docs/ >Docs</a><li class=masthead__menu-item><a href=/funding/ >Funding</a><li class=masthead__menu-item><a href=https://gitter.im/cortex-js title="Chat on Gitter"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg></a><li class=masthead__menu-item><a href=https://github.com/cortex-js title="Get source code on GitHub"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg></a></ul><button class="hidden greedy-nav__toggle"type=button><span class=visually-hidden>Toggle menu</span><div class=navicon></div></button><ul class="hidden hidden-links"></ul></nav></div></div></div><div class=initial-content><div id=main role=main><div class="sidebar sticky"><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items><li><a href=/cortex/ ><span class=nav__sub-title>Cortex</span></a><li><a href=/guides/mathfield-getting-started/ ><span class=nav__sub-title>MathLive</span></a><li><span class=nav__sub-title>MathJSON</span><ul><li><a href=/math-json/ >Introduction</a><li><a href=/guides/math-json-format/ >MathJSON Format</a><li><a href=/docs/mathjson/ >SDK Reference</a><li><a href=/guides/math-json-dictionary/ >Dictionary</a></ul><li><span class=nav__sub-title>Compute Engine</span><ul><li><a href=/compute-engine/ >Introduction</a><li><a href=/docs/compute-engine/ >SDK Reference</a></ul><li><span class=nav__sub-title>Dictionary</span><ul><li><a href=/guides/compute-engine-arithmetic/ >Arithmetic</a><li><a href=/guides/compute-engine-calculus/ >Calculus</a><li><a href=/guides/compute-engine-core/ >Core</a><li><a href=/guides/compute-engine-domains/ class=active>Domains</a><li><a href=/guides/compute-engine-forms/ >Forms</a><li><a href=/guides/compute-engine-logic/ >Logic</a><li><a href=/guides/compute-engine-sets/ >Sets</a><li><a href=/guides/compute-engine-trigonometry/ >Trigonometry</a></ul><li><span class=nav__sub-title>Contributing</span><ul><li><a href=/docs/reporting-issues/ >Reporting Issues</a><li><a href=/funding/ >Funding</a><li><a href=/docs/code-of-conduct/ >Code of Conduct</a><li><a href=/docs/license/ >License</a></ul></ul></nav><nav class=nav__list><input id=ac-toc name=accordion-toc type=checkbox> <label for=ac-toc><svg class="fa-ellipsis-h svg-inline--fa"aria-hidden=true data-icon=ellipsis-h data-prefix=fal focusable=false role=img style=width:32px;height:32px viewBox="0 0 320 512"xmlns=http://www.w3.org/2000/svg><path d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"fill=currentColor></path></svg></label><ul class=nav__items></ul></nav></div><article class=page itemscope itemtype=https://schema.org/CreativeWork><div class=page__inner-wrap><header></header><section class=page__content itemprop=text><script type=module>import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.mjs';
-    renderMathInDocument();</script><h1>Domains</h1><p>A domain represents a set of values, such as <code>"Number"</code> or <code>"Boolean"</code>.<p>Domains are analogous to types in programming languages and are used to ensure that the arguments of functions are compatible. This information is also useful to select appropriate algorithms, and to optimized compiled expressions.<p>Domains can be defined as a union or intersection of domains:<pre><code class=language-json>[<span class=hljs-string>"Union"</span>, <span class=hljs-string>"Number"</span>, <span class=hljs-string>"Boolean"</span>][(<span class=hljs-string>"SetMinus"</span>, <span class=hljs-string>"Number"</span>, <span class=hljs-number>1</span>)] <span class=hljs-comment>//  A number or a boolean. // Any number except "1".</span>
-</code></pre><p>Parametric domains can be used as functions:<pre><code class=language-json>[<span class=hljs-string>"Number"</span>, <span class=hljs-number>0</span>, <span class=hljs-string>"+Infinity"</span>] <span class=hljs-comment>// Range of non-negative numbers</span>
-</code></pre><p>Parametric domains define a subset or ‘specialization’ of a domain. Not all domains are parametric, and the precise semantic of the parametric form depends on the domain.<p>For example, the <code>"Number"</code> parametric domain implies a result in <code>"ExtendedRealNumber"</code>, not <code>"ExtendedComplexNumber"</code>.<p>Domains are defined in a hierarchy (a lattice). The upper bound of the domain lattice is <code>"Anything"</code> and the lower bound is <code>"Nothing"</code>. The ‘parent’ of a domain represent a ‘is-a’/‘subset-of’ relationship, for example, a <code>"List"</code> “is-a” <code>"Collection"</code>.<p><img alt="Anything domains"src=/assets/domains.001.jpeg title="The top-level domains"> <img alt="Tensor domains"src=/assets/domains.002.jpeg title="The Tensor sub-domains"> <img alt="Function domains"src=/assets/domains.003.jpeg title="The Function sub-domains"> <img alt="Number domains"src=/assets/domains.004.jpeg title="The Number sub-domains"><p>The implementation of the CortexJS domains is based on <a href=https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties>Weibel, Trudy & Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749.</a><h2>Obtaining the Domain of an Expression</h2><p>To obtain the domain of an expression, use the <code>ComputeEngine.domain()</code> function.<pre><code class=language-js><span class=hljs-keyword>const</span> engine = <span class=hljs-keyword>new</span> ComputeEngine();
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
 
-engine.domain(<span class=hljs-string>'Pi'</span>);
-<span class=hljs-comment>// ➔ "TranscendentalNumber"</span>
 
-engine.domain(<span class=hljs-string>'Add'</span>);
-<span class=hljs-comment>// ➔ "Function": domain of the symbol "Add"</span>
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
 
-engine.domain([<span class=hljs-string>'Add'</span>, <span class=hljs-number>5</span>, <span class=hljs-number>2</span>]);
-<span class=hljs-comment>// ➔ "Number": the result of the "Add" function</span>
-<span class=hljs-comment>// (its codomain) in general is a "Number"</span>
 
-engine.domain(engine.evaluate([<span class=hljs-string>'Add'</span>, <span class=hljs-number>5</span>, <span class=hljs-number>2</span>]));
-<span class=hljs-comment>// ➔ "PrimeNumber"</span>
-</code></pre><h2>Convertion Domains to a Canonical Form</h2><p>Domains can be converted to a canonical form using the <code>'canonical-domain'</code> form.<pre><code class=language-js>format([<span class=hljs-string>'SetMinus'</span>, <span class=hljs-string>'RealNumber'</span>, <span class=hljs-string>'IrrationalNumber'</span>], <span class=hljs-string>'canonical-domain'</span>);
-<span class=hljs-comment>// ➔ "RationalNumber"</span>
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css">
+  
+    
+      
+    
+    <link rel="stylesheet" href="/assets/js/ui.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="/funding/" >Funding</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/guides/mathfield-getting-started/"><span class="nav__sub-title">MathLive</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathJSON</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/math-json/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathjson/" class="">SDK Reference</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-dictionary/" class="">Dictionary</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Compute Engine</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/compute-engine/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/compute-engine/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Dictionary</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-arithmetic/" class="">Arithmetic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-calculus/" class="">Calculus</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-core/" class="">Core</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-domains/" class="active">Domains</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-forms/" class="">Forms</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-logic/" class="">Logic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-sets/" class="">Sets</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-trigonometry/" class="">Trigonometry</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.mjs';
+    renderMathInDocument();
+</script>
+<h1>Domains</h1>
+<p>A domain represents a set of values, such as <code>&quot;Number&quot;</code> or <code>&quot;Boolean&quot;</code>.</p>
+<p>Domains are analogous to types in programming languages and are used to ensure
+that the arguments of functions are compatible. This information is also useful
+to select appropriate algorithms, and to optimized compiled expressions.</p>
+<p>Domains can be defined as a union or intersection of domains:</p>
+<pre><code class="language-json">[<span class="hljs-string">&quot;Union&quot;</span>, <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-string">&quot;Boolean&quot;</span>][(<span class="hljs-string">&quot;SetMinus&quot;</span>, <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-number">1</span>)] <span class="hljs-comment">//  A number or a boolean. // Any number except &quot;1&quot;.</span>
+</code></pre>
+<p>Parametric domains can be used as functions:</p>
+<pre><code class="language-json">[<span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&quot;+Infinity&quot;</span>] <span class="hljs-comment">// Range of non-negative numbers</span>
+</code></pre>
+<p>Parametric domains define a subset or ‘specialization’ of a domain. Not all
+domains are parametric, and the precise semantic of the parametric form depends
+on the domain.</p>
+<p>For example, the <code>&quot;Number&quot;</code> parametric domain implies a result in
+<code>&quot;ExtendedRealNumber&quot;</code>, not <code>&quot;ExtendedComplexNumber&quot;</code>.</p>
+<p>Domains are defined in a hierarchy (a lattice). The upper bound of the domain
+lattice is <code>&quot;Anything&quot;</code> and the lower bound is <code>&quot;Nothing&quot;</code>. The ‘parent’ of a
+domain represent a ‘is-a’/‘subset-of’ relationship, for example, a <code>&quot;List&quot;</code>
+“is-a” <code>&quot;Collection&quot;</code>.</p>
+<p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains">
+<img src="/assets/domains.002.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
+<img src="/assets/domains.003.jpeg" alt="Function domains" title="The Function sub-domains">
+<img src="/assets/domains.004.jpeg" alt="Number domains" title="The Number sub-domains"></p>
+<p>The implementation of the CortexJS domains is based on
+<a href="https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties">Weibel, Trudy &amp; Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749. </a></p>
+<h2>Obtaining the Domain of an Expression</h2>
+<p>To obtain the domain of an expression, use the <code>ComputeEngine.domain()</code>
+function.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> ComputeEngine();
+
+engine.domain(<span class="hljs-string">&#x27;Pi&#x27;</span>);
+<span class="hljs-comment">// ➔ &quot;TranscendentalNumber&quot;</span>
+
+engine.domain(<span class="hljs-string">&#x27;Add&#x27;</span>);
+<span class="hljs-comment">// ➔ &quot;Function&quot;: domain of the symbol &quot;Add&quot;</span>
+
+engine.domain([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
+<span class="hljs-comment">// ➔ &quot;Number&quot;: the result of the &quot;Add&quot; function</span>
+<span class="hljs-comment">// (its codomain) in general is a &quot;Number&quot;</span>
+
+engine.domain(engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]));
+<span class="hljs-comment">// ➔ &quot;PrimeNumber&quot;</span>
+</code></pre>
+<h2>Convertion Domains to a Canonical Form</h2>
+<p>Domains can be converted to a canonical form using the <code>'canonical-domain'</code>
+form.</p>
+<pre><code class="language-js">format([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;IrrationalNumber&#x27;</span>], <span class="hljs-string">&#x27;canonical-domain&#x27;</span>);
+<span class="hljs-comment">// ➔ &quot;RationalNumber&quot;</span>
 
 format(
-  [<span class=hljs-string>'Union'</span>, [<span class=hljs-string>'Number'</span>, <span class=hljs-number>0</span>, <span class=hljs-string>'+Infinity'</span>], [<span class=hljs-string>'Number'</span>, <span class=hljs-string>'-Infinity'</span>, <span class=hljs-number>5</span>]],
-  <span class=hljs-string>'canonical-domain'</span>
+  [<span class="hljs-string">&#x27;Union&#x27;</span>, [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;+Infinity&#x27;</span>], [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">5</span>]],
+  <span class="hljs-string">&#x27;canonical-domain&#x27;</span>
 );
-<span class=hljs-comment>// ➔ "ExtendedRealNumber"</span>
-</code></pre><h2>List of Domains</h2><h3><code>"Boolean"</code> and <code>"MaybeBoolean"</code></h3><p>A <code>"Boolean"</code> is either <code>"True"</code> or <code>"False"</code>.<p>A <code>"MaybeBoolean"</code> is a <code>"Boolean"</code> or <code>"Maybe"</code>.<h3><code>"String"</code> and <code>"Symbol"</code></h3><p><code>"String"</code> is the domain of all the strings.<p>A <code>"Symbol"</code> is a string used to represent the name of a constant, variable or function in a MathJSON expression.<h3><code>"Number"</code></h3><p>Any numerical value.<ul><li><code>"PrimeNumber"</code> - An integer that cannot be produced as the product of 2 or more integers.<li><code>"CompositeNumber"</code> - An integer that can be produced by the product of 2 or more integers.<li><code>"Integer"</code> $$= \mathbb{Z}$$. The set of whole numbers: $$0, 1, 2, 3\ldots$$ and their additive inverse: $$-1, -2, -3, \ldots$$.<li><code>"NumberZero"</code> - The number $$0$$: a composite number and an imaginary number.<li><code>"RationalNumber"</code> $$= \mathbb{Q}$$. A number which can be expressed as the quotient $$\frac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.<li><code>"RealNumber"</code> $$= \mathbb{R}$$.<li><code>"NaturalNumber"</code> $$= \mathbb{N}$$. Counting numbers, $$0, 1, 2, 3\ldots$$ Note that $$0$$ is included, following the convention from <a href=https://en.wikipedia.org/wiki/ISO_80000-2>ISO/IEC 80000</a>.<li><code>"IrrationalNumber"</code> $$= \mathbb{Q^{\prime}}$$. Numbers such as $$\sqrt{5}, \pi, \exponentialE$$ that cannot be written as a quotient of two integers.<li><code>"ImaginaryNumber"</code> - Any purely imaginary value (including zero).<li><code>"ComplexNumber"</code> $$= \mathbb{C}$$. A real or imaginary number</ul><h3><code>"Tensor"</code></h3><ul><li><code>"ComplexTensor"</code> - A tensor whose elements are complex numbers.<li><code>"RealTensor"</code> - A tensor whose elements are real numbers.<li><code>"IntegerTensor"</code> - A tensor whose elements are integers.<li><code>"LogicalTensor"</code> - A tensor whose elements are 0 or 1.<li><code>"Scalar"</code> - A tensor of rank 0.<li><code>"Vector"</code>, <code>"Row"</code>, <code>"Column"</code> - A tensor of rank 1. The argument of the parametric version specifies the number of elements in the vector.<li><code>"Matrix"</code> - A tensor of rank 2. The argument of the parametric version specifies the number of rows and columns in the matrix.<li><code>"Quaternion"</code> - A $$2\times2$$ matrix of complex elements. <a href=https://en.wikipedia.org/wiki/Quaternion>Quaternions</a> are commonly used to represent vectors in 3D space ($$\mathbb{R}^3$$).<li><code>"SquareMatrix"</code> - A tensor with the same number of rows and columns.<li><code>"MonomialMatrix"</code> - A square matrix with exactly one non-zero entry in each row and column.<li><code>"OrthogonalMatrix"</code> - A real square matrix whose transpose is equal to its inverse: $$Q^{\mathrm{T}}=Q^{-1}$$<li><code>"PermutationMatrix"</code> - A square matrix with with exactly one non-zero entry in each row and column.<li><code>"DiagonalMatrix"</code> - A matrix in which the elements outside the main diagonal are zero.<li><code>"IdentityMatrix"</code> - A diagonal matrix whose diagonal elements are 1.<li><code>"ZeroMatrix"</code> a matrix whose elements are 0.<li><code>"SymmetricMatrix"</code> - A real matrix that is equal to its transpose.<li><code>"HermitianMatrix"</code> - A complex matrix that is equal to its conjugate transpose.</ul><h3><code>"Function"</code></h3><p>A function maps some expressions, its arguments, to another expression.<ul><li><code>["Function", ...</code><em><code>arg-domain</code></em><code>,</code><em><code>co-domain</code></em><code>]</code> is the parametric version of the <code>"Function"</code> domain. For example, <code>["Function", "Number", "Boolean"]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<li><code>"ContinuousFunction"</code> - A <a href=https://en.wikipedia.org/wiki/Continuous_function>continuous function</a> is a function that has no abrupt change in value (no discontinuity). The <a href=https://en.wikipedia.org/wiki/Weierstrass_function>Weirestrass function</a> is continuous, but not differentiable.<li><code>"TranscendentalFunction"</code> - A function not expressible as a finite combination of the algebraic operations of addition, subtraction, multiplication, division, raising to a power, and extracting a root. Example: “Log”, “Sin”…<li><code>"AlgebraicFunction"</code> - A function that can be defined as the root of a polynomial equation.<li><code>"PeriodicFunction"</code> - A function that repeats its values at regular intervals.<li><code>"TrigonometricFunction"</code> - Real functions which relate an angle of a right-angled triangle to ratios of two side lengths<li><code>"HyperbolicFunction"</code><li><code>"MonotonicFunction"</code> - A function that is either entirely non-increasing, or entirely non-decreasing.<li><code>"StrictMonotonicFunction"</code><li><code>"DifferentiableFunction"</code> - A function whose derivative exists at each point in its domain.<li><code>"InfinitelyDifferentiableFunction"</code><li><code>"RationalFunction"</code> - A function that can be expressed as the ratio of two polynomials.<li><code>"PolynomialFunction"</code> - A function expressed only with the operations of addition, subtraction, multiplication, and non-negative integer exponentiation.<li><code>"QuadraticFunction"</code> - A function of the form $$f(x) = ax^2+ bx + c$$<li><code>"LinearFunction"</code> = $$f(x) = ax+ b$$ A function that is the product of an argument plus a constant.<li><code>"ConstantFunction"</code> - A function that always return the same value.<li><code>"MonotonicFunction"</code><li><code>"StrictMonotonicFunction"</code></ul><h3><code>"Predicate"</code> and <code>"LogicalFunction"</code></h3><p>A predicate is a function with a codomain of <code>MaybeBoolean</code>.<p>It may have one, two or more arguments of any domain.<p>A <code>LogicalFunction</code> is a predicate whose arguments are in the <code>MaybeBoolean</code> domain, for example the domain of <code>And</code> is <code>"LogicalFunction"</code>.<h3><code>"Domain"</code> and <code>"ParametricDomain"</code></h3><p>The domain of all the domains is <code>"Domain"</code>.<p><code>"ParametricDomain"</code> is the domain of all the parametric domains, that is the domains that can accept one or more parameters to define a more precise domain, for example <code>["Matrix", 5]</code> to define the domain of 5x5 matrices.</section><footer class=page__meta><meta content="April 03, 2021"itemprop=datePublished><p class=page__date><strong><i aria-hidden=true class="fa-calendar-alt fa-fw fas"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 22:19:45 GMT+0200 (Central European Summer Time)">April 03, 2021</time></footer></div></article></div></div><div class=page__footer id=footer><footer><div class=page__footer-follow><ul class=social-icons><li><a href=https://github.com/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#github></use></svg>GitHub</a><li><a href=https://gitter.im/cortex-js rel="nofollow noopener noreferrer"><svg class=icon1em><use role=none xlink:href=/assets/icons.svg#gitter></use></svg>Gitter</a></ul></div><div class=page__footer-pages><ul><li><a href=/about rel="nofollow noopener noreferrer">About Us</a></ul></div></footer></div>
+<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
+</code></pre>
+<h2>List of Domains</h2>
+<h3><code>&quot;Boolean&quot;</code> and <code>&quot;MaybeBoolean&quot;</code></h3>
+<p>A <code>&quot;Boolean&quot;</code> is either <code>&quot;True&quot;</code> or <code>&quot;False&quot;</code>.</p>
+<p>A <code>&quot;MaybeBoolean&quot;</code> is a <code>&quot;Boolean&quot;</code> or <code>&quot;Maybe&quot;</code>.</p>
+<h3><code>&quot;String&quot;</code> and <code>&quot;Symbol&quot;</code></h3>
+<p><code>&quot;String&quot;</code> is the domain of all the strings.</p>
+<p>A <code>&quot;Symbol&quot;</code> is a string used to represent the name of a constant, variable or
+function in a MathJSON expression.</p>
+<h3><code>&quot;Number&quot;</code></h3>
+<p>Any numerical value.</p>
+<ul>
+<li><code>&quot;PrimeNumber&quot;</code> - An integer that cannot be produced as the product of 2 or
+more integers.</li>
+<li><code>&quot;CompositeNumber&quot;</code> - An integer that can be produced by the product of 2 or
+more integers.</li>
+<li><code>&quot;Integer&quot;</code> $$= \mathbb{Z}$$. The set of whole numbers: $$0, 1, 2, 3\ldots$$
+and their additive inverse: $$-1, -2, -3, \ldots$$.</li>
+<li><code>&quot;NumberZero&quot;</code> - The number $$0$$: a composite number and an imaginary number.</li>
+<li><code>&quot;RationalNumber&quot;</code> $$= \mathbb{Q}$$. A number which can be expressed as the
+quotient $$\frac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.</li>
+<li><code>&quot;RealNumber&quot;</code> $$= \mathbb{R}$$.</li>
+<li><code>&quot;NaturalNumber&quot;</code> $$= \mathbb{N}$$. Counting numbers, $$0, 1, 2, 3\ldots$$
+Note that $$0$$ is included, following the convention from
+<a href="https://en.wikipedia.org/wiki/ISO_80000-2">ISO/IEC 80000</a>.</li>
+<li><code>&quot;IrrationalNumber&quot;</code> $$= \mathbb{Q^{\prime}}$$. Numbers such as
+$$\sqrt{5}, \pi, \exponentialE$$ that cannot be written as a quotient of two
+integers.</li>
+<li><code>&quot;ImaginaryNumber&quot;</code> - Any purely imaginary value (including zero).</li>
+<li><code>&quot;ComplexNumber&quot;</code> $$= \mathbb{C}$$. A real or imaginary number</li>
+</ul>
+<h3><code>&quot;Tensor&quot;</code></h3>
+<ul>
+<li><code>&quot;ComplexTensor&quot;</code> - A tensor whose elements are complex numbers.</li>
+<li><code>&quot;RealTensor&quot;</code> - A tensor whose elements are real numbers.</li>
+<li><code>&quot;IntegerTensor&quot;</code> - A tensor whose elements are integers.</li>
+<li><code>&quot;LogicalTensor&quot;</code> - A tensor whose elements are 0 or 1.</li>
+<li><code>&quot;Scalar&quot;</code> - A tensor of rank 0.</li>
+<li><code>&quot;Vector&quot;</code>, <code>&quot;Row&quot;</code>, <code>&quot;Column&quot;</code> - A tensor of rank 1. The argument of the
+parametric version specifies the number of elements in the vector.</li>
+<li><code>&quot;Matrix&quot;</code> - A tensor of rank 2. The argument of the parametric version
+specifies the number of rows and columns in the matrix.</li>
+<li><code>&quot;Quaternion&quot;</code> - A $$2\times2$$ matrix of complex elements.
+<a href="https://en.wikipedia.org/wiki/Quaternion">Quaternions</a> are commonly used to
+represent vectors in 3D space ($$\mathbb{R}^3$$).</li>
+<li><code>&quot;SquareMatrix&quot;</code> - A tensor with the same number of rows and columns.</li>
+<li><code>&quot;MonomialMatrix&quot;</code> - A square matrix with exactly one non-zero entry in each
+row and column.</li>
+<li><code>&quot;OrthogonalMatrix&quot;</code> - A real square matrix whose transpose is equal to its
+inverse: $$Q^{\mathrm{T}}=Q^{-1}$$</li>
+<li><code>&quot;PermutationMatrix&quot;</code> - A square matrix with with exactly one non-zero entry
+in each row and column.</li>
+<li><code>&quot;DiagonalMatrix&quot;</code> - A matrix in which the elements outside the main diagonal
+are zero.</li>
+<li><code>&quot;IdentityMatrix&quot;</code> - A diagonal matrix whose diagonal elements are 1.</li>
+<li><code>&quot;ZeroMatrix&quot;</code> a matrix whose elements are 0.</li>
+<li><code>&quot;SymmetricMatrix&quot;</code> - A real matrix that is equal to its transpose.</li>
+<li><code>&quot;HermitianMatrix&quot;</code> - A complex matrix that is equal to its conjugate
+transpose.</li>
+</ul>
+<h3><code>&quot;Function&quot;</code></h3>
+<p>A function maps some expressions, its arguments, to another expression.</p>
+<ul>
+<li><code>[&quot;Function&quot;, ...</code><em><code>arg-domain</code></em><code>, </code><em><code>co-domain</code></em><code>]</code> is the parametric version
+of the <code>&quot;Function&quot;</code> domain. For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code>
+is the domain of the functions that have a single argument, a number, and
+return a boolean (has a boolean codomain).</li>
+<li><code>&quot;ContinuousFunction&quot;</code> - A
+<a href="https://en.wikipedia.org/wiki/Continuous_function">continuous function</a> is a
+function that has no abrupt change in value (no discontinuity). The
+<a href="https://en.wikipedia.org/wiki/Weierstrass_function">Weirestrass function</a> is
+continuous, but not differentiable.</li>
+<li><code>&quot;TranscendentalFunction&quot;</code> - A function not expressible as a finite
+combination of the algebraic operations of addition, subtraction,
+multiplication, division, raising to a power, and extracting a root. Example:
+“Log”, “Sin”…</li>
+<li><code>&quot;AlgebraicFunction&quot;</code> - A function that can be defined as the root of a
+polynomial equation.</li>
+<li><code>&quot;PeriodicFunction&quot;</code> - A function that repeats its values at regular
+intervals.</li>
+<li><code>&quot;TrigonometricFunction&quot;</code> - Real functions which relate an angle of a
+right-angled triangle to ratios of two side lengths</li>
+<li><code>&quot;HyperbolicFunction&quot;</code></li>
+<li><code>&quot;MonotonicFunction&quot;</code> - A function that is either entirely non-increasing, or
+entirely non-decreasing.</li>
+<li><code>&quot;StrictMonotonicFunction&quot;</code></li>
+<li><code>&quot;DifferentiableFunction&quot;</code> - A function whose derivative exists at each point
+in its domain.</li>
+<li><code>&quot;InfinitelyDifferentiableFunction&quot;</code></li>
+<li><code>&quot;RationalFunction&quot;</code> - A function that can be expressed as the ratio of two
+polynomials.</li>
+<li><code>&quot;PolynomialFunction&quot;</code> - A function expressed only with the operations of
+addition, subtraction, multiplication, and non-negative integer
+exponentiation.</li>
+<li><code>&quot;QuadraticFunction&quot;</code> - A function of the form $$f(x) = ax^2+ bx + c$$</li>
+<li><code>&quot;LinearFunction&quot;</code> = $$f(x) = ax+ b$$ A function that is the product of an
+argument plus a constant.</li>
+<li><code>&quot;ConstantFunction&quot;</code> - A function that always return the same value.</li>
+<li><code>&quot;MonotonicFunction&quot;</code></li>
+<li><code>&quot;StrictMonotonicFunction&quot;</code></li>
+</ul>
+<h3><code>&quot;Predicate&quot;</code> and <code>&quot;LogicalFunction&quot;</code></h3>
+<p>A predicate is a function with a codomain of <code>MaybeBoolean</code>.</p>
+<p>It may have one, two or more arguments of any domain.</p>
+<p>A <code>LogicalFunction</code> is a predicate whose arguments are in the <code>MaybeBoolean</code>
+domain, for example the domain of <code>And</code> is <code>&quot;LogicalFunction&quot;</code>.</p>
+<h3><code>&quot;Domain&quot;</code> and <code>&quot;ParametricDomain&quot;</code></h3>
+<p>The domain of all the domains is <code>&quot;Domain&quot;</code>.</p>
+<p><code>&quot;ParametricDomain&quot;</code> is the domain of all the parametric domains, that is the
+domains that can accept one or more parameters to define a more precise domain,
+for example <code>[&quot;Matrix&quot;, 5]</code> to define the domain of 5x5 matrices.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 03, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 23:14:42 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
