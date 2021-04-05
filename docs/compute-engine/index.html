@@ -96,8 +96,6 @@
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
-              <a href="/funding/" >Funding</a>
-            </li><li class="masthead__menu-item">
               <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
             </li><li class="masthead__menu-item">
               <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
@@ -924,7 +922,7 @@ transformations.</p>
 </div>
 
 </section>
-<section data-keywords="function, format" id="(format%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(format%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Transform an expression by applying one or more rewriting rules to it,
+<section data-keywords="function, format" id="(format%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(format%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Transform an expression by applying one or more rewriting rules to it,
 recursively.</p>
 
 <p>There are many ways to symbolically manipulate an expression, but
@@ -972,7 +970,7 @@ for example subtraction is replaced with addition</li>
 </section>
 
 
-<section><section id="(ComputeEngine%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
+<section><section id="(ComputeEngine%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
 <div></div>
 <p>For best performance when calling repeatedly <code>format()</code> or <code>evaluate()</code>,
 create an instance of <code>ComputeEngine</code> and call its methods. The constructor
@@ -981,7 +979,7 @@ the <code>format()</code> and <code>evaluate()</code> methods will bypass that s
 invoking the <code>format()</code> and <code>evaluate()</code> functions will compile the
 dictionary each time they are called.</p>
 
-<section><section data-keywords="new computeengine" id="ComputeEngine%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#ComputeEngine%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Construct a new ComputeEngine environment.</p>
+<section><section data-keywords="new computeengine" id="ComputeEngine%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#ComputeEngine%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Construct a new ComputeEngine environment.</p>
 
 <p>If no <code>options.dictionaries</code> is provided a default set of dictionaries
 will be used. The <code>ComputeEngine.getDictionaries()</code> method can be called
@@ -1058,7 +1056,7 @@ as domains (‘Boolean’, ‘Number’, etc…) that are used by later dictiona
 </ul>
 
 </div>
-<section data-keywords="function, canonical" id="(ComputeEngine%3Aclass).(canonical%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>canonical</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(canonical%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression to the canonical form.</p>
+<section data-keywords="function, canonical" id="(ComputeEngine%3Aclass).(canonical%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>canonical</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(canonical%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression to the canonical form.</p>
 
 <p>In the canonical form, some operations are simplified (subtractions
 becomes additions of negative, division become multiplications of inverse,
@@ -1089,7 +1087,7 @@ subsequent operations easier.</p>
 </div>
 
 </section>
-<section data-keywords="function, domain" id="(ComputeEngine%3Aclass).(domain%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(domain%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the domain of the expression</p>
+<section data-keywords="function, domain" id="(ComputeEngine%3Aclass).(domain%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(domain%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the domain of the expression</p>
 
 
 <div>
@@ -1147,7 +1145,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, format" id="(ComputeEngine%3Aclass).(format%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(format%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression according to the specified forms.</p>
+<section data-keywords="function, format" id="(ComputeEngine%3Aclass).(format%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(format%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression according to the specified forms.</p>
 
 <p>If no form is provided, the expression is formatted with the ‘canonical’
 form.</p>
@@ -1181,7 +1179,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, getdefinition" id="(ComputeEngine%3Aclass).(getDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getdefinition" id="(ComputeEngine%3Aclass).(getDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getDefinition</strong><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(FunctionDefinition%3Atype)">FunctionDefinition</a></div>
@@ -1229,7 +1227,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, getsetdefinition" id="(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSetDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getsetdefinition" id="(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSetDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getSetDefinition</strong><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(SetDefinition%3Atype)">SetDefinition</a></div>
@@ -1277,7 +1275,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, getvars" id="(ComputeEngine%3Aclass).(getVars%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getVars</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getVars%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the variables (free or not) in this expression</p>
+<section data-keywords="function, getvars" id="(ComputeEngine%3Aclass).(getVars%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getVars</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getVars%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the variables (free or not) in this expression</p>
 
 
 <div>
@@ -1303,7 +1301,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, issubsetof" id="(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isSubsetOf</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Test if <code>lhs</code> is a subset of <code>rhs</code>.</p>
+<section data-keywords="function, issubsetof" id="(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isSubsetOf</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Test if <code>lhs</code> is a subset of <code>rhs</code>.</p>
 
 <p><code>lhs</code> and <code>rhs</code> can be set expressions, i.e.
 <code>[&quot;SetMinus&quot;, &quot;ComplexNumber&quot;, 0]</code></p>
@@ -1336,7 +1334,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, popscope" id="(ComputeEngine%3Aclass).(popScope%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>popScope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(popScope%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Remove the topmost scope from the scope stack.</p>
+<section data-keywords="function, popscope" id="(ComputeEngine%3Aclass).(popScope%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>popScope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(popScope%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Remove the topmost scope from the scope stack.</p>
 
 
 <div>
@@ -1350,7 +1348,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, pushscope" id="(ComputeEngine%3Aclass).(pushScope%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>pushScope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(pushScope%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Create a new scope and add it to the top of the scope stack</p>
+<section data-keywords="function, pushscope" id="(ComputeEngine%3Aclass).(pushScope%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>pushScope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(pushScope%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Create a new scope and add it to the top of the scope stack</p>
 
 
 <div>
@@ -1370,7 +1368,7 @@ form.</p>
 </div>
 
 </section>
-<section data-keywords="function, same" id="(ComputeEngine%3Aclass).(same%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>same</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(same%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Indicate if two expressions are structurally identical, using a literal
+<section data-keywords="function, same" id="(ComputeEngine%3Aclass).(same%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>same</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(same%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Indicate if two expressions are structurally identical, using a literal
 symbolic identity.</p>
 
 <p>Using a canonical format will result in more positive matches.</p>
@@ -1417,7 +1415,7 @@ same(canonical([<span class="hljs-string">&quot;Add&quot;</span>, <span class="h
 </div>
 
 </section>
-<section data-keywords="function, shouldcontinueexecution" id="(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>shouldContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return false if the execution should stop.</p>
+<section data-keywords="function, shouldcontinueexecution" id="(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>shouldContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return false if the execution should stop.</p>
 
 <p>This can occur if:</p>
 <ul>
@@ -1469,7 +1467,7 @@ prevent the execution to continue.</p>
 </div>
 
 </section>
-<section data-keywords="function, getdictionaries" id="(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionaries</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return dictionaries suitable for the specified categories, or <code>&quot;all&quot;</code>
+<section data-keywords="function, getdictionaries" id="(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionaries</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return dictionaries suitable for the specified categories, or <code>&quot;all&quot;</code>
 for all categories (<code>&quot;arithmetic&quot;</code>, <code>&quot;algebra&quot;</code>, etc…).</p>
 
 <p>A symbol dictionary defines how the symbols and function names in a MathJSON
@@ -1504,7 +1502,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </section>
 
 
-<section><section data-keywords="context" id="(ComputeEngine%3Aclass).(context%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head">ComputeEngine.<strong>context</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(context%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><a href="#(RuntimeScope%3Atype)">RuntimeScope</a><p>The current scope.</p>
+<section><section data-keywords="context" id="(ComputeEngine%3Aclass).(context%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head">ComputeEngine.<strong>context</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(context%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><a href="#(RuntimeScope%3Atype)">RuntimeScope</a><p>The current scope.</p>
 
 <p>A scope is a dictionary that contains the definition of local symbols.</p>
 <p>Scopes form a stack, and definitions in more recent
@@ -1559,7 +1557,7 @@ scopes can obscure definitions from older scopes.</p>
 </ul>
 
 </div>
-<section data-keywords="type, basedefinition" id="(BaseDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>BaseDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(BaseDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, basedefinition" id="(BaseDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>BaseDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(BaseDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><div><dl><dt>domain<span class="punctuation">: </span><a href="#(Domain%3Atype)">Domain</a><span class="punctuation">;</span></dt><dd></dd><dt>scope<span class="punctuation">: </span><a href="#(Scope%3Atype)">Scope</a><span class="punctuation">;</span></dt><dd><p>The scope this definition belongs to. This field is usually undefined,
 but its value is set by <code>getDefinition()</code>, <code>getFunctionDefinition()</code> and
 <code>getSymbolDefinition()</code>.</p>
@@ -1571,7 +1569,7 @@ for the Pi constant.</p>
 </dd></dl></div></div>
 
 </section>
-<section data-keywords="type, collectiondefinition" id="(CollectionDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>CollectionDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(CollectionDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, collectiondefinition" id="(CollectionDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>CollectionDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(CollectionDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><a href="#(BaseDefinition%3Atype)">BaseDefinition</a><span class="punctuation"> &amp; </span></li>
 <li><div><dl><dt>at<span class="punctuation">: </span><span class="punctuation">(</span><var>index</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">;</span></dt><dd></dd><dt>countable<span class="punctuation">: </span><span class="keyword">boolean</span><span class="punctuation">;</span></dt><dd><p>If true, the size of the collection is finite.</p>
 
@@ -1589,7 +1587,7 @@ the `iterator() function</p>
 </dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, compileddictionary" id="(CompiledDictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>CompiledDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(CompiledDictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>The entries of a <code>CompiledDictionary</code> have been validated and
+<section data-keywords="type, compileddictionary" id="(CompiledDictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>CompiledDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(CompiledDictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>The entries of a <code>CompiledDictionary</code> have been validated and
 optimized for faster evaluation.</p>
 
 <p>When a new scope is created with <code>pushScope()</code> or when creating a new
@@ -1605,14 +1603,14 @@ engine instance, new instances of <code>CompiledDictionary</code> are created as
 <div class="code"><div><dl><dt>asyncEvaluate<span class="punctuation">: </span><span class="punctuation">(</span><var>scope</var><span class="punctuation">: </span><span class="punctuation">{</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="externallink">Promise<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&gt;</span><span class="punctuation">;</span></dt><dd></dd><dt>evaluate<span class="punctuation">: </span><span class="punctuation">(</span><var>scope</var><span class="punctuation">: </span><span class="punctuation">{</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">;</span></dt><dd></dd></dl></div></div>
 
 </section>
-<section data-keywords="type, definition" id="(Definition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Definition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(Definition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, definition" id="(Definition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Definition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Definition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><span class="punctuation">| </span><a href="#(SymbolDefinition%3Atype)">SymbolDefinition</a></li>
 <li><span class="punctuation">| </span><a href="#(FunctionDefinition%3Atype)">FunctionDefinition</a></li>
 <li><span class="punctuation">| </span><a href="#(SetDefinition%3Atype)">SetDefinition</a></li>
 <li><span class="punctuation">| </span><a href="#(CollectionDefinition%3Atype)">CollectionDefinition</a></li></ul></div>
 
 </section>
-<section data-keywords="type, dictionary" id="(Dictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Dictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(Dictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A dictionary maps a MathJSON name to a definition.</p>
+<section data-keywords="type, dictionary" id="(Dictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Dictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Dictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A dictionary maps a MathJSON name to a definition.</p>
 
 <p>A named entry in a dictionary can refer to a symbol, as in the expression,
 <code>&quot;Pi&quot;</code>, to a function: “Add” in the expression <code>[&quot;Add&quot;, 2, 3]</code>, or
@@ -1636,7 +1634,7 @@ well. In that case the domain is determined automatically.</p>
 <div class="code"><div><dl><dt><span class="punctuation">[</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">]</span><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation"> | </span><a href="#(Definition%3Atype)">Definition</a></dd></dl></div></div>
 
 </section>
-<section data-keywords="type, domain" id="(Domain%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(Domain%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A domain such as ‘Number’ or ‘Boolean’ represents a set of values.</p>
+<section data-keywords="type, domain" id="(Domain%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Domain%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A domain such as ‘Number’ or ‘Boolean’ represents a set of values.</p>
 
 <p>Domains can be defined as a union or intersection of domains:</p>
 <ul>
@@ -1651,7 +1649,7 @@ well. In that case the domain is determined automatically.</p>
 <div class="code"><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a></div>
 
 </section>
-<section data-keywords="type, form" id="(Form%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Form</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(Form%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A given mathematical expression can be represented in multiple equivalent
+<section data-keywords="type, form" id="(Form%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Form</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Form%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A given mathematical expression can be represented in multiple equivalent
 ways as a MathJSON expression.</p>
 
 <p><code>Form</code> is used to specify a representation:</p>
@@ -1744,7 +1742,7 @@ simplified</li>
 </dd><dt>signatures<span class="punctuation">: </span><a href="#(FunctionSignature%3Atype)">FunctionSignature</a><span class="punctuation">[]</span><span class="punctuation">;</span></dt><dd></dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, functionfeatures" id="(FunctionFeatures%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>FunctionFeatures</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(FunctionFeatures%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A function definition can have some flags set indicating specific
+<section data-keywords="type, functionfeatures" id="(FunctionFeatures%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>FunctionFeatures</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(FunctionFeatures%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A function definition can have some flags set indicating specific
 properties of the function.</p>
 
 
@@ -1803,7 +1801,7 @@ and equations.</p>
 </dd></dl></div></div>
 
 </section>
-<section data-keywords="type, functionsignature" id="(FunctionSignature%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>FunctionSignature</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(FunctionSignature%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Function signature: definition of the inputs and output of a function.</p>
+<section data-keywords="type, functionsignature" id="(FunctionSignature%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>FunctionSignature</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(FunctionSignature%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Function signature: definition of the inputs and output of a function.</p>
 
 <p>A function should have at least one signature, but can have several:</p>
 <ul>
@@ -1848,7 +1846,7 @@ named arguments, they should be of this domain</p>
 </dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, scope" id="(Scope%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Scope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Scope%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A scope is a set of names in a dictionary that are bound (defined) in
+<section data-keywords="type, scope" id="(Scope%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Scope</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(Scope%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A scope is a set of names in a dictionary that are bound (defined) in
 a MathJSON expression.</p>
 
 <p>Scopes are arranged in a stack structure. When an expression that defined
@@ -1895,7 +1893,7 @@ For example “NaturalNumber” = [“Union”, “PrimeNumber”, “CompositeN
 </dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, symboldefinition" id="(SymbolDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SymbolDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(SymbolDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, symboldefinition" id="(SymbolDefinition%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SymbolDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(SymbolDefinition%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><a href="#(BaseDefinition%3Atype)">BaseDefinition</a><span class="punctuation"> &amp; </span></li>
 <li><a href="#(SymbolFeatures%3Atype)">SymbolFeatures</a><span class="punctuation"> &amp; </span></li>
 <li><div><dl><dt>unit<span class="punctuation">: </span><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">;</span></dt><dd><p>For dimensional analysis, e.g. “Scalar”, “Meter”, [“Divide”, “Meter”, “Second”]</p>
@@ -1903,7 +1901,7 @@ For example “NaturalNumber” = [“Union”, “PrimeNumber”, “CompositeN
 </dd><dt>value<span class="punctuation">: </span><a href="https://developer.mozilla.org/docs/Web/API/Expression" class="externallink">Expression<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">;</span></dt><dd></dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, symbolfeatures" id="(SymbolFeatures%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SymbolFeatures</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(SymbolFeatures%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, symbolfeatures" id="(SymbolFeatures%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SymbolFeatures</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(SymbolFeatures%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><div><dl><dt>constant<span class="punctuation">: </span><span class="keyword">boolean</span><span class="punctuation">;</span></dt><dd><p>If true the value of the symbol is constant.</p>
 
 <p>If false, the symbol is a variable.</p>
@@ -1982,6 +1980,13 @@ For example “NaturalNumber” = [“Union”, “PrimeNumber”, “CompositeN
 <div class="page__footer-pages">
              
     <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
          
         
         <li>

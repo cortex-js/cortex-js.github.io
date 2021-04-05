@@ -125,8 +125,6 @@
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
-              <a href="/funding/" >Funding</a>
-            </li><li class="masthead__menu-item">
               <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
             </li><li class="masthead__menu-item">
               <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
@@ -443,14 +441,17 @@
 </script>
 <h1>Commands</h1>
 <p>User initiated commands that control the mathfield can be dispatched using
-<a href="///docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)"><code>executeCommand()</code></a>. Commands are
-identified by a string called the <strong>selector</strong>. Most commands take no
-parameters. When a command does have a parameter, an array made up of the
+<a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)"><code>executeCommand()</code></a>.</p>
+<p>Commands are
+identified by a string called the <strong>selector</strong>.</p>
+<pre><code class="language-js">mf.executeCommand(<span class="hljs-string">&#x27;deleteBackward&#x27;</span>);
+</code></pre>
+<p>Most commands take no parameters. When a command does have a parameter, a tuple with the
 selector and the commands arguments can be passed to
 <code>executeCommand()</code>. For example:</p>
 <pre><code class="language-js">mf.executeCommand([<span class="hljs-string">&#x27;insert&#x27;</span>, <span class="hljs-string">&#x27;(#0)&#x27;</span>]);
 </code></pre>
-<p>will insert an open and close parenthesis around the selection (the <code>#0</code>
+<p>The command above will insert an open and close parenthesis around the selection (the <code>#0</code>
 sequence is replaced with the current selection).</p>
 <h2>Editing</h2>
 <ul>
@@ -544,6 +545,11 @@ AWS speech synthesizer.</li>
 </ul>
 </li>
 </ul>
+<h2>Next</h2>
+<dl>
+<dt><a href="/mathlive/guides/macros">Macros<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
+<dd>Extend the Latex commands supported</dd>
+</dl>
 
         
       </section>
@@ -553,10 +559,10 @@ AWS speech synthesizer.</li>
         
 
 
-        <meta itemprop="datePublished" content="April 03, 2021">
+        <meta itemprop="datePublished" content="April 05, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:11:54 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Apr 05 2021 14:16:57 GMT+0200 (Central European Summer Time)">April 05, 2021</time></p>
         
       </footer>
 
@@ -613,6 +619,13 @@ AWS speech synthesizer.</li>
 <div class="page__footer-pages">
              
     <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
          
         
         <li>

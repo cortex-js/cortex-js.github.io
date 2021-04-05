@@ -125,8 +125,6 @@
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
-              <a href="/funding/" >Funding</a>
-            </li><li class="masthead__menu-item">
               <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
             </li><li class="masthead__menu-item">
               <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
@@ -444,7 +442,7 @@
 <h1>Static Mathfield</h1>
 <h2>Static math formulas</h2>
 <p>To render math contained in a document as a static (non-editable) formula,
-call <code>renderMathInDocument()</code> at the end of your document, or in a <code>onload</code>
+call <a href="/docs/mathlive/?q=renderMathInDocument"><code>renderMathInDocument()</code></a> at the end of your document, or in a <code>onload</code>
 handler .</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
   <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
@@ -479,17 +477,14 @@ used.</p>
 </code></pre>
 <p>Elements with the following tags will be ignored for conversion: <code>noscript</code>,
 <code>style</code>, <code>textarea</code>, <code>pre</code>, <code>code</code>, <code>annotation</code> and <code>annotation-xml</code>.</p>
-<p>If you dynamically generate content, call {@linkcode
-module:MathLive#renderMathInElement MathLive.renderMathInElement(element)} to
+<p>If you dynamically generate content, call <a href="/docs/mathlive/?q=renderMathInElement"><code>renderMathInElement(element)</code></a> to
 render your element after the page has been loaded. This is a recursive call
 that will be applied to <code>element</code> and all its children.</p>
-<p>It is possible to call <code>MathLive.renderMathInElement()</code> and
-<code>MathLive.renderMathInDocument</code> on elements and documents that have already been
+<p>It is possible to call <code>renderMathInElement()</code> and
+<code>renderMathInDocument</code> on elements and documents that have already been
 rendered, in which case they will be rendered again. This is useful if something
 in the environment changes that could require the layout to be updated.</p>
-<p>The {@linkcode module:mathlive#renderMathInElement |
-MathLive.renderMathInElement()} and {@linkcode
-module:mathlive#renderMathInDocument | MathLive.renderMathInDocument()}
+<p>The <code>renderMathInElement()</code> and <code>renderMathInDocument()</code>
 functions take an optional <code>options</code> object which can be used to customize their
 behavior:</p>
 <ul>
@@ -557,10 +552,10 @@ MathLive.makeMathField(document.getElementById('mathfield'));
         
 
 
-        <meta itemprop="datePublished" content="April 03, 2021">
+        <meta itemprop="datePublished" content="April 05, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:03:36 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Apr 05 2021 14:21:13 GMT+0200 (Central European Summer Time)">April 05, 2021</time></p>
         
       </footer>
 
@@ -617,6 +612,13 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 <div class="page__footer-pages">
              
     <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
          
         
         <li>
