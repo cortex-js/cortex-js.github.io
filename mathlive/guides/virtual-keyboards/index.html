@@ -531,6 +531,37 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 &lt;/div&gt;
 </div>
 </code-playground>
+<h2>Customizing the appearance of the virtual keyboard keycaps</h2>
+<p>The appearance of keycaps can be controlled with the following CSS variables:</p>
+<ul>
+<li><code>--keycap-height</code></li>
+<li><code>--keycap-font-size</code></li>
+<li><code>--keycap-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-extra-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-tt-font-size</code> (only if needed)</li>
+</ul>
+<h2>Sharing virtual keyboards amongst multiple instances</h2>
+<p>When there are multiple mathfield elements in a page, they usually each have
+their own virtual keyboard.</p>
+<p>However, in some cases it might be desirable to have the virtual keyboard
+instance “detached” from the mathfield, and potentially shared by multiple
+mathfield elements.</p>
+<p>That’s the case for example when mathfield elements are displayed in an
+<em>iframe</em>. Since an <em>iframe</em> is essentially a mini embedded document, the
+default virtual keyboard will not display correctly when use in an <em>iframe</em>,
+as it will be attached to the <em>iframe</em> instead of being attached to the
+main document.</p>
+<p>This can be solved by using a “shared” virtual keyboard.</p>
+<p>To use a shared virtual keyboard, call the <code>makeSharedVirtualKeyboard()</code>
+function in the context of the main document.</p>
+<pre><code class="language-javascript">makeSharedVirtualKeyboard({
+  <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
+});
+</code></pre>
+<p>In the <em>iframe</em> elements, use the <code>use-shared-virtual-keyboard</code> attribute on
+the <code>math-field</code> elements.</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
 <h2>Controling which keyboards are displayed</h2>
 <p>The virtual keyboard panel displays multiple keyboards which can be
 toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
@@ -553,7 +584,7 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 <p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
 set of keys that can be toggled using another key. For example, the <code>roman</code> keyboard has a regular layer and a layer for symbols. Most keyboards have a single layer.</p>
 <p>Custom virtual keyboard layouts can be defined with an object literal.</p>
-<h2>Defining a layer</h2>
+<h3>Defining a layer</h3>
 <p>First, let’s define a layer, which we’ll call <code>&quot;college-layer&quot;</code>.</p>
 <p>A layer is an array of rows, a row is an array of keycaps.</p>
 <p>Each keycap can have the following properties:</p>
@@ -630,6 +661,11 @@ name for the <code>backdrop</code> and <code>container</code> properties of the 
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
+            <span class="hljs-comment">// Will display the label using the system font. To display </span>
+            <span class="hljs-comment">// with the TeX font, use:</span>
+            <span class="hljs-comment">// { class: &quot;keycap tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
+            <span class="hljs-comment">// or </span>
+            <span class="hljs-comment">// { class: &quot;keycap&quot;, latex: &quot;7&quot;},</span>
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
@@ -706,15 +742,16 @@ name for the <code>backdrop</code> and <code>container</code> properties of the 
       }
     };
 </code></pre>
-<h2>Defining a keyboard</h2>
+<h3>Defining a keyboard</h3>
 <p>Now, let’s define a new keyboard called <code>&quot;college-keyboard&quot;</code>.</p>
 <p>The keyboard has a <code>label</code> which is displayed in the keyboard selector area
 of the virtual keyboard. When hovering on this label, a <code>tooltip</code> can be
 displayed to further explain what the keyboard is about.</p>
-<p>Finally, we must provide the list of layers that make up this keyboard. If
-there were several layers, we could use an array to list them. In this example
-we have a single layer, so we can just use a string with the name of the
-layer we created above.</p>
+<p>Finally, we must provide the layers that make up this keyboard.</p>
+<p>In this example we have a single layer, so we can set the value of the
+<code>layer</code> property to the name of the layer.</p>
+<p>If we had several layers, we could set the property <code>layers</code> to an
+array of their names.</p>
 <pre><code class="language-js">    <span class="hljs-keyword">const</span> COLLEGE_KEYBOARD = {
       <span class="hljs-string">&quot;college-keyboard&quot;</span>: {
         <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;College&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
@@ -723,7 +760,7 @@ layer we created above.</p>
       }
     };
 </code></pre>
-<h2>Adding the layers and keyboards</h2>
+<h3>Adding the layers and keyboards</h3>
 <p>Now, we just have to call <code>setOptions()</code> with our custom layer and custom
 keyboard.</p>
 <p>The <code>virtualKeyboards</code> option indicate which keyboards we want to be available.
@@ -758,10 +795,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="April 05, 2021">
+        <meta itemprop="datePublished" content="April 06, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Apr 05 2021 21:31:03 GMT+0200 (Central European Summer Time)">April 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Apr 06 2021 14:13:30 GMT+0200 (Central European Summer Time)">April 06, 2021</time></p>
         
       </footer>
 

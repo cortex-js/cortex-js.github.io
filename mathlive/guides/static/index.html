@@ -522,18 +522,24 @@ respectively.</li>
 });
 </code></pre>
 <h2>Read-only Mathfield</h2>
+<p>When a math formula is displayed as a static element using
+<code>renderMathInDocument()</code>, the formula is transformed into some static markup.
+As a result, only the markup content can be selected, not the underlying
+LaTex formula. Selection of a portion of the formula may also lead to
+unexpected results.</p>
+<p>If preserving the ability to select a formula is important, consider
+using a read-only mathfield.</p>
+<p>To create a read-only mathfield, add the <code>read-only</code> attribute to a <code>&lt;mathfield&gt;</code>
+element.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
+    <div slot="html">&lt;math-field read-only style="
         font-size: 32px; 
         padding: 8px; 
         border-radius: 8px;
         border: 1px solid rgba(0, 0, 0, .3); 
         box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
 &gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
+&lt;/math-field&gt;
 </div>
 </code-playground>
 <h2>Next</h2>
@@ -552,10 +558,10 @@ MathLive.makeMathField(document.getElementById('mathfield'));
         
 
 
-        <meta itemprop="datePublished" content="April 05, 2021">
+        <meta itemprop="datePublished" content="April 06, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Apr 05 2021 14:21:13 GMT+0200 (Central European Summer Time)">April 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Apr 06 2021 15:08:47 GMT+0200 (Central European Summer Time)">April 06, 2021</time></p>
         
       </footer>
 

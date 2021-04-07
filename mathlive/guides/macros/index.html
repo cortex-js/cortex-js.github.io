@@ -445,18 +445,17 @@ are macros, that is commands defined with a Latex expression.</p>
 config object:</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
+const mf = document.getElementById('mf'), {
 });
 console.log(mf.getOption('macros'));
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/div&gt;
+    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>
 </code-playground>
 <p>You can add (or remove) macros by using <code>setOptions({macros: ...})</code>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
-});
+const mf = document.getElementById('mf');
 mf.setOptions({
     macros: {
         ...mf.getOptions('macros'),
@@ -464,7 +463,7 @@ mf.setOptions({
     },
 });
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/div&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
 </code-playground>
 <p>The macro definition can contain up to eight arguments, represented by <code>#1</code> to <code>#9</code>.</p>
@@ -482,10 +481,10 @@ mf.setOptions({
         
 
 
-        <meta itemprop="datePublished" content="April 03, 2021">
+        <meta itemprop="datePublished" content="April 06, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:12:09 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Apr 06 2021 15:10:34 GMT+0200 (Central European Summer Time)">April 06, 2021</time></p>
         
       </footer>
 
