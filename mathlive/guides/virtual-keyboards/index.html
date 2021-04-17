@@ -505,12 +505,11 @@ single layer.</p>
 defined (see below about the <code>styles</code> layer property), or be one of the default
 ones:</p>
 <ul>
-<li><code>keycap</code>: a standard-width keycap, using the system font for its label</li>
-<li><code>keycap tex</code>: a standard-width keycap, using the TeX font for its label.
+<li><code>tex</code>: use the TeX font for its label.
 Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
 define the label.</li>
+<li><code>small</code>: display the label in a smaller size</li>
 <li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
-<li><code>keycap small</code>: display the label in a smaller size</li>
 <li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
 <li><code>separator w5</code>: a half-width blank used as a separator. Other widths
 include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
@@ -572,20 +571,21 @@ used to specify both the label and what happens when the key is pressed.</p>
 <p>They <code>keycap</code> class indicates that the appearance of the key should be
 of a regular keycap, as opposed to a modified key (<code>modifier</code>) or an action
 key (<code>action</code>).</p>
-<pre><code class="language-js">  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\beta&quot;</span> },
-  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\mu_0&quot;</span> },
-  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> },
+<pre><code class="language-js">  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\beta&quot;</span> },
+  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\mu_0&quot;</span> },
+  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> },
 </code></pre>
 <p>To display the key label as a some HTML markup instead, use the <code>label</code>
 property:</p>
-<pre><code class="language-js">  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
-  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, 
+<pre><code class="language-js">  { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
+  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, 
     <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>, 
     <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> 
   },
 </code></pre>
-<p>In that case the system font will be used to display the label, unless the
-<code>tex</code> class is specified.</p>
+<p>The keycap label is displayed using the system font when the <code>label</code> property
+is used. To display it using the TeX fonts instead, set the value of the <code>class</code>
+property to <code>tex</code>.</p>
 <p>To perform a command other than inserting some Latex, use the <code>command</code>
 property:</p>
 <pre><code class="language-js">  {
@@ -599,70 +599,70 @@ property:</p>
         <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
         <span class="hljs-attr">rows</span>: [
           [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
             <span class="hljs-comment">// Will display the label using the system font. To display </span>
             <span class="hljs-comment">// with the TeX font, use:</span>
-            <span class="hljs-comment">// { class: &quot;keycap tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
+            <span class="hljs-comment">// { class: &quot;tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
             <span class="hljs-comment">// or </span>
-            <span class="hljs-comment">// { class: &quot;keycap&quot;, latex: &quot;7&quot;},</span>
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
+            <span class="hljs-comment">// { latex: &quot;7&quot;},</span>
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex small&quot;</span>,
               <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>,
               <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{2}$$&quot;</span>
             },
             {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex small&quot;</span>,
               <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;&amp;thinsp;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;&lt;/span&gt;&quot;</span>,
               <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{}$$&quot;</span>
             },
             {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>,
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;small&quot;</span>,
               <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>,
               <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$\\sqrt{#0}$$&quot;</span>,
             }
           ],
           [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;b&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;y&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;b&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;y&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-attr">latex</span>:<span class="hljs-string">&quot;4&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;6&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-attr">latex</span>:<span class="hljs-string">&quot;4&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;5&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;6&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;small&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
           ],
           [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;1&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;2&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;3&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;1&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;2&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;3&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
           ],
           [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span> },
 
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;0&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
+            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;0&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
+            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
             { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
             {
               <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
@@ -828,10 +828,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="April 16, 2021">
+        <meta itemprop="datePublished" content="April 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Apr 16 2021 09:54:07 GMT+0200 (Central European Summer Time)">April 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 17 2021 13:30:35 GMT+0200 (Central European Summer Time)">April 17, 2021</time></p>
         
       </footer>
 
