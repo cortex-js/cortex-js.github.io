@@ -441,20 +441,20 @@
 </script>
 <h1>Virtual Keyboards</h1>
 <p>Typing math formulas require access to many special symbols. While <a href="/mathlive/guides/shortcuts">keyboard
-shortcuts and inline shortcuts</a> can help, mobile devices require another
-solution. A virtual keyboard is a keyboard displayed on screen that can be
-customized with specialized symbols for math input.</p>
+shortcuts and inline shortcuts</a> can help, mobile
+devices require another solution. A virtual keyboard is a keyboard displayed
+on screen that can be customized with specialized symbols for math input.</p>
 <p><img src="/assets/images/mathfield/virtual-keyboard.png" alt=""></p>
-<p>The mathfield virtual keyboard panel can display multiple keyboards.
-The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>,
-<strong>roman letters</strong> and <strong>greek letters</strong>.</p>
-<p>These keyboards  include the most common math symbols and
-they can be customized to fit your specific needs. For example you can remove
-some keyboards, or create new ones.</p>
-<p>Touch and hold a key to display variants related to the key. Not all keys have
+<p>To display variants related to a key, press and hold it. Not all keys have
 variants, though.</p>
 <p><img src="/assets/images/mathfield/alt-keys.png" alt="" class="max-w-md"></p>
 <p><img src="/assets/images/mathfield/more-alt-keys.png" alt="" class="max-w-md"></p>
+<p>The mathfield virtual keyboard panel can display multiple keyboards.
+The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>,
+<strong>roman letters</strong> and <strong>greek letters</strong>.</p>
+<p>These keyboards  include the most common math symbols and they can be
+customized to fit your specific needs. For example you can remove some
+keyboards, or create new ones.</p>
 <h2>Controlling when the virtual keyboard panel is displayed</h2>
 <p>The default behavior of the virtual keyboard panel is to only be displayed on
 touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
@@ -471,6 +471,253 @@ mathfield</li>
 </ul>
 <p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations.</p>
+<h2>Controling which keyboards are displayed</h2>
+<p>The virtual keyboard panel displays multiple keyboards which can be
+toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
+and <code>greek</code>.</p>
+<p>To choose which keyboards are available, use the <code>virtualKeyboards</code>
+configuration property. The value of this property is a space-separated string
+of the name of the keyboards that should be displayed.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'),  {
+  virtualKeyboardMode: "manual",
+  virtualKeyboards: 'numeric symbols'
+});
+</div>
+    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;
+</div>
+</code-playground>
+<h2>Defining custom virtual keyboards</h2>
+<p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
+set of keys that can be toggled using another key. For example, the <code>roman</code>
+keyboard has a regular layer and a layer for symbols. Most keyboards have a
+single layer.</p>
+<p>Custom virtual keyboard layouts can be defined with an object literal.</p>
+<h3>Defining a layer</h3>
+<p>First, let’s define a layer, which we’ll call <code>&quot;high-school-layer&quot;</code>.</p>
+<p>A layer is an array of rows, a row is an array of keycaps.</p>
+<p>Each keycap can have the following properties:</p>
+<ul>
+<li>
+<p><code>class</code>: the CSS classes to style this keycap. The classes can be custom
+defined (see below about the <code>styles</code> layer property), or be one of the default
+ones:</p>
+<ul>
+<li><code>keycap</code>: a standard-width keycap, using the system font for its label</li>
+<li><code>keycap tex</code>: a standard-width keycap, using the TeX font for its label.
+Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
+define the label.</li>
+<li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
+<li><code>keycap small</code>: display the label in a smaller size</li>
+<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
+<li><code>separator w5</code>: a half-width blank used as a separator. Other widths
+include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
+for the space bar).</li>
+<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
+</ul>
+</li>
+<li>
+<p><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
+the <code>latex</code> value is used. If no <code>key</code>, <code>command</code> or <code>insert</code> property is
+provided, the label (stripped of any HTML markup) is what will be inserted
+when the keycap is pressed.</p>
+</li>
+<li>
+<p><code>latex</code>: a Latex fragment used as a label and as the content to insert when
+the keycap is pressed.</p>
+</li>
+<li>
+<p><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</p>
+</li>
+<li>
+<p><code>aside</code>: an optional small label displayed below the keycap. This label
+may not be displayed if the space available is too small.</p>
+</li>
+<li>
+<p><code>insert</code>: a Latex fragment to insert when the keycap is pressed. The <code>latex</code>
+property is usually sufficient,</p>
+</li>
+<li>
+<p><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
+long-pressed.</p>
+</li>
+<li>
+<p><code>command</code>: the command to perform when the keycap is pressed.</p>
+</li>
+<li>
+<p><code>shifted</code>: the HTML markup to display as the label of the keycap when the
+shift key is pressed</p>
+</li>
+<li>
+<p><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
+the shift key.</p>
+</li>
+</ul>
+<p>The following properties, in order, are used to determine how to display
+they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
+<p>When the keycap is pressed, the following properties are used, in order, to
+determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.</p>
+<p>To associate a CSS stylesheet with this layer, use the <code>styles</code> property of the
+layer.</p>
+<p>The appearance of the layer can be further customized by providing a CSS class
+name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
+<h3>Keycap Examples</h3>
+<p>Each keycap must define its label and what happens when the keycap is pressed.
+There are many different ways of doing this using the properties above.</p>
+<p>The simplest case is when pressing a key insert some Latex and its label
+is the fragment to be inserted. In that case, the <code>latex</code> property can be
+used to specify both the label and what happens when the key is pressed.</p>
+<p>They <code>keycap</code> class indicates that the appearance of the key should be
+of a regular keycap, as opposed to a modified key (<code>modifier</code>) or an action
+key (<code>action</code>).</p>
+<pre><code class="language-js">  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\beta&quot;</span> },
+  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\mu_0&quot;</span> },
+  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> },
+</code></pre>
+<p>To display the key label as a some HTML markup instead, use the <code>label</code>
+property:</p>
+<pre><code class="language-js">  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
+  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, 
+    <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>, 
+    <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> 
+  },
+</code></pre>
+<p>In that case the system font will be used to display the label, unless the
+<code>tex</code> class is specified.</p>
+<p>To perform a command other than inserting some Latex, use the <code>command</code>
+property:</p>
+<pre><code class="language-js">  {
+    <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
+    <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>]
+  },
+</code></pre>
+<pre><code class="language-js">    <span class="hljs-keyword">const</span> HIGH_SCHOOL_KEYBOARD_LAYER = {
+      <span class="hljs-string">&quot;high-school-layer&quot;</span>: {
+        <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
+        <span class="hljs-attr">rows</span>: [
+          [
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
+            <span class="hljs-comment">// Will display the label using the system font. To display </span>
+            <span class="hljs-comment">// with the TeX font, use:</span>
+            <span class="hljs-comment">// { class: &quot;keycap tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
+            <span class="hljs-comment">// or </span>
+            <span class="hljs-comment">// { class: &quot;keycap&quot;, latex: &quot;7&quot;},</span>
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{2}$$&quot;</span>
+            },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;&amp;thinsp;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;&lt;/span&gt;&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{}$$&quot;</span>
+            },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>,
+              <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>,
+              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$\\sqrt{#0}$$&quot;</span>,
+            }
+          ],
+          [
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;b&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;y&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-attr">latex</span>:<span class="hljs-string">&quot;4&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;6&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
+          ],
+          [
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;1&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;2&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;3&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
+          ],
+          [
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span> },
+
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;0&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
+            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>]
+            },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-right&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToNextChar&quot;</span>]
+            },
+            {
+              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action font-glyph bottom right&quot;</span>,
+              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&amp;#x232b;&quot;</span>,
+              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;deleteBackward&quot;</span>]
+            }
+          ]
+        ]
+      }
+    };
+</code></pre>
+<h3>Defining a keyboard</h3>
+<p>Now, let’s define a new keyboard called <code>&quot;high-school-keyboard&quot;</code>.</p>
+<p>The keyboard has a <code>label</code> which is displayed in the keyboard selector area
+of the virtual keyboard. When hovering on this label, a <code>tooltip</code> can be
+displayed to further explain what the keyboard is about.</p>
+<p>Finally, we must provide the layers that make up this keyboard.</p>
+<p>In this example we have a single layer, so we can set the value of the
+<code>layer</code> property to the name of the layer.</p>
+<p>If we had several layers, we could set the property <code>layers</code> to an
+array of their names.</p>
+<pre><code class="language-js">    <span class="hljs-keyword">const</span> HIGH_SCHOOL_KEYBOARD = {
+      <span class="hljs-string">&quot;high-school-keyboard&quot;</span>: {
+        <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;High School&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
+        <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;High School Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
+        <span class="hljs-string">&quot;layer&quot;</span>: <span class="hljs-string">&quot;high-school-layer&quot;</span>
+      }
+    };
+</code></pre>
+<h3>Adding the layers and keyboards</h3>
+<p>Now, we just have to call <code>setOptions()</code> with our custom layer and custom
+keyboard.</p>
+<p>The <code>virtualKeyboards</code> option indicate which keyboards we want to be available.
+Here we only want our keyboard, so we’ll just pass its name.</p>
+<p>If we wanted multiple keyboards, we could provide a space-separated list, for
+example <code>&quot;numeric high-school-keyboard symbols&quot;</code>. If we wanted all the default
+keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortcut:
+<code>&quot;all high-school-keyboard&quot;</code>.</p>
+<pre><code class="language-js">  mf.setOptions({
+    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: HIGH_SCHOOL_KEYBOARD_LAYER
+    <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: HIGH_SCHOOL_KEYBOARD,
+    <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;high-school-keyboard&quot;</span>
+  });
+}
+</code></pre>
 <h2>Customizing the appearance of the virtual keyboard toggle</h2>
 <p>By specifying a CSS rule for the <code>.ML__virtual-keyboard-toggle</code> selector the
 appearance of the virtual keyboard toggle can be modified.</p>
@@ -562,220 +809,6 @@ function in the context of the main document.</p>
 the <code>math-field</code> elements.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
-<h2>Controling which keyboards are displayed</h2>
-<p>The virtual keyboard panel displays multiple keyboards which can be
-toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
-and <code>greek</code>.</p>
-<p>To choose which keyboards are available, use the <code>virtualKeyboards</code>
-configuration property. The value of this property is a space-separated string
-of the name of the keyboards that should be displayed.</p>
-<code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'),  {
-  virtualKeyboardMode: "manual",
-  virtualKeyboards: 'numeric symbols'
-});
-</div>
-    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
-</code-playground>
-<h2>Defining custom virtual keyboards</h2>
-<p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
-set of keys that can be toggled using another key. For example, the <code>roman</code> keyboard has a regular layer and a layer for symbols. Most keyboards have a single layer.</p>
-<p>Custom virtual keyboard layouts can be defined with an object literal.</p>
-<h3>Defining a layer</h3>
-<p>First, let’s define a layer, which we’ll call <code>&quot;college-layer&quot;</code>.</p>
-<p>A layer is an array of rows, a row is an array of keycaps.</p>
-<p>Each keycap can have the following properties:</p>
-<ul>
-<li>
-<p><code>class</code>: the CSS classes to style this keycap. The classes can be custom
-defined (see below about the <code>styles</code> layer property), or be one of the default
-ones:</p>
-<ul>
-<li><code>keycap</code>: a standard-width keycap, using the system font for its label</li>
-<li><code>keycap tex</code>: a standard-width keycap, using the TeX font for its label.
-Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
-define the label.</li>
-<li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
-<li><code>keycap small</code>: display the label in a smaller size</li>
-<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
-<li><code>separator w5</code>: a half-width blank used as a separator. Other widths
-include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
-for the space bar).</li>
-<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
-</ul>
-</li>
-<li>
-<p><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
-the <code>latex</code> value is used. If no <code>key</code>, <code>command</code> or <code>insert</code> property is
-provided, the label (stripped of any HTML markup) is what will be inserted
-when the keycap is pressed.</p>
-</li>
-<li>
-<p><code>latex</code>: a Latex fragment used as a label and as the content to insert when
-the keycap is pressed.</p>
-</li>
-<li>
-<p><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</p>
-</li>
-<li>
-<p><code>aside</code>: an optional small label displayed below the keycap. This label
-may not be displayed if the space available is too small.</p>
-</li>
-<li>
-<p><code>insert</code>: a Latex fragment to insert when the keycap is pressed. The <code>latex</code>
-property is usually sufficient,</p>
-</li>
-<li>
-<p><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
-long-pressed.</p>
-</li>
-<li>
-<p><code>command</code>: the command to perform when the keycap is pressed.</p>
-</li>
-<li>
-<p><code>shifted</code>: the HTML markup to display as the label of the keycap when the
-shift key is pressed</p>
-</li>
-<li>
-<p><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
-the shift key.</p>
-</li>
-</ul>
-<p>The following properties, in order, are used to determine how to display
-they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
-<p>When the keycap is pressed, the following properties are used, in order, to
-determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.</p>
-<p>To associate a CSS stylesheet with this layer, use the <code>styles</code> property of the
-layer.</p>
-<p>The appearance of the layer can be further customized by providing a CSS class
-name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> COLLEGE_KEYBOARD_LAYER = {
-      <span class="hljs-string">&quot;college-layer&quot;</span>: {
-        <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
-        <span class="hljs-attr">rows</span>: [
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
-            <span class="hljs-comment">// Will display the label using the system font. To display </span>
-            <span class="hljs-comment">// with the TeX font, use:</span>
-            <span class="hljs-comment">// { class: &quot;keycap tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
-            <span class="hljs-comment">// or </span>
-            <span class="hljs-comment">// { class: &quot;keycap&quot;, latex: &quot;7&quot;},</span>
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{2}$$&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex small&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{}$$&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;&amp;thinsp;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;&lt;/span&gt;&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$\\sqrt{#0}$$&quot;</span>,
-              <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>
-            }
-          ],
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;b&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;y&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-attr">latex</span>:<span class="hljs-string">&quot;4&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;6&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap small&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
-          ],
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;1&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;2&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;3&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
-          ],
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span> },
-
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;0&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;keycap&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>],
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToNextChar&quot;</span>],
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-right&#x27; /&gt;&lt;/svg&gt;&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action font-glyph bottom right&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;deleteBackward&quot;</span>],
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&amp;#x232b;&quot;</span>
-            }
-          ]
-        ]
-      }
-    };
-</code></pre>
-<h3>Defining a keyboard</h3>
-<p>Now, let’s define a new keyboard called <code>&quot;college-keyboard&quot;</code>.</p>
-<p>The keyboard has a <code>label</code> which is displayed in the keyboard selector area
-of the virtual keyboard. When hovering on this label, a <code>tooltip</code> can be
-displayed to further explain what the keyboard is about.</p>
-<p>Finally, we must provide the layers that make up this keyboard.</p>
-<p>In this example we have a single layer, so we can set the value of the
-<code>layer</code> property to the name of the layer.</p>
-<p>If we had several layers, we could set the property <code>layers</code> to an
-array of their names.</p>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> COLLEGE_KEYBOARD = {
-      <span class="hljs-string">&quot;college-keyboard&quot;</span>: {
-        <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;College&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
-        <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;College Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
-        <span class="hljs-string">&quot;layer&quot;</span>: <span class="hljs-string">&quot;college-layer&quot;</span>
-      }
-    };
-</code></pre>
-<h3>Adding the layers and keyboards</h3>
-<p>Now, we just have to call <code>setOptions()</code> with our custom layer and custom
-keyboard.</p>
-<p>The <code>virtualKeyboards</code> option indicate which keyboards we want to be available.
-Here we only want our keyboard, so we’ll just pass its name.</p>
-<p>If we wanted multiple keyboards, we could provide a space-separated list, for
-example <code>&quot;numeric college-keyboard symbols&quot;</code>. If we wanted all the default
-keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortcut:
-<code>&quot;all college-keyboard&quot;</code>.</p>
-<pre><code class="language-js">  mf.setOptions({
-    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: COLLEGE_KEYBOARD_LAYER
-    <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: COLLEGE_KEYBOARD,
-    <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;college-keyboard&quot;</span>
-  });
-}
-</code></pre>
 <h2>Next</h2>
 <dl>
 <dt><a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
@@ -795,10 +828,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="April 06, 2021">
+        <meta itemprop="datePublished" content="April 16, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Apr 06 2021 14:13:30 GMT+0200 (Central European Summer Time)">April 06, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Apr 16 2021 09:54:07 GMT+0200 (Central European Summer Time)">April 16, 2021</time></p>
         
       </footer>
 
