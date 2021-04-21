@@ -506,12 +506,15 @@ mathfield is active</li>
 <!-- htmlmin:ignore -->
 <h2>Editing options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
-the second argument of <a href="http://cortexjs.io/docs/mathlive/?q=%22makeMathField%22"><code>makeMathField()</code></a>
+the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
 as we’ve see above with the <code>fontsDirectory</code> option.</p>
 <p>The configuration options can also be changed programmatically using the <a href="http://cortexjs.io/docs/mathlive/?q=%22setOptions%22"><code>setOptions()</code></a> method.</p>
 <p>Several of these configuration options affect the behavior while editing a
 formula:</p>
 <ul>
+<li><code>defaultMode</code>: if <code>inline-math</code> the math field is using inline math mode
+by default. If set to <code>math</code>, it will use the display math mode. If set to
+<code>text</code> it will use the text mode.</li>
 <li><code>ignoreSpaceabrInMathMode</code>: if false, insert a space when the spacebar is
 pressed, even in math mode (spaces are usually ignored in math mode)</li>
 <li><code>removeExtraneousParentheses</code>: automatically remove extra parentheses around
@@ -569,10 +572,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="April 05, 2021">
+        <meta itemprop="datePublished" content="April 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Apr 05 2021 14:16:51 GMT+0200 (Central European Summer Time)">April 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Apr 21 2021 09:42:44 GMT+0200 (Central European Summer Time)">April 21, 2021</time></p>
         
       </footer>
 
