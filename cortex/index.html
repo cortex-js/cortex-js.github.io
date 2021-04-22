@@ -262,12 +262,80 @@
 // -&gt; 4x^3 + 2x^2 + 3
 
 x = 2^11 - 1
-String(x , &quot; is a &quot;, Domain(x))
+&quot;\(x) is a \(Domain(x))&quot;
 // -&gt; &quot;2047 is a PrimeNumber&quot;
 </code></pre>
 <p>Read more about the <a href="/cortex/syntax">formal syntax of Cortex</a>, the
 <a href="/cortex/implementation">implementation of Cortex</a> with MathJSON or continue
 below for an informal description of the language.</p>
+<h2>Pragmas</h2>
+<p>Pragmas, or compiler directives, are annotations in the source code that provide
+instructions to the parser/compiler about how to interpret the source code.
+These instructions are executed during the parsing/compilation phase, not during
+the execution phase.</p>
+<h3>Environment Variables</h3>
+<p>Environment variables are defined in the execution environment of the compiler
+process when executed from a <code>node</code> process. In Unix, they are set using a
+shell-specific syntax (<code>export VARIABLE=value</code> in bash shells, for example).</p>
+<p>Environment variables are not available when the compilation/parsing is taking
+place in a browser process.</p>
+<p>To access an environment variable, use the <code>#env()</code> pragma.</p>
+<pre><code class="language-cortex">#env(&quot;DEBUG&quot;)
+</code></pre>
+<p>Some common environment variables include:</p>
+<ul>
+<li><code>NO_COLOR</code>: if set, color output to the terminal should be avoided</li>
+<li><code>TERM</code>: describe the capabilities of the output terminal, e.g.
+<code>xterm-256color</code></li>
+<li><code>HOME</code>: path to the user home directory</li>
+<li><code>TEMP</code>: path to a temporary file directory</li>
+</ul>
+<h3>Navigator Properties</h3>
+<p>The navigator properties are available when the compilation/parsing is taking
+place in a browser process.</p>
+<p>To access the properties of the <code>navigator</code> Javascript global object use the
+<code>#navigator()</code> pragma function. It returns ‘Nothing’ if the property is not
+available.</p>
+<pre><code class="language-cortex">#navigator(&quot;userAgent&quot;)
+</code></pre>
+<h3>Compile-Time Diagnostic Statement</h3>
+<p>A compile-time diagnostic statement causes the compiler to emit an error or a
+warning during compilation.</p>
+<p>To output a message to the console and immediately interrupt the
+parsing/compilation, use the <code>#error()</code> pragma function.</p>
+<pre><code class="language-cortex">#error(&quot;File cannot be compiled&quot;)
+</code></pre>
+<p>To output a message to the console, but continue the parsing/compilation, use
+the <code>#warning()</code> pragma function.</p>
+<pre><code class="language-cortex">#warning(&quot;TODO: Implement function&quot;)
+</code></pre>
+<h3>Line Control Statements</h3>
+<p>The name and URL of the source file being parsed/compiled can be accessed using
+the <code>#sourceFile</code> and <code>#sourceUrl</code> pragmas. The current line is indicated by
+<code>#line</code> and column by <code>#column</code>.</p>
+<p>When generating and pre-processing code, it might be useful to indicate the
+original source code and location, rather than the current one. To change the
+source URL and line of the current file, use the <code>#sourceLocation()</code> pragma
+function.</p>
+<pre><code class="language-cortex">#sourceLocation(145, &quot;file://localhost/~user/dev/source.ctx&quot;)
+</code></pre>
+<p>To number the following line to 146, use:</p>
+<pre><code class="language-cortex">#sourceLocation(145)
+</code></pre>
+<p>To reset the source location to the actual source and line, use
+<code>#sourceLocation()</code>.</p>
+<h3>Other Pragmas</h3>
+<p>The following pragmas are replaced with the indicated value:</p>
+<ul>
+<li><code>#line</code>: the current source line number, which is either the actual source
+line number, or as calculated based on <code>#sourceLocation()</code>. The first line is
+line 1.</li>
+<li><code>#column</code>: the current column number. The first column is column 1.</li>
+<li><code>#url</code>: the URL of the current source file.</li>
+<li><code>#filename</code>: the filename of the current source file.</li>
+<li><code>#date</code>: the current date in the <code>YYYY-MM-DD</code> format.</li>
+<li><code>#time</code>: the current time in the <code>HH:MM:SS</code> format.</li>
+</ul>
 <h2>Comments</h2>
 <p><strong>Line Comments</strong> start with <code>//</code>. Everything after a <code>//</code> is ignored until the
 end of the line.</p>
@@ -305,6 +373,17 @@ form, a string of 0 to 8 hex-digits must be included between <code>\u{</code> an
 </ul>
 <h3>Multi-line String Literals</h3>
 <p>A multiline string is delimited by <code>&quot;&quot;&quot;</code> (three quotation marks).</p>
+<pre><code class="language-cortex">cortex = &quot;&quot;&quot;
+      ,ad8888ba,
+    d8&quot;'    `&quot;8b                             ,d
+    d8'                                       88
+    88              ,adPPYba,   8b,dPPYba,  MM88MMM   ,adPPYba,  8b,     ,d8
+    88             a8&quot;     &quot;8a  88P'   &quot;Y8    88     a8P_____88   `Y8, ,8P'
+    Y8,            8b       d8  88            88     8PP&quot;&quot;&quot;&quot;&quot;&quot;&quot;     )888(
+    Y8a.    .a8P  &quot;8a,   ,a8&quot;  88            88,    &quot;8b,   ,aa   ,d8&quot; &quot;8b,
+      `&quot;Y8888Y&quot;'    `&quot;YbbdP&quot;'   88            &quot;Y888   `&quot;Ybbd8&quot;'  8P'     `Y8
+    &quot;&quot;&quot;
+</code></pre>
 <p>A multiline string can contain <code>&quot;</code> or new line characters. It can’t contain an
 unescaped sequence of <code>&quot;&quot;&quot;</code>.</p>
 <p>Anything after the <code>&quot;&quot;&quot;</code> that begins the multiline string literal and before the
@@ -496,15 +575,32 @@ to help with readability. Neither type of formatting affects the underlying
 value of the literal.</p>
 <pre><code class="language-cortex">+03.14_15_92_65
 </code></pre>
-<h2>Arithmetic Operations</h2>
-<h3><code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></h3>
-<h3><code>&lt;</code>, <code>&lt;=</code>, <code>=</code>, <code>&gt;=</code>, '<code>&gt;</code>, ‘!=’</h3>
-<h3><code>==</code>, ‘!==’</h3>
-<h2>Logic Operations</h2>
-<h3><code>&amp;&amp;</code>, <code>||</code>, <code>!</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code></h3>
+<h2>Operators</h2>
+<p>Most operators are infix operators: they have two operands, a left-hand side
+(lhs) operand and a right-hand side operand (rhs).</p>
+<p>An infix operator can either have whitespace before and after the operator or
+have no whitespace neither before nor after the operator.</p>
+<p>Infix operators have a precedence that indicate how strongly they bind to their
+operand and a left or right associativity.</p>
+<p>A few operators are prefix operators: they only have a right-hand side. Prefix
+operators are followed immediately by their operand: they cannot be separated by
+whitespace.</p>
+<p class="notice--info">The whitespace rules are necessary to support unambiguous parsing of expressions
+spanning multiple lines without requiring a separator between expressions</p>
+<h3>Arithmetic Operations</h3>
+<ul>
+<li><code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
+<li><code>&lt;</code>, <code>&lt;=</code>, <code>=</code>, <code>&gt;=</code>, '<code>&gt;</code>, ‘!=’</li>
+<li><code>==</code>, ‘!==’</li>
+</ul>
+<h3>Logic Operations</h3>
+<ul>
+<li><code>and</code>, <code>or</code>, <code>not</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code></li>
+</ul>
 <h2>Functions</h2>
-<h2>Tuples</h2>
-<h2>Dictionaries</h2>
+<h2>Collections</h2>
+<h3>Tuples</h3>
+<h3>Dictionaries</h3>
 <p>A dictionary is a collection of set of key/value pairs separated with a comma
 (<code>,</code>) and surrounded by curly brackets.</p>
 <p>Elements in a dictionary are not ordered and the keys are unique. They are
@@ -517,7 +613,7 @@ if the quotation mark is omitted the character escape sequences are not applied.
 {&quot;one&quot; -&gt; 1, &quot;two&quot; -&gt; 2}
 </code></pre>
 <p>The empty dictionary is <code>{-&gt;}</code>.</p>
-<h2>Lists</h2>
+<h3>Lists</h3>
 <p>A list is a collection of expressions separated with a comma <code>,</code> and surrounded
 by square brackets: <code>[</code> and <code>]</code></p>
 <p>Elements in a list are ordered and don’t have to be unique. They are iterable
@@ -526,7 +622,7 @@ and indexable with a numeric value (their order in the list, start with 0).</p>
 [3, 3 + 5, 3 + + 7, 3 + 5 + 7 + 11]
 </code></pre>
 <p>The empty list is <code>[]</code>.</p>
-<h2>Sets</h2>
+<h3>Sets</h3>
 <p>A set is a collection of expressions surrounded by curly brackets: <code>{</code> and <code>}</code>.</p>
 <p>Elements in a set are not ordered and must be unique. They are iterable but they
 are not indexable.</p>
@@ -541,10 +637,10 @@ are not indexable.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 21, 2021">
+        <meta itemprop="datePublished" content="April 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Apr 21 2021 09:51:13 GMT+0200 (Central European Summer Time)">April 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Apr 22 2021 17:31:56 GMT+0200 (Central European Summer Time)">April 22, 2021</time></p>
         
       </footer>
 

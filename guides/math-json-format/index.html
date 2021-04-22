@@ -621,7 +621,7 @@ representation of numbers, a JSON number can be used.</p>
 <li>a <a href="https://tools.ietf.org/html/rfc7159#section-7">JSON string</a> that starts and
 ends with <strong>U+0027 APOSTROPHE</strong> : <strong><code>'</code></strong>.</li>
 </ul>
-<p>String can contain any valid Unicode characters (codepoints in the
+<p>Strings can contain any character represented by a Unicode scalar value (in the
 [0…0x10FFFF] range, except for [0xD800…0xDFFF]), but the following
 characters must be escaped as indicated:</p>
 <ul>
@@ -635,7 +635,7 @@ characters must be escaped as indicated:</p>
 <li><strong>U+0022</strong>, Quotation mark: <code>\&quot;</code> or <code>\u0022</code></li>
 </ul>
 <p>The encoding of the string follows the encoding of the JSON payload: UTF-8,
-UTF-16, etc…</p>
+UTF-16LE, UTF-16BE, etc…</p>
 <pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
 </code></pre>
 <h2>Symbols</h2>
@@ -847,10 +847,10 @@ the equivalent object literal before being annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 21, 2021">
+        <meta itemprop="datePublished" content="April 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Apr 21 2021 09:51:13 GMT+0200 (Central European Summer Time)">April 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Apr 22 2021 17:31:56 GMT+0200 (Central European Summer Time)">April 22, 2021</time></p>
         
       </footer>
 

@@ -253,8 +253,9 @@
     renderMathInDocument();
 </script>
 <h1>Inside Cortex</h1>
-<p>A Cortex program is an expression that gets desugared to MathJSON, compiled,
-evaluated by the Cortex Compute Engine before its result is displayed.</p>
+<p>A Cortex program is an expression that gets transformed into an IR (Intermediate
+Representation) expressed in MathJSON, compiled and evaluated by the Cortex
+Compute Engine.</p>
 <p>The process to convert a Cortex program into a MathJSON expression is pretty
 straightforward:</p>
 <ul>
@@ -322,10 +323,10 @@ sequence = 2, 5, 7
         
 
 
-        <meta itemprop="datePublished" content="April 21, 2021">
+        <meta itemprop="datePublished" content="April 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Apr 21 2021 09:51:13 GMT+0200 (Central European Summer Time)">April 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Apr 22 2021 17:31:56 GMT+0200 (Central European Summer Time)">April 22, 2021</time></p>
         
       </footer>
 

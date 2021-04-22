@@ -460,12 +460,12 @@ loses focus and the content has been modified</p>
 </code-playground>
 <p>The <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
 no argument. You can control how the result is formatted by passing options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
-For example to get the content as an ASCIIMath string, use <code>getValue('ASCIIMath)</code>.</p>
-<p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'ASCIIMath'</code> to <code>'spoken-text'</code>.</p>
+For example to get the content as an ASCIIMath string, use <code>getValue('ascii-math)</code>.</p>
+<p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'ascii-math'</code> to <code>'spoken-text'</code>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.getValue('ASCIIMath'));
+    console.log(ev.target.getValue('ascii-math'));
 });</div>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
@@ -527,10 +527,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="April 03, 2021">
+        <meta itemprop="datePublished" content="April 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 03 2021 10:12:09 GMT+0200 (Central European Summer Time)">April 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Apr 22 2021 15:24:23 GMT+0200 (Central European Summer Time)">April 22, 2021</time></p>
         
       </footer>
 

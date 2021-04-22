@@ -259,6 +259,7 @@
 <li>An arrow (→) marks grammar productions and can be read as “can consist of”</li>
 <li>Syntactic categories are written in lowercase italic (<em>newline</em>) on both sides
 of a production rule.</li>
+<li>Placeholders for recursive syntactic categories are indicated by <em>···</em>.</li>
 <li>Literal words and punctuation are indicated in bold (<strong>+</strong>) or as a Unicode
 codepoint (U+00A0) or as a Unicode codepoint range (U+2000-U+200A).</li>
 <li>Alternatives are indicated by a vertical bar (|)</li>
@@ -326,10 +327,10 @@ U+FF41-U+FF46</p>
         
 
 
-        <meta itemprop="datePublished" content="April 21, 2021">
+        <meta itemprop="datePublished" content="April 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Apr 21 2021 09:51:13 GMT+0200 (Central European Summer Time)">April 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Apr 22 2021 17:31:56 GMT+0200 (Central European Summer Time)">April 22, 2021</time></p>
         
       </footer>
 
