@@ -511,9 +511,11 @@ mathfield is active</li>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
 <h3>Color</h3>
-<p>To change the foreground (“ink”) of a formula, use the <code>\textcolor{}{}</code>
-command. To change the background (“paper”), use the <code>\colorbox{}{}</code> command.</p>
-<p>The first argument is a color specified as:</p>
+<p>To change the foreground (“ink”) and background (“paper”) colors of a formula
+programmatically, use the <code>applyStyle()</code> function.</p>
+<p>To modify the foreground color you can also use the <code>\textcolor{}{}</code> command.
+To change the background, use the <code>\colorbox{}{}</code> command.</p>
+<p>The first argument of these commands is a color specified as:</p>
 <ul>
 <li>a RGB color using the standard CSS format (<code>#d7170b</code>)</li>
 <li>a <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">CSS color name</a> (<code>goldenrod</code>)</li>
@@ -521,15 +523,15 @@ command. To change the background (“paper”), use the <code>\colorbox{}{}</co
 <li>one of the 10 Mathematica color from <code>ColorData[97, &quot;ColorList&quot;]</code> (<code>m0</code> to <code>m9</code>)</li>
 <li>a color defined using the syntax from the <a href="http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf"><code>xcolor</code> package</a>, for example: <code>blue!20!black!30!green</code></li>
 </ul>
-<p>The following color names are recommended. They will map to these color values,
-which are different from the <code>dvips</code> values. They can be applied using the color keys in the virtual keyboard:</p>
+<p>The following color names are recommended. They can be applied using the color
+keys in the virtual keyboard:</p>
 <p><img src="/assets/images/mathfield/colors.png" alt=""></p>
 <p class="notice--info">These colors have been carefully selected for a balanced representation of the range of
-hues on the color circle and to have similar lightness and intensity.</p>
-<p class="notice--info">To have proper visibility based on usage, these color names will map to
+hues on the color circle, with similar lightness and intensity. They will map to  different color values than the <code>dvips</code> colors of the same name.</p>
+<p class="notice--info">To have proper legibility based on usage, these color names will map to
 different values when used as a foreground color
-and a background color. To ensure a precise color value, use a RGB color instead.</p>
-<p class="notice--info">How the color names are interpreted can be customized by providing a <code>colorMap</code>
+and a background color. To use a specific color value, use a RGB color instead.</p>
+<p class="notice--info">To customize how the color names are interpreted provide a <code>colorMap</code>
 or <code>backgroundColorMap</code> function.</p>
 <h3>Size</h3>
 <p>To change the base font size, set the <code>font-size</code> CSS property to the desired
@@ -668,7 +670,7 @@ console.log(mf.getOptions().strings[locale]);
         <meta itemprop="datePublished" content="May 01, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat May 01 2021 09:37:45 GMT+0200 (Central European Summer Time)">May 01, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat May 01 2021 12:16:29 GMT+0200 (Central European Summer Time)">May 01, 2021</time></p>
         
       </footer>
 
