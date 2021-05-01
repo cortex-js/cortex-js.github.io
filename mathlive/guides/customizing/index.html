@@ -482,7 +482,7 @@ you can specify where the fonts can be located using the <a href="http://cortexj
 used by all the mathfields in the page.</p>
 <p class="notice--info">Learn more about configuring the MathLive library to your environment,
 including using custom asset pipelines and bundlers in the <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.</p>
-<h2>CSS variables</h2>
+<h2>CSS Variables</h2>
 <p>Some CSS variables can be used to modify the appearance of the mathfield:</p>
 <ul>
 <li><code>--hue</code>: (0…360) default is 212 (light blue). The default colors below are derived
@@ -492,6 +492,9 @@ mathfield is active</li>
 <li><code>--highlight-inactive</code>: selection color when the mathfield is not focused</li>
 <li><code>--caret</code>: color of the caret (insertion point)</li>
 <li><code>--primary</code>: accent color for some UI elements, such as the virtual keyboard toggle</li>
+<li><code>--smart-fence-opacity</code>: opacity of a smart gence (default is 50%)</li>
+<li><code>--smart-fence-color</code>: color of a smart fence (default is current color)</li>
+<li><code>--text-font-family</code>: the font stack used in text mode</li>
 </ul>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -504,7 +507,97 @@ mathfield is active</li>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<h2>Editing options</h2>
+<h2>Display Options</h2>
+<p>The appearance of a formula, in an editable mathfield or as a static
+representation, can be controlled with some of the following options:</p>
+<h3>Color</h3>
+<p>To change the foreground (“ink”) of a formula, use the <code>\textcolor{}{}</code>
+command. To change the background (“paper”), use the <code>\colorbox{}{}</code> command.</p>
+<p>The first argument is a color specified as:</p>
+<ul>
+<li>a RGB color using the standard CSS format (<code>#d7170b</code>)</li>
+<li>a <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">CSS color name</a> (<code>goldenrod</code>)</li>
+<li>one of the 68 colors from <a href="https://ctan.org/pkg/colordvi">dvips color name</a> (<code>cadetblue</code>)</li>
+<li>one of the 10 Mathematica color from <code>ColorData[97, &quot;ColorList&quot;]</code> (<code>m0</code> to <code>m9</code>)</li>
+<li>a color defined using the syntax from the <a href="http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf"><code>xcolor</code> package</a>, for example: <code>blue!20!black!30!green</code></li>
+</ul>
+<p>The following color names are recommended. They will map to these color values,
+which are different from the <code>dvips</code> values. They can be applied using the color keys in the virtual keyboard:</p>
+<p><img src="/assets/images/mathfield/colors.png" alt=""></p>
+<p class="notice--info">These colors have been carefully selected for a balanced representation of the range of
+hues on the color circle and to have similar lightness and intensity.</p>
+<p class="notice--info">To have proper visibility based on usage, these color names will map to
+different values when used as a foreground color
+and a background color. To ensure a precise color value, use a RGB color instead.</p>
+<p class="notice--info">How the color names are interpreted can be customized by providing a <code>colorMap</code>
+or <code>backgroundColorMap</code> function.</p>
+<h3>Size</h3>
+<p>To change the base font size, set the <code>font-size</code> CSS property to the desired
+value on the <code>mathfield</code> or static element.</p>
+<p>Within a formula, the size can be specified from a font scale with 10 values, where 1 em is the base font size.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><code>fontSize</code></th>
+<th style="text-align:left"></th>
+<th style="text-align:left">command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">1</td>
+<td style="text-align:left">0.5 em</td>
+<td style="text-align:left"><code>\tiny</code></td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td style="text-align:left">0.7 em</td>
+<td style="text-align:left"><code>\tiny</code></td>
+</tr>
+<tr>
+<td style="text-align:right">3</td>
+<td style="text-align:left">0.8 em</td>
+<td style="text-align:left"><code>\footnotesize</code></td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td style="text-align:left">0.9 em</td>
+<td style="text-align:left"><code>\small</code></td>
+</tr>
+<tr>
+<td style="text-align:right">5</td>
+<td style="text-align:left">1.0 em</td>
+<td style="text-align:left"><code>\normalsize</code> or <code>\normal</code></td>
+</tr>
+<tr>
+<td style="text-align:right">6</td>
+<td style="text-align:left">1.2 em</td>
+<td style="text-align:left"><code>\large</code></td>
+</tr>
+<tr>
+<td style="text-align:right">7</td>
+<td style="text-align:left">1.44 em</td>
+<td style="text-align:left"><code>\Large</code></td>
+</tr>
+<tr>
+<td style="text-align:right">8</td>
+<td style="text-align:left">1.728 em</td>
+<td style="text-align:left"><code>\LARGE</code></td>
+</tr>
+<tr>
+<td style="text-align:right">9</td>
+<td style="text-align:left">2.074 em</td>
+<td style="text-align:left"><code>\huge</code></td>
+</tr>
+<tr>
+<td style="text-align:right">10</td>
+<td style="text-align:left">2.488 em</td>
+<td style="text-align:left"><code>\Huge</code></td>
+</tr>
+</tbody>
+</table>
+<p class="notice--warning">In TeX, the sizing commands behave inconsistently when applied to math. Other implementations of TeX may also interpret the sizing commands differently.</p>
+<h2>Editing Options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
 the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
 as we’ve see above with the <code>fontsDirectory</code> option.</p>
@@ -572,10 +665,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2021">
+        <meta itemprop="datePublished" content="May 01, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 24 2021 12:22:39 GMT+0200 (Central European Summer Time)">April 24, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat May 01 2021 09:37:45 GMT+0200 (Central European Summer Time)">May 01, 2021</time></p>
         
       </footer>
 
