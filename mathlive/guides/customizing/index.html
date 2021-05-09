@@ -536,7 +536,8 @@ or <code>backgroundColorMap</code> function.</p>
 <h3>Size</h3>
 <p>To change the base font size, set the <code>font-size</code> CSS property to the desired
 value on the <code>mathfield</code> or static element.</p>
-<p>Within a formula, the size can be specified from a font scale with 10 values, where 1 em is the base font size.</p>
+<p>Within a formula, the size can be specified from a font scale with 10 values,
+where 1 em is the base font size of the mathfield or static element.</p>
 <table>
 <thead>
 <tr>
@@ -598,7 +599,89 @@ value on the <code>mathfield</code> or static element.</p>
 </tr>
 </tbody>
 </table>
-<p class="notice--warning">In TeX, the sizing commands behave inconsistently when applied to math. Other implementations of TeX may also interpret the sizing commands differently.</p>
+<p class="notice--warning">In TeX, the sizing commands behave inconsistently when applied to math.
+Other implementations of TeX may also interpret the sizing commands
+differently.</p>
+<h3>Math Layout</h3>
+<p>To control some aspects of the math typesetting, change the mathstyle with
+the commands <code>\displaystyle</code>, <code>\textstyle</code>, <code>\scriptstyle</code>, <code>\scriptscriptstyle</code>.</p>
+<p><img src="/assets/images/mathfield/mathstyles.png" alt=""></p>
+<p>The <code>displaystyle</code> style is most appropriate when there is plenty of space around
+the  formula. Limits over large operators, such as <code>\sum</code> are displayed above
+and below the operator. There is a generous amount of space below the numerator
+and above the denominator of fractions, and around relational (<code>=</code>) and binary
+(<code>+</code>) operators.</p>
+<p>The <code>textstyle</code> style is useful when space is constrained or when displaying
+a formula with some regular text around it. The limits of large operators
+are displayed after the operator. The numerator and denominator of fractions is
+displayed using a smaller font size. However, the font-size for other characters
+is not affected.</p>
+<p>The <code>scriptstyle</code> and <code>scriptscriptstyle</code> are rarely needed explicitly. The
+content is laid out using a smaller font-size (70% and 50% of the base font-size,
+respectively) and the spacing between operators is minimized. Note however
+that these styles are used automatically in some situations. For example,
+when using the <code>displaystyle</code> or <code>textstyle</code>, the limits of a large operator
+or the superscript or subscript of a symbol are displayed using these styles.
+Notice for example that <code>n=0</code> in <code>displaystyle</code> does not include space around
+the <code>=</code> sign because the limit is displayed in <code>scriptstyle</code>.</p>
+<p>To set the default mathstyle of a mathfield, use the <code>defaultMode</code> option
+(or the <code>default-mode</code> attribute).
+Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
+<p>To increase the default spacing between items, use the <code>horizontalSpacingScale</code>
+option (or the <code>horizontal-spacing-scale</code> attribute). Setting to a value of
+<code>1.5</code> will increase the spacing by 50%. A value of <code>1.1</code> is generally
+sufficient. This might be useful to make the formulas easier to read.</p>
+<h3>Letter Shape Style</h3>
+<p>To control which letters are automatically italicized, use the <code>letterShapeStyle</code> configuration option.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><code>letterShapeStyle</code></th>
+<th>xyz</th>
+<th>ABC</th>
+<th>αβɣ</th>
+<th>ΓΔΘ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>iso</code></td>
+<td><em>xyz</em></td>
+<td><em>ABC</em></td>
+<td><em>αβɣ</em></td>
+<td><em>ΓΔΘ</em></td>
+</tr>
+<tr>
+<td style="text-align:right"><code>tex</code></td>
+<td><em>xyz</em></td>
+<td><em>ABC</em></td>
+<td><em>αβɣ</em></td>
+<td>ΓΔΘ</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>french</code></td>
+<td><em>xyz</em></td>
+<td>ABC</td>
+<td>αβɣ</td>
+<td>ΓΔΘ</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>upright</code></td>
+<td>xyz</td>
+<td>ABC</td>
+<td>αβɣ</td>
+<td>ΓΔΘ</td>
+</tr>
+</tbody>
+</table>
+<p>In the <a href="https://www.nist.gov/pml/special-publication-811">ISO</a> style, lower and
+uppercase roman letter and lower and upper case greek letters are italicized
+when used as a variable. Mathematical constants such as $$e$$ are written upright.</p>
+<p>TeX has traditionally implemented a layout option that italicizes romman
+letters and lowercase greek letters, but not uppercase greek letters.</p>
+<p>The French typographical convention is to only italicize lowercase roman letters.</p>
+<p>The default letter shape style is <code>auto</code>: if the system locale is “french”,
+the <code>french</code> style is used, <code>tex</code> otherwise.</p>
 <h2>Editing Options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
 the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
@@ -667,10 +750,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="May 01, 2021">
+        <meta itemprop="datePublished" content="May 02, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat May 01 2021 12:16:29 GMT+0200 (Central European Summer Time)">May 01, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 02 2021 17:26:26 GMT+0200 (Central European Summer Time)">May 02, 2021</time></p>
         
       </footer>
 
