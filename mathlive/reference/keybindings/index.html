@@ -1,0 +1,2431 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/math-json/" >MathJSON</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cortex/" >Cortex</a>
+            </li><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/commands/" class="">Supported Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/keybindings/" class="active">Keyboard Shortcuts</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument();
+</script>
+<style>
+  ul.command-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  ul.command-list,
+  .command-list li {
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+  }
+</style>
+<h2>Keybindings</h2>
+<p>Commands to edit and modify a formula can be invoked by pressing some key
+combinations.</p>
+<h3>All Modes</h3>
+<p>The shortcuts apply in all modes.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Keybinding</th>
+<th style="text-align:left">Result</th>
+<th style="text-align:right">OS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>⇠</code></td>
+<td style="text-align:left">move to previous char</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇢</code></td>
+<td style="text-align:left">move to next char</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇡</code></td>
+<td style="text-align:left">move up</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇣</code></td>
+<td style="text-align:left">move down</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇠</code></td>
+<td style="text-align:left">extend selection backward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇢</code></td>
+<td style="text-align:left">extend selection forward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇡</code></td>
+<td style="text-align:left">extend selection upward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇣</code></td>
+<td style="text-align:left">extend selection downward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌫</code></td>
+<td style="text-align:left">delete backward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌦</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌦</code></td>
+<td style="text-align:left">delete forward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌫</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⇠</code></td>
+<td style="text-align:left">move to previous word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⇢</code></td>
+<td style="text-align:left">move to next word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥⇠</code></td>
+<td style="text-align:left">extend to previous word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥⇢</code></td>
+<td style="text-align:left">extend to next word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⇠</code></td>
+<td style="text-align:left">move to group start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⇢</code></td>
+<td style="text-align:left">move to group end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃⇠</code></td>
+<td style="text-align:left">extend to group start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃⇢</code></td>
+<td style="text-align:left">extend to group end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>space</code></td>
+<td style="text-align:left">move after parent</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧space</code></td>
+<td style="text-align:left">move before parent</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⤒</code></td>
+<td style="text-align:left">move to math field start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⇠</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⤒</code></td>
+<td style="text-align:left">extend to math field start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘⇠</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⤓</code></td>
+<td style="text-align:left">move to math field end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⇢</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⤓</code></td>
+<td style="text-align:left">extend to math field end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘⇢</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇞</code></td>
+<td style="text-align:left">move to group start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇟</code></td>
+<td style="text-align:left">move to group end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left">move to next placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇥</code></td>
+<td style="text-align:left">move to previous placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left">move to next placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇥</code></td>
+<td style="text-align:left">move to previous placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>esc</code></td>
+<td style="text-align:left">switchMode(“latex”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>esc</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[INTLBACKSLASH]</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥=</code></td>
+<td style="text-align:left">applyStyle({“mode”:“text”})</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥=</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>esc</code></td>
+<td style="text-align:left">complete(“complete”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left">complete(“accept-suggestion”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⏎</code></td>
+<td style="text-align:left">complete</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌤</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧esc</code></td>
+<td style="text-align:left">complete(“reject”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇣</code></td>
+<td style="text-align:left">next suggestion</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇡</code></td>
+<td style="text-align:left">previous suggestion</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃A</code></td>
+<td style="text-align:left">select all</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘A</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[CUT]</code></td>
+<td style="text-align:left">cut to clipboard</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[COPY]</code></td>
+<td style="text-align:left">copy to clipboard</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[PASTE]</code></td>
+<td style="text-align:left">paste from clipboard</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[CLEAR]</code></td>
+<td style="text-align:left">delete backward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃Z</code></td>
+<td style="text-align:left">undo</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘Z</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[UNDO]</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃Y</code></td>
+<td style="text-align:left">redo</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘Y</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃Z</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘Z</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[REDO]</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[ERASEEOF]</code></td>
+<td style="text-align:left">delete to group end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃B</code></td>
+<td style="text-align:left">move to previous char</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃F</code></td>
+<td style="text-align:left">move to next char</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃P</code></td>
+<td style="text-align:left">move up</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃N</code></td>
+<td style="text-align:left">move down</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃A</code></td>
+<td style="text-align:left">move to math field start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃E</code></td>
+<td style="text-align:left">move to math field end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃B</code></td>
+<td style="text-align:left">extend selection backward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃F</code></td>
+<td style="text-align:left">extend selection forward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃P</code></td>
+<td style="text-align:left">extend selection upward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃N</code></td>
+<td style="text-align:left">extend selection downward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃A</code></td>
+<td style="text-align:left">extend to math field start</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃E</code></td>
+<td style="text-align:left">extend to math field end</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌃B</code></td>
+<td style="text-align:left">move to previous word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌃F</code></td>
+<td style="text-align:left">move to next word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥⌃B</code></td>
+<td style="text-align:left">extend to previous word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥⌃F</code></td>
+<td style="text-align:left">extend to next word</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃H</code></td>
+<td style="text-align:left">delete backward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃D</code></td>
+<td style="text-align:left">delete forward</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃L</code></td>
+<td style="text-align:left">scroll into view</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧[QUOTE]</code></td>
+<td style="text-align:left">switchMode(“text”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧[QUOTE]</code></td>
+<td style="text-align:left">switchMode(“math”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃2</code></td>
+<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃5</code></td>
+<td style="text-align:left">move to opposite</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃6</code></td>
+<td style="text-align:left">move to superscript</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃-</code></td>
+<td style="text-align:left">move to subscript</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥[</code></td>
+<td style="text-align:left">$$\left\lbrack #0 \right\rbrack$$  —<code>$$\left\lbrack #0 \right\rbrack$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥[</code></td>
+<td style="text-align:left">$$\left\lbrace #0 \right\rbrace$$  —<code>$$\left\lbrace #0 \right\rbrace$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⏎</code></td>
+<td style="text-align:left">add row after</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⌤</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⏎</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⌤</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃;</code></td>
+<td style="text-align:left">add row before</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃,</code></td>
+<td style="text-align:left">add column after</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥P</code></td>
+<td style="text-align:left">$$\pi$$  —<code>$$\pi$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥V</code></td>
+<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥W</code></td>
+<td style="text-align:left">$$\sum_{i=#?}^{#?}$$  —<code>$$\sum_{i=#?}^{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥B</code></td>
+<td style="text-align:left">$$\int_{#?}^{#?}$$  —<code>$$\int_{#?}^{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥U</code></td>
+<td style="text-align:left">$$\cup$$  —<code>$$\cup$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥N</code></td>
+<td style="text-align:left">$$\cap$$  —<code>$$\cap$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥O</code></td>
+<td style="text-align:left">$$\emptyset$$  —<code>$$\emptyset$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥D</code></td>
+<td style="text-align:left">$$\differentialD$$  —<code>$$\differentialD$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥O</code></td>
+<td style="text-align:left">$$\varnothing$$  —<code>$$\varnothing$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥D</code></td>
+<td style="text-align:left">$$\partial$$  —<code>$$\partial$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥P</code></td>
+<td style="text-align:left">$$\prod_{i=#?}^{#?}$$  —<code>$$\prod_{i=#?}^{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥U</code></td>
+<td style="text-align:left">$$\bigcup$$  —<code>$$\bigcup$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥N</code></td>
+<td style="text-align:left">$$\bigcap$$  —<code>$$\bigcap$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥A</code></td>
+<td style="text-align:left">$$\forall$$  —<code>$$\forall$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥E</code></td>
+<td style="text-align:left">$$\exists$$  —<code>$$\exists$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥5</code></td>
+<td style="text-align:left">$$$\infty$$  —<code>$\infty$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥6</code></td>
+<td style="text-align:left">$$\wedge$$  —<code>$$\wedge$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥6</code></td>
+<td style="text-align:left">$$\vee$$  —<code>$$\vee$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥9</code></td>
+<td style="text-align:left">$$($$  —<code>(</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥0</code></td>
+<td style="text-align:left">$$)$$  —<code>)</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left">`⌥</td>
+<td style="text-align:left">`</td>
+<td style="text-align:right">$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥\</code></td>
+<td style="text-align:left">$$\backslash$$  —<code>$$\backslash$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>/</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥/</code></td>
+<td style="text-align:left">$$/$$  —<code>$$\/$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[NUMPADDIVIDE]</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥[NUMPADDIVIDE]</code></td>
+<td style="text-align:left">$$\frac{#?}{\unicode{&quot;2B1A}}$$  —<code>\frac{#?}{#@}</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧[BACKQUOTE]</code></td>
+<td style="text-align:left">$$~$$  —<code>$$\~$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥K</code></td>
+<td style="text-align:left">toggle keystroke caption</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥space</code></td>
+<td style="text-align:left">toggle virtual keyboard</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌃⇡</code></td>
+<td style="text-align:left">speak(“parent”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥⌃⇣</code></td>
+<td style="text-align:left">speak(“all”)</td>
+<td style="text-align:right"></td>
+</tr>
+</tbody>
+</table>
+<h3>Math Mode Only</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Keybinding</th>
+<th style="text-align:left">Result</th>
+<th style="text-align:right">OS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>space</code></td>
+<td style="text-align:left">move after parent</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧space</code></td>
+<td style="text-align:left">move before parent</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left">move to next placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⇥</code></td>
+<td style="text-align:left">move to previous placeholder</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>esc</code></td>
+<td style="text-align:left">switchMode(“latex”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[INTLBACKSLASH]</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥=</code></td>
+<td style="text-align:left">applyStyle({“mode”:“text”})</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧[QUOTE]</code></td>
+<td style="text-align:left">switchMode(“text”)</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃2</code></td>
+<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃5</code></td>
+<td style="text-align:left">move to opposite</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃6</code></td>
+<td style="text-align:left">move to superscript</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃-</code></td>
+<td style="text-align:left">move to subscript</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥[</code></td>
+<td style="text-align:left">$$\left\lbrack #0 \right\rbrack$$  —<code>$$\left\lbrack #0 \right\rbrack$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥[</code></td>
+<td style="text-align:left">$$\left\lbrace #0 \right\rbrace$$  —<code>$$\left\lbrace #0 \right\rbrace$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⏎</code></td>
+<td style="text-align:left">add row after</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃⌤</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⏎</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘⌤</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃;</code></td>
+<td style="text-align:left">add row before</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘;</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌃,</code></td>
+<td style="text-align:left">add column after</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌘,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌃,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌘,</code></td>
+<td style="text-align:left">〃</td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥P</code></td>
+<td style="text-align:left">$$\pi$$  —<code>$$\pi$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥V</code></td>
+<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥W</code></td>
+<td style="text-align:left">$$\sum_{i=#?}^{#?}$$  —<code>$$\sum_{i=#?}^{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥U</code></td>
+<td style="text-align:left">$$\cup$$  —<code>$$\cup$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥N</code></td>
+<td style="text-align:left">$$\cap$$  —<code>$$\cap$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥O</code></td>
+<td style="text-align:left">$$\emptyset$$  —<code>$$\emptyset$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥D</code></td>
+<td style="text-align:left">$$\differentialD$$  —<code>$$\differentialD$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥O</code></td>
+<td style="text-align:left">$$\varnothing$$  —<code>$$\varnothing$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥D</code></td>
+<td style="text-align:left">$$\partial$$  —<code>$$\partial$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥P</code></td>
+<td style="text-align:left">$$\prod_{i=#?}^{#?}$$  —<code>$$\prod_{i=#?}^{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥U</code></td>
+<td style="text-align:left">$$\bigcup$$  —<code>$$\bigcup$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥N</code></td>
+<td style="text-align:left">$$\bigcap$$  —<code>$$\bigcap$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥A</code></td>
+<td style="text-align:left">$$\forall$$  —<code>$$\forall$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥E</code></td>
+<td style="text-align:left">$$\exists$$  —<code>$$\exists$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥5</code></td>
+<td style="text-align:left">$$$\infty$$  —<code>$\infty$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥6</code></td>
+<td style="text-align:left">$$\wedge$$  —<code>$$\wedge$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧⌥6</code></td>
+<td style="text-align:left">$$\vee$$  —<code>$$\vee$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥9</code></td>
+<td style="text-align:left">$$($$  —<code>(</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥0</code></td>
+<td style="text-align:left">$$)$$  —<code>)</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left">`⌥</td>
+<td style="text-align:left">`</td>
+<td style="text-align:right">$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥\</code></td>
+<td style="text-align:left">$$\backslash$$  —<code>$$\backslash$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>/</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥/</code></td>
+<td style="text-align:left">$$/$$  —<code>$$\/$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[NUMPADDIVIDE]</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⌥[NUMPADDIVIDE]</code></td>
+<td style="text-align:left">$$\frac{#?}{\unicode{&quot;2B1A}}$$  —<code>\frac{#?}{#@}</code></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>⇧[BACKQUOTE]</code></td>
+<td style="text-align:left">$$~$$  —<code>$$\~$$</code></td>
+<td style="text-align:right"></td>
+</tr>
+</tbody>
+</table>
+<h2>Inline Shortcuts</h2>
+<p>Some sequence of characters can be automatically translated to symbols. For example, typing p followed by i will result in “π”.</p>
+<p>If the conversion was not desired, for example you actually meant “pi”, type ctrl/⌘ Z to undo it.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Trigger</th>
+<th style="text-align:left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>%</code></td>
+<td style="text-align:left">$$%$$ <code>\%</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>''</code></td>
+<td style="text-align:left">$$^{\doubleprime}$$ <code>^{\doubleprime}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>alpha</code></td>
+<td style="text-align:left">$$\alpha$$ <code>\alpha</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>delta</code></td>
+<td style="text-align:left">$$\delta$$ <code>\delta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Delta</code></td>
+<td style="text-align:left">$$\Delta$$ <code>\Delta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pi</code></td>
+<td style="text-align:left">$$\pi$$ <code>\pi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pi </code></td>
+<td style="text-align:left">$$\pi $$ <code>\pi </code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Pi</code></td>
+<td style="text-align:left">$$\Pi$$ <code>\Pi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>theta</code></td>
+<td style="text-align:left">$$\theta$$ <code>\theta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Theta</code></td>
+<td style="text-align:left">$$\Theta$$ <code>\Theta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ii</code></td>
+<td style="text-align:left">$$\imaginaryI$$ <code>\imaginaryI</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>jj</code></td>
+<td style="text-align:left">$$\imaginaryJ$$ <code>\imaginaryJ</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ee</code></td>
+<td style="text-align:left">$$\exponentialE$$ <code>\exponentialE</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nabla</code></td>
+<td style="text-align:left">$$\nabla$$ <code>\nabla</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>grad</code></td>
+<td style="text-align:left">$$\nabla$$ <code>\nabla</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>del</code></td>
+<td style="text-align:left">$$\partial$$ <code>\partial</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>infty</code></td>
+<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>∞</code></td>
+<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>oo</code></td>
+<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>∑</code></td>
+<td style="text-align:left">$$\sum$$ <code>\sum</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sum</code></td>
+<td style="text-align:left">$$\sum_{#?}^{#?}$$ <code>\sum_{#?}^{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:left">$$\int_{#?}^{#?}$$ <code>\int_{#?}^{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>prod</code></td>
+<td style="text-align:left">$$\prod_{#?}^{#?}$$ <code>\prod_{#?}^{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sqrt</code></td>
+<td style="text-align:left">$$\sqrt{#?}$$ <code>\sqrt{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>∆</code></td>
+<td style="text-align:left">$$\differentialD$$ <code>\differentialD</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>∂</code></td>
+<td style="text-align:left">$$\differentialD$$ <code>\differentialD</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>arcsin</code></td>
+<td style="text-align:left">$$\arcsin$$ <code>\arcsin</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>arccos</code></td>
+<td style="text-align:left">$$\arccos$$ <code>\arccos</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>arctan</code></td>
+<td style="text-align:left">$$\arctan$$ <code>\arctan</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sin</code></td>
+<td style="text-align:left">$$\sin$$ <code>\sin</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sinh</code></td>
+<td style="text-align:left">$$\sinh$$ <code>\sinh</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cos</code></td>
+<td style="text-align:left">$$\cos$$ <code>\cos</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cosh</code></td>
+<td style="text-align:left">$$\cosh$$ <code>\cosh</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>tan</code></td>
+<td style="text-align:left">$$\tan$$ <code>\tan</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>tanh</code></td>
+<td style="text-align:left">$$\tanh$$ <code>\tanh</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sec</code></td>
+<td style="text-align:left">$$\sec$$ <code>\sec</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>csc</code></td>
+<td style="text-align:left">$$\csc$$ <code>\csc</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cot</code></td>
+<td style="text-align:left">$$\cot$$ <code>\cot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>log</code></td>
+<td style="text-align:left">$$\log$$ <code>\log</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ln</code></td>
+<td style="text-align:left">$$\ln$$ <code>\ln</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>exp</code></td>
+<td style="text-align:left">$$\exp$$ <code>\exp</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lim</code></td>
+<td style="text-align:left">$$\lim_{#?}$$ <code>\lim_{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dx</code></td>
+<td style="text-align:left">$$\differentialD x$$ <code>\differentialD x</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dy</code></td>
+<td style="text-align:left">$$\differentialD y$$ <code>\differentialD y</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dt</code></td>
+<td style="text-align:left">$$\differentialD t$$ <code>\differentialD t</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>AA</code></td>
+<td style="text-align:left">$$\forall$$ <code>\forall</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>EE</code></td>
+<td style="text-align:left">$$\exists$$ <code>\exists</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>!EE</code></td>
+<td style="text-align:left">$$\nexists$$ <code>\nexists</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&amp;&amp;</code></td>
+<td style="text-align:left">$$\land$$ <code>\land</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>xin</code></td>
+<td style="text-align:left">$$x \in$$ <code>x \in</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>in</code></td>
+<td style="text-align:left">$$\in$$ <code>\in</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>!in</code></td>
+<td style="text-align:left">$$\notin$$ <code>\notin</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>NN</code></td>
+<td style="text-align:left">$$\N$$ <code>\N</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ZZ</code></td>
+<td style="text-align:left">$$\Z$$ <code>\Z</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>QQ</code></td>
+<td style="text-align:left">$$\Q$$ <code>\Q</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>RR</code></td>
+<td style="text-align:left">$$\R$$ <code>\R</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>CC</code></td>
+<td style="text-align:left">$$\C$$ <code>\C</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>PP</code></td>
+<td style="text-align:left">$$\P$$ <code>\P</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>xx</code></td>
+<td style="text-align:left">$$\times$$ <code>\times</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>+-</code></td>
+<td style="text-align:left">$$\pm$$ <code>\pm</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>!=</code></td>
+<td style="text-align:left">$$\ne$$ <code>\ne</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&gt;=</code></td>
+<td style="text-align:left">$$\ge$$ <code>\ge</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;=</code></td>
+<td style="text-align:left">$$\le$$ <code>\le</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;&lt;</code></td>
+<td style="text-align:left">$$\ll$$ <code>\ll</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&gt;&gt;</code></td>
+<td style="text-align:left">$$\gg$$ <code>\gg</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>~~</code></td>
+<td style="text-align:left">$$\approx$$ <code>\approx</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>≈</code></td>
+<td style="text-align:left">$$\approx$$ <code>\approx</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>?=</code></td>
+<td style="text-align:left">$$\questeq$$ <code>\questeq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>÷</code></td>
+<td style="text-align:left">$$\div$$ <code>\div</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>¬</code></td>
+<td style="text-align:left">$$\neg$$ <code>\neg</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>:=</code></td>
+<td style="text-align:left">$$\coloneq$$ <code>\coloneq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>::</code></td>
+<td style="text-align:left">$$\Colon$$ <code>\Colon</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(:</code></td>
+<td style="text-align:left">$$\langle$$ <code>\langle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>:)</code></td>
+<td style="text-align:left">$$\rangle$$ <code>\rangle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>beta</code></td>
+<td style="text-align:left">$$\beta$$ <code>\beta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>chi</code></td>
+<td style="text-align:left">$$\chi$$ <code>\chi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>epsilon</code></td>
+<td style="text-align:left">$$\epsilon$$ <code>\epsilon</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>varepsilon</code></td>
+<td style="text-align:left">$$\varepsilon$$ <code>\varepsilon</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>eta</code></td>
+<td style="text-align:left">$$\eta$$ <code>\eta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>eta </code></td>
+<td style="text-align:left">$$\eta $$ <code>\eta </code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gamma</code></td>
+<td style="text-align:left">$$\gamma$$ <code>\gamma</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Gamma</code></td>
+<td style="text-align:left">$$\Gamma$$ <code>\Gamma</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>iota</code></td>
+<td style="text-align:left">$$\iota$$ <code>\iota</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>kappa</code></td>
+<td style="text-align:left">$$\kappa$$ <code>\kappa</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lambda</code></td>
+<td style="text-align:left">$$\lambda$$ <code>\lambda</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Lambda</code></td>
+<td style="text-align:left">$$\Lambda$$ <code>\Lambda</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mu</code></td>
+<td style="text-align:left">$$\mu$$ <code>\mu</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mu </code></td>
+<td style="text-align:left">$$\mu $$ <code>\mu </code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nu</code></td>
+<td style="text-align:left">$$\nu$$ <code>\nu</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nu </code></td>
+<td style="text-align:left">$$\nu $$ <code>\nu </code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>µ</code></td>
+<td style="text-align:left">$$\mu$$ <code>\mu</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>phi</code></td>
+<td style="text-align:left">$$\phi$$ <code>\phi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Phi</code></td>
+<td style="text-align:left">$$\Phi$$ <code>\Phi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>varphi</code></td>
+<td style="text-align:left">$$\varphi$$ <code>\varphi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>psi</code></td>
+<td style="text-align:left">$$\psi$$ <code>\psi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Psi</code></td>
+<td style="text-align:left">$$\Psi$$ <code>\Psi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>rho</code></td>
+<td style="text-align:left">$$\rho$$ <code>\rho</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sigma</code></td>
+<td style="text-align:left">$$\sigma$$ <code>\sigma</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Sigma</code></td>
+<td style="text-align:left">$$\Sigma$$ <code>\Sigma</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>tau</code></td>
+<td style="text-align:left">$$\tau$$ <code>\tau</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>vartheta</code></td>
+<td style="text-align:left">$$\vartheta$$ <code>\vartheta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>upsilon</code></td>
+<td style="text-align:left">$$\upsilon$$ <code>\upsilon</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>xi</code></td>
+<td style="text-align:left">$$\xi$$ <code>\xi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Xi</code></td>
+<td style="text-align:left">$$\Xi$$ <code>\Xi</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>zeta</code></td>
+<td style="text-align:left">$$\zeta$$ <code>\zeta</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>omega</code></td>
+<td style="text-align:left">$$\omega$$ <code>\omega</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Omega</code></td>
+<td style="text-align:left">$$\Omega$$ <code>\Omega</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Ω</code></td>
+<td style="text-align:left">$$\omega$$ <code>\omega</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>forall</code></td>
+<td style="text-align:left">$$\forall$$ <code>\forall</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>exists</code></td>
+<td style="text-align:left">$$\exists$$ <code>\exists</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>!exists</code></td>
+<td style="text-align:left">$$\nexists$$ <code>\nexists</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>:.</code></td>
+<td style="text-align:left">$$\therefore$$ <code>\therefore</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>liminf</code></td>
+<td style="text-align:left">$$\operatorname*{lim~inf}_{#?}$$ <code>\operatorname*{lim~inf}_{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>limsup</code></td>
+<td style="text-align:left">$$\operatorname*{lim~sup}_{#?}$$ <code>\operatorname*{lim~sup}_{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>argmin</code></td>
+<td style="text-align:left">$$\operatorname*{arg~min}_{#?}$$ <code>\operatorname*{arg~min}_{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>argmax</code></td>
+<td style="text-align:left">$$\operatorname*{arg~max}_{#?}$$ <code>\operatorname*{arg~max}_{#?}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>det</code></td>
+<td style="text-align:left">$$\det$$ <code>\det</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mod</code></td>
+<td style="text-align:left">$$\mod$$ <code>\mod</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>max</code></td>
+<td style="text-align:left">$$\max$$ <code>\max</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>min</code></td>
+<td style="text-align:left">$$\min$$ <code>\min</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>erf</code></td>
+<td style="text-align:left">$$\operatorname{erf}$$ <code>\operatorname{erf}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>erfc</code></td>
+<td style="text-align:left">$$\operatorname{erfc}$$ <code>\operatorname{erfc}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>bessel</code></td>
+<td style="text-align:left">$$\operatorname{bessel}$$ <code>\operatorname{bessel}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mean</code></td>
+<td style="text-align:left">$$\operatorname{mean}$$ <code>\operatorname{mean}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>median</code></td>
+<td style="text-align:left">$$\operatorname{median}$$ <code>\operatorname{median}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>fft</code></td>
+<td style="text-align:left">$$\operatorname{fft}$$ <code>\operatorname{fft}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lcm</code></td>
+<td style="text-align:left">$$\operatorname{lcm}$$ <code>\operatorname{lcm}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gcd</code></td>
+<td style="text-align:left">$$\operatorname{gcd}$$ <code>\operatorname{gcd}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>randomReal</code></td>
+<td style="text-align:left">$$\operatorname{randomReal}$$ <code>\operatorname{randomReal}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>randomInteger</code></td>
+<td style="text-align:left">$$\operatorname{randomInteger}$$ <code>\operatorname{randomInteger}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Re</code></td>
+<td style="text-align:left">$$\operatorname{Re}$$ <code>\operatorname{Re}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Im</code></td>
+<td style="text-align:left">$$\operatorname{Im}$$ <code>\operatorname{Im}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mm</code></td>
+<td style="text-align:left">$$\operatorname{mm}$$ <code>\operatorname{mm}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cm</code></td>
+<td style="text-align:left">$$\operatorname{cm}$$ <code>\operatorname{cm}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>km</code></td>
+<td style="text-align:left">$$\operatorname{km}$$ <code>\operatorname{km}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>kg</code></td>
+<td style="text-align:left">$$\operatorname{kg}$$ <code>\operatorname{kg}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>...</code></td>
+<td style="text-align:left">$$\ldots$$ <code>\ldots</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>+...</code></td>
+<td style="text-align:left">$$+\cdots$$ <code>+\cdots</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-...</code></td>
+<td style="text-align:left">$$-\cdots$$ <code>-\cdots</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-&gt;...</code></td>
+<td style="text-align:left">$$\to\cdots$$ <code>\to\cdots</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-&gt;</code></td>
+<td style="text-align:left">$$\to$$ <code>\to</code></td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">-&gt;`</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--&gt;</code></td>
+<td style="text-align:left">$$\longrightarrow$$ <code>\longrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;--</code></td>
+<td style="text-align:left">$$\longleftarrow$$ <code>\longleftarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>=&gt;</code></td>
+<td style="text-align:left">$$\Rightarrow$$ <code>\Rightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>==&gt;</code></td>
+<td style="text-align:left">$$\Longrightarrow$$ <code>\Longrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;=&gt;</code></td>
+<td style="text-align:left">$$\Leftrightarrow$$ <code>\Leftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;-&gt;</code></td>
+<td style="text-align:left">$$\leftrightarrow$$ <code>\leftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(.)</code></td>
+<td style="text-align:left">$$\odot$$ <code>\odot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(+)</code></td>
+<td style="text-align:left">$$\oplus$$ <code>\oplus</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(/)</code></td>
+<td style="text-align:left">$$\oslash$$ <code>\oslash</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(*)</code></td>
+<td style="text-align:left">$$\otimes$$ <code>\otimes</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>(-)</code></td>
+<td style="text-align:left">$$\ominus$$ <code>\ominus</code></td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>{</code></td>
+<td style="text-align:left">$${$$ <code>\{</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>}</code></td>
+<td style="text-align:left">$$}$$ <code>\}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>*</code></td>
+<td style="text-align:left">$$\cdot$$ <code>\cdot</code></td>
+</tr>
+</tbody>
+</table>
+<h3>ASCII Math</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Trigger</th>
+<th style="text-align:left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>@</code></td>
+<td style="text-align:left">$$\circ$$ <code>\circ</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$</code></td>
+<td style="text-align:left">$$$$$ <code>\$</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>%</code></td>
+<td style="text-align:left">$$%$$ <code>\%</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>#</code></td>
+<td style="text-align:left">$$#$$ <code>\#</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>*</code></td>
+<td style="text-align:left">$$\cdot$$ <code>\cdot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>**</code></td>
+<td style="text-align:left">$$\ast$$ <code>\ast</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>***</code></td>
+<td style="text-align:left">$$\star$$ <code>\star</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>//</code></td>
+<td style="text-align:left">$$\slash$$ <code>\slash</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\\</code></td>
+<td style="text-align:left">$$\backslash$$ <code>\backslash</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>setminus</code></td>
+<td style="text-align:left">$$\backslash$$ <code>\backslash</code></td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">&gt;&lt;`</td>
+</tr>
+<tr>
+<td style="text-align:left">`&gt;&lt;</td>
+<td style="text-align:left">`</td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">&gt;&lt;</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-:</code></td>
+<td style="text-align:left">$$\div$$ <code>\div</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>divide</code></td>
+<td style="text-align:left">$$\div$$ <code>\div</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>o+</code></td>
+<td style="text-align:left">$$\oplus$$ <code>\oplus</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ox</code></td>
+<td style="text-align:left">$$\otimes$$ <code>\otimes</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>o.</code></td>
+<td style="text-align:left">$$\odot$$ <code>\odot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>^^</code></td>
+<td style="text-align:left">$$\wedge$$ <code>\wedge</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>^^^</code></td>
+<td style="text-align:left">$$\bigwedge$$ <code>\bigwedge</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>vv</code></td>
+<td style="text-align:left">$$\vee$$ <code>\vee</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>vvv</code></td>
+<td style="text-align:left">$$\bigvee$$ <code>\bigvee</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nn</code></td>
+<td style="text-align:left">$$\cap$$ <code>\cap</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nnn</code></td>
+<td style="text-align:left">$$\bigcap$$ <code>\bigcap</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>uu</code></td>
+<td style="text-align:left">$$\cup$$ <code>\cup</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>uuu</code></td>
+<td style="text-align:left">$$\bigcup$$ <code>\bigcup</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-=</code></td>
+<td style="text-align:left">$$\equiv$$ <code>\equiv</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>~=</code></td>
+<td style="text-align:left">$$\cong$$ <code>\cong</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lt</code></td>
+<td style="text-align:left">$$&lt;$$ <code>&lt;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lt=</code></td>
+<td style="text-align:left">$$\leq$$ <code>\leq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gt</code></td>
+<td style="text-align:left">$$&gt;$$ <code>&gt;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gt=</code></td>
+<td style="text-align:left">$$\geq$$ <code>\geq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-&lt;</code></td>
+<td style="text-align:left">$$\prec$$ <code>\prec</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-lt</code></td>
+<td style="text-align:left">$$\prec$$ <code>\prec</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-&lt;=</code></td>
+<td style="text-align:left">$$\preceq$$ <code>\preceq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&gt;-=</code></td>
+<td style="text-align:left">$$\succeq$$ <code>\succeq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>prop</code></td>
+<td style="text-align:left">$$\propto$$ <code>\propto</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>diamond</code></td>
+<td style="text-align:left">$$\diamond$$ <code>\diamond</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>square</code></td>
+<td style="text-align:left">$$\square$$ <code>\square</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>iff</code></td>
+<td style="text-align:left">$$\iff$$ <code>\iff</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sub</code></td>
+<td style="text-align:left">$$\subset$$ <code>\subset</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sup</code></td>
+<td style="text-align:left">$$\supset$$ <code>\supset</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sube</code></td>
+<td style="text-align:left">$$\subseteq$$ <code>\subseteq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>supe</code></td>
+<td style="text-align:left">$$\supseteq$$ <code>\supseteq</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>uarr</code></td>
+<td style="text-align:left">$$\uparrow$$ <code>\uparrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>darr</code></td>
+<td style="text-align:left">$$\downarrow$$ <code>\downarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>rarr</code></td>
+<td style="text-align:left">$$\rightarrow$$ <code>\rightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>rArr</code></td>
+<td style="text-align:left">$$\Rightarrow$$ <code>\Rightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>larr</code></td>
+<td style="text-align:left">$$\leftarrow$$ <code>\leftarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lArr</code></td>
+<td style="text-align:left">$$\Leftarrow$$ <code>\Leftarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>harr</code></td>
+<td style="text-align:left">$$\leftrightarrow$$ <code>\leftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>hArr</code></td>
+<td style="text-align:left">$$\Leftrightarrow$$ <code>\Leftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>aleph</code></td>
+<td style="text-align:left">$$\aleph$$ <code>\aleph</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>and</code></td>
+<td style="text-align:left">$$\land$$ <code>\land</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>or</code></td>
+<td style="text-align:left">$$\lor$$ <code>\lor</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>not</code></td>
+<td style="text-align:left">$$\neg$$ <code>\neg</code></td>
+</tr>
+<tr>
+<td style="text-align:left">`_</td>
+<td style="text-align:left">_`</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>TT</code></td>
+<td style="text-align:left">$$\top$$ <code>\top</code></td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">–`</td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">==`</td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">__`</td>
+</tr>
+<tr>
+<td style="text-align:left">`__</td>
+<td style="text-align:left">`</td>
+</tr>
+<tr>
+<td style="text-align:left">`</td>
+<td style="text-align:left">~`</td>
+</tr>
+<tr>
+<td style="text-align:left">`~</td>
+<td style="text-align:left">`</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&gt;-&gt;</code></td>
+<td style="text-align:left">$$\rightarrowtail$$ <code>\rightarrowtail</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>-&gt;&gt;</code></td>
+<td style="text-align:left">$$\twoheadrightarrow$$ <code>\twoheadrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&gt;-&gt;&gt;</code></td>
+<td style="text-align:left">$$\twoheadrightarrowtail$$ <code>\twoheadrightarrowtail</code></td>
+</tr>
+</tbody>
+</table>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="May 12, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 12 2021 14:13:58 GMT+0200 (Central European Summer Time)">May 12, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

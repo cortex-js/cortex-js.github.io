@@ -1,0 +1,1694 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/math-json/" >MathJSON</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cortex/" >Cortex</a>
+            </li><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/commands/" class="active">Supported Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/keybindings/" class="">Keyboard Shortcuts</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument();
+</script>
+<style>
+  ul.command-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  ul.command-list,
+  .command-list li {
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+  }
+</style>
+<h2>Fractions and Binomials</h2>
+<ul class="command-list">
+<li>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\frac{}{}</code></li>
+<li>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dfrac{}{}</code></li>
+<li>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\tfrac{}{}</code></li>
+<li>$$\cfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\cfrac{}{}</code></li>
+<li>$$\binom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\binom{}{}</code></li>
+<li>$$\dbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dbinom{}{}</code></li>
+<li>$$\tbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\tbinom{}{}</code></li>
+<li>$$\pdiff{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\pdiff{}{}</code></li>
+</ul>
+<p>The following commands are supported but their usage is generally discouraged
+when creating modern LaTeX content.</p>
+<ul class="command-list">
+<li>$${\unicode{&quot;2B1A} \overwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}}$$ <code>\overwithdelims{\lbrace}{\rbrace}</code></li>
+<li>$${\unicode{&quot;2B1A} \atopwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}}$$ <code>\atopwithdelims{\lbrace}{\rbrace}</code></li>
+<li>$$\unicode{&quot;2B1A} \over \unicode{&quot;2B1A}$$ <code>\over </code></li>
+<li>$$\unicode{&quot;2B1A} \atop \unicode{&quot;2B1A}$$ <code>\atop </code></li>
+<li>$$\unicode{&quot;2B1A} \choose \unicode{&quot;2B1A}$$ <code>\choose </code></li>
+</ul>
+<h2>Operators</h2>
+<ul class="command-list">
+<li>$$+$$   <code>+</code></li>
+<li>$$-$$   <code>-</code></li>
+<li>$$\pm$$   <code>\pm</code></li>
+<li>$$\mp$$   <code>\mp</code></li>
+<li>$$*$$   <code>*</code></li>
+<li>$$\times$$   <code>\times</code></li>
+<li>$$\div$$   <code>\div</code></li>
+<li>$$\divides$$   <code>\divides</code></li>
+<li>$$\cdot$$   <code>\cdot</code></li>
+<li>$$\ltimes$$   <code>\ltimes</code></li>
+<li>$$\rtimes$$   <code>\rtimes</code></li>
+<li>$$\leftthreetimes$$   <code>\leftthreetimes</code></li>
+<li>$$\rightthreetimes$$   <code>\rightthreetimes</code></li>
+<li>$$\intercal$$   <code>\intercal</code></li>
+<li>$$\dotplus$$   <code>\dotplus</code></li>
+<li>$$\doublebarwedge$$   <code>\doublebarwedge</code></li>
+<li>$$\divideontimes$$   <code>\divideontimes</code></li>
+<li>$$\centerdot$$   <code>\centerdot</code></li>
+<li>$$\surd$$   <code>\surd</code> * $$\sqrt{\unicode{&quot;2B1A}}$$ <code>\sqrt[]{}</code></li>
+</ul>
+<h2>Functions</h2>
+<ul class="command-list">
+<li>$$\deg$$ <code>\deg</code></li>
+<li>$$\dim$$ <code>\dim</code></li>
+<li>$$\exp$$ <code>\exp</code></li>
+<li>$$\hom$$ <code>\hom</code></li>
+<li>$$\ker$$ <code>\ker</code></li>
+<li>$$\ln$$ <code>\ln</code></li>
+<li>$$\log$$ <code>\log</code></li>
+<li>$$\lim$$ <code>\lim</code></li>
+<li>$$\mod$$ <code>\mod</code></li>
+<li>$$\det$$ <code>\det</code></li>
+<li>$$\max$$ <code>\max</code></li>
+<li>$$\min$$ <code>\min</code></li>
+</ul>
+<h2>Trigonometry</h2>
+<ul class="command-list">
+<li>$$\arccos$$ <code>\arccos</code></li>
+<li>$$\arcsin$$ <code>\arcsin</code></li>
+<li>$$\arctan$$ <code>\arctan</code></li>
+<li>$$\arctg$$ <code>\arctg</code></li>
+<li>$$\arcctg$$ <code>\arcctg</code></li>
+<li>$$\arg$$ <code>\arg</code></li>
+<li>$$\ch$$ <code>\ch</code></li>
+<li>$$\cos$$ <code>\cos</code></li>
+<li>$$\cosh$$ <code>\cosh</code></li>
+<li>$$\cot$$ <code>\cot</code></li>
+<li>$$\coth$$ <code>\coth</code></li>
+<li>$$\ctg$$ <code>\ctg</code></li>
+<li>$$\cth$$ <code>\cth</code></li>
+<li>$$\cotg$$ <code>\cotg</code></li>
+<li>$$\csc$$ <code>\csc</code></li>
+<li>$$\cosec$$ <code>\cosec</code></li>
+<li>$$\lg$$ <code>\lg</code></li>
+<li>$$\lb$$ <code>\lb</code></li>
+<li>$$\sec$$ <code>\sec</code></li>
+<li>$$\sh$$ <code>\sh</code></li>
+<li>$$\sin$$ <code>\sin</code></li>
+<li>$$\sinh$$ <code>\sinh</code></li>
+<li>$$\tan$$ <code>\tan</code></li>
+<li>$$\tanh$$ <code>\tanh</code></li>
+<li>$$\tg$$ <code>\tg</code></li>
+<li>$$\th$$ <code>\th</code></li>
+</ul>
+<h2>Extensible Operators</h2>
+<ul class="command-list">
+<li>$$\sum$$ <code>\sum</code></li>
+<li>$$\prod$$ <code>\prod</code></li>
+<li>$$\bigcup$$ <code>\bigcup</code></li>
+<li>$$\bigcap$$ <code>\bigcap</code></li>
+<li>$$\coprod$$ <code>\coprod</code></li>
+<li>$$\bigvee$$ <code>\bigvee</code></li>
+<li>$$\bigwedge$$ <code>\bigwedge</code></li>
+<li>$$\biguplus$$ <code>\biguplus</code></li>
+<li>$$\bigotimes$$ <code>\bigotimes</code></li>
+<li>$$\bigoplus$$ <code>\bigoplus</code></li>
+<li>$$\bigodot$$ <code>\bigodot</code></li>
+<li>$$\bigsqcup$$ <code>\bigsqcup</code></li>
+<li>$$\smallint$$ <code>\smallint</code></li>
+<li>$$\intop$$ <code>\intop</code></li>
+<li>$$\int$$ <code>\int</code></li>
+<li>$$\iint$$ <code>\iint</code></li>
+<li>$$\iiint$$ <code>\iiint</code></li>
+<li>$$\oint$$ <code>\oint</code></li>
+<li>$$\oiint$$ <code>\oiint</code></li>
+<li>$$\oiiint$$ <code>\oiiint</code></li>
+<li>$$\intclockwise$$ <code>\intclockwise</code></li>
+<li>$$\varointclockwise$$ <code>\varointclockwise</code></li>
+<li>$$\ointctrclockwise$$ <code>\ointctrclockwise</code></li>
+<li>$$\intctrclockwise$$ <code>\intctrclockwise</code></li>
+<li>$$\sqcup$$ <code>\sqcup</code></li>
+<li>$$\sqcap$$ <code>\sqcap</code></li>
+<li>$$\uplus$$ <code>\uplus</code></li>
+<li>$$\wr$$ <code>\wr</code></li>
+<li>$$\amalg$$ <code>\amalg</code></li>
+<li>$$\Cap$$ <code>\Cap</code></li>
+<li>$$\Cup$$ <code>\Cup</code></li>
+<li>$$\doublecap$$ <code>\doublecap</code></li>
+<li>$$\doublecup$$ <code>\doublecup</code></li>
+</ul>
+<h2>Logic</h2>
+<ul class="command-list">
+<li>$$\to$$   <code>\to</code></li>
+<li>$$\gets$$   <code>\gets</code></li>
+<li>$$\implies$$   <code>\implies</code></li>
+<li>$$\impliedby$$   <code>\impliedby</code></li>
+<li>$$\biconditional$$   <code>\biconditional</code></li>
+<li>$$\therefore$$   <code>\therefore</code></li>
+<li>$$\because$$   <code>\because</code></li>
+<li>$$\land$$   <code>\land</code></li>
+<li>$$\wedge$$   <code>\wedge</code></li>
+<li>$$\lor$$   <code>\lor</code></li>
+<li>$$\vee$$   <code>\vee</code></li>
+<li>$$\barwedge$$   <code>\barwedge</code></li>
+<li>$$\veebar$$   <code>\veebar</code></li>
+<li>$$\nor$$   <code>\nor</code></li>
+<li>$$\curlywedge$$   <code>\curlywedge</code></li>
+<li>$$\curlyvee$$   <code>\curlyvee</code></li>
+<li>$$\leftrightarrow$$   <code>\leftrightarrow</code></li>
+<li>$$\Leftrightarrow$$   <code>\Leftrightarrow</code></li>
+<li>$$\models$$   <code>\models</code></li>
+<li>$$\vdash$$   <code>\vdash</code></li>
+<li>$$\dashv$$   <code>\dashv</code></li>
+<li>$$\roundimplies$$   <code>\roundimplies</code></li>
+<li>$$\lnot$$   <code>\lnot</code></li>
+<li>$$\neg$$   <code>\neg</code></li>
+</ul>
+<h2>Arrows</h2>
+<ul class="command-list">
+<li>$$\rightarrow$$   <code>\rightarrow</code></li>
+<li>$$\leftarrow$$   <code>\leftarrow</code></li>
+<li>$$\Rightarrow$$   <code>\Rightarrow</code></li>
+<li>$$\Leftarrow$$   <code>\Leftarrow</code></li>
+<li>$$\longrightarrow$$   <code>\longrightarrow</code></li>
+<li>$$\longleftarrow$$   <code>\longleftarrow</code></li>
+<li>$$\Longrightarrow$$   <code>\Longrightarrow</code></li>
+<li>$$\Longleftarrow$$   <code>\Longleftarrow</code></li>
+<li>$$\longleftrightarrow$$   <code>\longleftrightarrow</code></li>
+<li>$$\Longleftrightarrow$$   <code>\Longleftrightarrow</code></li>
+<li>$$\mapsto$$   <code>\mapsto</code></li>
+<li>$$\longmapsto$$   <code>\longmapsto</code></li>
+<li>$$\uparrow$$   <code>\uparrow</code></li>
+<li>$$\downarrow$$   <code>\downarrow</code></li>
+<li>$$\Uparrow$$   <code>\Uparrow</code></li>
+<li>$$\Downarrow$$   <code>\Downarrow</code></li>
+<li>$$\updownarrow$$   <code>\updownarrow</code></li>
+<li>$$\Updownarrow$$   <code>\Updownarrow</code></li>
+<li>$$\hookrightarrow$$   <code>\hookrightarrow</code></li>
+<li>$$\hookleftarrow$$   <code>\hookleftarrow</code></li>
+<li>$$\rightharpoonup$$   <code>\rightharpoonup</code></li>
+<li>$$\leftharpoonup$$   <code>\leftharpoonup</code></li>
+<li>$$\rightharpoondown$$   <code>\rightharpoondown</code></li>
+<li>$$\leftharpoondown$$   <code>\leftharpoondown</code></li>
+<li>$$\searrow$$   <code>\searrow</code></li>
+<li>$$\nearrow$$   <code>\nearrow</code></li>
+<li>$$\swarrow$$   <code>\swarrow</code></li>
+<li>$$\nwarrow$$   <code>\nwarrow</code></li>
+<li>$$\dashrightarrow$$   <code>\dashrightarrow</code></li>
+<li>$$\dashleftarrow$$   <code>\dashleftarrow</code></li>
+<li>$$\Rrightarrow$$   <code>\Rrightarrow</code></li>
+<li>$$\Lleftarrow$$   <code>\Lleftarrow</code></li>
+<li>$$\leftrightarrows$$   <code>\leftrightarrows</code></li>
+<li>$$\rightleftarrows$$   <code>\rightleftarrows</code></li>
+<li>$$\curvearrowright$$   <code>\curvearrowright</code></li>
+<li>$$\curvearrowleft$$   <code>\curvearrowleft</code></li>
+<li>$$\rightrightarrows$$   <code>\rightrightarrows</code></li>
+<li>$$\leftleftarrows$$   <code>\leftleftarrows</code></li>
+<li>$$\upuparrows$$   <code>\upuparrows</code></li>
+<li>$$\downdownarrows$$   <code>\downdownarrows</code></li>
+<li>$$\leftarrowtail$$   <code>\leftarrowtail</code></li>
+<li>$$\rightarrowtail$$   <code>\rightarrowtail</code></li>
+<li>$$\looparrowright$$   <code>\looparrowright</code></li>
+<li>$$\looparrowleft$$   <code>\looparrowleft</code></li>
+<li>$$\twoheadleftarrow$$   <code>\twoheadleftarrow</code></li>
+<li>$$\twoheadrightarrow$$   <code>\twoheadrightarrow</code></li>
+<li>$$\rightleftharpoons$$   <code>\rightleftharpoons</code></li>
+<li>$$\leftrightharpoons$$   <code>\leftrightharpoons</code></li>
+<li>$$\Rsh$$   <code>\Rsh</code></li>
+<li>$$\Lsh$$   <code>\Lsh</code></li>
+<li>$$\circlearrowright$$   <code>\circlearrowright</code></li>
+<li>$$\circlearrowleft$$   <code>\circlearrowleft</code></li>
+<li>$$\restriction$$   <code>\restriction</code></li>
+<li>$$\upharpoonright$$   <code>\upharpoonright</code></li>
+<li>$$\upharpoonleft$$   <code>\upharpoonleft</code></li>
+<li>$$\downharpoonright$$   <code>\downharpoonright</code></li>
+<li>$$\downharpoonleft$$   <code>\downharpoonleft</code></li>
+<li>$$\rightsquigarrow$$   <code>\rightsquigarrow</code></li>
+<li>$$\leadsto$$   <code>\leadsto</code></li>
+<li>$$\leftrightsquigarrow$$   <code>\leftrightsquigarrow</code></li>
+<li>$$\multimap$$   <code>\multimap</code></li>
+</ul>
+<h2>Negated Arrows</h2>
+<ul class="command-list">
+<li>$$\nrightarrow$$   <code>\nrightarrow</code></li>
+<li>$$\nleftarrow$$   <code>\nleftarrow</code></li>
+<li>$$\nRightarrow$$   <code>\nRightarrow</code></li>
+<li>$$\nLeftarrow$$   <code>\nLeftarrow</code></li>
+<li>$$\nleftrightarrow$$   <code>\nleftrightarrow</code></li>
+<li>$$\nLeftrightarrow$$   <code>\nLeftrightarrow</code></li>
+</ul>
+<h2>Extensible Symbols</h2>
+<ul class="command-list">
+<li>$$\widehat{ABC}$$ <code>\widehat{}</code></li>
+<li>$$\widecheck{ABC}$$ <code>\widecheck{}</code></li>
+<li>$$\widetilde{ABC}$$ <code>\widetilde{}</code></li>
+<li>$$\utilde{ABC}$$ <code>\utilde{}</code></li>
+<li>$$\overrightarrow{ABC}$$ <code>\overrightarrow{}</code></li>
+<li>$$\overleftarrow{ABC}$$ <code>\overleftarrow{}</code></li>
+<li>$$\Overrightarrow{ABC}$$ <code>\Overrightarrow{}</code></li>
+<li>$$\overleftharpoon{ABC}$$ <code>\overleftharpoon{}</code></li>
+<li>$$\overrightharpoon{ABC}$$ <code>\overrightharpoon{}</code></li>
+<li>$$\overleftrightarrow{ABC}$$ <code>\overleftrightarrow{}</code></li>
+<li>$$\overlinesegment{ABC}$$ <code>\overlinesegment{}</code></li>
+<li>$$\overgroup{ABC}$$ <code>\overgroup{}</code></li>
+<li>$$\overbrace{ABC}$$ <code>\overbrace{}</code></li>
+<li>$$\underrightarrow{ABC}$$ <code>\underrightarrow{}</code></li>
+<li>$$\underleftarrow{ABC}$$ <code>\underleftarrow{}</code></li>
+<li>$$\underleftrightarrow{ABC}$$ <code>\underleftrightarrow{}</code></li>
+<li>$$\underlinesegment{ABC}$$ <code>\underlinesegment{}</code></li>
+<li>$$\undergroup{ABC}$$ <code>\undergroup{}</code></li>
+<li>$$\underbrace{ABC}$$ <code>\underbrace{}</code></li>
+<li>$$\xrightarrow[below]{above}=0$$ <code>\xrightarrow[]{}</code></li>
+<li>$$\xleftarrow[below]{above}=0$$ <code>\xleftarrow[]{}</code></li>
+<li>$$\xRightarrow[below]{above}=0$$ <code>\xRightarrow[]{}</code></li>
+<li>$$\xLeftarrow[below]{above}=0$$ <code>\xLeftarrow[]{}</code></li>
+<li>$$\xleftharpoonup[below]{above}=0$$ <code>\xleftharpoonup[]{}</code></li>
+<li>$$\xleftharpoondown[below]{above}=0$$ <code>\xleftharpoondown[]{}</code></li>
+<li>$$\xrightharpoonup[below]{above}=0$$ <code>\xrightharpoonup[]{}</code></li>
+<li>$$\xrightharpoondown[below]{above}=0$$ <code>\xrightharpoondown[]{}</code></li>
+<li>$$\xlongequal[below]{above}=0$$ <code>\xlongequal[]{}</code></li>
+<li>$$\xtwoheadleftarrow[below]{above}=0$$ <code>\xtwoheadleftarrow[]{}</code></li>
+<li>$$\xtwoheadrightarrow[below]{above}=0$$ <code>\xtwoheadrightarrow[]{}</code></li>
+<li>$$\xleftrightarrow[below]{above}=0$$ <code>\xleftrightarrow[]{}</code></li>
+<li>$$\xLeftrightarrow[below]{above}=0$$ <code>\xLeftrightarrow[]{}</code></li>
+<li>$$\xrightleftharpoons[below]{above}=0$$ <code>\xrightleftharpoons[]{}</code></li>
+<li>$$\xleftrightharpoons[below]{above}=0$$ <code>\xleftrightharpoons[]{}</code></li>
+<li>$$\xhookleftarrow[below]{above}=0$$ <code>\xhookleftarrow[]{}</code></li>
+<li>$$\xhookrightarrow[below]{above}=0$$ <code>\xhookrightarrow[]{}</code></li>
+<li>$$\xmapsto[below]{above}=0$$ <code>\xmapsto[]{}</code></li>
+<li>$$\xtofrom[below]{above}=0$$ <code>\xtofrom[]{}</code></li>
+<li>$$\xrightleftarrows[below]{above}=0$$ <code>\xrightleftarrows[]{}</code></li>
+<li>$$\xrightequilibrium[below]{above}=0$$ <code>\xrightequilibrium[]{}</code></li>
+<li>$$\xleftequilibrium[below]{above}=0$$ <code>\xleftequilibrium[]{}</code></li>
+</ul>
+<h2>Relations</h2>
+<ul class="command-list">
+<li>$$\shortparallel$$   <code>\shortparallel</code></li>
+<li>$$\leqslant$$   <code>\leqslant</code></li>
+<li>$$\geqslant$$   <code>\geqslant</code></li>
+<li>$$\gtrsim$$   <code>\gtrsim</code></li>
+<li>$$\approxeq$$   <code>\approxeq</code></li>
+<li>$$\thickapprox$$   <code>\thickapprox</code></li>
+<li>$$\lessapprox$$   <code>\lessapprox</code></li>
+<li>$$\gtrapprox$$   <code>\gtrapprox</code></li>
+<li>$$\precapprox$$   <code>\precapprox</code></li>
+<li>$$\succapprox$$   <code>\succapprox</code></li>
+<li>$$\thicksim$$   <code>\thicksim</code></li>
+<li>$$\succsim$$   <code>\succsim</code></li>
+<li>$$\precsim$$   <code>\precsim</code></li>
+<li>$$\backsim$$   <code>\backsim</code></li>
+<li>$$\eqsim$$   <code>\eqsim</code></li>
+<li>$$\backsimeq$$   <code>\backsimeq</code></li>
+<li>$$\lesssim$$   <code>\lesssim</code></li>
+<li>$$\nleq$$   <code>\nleq</code></li>
+<li>$$\ngeq$$   <code>\ngeq</code></li>
+<li>$$\smallsmile$$   <code>\smallsmile</code></li>
+<li>$$\smallfrown$$   <code>\smallfrown</code></li>
+<li>$$\leqq$$   <code>\leqq</code></li>
+<li>$$\eqslantless$$   <code>\eqslantless</code></li>
+<li>$$\lll$$   <code>\lll</code></li>
+<li>$$\lessgtr$$   <code>\lessgtr</code></li>
+<li>$$\lesseqgtr$$   <code>\lesseqgtr</code></li>
+<li>$$\lesseqqgtr$$   <code>\lesseqqgtr</code></li>
+<li>$$\risingdotseq$$   <code>\risingdotseq</code></li>
+<li>$$\fallingdotseq$$   <code>\fallingdotseq</code></li>
+<li>$$\preccurlyeq$$   <code>\preccurlyeq</code></li>
+<li>$$\curlyeqprec$$   <code>\curlyeqprec</code></li>
+<li>$$\vDash$$   <code>\vDash</code></li>
+<li>$$\Vvdash$$   <code>\Vvdash</code></li>
+<li>$$\bumpeq$$   <code>\bumpeq</code></li>
+<li>$$\Bumpeq$$   <code>\Bumpeq</code></li>
+<li>$$\geqq$$   <code>\geqq</code></li>
+<li>$$\eqslantgtr$$   <code>\eqslantgtr</code></li>
+<li>$$\ggg$$   <code>\ggg</code></li>
+<li>$$\gtrless$$   <code>\gtrless</code></li>
+<li>$$\gtreqless$$   <code>\gtreqless</code></li>
+<li>$$\gtreqqless$$   <code>\gtreqqless</code></li>
+<li>$$\succcurlyeq$$   <code>\succcurlyeq</code></li>
+<li>$$\curlyeqsucc$$   <code>\curlyeqsucc</code></li>
+<li>$$\Vdash$$   <code>\Vdash</code></li>
+<li>$$\shortmid$$   <code>\shortmid</code></li>
+<li>$$\between$$   <code>\between</code></li>
+<li>$$\pitchfork$$   <code>\pitchfork</code></li>
+<li>$$\varpropto$$   <code>\varpropto</code></li>
+<li>$$\backepsilon$$   <code>\backepsilon</code></li>
+<li>$$\llless$$   <code>\llless</code></li>
+<li>$$\gggtr$$   <code>\gggtr</code></li>
+<li>$$\doteqdot$$   <code>\doteqdot</code></li>
+<li>$$\Doteq$$   <code>\Doteq</code></li>
+<li>$$\eqcirc$$   <code>\eqcirc</code></li>
+<li>$$\circeq$$   <code>\circeq</code></li>
+<li>$$\lhd$$   <code>\lhd</code></li>
+<li>$$\rhd$$   <code>\rhd</code></li>
+<li>$$\lessdot$$   <code>\lessdot</code></li>
+<li>$$\gtrdot$$   <code>\gtrdot</code></li>
+<li>$$=$$   <code>=</code></li>
+<li>$$&lt;$$   <code>&lt;</code></li>
+<li>$$\lt$$   <code>\lt</code></li>
+<li>$$&gt;$$   <code>&gt;</code></li>
+<li>$$\gt$$   <code>\gt</code></li>
+<li>$$\le$$   <code>\le</code></li>
+<li>$$\leq$$   <code>\leq</code></li>
+<li>$$\ge$$   <code>\ge</code></li>
+<li>$$\geq$$   <code>\geq</code></li>
+<li>$$\ll$$   <code>\ll</code></li>
+<li>$$\gg$$   <code>\gg</code></li>
+<li>$$\coloneq$$   <code>\coloneq</code></li>
+<li>$$\measeq$$   <code>\measeq</code></li>
+<li>$$\eqdef$$   <code>\eqdef</code></li>
+<li>$$\questeq$$   <code>\questeq</code></li>
+<li>$$\cong$$   <code>\cong</code></li>
+<li>$$\equiv$$   <code>\equiv</code></li>
+<li>$$\prec$$   <code>\prec</code></li>
+<li>$$\preceq$$   <code>\preceq</code></li>
+<li>$$\succ$$   <code>\succ</code></li>
+<li>$$\succeq$$   <code>\succeq</code></li>
+<li>$$\perp$$   <code>\perp</code></li>
+<li>$$\propto$$   <code>\propto</code></li>
+<li>$$\smile$$   <code>\smile</code></li>
+<li>$$\frown$$   <code>\frown</code></li>
+<li>$$\sim$$   <code>\sim</code></li>
+<li>$$\doteq$$   <code>\doteq</code></li>
+<li>$$\bowtie$$   <code>\bowtie</code></li>
+<li>$$\Join$$   <code>\Join</code></li>
+<li>$$\asymp$$   <code>\asymp</code></li>
+<li>$$\approx$$   <code>\approx</code></li>
+<li>$$\parallel$$   <code>\parallel</code></li>
+<li>$$\simeq$$   <code>\simeq</code> * $$\ne$$ <code>\ne</code></li>
+<li>$$\neq$$ <code>\neq</code></li>
+</ul>
+<h2>Negated Relations</h2>
+<ul class="command-list">
+<li>$$\nless$$   <code>\nless</code></li>
+<li>$$\nleqslant$$   <code>\nleqslant</code></li>
+<li>$$\lneq$$   <code>\lneq</code></li>
+<li>$$\lneqq$$   <code>\lneqq</code></li>
+<li>$$\nleqq$$   <code>\nleqq</code></li>
+<li>$$\lvertneqq$$   <code>\lvertneqq</code></li>
+<li>$$\lnsim$$   <code>\lnsim</code></li>
+<li>$$\lnapprox$$   <code>\lnapprox</code></li>
+<li>$$\nprec$$   <code>\nprec</code></li>
+<li>$$\npreceq$$   <code>\npreceq</code></li>
+<li>$$\precnsim$$   <code>\precnsim</code></li>
+<li>$$\precnapprox$$   <code>\precnapprox</code></li>
+<li>$$\nsim$$   <code>\nsim</code></li>
+<li>$$\nshortmid$$   <code>\nshortmid</code></li>
+<li>$$\nmid$$   <code>\nmid</code></li>
+<li>$$\nvdash$$   <code>\nvdash</code></li>
+<li>$$\nvDash$$   <code>\nvDash</code></li>
+<li>$$\ngtr$$   <code>\ngtr</code></li>
+<li>$$\ngeqslant$$   <code>\ngeqslant</code></li>
+<li>$$\ngeqq$$   <code>\ngeqq</code></li>
+<li>$$\gneq$$   <code>\gneq</code></li>
+<li>$$\gneqq$$   <code>\gneqq</code></li>
+<li>$$\gvertneqq$$   <code>\gvertneqq</code></li>
+<li>$$\gnsim$$   <code>\gnsim</code></li>
+<li>$$\gnapprox$$   <code>\gnapprox</code></li>
+<li>$$\nsucc$$   <code>\nsucc</code></li>
+<li>$$\nsucceq$$   <code>\nsucceq</code></li>
+<li>$$\succnsim$$   <code>\succnsim</code></li>
+<li>$$\succnapprox$$   <code>\succnapprox</code></li>
+<li>$$\ncong$$   <code>\ncong</code></li>
+<li>$$\nshortparallel$$   <code>\nshortparallel</code></li>
+<li>$$\nparallel$$   <code>\nparallel</code></li>
+<li>$$\nVDash$$   <code>\nVDash</code></li>
+<li>$$\nVdash$$   <code>\nVdash</code></li>
+<li>$$\precneqq$$   <code>\precneqq</code></li>
+<li>$$\succneqq$$   <code>\succneqq</code></li>
+<li>$$\unlhd$$   <code>\unlhd</code></li>
+<li>$$\unrhd$$   <code>\unrhd</code></li>
+</ul>
+<h2>Sets</h2>
+<ul class="command-list">
+<li>$$\nsupseteqq$$   <code>\nsupseteqq</code></li>
+<li>$$\supsetneq$$   <code>\supsetneq</code></li>
+<li>$$\varsupsetneq$$   <code>\varsupsetneq</code></li>
+<li>$$\supsetneqq$$   <code>\supsetneqq</code></li>
+<li>$$\varsupsetneqq$$   <code>\varsupsetneqq</code></li>
+<li>$$\nsubseteqq$$   <code>\nsubseteqq</code></li>
+<li>$$\subseteqq$$   <code>\subseteqq</code></li>
+<li>$$\Subset$$   <code>\Subset</code></li>
+<li>$$\sqsubset$$   <code>\sqsubset</code></li>
+<li>$$\supseteqq$$   <code>\supseteqq</code></li>
+<li>$$\Supset$$   <code>\Supset</code></li>
+<li>$$\sqsupset$$   <code>\sqsupset</code></li>
+<li>$$\cap$$   <code>\cap</code></li>
+<li>$$\cup$$   <code>\cup</code></li>
+<li>$$\setminus$$   <code>\setminus</code></li>
+<li>$$\smallsetminus$$   <code>\smallsetminus</code></li>
+<li>$$\emptyset$$   <code>\emptyset</code></li>
+<li>$$\sqsubseteq$$   <code>\sqsubseteq</code></li>
+<li>$$\sqsupseteq$$   <code>\sqsupseteq</code></li>
+<li>$$\in$$   <code>\in</code></li>
+<li>$$\notin$$   <code>\notin</code></li>
+<li>$$\ni$$   <code>\ni</code></li>
+<li>$$\owns$$   <code>\owns</code></li>
+<li>$$\subset$$   <code>\subset</code></li>
+<li>$$\supset$$   <code>\supset</code></li>
+<li>$$\subseteq$$   <code>\subseteq</code></li>
+<li>$$\supseteq$$   <code>\supseteq</code></li>
+<li>$$\subsetneq$$   <code>\subsetneq</code></li>
+<li>$$\varsubsetneq$$   <code>\varsubsetneq</code></li>
+<li>$$\subsetneqq$$   <code>\subsetneqq</code></li>
+<li>$$\varsubsetneqq$$   <code>\varsubsetneqq</code></li>
+<li>$$\nsubset$$   <code>\nsubset</code></li>
+<li>$$\nsupset$$   <code>\nsupset</code></li>
+<li>$$\nsubseteq$$   <code>\nsubseteq</code></li>
+<li>$$\nsupseteq$$   <code>\nsupseteq</code></li>
+<li>$$\varnothing$$   <code>\varnothing</code></li>
+<li>$$\complement$$   <code>\complement</code> * $$\not$$ <code>\not{}</code></li>
+</ul>
+<h2>Greek</h2>
+<ul class="command-list">
+<li>$$\alpha$$   <code>\alpha</code></li>
+<li>$$\beta$$   <code>\beta</code></li>
+<li>$$\gamma$$   <code>\gamma</code></li>
+<li>$$\delta$$   <code>\delta</code></li>
+<li>$$\epsilon$$   <code>\epsilon</code></li>
+<li>$$\varepsilon$$   <code>\varepsilon</code></li>
+<li>$$\zeta$$   <code>\zeta</code></li>
+<li>$$\eta$$   <code>\eta</code></li>
+<li>$$\theta$$   <code>\theta</code></li>
+<li>$$\vartheta$$   <code>\vartheta</code></li>
+<li>$$\iota$$   <code>\iota</code></li>
+<li>$$\kappa$$   <code>\kappa</code></li>
+<li>$$\varkappa$$   <code>\varkappa</code></li>
+<li>$$\lambda$$   <code>\lambda</code></li>
+<li>$$\mu$$   <code>\mu</code></li>
+<li>$$\nu$$   <code>\nu</code></li>
+<li>$$\xi$$   <code>\xi</code></li>
+<li>$$\omicron$$   <code>\omicron</code></li>
+<li>$$\pi$$   <code>\pi</code></li>
+<li>$$\varpi$$   <code>\varpi</code></li>
+<li>$$\rho$$   <code>\rho</code></li>
+<li>$$\varrho$$   <code>\varrho</code></li>
+<li>$$\sigma$$   <code>\sigma</code></li>
+<li>$$\varsigma$$   <code>\varsigma</code></li>
+<li>$$\tau$$   <code>\tau</code></li>
+<li>$$\phi$$   <code>\phi</code></li>
+<li>$$\varphi$$   <code>\varphi</code></li>
+<li>$$\upsilon$$   <code>\upsilon</code></li>
+<li>$$\chi$$   <code>\chi</code></li>
+<li>$$\psi$$   <code>\psi</code></li>
+<li>$$\omega$$   <code>\omega</code></li>
+<li>$$\Gamma$$   <code>\Gamma</code></li>
+<li>$$\Delta$$   <code>\Delta</code></li>
+<li>$$\Theta$$   <code>\Theta</code></li>
+<li>$$\Lambda$$   <code>\Lambda</code></li>
+<li>$$\Xi$$   <code>\Xi</code></li>
+<li>$$\Pi$$   <code>\Pi</code></li>
+<li>$$\Sigma$$   <code>\Sigma</code></li>
+<li>$$\Upsilon$$   <code>\Upsilon</code></li>
+<li>$$\Phi$$   <code>\Phi</code></li>
+<li>$$\Psi$$   <code>\Psi</code></li>
+<li>$$\Omega$$   <code>\Omega</code></li>
+<li>$$\digamma$$   <code>\digamma</code></li>
+</ul>
+<h2>Hebrew</h2>
+<ul class="command-list">
+<li>$$\aleph$$   <code>\aleph</code></li>
+<li>$$\beth$$   <code>\beth</code></li>
+<li>$$\daleth$$   <code>\daleth</code></li>
+<li>$$\gimel$$   <code>\gimel</code></li>
+</ul>
+<h2>Letterlike Symbols</h2>
+<ul class="command-list">
+<li>$$@$$   <code>@</code></li>
+<li>$$\forall$$   <code>\forall</code></li>
+<li>$$\exists$$   <code>\exists</code></li>
+<li>$$\nexists$$   <code>\nexists</code></li>
+<li>$$\mid$$   <code>\mid</code></li>
+<li>$$\top$$   <code>\top</code></li>
+<li>$$\bot$$   <code>\bot</code></li>
+<li>$$\nabla$$   <code>\nabla</code></li>
+<li>$$\partial$$   <code>\partial</code></li>
+<li>$$\ell$$   <code>\ell</code></li>
+<li>$$\hbar$$   <code>\hbar</code></li>
+<li>$$\N$$   <code>\N</code></li>
+<li>$$\R$$   <code>\R</code></li>
+<li>$$\Q$$   <code>\Q</code></li>
+<li>$$\C$$   <code>\C</code></li>
+<li>$$\Z$$   <code>\Z</code></li>
+<li>$$\P$$   <code>\P</code></li>
+<li>$$\pounds$$   <code>\pounds</code></li>
+<li>$$\euro$$   <code>\euro</code></li>
+<li>$$\And$$   <code>\And</code></li>
+<li>$$$$$   <code>\$</code></li>
+<li>$$%$$   <code>\%</code></li>
+<li>$$\differencedelta$$   <code>\differencedelta</code></li>
+<li>$$\wp$$   <code>\wp</code></li>
+<li>$$\hslash$$   <code>\hslash</code></li>
+<li>$$\Finv$$   <code>\Finv</code></li>
+<li>$$\Game$$   <code>\Game</code></li>
+<li>$$\eth$$   <code>\eth</code></li>
+<li>$$\mho$$   <code>\mho</code></li>
+<li>$$\Bbbk$$   <code>\Bbbk</code></li>
+<li>$$\yen$$   <code>\yen</code></li>
+<li>$$\imath$$   <code>\imath</code></li>
+<li>$$\jmath$$   <code>\jmath</code></li>
+<li>$$\degree$$   <code>\degree</code> * $$\Re$$ <code>\Re</code></li>
+<li>$$\Im$$ <code>\Im</code></li>
+</ul>
+<h2>Delimiters</h2>
+<ul class="command-list">
+<li>$$\lbrace$$   <code>\lbrace</code></li>
+<li>$$\rbrace$$   <code>\rbrace</code></li>
+<li>$$\langle$$   <code>\langle</code></li>
+<li>$$\rangle$$   <code>\rangle</code></li>
+<li>$$\lfloor$$   <code>\lfloor</code></li>
+<li>$$\rfloor$$   <code>\rfloor</code></li>
+<li>$$\lceil$$   <code>\lceil</code></li>
+<li>$$\rceil$$   <code>\rceil</code></li>
+<li>$$\vert$$   <code>\vert</code></li>
+<li>$$\lvert$$   <code>\lvert</code></li>
+<li>$$\rvert$$   <code>\rvert</code></li>
+<li>$$|$$   <code>\|</code></li>
+<li>$$\Vert$$   <code>\Vert</code></li>
+<li>$$\mVert$$   <code>\mVert</code></li>
+<li>$$\lVert$$   <code>\lVert</code></li>
+<li>$$\rVert$$   <code>\rVert</code></li>
+<li>$$\lbrack$$   <code>\lbrack</code></li>
+<li>$$\rbrack$$   <code>\rbrack</code></li>
+<li>$$ { $$   <code>\{</code></li>
+<li>$$}$$   <code>\}</code></li>
+<li>$$($$   <code>(</code></li>
+<li>$$)$$   <code>)</code></li>
+<li>$$[$$   <code>[</code></li>
+<li>$$]$$   <code>]</code></li>
+<li>$$\ulcorner$$   <code>\ulcorner</code></li>
+<li>$$\urcorner$$   <code>\urcorner</code></li>
+<li>$$\llcorner$$   <code>\llcorner</code></li>
+<li>$$\lrcorner$$   <code>\lrcorner</code></li>
+<li>$$\lgroup$$   <code>\lgroup</code></li>
+<li>$$\rgroup$$   <code>\rgroup</code></li>
+<li>$$\lmoustache$$   <code>\lmoustache</code></li>
+<li>$$\rmoustache$$   <code>\rmoustache</code></li>
+<li>$$\mvert$$   <code>\mvert</code></li>
+</ul>
+<h2>Punctuation</h2>
+<ul class="command-list">
+<li>$$.$$   <code>.</code></li>
+<li>$$?$$   <code>?</code></li>
+<li>$$!$$   <code>!</code></li>
+<li>$$:$$   <code>:</code></li>
+<li>$$\Colon$$   <code>\Colon</code></li>
+<li>$$\colon$$   <code>\colon</code></li>
+<li>$$\cdotp$$   <code>\cdotp</code></li>
+<li>$$\vdots$$   <code>\vdots</code></li>
+<li>$$\ldotp$$   <code>\ldotp</code></li>
+<li>$$,$$   <code>,</code></li>
+<li>$$;$$   <code>;</code></li>
+<li>$$\cdots$$   <code>\cdots</code></li>
+<li>$$\ddots$$   <code>\ddots</code></li>
+<li>$$\ldots$$   <code>\ldots</code></li>
+<li>$$\mathellipsis$$   <code>\mathellipsis</code></li>
+<li>$$&quot;$$   <code>&quot;</code></li>
+</ul>
+<h2>Boxes</h2>
+<ul class="command-list">
+<li>$$\boxminus$$   <code>\boxminus</code></li>
+<li>$$\boxplus$$   <code>\boxplus</code></li>
+<li>$$\boxtimes$$   <code>\boxtimes</code></li>
+<li>$$\boxdot$$   <code>\boxdot</code></li>
+<li>$$\square$$   <code>\square</code></li>
+<li>$$\Box$$   <code>\Box</code></li>
+<li>$$\blacksquare$$   <code>\blacksquare</code></li>
+</ul>
+<h2>Circles</h2>
+<ul class="command-list">
+<li>$$\circ$$   <code>\circ</code></li>
+<li>$$\bigcirc$$   <code>\bigcirc</code></li>
+<li>$$\bullet$$   <code>\bullet</code></li>
+<li>$$\oplus$$   <code>\oplus</code></li>
+<li>$$\ominus$$   <code>\ominus</code></li>
+<li>$$\otimes$$   <code>\otimes</code></li>
+<li>$$\odot$$   <code>\odot</code></li>
+<li>$$\oslash$$   <code>\oslash</code></li>
+<li>$$\circleddash$$   <code>\circleddash</code></li>
+<li>$$\circledast$$   <code>\circledast</code></li>
+<li>$$\circledcirc$$   <code>\circledcirc</code></li>
+<li>$$\circledS$$   <code>\circledS</code></li>
+<li>$$\circledR$$   <code>\circledR</code></li>
+</ul>
+<h2>Triangles</h2>
+<ul class="command-list">
+<li>$$\vartriangle$$   <code>\vartriangle</code></li>
+<li>$$\triangleq$$   <code>\triangleq</code></li>
+<li>$$\vartriangleleft$$   <code>\vartriangleleft</code></li>
+<li>$$\trianglelefteq$$   <code>\trianglelefteq</code></li>
+<li>$$\ntriangleleft$$   <code>\ntriangleleft</code></li>
+<li>$$\ntrianglelefteq$$   <code>\ntrianglelefteq</code></li>
+<li>$$\vartriangleright$$   <code>\vartriangleright</code></li>
+<li>$$\trianglerighteq$$   <code>\trianglerighteq</code></li>
+<li>$$\ntriangleright$$   <code>\ntriangleright</code></li>
+<li>$$\ntrianglerighteq$$   <code>\ntrianglerighteq</code></li>
+<li>$$\blacktriangleleft$$   <code>\blacktriangleleft</code></li>
+<li>$$\blacktriangleright$$   <code>\blacktriangleright</code></li>
+<li>$$\bigtriangleup$$   <code>\bigtriangleup</code></li>
+<li>$$\bigtriangledown$$   <code>\bigtriangledown</code></li>
+<li>$$\triangleleft$$   <code>\triangleleft</code></li>
+<li>$$\triangleright$$   <code>\triangleright</code></li>
+<li>$$\triangle$$   <code>\triangle</code></li>
+<li>$$\blacktriangle$$   <code>\blacktriangle</code></li>
+<li>$$\triangledown$$   <code>\triangledown</code></li>
+<li>$$\blacktriangledown$$   <code>\blacktriangledown</code></li>
+</ul>
+<h2>Shapes</h2>
+<ul class="command-list">
+<li>$$\ast$$   <code>\ast</code></li>
+<li>$$\star$$   <code>\star</code></li>
+<li>$$\diamond$$   <code>\diamond</code></li>
+<li>$$\Diamond$$   <code>\Diamond</code></li>
+<li>$$\lozenge$$   <code>\lozenge</code></li>
+<li>$$\blacklozenge$$   <code>\blacklozenge</code></li>
+</ul>
+<h2>Crosses</h2>
+<ul class="command-list">
+<li>$$\dagger$$   <code>\dagger</code></li>
+<li>$$\dag$$   <code>\dag</code></li>
+<li>$$\ddag$$   <code>\ddag</code></li>
+<li>$$\ddagger$$   <code>\ddagger</code></li>
+<li>$$\maltese$$   <code>\maltese</code></li>
+</ul>
+<h2>Accents</h2>
+<ul class="command-list">
+<li>$$~{n}$$   <code>\~</code> * $$\acute{\unicode{&quot;2B1A}}$$ <code>\acute{}</code></li>
+<li>$$\grave{\unicode{&quot;2B1A}}$$ <code>\grave{}</code></li>
+<li>$$\dot{\unicode{&quot;2B1A}}$$ <code>\dot{}</code></li>
+<li>$$\ddot{\unicode{&quot;2B1A}}$$ <code>\ddot{}</code></li>
+<li>$$\mathring{\unicode{&quot;2B1A}}$$ <code>\mathring{}</code></li>
+<li>$$\tilde{\unicode{&quot;2B1A}}$$ <code>\tilde{}</code></li>
+<li>$$\bar{\unicode{&quot;2B1A}}$$ <code>\bar{}</code></li>
+<li>$$\breve{\unicode{&quot;2B1A}}$$ <code>\breve{}</code></li>
+<li>$$\check{\unicode{&quot;2B1A}}$$ <code>\check{}</code></li>
+<li>$$\hat{\unicode{&quot;2B1A}}$$ <code>\hat{}</code></li>
+<li>$$\vec$$ <code>\vec{}</code></li>
+<li>$$^{e}$$ <code>\^{}</code></li>
+<li>$$`{e}$$ <code>\</code>{}`</li>
+<li>$$'{e}$$ <code>\'{}</code></li>
+<li>$$~{n}$$ <code>\~{}</code></li>
+<li>$$\c{c}$$ <code>\c{}</code></li>
+</ul>
+<h2>Layout</h2>
+<ul class="command-list">
+<li>$$x=\mathop{arg}=0$$ <code>\mathop{}</code></li>
+<li>$$x=\mathbin{arg}=0$$ <code>\mathbin{}</code></li>
+<li>$$x=\mathrel{arg}=0$$ <code>\mathrel{}</code></li>
+<li>$$x=\mathopen{arg}=0$$ <code>\mathopen{}</code></li>
+<li>$$x=\mathclose{arg}=0$$ <code>\mathclose{}</code></li>
+<li>$$x=\mathpunct{arg}=0$$ <code>\mathpunct{}</code></li>
+<li>$$x=\mathord{arg}=0$$ <code>\mathord{}</code></li>
+<li>$$x=\mathinner{arg}=0$$ <code>\mathinner{}</code></li>
+<li>$$x=\operatorname{arg}=0$$ <code>\operatorname{}</code></li>
+<li>$$x=\operatorname*{arg}=0$$ <code>\operatorname*{}</code></li>
+<li>$$\overset{arg}{x=0}$$ <code>\overset{}{}</code></li>
+<li>$$\underset{arg}{x=0}$$ <code>\underset{}{}</code></li>
+<li>$$\stackrel{arg}{x=0}$$ <code>\stackrel[]{}{}</code></li>
+<li>$$\stackbin{arg}{x=0}$$ <code>\stackbin[]{}{}</code></li>
+<li>$$\rlap{/}0$$ <code>\rlap{}</code></li>
+<li>$$o\llap{/}$$ <code>\llap{}</code></li>
+<li>$$o\mathllap{/}$$ <code>\mathllap{}</code></li>
+<li>$$\mathrlap{/}0$$ <code>\mathrlap{}</code></li>
+<li>$$\left{x\middle|x&gt;0\right}$$ <code>\middle{}</code></li>
+</ul>
+<h2>Spacing</h2>
+<ul class="command-list">
+<li>$$\unicode{&quot;203A}\hspace{1em}\unicode{&quot;2039}$$ <code>\hspace{}</code></li>
+<li>$$\unicode{&quot;203A}\hspace*{1em}\unicode{&quot;2039}$$ <code>\hspace*{}</code></li>
+<li>$$\unicode{&quot;203A}!\unicode{&quot;2039}$$ <code>\!</code></li>
+<li>$$\unicode{&quot;203A},\unicode{&quot;2039}$$ <code>\,</code></li>
+<li>$$\unicode{&quot;203A}:\unicode{&quot;2039}$$ <code>\:</code></li>
+<li>$$\unicode{&quot;203A};\unicode{&quot;2039}$$ <code>\;</code></li>
+<li>$$\unicode{&quot;203A}\enskip\unicode{&quot;2039}$$ <code>\enskip</code></li>
+<li>$$\unicode{&quot;203A}\enspace\unicode{&quot;2039}$$ <code>\enspace</code></li>
+<li>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039}$$ <code>\qquad</code></li>
+</ul>
+<h2>Decoration</h2>
+<ul class="command-list">
+<li>$${\color{m0}A}{\color{m1}B}{\color{m2}C }{\color{m3}a}{\color{m4}b}{\color{m5}c}{\color{m6}8}$$ <code>\color{}</code></li>
+<li>$${\textcolor{m0}A}{\textcolor{m1}B}{\textcolor{m2}C }{\textcolor{m3}a}{\textcolor{m4}b}{\textcolor{m5}c}{\textcolor{m6}8}$$ <code>\textcolor{}{}</code></li>
+<li>$$\boxed{\unicode{&quot;2B1A}}$$ <code>\boxed{}</code></li>
+<li>$$\colorbox{#fbc0bd}{\unicode{&quot;2B1A}}$$ <code>\colorbox{}{}</code></li>
+<li>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}}$$ <code>\fcolorbox{}{}{}</code></li>
+<li>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}}$$ <code>\bbox[]{}</code></li>
+<li>$$\rule{2em}{1em}$$ <code>\rule[]{}{}</code></li>
+<li>$$\overline{\unicode{&quot;2B1A}}$$ <code>\overline{}</code></li>
+<li>$$\underline{\unicode{&quot;2B1A}}$$ <code>\underline{}</code></li>
+<li>$$\enclose{updiagonalstrike,roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0}$$ <code>\enclose{}[]{}</code></li>
+<li>$$\cancel{\unicode{&quot;2B1A}}$$ <code>\cancel{}</code></li>
+<li>$$\bcancel{\unicode{&quot;2B1A}}$$ <code>\bcancel{}</code></li>
+<li>$$\xcancel{\unicode{&quot;2B1A}}$$ <code>\xcancel{}</code></li>
+</ul>
+<h2>Styling</h2>
+<ul class="command-list">
+<li>$$\text{\fontseries{b}Don Knuth}$$ <code>\fontseries{}</code></li>
+<li>$$\text{\fontshape{sc}Don Knuth}$$ <code>\fontshape{}</code></li>
+<li>$$\text{\fontfamily{cmtt}Don Knuth}$$ <code>\fontfamily{}</code></li>
+<li>$$\text{\selectfont}$$ <code>\selectfont</code></li>
+<li>$${\bf Don Knuth}$$ <code>\bf</code></li>
+<li>$$\boldsymbol{Don Knuth}$$ <code>\boldsymbol{}</code></li>
+<li>$$\bm{Don Knuth}$$ <code>\bm{}</code></li>
+<li>$$\bold{Don Knuth}$$ <code>\bold{}</code></li>
+<li>$$\text{\bfseries Don Knuth}$$ <code>\bfseries</code></li>
+<li>$$\text{\mdseries Don Knuth}$$ <code>\mdseries</code></li>
+<li>$$\text{\upshape Don Knuth}$$ <code>\upshape</code></li>
+<li>$$\text{\slshape Don Knuth}$$ <code>\slshape</code></li>
+<li>$$\text{\scshape Don Knuth}$$ <code>\scshape</code></li>
+<li>$$\textbf{Don Knuth}$$ <code>\textbf{}</code></li>
+<li>$$\textmd{Don Knuth}$$ <code>\textmd{}</code></li>
+<li>$$\textup{Don Knuth}$$ <code>\textup{}</code></li>
+<li>$$\textnormal{Don Knuth}$$ <code>\textnormal{}</code></li>
+<li>$$\textsl{Don Knuth}$$ <code>\textsl{}</code></li>
+<li>$$\textit{Don Knuth}$$ <code>\textit{}</code></li>
+<li>$$\textsc{Don Knuth}$$ <code>\textsc{}</code></li>
+<li>$$\textrm{Don Knuth}$$ <code>\textrm{}</code></li>
+<li>$$\textsf{Don Knuth}$$ <code>\textsf{}</code></li>
+<li>$$\texttt{Don Knuth}$$ <code>\texttt{}</code></li>
+<li>$$\mathbf{Don Knuth}$$ <code>\mathbf{}</code></li>
+<li>$$\mathit{Don Knuth}$$ <code>\mathit{}</code></li>
+<li>$$\mathrm{Don Knuth}$$ <code>\mathrm{}</code></li>
+<li>$$\mathsf{Don Knuth}$$ <code>\mathsf{}</code></li>
+<li>$$\mathtt{Don Knuth}$$ <code>\mathtt{}</code></li>
+<li>$${\it Don Knuth}$$ <code>\it</code></li>
+<li>$${\rmfamily Don Knuth}$$ <code>\rmfamily</code></li>
+<li>$${\sffamily Don Knuth}$$ <code>\sffamily</code></li>
+<li>$${\ttfamily Don Knuth}$$ <code>\ttfamily</code></li>
+<li>$$\Bbb{Don Knuth}$$ <code>\Bbb{}</code></li>
+<li>$$\mathbb{Don Knuth}$$ <code>\mathbb{}</code></li>
+<li>$${\frak Don Knuth}$$ <code>\frak{}</code></li>
+<li>$$\mathfrak{Don Knuth}$$ <code>\mathfrak{}</code></li>
+<li>$$\mathcal{Don Knuth}$$ <code>\mathcal{}</code></li>
+<li>$$\mathscr{Don Knuth}$$ <code>\mathscr{}</code></li>
+<li>$$\mbox{Don Knuth}$$ <code>\mbox{}</code></li>
+<li>$$\text{Don Knuth}$$ <code>\text{}</code></li>
+<li>$$\class{testIdentifier}{Don Knuth}$$ <code>\class{}{}</code></li>
+<li>$$\cssId{testIdentifier}{Don Knuth}$$ <code>\cssId{}{}</code></li>
+<li>$${\htmlData Don Knuth}$$ <code>\htmlData{}{}</code></li>
+<li>$$Don{\em Knuth}$$ <code>\em{}</code></li>
+<li>$$Don\emph{Knuth}$$ <code>\emph{}</code></li>
+</ul>
+<h2>Sizing</h2>
+<ul class="command-list">
+<li>$$\tiny{x=0}$$ <code>\tiny</code></li>
+<li>$$\scriptsize{x=0}$$ <code>\scriptsize</code></li>
+<li>$$\footnotesize{x=0}$$ <code>\footnotesize</code></li>
+<li>$$\small{x=0}$$ <code>\small</code></li>
+<li>$$\normalsize{x=0}$$ <code>\normalsize</code></li>
+<li>$$\large{x=0}$$ <code>\large</code></li>
+<li>$$\Large{x=0}$$ <code>\Large</code></li>
+<li>$$\LARGE{x=0}$$ <code>\LARGE</code></li>
+<li>$$\huge{x=0}$$ <code>\huge</code></li>
+<li>$$\Huge{x=0}$$ <code>\Huge</code></li>
+</ul>
+<hr>
+<ul class="command-list">
+<li>$$\bigl($$ <code>\bigl{}</code></li>
+<li>$$\Bigl($$ <code>\Bigl{}</code></li>
+<li>$$\biggl($$ <code>\biggl{}</code></li>
+<li>$$\Biggl($$ <code>\Biggl{}</code></li>
+<li>$$\bigr)$$ <code>\bigr{}</code></li>
+<li>$$\Bigr)$$ <code>\Bigr{}</code></li>
+<li>$$\biggr)$$ <code>\biggr{}</code></li>
+<li>$$\Biggr)$$ <code>\Biggr{}</code></li>
+<li>$$\bigm|$$ <code>\bigm{}</code></li>
+<li>$$\Bigm|$$ <code>\Bigm{}</code></li>
+<li>$$\biggm|$$ <code>\biggm{}</code></li>
+<li>$$\Biggm|$$ <code>\Biggm{}</code></li>
+<li>$$\big(\big)$$ <code>\big{}</code></li>
+<li>$$\Big(\Big)$$ <code>\Big{}</code></li>
+<li>$$\bigg(\bigg)$$ <code>\bigg{}</code></li>
+<li>$$\Bigg(\Bigg)$$ <code>\Bigg{}</code></li>
+</ul>
+<h2>Various</h2>
+<ul class="command-list command-list">
+<li>
+<p>$$/$$   <code>/</code></p>
+</li>
+<li>
+<p>$$\sharp$$   <code>\sharp</code></p>
+</li>
+<li>
+<p>$$\flat$$   <code>\flat</code></p>
+</li>
+<li>
+<p>$$\natural$$   <code>\natural</code></p>
+</li>
+<li>
+<p>$$#$$   <code>\#</code></p>
+</li>
+<li>
+<p>$$&amp;$$   <code>\&amp;</code></p>
+</li>
+<li>
+<p>$$\clubsuit$$   <code>\clubsuit</code></p>
+</li>
+<li>
+<p>$$\heartsuit$$   <code>\heartsuit</code></p>
+</li>
+<li>
+<p>$$\spadesuit$$   <code>\spadesuit</code></p>
+</li>
+<li>
+<p>$$\diamondsuit$$   <code>\diamondsuit</code></p>
+</li>
+<li>
+<p>$$\backslash$$   <code>\backslash</code></p>
+</li>
+<li>
+<p>$$\infty$$   <code>\infty</code></p>
+</li>
+<li>
+<p>$$\prime$$   <code>\prime</code></p>
+</li>
+<li>
+<p>$$\doubleprime$$   <code>\doubleprime</code></p>
+</li>
+<li>
+<p>$$\angle$$   <code>\angle</code></p>
+</li>
+<li>
+<p>$$_$$   <code>\_</code></p>
+</li>
+<li>
+<p>$$\checkmark$$   <code>\checkmark</code></p>
+</li>
+<li>
+<p>$$\diagup$$   <code>\diagup</code></p>
+</li>
+<li>
+<p>$$\measuredangle$$   <code>\measuredangle</code></p>
+</li>
+<li>
+<p>$$\sphericalangle$$   <code>\sphericalangle</code></p>
+</li>
+<li>
+<p>$$\backprime$$   <code>\backprime</code></p>
+</li>
+<li>
+<p>$$\backdoubleprime$$   <code>\backdoubleprime</code></p>
+</li>
+<li>
+<p>$$/$$   <code>\/</code></p>
+</li>
+<li>
+<p>$$|$$   <code>|</code></p>
+</li>
+<li>
+<p>$$'$$   <code>'</code> * $$\unicode{&quot;2B1A}$$ <code>\unicode{}</code></p>
+</li>
+<li>
+<p>$$\originalof$$   <code>\originalof</code></p>
+</li>
+<li>
+<p>$$\laplace$$   <code>\laplace</code></p>
+</li>
+<li>
+<p>$$\imageof$$   <code>\imageof</code></p>
+</li>
+<li>
+<p>$$\Laplace$$   <code>\Laplace</code></p>
+</li>
+<li>
+<p>$$\lparen$$   <code>\lparen</code></p>
+</li>
+<li>
+<p>$$\rparen$$   <code>\rparen</code></p>
+</li>
+<li>
+<p>$$−$$   <code>−</code></p>
+</li>
+<li>
+<p>$$`$$   ```</p>
+</li>
+<li>
+<p>$$\ $$   <code>\ </code></p>
+</li>
+<li>
+<p>$$~$$   <code>~</code></p>
+</li>
+<li>
+<p>$$\space$$   <code>\space</code></p>
+</li>
+<li>
+<p>$$\ensuremath$$ <code>\ensuremath{}</code></p>
+</li>
+<li>
+<p>$$\displaystyle$$ <code>\displaystyle{}</code></p>
+</li>
+<li>
+<p>$$\textstyle$$ <code>\textstyle{}</code></p>
+</li>
+<li>
+<p>$$\scriptstyle$$ <code>\scriptstyle{}</code></p>
+</li>
+<li>
+<p>$$\scriptscriptstyle$$ <code>\scriptscriptstyle{}</code></p>
+</li>
+<li>
+<p>$$\mathbfit$$ <code>\mathbfit{}</code></p>
+</li>
+<li>
+<p>$$\overunderset$$ <code>\overunderset{}{}{}</code></p>
+</li>
+<li>
+<p>$$\smash$$ <code>\smash[]{}</code></p>
+</li>
+<li>
+<p>$$\vphantom$$ <code>\vphantom{}</code></p>
+</li>
+<li>
+<p>$$\hphantom$$ <code>\hphantom{}</code></p>
+</li>
+<li>
+<p>$$\phantom$$ <code>\phantom{}</code></p>
+</li>
+<li>
+<p>$$\inf$$ <code>\inf</code></p>
+</li>
+<li>
+<p>$$\Pr$$ <code>\Pr</code></p>
+</li>
+<li>
+<p>$$\sup$$ <code>\sup</code></p>
+</li>
+<li>
+<p>$$\liminf$$ <code>\liminf</code></p>
+</li>
+<li>
+<p>$$\limsup$$ <code>\limsup</code></p>
+</li>
+<li>
+<p>$$\ce$$ <code>\ce{}</code></p>
+</li>
+<li>
+<p>$$\pu$$ <code>\pu{}</code></p>
+</li>
+<li>
+<p>$$\quad$$ <code>\quad</code></p>
+</li>
+</ul>
+<h2>Chemistry</h2>
+<p>MathLive  supports the <a href="https://mhchem.github.io/MathJax-mhchem/"><code>mhchem</code> package</a>.</p>
+<h3>Chemical Formulae</h3>
+<ul>
+<li>$$\ce{H2O}$$ <code>\ce{H2O}$</code></li>
+<li>$$\ce{Sb2O3}$$ <code>\ce{Sb2O3}</code></li>
+</ul>
+<h3>Charges</h3>
+<ul>
+<li>$$\ce{[AgCl2]-}$$ <code>\ce{[AgCl2]-}</code></li>
+<li>$$\ce{Y^99+}$$ <code>\ce{Y^99+}</code></li>
+<li>$$\ce{Y^{99+}}$$ <code>\ce{Y^{99+}}</code></li>
+<li>$$\ce{H+}$$ <code>\ce{H+}</code></li>
+<li>$$\ce{CrO4^2-}$$ <code>\ce{CrO4^2-}</code></li>
+</ul>
+<h3>Stoichiometric numbers</h3>
+<ul>
+<li>$$\ce{2 H2O}$$ <code>\ce{2 H2O}</code></li>
+<li>$$\ce{2H2O}$$ <code>\ce{2H2O}</code></li>
+<li>$$\ce{0.5 H2O}$$ <code>\ce{0.5 H2O}</code></li>
+<li>$$\ce{1/2 H2O}$$ <code>\ce{1/2 H2O}</code></li>
+<li>$$\ce{(1/2) H2O}$$ <code>\ce{(1/2) H2O}</code></li>
+<li>$$\ce{$n$ H2O}$$ <code>\ce{$n$ H2O}</code></li>
+</ul>
+<h3>Isotopes</h3>
+<ul>
+<li>$$\ce{^{227}_{90}Th+}$$ <code>\ce{^{227}_{90}Th+}</code></li>
+<li>$$\ce{^227_90Th+}$$ <code>\ce{^227_90Th+}</code></li>
+<li>$$\ce{^{0}_{-1}n^{-}}$$  <code>\ce{^{0}_{-1}n^{-}}</code></li>
+<li>$$\ce{^0_-1n-}$$ <code>\ce{^0_-1n-}</code></li>
+<li>$$\ce{H{}^3HO}$$ <code>\ce{H{}^3HO}</code></li>
+<li>$$\ce{H^3HO}$$ <code>\ce{H^3HO}</code></li>
+</ul>
+<h3>Complex Examples</h3>
+<ul>
+<li>$$\ce{CO2 + C -&gt; 2 CO}$$ <br>  <code>\ce{CO2 + C -&gt; 2 CO}</code></li>
+<li>$$\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}$$ <br>   <code>\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}</code></li>
+<li>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}$$ <br>   <code>C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}</code></li>
+<li>$$\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}$$ <br>  <code>\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}</code></li>
+<li>$$\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}$$  <br>  <code>\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}</code></li>
+<li>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}$$ <br>  <code>\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}</code></li>
+<li>$$\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}$$ <br>   <code>\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}</code></li>
+</ul>
+<h2>Macros</h2>
+<ul class="command-list">
+<li>$$\iff$$	<code>\iff</code></li>
+<li>$$\nicefrac{3}{4}$$	<code>\nicefrac{3}{4}</code></li>
+<li>$$\bra{\Psi}$$	<code>\bra{\Psi}</code></li>
+<li>$$\ket{\Psi}$$	<code>\ket{\Psi}</code></li>
+<li>$$\braket{ab}$$	<code>\braket{}</code></li>
+<li>$$\set{ab}$$	<code>\set{}</code></li>
+<li>$$\Bra{ab}$$	<code>\Bra{}</code></li>
+<li>$$\Ket{ab}$$	<code>\Ket{}</code></li>
+<li>$$\Braket{ab}$$	<code>\Braket{}</code></li>
+<li>$$\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } $$	<code>\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } </code></li>
+<li>$$n \pmod{3}$$	<code>n \pmod{3}</code></li>
+<li>$$n \mod{3}$$	<code>n \mod{3}</code></li>
+<li>$$n \bmod 3$$	<code>n \bmod 3</code></li>
+<li>$$\rd$$	<code>\rd</code></li>
+<li>$$\rD$$	<code>\rD</code></li>
+<li>$$\doubleStruckCapitalN$$	<code>\doubleStruckCapitalN</code></li>
+<li>$$\doubleStruckCapitalR$$	<code>\doubleStruckCapitalR</code></li>
+<li>$$\doubleStruckCapitalQ$$	<code>\doubleStruckCapitalQ</code></li>
+<li>$$\doubleStruckCapitalZ$$	<code>\doubleStruckCapitalZ</code></li>
+<li>$$\doubleStruckCapitalP$$	<code>\doubleStruckCapitalP</code></li>
+<li>$$\scriptCapitalE$$	<code>\scriptCapitalE</code></li>
+<li>$$\scriptCapitalH$$	<code>\scriptCapitalH</code></li>
+<li>$$\scriptCapitalL$$	<code>\scriptCapitalL</code></li>
+<li>$$\gothicCapitalC$$	<code>\gothicCapitalC</code></li>
+<li>$$\gothicCapitalH$$	<code>\gothicCapitalH</code></li>
+<li>$$\gothicCapitalI$$	<code>\gothicCapitalI</code></li>
+<li>$$\gothicCapitalR$$	<code>\gothicCapitalR</code></li>
+<li>$$\imaginaryI$$	<code>\imaginaryI</code></li>
+<li>$$\imaginaryJ$$	<code>\imaginaryJ</code></li>
+<li>$$\exponentialE$$	<code>\exponentialE</code></li>
+<li>$$\differentialD$$	<code>\differentialD</code></li>
+<li>$$\capitalDifferentialD$$	<code>\capitalDifferentialD</code></li>
+</ul>
+<h2>Environments</h2>
+<ul>
+<li>
+<p><code>$$\begin{math}\text{first}\end{math}$$</code></p>
+</li>
+<li>
+<p><code>$$\begin{displaymath}\text{first}\end{displaymath}$$</code></p>
+</li>
+<li>
+<p>$$\begin{array}{lclc}a &amp; b \c &amp; \frac{1}{d}\end{array}$$<code>\​begin{array}...\end{array}</code></p>
+</li>
+<li>
+<p>$$\begin{equation}a &amp; b \c &amp; \frac{1}{d}\end{equation}$$<code>\​begin{equation}...\end{equation}</code></p>
+</li>
+<li>
+<p>$$\begin{subequations}a &amp; b \c &amp; \frac{1}{d}\end{subequations}$$<code>\​begin{subequations}...\end{subequations}</code></p>
+</li>
+<li>
+<p>$$\begin{multline}a &amp; b \c &amp; \frac{1}{d}\end{multline}$$<code>\​begin{multline}...\end{multline}</code></p>
+</li>
+<li>
+<p>$$\begin{align}a &amp; b \c &amp; \frac{1}{d}\end{align}$$<code>\​begin{align}...\end{align}</code></p>
+</li>
+<li>
+<p>$$\begin{align*}a &amp; b \c &amp; \frac{1}{d}\end{align*}$$<code>\​begin{align*}...\end{align*}</code></p>
+</li>
+<li>
+<p>$$\begin{aligned}a &amp; b \c &amp; \frac{1}{d}\end{aligned}$$<code>\​begin{aligned}...\end{aligned}</code></p>
+</li>
+<li>
+<p>$$\begin{eqnarray}a &amp; b \c &amp; \frac{1}{d}\end{eqnarray}$$<code>\​begin{eqnarray}...\end{eqnarray}</code></p>
+</li>
+<li>
+<p>$$\begin{split}a &amp; b \c &amp; \frac{1}{d}\end{split}$$<code>\​begin{split}...\end{split}</code></p>
+</li>
+<li>
+<p>$$\begin{gather}a &amp; b \c &amp; \frac{1}{d}\end{gather}$$<code>\​begin{gather}...\end{gather}</code></p>
+</li>
+<li>
+<p>$$\begin{gathered}a &amp; b \c &amp; \frac{1}{d}\end{gathered}$$<code>\​begin{gathered}...\end{gathered}</code></p>
+</li>
+<li>
+<p>$$\begin{matrix}a &amp; b \c &amp; \frac{1}{d}\end{matrix}$$<code>\​begin{matrix}...\end{matrix}</code></p>
+</li>
+<li>
+<p>$$\begin{pmatrix}a &amp; b \c &amp; \frac{1}{d}\end{pmatrix}$$<code>\​begin{pmatrix}...\end{pmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{bmatrix}a &amp; b \c &amp; \frac{1}{d}\end{bmatrix}$$<code>\​begin{bmatrix}...\end{bmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{Bmatrix}a &amp; b \c &amp; \frac{1}{d}\end{Bmatrix}$$<code>\​begin{Bmatrix}...\end{Bmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{vmatrix}a &amp; b \c &amp; \frac{1}{d}\end{vmatrix}$$<code>\​begin{vmatrix}...\end{vmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{Vmatrix}a &amp; b \c &amp; \frac{1}{d}\end{Vmatrix}$$<code>\​begin{Vmatrix}...\end{Vmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{matrix*}a &amp; b \c &amp; \frac{1}{d}\end{matrix*}$$<code>\​begin{matrix*}...\end{matrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{pmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{pmatrix*}$$<code>\​begin{pmatrix*}...\end{pmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{bmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{bmatrix*}$$<code>\​begin{bmatrix*}...\end{bmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{Bmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{Bmatrix*}$$<code>\​begin{Bmatrix*}...\end{Bmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{vmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{vmatrix*}$$<code>\​begin{vmatrix*}...\end{vmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{Vmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{Vmatrix*}$$<code>\​begin{Vmatrix*}...\end{Vmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{smallmatrix}a &amp; b \c &amp; \frac{1}{d}\end{smallmatrix}$$<code>\​begin{smallmatrix}...\end{smallmatrix}</code></p>
+</li>
+<li>
+<p>$$\begin{smallmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{smallmatrix*}$$<code>\​begin{smallmatrix*}...\end{smallmatrix*}</code></p>
+</li>
+<li>
+<p>$$\begin{cases}a &amp; b \c &amp; \frac{1}{d}\end{cases}$$<code>\​begin{cases}...\end{cases}</code></p>
+</li>
+<li>
+<p>$$\begin{dcases}a &amp; b \c &amp; \frac{1}{d}\end{dcases}$$<code>\​begin{dcases}...\end{dcases}</code></p>
+</li>
+<li>
+<p>$$\begin{rcases}a &amp; b \c &amp; \frac{1}{d}\end{rcases}$$<code>\​begin{rcases}...\end{rcases}</code></p>
+</li>
+<li>
+<p><code>$$\begin{center}\text{first}\end{center}$$</code></p>
+</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="May 12, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 12 2021 14:17:40 GMT+0200 (Central European Summer Time)">May 12, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
