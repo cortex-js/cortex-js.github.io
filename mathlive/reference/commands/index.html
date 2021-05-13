@@ -443,10 +443,16 @@
   }
 </style>
 <h2>Fractions and Binomials</h2>
-<ul class="command-list">
+<ul>
 <li>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\frac{}{}</code></li>
 <li>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dfrac{}{}</code></li>
 <li>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\tfrac{}{}</code></li>
+</ul>
+<p>The <code>\dfrac</code> command display in Display style even when it is in a context
+that would normally use a different style, such as in a superscript.</p>
+<p>The <code>\tfrac</code> command display in Text style (inline) even in a context
+that would  normally use Display style.</p>
+<ul class="command-list">
 <li>$$\cfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\cfrac{}{}</code></li>
 <li>$$\binom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\binom{}{}</code></li>
 <li>$$\dbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dbinom{}{}</code></li>
@@ -473,6 +479,8 @@ when creating modern LaTeX content.</p>
 <li>$$\div$$   <code>\div</code></li>
 <li>$$\divides$$   <code>\divides</code></li>
 <li>$$\cdot$$   <code>\cdot</code></li>
+<li>$$\sqrt[\unicode{&quot;2B1A}]{\unicode{&quot;2B1A}}$$ <code>\sqrt[]{}</code></li>
+<li>$$\surd$$   <code>\surd{}</code></li>
 <li>$$\ltimes$$   <code>\ltimes</code></li>
 <li>$$\rtimes$$   <code>\rtimes</code></li>
 <li>$$\leftthreetimes$$   <code>\leftthreetimes</code></li>
@@ -482,7 +490,6 @@ when creating modern LaTeX content.</p>
 <li>$$\doublebarwedge$$   <code>\doublebarwedge</code></li>
 <li>$$\divideontimes$$   <code>\divideontimes</code></li>
 <li>$$\centerdot$$   <code>\centerdot</code></li>
-<li>$$\surd$$   <code>\surd</code> * $$\sqrt{\unicode{&quot;2B1A}}$$ <code>\sqrt[]{}</code></li>
 </ul>
 <h2>Functions</h2>
 <ul class="command-list">
@@ -494,12 +501,17 @@ when creating modern LaTeX content.</p>
 <li>$$\ln$$ <code>\ln</code></li>
 <li>$$\log$$ <code>\log</code></li>
 <li>$$\lim$$ <code>\lim</code></li>
-<li>$$\mod$$ <code>\mod</code></li>
 <li>$$\det$$ <code>\det</code></li>
 <li>$$\max$$ <code>\max</code></li>
 <li>$$\min$$ <code>\min</code></li>
 </ul>
-<h2>Trigonometry</h2>
+<h3>Modulo</h3>
+<ul>
+<li>$$n \pmod{3}$$	<code>n \pmod{3}</code></li>
+<li>$$n \mod{3}$$	<code>n \mod{3}</code></li>
+<li>$$n \bmod 3$$	<code>n \bmod 3</code></li>
+</ul>
+<h3>Trigonometry</h3>
 <ul class="command-list">
 <li>$$\arccos$$ <code>\arccos</code></li>
 <li>$$\arcsin$$ <code>\arcsin</code></li>
@@ -527,6 +539,27 @@ when creating modern LaTeX content.</p>
 <li>$$\tanh$$ <code>\tanh</code></li>
 <li>$$\tg$$ <code>\tg</code></li>
 <li>$$\th$$ <code>\th</code></li>
+</ul>
+<h2>Unicode</h2>
+<ul>
+<li><code>\unicode{}</code> - The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use uppercase <code>A</code>-<code>F</code> for hexadecimal digits.
+<ul>
+<li>$$\unicode{10775}$$ <code>\unicode{10775}</code></li>
+<li>$$\unicode{&quot;2A17}$$ <code>\unicode{&quot;2A17}</code></li>
+<li>$$\unicode{x2A17}$$ <code>\unicode{x2A17}</code></li>
+</ul>
+</li>
+<li><code>\char</code> - The argument is also Unicode codepoint, but the <code>{</code>…<code>}</code> delimiters are optional when using <code>&quot;</code>
+<ul>
+<li>$$\char&quot;2A17$$ <code>\char&quot;2A17</code></li>
+</ul>
+</li>
+<li><code>^^</code> and <code>^^^^</code> - Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong> <code>a</code>-<code>f</code> to specify a Unicode codepoint
+<ul>
+<li>$$^^4a$$ <code>^^4a</code></li>
+<li>$$^^^^2a17$$ <code>^^^^2a17</code></li>
+</ul>
+</li>
 </ul>
 <h2>Extensible Operators</h2>
 <ul class="command-list">
@@ -566,6 +599,9 @@ when creating modern LaTeX content.</p>
 </ul>
 <h2>Logic</h2>
 <ul class="command-list">
+<li>$$\forall$$   <code>\forall</code></li>
+<li>$$\exists$$   <code>\exists</code></li>
+<li>$$\nexists$$   <code>\nexists</code></li>
 <li>$$\to$$   <code>\to</code></li>
 <li>$$\gets$$   <code>\gets</code></li>
 <li>$$\implies$$   <code>\implies</code></li>
@@ -801,7 +837,8 @@ when creating modern LaTeX content.</p>
 <li>$$\asymp$$   <code>\asymp</code></li>
 <li>$$\approx$$   <code>\approx</code></li>
 <li>$$\parallel$$   <code>\parallel</code></li>
-<li>$$\simeq$$   <code>\simeq</code> * $$\ne$$ <code>\ne</code></li>
+<li>$$\simeq$$   <code>\simeq</code></li>
+<li>$$\ne$$ <code>\ne</code></li>
 <li>$$\neq$$ <code>\neq</code></li>
 </ul>
 <h2>Negated Relations</h2>
@@ -883,7 +920,8 @@ when creating modern LaTeX content.</p>
 <li>$$\nsubseteq$$   <code>\nsubseteq</code></li>
 <li>$$\nsupseteq$$   <code>\nsupseteq</code></li>
 <li>$$\varnothing$$   <code>\varnothing</code></li>
-<li>$$\complement$$   <code>\complement</code> * $$\not$$ <code>\not{}</code></li>
+<li>$$\complement$$   <code>\complement</code></li>
+<li>$$\not$$ <code>\not{}</code></li>
 </ul>
 <h2>Greek</h2>
 <ul class="command-list">
@@ -935,15 +973,12 @@ when creating modern LaTeX content.</p>
 <ul class="command-list">
 <li>$$\aleph$$   <code>\aleph</code></li>
 <li>$$\beth$$   <code>\beth</code></li>
-<li>$$\daleth$$   <code>\daleth</code></li>
 <li>$$\gimel$$   <code>\gimel</code></li>
+<li>$$\daleth$$   <code>\daleth</code></li>
 </ul>
 <h2>Letterlike Symbols</h2>
 <ul class="command-list">
 <li>$$@$$   <code>@</code></li>
-<li>$$\forall$$   <code>\forall</code></li>
-<li>$$\exists$$   <code>\exists</code></li>
-<li>$$\nexists$$   <code>\nexists</code></li>
 <li>$$\mid$$   <code>\mid</code></li>
 <li>$$\top$$   <code>\top</code></li>
 <li>$$\bot$$   <code>\bot</code></li>
@@ -973,11 +1008,14 @@ when creating modern LaTeX content.</p>
 <li>$$\yen$$   <code>\yen</code></li>
 <li>$$\imath$$   <code>\imath</code></li>
 <li>$$\jmath$$   <code>\jmath</code></li>
-<li>$$\degree$$   <code>\degree</code> * $$\Re$$ <code>\Re</code></li>
+<li>$$\degree$$   <code>\degree</code></li>
+<li>$$\Re$$ <code>\Re</code></li>
 <li>$$\Im$$ <code>\Im</code></li>
 </ul>
 <h2>Delimiters</h2>
 <ul class="command-list">
+<li>$$\lparen$$   <code>\lparen</code></li>
+<li>$$\rparen$$   <code>\rparen</code></li>
 <li>$$\lbrace$$   <code>\lbrace</code></li>
 <li>$$\rbrace$$   <code>\rbrace</code></li>
 <li>$$\langle$$   <code>\langle</code></li>
@@ -1099,7 +1137,8 @@ when creating modern LaTeX content.</p>
 </ul>
 <h2>Accents</h2>
 <ul class="command-list">
-<li>$$~{n}$$   <code>\~</code> * $$\acute{\unicode{&quot;2B1A}}$$ <code>\acute{}</code></li>
+<li>$$~{n}$$   <code>\~</code></li>
+<li>$$\acute{\unicode{&quot;2B1A}}$$ <code>\acute{}</code></li>
 <li>$$\grave{\unicode{&quot;2B1A}}$$ <code>\grave{}</code></li>
 <li>$$\dot{\unicode{&quot;2B1A}}$$ <code>\dot{}</code></li>
 <li>$$\ddot{\unicode{&quot;2B1A}}$$ <code>\ddot{}</code></li>
@@ -1228,23 +1267,55 @@ when creating modern LaTeX content.</p>
 <li>$$\Huge{x=0}$$ <code>\Huge</code></li>
 </ul>
 <hr>
-<ul class="command-list">
-<li>$$\bigl($$ <code>\bigl{}</code></li>
-<li>$$\Bigl($$ <code>\Bigl{}</code></li>
-<li>$$\biggl($$ <code>\biggl{}</code></li>
-<li>$$\Biggl($$ <code>\Biggl{}</code></li>
-<li>$$\bigr)$$ <code>\bigr{}</code></li>
-<li>$$\Bigr)$$ <code>\Bigr{}</code></li>
-<li>$$\biggr)$$ <code>\biggr{}</code></li>
-<li>$$\Biggr)$$ <code>\Biggr{}</code></li>
-<li>$$\bigm|$$ <code>\bigm{}</code></li>
-<li>$$\Bigm|$$ <code>\Bigm{}</code></li>
-<li>$$\biggm|$$ <code>\biggm{}</code></li>
-<li>$$\Biggm|$$ <code>\Biggm{}</code></li>
-<li>$$\big(\big)$$ <code>\big{}</code></li>
-<li>$$\Big(\Big)$$ <code>\Big{}</code></li>
-<li>$$\bigg(\bigg)$$ <code>\bigg{}</code></li>
-<li>$$\Bigg(\Bigg)$$ <code>\Bigg{}</code></li>
+<ul class="command-list command-list command-list command-list command-list">
+<li>
+<p>$$\bigl($$ <code>\bigl{}</code></p>
+</li>
+<li>
+<p>$$\bigr)$$ <code>\bigr{}</code></p>
+</li>
+<li>
+<p>$$\bigm|$$ <code>\bigm{}</code></p>
+</li>
+<li>
+<p>$$\Bigl($$ <code>\Bigl{}</code></p>
+</li>
+<li>
+<p>$$\Bigr)$$ <code>\Bigr{}</code></p>
+</li>
+<li>
+<p>$$\Bigm|$$ <code>\Bigm{}</code></p>
+</li>
+<li>
+<p>$$\biggl($$ <code>\biggl{}</code></p>
+</li>
+<li>
+<p>$$\biggr)$$ <code>\biggr{}</code></p>
+</li>
+<li>
+<p>$$\biggm|$$ <code>\biggm{}</code></p>
+</li>
+<li>
+<p>$$\Biggl($$ <code>\Biggl{}</code></p>
+</li>
+<li>
+<p>$$\Biggr)$$ <code>\Biggr{}</code></p>
+</li>
+<li>
+<p>$$\Biggm|$$ <code>\Biggm{}</code></p>
+</li>
+<li>
+<p>$$\big(\big)$$ <code>\big{}</code></p>
+</li>
+<li>
+<p>$$\Big(\Big)$$ <code>\Big{}</code></p>
+</li>
+<li>
+<p>$$\bigg(\bigg)$$ <code>\bigg{}</code></p>
+</li>
+<li>
+<p>$$\Bigg(\Bigg)$$ <code>\Bigg{}</code></p>
+</li>
 </ul>
 <h2>Various</h2>
 <ul class="command-list command-list">
@@ -1321,7 +1392,7 @@ when creating modern LaTeX content.</p>
 <p>$$|$$   <code>|</code></p>
 </li>
 <li>
-<p>$$'$$   <code>'</code> * $$\unicode{&quot;2B1A}$$ <code>\unicode{}</code></p>
+<p>$$'$$   <code>'</code></p>
 </li>
 <li>
 <p>$$\originalof$$   <code>\originalof</code></p>
@@ -1334,12 +1405,6 @@ when creating modern LaTeX content.</p>
 </li>
 <li>
 <p>$$\Laplace$$   <code>\Laplace</code></p>
-</li>
-<li>
-<p>$$\lparen$$   <code>\lparen</code></p>
-</li>
-<li>
-<p>$$\rparen$$   <code>\rparen</code></p>
 </li>
 <li>
 <p>$$−$$   <code>−</code></p>
@@ -1469,9 +1534,6 @@ when creating modern LaTeX content.</p>
 <li>$$\Ket{ab}$$	<code>\Ket{}</code></li>
 <li>$$\Braket{ab}$$	<code>\Braket{}</code></li>
 <li>$$\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } $$	<code>\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } </code></li>
-<li>$$n \pmod{3}$$	<code>n \pmod{3}</code></li>
-<li>$$n \mod{3}$$	<code>n \mod{3}</code></li>
-<li>$$n \bmod 3$$	<code>n \bmod 3</code></li>
 <li>$$\rd$$	<code>\rd</code></li>
 <li>$$\rD$$	<code>\rD</code></li>
 <li>$$\doubleStruckCapitalN$$	<code>\doubleStruckCapitalN</code></li>
@@ -1588,6 +1650,16 @@ when creating modern LaTeX content.</p>
 <p><code>$$\begin{center}\text{first}\end{center}$$</code></p>
 </li>
 </ul>
+<h2>TeX Internals</h2>
+<ul>
+<li><code>\limits</code> and <code>\nolimits</code></li>
+<li><code>\relax</code></li>
+<li><code>\noexpand</code></li>
+<li><code>\obeyspaces</code></li>
+<li><code>\bgroup</code> and <code>\egroup</code></li>
+<li><code>\string</code></li>
+<li><code>\csname</code> and <code>\endcsname</code></li>
+</ul>
 
         
       </section>
@@ -1597,10 +1669,10 @@ when creating modern LaTeX content.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 12, 2021">
+        <meta itemprop="datePublished" content="May 13, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 12 2021 14:17:40 GMT+0200 (Central European Summer Time)">May 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 13 2021 11:42:35 GMT+0200 (Central European Summer Time)">May 13, 2021</time></p>
         
       </footer>
 
