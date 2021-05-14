@@ -490,7 +490,14 @@
         
         <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument();
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: { display: [ ['$$', '$$'] ] },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
 </script>
 <h1>Core</h1>
 <h2>Constants</h2>
@@ -743,7 +750,7 @@ conjugate.</li>
         <meta itemprop="datePublished" content="May 14, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:25:36 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:58:19 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
         
       </footer>
 

@@ -440,7 +440,14 @@
         
         <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument();
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: { display: [ ['$$', '$$'] ] },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
 </script>
 <h1>MathJSON</h1>
 <img src='/assets/MathJSON-1.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
@@ -494,10 +501,10 @@ MathJSON expressions.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2021">
+        <meta itemprop="datePublished" content="May 14, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Apr 24 2021 12:23:40 GMT+0200 (Central European Summer Time)">April 24, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:56:52 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
         
       </footer>
 

@@ -428,7 +428,14 @@
         
         <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument();
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: { display: [ ['$$', '$$'] ] },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
 </script>
 <style>
   ul.command-list {
@@ -2334,10 +2341,10 @@ combinations.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 12, 2021">
+        <meta itemprop="datePublished" content="May 14, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 12 2021 14:13:58 GMT+0200 (Central European Summer Time)">May 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:56:41 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
         
       </footer>
 
