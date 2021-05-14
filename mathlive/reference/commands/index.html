@@ -478,8 +478,8 @@ that would normally use a different style, such as in a superscript.</p>
 <p>The following commands are supported but their usage is generally discouraged
 when creating modern LaTeX content.</p>
 <ul class="command-list">
-<li><span class='math'>$${\unicode{&quot;2B1A} \overwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}} $$</span> <code>\overwithdelims{\lbrace}{\rbrace}</code></li>
-<li><span class='math'>$${\unicode{&quot;2B1A} \atopwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}} $$</span> <code>\atopwithdelims{\lbrace}{\rbrace}</code></li>
+<li><span class='math'>$${\unicode{&quot;2B1A} \overwithdelims\lbrace\rbrace \unicode{&quot;2B1A}} $$</span> <code>\overwithdelims\lbrace\rbrace</code></li>
+<li><span class='math'>$${\unicode{&quot;2B1A} \atopwithdelims\lbrace\rbrace \unicode{&quot;2B1A}} $$</span> <code>\atopwithdelims\lbrace\rbrace</code></li>
 <li><span class='math'>$$\unicode{&quot;2B1A} \over \unicode{&quot;2B1A} $$</span> <code>\over </code></li>
 <li><span class='math'>$$\unicode{&quot;2B1A} \atop \unicode{&quot;2B1A} $$</span> <code>\atop </code></li>
 <li><span class='math'>$$\unicode{&quot;2B1A} \choose \unicode{&quot;2B1A} $$</span> <code>\choose </code></li>
@@ -579,6 +579,9 @@ when creating modern LaTeX content.</p>
 </li>
 </ul>
 <h2>Extensible Operators</h2>
+<p>To force the display of the limits above and below the operator, use <code>\limits</code>. To force the display of the limits to be adjacent to the operator, use <code>\nolimits</code>.</p>
+<p><code>\sum_{n=0}^\infty\nolimits</code></p>
+<p><span class='math'>$$\sum_{n=0}^\infty\nolimits</span></p>
 <ul class="command-list">
 <li><span class='math'>$$\sum $$</span> <code>\sum</code></li>
 <li><span class='math'>$$\prod $$</span> <code>\prod</code></li>
@@ -747,11 +750,9 @@ when creating modern LaTeX content.</p>
 <h2>Extensible Symbols</h2>
 <ul class="command-list">
 <li><span class='math'>$$\overline{\unicode{&quot;2B1A}} $$</span> <code>\overline{}</code></li>
-<li><span class='math'>$$\underline{\unicode{&quot;2B1A}} $$</span> <code>\underline{}</code></li>
 <li><span class='math'>$$\widehat{ABC} $$</span> <code>\widehat{}</code></li>
 <li><span class='math'>$$\widecheck{ABC} $$</span> <code>\widecheck{}</code></li>
 <li><span class='math'>$$\widetilde{ABC} $$</span> <code>\widetilde{}</code></li>
-<li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
 <li><span class='math'>$$\overrightarrow{ABC} $$</span> <code>\overrightarrow{}</code></li>
 <li><span class='math'>$$\overleftarrow{ABC} $$</span> <code>\overleftarrow{}</code></li>
 <li><span class='math'>$$\Overrightarrow{ABC} $$</span> <code>\Overrightarrow{}</code></li>
@@ -764,6 +765,8 @@ when creating modern LaTeX content.</p>
 </ul>
 <hr>
 <ul class="command-list">
+<li><span class='math'>$$\underline{\unicode{&quot;2B1A}} $$</span> <code>\underline{}</code></li>
+<li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
 <li><span class='math'>$$\underrightarrow{ABC} $$</span> <code>\underrightarrow{}</code></li>
 <li><span class='math'>$$\underleftarrow{ABC} $$</span> <code>\underleftarrow{}</code></li>
 <li><span class='math'>$$\underleftrightarrow{ABC} $$</span> <code>\underleftrightarrow{}</code></li>
@@ -1257,6 +1260,13 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 </ul>
 <h2>Delimiters</h2>
 <ul class="command-list">
+<li><span class='math'>$$\left{x\middle|\fracx2 &gt; 0\right} $$</span> \left{x\middle|\fracx2 &gt; 0\right}`</li>
+</ul>
+<hr>
+<p>The argument to <code>\left</code>, <code>\right</code> and <code>\middle</code> can be one of the
+following symbols.</p>
+<p>To omit the delimiter, use <code>.</code>, <span class='math'>$$\left\lparen \frac1x \right.$$</span> <code>\left\lparen \frac1x \right.</code></p>
+<ul class="command-list">
 <li><span class='math'>$$\lparen $$</span>   <code>\lparen</code></li>
 <li><span class='math'>$$\rparen $$</span>   <code>\rparen</code></li>
 <li><span class='math'>$$\lbrace $$</span>   <code>\lbrace</code></li>
@@ -1277,7 +1287,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 <li><span class='math'>$$\rVert $$</span>   <code>\rVert</code></li>
 <li><span class='math'>$$\lbrack $$</span>   <code>\lbrack</code></li>
 <li><span class='math'>$$\rbrack $$</span>   <code>\rbrack</code></li>
-<li><span class='math'> $$</span> { <span class='math'> $$</span>   <code>\{</code></li>
+<li><span class='math'>$${ $$</span>   <code>\{</code></li>
 <li><span class='math'>$$} $$</span>   <code>\}</code></li>
 <li><span class='math'>$$( $$</span>   <code>(</code></li>
 <li><span class='math'>$$) $$</span>   <code>)</code></li>
@@ -1379,26 +1389,35 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 <li><span class='math'>$$\maltese $$</span>   <code>\maltese</code></li>
 </ul>
 <h2>Layout</h2>
+<p>These commands change the amount of space around a symbol: <code>\mathop{}</code>
+treats its argument as if it was a large operator, <code>\mathrel{}</code> a
+relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{}</code> and <code>\mathclose{}</code> an opening and closing delimiter, respectively, <code>\mathpunct{}</code> a punctuation, <code>\mathinner{}</code> a fraction, and <code>\mathord{}</code> an ordinary symbol</p>
 <ul class="command-list">
-<li><span class='math'>$$x=\mathop{arg}=0 $$</span> <code>\mathop{}</code></li>
+<li><span class='math'>$$x\mathop{+}0+1 $$</span> <code>x\mathop{+}0+1</code></li>
 <li><span class='math'>$$x=\mathbin{arg}=0 $$</span> <code>\mathbin{}</code></li>
 <li><span class='math'>$$x=\mathrel{arg}=0 $$</span> <code>\mathrel{}</code></li>
 <li><span class='math'>$$x=\mathopen{arg}=0 $$</span> <code>\mathopen{}</code></li>
 <li><span class='math'>$$x=\mathclose{arg}=0 $$</span> <code>\mathclose{}</code></li>
 <li><span class='math'>$$x=\mathpunct{arg}=0 $$</span> <code>\mathpunct{}</code></li>
-<li><span class='math'>$$x=\mathord{arg}=0 $$</span> <code>\mathord{}</code></li>
 <li><span class='math'>$$x=\mathinner{arg}=0 $$</span> <code>\mathinner{}</code></li>
-<li><span class='math'>$$x=\operatorname{arg}=0 $$</span> <code>\operatorname{}</code></li>
-<li><span class='math'>$$x=\operatorname*{arg}=0 $$</span> <code>\operatorname*{}</code></li>
+<li><span class='math'>$$x=\mathord{arg}=0 $$</span> <code>\mathord{}</code></li>
+</ul>
+<hr>
+<ul class="command-list">
+<li><span class='math'>$$x=\operatorname{lim}=0 $$</span> <code>\operatorname{lim}</code></li>
+<li><span class='math'>$$x=\operatorname*{lim}=0 $$</span> <code>\operatorname*{lim}</code></li>
+</ul>
+<hr>
+<ul>
 <li><span class='math'>$$\overset{arg}{x=0} $$</span> <code>\overset{}{}</code></li>
 <li><span class='math'>$$\underset{arg}{x=0} $$</span> <code>\underset{}{}</code></li>
+<li><span class='math'>$$\overunderset{arg}{x=0}{y=1} $$</span> <code>\overunderset{arg}{x=0}{y=1}</code></li>
 <li><span class='math'>$$\stackrel{arg}{x=0} $$</span> <code>\stackrel[]{}{}</code></li>
 <li><span class='math'>$$\stackbin{arg}{x=0} $$</span> <code>\stackbin[]{}{}</code></li>
 <li><span class='math'>$$\rlap{/}0 $$</span> <code>\rlap{}</code></li>
 <li><span class='math'>$$o\llap{/} $$</span> <code>\llap{}</code></li>
 <li><span class='math'>$$o\mathllap{/} $$</span> <code>\mathllap{}</code></li>
 <li><span class='math'>$$\mathrlap{/}0 $$</span> <code>\mathrlap{}</code></li>
-<li><span class='math'>$$\left{x\middle|x&gt;0\right} $$</span> <code>\middle{}</code></li>
 </ul>
 <h2>Spacing</h2>
 <ul class="command-list">
@@ -1412,67 +1431,264 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 <li><span class='math'>$$\unicode{&quot;203A}\enspace\unicode{&quot;2039} $$</span> <code>\enspace</code></li>
 <li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
-<h2>Decoration</h2>
+<h2>Decorations</h2>
 <ul class="command-list">
-<li><span class='math'>$${\color{m0}A}{\color{m1}B}{\color{m2}C }{\color{m3}a}{\color{m4}b}{\color{m5}c}{\color{m6}8} $$</span> <code>\color{}</code></li>
-<li><span class='math'>$${\textcolor{m0}A}{\textcolor{m1}B}{\textcolor{m2}C }{\textcolor{m3}a}{\textcolor{m4}b}{\textcolor{m5}c}{\textcolor{m6}8} $$</span> <code>\textcolor{}{}</code></li>
-<li><span class='math'>$$\boxed{\unicode{&quot;2B1A}} $$</span> <code>\boxed{}</code></li>
+<li><span class='math'>$${\color{blue}x+1=0}} $$</span> <code>{\color{blue} x+1=0}}</code></li>
+<li><span class='math'>$$\textcolor{blue}{x+1=0}$$</span> <code>\textcolor{blue}{x+1=0}</code></li>
 <li><span class='math'>$$\colorbox{#fbc0bd}{\unicode{&quot;2B1A}} $$</span> <code>\colorbox{}{}</code></li>
 <li><span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}} $$</span> <code>\fcolorbox{}{}{}</code></li>
+<li><span class='math'>$$\boxed{\unicode{&quot;2B1A}} $$</span> <code>\boxed{}</code></li>
 <li><span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}} $$</span> <code>\bbox[]{}</code></li>
 <li><span class='math'>$$\rule{2em}{1em} $$</span> <code>\rule[]{}{}</code></li>
-<li><span class='math'>$$\enclose{updiagonalstrike,roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0} $$</span> <code>\enclose{}[]{}</code></li>
+</ul>
+<h3>Notations</h3>
+<h4><code>\enclose</code></h4>
+<ul>
+<li><span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0} $$</span> <code>\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=&quot;#fbc0bd&quot;]{x=0}</code></li>
+<li><span class='math'>$$\enclose{circle}[mathbackground=“#fbc0bd”]{\frac1x}$$</span> <code>\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}</code></li>
+<li><span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> <code>\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}</code></li>
+</ul>
+<p>The <code>\enclose</code> command is very flexible. It accepts three arguments, two of
+which are required:</p>
+<pre><code class="language-tex">    <span class="hljs-keyword">\enclose</span>{notation:text}[style:text]{body:math}
+</code></pre>
+<ul>
+<li><code>notation</code> a list of whitespace-delimited values:
+<ul>
+<li><code>box</code></li>
+<li><code>roundedbox</code></li>
+<li><code>circle</code></li>
+<li><code>top</code>, <code>left</code>, <code>right</code> and <code>bottom</code></li>
+<li><code>horizontalstrike</code>, <code>verticalstrike</code></li>
+<li><code>updiagonalstrike</code>, <code>downdiagonalstrike</code></li>
+<li><code>updiagonalarrow</code></li>
+<li><code>phasorangle</code></li>
+<li><code>radical</code></li>
+<li><code>longdiv</code></li>
+<li><code>actuarial</code></li>
+<li><code>madruwb</code></li>
+</ul>
+</li>
+<li><code>style</code> an optional list of comma separated attributes including:
+<ul>
+<li><code>mathbackground=&quot;&lt;color&gt;&quot;</code> background color of the expression</li>
+<li><code>mathcolor=&quot;&lt;color&gt;&quot;</code> color of the notation, for example <code>red</code> or <code>#cd0030</code>
+or <code>rgba(205, 0, 11, .4)</code>.</li>
+<li><code>padding=&quot;&lt;dimension&gt;&quot;</code> <code>&quot;auto&quot;</code> or an amount of padding around the content</li>
+<li><code>shadow=&quot;&lt;shadow&gt;&quot;</code>: <code>&quot;auto&quot;</code> or <code>&quot;none&quot;</code> or a CSS <code>box-shadow</code> expression
+for example, <code>&quot;0 0 2px rgba(0, 0, 0, 0.5)&quot;</code>.</li>
+<li>in addition the style property can include a stroke style expression that
+follows the shorthand syntax of the CSS <code>border</code> property, for example
+<code>&quot;2px solid red&quot;</code>.</li>
+</ul>
+</li>
+<li><code>body</code> a math expression that is “enclosed” by the specified notations</li>
+</ul>
+<p class="notice--info"><code>\enclose</code> is an extension to LaTeX that follows the <code>&lt;menclose&gt;</code>
+definition of <a href="">MathML</a> and the LaTeX flavor defined by MathJax.</p>
+<h4><code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code></h4>
+<ul class="command-list">
 <li><span class='math'>$$\cancel{\unicode{&quot;2B1A}} $$</span> <code>\cancel{}</code></li>
 <li><span class='math'>$$\bcancel{\unicode{&quot;2B1A}} $$</span> <code>\bcancel{}</code></li>
 <li><span class='math'>$$\xcancel{\unicode{&quot;2B1A}} $$</span> <code>\xcancel{}</code></li>
 </ul>
-<h2>Styling</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command…</th>
+<th style="text-align:left">is a shorthand for…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>\cancel{body}</code></td>
+<td style="text-align:left"><code>\enclose{updiagonalstrike}{body}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\bcancel{body}</code></td>
+<td style="text-align:left"><code>\enclose{downdiagonalstrike}{body}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\xcancel{body}</code></td>
+<td style="text-align:left"><code>\enclose{updiagonalstrike downdiagonalstrike}{body}</code></td>
+</tr>
+</tbody>
+</table>
+<p class="notice--info">The <code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code> commands are part of the
+<a href="https://www.ctan.org/pkg/cancel">“cancel”</a> LaTeX package.</p>
+<h3>Colors</h3>
+<p>To modify the foreground color you use the <code>\textcolor{}{}</code> command.</p>
+<p>To change the background, use the <code>\colorbox{}{}</code> command.</p>
+<p>The first argument of these commands is a color specified as:</p>
+<ul>
+<li>a RGB color using the standard CSS format (<code>#d7170b</code>)</li>
+<li>a <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">CSS color name</a> (<code>goldenrod</code>)</li>
+<li>one of the 68 colors from <a href="https://ctan.org/pkg/colordvi">dvips color name</a> (<code>cadetblue</code>)</li>
+<li>one of the 10 Mathematica color from <code>ColorData[97, &quot;ColorList&quot;]</code> (<code>m0</code> to <code>m9</code>)</li>
+<li>a color defined using the syntax from the <a href="http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf"><code>xcolor</code> package</a>, for example: <code>blue!20!black!30!green</code></li>
+</ul>
+<p>The following color names are recommended. They can be applied using the color
+keys in the virtual keyboard:</p>
+<p><img src="/assets/images/mathfield/colors.png" alt=""></p>
+<p class="notice--info">These colors have been carefully selected for a balanced representation of the range of
+hues on the color circle, with similar lightness and intensity. They will map to  different color values than the <code>dvips</code> colors of the same name.</p>
+<p class="notice--info">To have proper legibility based on usage, these color names will map to
+different values when used as a foreground color
+and a background color. To use a specific color value, use a RGB color instead.</p>
+<p class="notice--info">To customize how the color names are interpreted provide a <code>colorMap</code>
+or <code>backgroundColorMap</code> function.</p>
+<h2>Font Styling</h2>
 <ul class="command-list">
-<li><span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> <code>\fontseries{}</code></li>
-<li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code></li>
-<li><span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> <code>\fontfamily{}</code></li>
-<li><span class='math'>$$\text{\selectfont} $$</span> <code>\selectfont</code></li>
-<li><span class='math'>$${\bf Don Knuth} $$</span> <code>\bf</code></li>
-<li><span class='math'>$$\boldsymbol{Don Knuth} $$</span> <code>\boldsymbol{}</code></li>
-<li><span class='math'>$$\bm{Don Knuth} $$</span> <code>\bm{}</code></li>
-<li><span class='math'>$$\bold{Don Knuth} $$</span> <code>\bold{}</code></li>
-<li><span class='math'>$$\text{\bfseries Don Knuth} $$</span> <code>\bfseries</code></li>
-<li><span class='math'>$$\text{\mdseries Don Knuth} $$</span> <code>\mdseries</code></li>
-<li><span class='math'>$$\text{\upshape Don Knuth} $$</span> <code>\upshape</code></li>
-<li><span class='math'>$$\text{\slshape Don Knuth} $$</span> <code>\slshape</code></li>
-<li><span class='math'>$$\text{\scshape Don Knuth} $$</span> <code>\scshape</code></li>
-<li><span class='math'>$$\textbf{Don Knuth} $$</span> <code>\textbf{}</code></li>
-<li><span class='math'>$$\textmd{Don Knuth} $$</span> <code>\textmd{}</code></li>
-<li><span class='math'>$$\textup{Don Knuth} $$</span> <code>\textup{}</code></li>
-<li><span class='math'>$$\textnormal{Don Knuth} $$</span> <code>\textnormal{}</code></li>
-<li><span class='math'>$$\textsl{Don Knuth} $$</span> <code>\textsl{}</code></li>
-<li><span class='math'>$$\textit{Don Knuth} $$</span> <code>\textit{}</code></li>
-<li><span class='math'>$$\textsc{Don Knuth} $$</span> <code>\textsc{}</code></li>
-<li><span class='math'>$$\textrm{Don Knuth} $$</span> <code>\textrm{}</code></li>
-<li><span class='math'>$$\textsf{Don Knuth} $$</span> <code>\textsf{}</code></li>
-<li><span class='math'>$$\texttt{Don Knuth} $$</span> <code>\texttt{}</code></li>
-<li><span class='math'>$$\mathbf{Don Knuth} $$</span> <code>\mathbf{}</code></li>
-<li><span class='math'>$$\mathit{Don Knuth} $$</span> <code>\mathit{}</code></li>
-<li><span class='math'>$$\mathrm{Don Knuth} $$</span> <code>\mathrm{}</code></li>
-<li><span class='math'>$$\mathsf{Don Knuth} $$</span> <code>\mathsf{}</code></li>
-<li><span class='math'>$$\mathtt{Don Knuth} $$</span> <code>\mathtt{}</code></li>
-<li><span class='math'>$${\it Don Knuth} $$</span> <code>\it</code></li>
-<li><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></li>
-<li><span class='math'>$${\sffamily Don Knuth} $$</span> <code>\sffamily</code></li>
-<li><span class='math'>$${\ttfamily Don Knuth} $$</span> <code>\ttfamily</code></li>
-<li><span class='math'>$$\Bbb{Don Knuth} $$</span> <code>\Bbb{}</code></li>
-<li><span class='math'>$$\mathbb{Don Knuth} $$</span> <code>\mathbb{}</code></li>
-<li><span class='math'>$${\frak Don Knuth} $$</span> <code>\frak{}</code></li>
-<li><span class='math'>$$\mathfrak{Don Knuth} $$</span> <code>\mathfrak{}</code></li>
-<li><span class='math'>$$\mathcal{Don Knuth} $$</span> <code>\mathcal{}</code></li>
-<li><span class='math'>$$\mathscr{Don Knuth} $$</span> <code>\mathscr{}</code></li>
-<li><span class='math'>$$\mbox{Don Knuth} $$</span> <code>\mbox{}</code></li>
-<li><span class='math'>$$\text{Don Knuth} $$</span> <code>\text{}</code></li>
-<li><span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> <code>\class{}{}</code></li>
-<li><span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> <code>\cssId{}{}</code></li>
-<li><span class='math'>$${\htmlData Don Knuth} $$</span> <code>\htmlData{}{}</code></li>
-<li><span class='math'>$$Don{\em Knuth} $$</span> <code>\em{}</code></li>
-<li><span class='math'>$$Don\emph{Knuth} $$</span> <code>\emph{}</code></li>
+<li>
+<p><span class='math'>$$\ensuremath $$</span> <code>\ensuremath{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\displaystyle $$</span> <code>\displaystyle{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textstyle $$</span> <code>\textstyle{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\scriptstyle $$</span> <code>\scriptstyle{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\scriptscriptstyle $$</span> <code>\scriptscriptstyle{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> <code>\fontseries{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> <code>\fontfamily{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\selectfont} $$</span> <code>\selectfont</code></p>
+</li>
+<li>
+<p><span class='math'>$${\bf Don Knuth} $$</span> <code>\bf</code></p>
+</li>
+<li>
+<p><span class='math'>$$\boldsymbol{Don Knuth} $$</span> <code>\boldsymbol{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\bm{Don Knuth} $$</span> <code>\bm{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\bold{Don Knuth} $$</span> <code>\bold{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\bfseries Don Knuth} $$</span> <code>\bfseries</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\mdseries Don Knuth} $$</span> <code>\mdseries</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\upshape Don Knuth} $$</span> <code>\upshape</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\slshape Don Knuth} $$</span> <code>\slshape</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{\scshape Don Knuth} $$</span> <code>\scshape</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textbf{Don Knuth} $$</span> <code>\textbf{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textmd{Don Knuth} $$</span> <code>\textmd{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textup{Don Knuth} $$</span> <code>\textup{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textnormal{Don Knuth} $$</span> <code>\textnormal{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textsl{Don Knuth} $$</span> <code>\textsl{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textit{Don Knuth} $$</span> <code>\textit{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textsc{Don Knuth} $$</span> <code>\textsc{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textrm{Don Knuth} $$</span> <code>\textrm{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\textsf{Don Knuth} $$</span> <code>\textsf{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\texttt{Don Knuth} $$</span> <code>\texttt{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathbf{Don Knuth} $$</span> <code>\mathbf{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathit{Don Knuth} $$</span> <code>\mathit{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathrm{Don Knuth} $$</span> <code>\mathrm{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathsf{Don Knuth} $$</span> <code>\mathsf{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathtt{Don Knuth} $$</span> <code>\mathtt{}</code></p>
+</li>
+<li>
+<p><span class='math'>$${\it Don Knuth} $$</span> <code>\it</code></p>
+</li>
+<li>
+<p><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></p>
+</li>
+<li>
+<p><span class='math'>$${\sffamily Don Knuth} $$</span> <code>\sffamily</code></p>
+</li>
+<li>
+<p><span class='math'>$${\ttfamily Don Knuth} $$</span> <code>\ttfamily</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Bbb{Don Knuth} $$</span> <code>\Bbb{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathbb{Don Knuth} $$</span> <code>\mathbb{}</code></p>
+</li>
+<li>
+<p><span class='math'>$${\frak Don Knuth} $$</span> <code>\frak{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathfrak{Don Knuth} $$</span> <code>\mathfrak{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathcal{Don Knuth} $$</span> <code>\mathcal{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathscr{Don Knuth} $$</span> <code>\mathscr{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\mathbfit $$</span> <code>\mathbfit{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\text{Don Knuth} $$</span> <code>\text{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> <code>\class{}{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> <code>\cssId{}{}</code></p>
+</li>
+<li>
+<p><span class='math'>$${\htmlData Don Knuth} $$</span> <code>\htmlData{}{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$Don{\em Knuth} $$</span> <code>\em{}</code></p>
+</li>
+<li>
+<p><span class='math'>$$Don\emph{Knuth} $$</span> <code>\emph{}</code></p>
+</li>
 </ul>
 <h2>Sizing</h2>
 <ul class="command-list">
@@ -1638,27 +1854,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 </li>
 <li>
 <p><span class='math'>$$\space $$</span>   <code>\space</code></p>
-</li>
-<li>
-<p><span class='math'>$$\ensuremath $$</span> <code>\ensuremath{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\displaystyle $$</span> <code>\displaystyle{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\textstyle $$</span> <code>\textstyle{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\scriptstyle $$</span> <code>\scriptstyle{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\scriptscriptstyle $$</span> <code>\scriptscriptstyle{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\mathbfit $$</span> <code>\mathbfit{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\overunderset $$</span> <code>\overunderset{}{}{}</code></p>
 </li>
 <li>
 <p><span class='math'>$$\smash $$</span> <code>\smash[]{}</code></p>
@@ -1977,6 +2172,7 @@ $$</p>
 <li><code>\bgroup</code> and <code>\egroup</code></li>
 <li><code>\string</code></li>
 <li><code>\csname</code> and <code>\endcsname</code></li>
+<li><span class='math'>$$\mbox{Don Knuth} $$</span> <code>\mbox{}</code></li>
 </ul>
 
         
@@ -1990,7 +2186,7 @@ $$</p>
         <meta itemprop="datePublished" content="May 14, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:55:55 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 12:34:03 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
         
       </footer>
 
