@@ -428,7 +428,15 @@
         
         <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument();
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      // TeX: { 
+      //   delimiters: { display: [ ['$$', '$$'] ] },
+      //   processEnvironments : false 
+      // },
+      // asciiMath: null,
+    });
+    document.body.classList.add('ready');
 </script>
 <style>
   ul.command-list {
@@ -441,1213 +449,1523 @@
     padding: 10px;
     list-style: none;
   }
+  .math {
+    display: none;
+  }
+  body.ready .math {
+    display: inline;
+  }
+  
 </style>
+<p>To find the name of a LaTeX command if you can draw the shape you are looking
+for, use <a href="http://detexify.kirelabs.org/classify.html">Detexify</a>.</p>
 <h2>Fractions and Binomials</h2>
-<ul>
-<li>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\frac{}{}</code></li>
-<li>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dfrac{}{}</code></li>
-<li>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\tfrac{}{}</code></li>
-</ul>
-<p>The <code>\dfrac</code> command display in Display style even when it is in a context
-that would normally use a different style, such as in a superscript.</p>
-<p>The <code>\tfrac</code> command display in Text style (inline) even in a context
-that would  normally use Display style.</p>
 <ul class="command-list">
-<li>$$\cfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\cfrac{}{}</code></li>
-<li>$$\binom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\binom{}{}</code></li>
-<li>$$\dbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\dbinom{}{}</code></li>
-<li>$$\tbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\tbinom{}{}</code></li>
-<li>$$\pdiff{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$ <code>\pdiff{}{}</code></li>
+<li><span class='math'>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\frac{}{}</code></li>
+<li><span class='math'>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\dfrac{}{}</code></li>
+<li><span class='math'>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\tfrac{}{}</code></li>
+</ul>
+<p>The <code>\dfrac</code> command typesets its content in Display style even when it is in a context
+that would normally use a different style, such as in a superscript.</p>
+<p>The <code>\tfrac</code> command uses Text style (inline) even in a context that would  normally use Display style.</p>
+<ul class="command-list">
+<li><span class='math'>$$\cfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\cfrac{}{}</code></li>
+<li><span class='math'>$$\binom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\binom{}{}</code></li>
+<li><span class='math'>$$\dbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\dbinom{}{}</code></li>
+<li><span class='math'>$$\tbinom{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\tbinom{}{}</code></li>
+<li><span class='math'>$$\pdiff{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\pdiff{}{}</code></li>
 </ul>
 <p>The following commands are supported but their usage is generally discouraged
 when creating modern LaTeX content.</p>
 <ul class="command-list">
-<li>$${\unicode{&quot;2B1A} \overwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}}$$ <code>\overwithdelims{\lbrace}{\rbrace}</code></li>
-<li>$${\unicode{&quot;2B1A} \atopwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}}$$ <code>\atopwithdelims{\lbrace}{\rbrace}</code></li>
-<li>$$\unicode{&quot;2B1A} \over \unicode{&quot;2B1A}$$ <code>\over </code></li>
-<li>$$\unicode{&quot;2B1A} \atop \unicode{&quot;2B1A}$$ <code>\atop </code></li>
-<li>$$\unicode{&quot;2B1A} \choose \unicode{&quot;2B1A}$$ <code>\choose </code></li>
+<li><span class='math'>$${\unicode{&quot;2B1A} \overwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}} $$</span> <code>\overwithdelims{\lbrace}{\rbrace}</code></li>
+<li><span class='math'>$${\unicode{&quot;2B1A} \atopwithdelims{\lbrace}{\rbrace} \unicode{&quot;2B1A}} $$</span> <code>\atopwithdelims{\lbrace}{\rbrace}</code></li>
+<li><span class='math'>$$\unicode{&quot;2B1A} \over \unicode{&quot;2B1A} $$</span> <code>\over </code></li>
+<li><span class='math'>$$\unicode{&quot;2B1A} \atop \unicode{&quot;2B1A} $$</span> <code>\atop </code></li>
+<li><span class='math'>$$\unicode{&quot;2B1A} \choose \unicode{&quot;2B1A} $$</span> <code>\choose </code></li>
 </ul>
 <h2>Operators</h2>
 <ul class="command-list">
-<li>$$+$$   <code>+</code></li>
-<li>$$-$$   <code>-</code></li>
-<li>$$\pm$$   <code>\pm</code></li>
-<li>$$\mp$$   <code>\mp</code></li>
-<li>$$*$$   <code>*</code></li>
-<li>$$\times$$   <code>\times</code></li>
-<li>$$\div$$   <code>\div</code></li>
-<li>$$\divides$$   <code>\divides</code></li>
-<li>$$\cdot$$   <code>\cdot</code></li>
-<li>$$\sqrt[\unicode{&quot;2B1A}]{\unicode{&quot;2B1A}}$$ <code>\sqrt[]{}</code></li>
-<li>$$\surd$$   <code>\surd{}</code></li>
-<li>$$\ltimes$$   <code>\ltimes</code></li>
-<li>$$\rtimes$$   <code>\rtimes</code></li>
-<li>$$\leftthreetimes$$   <code>\leftthreetimes</code></li>
-<li>$$\rightthreetimes$$   <code>\rightthreetimes</code></li>
-<li>$$\intercal$$   <code>\intercal</code></li>
-<li>$$\dotplus$$   <code>\dotplus</code></li>
-<li>$$\doublebarwedge$$   <code>\doublebarwedge</code></li>
-<li>$$\divideontimes$$   <code>\divideontimes</code></li>
-<li>$$\centerdot$$   <code>\centerdot</code></li>
+<li><span class='math'>$$+ $$</span>   <code>+</code></li>
+<li><span class='math'>$$- $$</span>   <code>-</code></li>
+<li><span class='math'>$$\pm $$</span>   <code>\pm</code></li>
+<li><span class='math'>$$\mp $$</span>   <code>\mp</code></li>
+<li><span class='math'>$$* $$</span>   <code>*</code></li>
+<li><span class='math'>$$\times $$</span>   <code>\times</code></li>
+<li><span class='math'>$$\div $$</span>   <code>\div</code></li>
+<li><span class='math'>$$\divides $$</span>   <code>\divides</code></li>
+<li><span class='math'>$$\cdot $$</span>   <code>\cdot</code></li>
+<li><span class='math'>$$\sqrt{\unicode{&quot;2B1A}} $$</span> <code>\sqrt{}</code></li>
+<li><span class='math'>$$\sqrt[\unicode{&quot;2B1A}]{\unicode{&quot;2B1A}} $$</span> <code>\sqrt[]{}</code></li>
+<li><span class='math'>$$\surd $$</span>   <code>\surd{}</code></li>
+<li><span class='math'>$$\ltimes $$</span>   <code>\ltimes</code></li>
+<li><span class='math'>$$\rtimes $$</span>   <code>\rtimes</code></li>
+<li><span class='math'>$$\leftthreetimes $$</span>   <code>\leftthreetimes</code></li>
+<li><span class='math'>$$\rightthreetimes $$</span>   <code>\rightthreetimes</code></li>
+<li><span class='math'>$$\intercal $$</span>   <code>\intercal</code></li>
+<li><span class='math'>$$\dotplus $$</span>   <code>\dotplus</code></li>
+<li><span class='math'>$$\doublebarwedge $$</span>   <code>\doublebarwedge</code></li>
+<li><span class='math'>$$\divideontimes $$</span>   <code>\divideontimes</code></li>
+<li><span class='math'>$$\centerdot $$</span>   <code>\centerdot</code></li>
 </ul>
 <h2>Functions</h2>
 <ul class="command-list">
-<li>$$\deg$$ <code>\deg</code></li>
-<li>$$\dim$$ <code>\dim</code></li>
-<li>$$\exp$$ <code>\exp</code></li>
-<li>$$\hom$$ <code>\hom</code></li>
-<li>$$\ker$$ <code>\ker</code></li>
-<li>$$\ln$$ <code>\ln</code></li>
-<li>$$\log$$ <code>\log</code></li>
-<li>$$\lim$$ <code>\lim</code></li>
-<li>$$\det$$ <code>\det</code></li>
-<li>$$\max$$ <code>\max</code></li>
-<li>$$\min$$ <code>\min</code></li>
+<li><span class='math'>$$\deg $$</span> <code>\deg</code></li>
+<li><span class='math'>$$\dim $$</span> <code>\dim</code></li>
+<li><span class='math'>$$\exp $$</span> <code>\exp</code></li>
+<li><span class='math'>$$\hom $$</span> <code>\hom</code></li>
+<li><span class='math'>$$\ker $$</span> <code>\ker</code></li>
+<li><span class='math'>$$\ln $$</span> <code>\ln</code></li>
+<li><span class='math'>$$\log $$</span> <code>\log</code></li>
+<li><span class='math'>$$\lim $$</span> <code>\lim</code></li>
+<li><span class='math'>$$\det $$</span> <code>\det</code></li>
+<li><span class='math'>$$\max $$</span> <code>\max</code></li>
+<li><span class='math'>$$\min $$</span> <code>\min</code></li>
 </ul>
 <h3>Modulo</h3>
 <ul>
-<li>$$n \pmod{3}$$	<code>n \pmod{3}</code></li>
-<li>$$n \mod{3}$$	<code>n \mod{3}</code></li>
-<li>$$n \bmod 3$$	<code>n \bmod 3</code></li>
+<li><span class='math'>$$n \pmod{3} $$</span> <code>n \pmod{3}</code></li>
+<li><span class='math'>$$n \mod{3} $$</span> <code>n \mod{3}</code></li>
+<li><span class='math'>$$n \bmod 3 $$</span> <code>n \bmod 3</code></li>
 </ul>
 <h3>Trigonometry</h3>
 <ul class="command-list">
-<li>$$\arccos$$ <code>\arccos</code></li>
-<li>$$\arcsin$$ <code>\arcsin</code></li>
-<li>$$\arctan$$ <code>\arctan</code></li>
-<li>$$\arctg$$ <code>\arctg</code></li>
-<li>$$\arcctg$$ <code>\arcctg</code></li>
-<li>$$\arg$$ <code>\arg</code></li>
-<li>$$\ch$$ <code>\ch</code></li>
-<li>$$\cos$$ <code>\cos</code></li>
-<li>$$\cosh$$ <code>\cosh</code></li>
-<li>$$\cot$$ <code>\cot</code></li>
-<li>$$\coth$$ <code>\coth</code></li>
-<li>$$\ctg$$ <code>\ctg</code></li>
-<li>$$\cth$$ <code>\cth</code></li>
-<li>$$\cotg$$ <code>\cotg</code></li>
-<li>$$\csc$$ <code>\csc</code></li>
-<li>$$\cosec$$ <code>\cosec</code></li>
-<li>$$\lg$$ <code>\lg</code></li>
-<li>$$\lb$$ <code>\lb</code></li>
-<li>$$\sec$$ <code>\sec</code></li>
-<li>$$\sh$$ <code>\sh</code></li>
-<li>$$\sin$$ <code>\sin</code></li>
-<li>$$\sinh$$ <code>\sinh</code></li>
-<li>$$\tan$$ <code>\tan</code></li>
-<li>$$\tanh$$ <code>\tanh</code></li>
-<li>$$\tg$$ <code>\tg</code></li>
-<li>$$\th$$ <code>\th</code></li>
+<li><span class='math'>$$\arccos $$</span> <code>\arccos</code></li>
+<li><span class='math'>$$\arcsin $$</span> <code>\arcsin</code></li>
+<li><span class='math'>$$\arctan $$</span> <code>\arctan</code></li>
+<li><span class='math'>$$\arctg $$</span> <code>\arctg</code></li>
+<li><span class='math'>$$\arcctg $$</span> <code>\arcctg</code></li>
+<li><span class='math'>$$\arg $$</span> <code>\arg</code></li>
+<li><span class='math'>$$\ch $$</span> <code>\ch</code></li>
+<li><span class='math'>$$\cos $$</span> <code>\cos</code></li>
+<li><span class='math'>$$\cosh $$</span> <code>\cosh</code></li>
+<li><span class='math'>$$\cot $$</span> <code>\cot</code></li>
+<li><span class='math'>$$\coth $$</span> <code>\coth</code></li>
+<li><span class='math'>$$\ctg $$</span> <code>\ctg</code></li>
+<li><span class='math'>$$\cth $$</span> <code>\cth</code></li>
+<li><span class='math'>$$\cotg $$</span> <code>\cotg</code></li>
+<li><span class='math'>$$\csc $$</span> <code>\csc</code></li>
+<li><span class='math'>$$\cosec $$</span> <code>\cosec</code></li>
+<li><span class='math'>$$\lg $$</span> <code>\lg</code></li>
+<li><span class='math'>$$\lb $$</span> <code>\lb</code></li>
+<li><span class='math'>$$\sec $$</span> <code>\sec</code></li>
+<li><span class='math'>$$\sh $$</span> <code>\sh</code></li>
+<li><span class='math'>$$\sin $$</span> <code>\sin</code></li>
+<li><span class='math'>$$\sinh $$</span> <code>\sinh</code></li>
+<li><span class='math'>$$\tan $$</span> <code>\tan</code></li>
+<li><span class='math'>$$\tanh $$</span> <code>\tanh</code></li>
+<li><span class='math'>$$\tg $$</span> <code>\tg</code></li>
+<li><span class='math'>$$\th $$</span> <code>\th</code></li>
 </ul>
 <h2>Unicode</h2>
 <ul>
 <li><code>\unicode{}</code> - The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use uppercase <code>A</code>-<code>F</code> for hexadecimal digits.
 <ul>
-<li>$$\unicode{10775}$$ <code>\unicode{10775}</code></li>
-<li>$$\unicode{&quot;2A17}$$ <code>\unicode{&quot;2A17}</code></li>
-<li>$$\unicode{x2A17}$$ <code>\unicode{x2A17}</code></li>
+<li><span class='math'>$$\unicode{10775} $$</span> <code>\unicode{10775}</code></li>
+<li><span class='math'>$$\unicode{&quot;2A17} $$</span> <code>\unicode{&quot;2A17}</code></li>
+<li><span class='math'>$$\unicode{x2A17} $$</span> <code>\unicode{x2A17}</code></li>
 </ul>
 </li>
 <li><code>\char</code> - The argument is also Unicode codepoint, but the <code>{</code>…<code>}</code> delimiters are optional when using <code>&quot;</code>
 <ul>
-<li>$$\char&quot;2A17$$ <code>\char&quot;2A17</code></li>
+<li><span class='math'>$$\char&quot;2A17 $$</span> <code>\char&quot;2A17</code></li>
 </ul>
 </li>
 <li><code>^^</code> and <code>^^^^</code> - Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong> <code>a</code>-<code>f</code> to specify a Unicode codepoint
 <ul>
-<li>$$^^4a$$ <code>^^4a</code></li>
-<li>$$^^^^2a17$$ <code>^^^^2a17</code></li>
+<li><span class='math'>$$^^4a $$</span> <code>^^4a</code></li>
+<li><span class='math'>$$^^^^2a17 $$</span> <code>^^^^2a17</code></li>
 </ul>
 </li>
 </ul>
 <h2>Extensible Operators</h2>
 <ul class="command-list">
-<li>$$\sum$$ <code>\sum</code></li>
-<li>$$\prod$$ <code>\prod</code></li>
-<li>$$\bigcup$$ <code>\bigcup</code></li>
-<li>$$\bigcap$$ <code>\bigcap</code></li>
-<li>$$\coprod$$ <code>\coprod</code></li>
-<li>$$\bigvee$$ <code>\bigvee</code></li>
-<li>$$\bigwedge$$ <code>\bigwedge</code></li>
-<li>$$\biguplus$$ <code>\biguplus</code></li>
-<li>$$\bigotimes$$ <code>\bigotimes</code></li>
-<li>$$\bigoplus$$ <code>\bigoplus</code></li>
-<li>$$\bigodot$$ <code>\bigodot</code></li>
-<li>$$\bigsqcup$$ <code>\bigsqcup</code></li>
-<li>$$\smallint$$ <code>\smallint</code></li>
-<li>$$\intop$$ <code>\intop</code></li>
-<li>$$\int$$ <code>\int</code></li>
-<li>$$\iint$$ <code>\iint</code></li>
-<li>$$\iiint$$ <code>\iiint</code></li>
-<li>$$\oint$$ <code>\oint</code></li>
-<li>$$\oiint$$ <code>\oiint</code></li>
-<li>$$\oiiint$$ <code>\oiiint</code></li>
-<li>$$\intclockwise$$ <code>\intclockwise</code></li>
-<li>$$\varointclockwise$$ <code>\varointclockwise</code></li>
-<li>$$\ointctrclockwise$$ <code>\ointctrclockwise</code></li>
-<li>$$\intctrclockwise$$ <code>\intctrclockwise</code></li>
-<li>$$\sqcup$$ <code>\sqcup</code></li>
-<li>$$\sqcap$$ <code>\sqcap</code></li>
-<li>$$\uplus$$ <code>\uplus</code></li>
-<li>$$\wr$$ <code>\wr</code></li>
-<li>$$\amalg$$ <code>\amalg</code></li>
-<li>$$\Cap$$ <code>\Cap</code></li>
-<li>$$\Cup$$ <code>\Cup</code></li>
-<li>$$\doublecap$$ <code>\doublecap</code></li>
-<li>$$\doublecup$$ <code>\doublecup</code></li>
+<li><span class='math'>$$\sum $$</span> <code>\sum</code></li>
+<li><span class='math'>$$\prod $$</span> <code>\prod</code></li>
+<li><span class='math'>$$\bigcup $$</span> <code>\bigcup</code></li>
+<li><span class='math'>$$\bigcap $$</span> <code>\bigcap</code></li>
+<li><span class='math'>$$\coprod $$</span> <code>\coprod</code></li>
+<li><span class='math'>$$\bigvee $$</span> <code>\bigvee</code></li>
+<li><span class='math'>$$\bigwedge $$</span> <code>\bigwedge</code></li>
+<li><span class='math'>$$\biguplus $$</span> <code>\biguplus</code></li>
+<li><span class='math'>$$\bigotimes $$</span> <code>\bigotimes</code></li>
+<li><span class='math'>$$\bigoplus $$</span> <code>\bigoplus</code></li>
+<li><span class='math'>$$\bigodot $$</span> <code>\bigodot</code></li>
+<li><span class='math'>$$\bigsqcup $$</span> <code>\bigsqcup</code></li>
+<li><span class='math'>$$\smallint $$</span> <code>\smallint</code></li>
+<li><span class='math'>$$\intop $$</span> <code>\intop</code></li>
+<li><span class='math'>$$\int $$</span> <code>\int</code></li>
+<li><span class='math'>$$\iint $$</span> <code>\iint</code></li>
+<li><span class='math'>$$\iiint $$</span> <code>\iiint</code></li>
+<li><span class='math'>$$\oint $$</span> <code>\oint</code></li>
+<li><span class='math'>$$\oiint $$</span> <code>\oiint</code></li>
+<li><span class='math'>$$\oiiint $$</span> <code>\oiiint</code></li>
+<li><span class='math'>$$\intclockwise $$</span> <code>\intclockwise</code></li>
+<li><span class='math'>$$\varointclockwise $$</span> <code>\varointclockwise</code></li>
+<li><span class='math'>$$\ointctrclockwise $$</span> <code>\ointctrclockwise</code></li>
+<li><span class='math'>$$\intctrclockwise $$</span> <code>\intctrclockwise</code></li>
+<li><span class='math'>$$\sqcup $$</span> <code>\sqcup</code></li>
+<li><span class='math'>$$\sqcap $$</span> <code>\sqcap</code></li>
+<li><span class='math'>$$\uplus $$</span> <code>\uplus</code></li>
+<li><span class='math'>$$\wr $$</span> <code>\wr</code></li>
+<li><span class='math'>$$\amalg $$</span> <code>\amalg</code></li>
+<li><span class='math'>$$\Cap $$</span> <code>\Cap</code></li>
+<li><span class='math'>$$\Cup $$</span> <code>\Cup</code></li>
+<li><span class='math'>$$\doublecap $$</span> <code>\doublecap</code></li>
+<li><span class='math'>$$\doublecup $$</span> <code>\doublecup</code></li>
 </ul>
 <h2>Logic</h2>
 <ul class="command-list">
-<li>$$\forall$$   <code>\forall</code></li>
-<li>$$\exists$$   <code>\exists</code></li>
-<li>$$\nexists$$   <code>\nexists</code></li>
-<li>$$\to$$   <code>\to</code></li>
-<li>$$\gets$$   <code>\gets</code></li>
-<li>$$\implies$$   <code>\implies</code></li>
-<li>$$\impliedby$$   <code>\impliedby</code></li>
-<li>$$\biconditional$$   <code>\biconditional</code></li>
-<li>$$\therefore$$   <code>\therefore</code></li>
-<li>$$\because$$   <code>\because</code></li>
-<li>$$\land$$   <code>\land</code></li>
-<li>$$\wedge$$   <code>\wedge</code></li>
-<li>$$\lor$$   <code>\lor</code></li>
-<li>$$\vee$$   <code>\vee</code></li>
-<li>$$\barwedge$$   <code>\barwedge</code></li>
-<li>$$\veebar$$   <code>\veebar</code></li>
-<li>$$\nor$$   <code>\nor</code></li>
-<li>$$\curlywedge$$   <code>\curlywedge</code></li>
-<li>$$\curlyvee$$   <code>\curlyvee</code></li>
-<li>$$\leftrightarrow$$   <code>\leftrightarrow</code></li>
-<li>$$\Leftrightarrow$$   <code>\Leftrightarrow</code></li>
-<li>$$\models$$   <code>\models</code></li>
-<li>$$\vdash$$   <code>\vdash</code></li>
-<li>$$\dashv$$   <code>\dashv</code></li>
-<li>$$\roundimplies$$   <code>\roundimplies</code></li>
-<li>$$\lnot$$   <code>\lnot</code></li>
-<li>$$\neg$$   <code>\neg</code></li>
+<li><span class='math'>$$\forall $$</span>   <code>\forall</code></li>
+<li><span class='math'>$$\exists $$</span>   <code>\exists</code></li>
+<li><span class='math'>$$\nexists $$</span>   <code>\nexists</code></li>
+<li><span class='math'>$$\to $$</span>   <code>\to</code></li>
+<li><span class='math'>$$\gets $$</span>   <code>\gets</code></li>
+<li><span class='math'>$$\implies $$</span>   <code>\implies</code></li>
+<li><span class='math'>$$\impliedby $$</span>   <code>\impliedby</code></li>
+<li><span class='math'>$$\biconditional $$</span>   <code>\biconditional</code></li>
+<li><span class='math'>$$\therefore $$</span>   <code>\therefore</code></li>
+<li><span class='math'>$$\because $$</span>   <code>\because</code></li>
+<li><span class='math'>$$\land $$</span>   <code>\land</code></li>
+<li><span class='math'>$$\wedge $$</span>   <code>\wedge</code></li>
+<li><span class='math'>$$\lor $$</span>   <code>\lor</code></li>
+<li><span class='math'>$$\vee $$</span>   <code>\vee</code></li>
+<li><span class='math'>$$\barwedge $$</span>   <code>\barwedge</code></li>
+<li><span class='math'>$$\veebar $$</span>   <code>\veebar</code></li>
+<li><span class='math'>$$\nor $$</span>   <code>\nor</code></li>
+<li><span class='math'>$$\curlywedge $$</span>   <code>\curlywedge</code></li>
+<li><span class='math'>$$\curlyvee $$</span>   <code>\curlyvee</code></li>
+<li><span class='math'>$$\leftrightarrow $$</span>   <code>\leftrightarrow</code></li>
+<li><span class='math'>$$\Leftrightarrow $$</span>   <code>\Leftrightarrow</code></li>
+<li><span class='math'>$$\models $$</span>   <code>\models</code></li>
+<li><span class='math'>$$\vdash $$</span>   <code>\vdash</code></li>
+<li><span class='math'>$$\dashv $$</span>   <code>\dashv</code></li>
+<li><span class='math'>$$\roundimplies $$</span>   <code>\roundimplies</code></li>
+<li><span class='math'>$$\lnot $$</span>   <code>\lnot</code></li>
+<li><span class='math'>$$\neg $$</span>   <code>\neg</code></li>
 </ul>
 <h2>Arrows</h2>
 <ul class="command-list">
-<li>$$\rightarrow$$   <code>\rightarrow</code></li>
-<li>$$\leftarrow$$   <code>\leftarrow</code></li>
-<li>$$\Rightarrow$$   <code>\Rightarrow</code></li>
-<li>$$\Leftarrow$$   <code>\Leftarrow</code></li>
-<li>$$\longrightarrow$$   <code>\longrightarrow</code></li>
-<li>$$\longleftarrow$$   <code>\longleftarrow</code></li>
-<li>$$\Longrightarrow$$   <code>\Longrightarrow</code></li>
-<li>$$\Longleftarrow$$   <code>\Longleftarrow</code></li>
-<li>$$\longleftrightarrow$$   <code>\longleftrightarrow</code></li>
-<li>$$\Longleftrightarrow$$   <code>\Longleftrightarrow</code></li>
-<li>$$\mapsto$$   <code>\mapsto</code></li>
-<li>$$\longmapsto$$   <code>\longmapsto</code></li>
-<li>$$\uparrow$$   <code>\uparrow</code></li>
-<li>$$\downarrow$$   <code>\downarrow</code></li>
-<li>$$\Uparrow$$   <code>\Uparrow</code></li>
-<li>$$\Downarrow$$   <code>\Downarrow</code></li>
-<li>$$\updownarrow$$   <code>\updownarrow</code></li>
-<li>$$\Updownarrow$$   <code>\Updownarrow</code></li>
-<li>$$\hookrightarrow$$   <code>\hookrightarrow</code></li>
-<li>$$\hookleftarrow$$   <code>\hookleftarrow</code></li>
-<li>$$\rightharpoonup$$   <code>\rightharpoonup</code></li>
-<li>$$\leftharpoonup$$   <code>\leftharpoonup</code></li>
-<li>$$\rightharpoondown$$   <code>\rightharpoondown</code></li>
-<li>$$\leftharpoondown$$   <code>\leftharpoondown</code></li>
-<li>$$\searrow$$   <code>\searrow</code></li>
-<li>$$\nearrow$$   <code>\nearrow</code></li>
-<li>$$\swarrow$$   <code>\swarrow</code></li>
-<li>$$\nwarrow$$   <code>\nwarrow</code></li>
-<li>$$\dashrightarrow$$   <code>\dashrightarrow</code></li>
-<li>$$\dashleftarrow$$   <code>\dashleftarrow</code></li>
-<li>$$\Rrightarrow$$   <code>\Rrightarrow</code></li>
-<li>$$\Lleftarrow$$   <code>\Lleftarrow</code></li>
-<li>$$\leftrightarrows$$   <code>\leftrightarrows</code></li>
-<li>$$\rightleftarrows$$   <code>\rightleftarrows</code></li>
-<li>$$\curvearrowright$$   <code>\curvearrowright</code></li>
-<li>$$\curvearrowleft$$   <code>\curvearrowleft</code></li>
-<li>$$\rightrightarrows$$   <code>\rightrightarrows</code></li>
-<li>$$\leftleftarrows$$   <code>\leftleftarrows</code></li>
-<li>$$\upuparrows$$   <code>\upuparrows</code></li>
-<li>$$\downdownarrows$$   <code>\downdownarrows</code></li>
-<li>$$\leftarrowtail$$   <code>\leftarrowtail</code></li>
-<li>$$\rightarrowtail$$   <code>\rightarrowtail</code></li>
-<li>$$\looparrowright$$   <code>\looparrowright</code></li>
-<li>$$\looparrowleft$$   <code>\looparrowleft</code></li>
-<li>$$\twoheadleftarrow$$   <code>\twoheadleftarrow</code></li>
-<li>$$\twoheadrightarrow$$   <code>\twoheadrightarrow</code></li>
-<li>$$\rightleftharpoons$$   <code>\rightleftharpoons</code></li>
-<li>$$\leftrightharpoons$$   <code>\leftrightharpoons</code></li>
-<li>$$\Rsh$$   <code>\Rsh</code></li>
-<li>$$\Lsh$$   <code>\Lsh</code></li>
-<li>$$\circlearrowright$$   <code>\circlearrowright</code></li>
-<li>$$\circlearrowleft$$   <code>\circlearrowleft</code></li>
-<li>$$\restriction$$   <code>\restriction</code></li>
-<li>$$\upharpoonright$$   <code>\upharpoonright</code></li>
-<li>$$\upharpoonleft$$   <code>\upharpoonleft</code></li>
-<li>$$\downharpoonright$$   <code>\downharpoonright</code></li>
-<li>$$\downharpoonleft$$   <code>\downharpoonleft</code></li>
-<li>$$\rightsquigarrow$$   <code>\rightsquigarrow</code></li>
-<li>$$\leadsto$$   <code>\leadsto</code></li>
-<li>$$\leftrightsquigarrow$$   <code>\leftrightsquigarrow</code></li>
-<li>$$\multimap$$   <code>\multimap</code></li>
+<li><span class='math'>$$\rightarrow $$</span>   <code>\rightarrow</code></li>
+<li><span class='math'>$$\leftarrow $$</span>   <code>\leftarrow</code></li>
+<li><span class='math'>$$\Rightarrow $$</span>   <code>\Rightarrow</code></li>
+<li><span class='math'>$$\Leftarrow $$</span>   <code>\Leftarrow</code></li>
+<li><span class='math'>$$\longrightarrow $$</span>   <code>\longrightarrow</code></li>
+<li><span class='math'>$$\longleftarrow $$</span>   <code>\longleftarrow</code></li>
+<li><span class='math'>$$\Longrightarrow $$</span>   <code>\Longrightarrow</code></li>
+<li><span class='math'>$$\Longleftarrow $$</span>   <code>\Longleftarrow</code></li>
+<li><span class='math'>$$\longleftrightarrow $$</span>   <code>\longleftrightarrow</code></li>
+<li><span class='math'>$$\Longleftrightarrow $$</span>   <code>\Longleftrightarrow</code></li>
+<li><span class='math'>$$\mapsto $$</span>   <code>\mapsto</code></li>
+<li><span class='math'>$$\longmapsto $$</span>   <code>\longmapsto</code></li>
+<li><span class='math'>$$\uparrow $$</span>   <code>\uparrow</code></li>
+<li><span class='math'>$$\downarrow $$</span>   <code>\downarrow</code></li>
+<li><span class='math'>$$\Uparrow $$</span>   <code>\Uparrow</code></li>
+<li><span class='math'>$$\Downarrow $$</span>   <code>\Downarrow</code></li>
+<li><span class='math'>$$\updownarrow $$</span>   <code>\updownarrow</code></li>
+<li><span class='math'>$$\Updownarrow $$</span>   <code>\Updownarrow</code></li>
+<li><span class='math'>$$\hookrightarrow $$</span>   <code>\hookrightarrow</code></li>
+<li><span class='math'>$$\hookleftarrow $$</span>   <code>\hookleftarrow</code></li>
+<li><span class='math'>$$\rightharpoonup $$</span>   <code>\rightharpoonup</code></li>
+<li><span class='math'>$$\leftharpoonup $$</span>   <code>\leftharpoonup</code></li>
+<li><span class='math'>$$\rightharpoondown $$</span>   <code>\rightharpoondown</code></li>
+<li><span class='math'>$$\leftharpoondown $$</span>   <code>\leftharpoondown</code></li>
+<li><span class='math'>$$\searrow $$</span>   <code>\searrow</code></li>
+<li><span class='math'>$$\nearrow $$</span>   <code>\nearrow</code></li>
+<li><span class='math'>$$\swarrow $$</span>   <code>\swarrow</code></li>
+<li><span class='math'>$$\nwarrow $$</span>   <code>\nwarrow</code></li>
+<li><span class='math'>$$\dashrightarrow $$</span>   <code>\dashrightarrow</code></li>
+<li><span class='math'>$$\dashleftarrow $$</span>   <code>\dashleftarrow</code></li>
+<li><span class='math'>$$\Rrightarrow $$</span>   <code>\Rrightarrow</code></li>
+<li><span class='math'>$$\Lleftarrow $$</span>   <code>\Lleftarrow</code></li>
+<li><span class='math'>$$\leftrightarrows $$</span>   <code>\leftrightarrows</code></li>
+<li><span class='math'>$$\rightleftarrows $$</span>   <code>\rightleftarrows</code></li>
+<li><span class='math'>$$\curvearrowright $$</span>   <code>\curvearrowright</code></li>
+<li><span class='math'>$$\curvearrowleft $$</span>   <code>\curvearrowleft</code></li>
+<li><span class='math'>$$\rightrightarrows $$</span>   <code>\rightrightarrows</code></li>
+<li><span class='math'>$$\leftleftarrows $$</span>   <code>\leftleftarrows</code></li>
+<li><span class='math'>$$\upuparrows $$</span>   <code>\upuparrows</code></li>
+<li><span class='math'>$$\downdownarrows $$</span>   <code>\downdownarrows</code></li>
+<li><span class='math'>$$\leftarrowtail $$</span>   <code>\leftarrowtail</code></li>
+<li><span class='math'>$$\rightarrowtail $$</span>   <code>\rightarrowtail</code></li>
+<li><span class='math'>$$\looparrowright $$</span>   <code>\looparrowright</code></li>
+<li><span class='math'>$$\looparrowleft $$</span>   <code>\looparrowleft</code></li>
+<li><span class='math'>$$\twoheadleftarrow $$</span>   <code>\twoheadleftarrow</code></li>
+<li><span class='math'>$$\twoheadrightarrow $$</span>   <code>\twoheadrightarrow</code></li>
+<li><span class='math'>$$\rightleftharpoons $$</span>   <code>\rightleftharpoons</code></li>
+<li><span class='math'>$$\leftrightharpoons $$</span>   <code>\leftrightharpoons</code></li>
+<li><span class='math'>$$\Rsh $$</span>   <code>\Rsh</code></li>
+<li><span class='math'>$$\Lsh $$</span>   <code>\Lsh</code></li>
+<li><span class='math'>$$\circlearrowright $$</span>   <code>\circlearrowright</code></li>
+<li><span class='math'>$$\circlearrowleft $$</span>   <code>\circlearrowleft</code></li>
+<li><span class='math'>$$\restriction $$</span>   <code>\restriction</code></li>
+<li><span class='math'>$$\upharpoonright $$</span>   <code>\upharpoonright</code></li>
+<li><span class='math'>$$\upharpoonleft $$</span>   <code>\upharpoonleft</code></li>
+<li><span class='math'>$$\downharpoonright $$</span>   <code>\downharpoonright</code></li>
+<li><span class='math'>$$\downharpoonleft $$</span>   <code>\downharpoonleft</code></li>
+<li><span class='math'>$$\rightsquigarrow $$</span>   <code>\rightsquigarrow</code></li>
+<li><span class='math'>$$\leadsto $$</span>   <code>\leadsto</code></li>
+<li><span class='math'>$$\leftrightsquigarrow $$</span>   <code>\leftrightsquigarrow</code></li>
+<li><span class='math'>$$\multimap $$</span>   <code>\multimap</code></li>
 </ul>
 <h2>Negated Arrows</h2>
 <ul class="command-list">
-<li>$$\nrightarrow$$   <code>\nrightarrow</code></li>
-<li>$$\nleftarrow$$   <code>\nleftarrow</code></li>
-<li>$$\nRightarrow$$   <code>\nRightarrow</code></li>
-<li>$$\nLeftarrow$$   <code>\nLeftarrow</code></li>
-<li>$$\nleftrightarrow$$   <code>\nleftrightarrow</code></li>
-<li>$$\nLeftrightarrow$$   <code>\nLeftrightarrow</code></li>
-</ul>
-<h2>Extensible Symbols</h2>
-<ul class="command-list">
-<li>$$\widehat{ABC}$$ <code>\widehat{}</code></li>
-<li>$$\widecheck{ABC}$$ <code>\widecheck{}</code></li>
-<li>$$\widetilde{ABC}$$ <code>\widetilde{}</code></li>
-<li>$$\utilde{ABC}$$ <code>\utilde{}</code></li>
-<li>$$\overrightarrow{ABC}$$ <code>\overrightarrow{}</code></li>
-<li>$$\overleftarrow{ABC}$$ <code>\overleftarrow{}</code></li>
-<li>$$\Overrightarrow{ABC}$$ <code>\Overrightarrow{}</code></li>
-<li>$$\overleftharpoon{ABC}$$ <code>\overleftharpoon{}</code></li>
-<li>$$\overrightharpoon{ABC}$$ <code>\overrightharpoon{}</code></li>
-<li>$$\overleftrightarrow{ABC}$$ <code>\overleftrightarrow{}</code></li>
-<li>$$\overlinesegment{ABC}$$ <code>\overlinesegment{}</code></li>
-<li>$$\overgroup{ABC}$$ <code>\overgroup{}</code></li>
-<li>$$\overbrace{ABC}$$ <code>\overbrace{}</code></li>
-<li>$$\underrightarrow{ABC}$$ <code>\underrightarrow{}</code></li>
-<li>$$\underleftarrow{ABC}$$ <code>\underleftarrow{}</code></li>
-<li>$$\underleftrightarrow{ABC}$$ <code>\underleftrightarrow{}</code></li>
-<li>$$\underlinesegment{ABC}$$ <code>\underlinesegment{}</code></li>
-<li>$$\undergroup{ABC}$$ <code>\undergroup{}</code></li>
-<li>$$\underbrace{ABC}$$ <code>\underbrace{}</code></li>
-<li>$$\xrightarrow[below]{above}=0$$ <code>\xrightarrow[]{}</code></li>
-<li>$$\xleftarrow[below]{above}=0$$ <code>\xleftarrow[]{}</code></li>
-<li>$$\xRightarrow[below]{above}=0$$ <code>\xRightarrow[]{}</code></li>
-<li>$$\xLeftarrow[below]{above}=0$$ <code>\xLeftarrow[]{}</code></li>
-<li>$$\xleftharpoonup[below]{above}=0$$ <code>\xleftharpoonup[]{}</code></li>
-<li>$$\xleftharpoondown[below]{above}=0$$ <code>\xleftharpoondown[]{}</code></li>
-<li>$$\xrightharpoonup[below]{above}=0$$ <code>\xrightharpoonup[]{}</code></li>
-<li>$$\xrightharpoondown[below]{above}=0$$ <code>\xrightharpoondown[]{}</code></li>
-<li>$$\xlongequal[below]{above}=0$$ <code>\xlongequal[]{}</code></li>
-<li>$$\xtwoheadleftarrow[below]{above}=0$$ <code>\xtwoheadleftarrow[]{}</code></li>
-<li>$$\xtwoheadrightarrow[below]{above}=0$$ <code>\xtwoheadrightarrow[]{}</code></li>
-<li>$$\xleftrightarrow[below]{above}=0$$ <code>\xleftrightarrow[]{}</code></li>
-<li>$$\xLeftrightarrow[below]{above}=0$$ <code>\xLeftrightarrow[]{}</code></li>
-<li>$$\xrightleftharpoons[below]{above}=0$$ <code>\xrightleftharpoons[]{}</code></li>
-<li>$$\xleftrightharpoons[below]{above}=0$$ <code>\xleftrightharpoons[]{}</code></li>
-<li>$$\xhookleftarrow[below]{above}=0$$ <code>\xhookleftarrow[]{}</code></li>
-<li>$$\xhookrightarrow[below]{above}=0$$ <code>\xhookrightarrow[]{}</code></li>
-<li>$$\xmapsto[below]{above}=0$$ <code>\xmapsto[]{}</code></li>
-<li>$$\xtofrom[below]{above}=0$$ <code>\xtofrom[]{}</code></li>
-<li>$$\xrightleftarrows[below]{above}=0$$ <code>\xrightleftarrows[]{}</code></li>
-<li>$$\xrightequilibrium[below]{above}=0$$ <code>\xrightequilibrium[]{}</code></li>
-<li>$$\xleftequilibrium[below]{above}=0$$ <code>\xleftequilibrium[]{}</code></li>
-</ul>
-<h2>Relations</h2>
-<ul class="command-list">
-<li>$$\shortparallel$$   <code>\shortparallel</code></li>
-<li>$$\leqslant$$   <code>\leqslant</code></li>
-<li>$$\geqslant$$   <code>\geqslant</code></li>
-<li>$$\gtrsim$$   <code>\gtrsim</code></li>
-<li>$$\approxeq$$   <code>\approxeq</code></li>
-<li>$$\thickapprox$$   <code>\thickapprox</code></li>
-<li>$$\lessapprox$$   <code>\lessapprox</code></li>
-<li>$$\gtrapprox$$   <code>\gtrapprox</code></li>
-<li>$$\precapprox$$   <code>\precapprox</code></li>
-<li>$$\succapprox$$   <code>\succapprox</code></li>
-<li>$$\thicksim$$   <code>\thicksim</code></li>
-<li>$$\succsim$$   <code>\succsim</code></li>
-<li>$$\precsim$$   <code>\precsim</code></li>
-<li>$$\backsim$$   <code>\backsim</code></li>
-<li>$$\eqsim$$   <code>\eqsim</code></li>
-<li>$$\backsimeq$$   <code>\backsimeq</code></li>
-<li>$$\lesssim$$   <code>\lesssim</code></li>
-<li>$$\nleq$$   <code>\nleq</code></li>
-<li>$$\ngeq$$   <code>\ngeq</code></li>
-<li>$$\smallsmile$$   <code>\smallsmile</code></li>
-<li>$$\smallfrown$$   <code>\smallfrown</code></li>
-<li>$$\leqq$$   <code>\leqq</code></li>
-<li>$$\eqslantless$$   <code>\eqslantless</code></li>
-<li>$$\lll$$   <code>\lll</code></li>
-<li>$$\lessgtr$$   <code>\lessgtr</code></li>
-<li>$$\lesseqgtr$$   <code>\lesseqgtr</code></li>
-<li>$$\lesseqqgtr$$   <code>\lesseqqgtr</code></li>
-<li>$$\risingdotseq$$   <code>\risingdotseq</code></li>
-<li>$$\fallingdotseq$$   <code>\fallingdotseq</code></li>
-<li>$$\preccurlyeq$$   <code>\preccurlyeq</code></li>
-<li>$$\curlyeqprec$$   <code>\curlyeqprec</code></li>
-<li>$$\vDash$$   <code>\vDash</code></li>
-<li>$$\Vvdash$$   <code>\Vvdash</code></li>
-<li>$$\bumpeq$$   <code>\bumpeq</code></li>
-<li>$$\Bumpeq$$   <code>\Bumpeq</code></li>
-<li>$$\geqq$$   <code>\geqq</code></li>
-<li>$$\eqslantgtr$$   <code>\eqslantgtr</code></li>
-<li>$$\ggg$$   <code>\ggg</code></li>
-<li>$$\gtrless$$   <code>\gtrless</code></li>
-<li>$$\gtreqless$$   <code>\gtreqless</code></li>
-<li>$$\gtreqqless$$   <code>\gtreqqless</code></li>
-<li>$$\succcurlyeq$$   <code>\succcurlyeq</code></li>
-<li>$$\curlyeqsucc$$   <code>\curlyeqsucc</code></li>
-<li>$$\Vdash$$   <code>\Vdash</code></li>
-<li>$$\shortmid$$   <code>\shortmid</code></li>
-<li>$$\between$$   <code>\between</code></li>
-<li>$$\pitchfork$$   <code>\pitchfork</code></li>
-<li>$$\varpropto$$   <code>\varpropto</code></li>
-<li>$$\backepsilon$$   <code>\backepsilon</code></li>
-<li>$$\llless$$   <code>\llless</code></li>
-<li>$$\gggtr$$   <code>\gggtr</code></li>
-<li>$$\doteqdot$$   <code>\doteqdot</code></li>
-<li>$$\Doteq$$   <code>\Doteq</code></li>
-<li>$$\eqcirc$$   <code>\eqcirc</code></li>
-<li>$$\circeq$$   <code>\circeq</code></li>
-<li>$$\lhd$$   <code>\lhd</code></li>
-<li>$$\rhd$$   <code>\rhd</code></li>
-<li>$$\lessdot$$   <code>\lessdot</code></li>
-<li>$$\gtrdot$$   <code>\gtrdot</code></li>
-<li>$$=$$   <code>=</code></li>
-<li>$$&lt;$$   <code>&lt;</code></li>
-<li>$$\lt$$   <code>\lt</code></li>
-<li>$$&gt;$$   <code>&gt;</code></li>
-<li>$$\gt$$   <code>\gt</code></li>
-<li>$$\le$$   <code>\le</code></li>
-<li>$$\leq$$   <code>\leq</code></li>
-<li>$$\ge$$   <code>\ge</code></li>
-<li>$$\geq$$   <code>\geq</code></li>
-<li>$$\ll$$   <code>\ll</code></li>
-<li>$$\gg$$   <code>\gg</code></li>
-<li>$$\coloneq$$   <code>\coloneq</code></li>
-<li>$$\measeq$$   <code>\measeq</code></li>
-<li>$$\eqdef$$   <code>\eqdef</code></li>
-<li>$$\questeq$$   <code>\questeq</code></li>
-<li>$$\cong$$   <code>\cong</code></li>
-<li>$$\equiv$$   <code>\equiv</code></li>
-<li>$$\prec$$   <code>\prec</code></li>
-<li>$$\preceq$$   <code>\preceq</code></li>
-<li>$$\succ$$   <code>\succ</code></li>
-<li>$$\succeq$$   <code>\succeq</code></li>
-<li>$$\perp$$   <code>\perp</code></li>
-<li>$$\propto$$   <code>\propto</code></li>
-<li>$$\smile$$   <code>\smile</code></li>
-<li>$$\frown$$   <code>\frown</code></li>
-<li>$$\sim$$   <code>\sim</code></li>
-<li>$$\doteq$$   <code>\doteq</code></li>
-<li>$$\bowtie$$   <code>\bowtie</code></li>
-<li>$$\Join$$   <code>\Join</code></li>
-<li>$$\asymp$$   <code>\asymp</code></li>
-<li>$$\approx$$   <code>\approx</code></li>
-<li>$$\parallel$$   <code>\parallel</code></li>
-<li>$$\simeq$$   <code>\simeq</code></li>
-<li>$$\ne$$ <code>\ne</code></li>
-<li>$$\neq$$ <code>\neq</code></li>
-</ul>
-<h2>Negated Relations</h2>
-<ul class="command-list">
-<li>$$\nless$$   <code>\nless</code></li>
-<li>$$\nleqslant$$   <code>\nleqslant</code></li>
-<li>$$\lneq$$   <code>\lneq</code></li>
-<li>$$\lneqq$$   <code>\lneqq</code></li>
-<li>$$\nleqq$$   <code>\nleqq</code></li>
-<li>$$\lvertneqq$$   <code>\lvertneqq</code></li>
-<li>$$\lnsim$$   <code>\lnsim</code></li>
-<li>$$\lnapprox$$   <code>\lnapprox</code></li>
-<li>$$\nprec$$   <code>\nprec</code></li>
-<li>$$\npreceq$$   <code>\npreceq</code></li>
-<li>$$\precnsim$$   <code>\precnsim</code></li>
-<li>$$\precnapprox$$   <code>\precnapprox</code></li>
-<li>$$\nsim$$   <code>\nsim</code></li>
-<li>$$\nshortmid$$   <code>\nshortmid</code></li>
-<li>$$\nmid$$   <code>\nmid</code></li>
-<li>$$\nvdash$$   <code>\nvdash</code></li>
-<li>$$\nvDash$$   <code>\nvDash</code></li>
-<li>$$\ngtr$$   <code>\ngtr</code></li>
-<li>$$\ngeqslant$$   <code>\ngeqslant</code></li>
-<li>$$\ngeqq$$   <code>\ngeqq</code></li>
-<li>$$\gneq$$   <code>\gneq</code></li>
-<li>$$\gneqq$$   <code>\gneqq</code></li>
-<li>$$\gvertneqq$$   <code>\gvertneqq</code></li>
-<li>$$\gnsim$$   <code>\gnsim</code></li>
-<li>$$\gnapprox$$   <code>\gnapprox</code></li>
-<li>$$\nsucc$$   <code>\nsucc</code></li>
-<li>$$\nsucceq$$   <code>\nsucceq</code></li>
-<li>$$\succnsim$$   <code>\succnsim</code></li>
-<li>$$\succnapprox$$   <code>\succnapprox</code></li>
-<li>$$\ncong$$   <code>\ncong</code></li>
-<li>$$\nshortparallel$$   <code>\nshortparallel</code></li>
-<li>$$\nparallel$$   <code>\nparallel</code></li>
-<li>$$\nVDash$$   <code>\nVDash</code></li>
-<li>$$\nVdash$$   <code>\nVdash</code></li>
-<li>$$\precneqq$$   <code>\precneqq</code></li>
-<li>$$\succneqq$$   <code>\succneqq</code></li>
-<li>$$\unlhd$$   <code>\unlhd</code></li>
-<li>$$\unrhd$$   <code>\unrhd</code></li>
-</ul>
-<h2>Sets</h2>
-<ul class="command-list">
-<li>$$\nsupseteqq$$   <code>\nsupseteqq</code></li>
-<li>$$\supsetneq$$   <code>\supsetneq</code></li>
-<li>$$\varsupsetneq$$   <code>\varsupsetneq</code></li>
-<li>$$\supsetneqq$$   <code>\supsetneqq</code></li>
-<li>$$\varsupsetneqq$$   <code>\varsupsetneqq</code></li>
-<li>$$\nsubseteqq$$   <code>\nsubseteqq</code></li>
-<li>$$\subseteqq$$   <code>\subseteqq</code></li>
-<li>$$\Subset$$   <code>\Subset</code></li>
-<li>$$\sqsubset$$   <code>\sqsubset</code></li>
-<li>$$\supseteqq$$   <code>\supseteqq</code></li>
-<li>$$\Supset$$   <code>\Supset</code></li>
-<li>$$\sqsupset$$   <code>\sqsupset</code></li>
-<li>$$\cap$$   <code>\cap</code></li>
-<li>$$\cup$$   <code>\cup</code></li>
-<li>$$\setminus$$   <code>\setminus</code></li>
-<li>$$\smallsetminus$$   <code>\smallsetminus</code></li>
-<li>$$\emptyset$$   <code>\emptyset</code></li>
-<li>$$\sqsubseteq$$   <code>\sqsubseteq</code></li>
-<li>$$\sqsupseteq$$   <code>\sqsupseteq</code></li>
-<li>$$\in$$   <code>\in</code></li>
-<li>$$\notin$$   <code>\notin</code></li>
-<li>$$\ni$$   <code>\ni</code></li>
-<li>$$\owns$$   <code>\owns</code></li>
-<li>$$\subset$$   <code>\subset</code></li>
-<li>$$\supset$$   <code>\supset</code></li>
-<li>$$\subseteq$$   <code>\subseteq</code></li>
-<li>$$\supseteq$$   <code>\supseteq</code></li>
-<li>$$\subsetneq$$   <code>\subsetneq</code></li>
-<li>$$\varsubsetneq$$   <code>\varsubsetneq</code></li>
-<li>$$\subsetneqq$$   <code>\subsetneqq</code></li>
-<li>$$\varsubsetneqq$$   <code>\varsubsetneqq</code></li>
-<li>$$\nsubset$$   <code>\nsubset</code></li>
-<li>$$\nsupset$$   <code>\nsupset</code></li>
-<li>$$\nsubseteq$$   <code>\nsubseteq</code></li>
-<li>$$\nsupseteq$$   <code>\nsupseteq</code></li>
-<li>$$\varnothing$$   <code>\varnothing</code></li>
-<li>$$\complement$$   <code>\complement</code></li>
-<li>$$\not$$ <code>\not{}</code></li>
-</ul>
-<h2>Greek</h2>
-<ul class="command-list">
-<li>$$\alpha$$   <code>\alpha</code></li>
-<li>$$\beta$$   <code>\beta</code></li>
-<li>$$\gamma$$   <code>\gamma</code></li>
-<li>$$\delta$$   <code>\delta</code></li>
-<li>$$\epsilon$$   <code>\epsilon</code></li>
-<li>$$\varepsilon$$   <code>\varepsilon</code></li>
-<li>$$\zeta$$   <code>\zeta</code></li>
-<li>$$\eta$$   <code>\eta</code></li>
-<li>$$\theta$$   <code>\theta</code></li>
-<li>$$\vartheta$$   <code>\vartheta</code></li>
-<li>$$\iota$$   <code>\iota</code></li>
-<li>$$\kappa$$   <code>\kappa</code></li>
-<li>$$\varkappa$$   <code>\varkappa</code></li>
-<li>$$\lambda$$   <code>\lambda</code></li>
-<li>$$\mu$$   <code>\mu</code></li>
-<li>$$\nu$$   <code>\nu</code></li>
-<li>$$\xi$$   <code>\xi</code></li>
-<li>$$\omicron$$   <code>\omicron</code></li>
-<li>$$\pi$$   <code>\pi</code></li>
-<li>$$\varpi$$   <code>\varpi</code></li>
-<li>$$\rho$$   <code>\rho</code></li>
-<li>$$\varrho$$   <code>\varrho</code></li>
-<li>$$\sigma$$   <code>\sigma</code></li>
-<li>$$\varsigma$$   <code>\varsigma</code></li>
-<li>$$\tau$$   <code>\tau</code></li>
-<li>$$\phi$$   <code>\phi</code></li>
-<li>$$\varphi$$   <code>\varphi</code></li>
-<li>$$\upsilon$$   <code>\upsilon</code></li>
-<li>$$\chi$$   <code>\chi</code></li>
-<li>$$\psi$$   <code>\psi</code></li>
-<li>$$\omega$$   <code>\omega</code></li>
-<li>$$\Gamma$$   <code>\Gamma</code></li>
-<li>$$\Delta$$   <code>\Delta</code></li>
-<li>$$\Theta$$   <code>\Theta</code></li>
-<li>$$\Lambda$$   <code>\Lambda</code></li>
-<li>$$\Xi$$   <code>\Xi</code></li>
-<li>$$\Pi$$   <code>\Pi</code></li>
-<li>$$\Sigma$$   <code>\Sigma</code></li>
-<li>$$\Upsilon$$   <code>\Upsilon</code></li>
-<li>$$\Phi$$   <code>\Phi</code></li>
-<li>$$\Psi$$   <code>\Psi</code></li>
-<li>$$\Omega$$   <code>\Omega</code></li>
-<li>$$\digamma$$   <code>\digamma</code></li>
-</ul>
-<h2>Hebrew</h2>
-<ul class="command-list">
-<li>$$\aleph$$   <code>\aleph</code></li>
-<li>$$\beth$$   <code>\beth</code></li>
-<li>$$\gimel$$   <code>\gimel</code></li>
-<li>$$\daleth$$   <code>\daleth</code></li>
-</ul>
-<h2>Letterlike Symbols</h2>
-<ul class="command-list">
-<li>$$@$$   <code>@</code></li>
-<li>$$\mid$$   <code>\mid</code></li>
-<li>$$\top$$   <code>\top</code></li>
-<li>$$\bot$$   <code>\bot</code></li>
-<li>$$\nabla$$   <code>\nabla</code></li>
-<li>$$\partial$$   <code>\partial</code></li>
-<li>$$\ell$$   <code>\ell</code></li>
-<li>$$\hbar$$   <code>\hbar</code></li>
-<li>$$\N$$   <code>\N</code></li>
-<li>$$\R$$   <code>\R</code></li>
-<li>$$\Q$$   <code>\Q</code></li>
-<li>$$\C$$   <code>\C</code></li>
-<li>$$\Z$$   <code>\Z</code></li>
-<li>$$\P$$   <code>\P</code></li>
-<li>$$\pounds$$   <code>\pounds</code></li>
-<li>$$\euro$$   <code>\euro</code></li>
-<li>$$\And$$   <code>\And</code></li>
-<li>$$$$$   <code>\$</code></li>
-<li>$$%$$   <code>\%</code></li>
-<li>$$\differencedelta$$   <code>\differencedelta</code></li>
-<li>$$\wp$$   <code>\wp</code></li>
-<li>$$\hslash$$   <code>\hslash</code></li>
-<li>$$\Finv$$   <code>\Finv</code></li>
-<li>$$\Game$$   <code>\Game</code></li>
-<li>$$\eth$$   <code>\eth</code></li>
-<li>$$\mho$$   <code>\mho</code></li>
-<li>$$\Bbbk$$   <code>\Bbbk</code></li>
-<li>$$\yen$$   <code>\yen</code></li>
-<li>$$\imath$$   <code>\imath</code></li>
-<li>$$\jmath$$   <code>\jmath</code></li>
-<li>$$\degree$$   <code>\degree</code></li>
-<li>$$\Re$$ <code>\Re</code></li>
-<li>$$\Im$$ <code>\Im</code></li>
-</ul>
-<h2>Delimiters</h2>
-<ul class="command-list">
-<li>$$\lparen$$   <code>\lparen</code></li>
-<li>$$\rparen$$   <code>\rparen</code></li>
-<li>$$\lbrace$$   <code>\lbrace</code></li>
-<li>$$\rbrace$$   <code>\rbrace</code></li>
-<li>$$\langle$$   <code>\langle</code></li>
-<li>$$\rangle$$   <code>\rangle</code></li>
-<li>$$\lfloor$$   <code>\lfloor</code></li>
-<li>$$\rfloor$$   <code>\rfloor</code></li>
-<li>$$\lceil$$   <code>\lceil</code></li>
-<li>$$\rceil$$   <code>\rceil</code></li>
-<li>$$\vert$$   <code>\vert</code></li>
-<li>$$\lvert$$   <code>\lvert</code></li>
-<li>$$\rvert$$   <code>\rvert</code></li>
-<li>$$|$$   <code>\|</code></li>
-<li>$$\Vert$$   <code>\Vert</code></li>
-<li>$$\mVert$$   <code>\mVert</code></li>
-<li>$$\lVert$$   <code>\lVert</code></li>
-<li>$$\rVert$$   <code>\rVert</code></li>
-<li>$$\lbrack$$   <code>\lbrack</code></li>
-<li>$$\rbrack$$   <code>\rbrack</code></li>
-<li>$$ { $$   <code>\{</code></li>
-<li>$$}$$   <code>\}</code></li>
-<li>$$($$   <code>(</code></li>
-<li>$$)$$   <code>)</code></li>
-<li>$$[$$   <code>[</code></li>
-<li>$$]$$   <code>]</code></li>
-<li>$$\ulcorner$$   <code>\ulcorner</code></li>
-<li>$$\urcorner$$   <code>\urcorner</code></li>
-<li>$$\llcorner$$   <code>\llcorner</code></li>
-<li>$$\lrcorner$$   <code>\lrcorner</code></li>
-<li>$$\lgroup$$   <code>\lgroup</code></li>
-<li>$$\rgroup$$   <code>\rgroup</code></li>
-<li>$$\lmoustache$$   <code>\lmoustache</code></li>
-<li>$$\rmoustache$$   <code>\rmoustache</code></li>
-<li>$$\mvert$$   <code>\mvert</code></li>
-</ul>
-<h2>Punctuation</h2>
-<ul class="command-list">
-<li>$$.$$   <code>.</code></li>
-<li>$$?$$   <code>?</code></li>
-<li>$$!$$   <code>!</code></li>
-<li>$$:$$   <code>:</code></li>
-<li>$$\Colon$$   <code>\Colon</code></li>
-<li>$$\colon$$   <code>\colon</code></li>
-<li>$$\cdotp$$   <code>\cdotp</code></li>
-<li>$$\vdots$$   <code>\vdots</code></li>
-<li>$$\ldotp$$   <code>\ldotp</code></li>
-<li>$$,$$   <code>,</code></li>
-<li>$$;$$   <code>;</code></li>
-<li>$$\cdots$$   <code>\cdots</code></li>
-<li>$$\ddots$$   <code>\ddots</code></li>
-<li>$$\ldots$$   <code>\ldots</code></li>
-<li>$$\mathellipsis$$   <code>\mathellipsis</code></li>
-<li>$$&quot;$$   <code>&quot;</code></li>
-</ul>
-<h2>Boxes</h2>
-<ul class="command-list">
-<li>$$\boxminus$$   <code>\boxminus</code></li>
-<li>$$\boxplus$$   <code>\boxplus</code></li>
-<li>$$\boxtimes$$   <code>\boxtimes</code></li>
-<li>$$\boxdot$$   <code>\boxdot</code></li>
-<li>$$\square$$   <code>\square</code></li>
-<li>$$\Box$$   <code>\Box</code></li>
-<li>$$\blacksquare$$   <code>\blacksquare</code></li>
-</ul>
-<h2>Circles</h2>
-<ul class="command-list">
-<li>$$\circ$$   <code>\circ</code></li>
-<li>$$\bigcirc$$   <code>\bigcirc</code></li>
-<li>$$\bullet$$   <code>\bullet</code></li>
-<li>$$\oplus$$   <code>\oplus</code></li>
-<li>$$\ominus$$   <code>\ominus</code></li>
-<li>$$\otimes$$   <code>\otimes</code></li>
-<li>$$\odot$$   <code>\odot</code></li>
-<li>$$\oslash$$   <code>\oslash</code></li>
-<li>$$\circleddash$$   <code>\circleddash</code></li>
-<li>$$\circledast$$   <code>\circledast</code></li>
-<li>$$\circledcirc$$   <code>\circledcirc</code></li>
-<li>$$\circledS$$   <code>\circledS</code></li>
-<li>$$\circledR$$   <code>\circledR</code></li>
-</ul>
-<h2>Triangles</h2>
-<ul class="command-list">
-<li>$$\vartriangle$$   <code>\vartriangle</code></li>
-<li>$$\triangleq$$   <code>\triangleq</code></li>
-<li>$$\vartriangleleft$$   <code>\vartriangleleft</code></li>
-<li>$$\trianglelefteq$$   <code>\trianglelefteq</code></li>
-<li>$$\ntriangleleft$$   <code>\ntriangleleft</code></li>
-<li>$$\ntrianglelefteq$$   <code>\ntrianglelefteq</code></li>
-<li>$$\vartriangleright$$   <code>\vartriangleright</code></li>
-<li>$$\trianglerighteq$$   <code>\trianglerighteq</code></li>
-<li>$$\ntriangleright$$   <code>\ntriangleright</code></li>
-<li>$$\ntrianglerighteq$$   <code>\ntrianglerighteq</code></li>
-<li>$$\blacktriangleleft$$   <code>\blacktriangleleft</code></li>
-<li>$$\blacktriangleright$$   <code>\blacktriangleright</code></li>
-<li>$$\bigtriangleup$$   <code>\bigtriangleup</code></li>
-<li>$$\bigtriangledown$$   <code>\bigtriangledown</code></li>
-<li>$$\triangleleft$$   <code>\triangleleft</code></li>
-<li>$$\triangleright$$   <code>\triangleright</code></li>
-<li>$$\triangle$$   <code>\triangle</code></li>
-<li>$$\blacktriangle$$   <code>\blacktriangle</code></li>
-<li>$$\triangledown$$   <code>\triangledown</code></li>
-<li>$$\blacktriangledown$$   <code>\blacktriangledown</code></li>
-</ul>
-<h2>Shapes</h2>
-<ul class="command-list">
-<li>$$\ast$$   <code>\ast</code></li>
-<li>$$\star$$   <code>\star</code></li>
-<li>$$\diamond$$   <code>\diamond</code></li>
-<li>$$\Diamond$$   <code>\Diamond</code></li>
-<li>$$\lozenge$$   <code>\lozenge</code></li>
-<li>$$\blacklozenge$$   <code>\blacklozenge</code></li>
-</ul>
-<h2>Crosses</h2>
-<ul class="command-list">
-<li>$$\dagger$$   <code>\dagger</code></li>
-<li>$$\dag$$   <code>\dag</code></li>
-<li>$$\ddag$$   <code>\ddag</code></li>
-<li>$$\ddagger$$   <code>\ddagger</code></li>
-<li>$$\maltese$$   <code>\maltese</code></li>
+<li><span class='math'>$$\nrightarrow $$</span>   <code>\nrightarrow</code></li>
+<li><span class='math'>$$\nleftarrow $$</span>   <code>\nleftarrow</code></li>
+<li><span class='math'>$$\nRightarrow $$</span>   <code>\nRightarrow</code></li>
+<li><span class='math'>$$\nLeftarrow $$</span>   <code>\nLeftarrow</code></li>
+<li><span class='math'>$$\nleftrightarrow $$</span>   <code>\nleftrightarrow</code></li>
+<li><span class='math'>$$\nLeftrightarrow $$</span>   <code>\nLeftrightarrow</code></li>
 </ul>
 <h2>Accents</h2>
 <ul class="command-list">
-<li>$$~{n}$$   <code>\~</code></li>
-<li>$$\acute{\unicode{&quot;2B1A}}$$ <code>\acute{}</code></li>
-<li>$$\grave{\unicode{&quot;2B1A}}$$ <code>\grave{}</code></li>
-<li>$$\dot{\unicode{&quot;2B1A}}$$ <code>\dot{}</code></li>
-<li>$$\ddot{\unicode{&quot;2B1A}}$$ <code>\ddot{}</code></li>
-<li>$$\mathring{\unicode{&quot;2B1A}}$$ <code>\mathring{}</code></li>
-<li>$$\tilde{\unicode{&quot;2B1A}}$$ <code>\tilde{}</code></li>
-<li>$$\bar{\unicode{&quot;2B1A}}$$ <code>\bar{}</code></li>
-<li>$$\breve{\unicode{&quot;2B1A}}$$ <code>\breve{}</code></li>
-<li>$$\check{\unicode{&quot;2B1A}}$$ <code>\check{}</code></li>
-<li>$$\hat{\unicode{&quot;2B1A}}$$ <code>\hat{}</code></li>
-<li>$$\vec$$ <code>\vec{}</code></li>
-<li>$$^{e}$$ <code>\^{}</code></li>
-<li>$$`{e}$$ <code>\</code>{}`</li>
-<li>$$'{e}$$ <code>\'{}</code></li>
-<li>$$~{n}$$ <code>\~{}</code></li>
-<li>$$\c{c}$$ <code>\c{}</code></li>
+<li><span class='math'>$$\acute{\unicode{&quot;2B1A}} $$</span> <code>\acute{}</code></li>
+<li><span class='math'>$$\grave{\unicode{&quot;2B1A}} $$</span> <code>\grave{}</code></li>
+<li><span class='math'>$$\dot{\unicode{&quot;2B1A}} $$</span> <code>\dot{}</code></li>
+<li><span class='math'>$$\ddot{\unicode{&quot;2B1A}} $$</span> <code>\ddot{}</code></li>
+<li><span class='math'>$$\mathring{\unicode{&quot;2B1A}} $$</span> <code>\mathring{}</code></li>
+<li><span class='math'>$$\tilde{\unicode{&quot;2B1A}} $$</span> <code>\tilde{}</code></li>
+<li><span class='math'>$$\bar{\unicode{&quot;2B1A}} $$</span> <code>\bar{}</code></li>
+<li><span class='math'>$$\breve{\unicode{&quot;2B1A}} $$</span> <code>\breve{}</code></li>
+<li><span class='math'>$$\check{\unicode{&quot;2B1A}} $$</span> <code>\check{}</code></li>
+<li><span class='math'>$$\hat{\unicode{&quot;2B1A}} $$</span> <code>\hat{}</code></li>
+<li><span class='math'>$$\vec{\unicode{&quot;2B1A}} $$</span> <code>\vec{}</code></li>
+<li><span class='math'>$$\^{e} $$</span> <code>\^{e}</code></li>
+<li><span class='math'>$$`{e} $$</span> <code e="">\</code>`</li>
+<li><span class='math'>$$\'{e} $$</span> <code>\'{e}</code></li>
+<li><span class='math'>$$\c{c} $$</span> <code>\c{c}</code></li>
+<li><span class='math'>$$\~{n} $$</span>   <code>\~{n}</code></li>
+</ul>
+<p>Accents have a fixed width and do not stretch. For example, compare:</p>
+<ul>
+<li><span class='math'>$$\vec{ABC}$$</span> <code>\vec{ABC}</code></li>
+</ul>
+<p>and</p>
+<ul>
+<li><span class='math'>$$\overrightarrow{ABC}$$</span> <code>\overrightarrow{ABC}</code>.</li>
+</ul>
+<h2>Extensible Symbols</h2>
+<ul class="command-list">
+<li><span class='math'>$$\overline{\unicode{&quot;2B1A}} $$</span> <code>\overline{}</code></li>
+<li><span class='math'>$$\underline{\unicode{&quot;2B1A}} $$</span> <code>\underline{}</code></li>
+<li><span class='math'>$$\widehat{ABC} $$</span> <code>\widehat{}</code></li>
+<li><span class='math'>$$\widecheck{ABC} $$</span> <code>\widecheck{}</code></li>
+<li><span class='math'>$$\widetilde{ABC} $$</span> <code>\widetilde{}</code></li>
+<li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
+<li><span class='math'>$$\overrightarrow{ABC} $$</span> <code>\overrightarrow{}</code></li>
+<li><span class='math'>$$\overleftarrow{ABC} $$</span> <code>\overleftarrow{}</code></li>
+<li><span class='math'>$$\Overrightarrow{ABC} $$</span> <code>\Overrightarrow{}</code></li>
+<li><span class='math'>$$\overleftharpoon{ABC} $$</span> <code>\overleftharpoon{}</code></li>
+<li><span class='math'>$$\overrightharpoon{ABC} $$</span> <code>\overrightharpoon{}</code></li>
+<li><span class='math'>$$\overleftrightarrow{ABC} $$</span> <code>\overleftrightarrow{}</code></li>
+<li><span class='math'>$$\overlinesegment{ABC} $$</span> <code>\overlinesegment{}</code></li>
+<li><span class='math'>$$\overgroup{ABC} $$</span> <code>\overgroup{}</code></li>
+<li><span class='math'>$$\overbrace{ABC} $$</span> <code>\overbrace{}</code></li>
+</ul>
+<hr>
+<ul class="command-list">
+<li><span class='math'>$$\underrightarrow{ABC} $$</span> <code>\underrightarrow{}</code></li>
+<li><span class='math'>$$\underleftarrow{ABC} $$</span> <code>\underleftarrow{}</code></li>
+<li><span class='math'>$$\underleftrightarrow{ABC} $$</span> <code>\underleftrightarrow{}</code></li>
+<li><span class='math'>$$\underlinesegment{ABC} $$</span> <code>\underlinesegment{}</code></li>
+<li><span class='math'>$$\undergroup{ABC} $$</span> <code>\undergroup{}</code></li>
+<li><span class='math'>$$\underbrace{ABC} $$</span> <code>\underbrace{}</code></li>
+</ul>
+<hr>
+<ul class="command-list">
+<li><span class='math'>$$\xrightarrow[below]{above}=0 $$</span> <code>\xrightarrow[]{}</code></li>
+<li><span class='math'>$$\xleftarrow[below]{above}=0 $$</span> <code>\xleftarrow[]{}</code></li>
+<li><span class='math'>$$\xRightarrow[below]{above}=0 $$</span> <code>\xRightarrow[]{}</code></li>
+<li><span class='math'>$$\xLeftarrow[below]{above}=0 $$</span> <code>\xLeftarrow[]{}</code></li>
+<li><span class='math'>$$\xleftharpoonup[below]{above}=0 $$</span> <code>\xleftharpoonup[]{}</code></li>
+<li><span class='math'>$$\xleftharpoondown[below]{above}=0 $$</span> <code>\xleftharpoondown[]{}</code></li>
+<li><span class='math'>$$\xrightharpoonup[below]{above}=0 $$</span> <code>\xrightharpoonup[]{}</code></li>
+<li><span class='math'>$$\xrightharpoondown[below]{above}=0 $$</span> <code>\xrightharpoondown[]{}</code></li>
+<li><span class='math'>$$\xlongequal[below]{above}=0 $$</span> <code>\xlongequal[]{}</code></li>
+<li><span class='math'>$$\xtwoheadleftarrow[below]{above}=0 $$</span> <code>\xtwoheadleftarrow[]{}</code></li>
+<li><span class='math'>$$\xtwoheadrightarrow[below]{above}=0 $$</span> <code>\xtwoheadrightarrow[]{}</code></li>
+<li><span class='math'>$$\xleftrightarrow[below]{above}=0 $$</span> <code>\xleftrightarrow[]{}</code></li>
+<li><span class='math'>$$\xLeftrightarrow[below]{above}=0 $$</span> <code>\xLeftrightarrow[]{}</code></li>
+<li><span class='math'>$$\xrightleftharpoons[below]{above}=0 $$</span> <code>\xrightleftharpoons[]{}</code></li>
+<li><span class='math'>$$\xleftrightharpoons[below]{above}=0 $$</span> <code>\xleftrightharpoons[]{}</code></li>
+<li><span class='math'>$$\xhookleftarrow[below]{above}=0 $$</span> <code>\xhookleftarrow[]{}</code></li>
+<li><span class='math'>$$\xhookrightarrow[below]{above}=0 $$</span> <code>\xhookrightarrow[]{}</code></li>
+<li><span class='math'>$$\xmapsto[below]{above}=0 $$</span> <code>\xmapsto[]{}</code></li>
+<li><span class='math'>$$\xtofrom[below]{above}=0 $$</span> <code>\xtofrom[]{}</code></li>
+<li><span class='math'>$$\xrightleftarrows[below]{above}=0 $$</span> <code>\xrightleftarrows[]{}</code></li>
+<li><span class='math'>$$\xrightequilibrium[below]{above}=0 $$</span> <code>\xrightequilibrium[]{}</code></li>
+<li><span class='math'>$$\xleftequilibrium[below]{above}=0 $$</span> <code>\xleftequilibrium[]{}</code></li>
+</ul>
+<h2>Relations</h2>
+<p>To display a vertical “stack” of two symbols as a relation, use the <code>\stackrel</code>
+command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}b</code>.</p>
+<ul class="command-list command-list">
+<li>
+<p><span class='math'>$$= $$</span>   <code>=</code></p>
+</li>
+<li>
+<p><span class='math'>$$&lt; $$</span>   <code>&lt;</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lt $$</span>   <code>\lt</code></p>
+</li>
+<li>
+<p><span class='math'>$$&gt; $$</span>   <code>&gt;</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gt $$</span>   <code>\gt</code></p>
+</li>
+<li>
+<p><span class='math'>$$\le $$</span>   <code>\le</code></p>
+</li>
+<li>
+<p><span class='math'>$$\leq $$</span>   <code>\leq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\ge $$</span>   <code>\ge</code></p>
+</li>
+<li>
+<p><span class='math'>$$\geq $$</span>   <code>\geq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\shortparallel $$</span>   <code>\shortparallel</code></p>
+</li>
+<li>
+<p><span class='math'>$$\leqslant $$</span>   <code>\leqslant</code></p>
+</li>
+<li>
+<p><span class='math'>$$\geqslant $$</span>   <code>\geqslant</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtrsim $$</span>   <code>\gtrsim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\approxeq $$</span>   <code>\approxeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\thickapprox $$</span>   <code>\thickapprox</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lessapprox $$</span>   <code>\lessapprox</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtrapprox $$</span>   <code>\gtrapprox</code></p>
+</li>
+<li>
+<p><span class='math'>$$\precapprox $$</span>   <code>\precapprox</code></p>
+</li>
+<li>
+<p><span class='math'>$$\succapprox $$</span>   <code>\succapprox</code></p>
+</li>
+<li>
+<p><span class='math'>$$\thicksim $$</span>   <code>\thicksim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\succsim $$</span>   <code>\succsim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\precsim $$</span>   <code>\precsim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\backsim $$</span>   <code>\backsim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\eqsim $$</span>   <code>\eqsim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\backsimeq $$</span>   <code>\backsimeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lesssim $$</span>   <code>\lesssim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\nleq $$</span>   <code>\nleq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\ngeq $$</span>   <code>\ngeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\smallsmile $$</span>   <code>\smallsmile</code></p>
+</li>
+<li>
+<p><span class='math'>$$\smallfrown $$</span>   <code>\smallfrown</code></p>
+</li>
+<li>
+<p><span class='math'>$$\leqq $$</span>   <code>\leqq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\eqslantless $$</span>   <code>\eqslantless</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lll $$</span>   <code>\lll</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lessgtr $$</span>   <code>\lessgtr</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lesseqgtr $$</span>   <code>\lesseqgtr</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lesseqqgtr $$</span>   <code>\lesseqqgtr</code></p>
+</li>
+<li>
+<p><span class='math'>$$\risingdotseq $$</span>   <code>\risingdotseq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\fallingdotseq $$</span>   <code>\fallingdotseq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\preccurlyeq $$</span>   <code>\preccurlyeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\curlyeqprec $$</span>   <code>\curlyeqprec</code></p>
+</li>
+<li>
+<p><span class='math'>$$\vDash $$</span>   <code>\vDash</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Vvdash $$</span>   <code>\Vvdash</code></p>
+</li>
+<li>
+<p><span class='math'>$$\bumpeq $$</span>   <code>\bumpeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Bumpeq $$</span>   <code>\Bumpeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\geqq $$</span>   <code>\geqq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\eqslantgtr $$</span>   <code>\eqslantgtr</code></p>
+</li>
+<li>
+<p><span class='math'>$$\ggg $$</span>   <code>\ggg</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtrless $$</span>   <code>\gtrless</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtreqless $$</span>   <code>\gtreqless</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtreqqless $$</span>   <code>\gtreqqless</code></p>
+</li>
+<li>
+<p><span class='math'>$$\succcurlyeq $$</span>   <code>\succcurlyeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\curlyeqsucc $$</span>   <code>\curlyeqsucc</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Vdash $$</span>   <code>\Vdash</code></p>
+</li>
+<li>
+<p><span class='math'>$$\shortmid $$</span>   <code>\shortmid</code></p>
+</li>
+<li>
+<p><span class='math'>$$\between $$</span>   <code>\between</code></p>
+</li>
+<li>
+<p><span class='math'>$$\pitchfork $$</span>   <code>\pitchfork</code></p>
+</li>
+<li>
+<p><span class='math'>$$\varpropto $$</span>   <code>\varpropto</code></p>
+</li>
+<li>
+<p><span class='math'>$$\backepsilon $$</span>   <code>\backepsilon</code></p>
+</li>
+<li>
+<p><span class='math'>$$\llless $$</span>   <code>\llless</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gggtr $$</span>   <code>\gggtr</code></p>
+</li>
+<li>
+<p><span class='math'>$$\doteqdot $$</span>   <code>\doteqdot</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Doteq $$</span>   <code>\Doteq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\eqcirc $$</span>   <code>\eqcirc</code></p>
+</li>
+<li>
+<p><span class='math'>$$\circeq $$</span>   <code>\circeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lhd $$</span>   <code>\lhd</code></p>
+</li>
+<li>
+<p><span class='math'>$$\rhd $$</span>   <code>\rhd</code></p>
+</li>
+<li>
+<p><span class='math'>$$\lessdot $$</span>   <code>\lessdot</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gtrdot $$</span>   <code>\gtrdot</code></p>
+</li>
+<li>
+<p><span class='math'>$$\ll $$</span>   <code>\ll</code></p>
+</li>
+<li>
+<p><span class='math'>$$\gg $$</span>   <code>\gg</code></p>
+</li>
+<li>
+<p><span class='math'>$$\coloneq $$</span>   <code>\coloneq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\measeq $$</span>   <code>\measeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\eqdef $$</span>   <code>\eqdef</code></p>
+</li>
+<li>
+<p><span class='math'>$$\questeq $$</span>   <code>\questeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\cong $$</span>   <code>\cong</code></p>
+</li>
+<li>
+<p><span class='math'>$$\equiv $$</span>   <code>\equiv</code></p>
+</li>
+<li>
+<p><span class='math'>$$\prec $$</span>   <code>\prec</code></p>
+</li>
+<li>
+<p><span class='math'>$$\preceq $$</span>   <code>\preceq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\succ $$</span>   <code>\succ</code></p>
+</li>
+<li>
+<p><span class='math'>$$\succeq $$</span>   <code>\succeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\perp $$</span>   <code>\perp</code></p>
+</li>
+<li>
+<p><span class='math'>$$\propto $$</span>   <code>\propto</code></p>
+</li>
+<li>
+<p><span class='math'>$$\smile $$</span>   <code>\smile</code></p>
+</li>
+<li>
+<p><span class='math'>$$\frown $$</span>   <code>\frown</code></p>
+</li>
+<li>
+<p><span class='math'>$$\sim $$</span>   <code>\sim</code></p>
+</li>
+<li>
+<p><span class='math'>$$\doteq $$</span>   <code>\doteq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\bowtie $$</span>   <code>\bowtie</code></p>
+</li>
+<li>
+<p><span class='math'>$$\Join $$</span>   <code>\Join</code></p>
+</li>
+<li>
+<p><span class='math'>$$\asymp $$</span>   <code>\asymp</code></p>
+</li>
+<li>
+<p><span class='math'>$$\approx $$</span>   <code>\approx</code></p>
+</li>
+<li>
+<p><span class='math'>$$\parallel $$</span>   <code>\parallel</code></p>
+</li>
+<li>
+<p><span class='math'>$$\simeq $$</span>   <code>\simeq</code></p>
+</li>
+<li>
+<p><span class='math'>$$\ne $$</span> <code>\ne</code></p>
+</li>
+<li>
+<p><span class='math'>$$\neq $$</span> <code>\neq</code></p>
+</li>
+</ul>
+<h2>Negated Relations</h2>
+<ul class="command-list">
+<li><span class='math'>$$\not{=} $$</span> <code>\not=</code></li>
+<li><span class='math'>$$\not $$</span> <code>\not{}</code></li>
+<li><span class='math'>$$\nless $$</span>   <code>\nless</code></li>
+<li><span class='math'>$$\nleqslant $$</span>   <code>\nleqslant</code></li>
+<li><span class='math'>$$\lneq $$</span>   <code>\lneq</code></li>
+<li><span class='math'>$$\lneqq $$</span>   <code>\lneqq</code></li>
+<li><span class='math'>$$\nleqq $$</span>   <code>\nleqq</code></li>
+<li><span class='math'>$$\lvertneqq $$</span>   <code>\lvertneqq</code></li>
+<li><span class='math'>$$\lnsim $$</span>   <code>\lnsim</code></li>
+<li><span class='math'>$$\lnapprox $$</span>   <code>\lnapprox</code></li>
+<li><span class='math'>$$\nprec $$</span>   <code>\nprec</code></li>
+<li><span class='math'>$$\npreceq $$</span>   <code>\npreceq</code></li>
+<li><span class='math'>$$\precnsim $$</span>   <code>\precnsim</code></li>
+<li><span class='math'>$$\precnapprox $$</span>   <code>\precnapprox</code></li>
+<li><span class='math'>$$\nsim $$</span>   <code>\nsim</code></li>
+<li><span class='math'>$$\nshortmid $$</span>   <code>\nshortmid</code></li>
+<li><span class='math'>$$\nmid $$</span>   <code>\nmid</code></li>
+<li><span class='math'>$$\nvdash $$</span>   <code>\nvdash</code></li>
+<li><span class='math'>$$\nvDash $$</span>   <code>\nvDash</code></li>
+<li><span class='math'>$$\ngtr $$</span>   <code>\ngtr</code></li>
+<li><span class='math'>$$\ngeqslant $$</span>   <code>\ngeqslant</code></li>
+<li><span class='math'>$$\ngeqq $$</span>   <code>\ngeqq</code></li>
+<li><span class='math'>$$\gneq $$</span>   <code>\gneq</code></li>
+<li><span class='math'>$$\gneqq $$</span>   <code>\gneqq</code></li>
+<li><span class='math'>$$\gvertneqq $$</span>   <code>\gvertneqq</code></li>
+<li><span class='math'>$$\gnsim $$</span>   <code>\gnsim</code></li>
+<li><span class='math'>$$\gnapprox $$</span>   <code>\gnapprox</code></li>
+<li><span class='math'>$$\nsucc $$</span>   <code>\nsucc</code></li>
+<li><span class='math'>$$\nsucceq $$</span>   <code>\nsucceq</code></li>
+<li><span class='math'>$$\succnsim $$</span>   <code>\succnsim</code></li>
+<li><span class='math'>$$\succnapprox $$</span>   <code>\succnapprox</code></li>
+<li><span class='math'>$$\ncong $$</span>   <code>\ncong</code></li>
+<li><span class='math'>$$\nshortparallel $$</span>   <code>\nshortparallel</code></li>
+<li><span class='math'>$$\nparallel $$</span>   <code>\nparallel</code></li>
+<li><span class='math'>$$\nVDash $$</span>   <code>\nVDash</code></li>
+<li><span class='math'>$$\nVdash $$</span>   <code>\nVdash</code></li>
+<li><span class='math'>$$\precneqq $$</span>   <code>\precneqq</code></li>
+<li><span class='math'>$$\succneqq $$</span>   <code>\succneqq</code></li>
+<li><span class='math'>$$\unlhd $$</span>   <code>\unlhd</code></li>
+<li><span class='math'>$$\unrhd $$</span>   <code>\unrhd</code></li>
+</ul>
+<h2>Sets</h2>
+<ul class="command-list">
+<li><span class='math'>$$\nsupseteqq $$</span>   <code>\nsupseteqq</code></li>
+<li><span class='math'>$$\supsetneq $$</span>   <code>\supsetneq</code></li>
+<li><span class='math'>$$\varsupsetneq $$</span>   <code>\varsupsetneq</code></li>
+<li><span class='math'>$$\supsetneqq $$</span>   <code>\supsetneqq</code></li>
+<li><span class='math'>$$\varsupsetneqq $$</span>   <code>\varsupsetneqq</code></li>
+<li><span class='math'>$$\nsubseteqq $$</span>   <code>\nsubseteqq</code></li>
+<li><span class='math'>$$\subseteqq $$</span>   <code>\subseteqq</code></li>
+<li><span class='math'>$$\Subset $$</span>   <code>\Subset</code></li>
+<li><span class='math'>$$\sqsubset $$</span>   <code>\sqsubset</code></li>
+<li><span class='math'>$$\supseteqq $$</span>   <code>\supseteqq</code></li>
+<li><span class='math'>$$\Supset $$</span>   <code>\Supset</code></li>
+<li><span class='math'>$$\sqsupset $$</span>   <code>\sqsupset</code></li>
+<li><span class='math'>$$\cap $$</span>   <code>\cap</code></li>
+<li><span class='math'>$$\cup $$</span>   <code>\cup</code></li>
+<li><span class='math'>$$\setminus $$</span>   <code>\setminus</code></li>
+<li><span class='math'>$$\smallsetminus $$</span>   <code>\smallsetminus</code></li>
+<li><span class='math'>$$\emptyset $$</span>   <code>\emptyset</code></li>
+<li><span class='math'>$$\sqsubseteq $$</span>   <code>\sqsubseteq</code></li>
+<li><span class='math'>$$\sqsupseteq $$</span>   <code>\sqsupseteq</code></li>
+<li><span class='math'>$$\in $$</span>   <code>\in</code></li>
+<li><span class='math'>$$\notin $$</span>   <code>\notin</code></li>
+<li><span class='math'>$$\ni $$</span>   <code>\ni</code></li>
+<li><span class='math'>$$\owns $$</span>   <code>\owns</code></li>
+<li><span class='math'>$$\subset $$</span>   <code>\subset</code></li>
+<li><span class='math'>$$\supset $$</span>   <code>\supset</code></li>
+<li><span class='math'>$$\subseteq $$</span>   <code>\subseteq</code></li>
+<li><span class='math'>$$\supseteq $$</span>   <code>\supseteq</code></li>
+<li><span class='math'>$$\subsetneq $$</span>   <code>\subsetneq</code></li>
+<li><span class='math'>$$\varsubsetneq $$</span>   <code>\varsubsetneq</code></li>
+<li><span class='math'>$$\subsetneqq $$</span>   <code>\subsetneqq</code></li>
+<li><span class='math'>$$\varsubsetneqq $$</span>   <code>\varsubsetneqq</code></li>
+<li><span class='math'>$$\nsubset $$</span>   <code>\nsubset</code></li>
+<li><span class='math'>$$\nsupset $$</span>   <code>\nsupset</code></li>
+<li><span class='math'>$$\nsubseteq $$</span>   <code>\nsubseteq</code></li>
+<li><span class='math'>$$\nsupseteq $$</span>   <code>\nsupseteq</code></li>
+<li><span class='math'>$$\varnothing $$</span>   <code>\varnothing</code></li>
+<li><span class='math'>$$\complement $$</span>   <code>\complement</code></li>
+</ul>
+<h2>Greek</h2>
+<ul class="command-list">
+<li><span class='math'>$$\alpha $$</span>   <code>\alpha</code></li>
+<li><span class='math'>$$\beta $$</span>   <code>\beta</code></li>
+<li><span class='math'>$$\gamma $$</span>   <code>\gamma</code></li>
+<li><span class='math'>$$\delta $$</span>   <code>\delta</code></li>
+<li><span class='math'>$$\epsilon $$</span>   <code>\epsilon</code></li>
+<li><span class='math'>$$\varepsilon $$</span>   <code>\varepsilon</code></li>
+<li><span class='math'>$$\zeta $$</span>   <code>\zeta</code></li>
+<li><span class='math'>$$\eta $$</span>   <code>\eta</code></li>
+<li><span class='math'>$$\theta $$</span>   <code>\theta</code></li>
+<li><span class='math'>$$\vartheta $$</span>   <code>\vartheta</code></li>
+<li><span class='math'>$$\iota $$</span>   <code>\iota</code></li>
+<li><span class='math'>$$\kappa $$</span>   <code>\kappa</code></li>
+<li><span class='math'>$$\varkappa $$</span>   <code>\varkappa</code></li>
+<li><span class='math'>$$\lambda $$</span>   <code>\lambda</code></li>
+<li><span class='math'>$$\mu $$</span>   <code>\mu</code></li>
+<li><span class='math'>$$\nu $$</span>   <code>\nu</code></li>
+<li><span class='math'>$$\xi $$</span>   <code>\xi</code></li>
+<li><span class='math'>$$\omicron $$</span>   <code>\omicron</code></li>
+<li><span class='math'>$$\pi $$</span>   <code>\pi</code></li>
+<li><span class='math'>$$\varpi $$</span>   <code>\varpi</code></li>
+<li><span class='math'>$$\rho $$</span>   <code>\rho</code></li>
+<li><span class='math'>$$\varrho $$</span>   <code>\varrho</code></li>
+<li><span class='math'>$$\sigma $$</span>   <code>\sigma</code></li>
+<li><span class='math'>$$\varsigma $$</span>   <code>\varsigma</code></li>
+<li><span class='math'>$$\tau $$</span>   <code>\tau</code></li>
+<li><span class='math'>$$\phi $$</span>   <code>\phi</code></li>
+<li><span class='math'>$$\varphi $$</span>   <code>\varphi</code></li>
+<li><span class='math'>$$\upsilon $$</span>   <code>\upsilon</code></li>
+<li><span class='math'>$$\chi $$</span>   <code>\chi</code></li>
+<li><span class='math'>$$\psi $$</span>   <code>\psi</code></li>
+<li><span class='math'>$$\omega $$</span>   <code>\omega</code></li>
+<li><span class='math'>$$\Gamma $$</span>   <code>\Gamma</code></li>
+<li><span class='math'>$$\Delta $$</span>   <code>\Delta</code></li>
+<li><span class='math'>$$\Theta $$</span>   <code>\Theta</code></li>
+<li><span class='math'>$$\Lambda $$</span>   <code>\Lambda</code></li>
+<li><span class='math'>$$\Xi $$</span>   <code>\Xi</code></li>
+<li><span class='math'>$$\Pi $$</span>   <code>\Pi</code></li>
+<li><span class='math'>$$\Sigma $$</span>   <code>\Sigma</code></li>
+<li><span class='math'>$$\Upsilon $$</span>   <code>\Upsilon</code></li>
+<li><span class='math'>$$\Phi $$</span>   <code>\Phi</code></li>
+<li><span class='math'>$$\Psi $$</span>   <code>\Psi</code></li>
+<li><span class='math'>$$\Omega $$</span>   <code>\Omega</code></li>
+<li><span class='math'>$$\digamma $$</span>   <code>\digamma</code></li>
+</ul>
+<h2>Hebrew</h2>
+<ul class="command-list">
+<li><span class='math'>$$\aleph $$</span>   <code>\aleph</code></li>
+<li><span class='math'>$$\beth $$</span>   <code>\beth</code></li>
+<li><span class='math'>$$\gimel $$</span>   <code>\gimel</code></li>
+<li><span class='math'>$$\daleth $$</span>   <code>\daleth</code></li>
+</ul>
+<h2>Letterlike Symbols</h2>
+<ul class="command-list">
+<li><span class='math'>$$@ $$</span>   <code>@</code></li>
+<li><span class='math'>$$\mid $$</span>   <code>\mid</code></li>
+<li><span class='math'>$$\top $$</span>   <code>\top</code></li>
+<li><span class='math'>$$\bot $$</span>   <code>\bot</code></li>
+<li><span class='math'>$$\nabla $$</span>   <code>\nabla</code></li>
+<li><span class='math'>$$\partial $$</span>   <code>\partial</code></li>
+<li><span class='math'>$$\ell $$</span>   <code>\ell</code></li>
+<li><span class='math'>$$\hbar $$</span>   <code>\hbar</code></li>
+<li><span class='math'>$$\N $$</span>   <code>\N</code></li>
+<li><span class='math'>$$\R $$</span>   <code>\R</code></li>
+<li><span class='math'>$$\Q $$</span>   <code>\Q</code></li>
+<li><span class='math'>$$\C $$</span>   <code>\C</code></li>
+<li><span class='math'>$$\Z $$</span>   <code>\Z</code></li>
+<li><span class='math'>$$\P $$</span>   <code>\P</code></li>
+<li><span class='math'>$$\pounds $$</span>   <code>\pounds</code></li>
+<li><span class='math'>$$\euro $$</span>   <code>\euro</code></li>
+<li><span class='math'>$$\And $$</span>   <code>\And</code></li>
+<li><span class='math'>$$$ $$</span>   <code>\$</code></li>
+<li><span class='math'>$$% $$</span>   <code>\%</code></li>
+<li><span class='math'>$$\differencedelta $$</span>   <code>\differencedelta</code></li>
+<li><span class='math'>$$\wp $$</span>   <code>\wp</code></li>
+<li><span class='math'>$$\hslash $$</span>   <code>\hslash</code></li>
+<li><span class='math'>$$\Finv $$</span>   <code>\Finv</code></li>
+<li><span class='math'>$$\Game $$</span>   <code>\Game</code></li>
+<li><span class='math'>$$\eth $$</span>   <code>\eth</code></li>
+<li><span class='math'>$$\mho $$</span>   <code>\mho</code></li>
+<li><span class='math'>$$\Bbbk $$</span>   <code>\Bbbk</code></li>
+<li><span class='math'>$$\yen $$</span>   <code>\yen</code></li>
+<li><span class='math'>$$\imath $$</span>   <code>\imath</code></li>
+<li><span class='math'>$$\jmath $$</span>   <code>\jmath</code></li>
+<li><span class='math'>$$\degree $$</span>   <code>\degree</code></li>
+<li><span class='math'>$$\Re $$</span> <code>\Re</code></li>
+<li><span class='math'>$$\Im $$</span> <code>\Im</code></li>
+</ul>
+<h2>Delimiters</h2>
+<ul class="command-list">
+<li><span class='math'>$$\lparen $$</span>   <code>\lparen</code></li>
+<li><span class='math'>$$\rparen $$</span>   <code>\rparen</code></li>
+<li><span class='math'>$$\lbrace $$</span>   <code>\lbrace</code></li>
+<li><span class='math'>$$\rbrace $$</span>   <code>\rbrace</code></li>
+<li><span class='math'>$$\langle $$</span>   <code>\langle</code></li>
+<li><span class='math'>$$\rangle $$</span>   <code>\rangle</code></li>
+<li><span class='math'>$$\lfloor $$</span>   <code>\lfloor</code></li>
+<li><span class='math'>$$\rfloor $$</span>   <code>\rfloor</code></li>
+<li><span class='math'>$$\lceil $$</span>   <code>\lceil</code></li>
+<li><span class='math'>$$\rceil $$</span>   <code>\rceil</code></li>
+<li><span class='math'>$$\vert $$</span>   <code>\vert</code></li>
+<li><span class='math'>$$\lvert $$</span>   <code>\lvert</code></li>
+<li><span class='math'>$$\rvert $$</span>   <code>\rvert</code></li>
+<li><span class='math'>$$| $$</span>   <code>\|</code></li>
+<li><span class='math'>$$\Vert $$</span>   <code>\Vert</code></li>
+<li><span class='math'>$$\mVert $$</span>   <code>\mVert</code></li>
+<li><span class='math'>$$\lVert $$</span>   <code>\lVert</code></li>
+<li><span class='math'>$$\rVert $$</span>   <code>\rVert</code></li>
+<li><span class='math'>$$\lbrack $$</span>   <code>\lbrack</code></li>
+<li><span class='math'>$$\rbrack $$</span>   <code>\rbrack</code></li>
+<li><span class='math'> $$</span> { <span class='math'> $$</span>   <code>\{</code></li>
+<li><span class='math'>$$} $$</span>   <code>\}</code></li>
+<li><span class='math'>$$( $$</span>   <code>(</code></li>
+<li><span class='math'>$$) $$</span>   <code>)</code></li>
+<li><span class='math'>$$[ $$</span>   <code>[</code></li>
+<li><span class='math'>$$] $$</span>   <code>]</code></li>
+<li><span class='math'>$$\ulcorner $$</span>   <code>\ulcorner</code></li>
+<li><span class='math'>$$\urcorner $$</span>   <code>\urcorner</code></li>
+<li><span class='math'>$$\llcorner $$</span>   <code>\llcorner</code></li>
+<li><span class='math'>$$\lrcorner $$</span>   <code>\lrcorner</code></li>
+<li><span class='math'>$$\lgroup $$</span>   <code>\lgroup</code></li>
+<li><span class='math'>$$\rgroup $$</span>   <code>\rgroup</code></li>
+<li><span class='math'>$$\lmoustache $$</span>   <code>\lmoustache</code></li>
+<li><span class='math'>$$\rmoustache $$</span>   <code>\rmoustache</code></li>
+<li><span class='math'>$$\mvert $$</span>   <code>\mvert</code></li>
+</ul>
+<h2>Punctuation</h2>
+<ul class="command-list">
+<li><span class='math'>$$. $$</span>   <code>.</code></li>
+<li><span class='math'>$$? $$</span>   <code>?</code></li>
+<li><span class='math'>$$! $$</span>   <code>!</code></li>
+<li><span class='math'>$$: $$</span>   <code>:</code></li>
+<li><span class='math'>$$\Colon $$</span>   <code>\Colon</code></li>
+<li><span class='math'>$$\colon $$</span>   <code>\colon</code></li>
+<li><span class='math'>$$\cdotp $$</span>   <code>\cdotp</code></li>
+<li><span class='math'>$$\vdots $$</span>   <code>\vdots</code></li>
+<li><span class='math'>$$\ldotp $$</span>   <code>\ldotp</code></li>
+<li><span class='math'>$$, $$</span>   <code>,</code></li>
+<li><span class='math'>$$; $$</span>   <code>;</code></li>
+<li><span class='math'>$$\cdots $$</span>   <code>\cdots</code></li>
+<li><span class='math'>$$\ddots $$</span>   <code>\ddots</code></li>
+<li><span class='math'>$$\ldots $$</span>   <code>\ldots</code></li>
+<li><span class='math'>$$\mathellipsis $$</span>   <code>\mathellipsis</code></li>
+<li><span class='math'>$$&quot; $$</span>   <code>&quot;</code></li>
+</ul>
+<h2>Boxes</h2>
+<ul class="command-list">
+<li><span class='math'>$$\boxminus $$</span>   <code>\boxminus</code></li>
+<li><span class='math'>$$\boxplus $$</span>   <code>\boxplus</code></li>
+<li><span class='math'>$$\boxtimes $$</span>   <code>\boxtimes</code></li>
+<li><span class='math'>$$\boxdot $$</span>   <code>\boxdot</code></li>
+<li><span class='math'>$$\square $$</span>   <code>\square</code></li>
+<li><span class='math'>$$\Box $$</span>   <code>\Box</code></li>
+<li><span class='math'>$$\blacksquare $$</span>   <code>\blacksquare</code></li>
+</ul>
+<h2>Circles</h2>
+<ul class="command-list">
+<li><span class='math'>$$\circ $$</span>   <code>\circ</code></li>
+<li><span class='math'>$$\bigcirc $$</span>   <code>\bigcirc</code></li>
+<li><span class='math'>$$\bullet $$</span>   <code>\bullet</code></li>
+<li><span class='math'>$$\oplus $$</span>   <code>\oplus</code></li>
+<li><span class='math'>$$\ominus $$</span>   <code>\ominus</code></li>
+<li><span class='math'>$$\otimes $$</span>   <code>\otimes</code></li>
+<li><span class='math'>$$\odot $$</span>   <code>\odot</code></li>
+<li><span class='math'>$$\oslash $$</span>   <code>\oslash</code></li>
+<li><span class='math'>$$\circleddash $$</span>   <code>\circleddash</code></li>
+<li><span class='math'>$$\circledast $$</span>   <code>\circledast</code></li>
+<li><span class='math'>$$\circledcirc $$</span>   <code>\circledcirc</code></li>
+<li><span class='math'>$$\circledS $$</span>   <code>\circledS</code></li>
+<li><span class='math'>$$\circledR $$</span>   <code>\circledR</code></li>
+</ul>
+<h2>Triangles</h2>
+<ul class="command-list">
+<li><span class='math'>$$\vartriangle $$</span>   <code>\vartriangle</code></li>
+<li><span class='math'>$$\triangleq $$</span>   <code>\triangleq</code></li>
+<li><span class='math'>$$\vartriangleleft $$</span>   <code>\vartriangleleft</code></li>
+<li><span class='math'>$$\trianglelefteq $$</span>   <code>\trianglelefteq</code></li>
+<li><span class='math'>$$\ntriangleleft $$</span>   <code>\ntriangleleft</code></li>
+<li><span class='math'>$$\ntrianglelefteq $$</span>   <code>\ntrianglelefteq</code></li>
+<li><span class='math'>$$\vartriangleright $$</span>   <code>\vartriangleright</code></li>
+<li><span class='math'>$$\trianglerighteq $$</span>   <code>\trianglerighteq</code></li>
+<li><span class='math'>$$\ntriangleright $$</span>   <code>\ntriangleright</code></li>
+<li><span class='math'>$$\ntrianglerighteq $$</span>   <code>\ntrianglerighteq</code></li>
+<li><span class='math'>$$\blacktriangleleft $$</span>   <code>\blacktriangleleft</code></li>
+<li><span class='math'>$$\blacktriangleright $$</span>   <code>\blacktriangleright</code></li>
+<li><span class='math'>$$\bigtriangleup $$</span>   <code>\bigtriangleup</code></li>
+<li><span class='math'>$$\bigtriangledown $$</span>   <code>\bigtriangledown</code></li>
+<li><span class='math'>$$\triangleleft $$</span>   <code>\triangleleft</code></li>
+<li><span class='math'>$$\triangleright $$</span>   <code>\triangleright</code></li>
+<li><span class='math'>$$\triangle $$</span>   <code>\triangle</code></li>
+<li><span class='math'>$$\blacktriangle $$</span>   <code>\blacktriangle</code></li>
+<li><span class='math'>$$\triangledown $$</span>   <code>\triangledown</code></li>
+<li><span class='math'>$$\blacktriangledown $$</span>   <code>\blacktriangledown</code></li>
+</ul>
+<h2>Shapes</h2>
+<ul class="command-list">
+<li><span class='math'>$$\ast $$</span>   <code>\ast</code></li>
+<li><span class='math'>$$\star $$</span>   <code>\star</code></li>
+<li><span class='math'>$$\diamond $$</span>   <code>\diamond</code></li>
+<li><span class='math'>$$\Diamond $$</span>   <code>\Diamond</code></li>
+<li><span class='math'>$$\lozenge $$</span>   <code>\lozenge</code></li>
+<li><span class='math'>$$\blacklozenge $$</span>   <code>\blacklozenge</code></li>
+</ul>
+<h2>Crosses</h2>
+<ul class="command-list">
+<li><span class='math'>$$\dagger $$</span>   <code>\dagger</code></li>
+<li><span class='math'>$$\dag $$</span>   <code>\dag</code></li>
+<li><span class='math'>$$\ddag $$</span>   <code>\ddag</code></li>
+<li><span class='math'>$$\ddagger $$</span>   <code>\ddagger</code></li>
+<li><span class='math'>$$\maltese $$</span>   <code>\maltese</code></li>
 </ul>
 <h2>Layout</h2>
 <ul class="command-list">
-<li>$$x=\mathop{arg}=0$$ <code>\mathop{}</code></li>
-<li>$$x=\mathbin{arg}=0$$ <code>\mathbin{}</code></li>
-<li>$$x=\mathrel{arg}=0$$ <code>\mathrel{}</code></li>
-<li>$$x=\mathopen{arg}=0$$ <code>\mathopen{}</code></li>
-<li>$$x=\mathclose{arg}=0$$ <code>\mathclose{}</code></li>
-<li>$$x=\mathpunct{arg}=0$$ <code>\mathpunct{}</code></li>
-<li>$$x=\mathord{arg}=0$$ <code>\mathord{}</code></li>
-<li>$$x=\mathinner{arg}=0$$ <code>\mathinner{}</code></li>
-<li>$$x=\operatorname{arg}=0$$ <code>\operatorname{}</code></li>
-<li>$$x=\operatorname*{arg}=0$$ <code>\operatorname*{}</code></li>
-<li>$$\overset{arg}{x=0}$$ <code>\overset{}{}</code></li>
-<li>$$\underset{arg}{x=0}$$ <code>\underset{}{}</code></li>
-<li>$$\stackrel{arg}{x=0}$$ <code>\stackrel[]{}{}</code></li>
-<li>$$\stackbin{arg}{x=0}$$ <code>\stackbin[]{}{}</code></li>
-<li>$$\rlap{/}0$$ <code>\rlap{}</code></li>
-<li>$$o\llap{/}$$ <code>\llap{}</code></li>
-<li>$$o\mathllap{/}$$ <code>\mathllap{}</code></li>
-<li>$$\mathrlap{/}0$$ <code>\mathrlap{}</code></li>
-<li>$$\left{x\middle|x&gt;0\right}$$ <code>\middle{}</code></li>
+<li><span class='math'>$$x=\mathop{arg}=0 $$</span> <code>\mathop{}</code></li>
+<li><span class='math'>$$x=\mathbin{arg}=0 $$</span> <code>\mathbin{}</code></li>
+<li><span class='math'>$$x=\mathrel{arg}=0 $$</span> <code>\mathrel{}</code></li>
+<li><span class='math'>$$x=\mathopen{arg}=0 $$</span> <code>\mathopen{}</code></li>
+<li><span class='math'>$$x=\mathclose{arg}=0 $$</span> <code>\mathclose{}</code></li>
+<li><span class='math'>$$x=\mathpunct{arg}=0 $$</span> <code>\mathpunct{}</code></li>
+<li><span class='math'>$$x=\mathord{arg}=0 $$</span> <code>\mathord{}</code></li>
+<li><span class='math'>$$x=\mathinner{arg}=0 $$</span> <code>\mathinner{}</code></li>
+<li><span class='math'>$$x=\operatorname{arg}=0 $$</span> <code>\operatorname{}</code></li>
+<li><span class='math'>$$x=\operatorname*{arg}=0 $$</span> <code>\operatorname*{}</code></li>
+<li><span class='math'>$$\overset{arg}{x=0} $$</span> <code>\overset{}{}</code></li>
+<li><span class='math'>$$\underset{arg}{x=0} $$</span> <code>\underset{}{}</code></li>
+<li><span class='math'>$$\stackrel{arg}{x=0} $$</span> <code>\stackrel[]{}{}</code></li>
+<li><span class='math'>$$\stackbin{arg}{x=0} $$</span> <code>\stackbin[]{}{}</code></li>
+<li><span class='math'>$$\rlap{/}0 $$</span> <code>\rlap{}</code></li>
+<li><span class='math'>$$o\llap{/} $$</span> <code>\llap{}</code></li>
+<li><span class='math'>$$o\mathllap{/} $$</span> <code>\mathllap{}</code></li>
+<li><span class='math'>$$\mathrlap{/}0 $$</span> <code>\mathrlap{}</code></li>
+<li><span class='math'>$$\left{x\middle|x&gt;0\right} $$</span> <code>\middle{}</code></li>
 </ul>
 <h2>Spacing</h2>
 <ul class="command-list">
-<li>$$\unicode{&quot;203A}\hspace{1em}\unicode{&quot;2039}$$ <code>\hspace{}</code></li>
-<li>$$\unicode{&quot;203A}\hspace*{1em}\unicode{&quot;2039}$$ <code>\hspace*{}</code></li>
-<li>$$\unicode{&quot;203A}!\unicode{&quot;2039}$$ <code>\!</code></li>
-<li>$$\unicode{&quot;203A},\unicode{&quot;2039}$$ <code>\,</code></li>
-<li>$$\unicode{&quot;203A}:\unicode{&quot;2039}$$ <code>\:</code></li>
-<li>$$\unicode{&quot;203A};\unicode{&quot;2039}$$ <code>\;</code></li>
-<li>$$\unicode{&quot;203A}\enskip\unicode{&quot;2039}$$ <code>\enskip</code></li>
-<li>$$\unicode{&quot;203A}\enspace\unicode{&quot;2039}$$ <code>\enspace</code></li>
-<li>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039}$$ <code>\qquad</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}\hspace{1em}\unicode{&quot;2039} $$</span> <code>\hspace{}</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}\hspace*{1em}\unicode{&quot;2039} $$</span> <code>\hspace*{}</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}!\unicode{&quot;2039} $$</span> <code>\!</code></li>
+<li><span class='math'>$$\unicode{&quot;203A},\unicode{&quot;2039} $$</span> <code>\,</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}:\unicode{&quot;2039} $$</span> <code>\:</code></li>
+<li><span class='math'>$$\unicode{&quot;203A};\unicode{&quot;2039} $$</span> <code>\;</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}\enskip\unicode{&quot;2039} $$</span> <code>\enskip</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}\enspace\unicode{&quot;2039} $$</span> <code>\enspace</code></li>
+<li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
 <h2>Decoration</h2>
 <ul class="command-list">
-<li>$${\color{m0}A}{\color{m1}B}{\color{m2}C }{\color{m3}a}{\color{m4}b}{\color{m5}c}{\color{m6}8}$$ <code>\color{}</code></li>
-<li>$${\textcolor{m0}A}{\textcolor{m1}B}{\textcolor{m2}C }{\textcolor{m3}a}{\textcolor{m4}b}{\textcolor{m5}c}{\textcolor{m6}8}$$ <code>\textcolor{}{}</code></li>
-<li>$$\boxed{\unicode{&quot;2B1A}}$$ <code>\boxed{}</code></li>
-<li>$$\colorbox{#fbc0bd}{\unicode{&quot;2B1A}}$$ <code>\colorbox{}{}</code></li>
-<li>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}}$$ <code>\fcolorbox{}{}{}</code></li>
-<li>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}}$$ <code>\bbox[]{}</code></li>
-<li>$$\rule{2em}{1em}$$ <code>\rule[]{}{}</code></li>
-<li>$$\overline{\unicode{&quot;2B1A}}$$ <code>\overline{}</code></li>
-<li>$$\underline{\unicode{&quot;2B1A}}$$ <code>\underline{}</code></li>
-<li>$$\enclose{updiagonalstrike,roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0}$$ <code>\enclose{}[]{}</code></li>
-<li>$$\cancel{\unicode{&quot;2B1A}}$$ <code>\cancel{}</code></li>
-<li>$$\bcancel{\unicode{&quot;2B1A}}$$ <code>\bcancel{}</code></li>
-<li>$$\xcancel{\unicode{&quot;2B1A}}$$ <code>\xcancel{}</code></li>
+<li><span class='math'>$${\color{m0}A}{\color{m1}B}{\color{m2}C }{\color{m3}a}{\color{m4}b}{\color{m5}c}{\color{m6}8} $$</span> <code>\color{}</code></li>
+<li><span class='math'>$${\textcolor{m0}A}{\textcolor{m1}B}{\textcolor{m2}C }{\textcolor{m3}a}{\textcolor{m4}b}{\textcolor{m5}c}{\textcolor{m6}8} $$</span> <code>\textcolor{}{}</code></li>
+<li><span class='math'>$$\boxed{\unicode{&quot;2B1A}} $$</span> <code>\boxed{}</code></li>
+<li><span class='math'>$$\colorbox{#fbc0bd}{\unicode{&quot;2B1A}} $$</span> <code>\colorbox{}{}</code></li>
+<li><span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}} $$</span> <code>\fcolorbox{}{}{}</code></li>
+<li><span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}} $$</span> <code>\bbox[]{}</code></li>
+<li><span class='math'>$$\rule{2em}{1em} $$</span> <code>\rule[]{}{}</code></li>
+<li><span class='math'>$$\enclose{updiagonalstrike,roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0} $$</span> <code>\enclose{}[]{}</code></li>
+<li><span class='math'>$$\cancel{\unicode{&quot;2B1A}} $$</span> <code>\cancel{}</code></li>
+<li><span class='math'>$$\bcancel{\unicode{&quot;2B1A}} $$</span> <code>\bcancel{}</code></li>
+<li><span class='math'>$$\xcancel{\unicode{&quot;2B1A}} $$</span> <code>\xcancel{}</code></li>
 </ul>
 <h2>Styling</h2>
 <ul class="command-list">
-<li>$$\text{\fontseries{b}Don Knuth}$$ <code>\fontseries{}</code></li>
-<li>$$\text{\fontshape{sc}Don Knuth}$$ <code>\fontshape{}</code></li>
-<li>$$\text{\fontfamily{cmtt}Don Knuth}$$ <code>\fontfamily{}</code></li>
-<li>$$\text{\selectfont}$$ <code>\selectfont</code></li>
-<li>$${\bf Don Knuth}$$ <code>\bf</code></li>
-<li>$$\boldsymbol{Don Knuth}$$ <code>\boldsymbol{}</code></li>
-<li>$$\bm{Don Knuth}$$ <code>\bm{}</code></li>
-<li>$$\bold{Don Knuth}$$ <code>\bold{}</code></li>
-<li>$$\text{\bfseries Don Knuth}$$ <code>\bfseries</code></li>
-<li>$$\text{\mdseries Don Knuth}$$ <code>\mdseries</code></li>
-<li>$$\text{\upshape Don Knuth}$$ <code>\upshape</code></li>
-<li>$$\text{\slshape Don Knuth}$$ <code>\slshape</code></li>
-<li>$$\text{\scshape Don Knuth}$$ <code>\scshape</code></li>
-<li>$$\textbf{Don Knuth}$$ <code>\textbf{}</code></li>
-<li>$$\textmd{Don Knuth}$$ <code>\textmd{}</code></li>
-<li>$$\textup{Don Knuth}$$ <code>\textup{}</code></li>
-<li>$$\textnormal{Don Knuth}$$ <code>\textnormal{}</code></li>
-<li>$$\textsl{Don Knuth}$$ <code>\textsl{}</code></li>
-<li>$$\textit{Don Knuth}$$ <code>\textit{}</code></li>
-<li>$$\textsc{Don Knuth}$$ <code>\textsc{}</code></li>
-<li>$$\textrm{Don Knuth}$$ <code>\textrm{}</code></li>
-<li>$$\textsf{Don Knuth}$$ <code>\textsf{}</code></li>
-<li>$$\texttt{Don Knuth}$$ <code>\texttt{}</code></li>
-<li>$$\mathbf{Don Knuth}$$ <code>\mathbf{}</code></li>
-<li>$$\mathit{Don Knuth}$$ <code>\mathit{}</code></li>
-<li>$$\mathrm{Don Knuth}$$ <code>\mathrm{}</code></li>
-<li>$$\mathsf{Don Knuth}$$ <code>\mathsf{}</code></li>
-<li>$$\mathtt{Don Knuth}$$ <code>\mathtt{}</code></li>
-<li>$${\it Don Knuth}$$ <code>\it</code></li>
-<li>$${\rmfamily Don Knuth}$$ <code>\rmfamily</code></li>
-<li>$${\sffamily Don Knuth}$$ <code>\sffamily</code></li>
-<li>$${\ttfamily Don Knuth}$$ <code>\ttfamily</code></li>
-<li>$$\Bbb{Don Knuth}$$ <code>\Bbb{}</code></li>
-<li>$$\mathbb{Don Knuth}$$ <code>\mathbb{}</code></li>
-<li>$${\frak Don Knuth}$$ <code>\frak{}</code></li>
-<li>$$\mathfrak{Don Knuth}$$ <code>\mathfrak{}</code></li>
-<li>$$\mathcal{Don Knuth}$$ <code>\mathcal{}</code></li>
-<li>$$\mathscr{Don Knuth}$$ <code>\mathscr{}</code></li>
-<li>$$\mbox{Don Knuth}$$ <code>\mbox{}</code></li>
-<li>$$\text{Don Knuth}$$ <code>\text{}</code></li>
-<li>$$\class{testIdentifier}{Don Knuth}$$ <code>\class{}{}</code></li>
-<li>$$\cssId{testIdentifier}{Don Knuth}$$ <code>\cssId{}{}</code></li>
-<li>$${\htmlData Don Knuth}$$ <code>\htmlData{}{}</code></li>
-<li>$$Don{\em Knuth}$$ <code>\em{}</code></li>
-<li>$$Don\emph{Knuth}$$ <code>\emph{}</code></li>
+<li><span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> <code>\fontseries{}</code></li>
+<li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code></li>
+<li><span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> <code>\fontfamily{}</code></li>
+<li><span class='math'>$$\text{\selectfont} $$</span> <code>\selectfont</code></li>
+<li><span class='math'>$${\bf Don Knuth} $$</span> <code>\bf</code></li>
+<li><span class='math'>$$\boldsymbol{Don Knuth} $$</span> <code>\boldsymbol{}</code></li>
+<li><span class='math'>$$\bm{Don Knuth} $$</span> <code>\bm{}</code></li>
+<li><span class='math'>$$\bold{Don Knuth} $$</span> <code>\bold{}</code></li>
+<li><span class='math'>$$\text{\bfseries Don Knuth} $$</span> <code>\bfseries</code></li>
+<li><span class='math'>$$\text{\mdseries Don Knuth} $$</span> <code>\mdseries</code></li>
+<li><span class='math'>$$\text{\upshape Don Knuth} $$</span> <code>\upshape</code></li>
+<li><span class='math'>$$\text{\slshape Don Knuth} $$</span> <code>\slshape</code></li>
+<li><span class='math'>$$\text{\scshape Don Knuth} $$</span> <code>\scshape</code></li>
+<li><span class='math'>$$\textbf{Don Knuth} $$</span> <code>\textbf{}</code></li>
+<li><span class='math'>$$\textmd{Don Knuth} $$</span> <code>\textmd{}</code></li>
+<li><span class='math'>$$\textup{Don Knuth} $$</span> <code>\textup{}</code></li>
+<li><span class='math'>$$\textnormal{Don Knuth} $$</span> <code>\textnormal{}</code></li>
+<li><span class='math'>$$\textsl{Don Knuth} $$</span> <code>\textsl{}</code></li>
+<li><span class='math'>$$\textit{Don Knuth} $$</span> <code>\textit{}</code></li>
+<li><span class='math'>$$\textsc{Don Knuth} $$</span> <code>\textsc{}</code></li>
+<li><span class='math'>$$\textrm{Don Knuth} $$</span> <code>\textrm{}</code></li>
+<li><span class='math'>$$\textsf{Don Knuth} $$</span> <code>\textsf{}</code></li>
+<li><span class='math'>$$\texttt{Don Knuth} $$</span> <code>\texttt{}</code></li>
+<li><span class='math'>$$\mathbf{Don Knuth} $$</span> <code>\mathbf{}</code></li>
+<li><span class='math'>$$\mathit{Don Knuth} $$</span> <code>\mathit{}</code></li>
+<li><span class='math'>$$\mathrm{Don Knuth} $$</span> <code>\mathrm{}</code></li>
+<li><span class='math'>$$\mathsf{Don Knuth} $$</span> <code>\mathsf{}</code></li>
+<li><span class='math'>$$\mathtt{Don Knuth} $$</span> <code>\mathtt{}</code></li>
+<li><span class='math'>$${\it Don Knuth} $$</span> <code>\it</code></li>
+<li><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></li>
+<li><span class='math'>$${\sffamily Don Knuth} $$</span> <code>\sffamily</code></li>
+<li><span class='math'>$${\ttfamily Don Knuth} $$</span> <code>\ttfamily</code></li>
+<li><span class='math'>$$\Bbb{Don Knuth} $$</span> <code>\Bbb{}</code></li>
+<li><span class='math'>$$\mathbb{Don Knuth} $$</span> <code>\mathbb{}</code></li>
+<li><span class='math'>$${\frak Don Knuth} $$</span> <code>\frak{}</code></li>
+<li><span class='math'>$$\mathfrak{Don Knuth} $$</span> <code>\mathfrak{}</code></li>
+<li><span class='math'>$$\mathcal{Don Knuth} $$</span> <code>\mathcal{}</code></li>
+<li><span class='math'>$$\mathscr{Don Knuth} $$</span> <code>\mathscr{}</code></li>
+<li><span class='math'>$$\mbox{Don Knuth} $$</span> <code>\mbox{}</code></li>
+<li><span class='math'>$$\text{Don Knuth} $$</span> <code>\text{}</code></li>
+<li><span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> <code>\class{}{}</code></li>
+<li><span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> <code>\cssId{}{}</code></li>
+<li><span class='math'>$${\htmlData Don Knuth} $$</span> <code>\htmlData{}{}</code></li>
+<li><span class='math'>$$Don{\em Knuth} $$</span> <code>\em{}</code></li>
+<li><span class='math'>$$Don\emph{Knuth} $$</span> <code>\emph{}</code></li>
 </ul>
 <h2>Sizing</h2>
 <ul class="command-list">
-<li>$$\tiny{x=0}$$ <code>\tiny</code></li>
-<li>$$\scriptsize{x=0}$$ <code>\scriptsize</code></li>
-<li>$$\footnotesize{x=0}$$ <code>\footnotesize</code></li>
-<li>$$\small{x=0}$$ <code>\small</code></li>
-<li>$$\normalsize{x=0}$$ <code>\normalsize</code></li>
-<li>$$\large{x=0}$$ <code>\large</code></li>
-<li>$$\Large{x=0}$$ <code>\Large</code></li>
-<li>$$\LARGE{x=0}$$ <code>\LARGE</code></li>
-<li>$$\huge{x=0}$$ <code>\huge</code></li>
-<li>$$\Huge{x=0}$$ <code>\Huge</code></li>
+<li><span class='math'>$$\tiny{x=0} $$</span> <code>\tiny</code></li>
+<li><span class='math'>$$\scriptsize{x=0} $$</span> <code>\scriptsize</code></li>
+<li><span class='math'>$$\footnotesize{x=0} $$</span> <code>\footnotesize</code></li>
+<li><span class='math'>$$\small{x=0} $$</span> <code>\small</code></li>
+<li><span class='math'>$$\normalsize{x=0} $$</span> <code>\normalsize</code></li>
+<li><span class='math'>$$\large{x=0} $$</span> <code>\large</code></li>
+<li><span class='math'>$$\Large{x=0} $$</span> <code>\Large</code></li>
+<li><span class='math'>$$\LARGE{x=0} $$</span> <code>\LARGE</code></li>
+<li><span class='math'>$$\huge{x=0} $$</span> <code>\huge</code></li>
+<li><span class='math'>$$\Huge{x=0} $$</span> <code>\Huge</code></li>
 </ul>
 <hr>
 <ul class="command-list command-list command-list command-list command-list">
 <li>
-<p>$$\bigl($$ <code>\bigl{}</code></p>
+<p><span class='math'>$$\bigl( $$</span> <code>\bigl{}</code></p>
 </li>
 <li>
-<p>$$\bigr)$$ <code>\bigr{}</code></p>
+<p><span class='math'>$$\bigr) $$</span> <code>\bigr{}</code></p>
 </li>
 <li>
-<p>$$\bigm|$$ <code>\bigm{}</code></p>
+<p><span class='math'>$$\bigm| $$</span> <code>\bigm{}</code></p>
 </li>
 <li>
-<p>$$\Bigl($$ <code>\Bigl{}</code></p>
+<p><span class='math'>$$\Bigl( $$</span> <code>\Bigl{}</code></p>
 </li>
 <li>
-<p>$$\Bigr)$$ <code>\Bigr{}</code></p>
+<p><span class='math'>$$\Bigr) $$</span> <code>\Bigr{}</code></p>
 </li>
 <li>
-<p>$$\Bigm|$$ <code>\Bigm{}</code></p>
+<p><span class='math'>$$\Bigm| $$</span> <code>\Bigm{}</code></p>
 </li>
 <li>
-<p>$$\biggl($$ <code>\biggl{}</code></p>
+<p><span class='math'>$$\biggl( $$</span> <code>\biggl{}</code></p>
 </li>
 <li>
-<p>$$\biggr)$$ <code>\biggr{}</code></p>
+<p><span class='math'>$$\biggr) $$</span> <code>\biggr{}</code></p>
 </li>
 <li>
-<p>$$\biggm|$$ <code>\biggm{}</code></p>
+<p><span class='math'>$$\biggm| $$</span> <code>\biggm{}</code></p>
 </li>
 <li>
-<p>$$\Biggl($$ <code>\Biggl{}</code></p>
+<p><span class='math'>$$\Biggl( $$</span> <code>\Biggl{}</code></p>
 </li>
 <li>
-<p>$$\Biggr)$$ <code>\Biggr{}</code></p>
+<p><span class='math'>$$\Biggr) $$</span> <code>\Biggr{}</code></p>
 </li>
 <li>
-<p>$$\Biggm|$$ <code>\Biggm{}</code></p>
+<p><span class='math'>$$\Biggm| $$</span> <code>\Biggm{}</code></p>
 </li>
 <li>
-<p>$$\big(\big)$$ <code>\big{}</code></p>
+<p><span class='math'>$$\big(\big) $$</span> <code>\big{}</code></p>
 </li>
 <li>
-<p>$$\Big(\Big)$$ <code>\Big{}</code></p>
+<p><span class='math'>$$\Big(\Big) $$</span> <code>\Big{}</code></p>
 </li>
 <li>
-<p>$$\bigg(\bigg)$$ <code>\bigg{}</code></p>
+<p><span class='math'>$$\bigg(\bigg) $$</span> <code>\bigg{}</code></p>
 </li>
 <li>
-<p>$$\Bigg(\Bigg)$$ <code>\Bigg{}</code></p>
+<p><span class='math'>$$\Bigg(\Bigg) $$</span> <code>\Bigg{}</code></p>
 </li>
 </ul>
 <h2>Various</h2>
 <ul class="command-list command-list">
 <li>
-<p>$$/$$   <code>/</code></p>
+<p><span class='math'>$$/ $$</span>   <code>/</code></p>
 </li>
 <li>
-<p>$$\sharp$$   <code>\sharp</code></p>
+<p><span class='math'>$$\sharp $$</span>   <code>\sharp</code></p>
 </li>
 <li>
-<p>$$\flat$$   <code>\flat</code></p>
+<p><span class='math'>$$\flat $$</span>   <code>\flat</code></p>
 </li>
 <li>
-<p>$$\natural$$   <code>\natural</code></p>
+<p><span class='math'>$$\natural $$</span>   <code>\natural</code></p>
 </li>
 <li>
-<p>$$#$$   <code>\#</code></p>
+<p><span class='math'>$$# $$</span>   <code>\#</code></p>
 </li>
 <li>
-<p>$$&amp;$$   <code>\&amp;</code></p>
+<p><span class='math'>$$&amp; $$</span>   <code>\&amp;</code></p>
 </li>
 <li>
-<p>$$\clubsuit$$   <code>\clubsuit</code></p>
+<p><span class='math'>$$\clubsuit $$</span>   <code>\clubsuit</code></p>
 </li>
 <li>
-<p>$$\heartsuit$$   <code>\heartsuit</code></p>
+<p><span class='math'>$$\heartsuit $$</span>   <code>\heartsuit</code></p>
 </li>
 <li>
-<p>$$\spadesuit$$   <code>\spadesuit</code></p>
+<p><span class='math'>$$\spadesuit $$</span>   <code>\spadesuit</code></p>
 </li>
 <li>
-<p>$$\diamondsuit$$   <code>\diamondsuit</code></p>
+<p><span class='math'>$$\diamondsuit $$</span>   <code>\diamondsuit</code></p>
 </li>
 <li>
-<p>$$\backslash$$   <code>\backslash</code></p>
+<p><span class='math'>$$\backslash $$</span>   <code>\backslash</code></p>
 </li>
 <li>
-<p>$$\infty$$   <code>\infty</code></p>
+<p><span class='math'>$$\infty $$</span>   <code>\infty</code></p>
 </li>
 <li>
-<p>$$\prime$$   <code>\prime</code></p>
+<p><span class='math'>$$\prime $$</span>   <code>\prime</code></p>
 </li>
 <li>
-<p>$$\doubleprime$$   <code>\doubleprime</code></p>
+<p><span class='math'>$$\doubleprime $$</span>   <code>\doubleprime</code></p>
 </li>
 <li>
-<p>$$\angle$$   <code>\angle</code></p>
+<p><span class='math'>$$\angle $$</span>   <code>\angle</code></p>
 </li>
 <li>
-<p>$$_$$   <code>\_</code></p>
+<p><span class='math'>$$_ $$</span>   <code>\_</code></p>
 </li>
 <li>
-<p>$$\checkmark$$   <code>\checkmark</code></p>
+<p><span class='math'>$$\checkmark $$</span>   <code>\checkmark</code></p>
 </li>
 <li>
-<p>$$\diagup$$   <code>\diagup</code></p>
+<p><span class='math'>$$\diagup $$</span>   <code>\diagup</code></p>
 </li>
 <li>
-<p>$$\measuredangle$$   <code>\measuredangle</code></p>
+<p><span class='math'>$$\measuredangle $$</span>   <code>\measuredangle</code></p>
 </li>
 <li>
-<p>$$\sphericalangle$$   <code>\sphericalangle</code></p>
+<p><span class='math'>$$\sphericalangle $$</span>   <code>\sphericalangle</code></p>
 </li>
 <li>
-<p>$$\backprime$$   <code>\backprime</code></p>
+<p><span class='math'>$$\backprime $$</span>   <code>\backprime</code></p>
 </li>
 <li>
-<p>$$\backdoubleprime$$   <code>\backdoubleprime</code></p>
+<p><span class='math'>$$\backdoubleprime $$</span>   <code>\backdoubleprime</code></p>
 </li>
 <li>
-<p>$$/$$   <code>\/</code></p>
+<p><span class='math'>$$/ $$</span>   <code>\/</code></p>
 </li>
 <li>
-<p>$$|$$   <code>|</code></p>
+<p><span class='math'>$$| $$</span>   <code>|</code></p>
 </li>
 <li>
-<p>$$'$$   <code>'</code></p>
+<p><span class='math'>$$’ $$</span>   <code>'</code></p>
 </li>
 <li>
-<p>$$\originalof$$   <code>\originalof</code></p>
+<p><span class='math'>$$\originalof $$</span>   <code>\originalof</code></p>
 </li>
 <li>
-<p>$$\laplace$$   <code>\laplace</code></p>
+<p><span class='math'>$$\laplace $$</span>   <code>\laplace</code></p>
 </li>
 <li>
-<p>$$\imageof$$   <code>\imageof</code></p>
+<p><span class='math'>$$\imageof $$</span>   <code>\imageof</code></p>
 </li>
 <li>
-<p>$$\Laplace$$   <code>\Laplace</code></p>
+<p><span class='math'>$$\Laplace $$</span>   <code>\Laplace</code></p>
 </li>
 <li>
-<p>$$−$$   <code>−</code></p>
+<p><span class='math'>$$− $$</span>   <code>−</code></p>
 </li>
 <li>
-<p>$$`$$   ```</p>
+<p><span class='math'>$$` $$</span>   ```</p>
 </li>
 <li>
-<p>$$\ $$   <code>\ </code></p>
+<p><span class='math'>$$~ $$</span>   <code>~</code></p>
 </li>
 <li>
-<p>$$~$$   <code>~</code></p>
+<p><span class='math'>$$\space $$</span>   <code>\space</code></p>
 </li>
 <li>
-<p>$$\space$$   <code>\space</code></p>
+<p><span class='math'>$$\ensuremath $$</span> <code>\ensuremath{}</code></p>
 </li>
 <li>
-<p>$$\ensuremath$$ <code>\ensuremath{}</code></p>
+<p><span class='math'>$$\displaystyle $$</span> <code>\displaystyle{}</code></p>
 </li>
 <li>
-<p>$$\displaystyle$$ <code>\displaystyle{}</code></p>
+<p><span class='math'>$$\textstyle $$</span> <code>\textstyle{}</code></p>
 </li>
 <li>
-<p>$$\textstyle$$ <code>\textstyle{}</code></p>
+<p><span class='math'>$$\scriptstyle $$</span> <code>\scriptstyle{}</code></p>
 </li>
 <li>
-<p>$$\scriptstyle$$ <code>\scriptstyle{}</code></p>
+<p><span class='math'>$$\scriptscriptstyle $$</span> <code>\scriptscriptstyle{}</code></p>
 </li>
 <li>
-<p>$$\scriptscriptstyle$$ <code>\scriptscriptstyle{}</code></p>
+<p><span class='math'>$$\mathbfit $$</span> <code>\mathbfit{}</code></p>
 </li>
 <li>
-<p>$$\mathbfit$$ <code>\mathbfit{}</code></p>
+<p><span class='math'>$$\overunderset $$</span> <code>\overunderset{}{}{}</code></p>
 </li>
 <li>
-<p>$$\overunderset$$ <code>\overunderset{}{}{}</code></p>
+<p><span class='math'>$$\smash $$</span> <code>\smash[]{}</code></p>
 </li>
 <li>
-<p>$$\smash$$ <code>\smash[]{}</code></p>
+<p><span class='math'>$$\vphantom $$</span> <code>\vphantom{}</code></p>
 </li>
 <li>
-<p>$$\vphantom$$ <code>\vphantom{}</code></p>
+<p><span class='math'>$$\hphantom $$</span> <code>\hphantom{}</code></p>
 </li>
 <li>
-<p>$$\hphantom$$ <code>\hphantom{}</code></p>
+<p><span class='math'>$$\phantom $$</span> <code>\phantom{}</code></p>
 </li>
 <li>
-<p>$$\phantom$$ <code>\phantom{}</code></p>
+<p><span class='math'>$$\inf $$</span> <code>\inf</code></p>
 </li>
 <li>
-<p>$$\inf$$ <code>\inf</code></p>
+<p><span class='math'>$$\Pr $$</span> <code>\Pr</code></p>
 </li>
 <li>
-<p>$$\Pr$$ <code>\Pr</code></p>
+<p><span class='math'>$$\sup $$</span> <code>\sup</code></p>
 </li>
 <li>
-<p>$$\sup$$ <code>\sup</code></p>
+<p><span class='math'>$$\liminf $$</span> <code>\liminf</code></p>
 </li>
 <li>
-<p>$$\liminf$$ <code>\liminf</code></p>
+<p><span class='math'>$$\limsup $$</span> <code>\limsup</code></p>
 </li>
 <li>
-<p>$$\limsup$$ <code>\limsup</code></p>
+<p><span class='math'>$$\ce $$</span> <code>\ce{}</code></p>
 </li>
 <li>
-<p>$$\ce$$ <code>\ce{}</code></p>
+<p><span class='math'>$$\pu $$</span> <code>\pu{}</code></p>
 </li>
 <li>
-<p>$$\pu$$ <code>\pu{}</code></p>
-</li>
-<li>
-<p>$$\quad$$ <code>\quad</code></p>
+<p><span class='math'>$$\quad $$</span> <code>\quad</code></p>
 </li>
 </ul>
 <h2>Chemistry</h2>
 <p>MathLive  supports the <a href="https://mhchem.github.io/MathJax-mhchem/"><code>mhchem</code> package</a>.</p>
 <h3>Chemical Formulae</h3>
 <ul>
-<li>$$\ce{H2O}$$ <code>\ce{H2O}$</code></li>
-<li>$$\ce{Sb2O3}$$ <code>\ce{Sb2O3}</code></li>
+<li><span class='math'>$$\ce{H2O} $$</span> <code>\ce{H2O}$</code></li>
+<li><span class='math'>$$\ce{Sb2O3} $$</span> <code>\ce{Sb2O3}</code></li>
 </ul>
 <h3>Charges</h3>
 <ul>
-<li>$$\ce{[AgCl2]-}$$ <code>\ce{[AgCl2]-}</code></li>
-<li>$$\ce{Y^99+}$$ <code>\ce{Y^99+}</code></li>
-<li>$$\ce{Y^{99+}}$$ <code>\ce{Y^{99+}}</code></li>
-<li>$$\ce{H+}$$ <code>\ce{H+}</code></li>
-<li>$$\ce{CrO4^2-}$$ <code>\ce{CrO4^2-}</code></li>
+<li><span class='math'>$$\ce{[AgCl2]-} $$</span> <code>\ce{[AgCl2]-}</code></li>
+<li><span class='math'>$$\ce{Y^99+} $$</span> <code>\ce{Y^99+}</code></li>
+<li><span class='math'>$$\ce{Y^{99+}} $$</span> <code>\ce{Y^{99+}}</code></li>
+<li><span class='math'>$$\ce{H+} $$</span> <code>\ce{H+}</code></li>
+<li><span class='math'>$$\ce{CrO4^2-} $$</span> <code>\ce{CrO4^2-}</code></li>
 </ul>
 <h3>Stoichiometric numbers</h3>
 <ul>
-<li>$$\ce{2 H2O}$$ <code>\ce{2 H2O}</code></li>
-<li>$$\ce{2H2O}$$ <code>\ce{2H2O}</code></li>
-<li>$$\ce{0.5 H2O}$$ <code>\ce{0.5 H2O}</code></li>
-<li>$$\ce{1/2 H2O}$$ <code>\ce{1/2 H2O}</code></li>
-<li>$$\ce{(1/2) H2O}$$ <code>\ce{(1/2) H2O}</code></li>
-<li>$$\ce{$n$ H2O}$$ <code>\ce{$n$ H2O}</code></li>
+<li><span class='math'>$$\ce{2 H2O} $$</span> <code>\ce{2 H2O}</code></li>
+<li><span class='math'>$$\ce{2H2O} $$</span> <code>\ce{2H2O}</code></li>
+<li><span class='math'>$$\ce{0.5 H2O} $$</span> <code>\ce{0.5 H2O}</code></li>
+<li><span class='math'>$$\ce{1/2 H2O} $$</span> <code>\ce{1/2 H2O}</code></li>
+<li><span class='math'>$$\ce{(1/2) H2O} $$</span> <code>\ce{(1/2) H2O}</code></li>
+<li><span class='math'>$$\ce{$n$ H2O} $$</span> <code>\ce{$n$ H2O}</code></li>
 </ul>
 <h3>Isotopes</h3>
 <ul>
-<li>$$\ce{^{227}_{90}Th+}$$ <code>\ce{^{227}_{90}Th+}</code></li>
-<li>$$\ce{^227_90Th+}$$ <code>\ce{^227_90Th+}</code></li>
-<li>$$\ce{^{0}_{-1}n^{-}}$$  <code>\ce{^{0}_{-1}n^{-}}</code></li>
-<li>$$\ce{^0_-1n-}$$ <code>\ce{^0_-1n-}</code></li>
-<li>$$\ce{H{}^3HO}$$ <code>\ce{H{}^3HO}</code></li>
-<li>$$\ce{H^3HO}$$ <code>\ce{H^3HO}</code></li>
+<li><span class='math'>$$\ce{^{227}_{90}Th+} $$</span> <code>\ce{^{227}_{90}Th+}</code></li>
+<li><span class='math'>$$\ce{^227_90Th+} $$</span> <code>\ce{^227_90Th+}</code></li>
+<li><span class='math'>$$\ce{^{0}_{-1}n^{-}} $$</span>  <code>\ce{^{0}_{-1}n^{-}}</code></li>
+<li><span class='math'>$$\ce{^0_-1n-} $$</span> <code>\ce{^0_-1n-}</code></li>
+<li><span class='math'>$$\ce{H{}^3HO} $$</span> <code>\ce{H{}^3HO}</code></li>
+<li><span class='math'>$$\ce{H^3HO} $$</span> <code>\ce{H^3HO}</code></li>
 </ul>
 <h3>Complex Examples</h3>
 <ul>
-<li>$$\ce{CO2 + C -&gt; 2 CO}$$ <br>  <code>\ce{CO2 + C -&gt; 2 CO}</code></li>
-<li>$$\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}$$ <br>   <code>\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}</code></li>
-<li>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}$$ <br>   <code>C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}</code></li>
-<li>$$\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}$$ <br>  <code>\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}</code></li>
-<li>$$\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}$$  <br>  <code>\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}</code></li>
-<li>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}$$ <br>  <code>\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}</code></li>
-<li>$$\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}$$ <br>   <code>\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}</code></li>
+<li><span class='math'>$$\ce{CO2 + C -&gt; 2 CO} $$</span> <br>  <code>\ce{CO2 + C -&gt; 2 CO}</code></li>
+<li><span class='math'>$$\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-} $$</span> <br>   <code>\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}</code></li>
+<li><span class='math'>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K} $$</span> <br>   <code>C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}</code></li>
+<li><span class='math'>$$\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$} $$</span> <br>  <code>\ce{Zn^2+  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  &lt;=&gt;[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}</code></li>
+<li><span class='math'>$$\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$} $$</span>  <br>  <code>\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}</code></li>
+<li><span class='math'>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$} $$</span> <br>  <code>\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}</code></li>
+<li><span class='math'>$$\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$} $$</span> <br>   <code>\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}</code></li>
 </ul>
 <h2>Macros</h2>
 <ul class="command-list">
-<li>$$\iff$$	<code>\iff</code></li>
-<li>$$\nicefrac{3}{4}$$	<code>\nicefrac{3}{4}</code></li>
-<li>$$\bra{\Psi}$$	<code>\bra{\Psi}</code></li>
-<li>$$\ket{\Psi}$$	<code>\ket{\Psi}</code></li>
-<li>$$\braket{ab}$$	<code>\braket{}</code></li>
-<li>$$\set{ab}$$	<code>\set{}</code></li>
-<li>$$\Bra{ab}$$	<code>\Bra{}</code></li>
-<li>$$\Ket{ab}$$	<code>\Ket{}</code></li>
-<li>$$\Braket{ab}$$	<code>\Braket{}</code></li>
-<li>$$\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } $$	<code>\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } </code></li>
-<li>$$\rd$$	<code>\rd</code></li>
-<li>$$\rD$$	<code>\rD</code></li>
-<li>$$\doubleStruckCapitalN$$	<code>\doubleStruckCapitalN</code></li>
-<li>$$\doubleStruckCapitalR$$	<code>\doubleStruckCapitalR</code></li>
-<li>$$\doubleStruckCapitalQ$$	<code>\doubleStruckCapitalQ</code></li>
-<li>$$\doubleStruckCapitalZ$$	<code>\doubleStruckCapitalZ</code></li>
-<li>$$\doubleStruckCapitalP$$	<code>\doubleStruckCapitalP</code></li>
-<li>$$\scriptCapitalE$$	<code>\scriptCapitalE</code></li>
-<li>$$\scriptCapitalH$$	<code>\scriptCapitalH</code></li>
-<li>$$\scriptCapitalL$$	<code>\scriptCapitalL</code></li>
-<li>$$\gothicCapitalC$$	<code>\gothicCapitalC</code></li>
-<li>$$\gothicCapitalH$$	<code>\gothicCapitalH</code></li>
-<li>$$\gothicCapitalI$$	<code>\gothicCapitalI</code></li>
-<li>$$\gothicCapitalR$$	<code>\gothicCapitalR</code></li>
-<li>$$\imaginaryI$$	<code>\imaginaryI</code></li>
-<li>$$\imaginaryJ$$	<code>\imaginaryJ</code></li>
-<li>$$\exponentialE$$	<code>\exponentialE</code></li>
-<li>$$\differentialD$$	<code>\differentialD</code></li>
-<li>$$\capitalDifferentialD$$	<code>\capitalDifferentialD</code></li>
+<li><span class='math'>$$\iff $$</span> <code>\iff</code></li>
+<li><span class='math'>$$\nicefrac{3}{4} $$</span> <code>\nicefrac{3}{4}</code></li>
+<li><span class='math'>$$\bra{\Psi} $$</span> <code>\bra{\Psi}</code></li>
+<li><span class='math'>$$\ket{\Psi} $$</span> <code>\ket{\Psi}</code></li>
+<li><span class='math'>$$\braket{ab} $$</span> <code>\braket{}</code></li>
+<li><span class='math'>$$\set{ab} $$</span> <code>\set{}</code></li>
+<li><span class='math'>$$\Bra{ab} $$</span> <code>\Bra{}</code></li>
+<li><span class='math'>$$\Ket{ab} $$</span> <code>\Ket{}</code></li>
+<li><span class='math'>$$\Braket{ab} $$</span> <code>\Braket{}</code></li>
+<li><span class='math'>$$\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } $$</span> <code>\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 }</code></li>
+<li><span class='math'>$$\rd $$</span> <code>\rd</code></li>
+<li><span class='math'>$$\rD $$</span> <code>\rD</code></li>
+<li><span class='math'>$$\doubleStruckCapitalN $$</span> <code>\doubleStruckCapitalN</code></li>
+<li><span class='math'>$$\doubleStruckCapitalR $$</span> <code>\doubleStruckCapitalR</code></li>
+<li><span class='math'>$$\doubleStruckCapitalQ $$</span> <code>\doubleStruckCapitalQ</code></li>
+<li><span class='math'>$$\doubleStruckCapitalZ $$</span> <code>\doubleStruckCapitalZ</code></li>
+<li><span class='math'>$$\doubleStruckCapitalP $$</span> <code>\doubleStruckCapitalP</code></li>
+<li><span class='math'>$$\scriptCapitalE $$</span> <code>\scriptCapitalE</code></li>
+<li><span class='math'>$$\scriptCapitalH $$</span> <code>\scriptCapitalH</code></li>
+<li><span class='math'>$$\scriptCapitalL $$</span> <code>\scriptCapitalL</code></li>
+<li><span class='math'>$$\gothicCapitalC $$</span> <code>\gothicCapitalC</code></li>
+<li><span class='math'>$$\gothicCapitalH $$</span> <code>\gothicCapitalH</code></li>
+<li><span class='math'>$$\gothicCapitalI $$</span> <code>\gothicCapitalI</code></li>
+<li><span class='math'>$$\gothicCapitalR $$</span> <code>\gothicCapitalR</code></li>
+<li><span class='math'>$$\imaginaryI $$</span> <code>\imaginaryI</code></li>
+<li><span class='math'>$$\imaginaryJ $$</span> <code>\imaginaryJ</code></li>
+<li><span class='math'>$$\exponentialE $$</span> <code>\exponentialE</code></li>
+<li><span class='math'>$$\differentialD $$</span> <code>\differentialD</code></li>
+<li><span class='math'>$$\capitalDifferentialD $$</span> <code>\capitalDifferentialD</code></li>
 </ul>
-<h2>Environments</h2>
+<h2>Environments / Matrixes</h2>
+<p>Environements are used to typeset a set of related items, for examples cells
+in a matrix, or multi-line equations.</p>
+<p>Each row in a tabular environment is separated by a <code>\\</code> command.</p>
+<p>Each column is separated by a <code>&amp;</code>.</p>
+<h3>Matrixes</h3>
+<h4><code>array</code></h4>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{lc}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{array}
+</code></pre>
+<p>$$\begin{array}{lc}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<p>A simple matrix with no delimiters.</p>
+<p>The <code>{lc}</code> argument specifies how many columns there are and how they should be
+formated:</p>
+<ul>
+<li><code>l</code>: left-aligned</li>
+<li><code>c</code>: centered</li>
+<li><code>r</code>: right-aligned</li>
+</ul>
+<p>To add a vertical line separating columns, add <code>|</code> character in the column format:</p>
+<p>$$\begin{array}{l|c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l|c}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{array}
+</code></pre>
+<p>To add a double vertical line separating columns, add two <code>|</code> characters in the
+column format:</p>
+<p>$$\begin{array}{l||c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l||c}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{array}
+</code></pre>
+<p>To add a dashed vertical line between two columns, use <code>:</code>:</p>
+<p>$$\begin{array}{l:c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l:c}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{array}
+</code></pre>
+<h4><code>matrix</code></h4>
+<p>The <code>matrix</code> environment is very similar to <code>array</code>, but it does not have an
+argument to specify the format of the columns.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{matrix}
+</code></pre>
+<p>$$\begin{matrix}a + 1   &amp;   b  + 1 \\ c       &amp;   \frac{1}{d} \end{matrix}$$</p>
+<p>To specify the format of the columns, use the starred version and an optional
+argument. This applies to all the other <code>matrix</code> environments.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}[l|r]
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{matrix*}
+</code></pre>
+<p>$$\begin{matrix*}[l|r]a + 1   &amp;   b  + 1 \\ c       &amp;   \frac{1}{d} \end{matrix*}$$</p>
+<h4><code>pmatrix</code></h4>
+<p>A matrix with <strong>parentheses</strong> as delimiters.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{pmatrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{pmatrix}
+</code></pre>
+<p><span class='math'>$$\begin{pmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{pmatrix}$$</p>
+<h4><code>bmatrix</code></h4>
+<p>A matrix with <strong>square brackets</strong> as delimiters.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{bmatrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{bmatrix}
+</code></pre>
+<p><span class='math'>$$\begin{bmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{bmatrix}$$</p>
+<h4><code>Bmatrix</code></h4>
+<p>A matrix with <strong>braces</strong> (curly brackets) as delimiters.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Bmatrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{Bmatrix}
+</code></pre>
+<p><span class='math'>$$\begin{Bmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{Bmatrix}$$</p>
+<h4><code>vmatrix</code></h4>
+<p>A matrix with <strong>single bars</strong> as delimiters.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{vmatrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{vmatrix}
+</code></pre>
+<p><span class='math'>$$\begin{vmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{vmatrix}$$</p>
+<h4><code>Vmatrix</code></h4>
+<p>A matrix with <strong>double bars</strong> as delimiters.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Vmatrix}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{Vmatrix}
+</code></pre>
+<p><span class='math'>$$\begin{Vmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{Vmatrix}$$</p>
+<h4><code>matrix*</code></h4>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}
+  a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
+  c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
+<span class="hljs-keyword">\end</span>{matrix*}
+</code></pre>
+<p><span class='math'>$$\begin{matrix*}a &amp; b \\ c &amp; \frac{1}{d}\end{matrix*}$$</p>
+<h4><code>smallmatrix</code></h4>
+<ul>
+<li><span class='math'>$$\begin{smallmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{smallmatrix}$$</li>
+</ul>
+<h3>Other Environments</h3>
+<h4><code>cases</code></h4>
+<pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{cases}
+  1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
+  f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
+<span class="hljs-keyword">\end</span>{cases}
+
+</code></pre>
+<p>$$f(n) = \begin{cases}
+1 &amp; \text{if } n = 0  \\
+f(n-1) + f(n-2) &amp; \text{if } n \ge 2
+\end{cases}
+$$</p>
+<h4><code>dcases</code></h4>
+<p>Like <code>cases</code> but the content is typeset in <code>displaystyle</code>.</p>
+<pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{dcases}
+  1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
+  f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
+<span class="hljs-keyword">\end</span>{dcases}
+
+</code></pre>
+<p>$$f(n) = \begin{dcases}
+1 &amp; \text{if } n = 0  \\
+f(n-1) + f(n-2) &amp; \text{if } n \ge 2
+\end{dcases}
+$$</p>
+<h4><code>rcases</code></h4>
+<p>Like <code>cases</code> but with the brace delimiter on the right.</p>
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{rcases}
+  1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
+  f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
+<span class="hljs-keyword">\end</span>{rcases} = f(n)
+
+</code></pre>
+<p>$$\begin{rcases}
+1 &amp; \text{if } n = 0  \\
+f(n-1) + f(n-2) &amp; \text{if } n \ge 2
+\end{rcases} = f(n)
+$$</p>
+<h4><code>multline</code></h4>
+<pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{multline}
+    x + <span class="hljs-keyword">\frac</span>12 <span class="hljs-keyword">\\</span> 
+    y - <span class="hljs-keyword">\frac</span>34 
+  <span class="hljs-keyword">\end</span>{multline}
+</code></pre>
+<p><span class='math'>$$\begin{multline}x+\frac12 \\ y - \frac34 \end{multline} $$</span></p>
+<h4>Others</h4>
 <ul>
 <li>
-<p><code>$$\begin{math}\text{first}\end{math}$$</code></p>
+<p><span class='math'>$$\begin{math}x+\frac12\end{math}$$</span> <code>$$\begin{math}x+\frac12\end{math}$$</code></p>
 </li>
 <li>
-<p><code>$$\begin{displaymath}\text{first}\end{displaymath}$$</code></p>
+<p><span class='math'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</span> <code>$$\begin{displaymath}x+\frac12\end{displaymath}$$</code></p>
 </li>
 <li>
-<p>$$\begin{array}{lclc}a &amp; b \c &amp; \frac{1}{d}\end{array}$$<code>\​begin{array}...\end{array}</code></p>
+<p><span class='math'>$$\begin{equation}x+\frac12\end{equation} $$</span>  <code>\​begin{equation}x+\frac12\end{equation}</code></p>
 </li>
 <li>
-<p>$$\begin{equation}a &amp; b \c &amp; \frac{1}{d}\end{equation}$$<code>\​begin{equation}...\end{equation}</code></p>
+<p><span class='math'>$$\begin{subequations}x+\frac12\end{subequations} $$</span>  <code>\​begin{subequations}x+\frac12\end{subequations}</code></p>
 </li>
 <li>
-<p>$$\begin{subequations}a &amp; b \c &amp; \frac{1}{d}\end{subequations}$$<code>\​begin{subequations}...\end{subequations}</code></p>
+<p><span class='math'>$$\begin{align}a &amp; b \ c &amp; \frac{1}{d}\end{align} $$</span>  <code>\​begin{align}...\end{align}</code></p>
 </li>
 <li>
-<p>$$\begin{multline}a &amp; b \c &amp; \frac{1}{d}\end{multline}$$<code>\​begin{multline}...\end{multline}</code></p>
+<p><span class='math'>$$\begin{align*}a &amp; b \ c &amp; \frac{1}{d}\end{align*} $$</span>  <code>\​begin{align*}...\end{align*}</code></p>
 </li>
 <li>
-<p>$$\begin{align}a &amp; b \c &amp; \frac{1}{d}\end{align}$$<code>\​begin{align}...\end{align}</code></p>
+<p><span class='math'>$$\begin{aligned}a &amp; b \ c &amp; \frac{1}{d}\end{aligned} $$</span>  <code>\​begin{aligned}...\end{aligned}</code></p>
 </li>
 <li>
-<p>$$\begin{align*}a &amp; b \c &amp; \frac{1}{d}\end{align*}$$<code>\​begin{align*}...\end{align*}</code></p>
+<p><span class='math'>$$\begin{eqnarray}a &amp; b \ c &amp; \frac{1}{d}\end{eqnarray} $$</span>  <code>\​begin{eqnarray}...\end{eqnarray}</code></p>
 </li>
 <li>
-<p>$$\begin{aligned}a &amp; b \c &amp; \frac{1}{d}\end{aligned}$$<code>\​begin{aligned}...\end{aligned}</code></p>
+<p><span class='math'>$$\begin{split}a &amp; b \ c &amp; \frac{1}{d}\end{split} $$</span>  <code>\​begin{split}...\end{split}</code></p>
 </li>
 <li>
-<p>$$\begin{eqnarray}a &amp; b \c &amp; \frac{1}{d}\end{eqnarray}$$<code>\​begin{eqnarray}...\end{eqnarray}</code></p>
+<p><span class='math'>$$\begin{gather}a &amp; b \ c &amp; \frac{1}{d}\end{gather} $$</span>  <code>\​begin{gather}...\end{gather}</code></p>
 </li>
 <li>
-<p>$$\begin{split}a &amp; b \c &amp; \frac{1}{d}\end{split}$$<code>\​begin{split}...\end{split}</code></p>
+<p><span class='math'>$$\begin{gathered}a &amp; b \ c &amp; \frac{1}{d}\end{gathered} $$</span>  <code>\​begin{gathered}...\end{gathered}</code></p>
 </li>
 <li>
-<p>$$\begin{gather}a &amp; b \c &amp; \frac{1}{d}\end{gather}$$<code>\​begin{gather}...\end{gather}</code></p>
-</li>
-<li>
-<p>$$\begin{gathered}a &amp; b \c &amp; \frac{1}{d}\end{gathered}$$<code>\​begin{gathered}...\end{gathered}</code></p>
-</li>
-<li>
-<p>$$\begin{matrix}a &amp; b \c &amp; \frac{1}{d}\end{matrix}$$<code>\​begin{matrix}...\end{matrix}</code></p>
-</li>
-<li>
-<p>$$\begin{pmatrix}a &amp; b \c &amp; \frac{1}{d}\end{pmatrix}$$<code>\​begin{pmatrix}...\end{pmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{bmatrix}a &amp; b \c &amp; \frac{1}{d}\end{bmatrix}$$<code>\​begin{bmatrix}...\end{bmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{Bmatrix}a &amp; b \c &amp; \frac{1}{d}\end{Bmatrix}$$<code>\​begin{Bmatrix}...\end{Bmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{vmatrix}a &amp; b \c &amp; \frac{1}{d}\end{vmatrix}$$<code>\​begin{vmatrix}...\end{vmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{Vmatrix}a &amp; b \c &amp; \frac{1}{d}\end{Vmatrix}$$<code>\​begin{Vmatrix}...\end{Vmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{matrix*}a &amp; b \c &amp; \frac{1}{d}\end{matrix*}$$<code>\​begin{matrix*}...\end{matrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{pmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{pmatrix*}$$<code>\​begin{pmatrix*}...\end{pmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{bmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{bmatrix*}$$<code>\​begin{bmatrix*}...\end{bmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{Bmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{Bmatrix*}$$<code>\​begin{Bmatrix*}...\end{Bmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{vmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{vmatrix*}$$<code>\​begin{vmatrix*}...\end{vmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{Vmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{Vmatrix*}$$<code>\​begin{Vmatrix*}...\end{Vmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{smallmatrix}a &amp; b \c &amp; \frac{1}{d}\end{smallmatrix}$$<code>\​begin{smallmatrix}...\end{smallmatrix}</code></p>
-</li>
-<li>
-<p>$$\begin{smallmatrix*}a &amp; b \c &amp; \frac{1}{d}\end{smallmatrix*}$$<code>\​begin{smallmatrix*}...\end{smallmatrix*}</code></p>
-</li>
-<li>
-<p>$$\begin{cases}a &amp; b \c &amp; \frac{1}{d}\end{cases}$$<code>\​begin{cases}...\end{cases}</code></p>
-</li>
-<li>
-<p>$$\begin{dcases}a &amp; b \c &amp; \frac{1}{d}\end{dcases}$$<code>\​begin{dcases}...\end{dcases}</code></p>
-</li>
-<li>
-<p>$$\begin{rcases}a &amp; b \c &amp; \frac{1}{d}\end{rcases}$$<code>\​begin{rcases}...\end{rcases}</code></p>
-</li>
-<li>
-<p><code>$$\begin{center}\text{first}\end{center}$$</code></p>
+<p><span class='math'>$$\begin{center}\text{first}\end{center}$$</span> <code>$$\begin{center}\text{first}\end{center} $$&lt;/span&gt;  </code></p>
 </li>
 </ul>
 <h2>TeX Internals</h2>
@@ -1669,10 +1987,10 @@ when creating modern LaTeX content.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 13, 2021">
+        <meta itemprop="datePublished" content="May 14, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 13 2021 11:42:35 GMT+0200 (Central European Summer Time)">May 13, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:23:36 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
         
       </footer>
 
