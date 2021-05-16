@@ -465,8 +465,7 @@
 <h1>Macros</h1>
 <p>MathLive has over <a href="https://mathlive.io/reference.html">800 Latex commands</a> predefined. Some are primitives but others
 are macros, that is commands defined with a Latex expression.</p>
-<p>You can view the default macros by inspecting the <code>macros</code> property of the
-config object:</p>
+<p>To view the default macros, inspect the <code>macros</code> option:</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = document.getElementById('mf'), {
@@ -476,7 +475,7 @@ console.log(mf.getOption('macros'));
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>
 </code-playground>
-<p>You can add (or remove) macros by using <code>setOptions({macros: ...})</code>.</p>
+<p>To add (or remove) macros use <code>setOptions({macros: ...})</code>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = document.getElementById('mf');
@@ -505,10 +504,10 @@ mf.setOptions({
         
 
 
-        <meta itemprop="datePublished" content="April 25, 2021">
+        <meta itemprop="datePublished" content="May 16, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun Apr 25 2021 10:43:20 GMT+0200 (Central European Summer Time)">April 25, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 16 2021 09:41:30 GMT+0200 (Central European Summer Time)">May 16, 2021</time></p>
         
       </footer>
 
