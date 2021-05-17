@@ -463,22 +463,81 @@
   .deprecated h3 {
     margin: 0 0 0.5em 0;
   }
+  .no-header thead {
+    display: none;
+  }
   
 </style>
 <p>To find the name of a LaTeX command maching a shape you can draw, use
 <a href="http://detexify.kirelabs.org/classify.html">Detexify</a>.</p>
+<h2>Math Styles and Text Mode</h2>
+<p>When in <strong>Math Mode</strong>, the content is laid out using typesetting rules
+specific to math. For example, variables are displayed in italics,
+an appropriate amount of space is inserted around some letters such as “f” to improve their legibility and white spaces are ignored.</p>
+<p>To include some textual comments, switch to <strong>Text Mode</strong> using the
+<code>\text{}</code> command.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Math Mode</th>
+<th style="text-align:left">Text Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">$$if and only if x &gt; 0$$</td>
+<td style="text-align:left">$$\text{if and only if } x &gt; 0$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>if and only if x &gt; 0</code></td>
+<td style="text-align:left"><code>\text{if and only if } x &gt; 0</code></td>
+</tr>
+</tbody>
+</table>
+<p>In Math Mode, the layout and size of some math elements is adjusted based on the context in
+which they are used. For example, superscripts and subscripts are displayed
+in a smaller font.</p>
+<p>The appropriate <em>math style</em> is selected automatically, but it can be overridden with the following commands:</p>
+<ul>
+<li><code>\displaystyle</code>: <strong>Display Style</strong> for standalone equations</li>
+<li><code>\textstyle</code>: <strong>Text Style</strong> for inline math</li>
+<li><code>\scriptstyle</code>: <strong>Script Style</strong> for subscripts and superscripts</li>
+<li><code>\scriptscriptstyle</code>: <strong>Scriptscript Style</strong> for subscripts and superscripts of subscripts and
+superscripts</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Display Style</th>
+<th style="text-align:left">Text Style (inline math)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</td>
+<td style="text-align:left">$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
+<td style="text-align:left"><code>\textstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
+</tr>
+</tbody>
+</table>
 <h2>Fractions and Binomials</h2>
 <ul class="command-list">
 <li><span class='math'>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\frac{}{}</code></li>
 <li><span class='math'>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\dfrac{}{}</code></li>
 <li><span class='math'>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\tfrac{}{}</code></li>
 </ul>
-<p>The <code>\dfrac</code> command typesets its content in Display style even when it is in a context
-that would normally use a different style, such as in a superscript.</p>
-<p>The <code>\tfrac</code> command uses Text style (inline) even in a context that would<br>
-normally use Display style.</p>
+<p>The <code>\dfrac</code> command typesets its content in Display Style.</p>
+<p>The <code>\tfrac</code> command uses Text Style (inline).</p>
 <ul class="command-list">
-<li><span class='math'>$$\cfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\cfrac{}{}</code></li>
+<li><span class='math'>$$\cfrac[l]{1}{x+1} $$</span> <code>\cfrac[l]{1}{x+1}</code></li>
+<li><span class='math'>$$\cfrac[r]{1}{x+1} $$</span> <code>\cfrac[r]{1}{x+1}</code></li>
+</ul>
+<p>The <code>\cfrac</code> (continuous fraction) command has an optional argument, <code>[l]</code> or <code>[r]</code>, that controls
+if the numerator is left-aligned or right-aligned.</p>
+<ul class="command-list">
 <li><span class='math'>$$\pdiff{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\pdiff{}{}</code></li>
 </ul>
 <hr>
@@ -499,9 +558,9 @@ when creating modern LaTeX content.
 </ul>
 </section>
 <h2>Binary Operators</h2>
-<p>Some operators (<code>+</code>, <code>-</code>, etc…) can also be used as a unary operator, and
-their spacing will be adjusted accordingly. For example in $$-1-2$$ (<code>-1-2</code>)
-there is less space between <code>-</code> and <code>1</code> then there is between <code>-</code> and <code>2</code>.</p>
+<p>Some binary operators can also be used as a unary operator: <code>+</code>, <code>-</code>, etc…
+Their spacing is adjusted accordingly. For example in $$-1-2$$
+there is less space between <code>-</code> and <code>1</code> than there is between <code>-</code> and <code>2</code>.</p>
 <ul class="command-list">
 <li><span class='math'>$$+ $$</span>   <code>+</code></li>
 <li><span class='math'>$$- $$</span>   <code>-</code></li>
@@ -510,6 +569,8 @@ there is less space between <code>-</code> and <code>1</code> then there is betw
 <li><span class='math'>$$* $$</span>   <code>*</code></li>
 <li><span class='math'>$$\cdot $$</span>   <code>\cdot</code></li>
 <li><span class='math'>$$\times $$</span>   <code>\times</code></li>
+<li><span class='math'>$$a / b $$</span>   <code>a / b</code></li>
+<li><span class='math'>$$\nicefrac{3}{4}$$</span>   <code>nicefrac{3}{4}</code> (macro)</li>
 <li><span class='math'>$$\div $$</span>   <code>\div</code></li>
 <li><span class='math'>$$\divides $$</span>   <code>\divides</code></li>
 <li><span class='math'>$$\sqrt{\unicode{&quot;2B1A}} $$</span> <code>\sqrt{}</code></li>
@@ -533,16 +594,16 @@ there is less space between <code>-</code> and <code>1</code> then there is betw
 </ul>
 <br>
 <ul class="command-list">
+<li><span class='math'>$$\ominus $$</span>   <code>\ominus</code></li>
+<li><span class='math'>$$\oplus $$</span>   <code>\oplus</code></li>
+<li><span class='math'>$$\otimes $$</span>   <code>\otimes</code></li>
+<li><span class='math'>$$\odot $$</span>   <code>\odot</code></li>
 <li><span class='math'>$$\circ $$</span>   <code>\circ</code></li>
 <li><span class='math'>$$\centerdot $$</span>   <code>\centerdot</code></li>
 <li><span class='math'>$$\bullet $$</span>   <code>\bullet</code></li>
 <li><span class='math'>$$\circleddash $$</span>   <code>\circleddash</code></li>
 <li><span class='math'>$$\circledast $$</span>   <code>\circledast</code></li>
 <li><span class='math'>$$\circledcirc $$</span>   <code>\circledcirc</code></li>
-<li><span class='math'>$$\oplus $$</span>   <code>\oplus</code></li>
-<li><span class='math'>$$\ominus $$</span>   <code>\ominus</code></li>
-<li><span class='math'>$$\otimes $$</span>   <code>\otimes</code></li>
-<li><span class='math'>$$\odot $$</span>   <code>\odot</code></li>
 <li><span class='math'>$$\oslash $$</span>   <code>\oslash</code></li>
 </ul>
 <br>
@@ -557,7 +618,6 @@ there is less space between <code>-</code> and <code>1</code> then there is betw
 <li><span class='math'>$$\ker $$</span> <code>\ker</code></li>
 <li><span class='math'>$$\ln $$</span> <code>\ln</code></li>
 <li><span class='math'>$$\log $$</span> <code>\log</code></li>
-<li><span class='math'>$$\lim $$</span> <code>\lim</code></li>
 <li><span class='math'>$$\det $$</span> <code>\det</code></li>
 </ul>
 <h3>Trigonometry</h3>
@@ -592,11 +652,12 @@ there is less space between <code>-</code> and <code>1</code> then there is betw
 <ul class="command-list">
 <li><span class='math'>$$\max $$</span> <code>\max</code></li>
 <li><span class='math'>$$\min $$</span> <code>\min</code></li>
-<li><span class='math'>$$\dim $$</span> <code>\dim</code></li>
 <li><span class='math'>$$\sup $$</span> <code>\sup</code></li>
-<li><span class='math'>$$\liminf $$</span> <code>\liminf</code></li>
 <li><span class='math'>$$\inf $$</span> <code>\inf</code></li>
+<li><span class='math'>$$\lim $$</span> <code>\lim</code></li>
+<li><span class='math'>$$\liminf $$</span> <code>\liminf</code></li>
 <li><span class='math'>$$\limsup $$</span> <code>\limsup</code></li>
+<li><span class='math'>$$\dim $$</span> <code>\dim</code></li>
 </ul>
 <h3>Projections</h3>
 <ul class="command-list">
@@ -616,31 +677,35 @@ there is less space between <code>-</code> and <code>1</code> then there is betw
 </ul>
 <h2>Unicode</h2>
 <ul>
-<li><code>\unicode{}</code> - The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use uppercase <code>A</code>-<code>F</code> for hexadecimal digits.
+<li><code>\unicode{}</code> - The argument is a Unicode codepoint expressed as a number. To
+use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use
+<strong>uppercase</strong> <code>A</code>-<code>F</code> for hexadecimal digits.
 <ul>
 <li><span class='math'>$$\unicode{10775} $$</span> <code>\unicode{10775}</code></li>
 <li><span class='math'>$$\unicode{&quot;2A17} $$</span> <code>\unicode{&quot;2A17}</code></li>
 <li><span class='math'>$$\unicode{x2A17} $$</span> <code>\unicode{x2A17}</code></li>
 </ul>
 </li>
-<li><code>\char</code> - The argument is also Unicode codepoint, but the <code>{</code>…<code>}</code> delimiters are optional when using <code>&quot;</code>
+<li><code>\char</code> - The argument is also a Unicode codepoint, but the <code>{</code>…<code>}</code>
+delimiters are optional when using <code>&quot;</code>
 <ul>
 <li><span class='math'>$$\char&quot;2A17 $$</span> <code>\char&quot;2A17</code></li>
 </ul>
 </li>
-<li><code>^^</code> and <code>^^^^</code> - Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong> <code>a</code>-<code>f</code> to specify a Unicode codepoint
+<li><code>^^</code> and <code>^^^^</code> - Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong>
+<code>a</code>-<code>f</code> to specify a Unicode codepoint
 <ul>
 <li><span class='math'>$$^^4a $$</span> <code>^^4a</code></li>
 <li><span class='math'>$$^^^^2a17 $$</span> <code>^^^^2a17</code></li>
 </ul>
 </li>
 </ul>
-<h2>Prefix Operators</h2>
-<p>Operators display their limits above and below or adjacent to the operator,
-depending on the math style (Display or Inline).</p>
-<p>To force the display of the limits above and below the operator, use <code>\limits</code>.</p>
-<p>To force the display of the limits to be adjacent to the operator, use <code>\nolimits</code>.</p>
-<p>The <code>\intop</code> and <code>\ointop</code> commands display their limits above and below.</p>
+<h2>Large Operators</h2>
+<p>Large operators display their limits above and below or adjacent to the operator,
+depending on the math style (<strong>Display Style</strong> or <strong>Text Style</strong>).</p>
+<p>To force the display of the limits above and below the operator, use the <code>\limits</code> command after the operator.</p>
+<p>To force the display of the limits to be adjacent to the operator, use the <code>\nolimits</code> command after the operator.</p>
+<p>The <code>\intop</code> and <code>\ointop</code> commands display their limits above and below by default.</p>
 <p><span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> <code>\sum_{n=0}^\infty\nolimits</code></p>
 <ul class="command-list">
 <li><span class='math'>$$\sum_{n=0}^\infty $$</span> <code>\sum</code></li>
@@ -718,152 +783,267 @@ depending on the math style (Display or Inline).</p>
 <li><span class='math'>$$\dashv $$</span>   <code>\dashv</code></li>
 </ul>
 <h2>Arrows</h2>
-<ul class="command-list">
-<li><span class='math'>$$\rightarrow $$</span>   <code>\rightarrow</code></li>
-<li><span class='math'>$$\leftarrow $$</span>   <code>\leftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\twoheadrightarrow $$</span>   <code>\twoheadrightarrow</code></li>
-<li><span class='math'>$$\twoheadleftarrow $$</span>   <code>\twoheadleftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightarrowtail $$</span>   <code>\rightarrowtail</code></li>
-<li><span class='math'>$$\leftarrowtail $$</span>   <code>\leftarrowtail</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\dashrightarrow $$</span>   <code>\dashrightarrow</code></li>
-<li><span class='math'>$$\dashleftarrow $$</span>   <code>\dashleftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\longrightarrow $$</span>   <code>\longrightarrow</code></li>
-<li><span class='math'>$$\longleftarrow $$</span>   <code>\longleftarrow</code></li>
-<li><span class='math'>$$\longleftrightarrow $$</span>   <code>\longleftrightarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\Rightarrow $$</span>   <code>\Rightarrow</code></li>
-<li><span class='math'>$$\Leftarrow $$</span>   <code>\Leftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\Longrightarrow $$</span>   <code>\Longrightarrow</code></li>
-<li><span class='math'>$$\Longleftarrow $$</span>   <code>\Longleftarrow</code></li>
-<li><span class='math'>$$\Longleftrightarrow $$</span>   <code>\Longleftrightarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\mapsto $$</span>   <code>\mapsto</code></li>
-<li><span class='math'>$$\longmapsto $$</span>   <code>\longmapsto</code></li>
-<li><span class='math'>$$\multimap $$</span>   <code>\multimap</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\uparrow $$</span>   <code>\uparrow</code></li>
-<li><span class='math'>$$\downarrow $$</span>   <code>\downarrow</code></li>
-<li><span class='math'>$$\updownarrow $$</span>   <code>\updownarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\Uparrow $$</span>   <code>\Uparrow</code></li>
-<li><span class='math'>$$\Downarrow $$</span>   <code>\Downarrow</code></li>
-<li><span class='math'>$$\Updownarrow $$</span>   <code>\Updownarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightharpoonup $$</span>   <code>\rightharpoonup</code></li>
-<li><span class='math'>$$\leftharpoonup $$</span>   <code>\leftharpoonup</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightharpoondown $$</span>   <code>\rightharpoondown</code></li>
-<li><span class='math'>$$\leftharpoondown $$</span>   <code>\leftharpoondown</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightleftharpoons $$</span>   <code>\rightleftharpoons</code></li>
-<li><span class='math'>$$\leftrightharpoons $$</span>   <code>\leftrightharpoons</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\searrow $$</span>   <code>\searrow</code></li>
-<li><span class='math'>$$\nearrow $$</span>   <code>\nearrow</code></li>
-<li><span class='math'>$$\swarrow $$</span>   <code>\swarrow</code></li>
-<li><span class='math'>$$\nwarrow $$</span>   <code>\nwarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\Rrightarrow $$</span>   <code>\Rrightarrow</code></li>
-<li><span class='math'>$$\Lleftarrow $$</span>   <code>\Lleftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\leftrightarrows $$</span>   <code>\leftrightarrows</code></li>
-<li><span class='math'>$$\rightleftarrows $$</span>   <code>\rightleftarrows</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\curvearrowright $$</span>   <code>\curvearrowright</code></li>
-<li><span class='math'>$$\curvearrowleft $$</span>   <code>\curvearrowleft</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\hookrightarrow $$</span>   <code>\hookrightarrow</code></li>
-<li><span class='math'>$$\hookleftarrow $$</span>   <code>\hookleftarrow</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\looparrowright $$</span>   <code>\looparrowright</code></li>
-<li><span class='math'>$$\looparrowleft $$</span>   <code>\looparrowleft</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\circlearrowright $$</span>   <code>\circlearrowright</code></li>
-<li><span class='math'>$$\circlearrowleft $$</span>   <code>\circlearrowleft</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightrightarrows $$</span>   <code>\rightrightarrows</code></li>
-<li><span class='math'>$$\leftleftarrows $$</span>   <code>\leftleftarrows</code></li>
-<li><span class='math'>$$\upuparrows $$</span>   <code>\upuparrows</code></li>
-<li><span class='math'>$$\downdownarrows $$</span>   <code>\downdownarrows</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\Rsh $$</span>   <code>\Rsh</code></li>
-<li><span class='math'>$$\Lsh $$</span>   <code>\Lsh</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\restriction $$</span>   <code>\restriction</code></li>
-<li><span class='math'>$$\upharpoonright $$</span>   <code>\upharpoonright</code></li>
-<li><span class='math'>$$\upharpoonleft $$</span>   <code>\upharpoonleft</code></li>
-<li><span class='math'>$$\downharpoonright $$</span>   <code>\downharpoonright</code></li>
-<li><span class='math'>$$\downharpoonleft $$</span>   <code>\downharpoonleft</code></li>
-</ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\rightsquigarrow $$</span>   <code>\rightsquigarrow</code></li>
-<li><span class='math'>$$\leadsto $$</span>   <code>\leadsto</code></li>
-<li><span class='math'>$$\leftrightsquigarrow $$</span>   <code>\leftrightsquigarrow</code></li>
-</ul>
+<section class='no-header'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightarrow $$</span>   <code>\rightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\leftarrow $$</span>   <code>\leftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\twoheadrightarrow $$</span>   <code>\twoheadrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\twoheadleftarrow $$</span>   <code>\twoheadleftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightarrowtail $$</span>   <code>\rightarrowtail</code></td>
+<td style="text-align:left"><span class='math'>$$\leftarrowtail $$</span>   <code>\leftarrowtail</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\dashrightarrow $$</span>   <code>\dashrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\dashleftarrow $$</span>   <code>\dashleftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\longrightarrow $$</span>   <code>\longrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\longleftarrow $$</span>   <code>\longleftarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\longleftrightarrow $$</span>   <code>\longleftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Rightarrow $$</span>   <code>\Rightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Leftarrow $$</span>   <code>\Leftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Longrightarrow $$</span>   <code>\Longrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Longleftarrow $$</span>   <code>\Longleftarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Longleftrightarrow $$</span>   <code>\Longleftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\mapsto $$</span>   <code>\mapsto</code></td>
+<td style="text-align:left"><span class='math'>$$\longmapsto $$</span>   <code>\longmapsto</code></td>
+<td style="text-align:left"><span class='math'>$$\multimap $$</span>   <code>\multimap</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\uparrow $$</span>   <code>\uparrow</code></td>
+<td style="text-align:left"><span class='math'>$$\downarrow $$</span>   <code>\downarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\updownarrow $$</span>   <code>\updownarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Uparrow $$</span>   <code>\Uparrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Downarrow $$</span>   <code>\Downarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Updownarrow $$</span>   <code>\Updownarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightharpoonup $$</span>   <code>\rightharpoonup</code></td>
+<td style="text-align:left"><span class='math'>$$\leftharpoonup $$</span>   <code>\leftharpoonup</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightharpoondown $$</span>   <code>\rightharpoondown</code></td>
+<td style="text-align:left"><span class='math'>$$\leftharpoondown $$</span>   <code>\leftharpoondown</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightleftharpoons $$</span>   <code>\rightleftharpoons</code></td>
+<td style="text-align:left"><span class='math'>$$\leftrightharpoons $$</span>   <code>\leftrightharpoons</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\searrow $$</span>   <code>\searrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nearrow $$</span>   <code>\nearrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\swarrow $$</span>   <code>\swarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nwarrow $$</span>   <code>\nwarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Rrightarrow $$</span>   <code>\Rrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\Lleftarrow $$</span>   <code>\Lleftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\leftrightarrows $$</span>   <code>\leftrightarrows</code></td>
+<td style="text-align:left"><span class='math'>$$\rightleftarrows $$</span>   <code>\rightleftarrows</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\curvearrowright $$</span>   <code>\curvearrowright</code></td>
+<td style="text-align:left"><span class='math'>$$\curvearrowleft $$</span>   <code>\curvearrowleft</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\hookrightarrow $$</span>   <code>\hookrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\hookleftarrow $$</span>   <code>\hookleftarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\looparrowright $$</span>   <code>\looparrowright</code></td>
+<td style="text-align:left"><span class='math'>$$\looparrowleft $$</span>   <code>\looparrowleft</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\circlearrowright $$</span>   <code>\circlearrowright</code></td>
+<td style="text-align:left"><span class='math'>$$\circlearrowleft $$</span>   <code>\circlearrowleft</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightrightarrows $$</span>   <code>\rightrightarrows</code></td>
+<td style="text-align:left"><span class='math'>$$\leftleftarrows $$</span>   <code>\leftleftarrows</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\upuparrows $$</span>   <code>\upuparrows</code></td>
+<td style="text-align:left"><span class='math'>$$\downdownarrows $$</span>   <code>\downdownarrows</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Rsh $$</span>   <code>\Rsh</code></td>
+<td style="text-align:left"><span class='math'>$$\Lsh $$</span>   <code>\Lsh</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\upharpoonright $$</span>   <code>\upharpoonright</code></td>
+<td style="text-align:left"><span class='math'>$$\upharpoonleft $$</span>   <code>\upharpoonleft</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\downharpoonright $$</span>   <code>\downharpoonright</code></td>
+<td style="text-align:left"><span class='math'>$$\downharpoonleft $$</span>   <code>\downharpoonleft</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\restriction $$</span>   <code>\restriction</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rightsquigarrow $$</span>   <code>\rightsquigarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\leftrightsquigarrow $$</span>   <code>\leftrightsquigarrow</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\leadsto $$</span>   <code>\leadsto</code></td>
+<td style="text-align:left" class="no-header"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+</section>
 <h3>Negated Arrows</h3>
+<section class='no-header'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\nrightarrow $$</span>   <code>\nrightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nleftarrow $$</span>   <code>\nleftarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nleftrightarrow $$</span>   <code>\nleftrightarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\nRightarrow $$</span>   <code>\nRightarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nLeftarrow $$</span>   <code>\nLeftarrow</code></td>
+<td style="text-align:left"><span class='math'>$$\nLeftrightarrow $$</span>   <code>\nLeftrightarrow</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<h3>Extensible Arrows</h3>
+<p>The width of the arrow commands above is fixed. The width of the commands
+below is determined by the length of the content above and below
+the arrows, which is specified as an argument (and optional argument):</p>
 <ul class="command-list">
-<li><span class='math'>$$\nrightarrow $$</span>   <code>\nrightarrow</code></li>
-<li><span class='math'>$$\nleftarrow $$</span>   <code>\nleftarrow</code></li>
-<li><span class='math'>$$\nleftrightarrow $$</span>   <code>\nleftrightarrow</code></li>
+<li>$$\xrightarrow[\text{long text below}]{}$$ <code>\xrightarrow[\text{long text below}]{}</code></li>
+<li>$$\xrightarrow{\text{long text above}}$$ <code>\xrightarrow{\text{long text above}}</code></li>
+<li>$$\xrightarrow[\text{and below}]{\text{long text above}}$$ <code>\xrightarrow[\text{and below}]{\text{long text above}}</code></li>
 </ul>
-<br>
-<ul class="command-list">
-<li><span class='math'>$$\nRightarrow $$</span>   <code>\nRightarrow</code></li>
-<li><span class='math'>$$\nLeftarrow $$</span>   <code>\nLeftarrow</code></li>
-<li><span class='math'>$$\nLeftrightarrow $$</span>   <code>\nLeftrightarrow</code></li>
-</ul>
+<section class='no-header'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xlongequal[below]{above} $$</span> <code>\xlongequal[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightarrow[below]{above} $$</span> <code>\xrightarrow[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xleftarrow[below]{above} $$</span> <code>\xleftarrow[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xleftrightarrow[below]{above} $$</span> <code>\xleftrightarrow[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightleftarrows[below]{above} $$</span> <code>\xrightleftarrows[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xtwoheadrightarrow[below]{above} $$</span> <code>\xtwoheadrightarrow[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xtwoheadleftarrow[below]{above} $$</span> <code>\xtwoheadleftarrow[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xRightarrow[below]{above} $$</span> <code>\xRightarrow[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xLeftarrow[below]{above} $$</span> <code>\xLeftarrow[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightharpoonup[below]{above} $$</span> <code>\xrightharpoonup[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xleftharpoonup[below]{above} $$</span> <code>\xleftharpoonup[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightharpoondown[below]{above} $$</span> <code>\xrightharpoondown[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xleftharpoondown[below]{above} $$</span> <code>\xleftharpoondown[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightleftharpoons[below]{above} $$</span> <code>\xrightleftharpoons[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xLeftrightarrow[below]{above} $$</span> <code>\xLeftrightarrow[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xleftrightharpoons[below]{above} $$</span> <code>\xleftrightharpoons[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xhookrightarrow[below]{above} $$</span> <code>\xhookrightarrow[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xhookleftarrow[below]{above} $$</span> <code>\xhookleftarrow[]{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xmapsto[below]{above} $$</span> <code>\xmapsto[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xtofrom[below]{above} $$</span> <code>\xtofrom[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\xrightequilibrium[below]{above} $$</span> <code>\xrightequilibrium[]{}</code></td>
+<td style="text-align:left"><span class='math'>$$\xleftequilibrium[below]{above} $$</span> <code>\xleftequilibrium[]{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
 <h2>Accents</h2>
-<p>Accents have a fixed width and do not stretch. For example, compare:</p>
+<p>Regular accents have a fixed width and do not stretch. For example, compare:</p>
 <ul>
 <li><span class='math'>$$\vec{ABC}$$</span> <code>\vec{ABC}</code></li>
 </ul>
@@ -874,8 +1054,8 @@ depending on the math style (Display or Inline).</p>
 <section class='deprecated'>
 The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content
-if there is an equivalent Unicode character available.
-<p>For example use $$é$$ (<code>é</code>) rather than $$\'{e}$$ (<code>\'{e}</code>).</p>
+when there is an equivalent Unicode character available.
+<p>For example use <code>é</code> rather than <code>\'{e}</code>.</p>
 </section>
 <hr>
 <ul class="command-list">
@@ -896,9 +1076,9 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\c{c} $$</span> <code>\c{c}</code></li>
 <li><span class='math'>$$\~{n} $$</span>   <code>\~{n}</code></li>
 </ul>
-<h2>Extensible Symbols</h2>
+<h3>Extensible Accents</h3>
 <ul class="command-list">
-<li><span class='math'>$$\overline{\unicode{&quot;2B1A}} $$</span> <code>\overline{}</code></li>
+<li><span class='math'>$$\overline{ABC} $$</span> <code>\overline{}</code></li>
 <li><span class='math'>$$\widehat{ABC} $$</span> <code>\widehat{}</code></li>
 <li><span class='math'>$$\widecheck{ABC} $$</span> <code>\widecheck{}</code></li>
 <li><span class='math'>$$\widetilde{ABC} $$</span> <code>\widetilde{}</code></li>
@@ -914,7 +1094,7 @@ if there is an equivalent Unicode character available.
 </ul>
 <hr>
 <ul class="command-list">
-<li><span class='math'>$$\underline{\unicode{&quot;2B1A}} $$</span> <code>\underline{}</code></li>
+<li><span class='math'>$$\underline{ABC} $$</span> <code>\underline{}</code></li>
 <li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
 <li><span class='math'>$$\underrightarrow{ABC} $$</span> <code>\underrightarrow{}</code></li>
 <li><span class='math'>$$\underleftarrow{ABC} $$</span> <code>\underleftarrow{}</code></li>
@@ -922,31 +1102,6 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\underlinesegment{ABC} $$</span> <code>\underlinesegment{}</code></li>
 <li><span class='math'>$$\undergroup{ABC} $$</span> <code>\undergroup{}</code></li>
 <li><span class='math'>$$\underbrace{ABC} $$</span> <code>\underbrace{}</code></li>
-</ul>
-<hr>
-<ul class="command-list">
-<li><span class='math'>$$\xrightarrow[below]{above} $$</span> <code>\xrightarrow[]{}</code></li>
-<li><span class='math'>$$\xleftarrow[below]{above} $$</span> <code>\xleftarrow[]{}</code></li>
-<li><span class='math'>$$\xRightarrow[below]{above} $$</span> <code>\xRightarrow[]{}</code></li>
-<li><span class='math'>$$\xLeftarrow[below]{above} $$</span> <code>\xLeftarrow[]{}</code></li>
-<li><span class='math'>$$\xleftharpoonup[below]{above} $$</span> <code>\xleftharpoonup[]{}</code></li>
-<li><span class='math'>$$\xleftharpoondown[below]{above} $$</span> <code>\xleftharpoondown[]{}</code></li>
-<li><span class='math'>$$\xrightharpoonup[below]{above} $$</span> <code>\xrightharpoonup[]{}</code></li>
-<li><span class='math'>$$\xrightharpoondown[below]{above} $$</span> <code>\xrightharpoondown[]{}</code></li>
-<li><span class='math'>$$\xlongequal[below]{above} $$</span> <code>\xlongequal[]{}</code></li>
-<li><span class='math'>$$\xtwoheadleftarrow[below]{above} $$</span> <code>\xtwoheadleftarrow[]{}</code></li>
-<li><span class='math'>$$\xtwoheadrightarrow[below]{above} $$</span> <code>\xtwoheadrightarrow[]{}</code></li>
-<li><span class='math'>$$\xleftrightarrow[below]{above} $$</span> <code>\xleftrightarrow[]{}</code></li>
-<li><span class='math'>$$\xLeftrightarrow[below]{above} $$</span> <code>\xLeftrightarrow[]{}</code></li>
-<li><span class='math'>$$\xrightleftharpoons[below]{above} $$</span> <code>\xrightleftharpoons[]{}</code></li>
-<li><span class='math'>$$\xleftrightharpoons[below]{above} $$</span> <code>\xleftrightharpoons[]{}</code></li>
-<li><span class='math'>$$\xhookleftarrow[below]{above} $$</span> <code>\xhookleftarrow[]{}</code></li>
-<li><span class='math'>$$\xhookrightarrow[below]{above} $$</span> <code>\xhookrightarrow[]{}</code></li>
-<li><span class='math'>$$\xmapsto[below]{above} $$</span> <code>\xmapsto[]{}</code></li>
-<li><span class='math'>$$\xtofrom[below]{above} $$</span> <code>\xtofrom[]{}</code></li>
-<li><span class='math'>$$\xrightleftarrows[below]{above} $$</span> <code>\xrightleftarrows[]{}</code></li>
-<li><span class='math'>$$\xrightequilibrium[below]{above} $$</span> <code>\xrightequilibrium[]{}</code></li>
-<li><span class='math'>$$\xleftequilibrium[below]{above} $$</span> <code>\xleftequilibrium[]{}</code></li>
 </ul>
 <h2>Relational Operators</h2>
 <p>To display a vertical “stack” of two symbols as a relation, use the <code>\stackrel</code>
@@ -1103,8 +1258,13 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 <li><span class='math'>$$\C $$</span>   <code>\C</code></li>
 <li><span class='math'>$$\Z $$</span>   <code>\Z</code></li>
 <li><span class='math'>$$\P $$</span>   <code>\P</code></li>
+<li><span class='math'>$$\doubleStruckCapitalN $$</span> <code>\doubleStruckCapitalN</code> (macro)</li>
+<li><span class='math'>$$\doubleStruckCapitalR $$</span> <code>\doubleStruckCapitalR</code> (macro)</li>
+<li><span class='math'>$$\doubleStruckCapitalQ $$</span> <code>\doubleStruckCapitalQ</code> (macro)</li>
+<li><span class='math'>$$\doubleStruckCapitalZ $$</span> <code>\doubleStruckCapitalZ</code> (macro)</li>
+<li><span class='math'>$$\doubleStruckCapitalP $$</span> <code>\doubleStruckCapitalP</code> (macro)</li>
 </ul>
-<h3>Unary/Binary Operators</h3>
+<h3>Unary/Binary Set Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\cap $$</span>   <code>\cap</code></li>
 <li><span class='math'>$$\cup $$</span>   <code>\cup</code></li>
@@ -1112,7 +1272,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 <li><span class='math'>$$\smallsetminus $$</span>   <code>\smallsetminus</code></li>
 <li><span class='math'>$$\complement $$</span>   <code>\complement</code></li>
 </ul>
-<h3>Relational Operators</h3>
+<h3>Relational Set Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\nsupseteqq $$</span>   <code>\nsupseteqq</code></li>
 <li><span class='math'>$$\supsetneq $$</span>   <code>\supsetneq</code></li>
@@ -1257,15 +1417,28 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}
 </ul>
 <h2>Delimiters</h2>
 <p>To grow delimiters based on their content, use <code>\left...\right</code>.</p>
-<p>Compare</p>
-<ul>
-<li><span class='math'>$$\lbrace x | \frac{x}{2} &gt; 0\rbrace $$</span> <code>\lbrace x | \frac{x}{2} &gt; 0\rbrace</code></li>
-</ul>
-<p>and</p>
-<ul>
-<li><span class='math'>$$\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace $$</span> <code>\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace</code></li>
-</ul>
-<p>To omit the delimiter, use <code>.</code>, <span class='math'>$$\left\lparen \frac1x \right.$$</span> <code>\left\lparen \frac1x \right.</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Regular delimiters</th>
+<th style="text-align:left"><code>\left...\right</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\lbrace x | \frac{x}{2} &gt; 0\rbrace $$</span></td>
+<td style="text-align:left"><span class='math'>$$\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace $$</span></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\lbrace x | \frac{x}{2} &gt; 0\rbrace</code></td>
+<td style="text-align:left"><code>\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace</code></td>
+</tr>
+</tbody>
+</table>
+<p>The left and right delimiters do not have to match:</p>
+<p><span class='math'>$$\left\lparen \frac1x \right\rbrack$$</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
+<p>To omit a delimiter, use <code>.</code>:</p>
+<p><span class='math'>$$\left\lparen \frac1x \right.$$</span> <code>\left\lparen \frac1x \right.</code></p>
 <hr>
 <p>The argument to <code>\left</code>, <code>\right</code> and <code>\middle</code> can be one of the
 following commands.</p>
@@ -1290,8 +1463,8 @@ following commands.</p>
 <li><span class='math'>$$\rVert $$</span>   <code>\rVert</code></li>
 <li><span class='math'>$$\lbrack $$</span>   <code>\lbrack</code></li>
 <li><span class='math'>$$\rbrack $$</span>   <code>\rbrack</code></li>
-<li><span class='math'>$${ $$</span>   <code>\{</code></li>
-<li><span class='math'>$$} $$</span>   <code>\}</code></li>
+<li><span class='math'>$$\{ $$</span>   <code>\{</code></li>
+<li><span class='math'>$$\} $$</span>   <code>\}</code></li>
 <li><span class='math'>$$( $$</span>   <code>(</code></li>
 <li><span class='math'>$$) $$</span>   <code>)</code></li>
 <li><span class='math'>$$[ $$</span>   <code>[</code></li>
@@ -1335,19 +1508,19 @@ following commands.</p>
 <li><span class='math'>$$\lozenge $$</span>   <code>\lozenge</code></li>
 <li><span class='math'>$$\blacklozenge $$</span>   <code>\blacklozenge</code></li>
 </ul>
-<h3>Boxes</h3>
+<hr>
 <ul class="command-list">
 <li><span class='math'>$$\square $$</span>   <code>\square</code></li>
 <li><span class='math'>$$\Box $$</span>   <code>\Box</code></li>
 <li><span class='math'>$$\blacksquare $$</span>   <code>\blacksquare</code></li>
 </ul>
-<h3>Circles</h3>
+<hr>
 <ul class="command-list">
 <li><span class='math'>$$\bigcirc $$</span>   <code>\bigcirc</code></li>
 <li><span class='math'>$$\circledS $$</span>   <code>\circledS</code></li>
 <li><span class='math'>$$\circledR $$</span>   <code>\circledR</code></li>
 </ul>
-<h3>Triangles</h3>
+<hr>
 <ul class="command-list">
 <li><span class='math'>$$\triangleleft $$</span>   <code>\triangleleft</code></li>
 <li><span class='math'>$$\triangleright $$</span>   <code>\triangleright</code></li>
@@ -1382,7 +1555,7 @@ following commands.</p>
 <li><span class='math'>$$\bigtriangleup $$</span>   <code>\bigtriangleup</code></li>
 <li><span class='math'>$$\bigtriangledown $$</span>   <code>\bigtriangledown</code></li>
 </ul>
-<h3>Crosses</h3>
+<hr>
 <ul class="command-list">
 <li><span class='math'>$$\dagger $$</span>   <code>\dagger</code></li>
 <li><span class='math'>$$\dag $$</span>   <code>\dag</code></li>
@@ -1430,15 +1603,54 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
 <h2>Decorations</h2>
-<ul class="command-list">
-<li><span class='math'>$${\color{blue}x+1=0}} $$</span> <code>{\color{blue} x+1=0}}</code></li>
-<li><span class='math'>$$\textcolor{blue}{x+1=0}$$</span> <code>\textcolor{blue}{x+1=0}</code></li>
-<li><span class='math'>$$\colorbox{#fbc0bd}{\unicode{&quot;2B1A}} $$</span> <code>\colorbox{}{}</code></li>
-<li><span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}} $$</span> <code>\fcolorbox{}{}{}</code></li>
-<li><span class='math'>$$\boxed{\unicode{&quot;2B1A}} $$</span> <code>\boxed{}</code></li>
-<li><span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}} $$</span> <code>\bbox[]{}</code></li>
-<li><span class='math'>$$\rule{2em}{1em} $$</span> <code>\rule[]{}{}</code></li>
-</ul>
+<section class='no-header'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\textcolor{blue}{x+1=0}$$</span></td>
+<td style="text-align:left"><code>\textcolor{blue}{x+1=0}</code></td>
+<td style="text-align:left">Recommended over <code>\color</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$${\color{blue}x+1=0}} $$</span></td>
+<td style="text-align:left"><code>{\color{blue} x+1=0}}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\colorbox{yellow}{\[ax^2+bx+c\]} $$</span></td>
+<td style="text-align:left"><code>\colorbox{yellow}{\[ax^2+bx+c\]}</code></td>
+<td style="text-align:left">The argument is in Text Mode. Use <code>\[...\]</code> to switch to math mode.</td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}} $$</span></td>
+<td style="text-align:left"><code>\fcolorbox{}{}{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\boxed{1+\frac{1}{x}} $$</span></td>
+<td style="text-align:left"><code>\boxed{1+\frac{1}{x}}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}} $$</span></td>
+<td style="text-align:left"><code>\bbox[]{}</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\rule{2em}{1em} $$</span></td>
+<td style="text-align:left"><code>\rule[]{2em}{1em}</code></td>
+<td style="text-align:left">The arguments are the width and height. The optional argument is an offset from the baseline.</td>
+</tr>
+</tbody>
+</table>
+</section>
 <h3>Notations</h3>
 <h4><code>\enclose</code></h4>
 <p>The <code>\enclose</code> command is very flexible. It accepts three arguments, two of
@@ -1446,23 +1658,92 @@ which are required:</p>
 <pre><code class="language-tex">    <span class="hljs-keyword">\enclose</span>{&lt;notation&gt;}[&lt;style&gt;]{&lt;body&gt;}
 </code></pre>
 <ul>
-<li><code>&lt;notation&gt;</code> a list of whitespace-delimited values:
-<ul>
-<li><code>box</code></li>
-<li><code>roundedbox</code></li>
-<li><code>circle</code></li>
-<li><code>top</code>, <code>left</code>, <code>right</code> and <code>bottom</code></li>
-<li><code>horizontalstrike</code>, <code>verticalstrike</code></li>
-<li><code>updiagonalstrike</code>, <code>downdiagonalstrike</code></li>
-<li><code>updiagonalarrow</code></li>
-<li><code>phasorangle</code></li>
-<li><code>radical</code></li>
-<li><code>longdiv</code></li>
-<li><code>actuarial</code></li>
-<li><code>madruwb</code></li>
+<li><code>&lt;notation&gt;</code> a list of whitespace-delimited values:</li>
 </ul>
-</li>
-<li><code>&lt;style&gt;</code> an optional list of comma separated attributes including:
+<section class='no-header'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{box}{x=0} $$</span></td>
+<td style="text-align:left"><code>box</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{roundedbox}{x=0} $$</span></td>
+<td style="text-align:left"><code>roundedbox</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{circle}{x=0} $$</span></td>
+<td style="text-align:left"><code>circle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{top}{x=0} $$</span></td>
+<td style="text-align:left"><code>top</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{left}{x=0} $$</span></td>
+<td style="text-align:left"><code>left</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{bottom}{x=0} $$</span></td>
+<td style="text-align:left"><code>bottom</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{right}{x=0} $$</span></td>
+<td style="text-align:left"><code>right</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{horizontalstrike}{x=0} $$</span></td>
+<td style="text-align:left"><code>horizontalstrike</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{verticalstrike}{x=0} $$</span></td>
+<td style="text-align:left"><code>verticalstrike</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{updiagonalstrike}{x=0} $$</span></td>
+<td style="text-align:left"><code>updiagonalstrike</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{downdiagonalstrike}{x=0} $$</span></td>
+<td style="text-align:left"><code>downdiagonalstrike</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{updiagonalarrow}{x=0} $$</span></td>
+<td style="text-align:left"><code>updiagonalarrow</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{phasorangle}{x=0} $$</span></td>
+<td style="text-align:left"><code>phasorangle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{radical}{x=0} $$</span></td>
+<td style="text-align:left"><code>radical</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{longdiv}{x=0} $$</span></td>
+<td style="text-align:left"><code>longdiv</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{actuarial}{x=0} $$</span></td>
+<td style="text-align:left"><code>actuarial</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\enclose{madruwb}{x=0} $$</span></td>
+<td style="text-align:left"><code>madruwb</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<p>They can be combined:</p>
+<p><span class='math'>$$\enclose{roundedbox updiagonalstrike}{x=0} $$</span>  <code>roundedbox, updiagonalstrike</code></p>
+<ul>
+<li><code>&lt;style&gt;</code> an optional list of comma separated key-value pairs including:
 <ul>
 <li><code>mathbackground=&quot;&lt;color&gt;&quot;</code> background color of the expression</li>
 <li><code>mathcolor=&quot;&lt;color&gt;&quot;</code> color of the notation, for example <code>red</code> or <code>#cd0030</code>
@@ -1477,8 +1758,7 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 </li>
 <li><code>&lt;body&gt;</code> a math expression that is “enclosed” by the specified notations</li>
 </ul>
-<p class="notice--info"><code>\enclose</code> is an extension to LaTeX that follows the <code>&lt;menclose&gt;</code>
-definition of <a href="">MathML</a> and the LaTeX flavor defined by MathJax.</p>
+<p class="notice--info"><code>\enclose</code> is a LaTeX extension introduced by MathJax that follows the <code>&lt;menclose&gt;</code> definition of <a href="">MathML</a>.</p>
 <ul>
 <li><span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0} $$</span> <code>\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=&quot;#fbc0bd&quot;]{x=0}</code></li>
 <li><span class='math'>$$\enclose{circle}[mathbackground=“#fbc0bd”]{\frac1x}$$</span> <code>\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}</code></li>
@@ -1619,74 +1899,136 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <h3>Deprecated</h3>
 <p>The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content</p>
-<ul class="command-list">
-<li><span class='math'>$${\bf Don Knuth} $$</span> <code>\bf</code> – Use <code>\textbf{}</code> or <code>\bfseries</code> instead.</li>
-<li><span class='math'>$${\it Don Knuth} $$</span> <code>\it</code> – Use <code>\textit{}</code> or <code>\itshape</code> instead.</li>
-</ul>
+<section class="no-header">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$${\bf Don Knuth} $$</span></td>
+<td style="text-align:left"><code>{\bf Don Knuth}</code></td>
+<td style="text-align:left">Use <code>\textbf{}</code> or <code>\bfseries</code> instead.</td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$${\it Don Knuth} $$</span></td>
+<td style="text-align:left"><code>{\it Don Knuth}</code></td>
+<td style="text-align:left">Use <code>\textit{}</code> or <code>\itshape</code> instead.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <h2>Sizing</h2>
+<p>In LaTeX using the sizing commands below may not always achieve the expected result. In MathLive, the sizing commands are applied consistently to text and math mode.</p>
+<p>These size are relative to the <code>font-size</code> property of the mathfield.</p>
+<section class="no-header">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\tiny{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\tiny</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\scriptsize{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\scriptsize</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\footnotesize{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\footnotesize</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\small{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\small</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\normalsize{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\normalsize</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\large{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\large</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Large{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\Large</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\LARGE{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\LARGE</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\huge{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\huge</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Huge{e^{i\pi}=0} $$</span></td>
+<td style="text-align:left"><code>\Huge</code></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+</section>
+<p>The size of delimiters can be controlled manually with the commands below. The <code>\left...\right...</code> commands calculate automatically the size of the
+delimiters based on the content.</p>
+<section class="no-header">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\bigl( \bigm| \bigr) $$</span></td>
+<td style="text-align:left"><code>\bigl( \bigm| \bigr)</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Bigl( \Bigm| \Bigr) $$</span></td>
+<td style="text-align:left"><code>\Bigl( \Bigm| \Bigr)</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\biggl( \biggm| \biggr) $$</span></td>
+<td style="text-align:left"><code>\biggl( \biggm| \biggr)</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\Biggl( \Biggm| \Biggr) $$</span></td>
+<td style="text-align:left"><code>\Biggl( \Biggm| \Biggr)</code></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+</section>
 <ul class="command-list">
-<li><span class='math'>$$\tiny{x=0} $$</span> <code>\tiny</code></li>
-<li><span class='math'>$$\scriptsize{x=0} $$</span> <code>\scriptsize</code></li>
-<li><span class='math'>$$\footnotesize{x=0} $$</span> <code>\footnotesize</code></li>
-<li><span class='math'>$$\small{x=0} $$</span> <code>\small</code></li>
-<li><span class='math'>$$\normalsize{x=0} $$</span> <code>\normalsize</code></li>
-<li><span class='math'>$$\large{x=0} $$</span> <code>\large</code></li>
-<li><span class='math'>$$\Large{x=0} $$</span> <code>\Large</code></li>
-<li><span class='math'>$$\LARGE{x=0} $$</span> <code>\LARGE</code></li>
-<li><span class='math'>$$\huge{x=0} $$</span> <code>\huge</code></li>
-<li><span class='math'>$$\Huge{x=0} $$</span> <code>\Huge</code></li>
-</ul>
-<hr>
-<ul class="command-list command-list command-list command-list command-list">
-<li>
-<p><span class='math'>$$\bigl( $$</span> <code>\bigl{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\bigr) $$</span> <code>\bigr{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\bigm| $$</span> <code>\bigm{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Bigl( $$</span> <code>\Bigl{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Bigr) $$</span> <code>\Bigr{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Bigm| $$</span> <code>\Bigm{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\biggl( $$</span> <code>\biggl{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\biggr) $$</span> <code>\biggr{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\biggm| $$</span> <code>\biggm{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Biggl( $$</span> <code>\Biggl{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Biggr) $$</span> <code>\Biggr{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Biggm| $$</span> <code>\Biggm{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\big(\big) $$</span> <code>\big{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Big(\Big) $$</span> <code>\Big{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\bigg(\bigg) $$</span> <code>\bigg{}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\Bigg(\Bigg) $$</span> <code>\Bigg{}</code></p>
-</li>
+<li><span class='math'>$$\big(\big) $$</span> <code>\big{}</code></li>
+<li><span class='math'>$$\Big(\Big) $$</span> <code>\Big{}</code></li>
+<li><span class='math'>$$\bigg(\bigg) $$</span> <code>\bigg{}</code></li>
+<li><span class='math'>$$\Bigg(\Bigg) $$</span> <code>\Bigg{}</code></li>
 </ul>
 <h2>Various</h2>
 <ul class="command-list command-list">
@@ -1802,7 +2144,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <p><span class='math'>$$\phantom $$</span> <code>\phantom{}</code></p>
 </li>
 </ul>
-<h2>MediaWiki Package (<code>texvc.sty</code>)</h2>
+<h2>MediaWiki (<code>texvc.sty</code> package)</h2>
 <p>MathLive supports the commands used by <a href="https://en.wikipedia.org/wiki/Help:Displaying_a_formula">MediaWiki</a> pages, except for the deprecated ones.</p>
 <ul>
 <li><span class='math'>$$ \darr $$</span> <code>\darr</code></li>
@@ -1869,7 +2211,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <li><span class='math'>$$ \weierp $$</span> <code>\weierp</code></li>
 <li><span class='math'>$$ \Zeta $$</span> <code>\Zeta</code></li>
 </ul>
-<h2>Chemistry</h2>
+<h2>Chemistry (<code>mhchem</code> package)</h2>
 <p>MathLive  supports the <a href="https://mhchem.github.io/MathJax-mhchem/"><code>mhchem</code> package</a>.</p>
 <h3>Chemical Formulae</h3>
 <ul class="command-list">
@@ -1915,7 +2257,6 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <h2>Macros</h2>
 <ul class="command-list">
 <li><span class='math'>$$\iff $$</span> <code>\iff</code></li>
-<li><span class='math'>$$\nicefrac{3}{4} $$</span> <code>\nicefrac{3}{4}</code></li>
 <li><span class='math'>$$\bra{\Psi} $$</span> <code>\bra{\Psi}</code></li>
 <li><span class='math'>$$\ket{\Psi} $$</span> <code>\ket{\Psi}</code></li>
 <li><span class='math'>$$\braket{ab} $$</span> <code>\braket{}</code></li>
@@ -1926,11 +2267,6 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <li><span class='math'>$$\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 } $$</span> <code>\Set{ x\in\mathbf{R}^2 | 0&lt;{|x|}&lt;5 }</code></li>
 <li><span class='math'>$$\rd $$</span> <code>\rd</code></li>
 <li><span class='math'>$$\rD $$</span> <code>\rD</code></li>
-<li><span class='math'>$$\doubleStruckCapitalN $$</span> <code>\doubleStruckCapitalN</code></li>
-<li><span class='math'>$$\doubleStruckCapitalR $$</span> <code>\doubleStruckCapitalR</code></li>
-<li><span class='math'>$$\doubleStruckCapitalQ $$</span> <code>\doubleStruckCapitalQ</code></li>
-<li><span class='math'>$$\doubleStruckCapitalZ $$</span> <code>\doubleStruckCapitalZ</code></li>
-<li><span class='math'>$$\doubleStruckCapitalP $$</span> <code>\doubleStruckCapitalP</code></li>
 <li><span class='math'>$$\scriptCapitalE $$</span> <code>\scriptCapitalE</code></li>
 <li><span class='math'>$$\scriptCapitalH $$</span> <code>\scriptCapitalH</code></li>
 <li><span class='math'>$$\scriptCapitalL $$</span> <code>\scriptCapitalL</code></li>
@@ -2151,7 +2487,7 @@ f(x) &amp; = (a+b)^2 \
 </li>
 </ul>
 <hr>
-<p>These environments do not form a math environment by themselves but can
+<p>These environments do not form a math environment by themselves but
 can be used as building blocks for more elaborate structures:</p>
 <ul>
 <li><span class='math'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\
@@ -2165,7 +2501,7 @@ a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</span>  <code>\​begin{split}...\
 a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</span>  <code>\​begin{aligned}...\end{aligned}</code></li>
 </ul>
 <h2>TeX Internals</h2>
-<p>The commands are TeX primitives. Most are only useful when writing
+<p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
 <ul>
 <li><code>\limits</code> and <code>\nolimits</code></li>
@@ -2185,10 +2521,10 @@ TeX packages or macros.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 16, 2021">
+        <meta itemprop="datePublished" content="May 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 16 2021 17:30:48 GMT+0200 (Central European Summer Time)">May 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon May 17 2021 10:07:21 GMT+0200 (Central European Summer Time)">May 17, 2021</time></p>
         
       </footer>
 
