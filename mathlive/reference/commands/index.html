@@ -449,12 +449,24 @@
     padding: 10px;
     list-style: none;
   }
+
   .math {
-    display: none;
+    visibility: hidden;
   }
+
+  .math.frame {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+
   body.ready .math {
-    display: inline;
+    visibility: visible;
   }
+
   .deprecated {
     background: #fafafa;
     padding: 1em;
@@ -465,6 +477,15 @@
   }
   .no-header thead {
     display: none;
+  }
+
+  table {
+    width: auto;
+  }
+
+  .center {
+    display: flex;
+    justify-content: center;
   }
   
 </style>
@@ -498,8 +519,8 @@ of subscripts and superscripts</li>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</td>
-<td style="text-align:left">$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</td>
+<td style="text-align:left"><span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left"><span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
@@ -519,8 +540,8 @@ of subscripts and superscripts</li>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">$$if and only if x &gt; 0$$</td>
-<td style="text-align:left">$$\text{if and only if } x &gt; 0$$</td>
+<td style="text-align:left"><span class='math'>$$if and only if x &gt; 0$$</span></td>
+<td style="text-align:left"><span class='math'>$$\text{if and only if } x &gt; 0$$</span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>if and only if x &gt; 0</code></td>
@@ -791,7 +812,7 @@ depending on the math style (<strong>Display Style</strong> or <strong>Text Styl
 <li><span class='math'>$$\dashv $$</span>   <code>\dashv</code></li>
 </ul>
 <h2>Arrows</h2>
-<section class='no-header'>
+<section class='no-header center'>
 <table>
 <thead>
 <tr>
@@ -943,14 +964,14 @@ depending on the math style (<strong>Display Style</strong> or <strong>Text Styl
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\leadsto $$</span>   <code>\leadsto</code></td>
-<td style="text-align:left" class="no-header"></td>
+<td style="text-align:left"></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
 </section>
 <h3>Negated Arrows</h3>
-<section class='no-header'>
+<section class='no-header center'>
 <table>
 <thead>
 <tr>
@@ -982,7 +1003,7 @@ the arrows, which is specified as an argument (and optional argument):</p>
 <li>$$\xrightarrow{\text{long text above}}$$ <code>\xrightarrow{\text{long text above}}</code></li>
 <li>$$\xrightarrow[\text{and below}]{\text{long text above}}$$ <code>\xrightarrow[\text{and below}]{\text{long text above}}</code></li>
 </ul>
-<section class='no-header'>
+<section class='no-header center'>
 <table>
 <thead>
 <tr>
@@ -1612,7 +1633,7 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
 <h2>Decorations</h2>
-<section class='no-header'>
+<section class='no-header center'>
 <table>
 <thead>
 <tr>
@@ -1669,7 +1690,7 @@ which are required:</p>
 <ul>
 <li><code>&lt;notation&gt;</code> a list of whitespace-delimited values:</li>
 </ul>
-<section class='no-header'>
+<section class='no-header center'>
 <table>
 <thead>
 <tr>
@@ -1908,7 +1929,7 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <h3>Deprecated</h3>
 <p>The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content</p>
-<section class="no-header">
+<section class="no-header center">
 <table>
 <thead>
 <tr>
@@ -1935,7 +1956,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <h2>Sizing</h2>
 <p>In LaTeX using the sizing commands below may not always achieve the expected result. In MathLive, the sizing commands are applied consistently to text and math mode.</p>
 <p>These size are relative to the <code>font-size</code> property of the mathfield.</p>
-<section class="no-header">
+<section class="no-header center">
 <table>
 <thead>
 <tr>
@@ -2000,7 +2021,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 </section>
 <p>The size of delimiters can be controlled manually with the commands below. The <code>\left...\right...</code> commands calculate automatically the size of the
 delimiters based on the content.</p>
-<section class="no-header">
+<section class="no-header center">
 <table>
 <thead>
 <tr>
@@ -2301,13 +2322,13 @@ in a matrix, or multi-line equations.</p>
 <p>Each column is separated by a <code>&amp;</code>.</p>
 <h3>Matrixes</h3>
 <h4><code>array</code></h4>
+<p>A simple matrix with no delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{lc}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
-<p><span class="math">$$\begin{array}{lc}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
-<p>A simple matrix with no delimiters.</p>
+<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <p>The <code>{lc}</code> argument specifies how many columns there are and how they should be
 formated:</p>
 <ul>
@@ -2316,7 +2337,7 @@ formated:</p>
 <li><code>r</code>: right-aligned</li>
 </ul>
 <p>To add a vertical line separating columns, add <code>|</code> character in the column format:</p>
-<p><span class="math">$$\begin{array}{l|c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<div class="math frame">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l|c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
@@ -2324,14 +2345,14 @@ formated:</p>
 </code></pre>
 <p>To add a double vertical line separating columns, add two <code>|</code> characters in the
 column format:</p>
-<p>$$\begin{array}{l||c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<div class="math frame">$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l||c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
 <p>To add a dashed vertical line between two columns, use <code>:</code>:</p>
-<p><span class="math">$$\begin{array}{l:c}a + 1 &amp; b  + 1 \\ c &amp; \frac{1}{d}\end{array} $$</span></p>
+<div class="math frame">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l:c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
@@ -2345,7 +2366,7 @@ argument to specify the format of the columns.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix}
 </code></pre>
-<p><span class="math">$$\begin{matrix}a + 1   &amp;   b  + 1 \\ c       &amp;   \frac{1}{d} \end{matrix}$$</span></p>
+<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
 <p>To specify the format of the columns, use the starred version and an optional
 argument. This applies to all the other <code>matrix</code> environments.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}[l|r]
@@ -2353,7 +2374,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
-<p><span class="math">$$\begin{matrix*}[l|r]a + 1   &amp;   b  + 1 \\ c       &amp;   \frac{1}{d} \end{matrix*}$$</span></p>
+<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
 <h4><code>pmatrix</code></h4>
 <p>A matrix with <strong>parentheses</strong> as delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{pmatrix}
@@ -2361,7 +2382,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{pmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{pmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{pmatrix}$$</span></p>
+<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
 <h4><code>bmatrix</code></h4>
 <p>A matrix with <strong>square brackets</strong> as delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{bmatrix}
@@ -2369,7 +2390,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{bmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{bmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{bmatrix}$$</span></p>
+<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
 <h4><code>Bmatrix</code></h4>
 <p>A matrix with <strong>braces</strong> (curly brackets) as delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Bmatrix}
@@ -2377,7 +2398,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{Bmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{Bmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{Bmatrix}$$</span></p>
+<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
 <h4><code>vmatrix</code></h4>
 <p>A matrix with <strong>single bars</strong> as delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{vmatrix}
@@ -2385,7 +2406,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{vmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{vmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{vmatrix}$$</span></p>
+ <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
 <h4><code>Vmatrix</code></h4>
 <p>A matrix with <strong>double bars</strong> as delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Vmatrix}
@@ -2393,18 +2414,18 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{Vmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{Vmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{Vmatrix}$$</span></p>
+<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
 <h4><code>matrix*</code></h4>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
-<p><span class='math'>$$\begin{matrix*}a &amp; b \\ c &amp; \frac{1}{d}\end{matrix*}$$</span></p>
+<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
 <h4><code>smallmatrix</code></h4>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span><span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
 </code></pre>
-<p><span class='math'>$$\begin{smallmatrix}a &amp; b \\ c &amp; \frac{1}{d}\end{smallmatrix}$$</span></p>
+<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 <h3>Other Environments</h3>
 <h4><code>cases</code>, <code>dcases</code> and <code>rcases</code></h4>
 <p>Use these environments to write piecewise functions:</p>
@@ -2414,11 +2435,11 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{cases}
 
 </code></pre>
-<p><span class='math'>$$f(n) = \begin{cases}
-1 &amp; \text{if } n = 0  \\
-f(n-1) + f(n-2) &amp; \text{if } n \ge 2
+<div class='math frame'>$$f(n) = \begin{cases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{cases}
-$$</span></p>
+$$</div>
 <p>To typeset the content in Display style, use <code>dcases</code> instead:</p>
 <pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{dcases}
   1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
@@ -2426,11 +2447,11 @@ $$</span></p>
 <span class="hljs-keyword">\end</span>{dcases}
 
 </code></pre>
-<p><span class='math'>$$f(n) = \begin{dcases}
-1 &amp; \text{if } n = 0  \\
-f(n-1) + f(n-2) &amp; \text{if } n \ge 2
+<div class='math frame'>$$f(n) = \begin{dcases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{dcases}
-$$</span></p>
+$$</div>
 <p>To display the brace on the right, use <code>rcases</code>.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{rcases}
   1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
@@ -2438,11 +2459,11 @@ $$</span></p>
 <span class="hljs-keyword">\end</span>{rcases} = f(n)
 
 </code></pre>
-<p><span class='math'>$$\begin{rcases}
-1 &amp; \text{if } n = 0  \\
-f(n-1) + f(n-2) &amp; \text{if } n \ge 2
-\end{rcases} = f(n)
-$$</span></p>
+<div class='math frame'>$$\begin{rcases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
+\end{rcases} = f(n) 
+$$</div>
 <h4><code>gather</code></h4>
 <p>Consecutive equations without alignment</p>
 <pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{gather}
@@ -2451,11 +2472,11 @@ $$</span></p>
     a = <span class="hljs-keyword">\frac</span>{13}{4}x - <span class="hljs-keyword">\frac</span>{1}{2}
   <span class="hljs-keyword">\end</span>{gather}
 </code></pre>
-<p><span class='math'>$$\begin{gather}
-3(a-x) = 3.5x + a - 1 \\
-3a - 3x = 3.5x + a - 1 \\
-a = \frac{13}{4}x - \frac{1}{2}
-\end{gather} $$</span></p>
+<div class='math frame'>$$\begin{gather}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{gather} $$</div>  
 <h4><code>multline</code></h4>
 <p>The first line is left aligned, the last line is right aligned.</p>
 <pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{multline}
@@ -2464,56 +2485,49 @@ a = \frac{13}{4}x - \frac{1}{2}
     a = <span class="hljs-keyword">\frac</span>{13}{4}x - <span class="hljs-keyword">\frac</span>{1}{2}
   <span class="hljs-keyword">\end</span>{multline}
 </code></pre>
-<p><span class='math'>$$\begin{multline}
-3(a-x) = 3.5x + a - 1 \\
-3a - 3x = 3.5x + a - 1 \\
-a = \frac{13}{4}x - \frac{1}{2}
-\end{multline} $$</span></p>
+<div class='math frame'>$$\begin{multline}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{multline} $$</div>  
 <h4><code>align</code></h4>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{align}
   f(x)  <span class="hljs-built_in">&amp;</span> = (a+b)<span class="hljs-built_in">^</span>2 <span class="hljs-keyword">\\</span>
         <span class="hljs-built_in">&amp;</span> = a<span class="hljs-built_in">^</span>2+2ab+b<span class="hljs-built_in">^</span>2 <span class="hljs-keyword">\\</span>
 <span class="hljs-keyword">\end</span>{align}
 </code></pre>
-<p><span class='math'>$$\begin{align}
-f(x) &amp; = (a+b)^2 \
-&amp; = a^2+2ab+b^2 \
-\end{align}$$</span></p>
+<div class='math frame'>$$\begin{align}
+f(x) & = (a+b)^2 \\
+& = a^2+2ab+b^2 \\
+\end{align}$$</div>  
 <h4>Others</h4>
-<ul>
-<li>
-<p><span class='math'>$$\begin{math}x+\frac12\end{math}$$</span> <code>$$\begin{math}x+\frac12\end{math}$$</code></p>
-</li>
-<li>
-<p><span class='math'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</span> <code>$$\begin{displaymath}x+\frac12\end{displaymath}$$</code></p>
-</li>
-<li>
-<p><span class='math'>$$\begin{equation}x+\frac12\end{equation} $$</span>  <code>\​begin{equation}x+\frac12\end{equation}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\begin{subequations}x+\frac12\end{subequations} $$</span>  <code>\​begin{subequations}x+\frac12\end{subequations}</code></p>
-</li>
-<li>
-<p><span class='math'>$$\begin{eqnarray}a &amp; b \ c &amp; \frac{1}{d}\end{eqnarray} $$</span>  <code>\​begin{eqnarray}...\end{eqnarray}</code> – Avoid, use <code>align</code> instead</p>
-</li>
-<li>
-<p><span class='math'>$$\begin{center}\text{first}\end{center}$$</span> <code>$$\begin{center}\text{first}\end{center} $$&lt;/span&gt;  </code></p>
-</li>
-</ul>
+<p><code>$$\begin{math}x+\frac12\end{math}$$</code></p>
+<div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
+<p><code>$$\begin{displaymath}x+\frac12\end{displaymath}$$</code></p>
+<div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
+<p><code>\​begin{equation}x+\frac12\end{equation}</code></p>
+<p><span class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div></p>
+<p><code>\​begin{subequations}x+\frac12\end{subequations}</code></p>
+<div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
+<p><code>\​begin{eqnarray}...\end{eqnarray}</code> – Avoid, use <code>align</code> instead</p>
+ <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
+<p><code>$$\begin{center}\text{first}\end{center} $$</code></p>
+ <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
 <hr>
 <p>These environments do not form a math environment by themselves but
 can be used as building blocks for more elaborate structures:</p>
-<ul>
-<li><span class='math'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\
-3a - 3x = 3.5x + a - 1 \\
-a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</span>  <code>\​begin{gathered}...\end{gathered}</code></li>
-<li><span class='math'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\
-3a - 3x = 3.5x + a - 1 \\
-a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</span>  <code>\​begin{split}...\end{split}</code></li>
-<li><span class='math'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\
-3a - 3x = 3.5x + a - 1 \\
-a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</span>  <code>\​begin{aligned}...\end{aligned}</code></li>
-</ul>
+<p><code>\​begin{gathered}...\end{gathered}</code></p>
+<div class='math frame'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</div>  
+<p><code>\​begin{split}...\end{split}</code></p>
+<div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
+<p><code>\​begin{aligned}...\end{aligned}</code></p>
+<div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
 <h2>TeX Internals</h2>
 <p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
@@ -2539,7 +2553,7 @@ TeX packages or macros.</p>
         <meta itemprop="datePublished" content="May 18, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 08:44:48 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 10:30:24 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
         
       </footer>
 
