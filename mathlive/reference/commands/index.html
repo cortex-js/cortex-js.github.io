@@ -1912,6 +1912,28 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></li>
 <li><span class='math'>$${\frak Don Knuth} $$</span> <code>\frak{}</code></li>
 </ul>
+<h3>MathJax HTML Extension</h3>
+<p>MathLive support some commands from the <a href="http://docs.mathjax.org/en/latest/input/tex/extensions/html.html">MathJax HTML extension</a>.</p>
+<p><code>\class{}{}</code>
+<span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span></p>
+<p>When used in a <code>&lt;math-field&gt;</code> component, the class names should refer to a
+stylesheet defined with a <code>&lt;style&gt;</code> tag inside the <code>&lt;math-field&gt;</code> element:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css">
+    <span class="hljs-selector-class">.custom-class</span> { <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">2px</span> <span class="hljs-number">2px</span> <span class="hljs-number">2px</span> <span class="hljs-number">#000</span> };
+  </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+
+  \class{custom-class}{\frac{1}{x+1}}
+
+<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+
+</code></pre>
+<hr>
+<p><code>\cssId{}{}</code></p>
+<p><span class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</span></p>
+<hr>
+<p><code>\htmlData{}{}</code></p>
+<p><span class='math frame'>$$\htmlData{foo=bar}{ Don Knuth} $$</span></p>
 <h3>Others</h3>
 <ul class="command-list">
 <li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code> Small Caps</li>
@@ -1919,9 +1941,6 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$$\textsc{Don Knuth} $$</span> <code>\textsc{}</code></li>
 <li><span class='math'>$$\textrm{Don Knuth} $$</span> <code>\textrm{}</code></li>
 <li><span class='math'>$$\mathrm{Don Knuth} $$</span> <code>\mathrm{}</code></li>
-<li><span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> <code>\class{}{}</code></li>
-<li><span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> <code>\cssId{}{}</code></li>
-<li><span class='math'>$${\htmlData Don Knuth} $$</span> <code>\htmlData{}{}</code></li>
 <li><span class='math'>$$\text{Don {\em{Knuth}}} $$</span> <code>\em{}</code> – Emphasis</li>
 <li><span class='math'>$$\text{Don \emph{Knuth} }$$</span> <code>\emph{}</code> – Emphasis</li>
 </ul>
@@ -2553,7 +2572,7 @@ TeX packages or macros.</p>
         <meta itemprop="datePublished" content="May 18, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 10:30:24 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 13:29:04 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
         
       </footer>
 
