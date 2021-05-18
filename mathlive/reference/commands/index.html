@@ -441,7 +441,7 @@
 <style>
   ul.command-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
   ul.command-list,
   .command-list li {
@@ -487,12 +487,20 @@
     display: flex;
     justify-content: center;
   }
+
+  .no-line td {
+    border: none;
+  }
+  .two-col td {
+    width: 50%;
+  }
+
   
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
 <p>To find the name of a LaTeX command matching a shape you can draw, use
 <a href="http://detexify.kirelabs.org/classify.html">Detexify</a>.</p>
-<h2>Math Styles and Text Mode</h2>
+<h2>Text Mode, Math Mode and Math Style</h2>
 <h3>Math Mode</h3>
 <p>When in <strong>Math Mode</strong>, the content is laid out using typesetting rules specific
 to math. For example, variables are displayed in italics, an appropriate amount
@@ -505,11 +513,12 @@ displayed in a smaller font.</p>
 with the following commands:</p>
 <ul>
 <li><code>\displaystyle</code>: <strong>Display Style</strong> for standalone equations</li>
-<li><code>\textstyle</code>: <strong>Text Style</strong> for inline math</li>
+<li><code>\textstyle</code>: <strong>Text Style</strong> is the confusing name for inline math, not for text mode.</li>
 <li><code>\scriptstyle</code>: <strong>Script Style</strong> for subscripts and superscripts</li>
 <li><code>\scriptscriptstyle</code>: <strong>Scriptscript Style</strong> for subscripts and superscripts
 of subscripts and superscripts</li>
 </ul>
+<div class='no-line two-col'>
 <table>
 <thead>
 <tr>
@@ -528,9 +537,29 @@ of subscripts and superscripts</li>
 </tr>
 </tbody>
 </table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Script Style</th>
+<th style="text-align:left">Scriptscript Style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left"><span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
+<td style="text-align:left"><code>\scriptscripstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 <h3>Text Mode</h3>
 <p>To include some textual comments, switch to <strong>Text Mode</strong> using the
 <code>\text{}</code> command.</p>
+<div class='no-line two-col'>
 <table>
 <thead>
 <tr>
@@ -549,6 +578,23 @@ of subscripts and superscripts</li>
 </tr>
 </tbody>
 </table>
+</div>
+<p>The <code>\text{}</code> command will use the font defined by the <code>font-family</code> attribute
+of the enclosing mathfield. The size of the text will adjust depending on
+the current math style (smaller in superscript/subscript).</p>
+<hr>
+<p>The <code>\textrm{}</code> command works like <code>\text{}</code> but will use a serif (roman) font.</p>
+<p><code>\textrm{Don Knuth}_\textrm{Don Knuth}</code></p>
+<div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+<hr>
+<p>The <code>\mbox{}</code> command uses the same font as <code>\text</code> but its size does not
+account for the current math style.</p>
+<p><code>\mbox{Don Knuth}_\mbox{Don Knuth}</code></p>
+<div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+<hr>
+<p>The <code>\textnormal{}</code> command works like <code>\text{}</code>. But it’s longer to type.</p>
+<p><code>\textnormal{Don Knuth}_\textnormal{Don Knuth} </code></p>
+<div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
 <p>When in Text Mode, use <code>$...$</code> to switch back to Math Mode, Text Style (inline math) or <code>\\[...\\]</code> to switch
 to Math Mode, Display Style.</p>
 <h2>Fractions and Binomials</h2>
@@ -558,7 +604,7 @@ to Math Mode, Display Style.</p>
 <li><span class='math'>$$\tfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}} $$</span> <code>\tfrac{}{}</code></li>
 </ul>
 <p>The <code>\dfrac</code> command typesets its numerator and denominator in Display Style.
-The <code>\tfrac</code> command uses Text Style (inline).</p>
+The <code>\tfrac</code> command uses Text Style (inline math).</p>
 <ul class="command-list">
 <li><span class='math'>$$\cfrac[l]{1}{x+1} $$</span> <code>\cfrac[l]{1}{x+1}</code></li>
 <li><span class='math'>$$\cfrac[r]{1}{x+1} $$</span> <code>\cfrac[r]{1}{x+1}</code></li>
@@ -1003,7 +1049,7 @@ the arrows, which is specified as an argument (and optional argument):</p>
 <li>$$\xrightarrow{\text{long text above}}$$ <code>\xrightarrow{\text{long text above}}</code></li>
 <li>$$\xrightarrow[\text{and below}]{\text{long text above}}$$ <code>\xrightarrow[\text{and below}]{\text{long text above}}</code></li>
 </ul>
-<section class='no-header center'>
+<section class='no-header center no-line two-col'>
 <table>
 <thead>
 <tr>
@@ -1849,16 +1895,6 @@ and a background color. To use a specific color value, use a RGB color instead.<
 and <code>Magenta</code>. Those names are case-sensitive.</p>
 <h2>Font Styling</h2>
 <ul class="command-list">
-<li><span class='math'>$$\text{Don Knuth} $$</span> <code>\text{}</code> – Regular text</li>
-<li><span class='math'>$$\mbox{Some text} $$</span> <code>\mbox{}</code> – Alternative to <code>\text{}</code></li>
-<li><span class='math'>$$\ensuremath $$</span> <code>\ensuremath{}</code></li>
-<li><span class='math'>$$\displaystyle $$</span> <code>\displaystyle{}</code></li>
-<li><span class='math'>$$\textstyle $$</span> <code>\textstyle{}</code></li>
-<li><span class='math'>$$\scriptstyle $$</span> <code>\scriptstyle{}</code></li>
-<li><span class='math'>$$\scriptscriptstyle $$</span> <code>\scriptscriptstyle{}</code></li>
-</ul>
-<hr>
-<ul class="command-list">
 <li><span class='math'>$$\text{\selectfont} $$</span> <code>\selectfont</code></li>
 </ul>
 <hr>
@@ -1880,7 +1916,6 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$$\text{\upshape Don Knuth} $$</span> <code>\upshape</code></li>
 <li><span class='math'>$$\text{\slshape Don Knuth} $$</span> <code>\slshape</code></li>
 <li><span class='math'>$$\textup{Don Knuth} $$</span> <code>\textup{}</code></li>
-<li><span class='math'>$$\textnormal{Don Knuth} $$</span> <code>\textnormal{}</code></li>
 <li><span class='math'>$$\textsl{Don Knuth} $$</span> <code>\textsl{}</code></li>
 <li><span class='math'>$$\textit{Don Knuth} $$</span> <code>\textit{}</code></li>
 <li><span class='math'>$$\mathit{Don Knuth} $$</span> <code>\mathit{}</code></li>
@@ -1910,14 +1945,16 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$$\mathbb{Don Knuth} $$</span> <code>\mathbb{}</code> – Blackboard</li>
 <li><span class='math'>$$\Bbb{ABCdef} $$</span> <code>\Bbb{}</code></li>
 <li><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></li>
-<li><span class='math'>$${\frak Don Knuth} $$</span> <code>\frak{}</code></li>
+<li><span class='math'>$${\frak Don Knuth} $$</span> <code>{\frak}</code></li>
 </ul>
 <h3>MathJax HTML Extension</h3>
 <p>MathLive support some commands from the <a href="http://docs.mathjax.org/en/latest/input/tex/extensions/html.html">MathJax HTML extension</a>.</p>
-<p><code>\class{}{}</code>
-<span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span></p>
+<p><code>\class{custom-class}{x+1}</code></p>
+<p><span class='math frame'>$$\class{custom-class}{x+1} $$</span></p>
 <p>When used in a <code>&lt;math-field&gt;</code> component, the class names should refer to a
-stylesheet defined with a <code>&lt;style&gt;</code> tag inside the <code>&lt;math-field&gt;</code> element:</p>
+stylesheet defined with a <code>&lt;style&gt;</code> tag inside the <code>&lt;math-field&gt;</code> element.
+The stylesheet can also be specified by setting ther <code>innerHTML</code> property of
+the <code>MathFieldElement</code>.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css">
     <span class="hljs-selector-class">.custom-class</span> { <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">2px</span> <span class="hljs-number">2px</span> <span class="hljs-number">2px</span> <span class="hljs-number">#000</span> };
@@ -1933,7 +1970,11 @@ stylesheet defined with a <code>&lt;style&gt;</code> tag inside the <code>&lt;ma
 <p><span class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</span></p>
 <hr>
 <p><code>\htmlData{}{}</code></p>
-<p><span class='math frame'>$$\htmlData{foo=bar}{ Don Knuth} $$</span></p>
+<p>The argument of this command is a comma-delimited list of key/value pairs, e.g.
+<code>\htmlData{foo=green,bar=blue}{x=0}</code>. A corresponding
+<code>data-foo</code> and <code>data-bar</code> DOM attribute is generated to the rendered DOM.</p>
+<p><code>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }</code></p>
+<p><span class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</span></p>
 <h3>Others</h3>
 <ul class="command-list">
 <li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code> Small Caps</li>
@@ -2341,7 +2382,7 @@ in a matrix, or multi-line equations.</p>
 <p>Each column is separated by a <code>&amp;</code>.</p>
 <h3>Matrixes</h3>
 <h4><code>array</code></h4>
-<p>A simple matrix with no delimiters.</p>
+<p>A simple table with no delimiters.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{lc}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
@@ -2530,7 +2571,7 @@ f(x) & = (a+b)^2 \\
 <div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
 <p><code>\​begin{eqnarray}...\end{eqnarray}</code> – Avoid, use <code>align</code> instead</p>
  <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
-<p><code>$$\begin{center}\text{first}\end{center} $$</code></p>
+<p><code>\begin{center}\text{first}\end{center}</code></p>
  <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
 <hr>
 <p>These environments do not form a math environment by themselves but
@@ -2547,18 +2588,21 @@ can be used as building blocks for more elaborate structures:</p>
 <div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
-<h2>TeX Internals</h2>
+<h2>TeX Primitive</h2>
 <p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
 <ul>
-<li><code>%</code>: anything after a <code>%</code> character and an end of line character is interpreted as a comment and ignored</li>
+<li><code>%</code>: anything after a <code>%</code> character and an end of line character is
+interpreted as a comment and ignored</li>
 <li><code>\limits</code> and <code>\nolimits</code></li>
 <li><code>\relax</code></li>
 <li><code>\noexpand</code></li>
-<li><code>\obeyspaces</code></li>
+<li><code>\obeyspaces</code> – In Math Mode, spaces are normally ignored. Using this
+command spaces will be preserved in Math Mode.</li>
 <li><code>\bgroup</code> and <code>\egroup</code></li>
 <li><code>\string</code></li>
 <li><code>\csname</code> and <code>\endcsname</code></li>
+<li><code>\ensuremath{}</code> – If in Math Mode, does nothing. Otherwise, switch to Math Mode.</li>
 </ul>
 
         
@@ -2572,7 +2616,7 @@ TeX packages or macros.</p>
         <meta itemprop="datePublished" content="May 18, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 13:29:04 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 16:32:29 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
         
       </footer>
 
