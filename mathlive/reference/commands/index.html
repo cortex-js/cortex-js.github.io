@@ -532,7 +532,7 @@
     justify-content: center;
     padding: 1em;
     border-right: 1px solid #ddd;
-    margin: .5em;
+    margin: 0 0.5em 0.5em 0.5em;
   }
   .side-by-side > pre {
     background: #f0f0f0;
@@ -875,7 +875,6 @@ automatic position, based on the operator and current math style.</p>
 </div>
 <p>In Display Style, the <code>\intop</code> and <code>\ointop</code> commands display their limits
 above and below by default, while the <code>\int</code> command display its limit adjacent.</p>
-<p><span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> <code>\sum_{n=0}^\infty\nolimits</code></p>
 <ul class="command-list">
 <li><span class='math'>$$\sum_{n=0}^\infty $$</span> <code>\sum</code></li>
 <li><span class='math'>$$\prod_{n=0}^\infty $$</span> <code>\prod</code></li>
@@ -2635,7 +2634,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <h4><code>smallmatrix</code></h4>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
-<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span><span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
 </code></pre>
 </div>
 <h3>Other Environments</h3>
@@ -2819,11 +2818,7 @@ the <code>registers</code> option.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>jot</code></td>
-<td style="text-align:left">Vertical space between the lines for all math expressions which</td>
-</tr>
-<tr>
-<td style="text-align:left">// allow multiple lines</td>
-<td style="text-align:left"></td>
+<td style="text-align:left">Vertical space between the lines for all math expressions which allow multiple lines</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>fboxrule</code></td>
@@ -2879,7 +2874,7 @@ command spaces will be preserved in Math Mode.</li>
         <meta itemprop="datePublished" content="May 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 13:29:51 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 13:39:09 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
         
       </footer>
 
