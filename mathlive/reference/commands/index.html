@@ -519,6 +519,29 @@
     width: 80px;
   }
 
+  .side-by-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .side-by-side > * {
+    flex: 1 1 0;
+  }
+  .side-by-side > div.math {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+    border-right: 1px solid #ddd;
+    margin: .5em;
+  }
+  .side-by-side > pre {
+    background: #f0f0f0;
+    color: #35324e;
+    font-size: .9em;
+    white-space: break-spaces;
+  }
+
+
   
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
@@ -608,17 +631,26 @@ of the enclosing mathfield. The size of the text will adjust depending on
 the current math style (smaller in superscript/subscript).</p>
 <hr>
 <p>The <code>\textrm{}</code> command works like <code>\text{}</code> but will use a serif (roman) font.</p>
-<p><code>\textrm{Don Knuth}_\textrm{Don Knuth}</code></p>
-<div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\textrm</span>{Don Knuth}<span class="hljs-built_in">_</span><span class="hljs-keyword">\textrm</span>{Don Knuth}
+</code></pre>
+</div>
 <hr>
 <p>The <code>\mbox{}</code> command uses the same font as <code>\text</code> but its size does not
 account for the current math style.</p>
-<p><code>\mbox{Don Knuth}_\mbox{Don Knuth}</code></p>
-<div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\mbox</span>{Don Knuth}<span class="hljs-built_in">_</span><span class="hljs-keyword">\mbox</span>{Don Knuth}
+</code></pre>
+</div>
 <hr>
 <p>The <code>\textnormal{}</code> command works like <code>\text{}</code>. But it’s longer to type.</p>
-<p><code>\textnormal{Don Knuth}_\textnormal{Don Knuth} </code></p>
-<div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\textnormal</span>{Don Knuth}<span class="hljs-built_in">_</span><span class="hljs-keyword">\textnormal</span>{Don Knuth}
+</code></pre>
+</div>
 <p>When in Text Mode, use <code>$...$</code> to switch back to Math Mode, Text Style (inline math) or <code>\\[...\\]</code> to switch
 to Math Mode, Display Style.</p>
 <h2>Fractions and Binomials</h2>
@@ -1106,12 +1138,21 @@ above and below by default, while the <code>\int</code> command display its limi
 <p>The width of the arrow commands above is fixed. The width of the commands
 below is determined by the length of the content above and below
 the arrows, which is specified as an argument (and optional argument):</p>
-<p><code>\xrightarrow[\text{long text below}]{}</code></p>
-<p><span class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</span></p>
-<p><code>\xrightarrow{\text{long text above}}</code></p>
-<p><span class='math frame'>$$\xrightarrow{\text{long text above}}$$</span></p>
-<p><code>\xrightarrow[\text{and below}]{\text{long text above}}</code></p>
-<p><span class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</span></p>
+<div class="side-by-side">
+ <div class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</div> 
+<pre><code class="language-tex"><span class="hljs-keyword">\xrightarrow</span>[<span class="hljs-keyword">\text</span>{long text below}]{}
+</code></pre>
+</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\xrightarrow{\text{long text above}}$$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\xrightarrow</span>{<span class="hljs-keyword">\text</span>{long text above}}
+</code></pre>
+</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\xrightarrow</span>[<span class="hljs-keyword">\text</span>{and below}]{<span class="hljs-keyword">\text</span>{long text above}}
+</code></pre>
+</div>
 <section class='full-width no-header center thin-line two-col math-80px'>
 <table>
 <thead>
@@ -2019,8 +2060,11 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 </ul>
 <h3>MathJax HTML Extension</h3>
 <p>MathLive support some commands from the <a href="http://docs.mathjax.org/en/latest/input/tex/extensions/html.html">MathJax HTML extension</a>.</p>
-<p><code>\class{custom-class}{x+1}</code></p>
-<p><span class='math frame'>$$\class{custom-class}{x+1} $$</span></p>
+<div class="side-by-side">
+  <div class='math frame'>$$\class{custom-class}{x+1} $$</div>
+<pre><code class="language-tex">  <span class="hljs-keyword">\class</span>{custom-class}{x+1}
+</code></pre>
+</div>
 <p>When used in a <code>&lt;math-field&gt;</code> component, the class names should refer to a
 stylesheet defined with a <code>&lt;style&gt;</code> tag inside the <code>&lt;math-field&gt;</code> element.
 The stylesheet can also be specified by setting ther <code>innerHTML</code> property of
@@ -2033,18 +2077,26 @@ the <code>MathFieldElement</code>.</p>
   \class{custom-class}{\frac{1}{x+1}}
 
 <span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
-
 </code></pre>
 <hr>
-<p><code>\cssId{}{}</code></p>
-<p><span class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</span></p>
+<div class="side-by-side">
+  <div class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</div> 
+<pre><code class="language-tex">  <span class="hljs-keyword">\cssId</span>{}{}
+</code></pre>
+</div>
 <hr>
-<p><code>\htmlData{}{}</code></p>
+<div class="side-by-side">
+<pre><code class="language-tex">  <span class="hljs-keyword">\htmlData</span>{}{}
+</code></pre>
+</div>
 <p>The argument of this command is a comma-delimited list of key/value pairs, e.g.
 <code>\htmlData{foo=green,bar=blue}{x=0}</code>. A corresponding
 <code>data-foo</code> and <code>data-bar</code> DOM attribute is generated to the rendered DOM.</p>
-<p><code>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }</code></p>
-<p><span class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</span></p>
+<div class="side-by-side">
+  <div class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</div> 
+<pre><code class="language-tex">  <span class="hljs-keyword">\htmlData</span>{foo=green,bar=blue}{ <span class="hljs-keyword">\text</span>{Don Knuth} }
+</code></pre>
+</div>
 <h3>Others</h3>
 <ul class="command-list">
 <li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code> Small Caps</li>
@@ -2453,12 +2505,14 @@ in a matrix, or multi-line equations.</p>
 <h3>Matrixes</h3>
 <h4><code>array</code></h4>
 <p>A simple table with no delimiters.</p>
+<div class='side-by-side'>
+<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{lc}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
-<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
+</div>
 <p>The <code>{lc}</code> argument specifies how many columns there are and how they should be
 formated:</p>
 <ul>
@@ -2467,197 +2521,270 @@ formated:</p>
 <li><code>r</code>: right-aligned</li>
 </ul>
 <p>To add a vertical line separating columns, add <code>|</code> character in the column format:</p>
+<div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l|c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
+</div>
 <p>To add a double vertical line separating columns, add two <code>|</code> characters in the
 column format:</p>
+<div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l||c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
+</div>
 <p>To add a dashed vertical line between two columns, use <code>:</code>:</p>
+<div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l:c}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
+</div>
 <h4><code>matrix</code></h4>
 <p>The <code>matrix</code> environment is very similar to <code>array</code>, but it does not have an
 argument to specify the format of the columns.</p>
+<div class='side-by-side'>
+<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix}
 </code></pre>
-<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
+</div>
 <p>To specify the format of the columns, use the starred version and an optional
 argument. This applies to all the other <code>matrix</code> environments.</p>
+<div class='side-by-side'>
+<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}[l|r]
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
-<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
+</div>
 <h4><code>pmatrix</code></h4>
 <p>A matrix with <strong>parentheses</strong> as delimiters.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{pmatrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{pmatrix}
 </code></pre>
-<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
+</div>
 <h4><code>bmatrix</code></h4>
 <p>A matrix with <strong>square brackets</strong> as delimiters.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{bmatrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{bmatrix}
 </code></pre>
-<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
+</div>
 <h4><code>Bmatrix</code></h4>
 <p>A matrix with <strong>braces</strong> (curly brackets) as delimiters.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Bmatrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{Bmatrix}
 </code></pre>
-<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
+</div>
 <h4><code>vmatrix</code></h4>
 <p>A matrix with <strong>single bars</strong> as delimiters.</p>
+<div class='side-by-side'>
+ <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{vmatrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{vmatrix}
 </code></pre>
- <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
+</div>
 <h4><code>Vmatrix</code></h4>
 <p>A matrix with <strong>double bars</strong> as delimiters.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{Vmatrix}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{Vmatrix}
 </code></pre>
-<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
+</div>
 <h4><code>matrix*</code></h4>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}
   a + 1   <span class="hljs-built_in">&amp;</span>   b  + 1 <span class="hljs-keyword">\\</span>
   c       <span class="hljs-built_in">&amp;</span>   <span class="hljs-keyword">\frac</span>{1}{d}
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
-<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
+</div>
 <h4><code>smallmatrix</code></h4>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span><span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
 </code></pre>
-<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
+</div>
 <h3>Other Environments</h3>
 <h4><code>cases</code>, <code>dcases</code> and <code>rcases</code></h4>
 <p>Use these environments to write piecewise functions:</p>
-<pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{cases}
-  1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
-  f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
-<span class="hljs-keyword">\end</span>{cases}
-
-</code></pre>
+<div class='side-by-side'>
 <div class='math frame'>$$f(n) = \begin{cases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{cases}
 $$</div>
+<pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{cases}
+  1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
+  f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
+<span class="hljs-keyword">\end</span>{cases}
+</code></pre>
+</div>
 <p>To typeset the content in Display style, use <code>dcases</code> instead:</p>
+<div class='side-by-side'>
+<div class='math frame'>$$f(n) = \begin{dcases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
+\end{dcases}
+$$</div>
 <pre><code class="language-tex">f(n) = <span class="hljs-keyword">\begin</span>{dcases}
   1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
   f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
 <span class="hljs-keyword">\end</span>{dcases}
 
 </code></pre>
-<div class='math frame'>$$f(n) = \begin{dcases}
+</div>
+<p>To display the brace on the right, use <code>rcases</code>.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{rcases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
-\end{dcases}
+\end{rcases} = f(n) 
 $$</div>
-<p>To display the brace on the right, use <code>rcases</code>.</p>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{rcases}
   1 <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n = 0  <span class="hljs-keyword">\\</span> 
   f(n-1) + f(n-2) <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\text</span>{if } n <span class="hljs-keyword">\ge</span> 2
 <span class="hljs-keyword">\end</span>{rcases} = f(n)
 
 </code></pre>
-<div class='math frame'>$$\begin{rcases}
-  1 & \text{if } n = 0  \\\\ 
-  f(n-1) + f(n-2) & \text{if } n \ge 2
-\end{rcases} = f(n) 
-$$</div>
+</div>
 <h4><code>gather</code></h4>
 <p>Consecutive equations without alignment</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{gather}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{gather} $$</div>  
 <pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{gather}
     3(a-x) = 3.5x + a - 1 <span class="hljs-keyword">\\</span>
     3a - 3x = 3.5x + a - 1 <span class="hljs-keyword">\\</span>
     a = <span class="hljs-keyword">\frac</span>{13}{4}x - <span class="hljs-keyword">\frac</span>{1}{2}
   <span class="hljs-keyword">\end</span>{gather}
 </code></pre>
-<div class='math frame'>$$\begin{gather}
+</div>
+<h4><code>multline</code></h4>
+<p>The first line is left aligned, the last line is right aligned.</p>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{multline}
   3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}
-\end{gather} $$</div>  
-<h4><code>multline</code></h4>
-<p>The first line is left aligned, the last line is right aligned.</p>
+\end{multline} $$</div>  
 <pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{multline}
     3(a-x) = 3.5x + a - 1 <span class="hljs-keyword">\\</span>
     3a - 3x = 3.5x + a - 1 <span class="hljs-keyword">\\</span>
     a = <span class="hljs-keyword">\frac</span>{13}{4}x - <span class="hljs-keyword">\frac</span>{1}{2}
   <span class="hljs-keyword">\end</span>{multline}
 </code></pre>
-<div class='math frame'>$$\begin{multline}
-  3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}
-\end{multline} $$</div>  
+</div>
 <h4><code>align</code></h4>
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{align}
+f(x) & = (a+b)^2 \\
+& = a^2+2ab+b^2 \\
+\end{align}$$</div>  
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{align}
   f(x)  <span class="hljs-built_in">&amp;</span> = (a+b)<span class="hljs-built_in">^</span>2 <span class="hljs-keyword">\\</span>
         <span class="hljs-built_in">&amp;</span> = a<span class="hljs-built_in">^</span>2+2ab+b<span class="hljs-built_in">^</span>2 <span class="hljs-keyword">\\</span>
 <span class="hljs-keyword">\end</span>{align}
 </code></pre>
-<div class='math frame'>$$\begin{align}
-f(x) & = (a+b)^2 \\
-& = a^2+2ab+b^2 \\
-\end{align}$$</div>  
+</div>
 <h4>Others</h4>
-<p><code>$$\begin{math}x+\frac12\end{math}$$</code></p>
-<div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
-<p><code>$$\begin{displaymath}x+\frac12\end{displaymath}$$</code></p>
-<div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
-<p><code>\​begin{equation}x+\frac12\end{equation}</code></p>
-<p><span class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div></p>
-<p><code>\​begin{subequations}x+\frac12\end{subequations}</code></p>
-<div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
-<p><code>\​begin{eqnarray}...\end{eqnarray}</code> – Avoid, use <code>align</code> instead</p>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{math}
+  x+<span class="hljs-keyword">\frac</span>12
+<span class="hljs-keyword">\end</span>{math}
+</code></pre>
+</div>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{displaymath}
+  x+<span class="hljs-keyword">\frac</span>12
+<span class="hljs-keyword">\end</span>{displaymath}
+</code></pre>
+</div>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div>  
+<pre><code class="language-tex"><span class="hljs-keyword">\​</span>begin{equation}
+  x+<span class="hljs-keyword">\frac</span>12
+<span class="hljs-keyword">\end</span>{equation}
+</code></pre>
+</div>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
+<pre><code class="language-tex"><span class="hljs-keyword">\​</span>begin{subequations}
+  x+<span class="hljs-keyword">\frac</span>12
+<span class="hljs-keyword">\end</span>{subequations}
+</code></pre>
+</div>
+<div class='side-by-side'>
  <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
-<p><code>\begin{center}\text{first}\end{center}</code></p>
+<pre><code class="language-tex"> <span class="hljs-keyword">\​</span>begin{eqnarray}...<span class="hljs-keyword">\end</span>{eqnarray}
+</code></pre>
+</div>
+ -- Avoid, use `align` instead
+<div class='side-by-side'>
  <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
+<pre><code class="language-tex"> <span class="hljs-keyword">\begin</span>{center}
+   <span class="hljs-keyword">\text</span>{first}
+ <span class="hljs-keyword">\end</span>{center}
+</code></pre>
+</div>
 <hr>
 <p>These environments do not form a math environment by themselves but
 can be used as building blocks for more elaborate structures:</p>
-<p><code>\​begin{gathered}...\end{gathered}</code></p>
+<div class='side-by-side'>
 <div class='math frame'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</div>  
-<p><code>\​begin{split}...\end{split}</code></p>
-<div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
-<p><code>\​begin{aligned}...\end{aligned}</code></p>
-<div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
+<pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{gathered}...<span class="hljs-keyword">\end</span>{gathered}
+</code></pre>
+</div>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
+      3a - 3x = 3.5x + a - 1 \\\\
+      a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
+<pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{split}...<span class="hljs-keyword">\end</span>{split}
+</code></pre>
+</div>
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
+      3a - 3x = 3.5x + a - 1 \\\\
+      a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
+<pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{aligned}...<span class="hljs-keyword">\end</span>{aligned}
+</code></pre>
+</div>
 <h2>TeX Registers</h2>
 <p>The math typesetting is influenced by some “constants” that are stored
 in “registers”. Those registers can be set globally on a mathfield using
@@ -2745,10 +2872,10 @@ command spaces will be preserved in Math Mode.</li>
         
 
 
-        <meta itemprop="datePublished" content="May 20, 2021">
+        <meta itemprop="datePublished" content="May 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:44:28 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 10:50:14 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
         
       </footer>
 
