@@ -649,12 +649,26 @@ or the superscript or subscript of a symbol are displayed using these styles.
 Notice for example that <code>n=0</code> in <code>displaystyle</code> does not include space around
 the <code>=</code> sign because the limit is displayed in <code>scriptstyle</code>.</p>
 <p>To set the default mathstyle of a mathfield, use the <code>defaultMode</code> option
-(or the <code>default-mode</code> attribute).
-Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
-<p>To increase the default spacing between items, use the <code>horizontalSpacingScale</code>
-option (or the <code>horizontal-spacing-scale</code> attribute). Setting to a value of
-<code>1.5</code> will increase the spacing by 50%. A value of <code>1.1</code> is generally
-sufficient. This might be useful to make the formulas easier to read.</p>
+(or the <code>default-mode</code> attribute).</p>
+<p>Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
+<p>By default, the mathfield element behaves as if it had a <code>display: block</code>
+CSS property. To get it to behave as a inline element, set
+<code>display: inline-block</code> on the mathfield. This is particularly useful when
+used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" class="m-lg w-full-lg">
+  <div slot="html">The answer is &lt;math-field 
+  default-mode="inline-math"
+  style="
+    display: inline-block;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, .3); 
+  "&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  &lt;/math-field&gt;.
+</div>
+</code-playground>
+<!-- htmlmin:ignore -->
 <h3>Letter Shape Style</h3>
 <p>To control which letters are automatically italicized, use the <code>letterShapeStyle</code> configuration option.</p>
 <table>
@@ -774,10 +788,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="May 16, 2021">
+        <meta itemprop="datePublished" content="May 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 16 2021 09:37:06 GMT+0200 (Central European Summer Time)">May 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 08:55:53 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
         
       </footer>
 

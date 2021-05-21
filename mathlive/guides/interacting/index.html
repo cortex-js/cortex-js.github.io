@@ -460,7 +460,6 @@
         <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
-        "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
 <h1>Interacting with a mathfield</h1>
@@ -504,35 +503,63 @@ below, the <strong>Latex</strong> input field is editable and is reflected in th
 changing the content of the mathfield, to prevent a <code>'input'</code> event from being
 triggered and creating an infinite loop.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
+  <div slot="javascript">import MathLive from 'mathlive';
+    const mf = document.getElementById('formula');
+    mf.addEventListener('input',(ev) => {
+        document.getElementById('latex').value = mf.value;
+    });
+    //
+    document.getElementById('latex').value = mf.value;
+    //
+    // Listen for changes in the latex text field, and reflect its value in 
+    // the mathfield.
+    document.getElementById('latex').addEventListener('input', (ev) => {
+        mf.setValue(ev.target.value, {suppressChangeNotifications: true});
+    });
+  </div>
+  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+  &lt;math-field id="formula"&gt;
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  &lt;/math-field&gt;                
+  &lt;label&gt;Latex&lt;/label&gt;
+  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
+  autocorrect="off" spellcheck="false"></textarea></textarea>
+  </div>
+</code-playground>
+</section>
+<h2>Applying style to a mathfield</h2>
+<p>The text color (“ink”) and background color (“paper”), as well as other
+stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
+using <code>applyStyle()</code>.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = document.getElementById('formula');
-mf.addEventListener('input',(ev) => {
-    document.getElementById('latex').value = mf.value;
-});
-//
-document.getElementById('latex').value = mf.value;
-//
-// Listen for changes in the latex text field, and reflect its value in 
-// the mathfield.
-document.getElementById('latex').addEventListener('input', (ev) => {
-    mf.setValue(ev.target.value, {suppressChangeNotifications: true});
-});
+// Change the background color of the entire mathfield
+mf.applyStyle({backgroundColor: "yellow" });
 </div>
-<div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+<div slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;                
-&lt;label&gt;Latex&lt;/label&gt;
-<textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-autocorrect="off" spellcheck="false"></textarea></textarea>
 </div>
 </code-playground>
-</section>
+<p>To change the style of a portion of the mathfield, specify a selection range
+to <code>applyStyle()</code>.</p>
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+const mf = document.getElementById('formula');
+// Change the color and size of the first two characters of the mathfield
+mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
+</div>
+<div slot="html">
+&lt;math-field id="formula"&gt;
+x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;                
+</div>
+</code-playground>
 <!-- Intercepting navigate out of and multiple fields -->
 <!-- MathfieldListeners --> 
 <!-- $insert() -->
-<!-- ## Applying styling -->
-<!-- applyStyle -->
 <!-- ## Performing editing commands -->
 <h2>Next</h2>
 <dl>
@@ -551,10 +578,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="May 16, 2021">
+        <meta itemprop="datePublished" content="May 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 16 2021 09:36:11 GMT+0200 (Central European Summer Time)">May 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 09:37:24 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
         
       </footer>
 

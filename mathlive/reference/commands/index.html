@@ -450,6 +450,11 @@
     list-style: none;
   }
 
+  .command-list li span.math {
+    display: inline-block;
+    width: 80px;
+  }
+
   .math {
     visibility: hidden;
   }
@@ -483,6 +488,11 @@
     width: auto;
   }
 
+  .full-width table {
+    display: inline-table;
+    width: 100%;
+  }
+
   .center {
     display: flex;
     justify-content: center;
@@ -491,8 +501,22 @@
   .no-line td {
     border: none;
   }
+  .thin-line td {
+    border-top: 0.5px solid rgba(0, 0, 0, .07);
+    border-bottom: 0.5px solid rgba(0, 0, 0, .07);
+  }
+  .thin-line td:not(:last-child) {
+    border-right: 0.5px solid rgba(0, 0, 0, .07);
+  }
   .two-col td {
     width: 50%;
+  }
+  .three-col td {
+    width: 33%;
+  }
+  .math-80px span.math {
+    display: inline-block;
+    width: 80px;
   }
 
   
@@ -777,10 +801,48 @@ delimiters are optional when using <code>&quot;</code>
 <p class="notice--info">The codepoint of the Unicode character ⨗ <strong>U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK</strong> is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter J is 004A<sub>16</sub> in hexadecimal</p>
 <h2>Large Operators</h2>
 <p>Large operators display their limits above and below or adjacent to the operator,
-depending on the math style (<strong>Display Style</strong> or <strong>Text Style</strong>).</p>
-<p>To force the display of the limits above and below the operator, use the <code>\limits</code> command after the operator.</p>
-<p>To force the display of the limits to be adjacent to the operator, use the <code>\nolimits</code> command after the operator.</p>
-<p>The <code>\intop</code> and <code>\ointop</code> commands display their limits above and below by default.</p>
+depending on the math style (<strong>Display Style</strong> or <strong>Text Style</strong>) and on the
+operator.</p>
+<p>The position of the limits can be controlled with <code>\limits</code>, <code>\nolimits</code> or
+<code>\displaylimits</code> after the operator. The <code>\limits</code> command forces the display
+of the limits above and below the operator, <code>\nolimits</code> forces the display
+of the limits adjavent to the operator, and <code>\displaylimits</code> uses an
+automatic position, based on the operator and current math style.</p>
+<div class='no-line three-col'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><code>\limits</code></th>
+<th style="text-align:left"><code>\nolimits</code></th>
+<th style="text-align:left"><code>\displaylimits</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='math'>$$\sum_{i=0}^n\limits $$</span></td>
+<td style="text-align:left"><span class='math'>$$\sum_{i=0}^n\nolimits $$</span></td>
+<td style="text-align:left"><span class='math'>$$\sum_{i=0}^n\displaylimits $$</span></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\sum_{i=0}^n\limits</code></td>
+<td style="text-align:left"><code>\sum_{i=0}^n\nolimits</code></td>
+<td style="text-align:left"><code>\sum_{i=0}^n\displaylimits</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='math'>$$\int_0^\infty\limits $$</span></td>
+<td style="text-align:left"><span class='math'>$$\int_0^\infty\nolimits $$</span></td>
+<td style="text-align:left"><span class='math'>$$\int_0^\infty\displaylimits $$</span></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\int_0^\infty\limits</code></td>
+<td style="text-align:left"><code>\int_0^\infty\nolimits</code></td>
+<td style="text-align:left"><code>\int_0^\infty\displaylimits</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In Display Style, the <code>\intop</code> and <code>\ointop</code> commands display their limits
+above and below by default, while the <code>\int</code> command display its limit adjacent.</p>
 <p><span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> <code>\sum_{n=0}^\infty\nolimits</code></p>
 <ul class="command-list">
 <li><span class='math'>$$\sum_{n=0}^\infty $$</span> <code>\sum</code></li>
@@ -858,7 +920,7 @@ depending on the math style (<strong>Display Style</strong> or <strong>Text Styl
 <li><span class='math'>$$\dashv $$</span>   <code>\dashv</code></li>
 </ul>
 <h2>Arrows</h2>
-<section class='no-header center'>
+<section class='full-width no-header center thin-line three-col math-80px'>
 <table>
 <thead>
 <tr>
@@ -1017,7 +1079,7 @@ depending on the math style (<strong>Display Style</strong> or <strong>Text Styl
 </table>
 </section>
 <h3>Negated Arrows</h3>
-<section class='no-header center'>
+<section class='full-width no-header center thin-line two-col math-80px'>
 <table>
 <thead>
 <tr>
@@ -1044,12 +1106,13 @@ depending on the math style (<strong>Display Style</strong> or <strong>Text Styl
 <p>The width of the arrow commands above is fixed. The width of the commands
 below is determined by the length of the content above and below
 the arrows, which is specified as an argument (and optional argument):</p>
-<ul class="command-list">
-<li>$$\xrightarrow[\text{long text below}]{}$$ <code>\xrightarrow[\text{long text below}]{}</code></li>
-<li>$$\xrightarrow{\text{long text above}}$$ <code>\xrightarrow{\text{long text above}}</code></li>
-<li>$$\xrightarrow[\text{and below}]{\text{long text above}}$$ <code>\xrightarrow[\text{and below}]{\text{long text above}}</code></li>
-</ul>
-<section class='no-header center no-line two-col'>
+<p><code>\xrightarrow[\text{long text below}]{}</code></p>
+<p><span class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</span></p>
+<p><code>\xrightarrow{\text{long text above}}</code></p>
+<p><span class='math frame'>$$\xrightarrow{\text{long text above}}$$</span></p>
+<p><code>\xrightarrow[\text{and below}]{\text{long text above}}</code></p>
+<p><span class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</span></p>
+<section class='full-width no-header center thin-line two-col math-80px'>
 <table>
 <thead>
 <tr>
@@ -1493,6 +1556,7 @@ if there is an equivalent Unicode character available.
 </ul>
 <h2>Delimiters</h2>
 <p>To grow delimiters based on their content, use <code>\left...\right</code>.</p>
+<div class='no-line two-col'>
 <table>
 <thead>
 <tr>
@@ -1511,6 +1575,7 @@ if there is an equivalent Unicode character available.
 </tr>
 </tbody>
 </table>
+</div>
 <p>The left and right delimiters do not have to match:</p>
 <p><span class='math'>$$\left\lparen \frac1x \right\rbrack$$</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
 <p>To omit a delimiter, use <code>.</code>:</p>
@@ -1679,7 +1744,7 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
 <h2>Decorations</h2>
-<section class='no-header center'>
+<section class='no-header thin-line center'>
 <table>
 <thead>
 <tr>
@@ -1736,7 +1801,7 @@ which are required:</p>
 <ul>
 <li><code>&lt;notation&gt;</code> a list of whitespace-delimited values:</li>
 </ul>
-<section class='no-header center'>
+<section class='no-header thin-line center'>
 <table>
 <thead>
 <tr>
@@ -1841,6 +1906,7 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 <li><span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> <code>\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}</code></li>
 </ul>
 <h4><code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code></h4>
+<div class='thin-line two-col'>
 <table>
 <thead>
 <tr>
@@ -1850,24 +1916,20 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>\cancel{body}</code></td>
+<td style="text-align:left"><span class='math'>$$\cancel{\unicode{&quot;2B1A}} $$</span> <code>\cancel{body}</code></td>
 <td style="text-align:left"><code>\enclose{updiagonalstrike}{body}</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\bcancel{body}</code></td>
+<td style="text-align:left"><span class='math'>$$\bcancel{\unicode{&quot;2B1A}} $$</span> <code>\bcancel{body}</code></td>
 <td style="text-align:left"><code>\enclose{downdiagonalstrike}{body}</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\xcancel{body}</code></td>
+<td style="text-align:left"><span class='math'>$$\xcancel{\unicode{&quot;2B1A}} $$</span> <code>\xcancel{body}</code></td>
 <td style="text-align:left"><code>\enclose{updiagonalstrike downdiagonalstrike}{body}</code></td>
 </tr>
 </tbody>
 </table>
-<ul class="command-list">
-<li><span class='math'>$$\cancel{\unicode{&quot;2B1A}} $$</span> <code>\cancel{}</code></li>
-<li><span class='math'>$$\bcancel{\unicode{&quot;2B1A}} $$</span> <code>\bcancel{}</code></li>
-<li><span class='math'>$$\xcancel{\unicode{&quot;2B1A}} $$</span> <code>\xcancel{}</code></li>
-</ul>
+</div>
 <p class="notice--info">The <code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code> commands are part of the
 <a href="https://www.ctan.org/pkg/cancel">“cancel”</a> LaTeX package.</p>
 <h3>Colors</h3>
@@ -1875,11 +1937,18 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 <p>To change the background, use the <code>\colorbox{}{}</code> command.</p>
 <p>The first argument of these commands is a color specified as:</p>
 <ul>
-<li>a RGB color using the standard CSS format (<code>#d7170b</code>)</li>
-<li>a <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">CSS color name</a> (<code>goldenrod</code>)</li>
-<li>one of the 68 colors from <a href="https://ctan.org/pkg/colordvi">dvips color name</a> (<code>cadetblue</code>)</li>
-<li>one of the 10 Mathematica color from <code>ColorData[97, &quot;ColorList&quot;]</code> (<code>m0</code> to <code>m9</code>)</li>
-<li>a color defined using the syntax from the <a href="http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf"><code>xcolor</code> package</a>, for example: <code>blue!20!black!30!green</code></li>
+<li>one of <code>red</code>, <code>orange</code>, <code>yellow</code>, <code>lime</code>, <code>green</code>, <code>teal</code>, <code>blue</code>, <code>indigo</code>,</li>
+</ul>
+<ul>
+<li><code>purple</code>, <code>magenta</code>, <code>black</code>, <code>dark-grey</code>, <code>grey</code>, <code>light-grey</code>, `white.</li>
+</ul>
+<ul>
+<li>a RGB color using the standard CSS format (<code>#d7170b</code> or <code>rgb(240, 20, 10)</code>)</li>
+<li>one of the 68 colors from <a href="https://ctan.org/pkg/colordvi">dvips color name</a>
+(<code>CadetBlue</code>). Note that these names are case-sensitive.</li>
+<li>one of the 10 Mathematica color from <code>ColorData[97, &quot;ColorList&quot;]</code> (<code>M0</code> to <code>M9</code>)</li>
+<li>a color defined using the syntax from the <a href="http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf"><code>xcolor</code> package</a>, for example: <code>Blue!20!Black!30!Green</code></li>
+<li>if the color is prefixed with a <code>-</code>, the complementary color is used</li>
 </ul>
 <p>The following color names are recommended:</p>
 <p><img src="/assets/images/mathfield/colors.png" alt=""></p>
@@ -1889,7 +1958,8 @@ to  different color values than the <code>dvips</code> colors of the same name.<
 <p class="notice--info">To have proper legibility based on usage, these color names will map to
 different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.</p>
-<p class="notice--info">For best portability between versions of TeX, limit yourself to this subset of DVIPS colors: <code>White</code>, <code>Black</code>,
+<p class="notice--info">For best portability between versions of TeX, limit yourself to this subset of
+DVIPS colors: <code>White</code>, <code>Black</code>,
 <code>Gray</code>, <code>Red</code>, <code>Orange</code>, <code>Yellow</code>, <code>LimeGreen</code>, <code>Green</code>, <code>TealBlue</code>, <code>Blue</code>,
 <code>Violet</code>, <code>Purple</code>
 and <code>Magenta</code>. Those names are case-sensitive.</p>
@@ -2588,7 +2658,69 @@ can be used as building blocks for more elaborate structures:</p>
 <div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
-<h2>TeX Primitive</h2>
+<h2>TeX Registers</h2>
+<p>The math typesetting is influenced by some “constants” that are stored
+in “registers”. Those registers can be set globally on a mathfield using
+the <code>registers</code> option.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Register</th>
+<th style="text-align:left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>arrayrulewidth</code></td>
+<td style="text-align:left">Width of separator lines in array environments</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>arraycolsep</code></td>
+<td style="text-align:left">Amount of space between separator lines</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>delimitershortfall</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>doublerulesep</code></td>
+<td style="text-align:left">Amount of space between adjacent separator lines</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>jot</code></td>
+<td style="text-align:left">Vertical space between the lines for all math expressions which</td>
+</tr>
+<tr>
+<td style="text-align:left">// allow multiple lines</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>fboxrule</code></td>
+<td style="text-align:left">Default width of the border with commands such as <code>\boxed</code> or <code>\fbox</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>fboxsep</code></td>
+<td style="text-align:left">Default padding between a box and its content</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>medmuskip</code></td>
+<td style="text-align:left">Amount of space around a binary operator. See also <code>thinmuskip</code>, <code>thickmuskip</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>nulldelimiterspace</code></td>
+<td style="text-align:left">Horizontal space of an empty delimiter</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>thickmuskip</code></td>
+<td style="text-align:left">Amount of space around a relational operator. See also <code>medmuskip</code>, <code>thinmuskip</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>thinmuskip</code></td>
+<td style="text-align:left">Amount of space around math punctuation. See also <code>medmuskip</code>, <code>thickmuskip</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>TeX Primitives</h2>
 <p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
 <ul>
@@ -2613,10 +2745,10 @@ command spaces will be preserved in Math Mode.</li>
         
 
 
-        <meta itemprop="datePublished" content="May 18, 2021">
+        <meta itemprop="datePublished" content="May 20, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue May 18 2021 16:32:29 GMT+0200 (Central European Summer Time)">May 18, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:44:28 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
         
       </footer>
 
