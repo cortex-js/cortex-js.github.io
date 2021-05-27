@@ -468,21 +468,23 @@
 <p>There are two aspects that can be configured independently:</p>
 <ol>
 <li>
-<p>Speech Rules: the set of rules use to produce readable text from a math expression. MathLive has a built-in set of speech rules, but it can also be configured to use Volker Sorge’s Speech Rule Engine.</p>
+<p>Speech Rules: the set of rules use to produce readable text from a math expression.</p>
 </li>
 <li>
 <p>Text-to-Speech engine: the software used to transform the readable text produced by the speech rules into sound. By default, the TTS engine provide by the operating system will be used, but MathLive can be configured to use the Amazon Cloud TTS engine as well.</p>
 </li>
 </ol>
-<h2>Speech Rules</h2>
-<p>The format of the output can be configured using the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
+<p>The speech commands can be access using a keyboard shortcut:</p>
 <ul>
-<li><code>'ssml'</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
-<li><code>'mac'</code> to request an output using Mac OS speech markup, e.g. ‘[[slc 150]]’. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.</li>
-<li><code>''</code> (empty string) to request no markup.</li>
+<li><strong>alt/option + ctrl + up</strong>: speak the current group</li>
+<li><strong>alt/option + ctrl + down</strong>: speak the entire formula</li>
 </ul>
-<p>The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.</p>
-<p>To use Volker Sorge’s SRE:</p>
+<h2>Speech Rules</h2>
+<p>A set of <strong>speech rules</strong> define how a math formula is transformed to speakable
+text.</p>
+<p>To use the MathLive built-in speech rules, set <code>textToSpeechRules</code> to <code>mathlive</code>.</p>
+<p>Another set of speech rules supported are the SRE speech rules from Volker Sorge</p>
+<p>To use the SRE speech rules.</p>
 <ol>
 <li>Include the browser version of the SRE JavaScript file in your project. You can download it on <a href="https://github.com/zorkow/speech-rule-engine">GitHub</a></li>
 <li>Set the <code>textToSpeechRules</code> configuration key to <code>'sre'</code>.</li>
@@ -522,6 +524,14 @@ This may be as simple as adding this:</li>
 </li>
 </ol>
 <p>Carefully consider what you do with the access and secret access keys. Although with the setup above you have somewhat restricted them to a domain, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.</p>
+<h3>Speech Output Format</h3>
+<p>To configure the format of the speech output engine use the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
+<ul>
+<li><code>'ssml'</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
+<li><code>'mac'</code> to request an output using Mac OS speech markup, e.g. ‘[[slc 150]]’. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.</li>
+<li><code>''</code> (empty string) to request no markup.</li>
+</ul>
+<p>The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.</p>
 <h3>Using the Google Cloud TTS Engine</h3>
 <p>NOTE: THE GOOGLE CLOUD TTS ENGINE IS NOT YET SUPPORTED</p>
 <p>To use the Google Cloud TTS engine you will need to create a Google Cloud Platform project, enable billing for the project, enable it to use the TTS API, and obtain a <strong>service account key</strong>. See <a href="https://cloud.google.com/text-to-speech/docs/quickstart-protocol">detailed instructions from Google.</a>.</p>
@@ -568,10 +578,10 @@ MathLive.makeMathField(document.getElementById('mathfield'));
         
 
 
-        <meta itemprop="datePublished" content="May 20, 2021">
+        <meta itemprop="datePublished" content="May 23, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:31:01 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 23 2021 19:02:42 GMT+0200 (Central European Summer Time)">May 23, 2021</time></p>
         
       </footer>
 

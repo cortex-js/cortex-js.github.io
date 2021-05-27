@@ -443,7 +443,13 @@
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [
+            ['$$', '$$'],
+            ['\\[', '\\]'],
+          ],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
@@ -462,15 +468,15 @@ notation.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><math>$$\frac{n}{1+n}$$</math></td>
+<td style="text-align:left">\[\frac{n}{1+n}\]</td>
 <td style="text-align:left"><code>[&quot;Divide&quot;, &quot;n&quot;, [&quot;Add&quot;, 1, &quot;n&quot;]]</code></td>
 </tr>
 <tr>
-<td style="text-align:left">$$e^{\imaginaryI \pi }+1=0$$</td>
+<td style="text-align:left">\[e^{\imaginaryI \pi }+1=0\]</td>
 <td style="text-align:left"><code>[&quot;Equal&quot;,  [&quot;Add&quot;, [&quot;Power&quot;, &quot;ExponentialE&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryI&quot;], 1]], 0]</code></td>
 </tr>
 <tr>
-<td style="text-align:left">$$\sin^{-1}^\prime(x)$$</td>
+<td style="text-align:left">\[\sin^{-1}^\prime(x)\]</td>
 <td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
 </tr>
 </tbody>
@@ -501,10 +507,10 @@ MathJSON expressions.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 14, 2021">
+        <meta itemprop="datePublished" content="May 26, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:56:52 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 26 2021 15:48:52 GMT+0200 (Central European Summer Time)">May 26, 2021</time></p>
         
       </footer>
 

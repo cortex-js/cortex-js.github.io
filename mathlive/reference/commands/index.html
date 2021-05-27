@@ -427,7 +427,7 @@
       <section class="page__content" itemprop="text">
         
         <script type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    import {renderMathInDocument, version} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
@@ -437,6 +437,7 @@
       asciiMath: null,
     });
     document.body.classList.add('ready');
+    document.getElementById('version').innerHTML = version;
 </script>
 <style>
   ul.command-list {
@@ -542,6 +543,9 @@
   }
 
 
+  .footer-version {
+
+  }
   
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
@@ -1264,6 +1268,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\overleftrightarrow{ABC} $$</span> <code>\overleftrightarrow{}</code></li>
 <li><span class='math'>$$\overarc{ABC} $$</span> <code>\overarc{}</code></li>
 <li><span class='math'>$$\overparen{ABC} $$</span> <code>\overparen{}</code></li>
+<li><span class='math'>$$\wideparen{ABC} $$</span> <code>\wideparen{}</code></li>
 <li><span class='math'>$$\widetilde{ABC} $$</span> <code>\widetilde{}</code></li>
 <li><span class='math'>$$\widehat{ABC} $$</span> <code>\widehat{}</code></li>
 <li><span class='math'>$$\widecheck{ABC} $$</span> <code>\widecheck{}</code></li>
@@ -2862,6 +2867,7 @@ command spaces will be preserved in Math Mode.</li>
 <li><code>\csname</code> and <code>\endcsname</code></li>
 <li><code>\ensuremath{}</code> – If in Math Mode, does nothing. Otherwise, switch to Math Mode.</li>
 </ul>
+<footer class="page__meta"><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='version'></span></footer>
 
         
       </section>
@@ -2874,7 +2880,7 @@ command spaces will be preserved in Math Mode.</li>
         <meta itemprop="datePublished" content="May 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 13:39:09 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 20:28:30 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
         
       </footer>
 

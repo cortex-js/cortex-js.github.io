@@ -524,10 +524,9 @@ single layer.</p>
 <p>A layer is an array of rows, a row is an array of keycaps.</p>
 <p>Each keycap can have the following properties:</p>
 <ul>
-<li>
-<p><code>class</code>: the CSS classes to style this keycap. The classes can be custom
-defined (see below about the <code>styles</code> layer property), or be one of the default
-ones:</p>
+<li><code>class</code>: a set of CSS classes to style this keycap. The classes can be custom
+defined (see below about the <code>styles</code> layer property), or be one or more of the
+standard ones:
 <ul>
 <li><code>tex</code>: use the TeX font for its label.
 Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
@@ -541,42 +540,24 @@ for the space bar).</li>
 <li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
 </ul>
 </li>
-<li>
-<p><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
+<li><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
 the <code>latex</code> value is used. If no <code>key</code>, <code>command</code> or <code>insert</code> property is
 provided, the label (stripped of any HTML markup) is what will be inserted
-when the keycap is pressed.</p>
-</li>
-<li>
-<p><code>latex</code>: a Latex fragment used as a label and as the content to insert when
-the keycap is pressed.</p>
-</li>
-<li>
-<p><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</p>
-</li>
-<li>
-<p><code>aside</code>: an optional small label displayed below the keycap. This label
-may not be displayed if the space available is too small.</p>
-</li>
-<li>
-<p><code>insert</code>: a Latex fragment to insert when the keycap is pressed. The <code>latex</code>
-property is usually sufficient,</p>
-</li>
-<li>
-<p><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
-long-pressed.</p>
-</li>
-<li>
-<p><code>command</code>: the command to perform when the keycap is pressed.</p>
-</li>
-<li>
-<p><code>shifted</code>: the HTML markup to display as the label of the keycap when the
-shift key is pressed</p>
-</li>
-<li>
-<p><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
-the shift key.</p>
-</li>
+when the keycap is pressed.</li>
+<li><code>latex</code>: a Latex fragment used as a label and as the content to insert when
+the keycap is pressed.</li>
+<li><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</li>
+<li><code>aside</code>: an optional small label displayed below the keycap. This label
+may not be displayed if the space available is too small.</li>
+<li><code>insert</code>: a Latex fragment to insert when the keycap is pressed. The <code>latex</code>
+property is usually sufficient,</li>
+<li><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
+long-pressed.</li>
+<li><code>command</code>: the command to perform when the keycap is pressed.</li>
+<li><code>shifted</code>: the HTML markup to display as the label of the keycap when the
+shift key is pressed</li>
+<li><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
+the shift key.</li>
 </ul>
 <p>The following properties, in order, are used to determine how to display
 they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
@@ -586,6 +567,23 @@ determine the action to perform: <code>command</code>, <code>insert</code>, <cod
 layer.</p>
 <p>The appearance of the layer can be further customized by providing a CSS class
 name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
+<h3>Keycap Variants</h3>
+<p>The default keyboard include <strong>variants</strong> for many of its keycaps. These
+variants are accessed with a long press on the keycap. The variants are
+typically related, but less frequently used version of the main keycap.</p>
+<p>You can define variants for a custom keyboard by specifying a <code>variants</code>
+property with the definition of a keycap. The value of the <code>variants</code> property
+is an array of <code>VirtualKeyboardKeycap</code>. As a shortcut, a string can also be
+used, which is equivalent to a <code>VirtualKeyboardKeycap</code> with a <code>latex</code> property
+equal to the string, that is, it will display the latex string as the keycap
+label and insert it when the key is pressed.</p>
+<pre><code class="language-js">rows: [
+  [
+    { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-attr">variants</span>: [<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;\\Alpha&quot;</span>] }
+    ...
+  ]
+]
+</code></pre>
 <h3>Keycap Examples</h3>
 <p>Each keycap must define its label and what happens when the keycap is pressed.
 There are many different ways of doing this using the properties above.</p>
@@ -736,7 +734,7 @@ example <code>&quot;numeric high-school-keyboard symbols&quot;</code>. If we wan
 keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortcut:
 <code>&quot;all high-school-keyboard&quot;</code>.</p>
 <pre><code class="language-js">  mf.setOptions({
-    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: HIGH_SCHOOL_KEYBOARD_LAYER
+    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: HIGH_SCHOOL_KEYBOARD_LAYER,
     <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: HIGH_SCHOOL_KEYBOARD,
     <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;high-school-keyboard&quot;</span>
   });
@@ -852,10 +850,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="May 20, 2021">
+        <meta itemprop="datePublished" content="May 27, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:31:11 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 27 2021 10:23:07 GMT+0200 (Central European Summer Time)">May 27, 2021</time></p>
         
       </footer>
 

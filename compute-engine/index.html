@@ -443,7 +443,13 @@
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [
+            ['$$', '$$'],
+            ['\\[', '\\]'],
+          ],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
@@ -481,8 +487,8 @@ elements of the expression.</p>
 <p>See <a href="/guides/compute-engine-forms/">Compute Engine Forms</a> for more info.</p>
 <h2>Comparing</h2>
 <p>Use the <code>ComputeEngine.same()</code> function to compare two expressions.</p>
-<p>The comparison between expressions is structural so that $$x + 1$$ is not equal
-to $$1 + x$$. To obtain the desired result, you may need to apply a canonical
+<p>The comparison between expressions is structural so that \(x + 1\) is not equal
+to \(1 + x\). To obtain the desired result, you may need to apply a canonical
 form to the expressions using <code>ComputeEngine.canonical()</code>, or evaluate them using <code>ComputeEngine.evaluate()</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> ComputeEngine();
 
@@ -536,10 +542,10 @@ engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="
         
 
 
-        <meta itemprop="datePublished" content="May 14, 2021">
+        <meta itemprop="datePublished" content="May 26, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:56:46 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed May 26 2021 15:48:54 GMT+0200 (Central European Summer Time)">May 26, 2021</time></p>
         
       </footer>
 
