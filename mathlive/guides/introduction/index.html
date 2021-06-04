@@ -465,8 +465,8 @@
 </script>
 <h1>Mathfield Introduction</h1>
 <p>Let’s add an editable mathfield to a web page.</p>
-<p><strong>1. Load  the MathLive library with a <code>&lt;script&gt;</code> tag.</strong></p>
-<p class="notice--info">Read more about options to integrate MathLive in your 
+<p><strong>1. Load the MathLive library from a CDN with a <code>&lt;script&gt;</code> tag.</strong></p>
+<p class="notice--info">Read about other options to integrate MathLive in your 
   project in the 
   <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
 </p>
@@ -479,6 +479,15 @@ the playground to its original state.</p>
 <p><strong>4. Change line 3 of the HTML to another Latex expression.</strong>
 For example <code>f(x) = \sin(x)</code>,</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -498,10 +507,10 @@ For example <code>f(x) = \sin(x)</code>,</p>
         
 
 
-        <meta itemprop="datePublished" content="May 20, 2021">
+        <meta itemprop="datePublished" content="June 04, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:30:35 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 04 2021 16:26:23 GMT+0200 (Central European Summer Time)">June 04, 2021</time></p>
         
       </footer>
 

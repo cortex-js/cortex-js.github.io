@@ -464,7 +464,59 @@
     };
 </script>
 <h1>Speech</h1>
-<p>This example shows how to configure the MathLive text-to-speech features.</p>
+<h2>Using Speech Output in MathLive</h2>
+<p>To speak the formula or a portion of it, use these keyboard shortcuts:</p>
+<ul>
+<li><strong>alt/⌥ + ctrl + ⇡</strong>: speak the entire formula</li>
+<li><strong>alt/⌥ + ctrl + ⇣</strong>: speak the selection</li>
+</ul>
+<p>To programatically trigger speech output, use:</p>
+<pre><code class="language-js">mf.executeCommand(<span class="hljs-string">&#x27;speak&#x27;</span>);
+</code></pre>
+<p>The command above will speak the entire formula. To speak a subset of the
+formula use:</p>
+<pre><code class="language-js">mf.executeCommand([<span class="hljs-string">&#x27;speak&#x27;</span>, <span class="hljs-string">&#x27;selection&#x27;</span>);
+</code></pre>
+<p>The options to specify the speech “scope” are:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>all</code></td>
+<td style="text-align:left">the entire formula</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>selection</code></td>
+<td style="text-align:left">the selection portion of the formula</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>left</code></td>
+<td style="text-align:left">the element to the left of the selection</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>right</code></td>
+<td style="text-align:left">the element to the right of the selection</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>group</code></td>
+<td style="text-align:left">the group (numerator, root, etc…) the selection is in</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>parent</code></td>
+<td style="text-align:left">the parent of the selection</td>
+</tr>
+</tbody>
+</table>
+<p>To get a textual representation of a spoken description of the formula, use
+the <code>spoken-text</code> format:</p>
+<pre><code class="language-js">mf.getValue(<span class="hljs-string">&#x27;spoken-text&#x27;</span>);
+</code></pre>
+<h2>Configuring Speech Options</h2>
 <p>There are two aspects that can be configured independently:</p>
 <ol>
 <li>
@@ -474,12 +526,7 @@
 <p>Text-to-Speech engine: the software used to transform the readable text produced by the speech rules into sound. By default, the TTS engine provide by the operating system will be used, but MathLive can be configured to use the Amazon Cloud TTS engine as well.</p>
 </li>
 </ol>
-<p>The speech commands can be access using a keyboard shortcut:</p>
-<ul>
-<li><strong>alt/option + ctrl + up</strong>: speak the current group</li>
-<li><strong>alt/option + ctrl + down</strong>: speak the entire formula</li>
-</ul>
-<h2>Speech Rules</h2>
+<h3>Speech Rules</h3>
 <p>A set of <strong>speech rules</strong> define how a math formula is transformed to speakable
 text.</p>
 <p>To use the MathLive built-in speech rules, set <code>textToSpeechRules</code> to <code>mathlive</code>.</p>
@@ -495,11 +542,11 @@ text.</p>
     <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
 },
 </code></pre>
-<h2>Text-to-Speech Engine</h2>
-<h3>Using the Local TTS Engine</h3>
+<h3>Text-to-Speech Engine</h3>
+<h4>Using the Local TTS Engine</h4>
 <p>To use the local (built-in, OS specific) TTS engine, set the <code>speechEngine</code> configuration key to <code>'local'</code>.</p>
 <p>There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.</p>
-<h3>Using Amazon Polly TTS Engine</h3>
+<h4>Using Amazon Polly TTS Engine</h4>
 <ol>
 <li>Include the AWS SDK for JavaScript in your app. See <a href="https://aws.amazon.com/sdk-for-browser/">here for details</a>.
 This may be as simple as adding this:</li>
@@ -523,8 +570,8 @@ This may be as simple as adding this:</li>
 <p>2.4 At the end of the creation, you will be provided by the access key and the secret access key.</p>
 </li>
 </ol>
-<p>Carefully consider what you do with the access and secret access keys. Although with the setup above you have somewhat restricted them to a domain, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.</p>
-<h3>Speech Output Format</h3>
+<p>Carefully consider how to handle the access and secret access keys. With the setup above they are somewhat restricted to a domain, however, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.</p>
+<h4>Speech Output Format</h4>
 <p>To configure the format of the speech output engine use the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
 <ul>
 <li><code>'ssml'</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
@@ -532,38 +579,6 @@ This may be as simple as adding this:</li>
 <li><code>''</code> (empty string) to request no markup.</li>
 </ul>
 <p>The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.</p>
-<h3>Using the Google Cloud TTS Engine</h3>
-<p>NOTE: THE GOOGLE CLOUD TTS ENGINE IS NOT YET SUPPORTED</p>
-<p>To use the Google Cloud TTS engine you will need to create a Google Cloud Platform project, enable billing for the project, enable it to use the TTS API, and obtain a <strong>service account key</strong>. See <a href="https://cloud.google.com/text-to-speech/docs/quickstart-protocol">detailed instructions from Google.</a>.</p>
-<p>After creating the <strong>service account key</strong> and downloading the JSON file containing it to your local machine, install the Google Cloud SDK, then run</p>
-<pre><code class="language-sh">$ gcloud auth activate-service-account --key-file=/PATH/TO/KEYFILE.json
-</code></pre>
-<p>Set the <code>GOOGLE_APPLICATION_CREDENTIALS</code> variable to point to your keyfile</p>
-<pre><code class="language-sh">$ GOOGLE_APPLICATION_CREDENTIALS=/PATH/TO/KEYFILE.json
-</code></pre>
-<p>Login into the auth console</p>
-<pre><code class="language-sh">$ gcloud auth application-default login
-</code></pre>
-<p>Run</p>
-<pre><code class="language-sh">$ gcloud auth application-default print-access-token
-</code></pre>
-<p>This should spit out an access key.</p>
-<p>Set the <code>speechEngine</code> configuration key to <code>'google'</code></p>
-<p>Set the <code>speechEngineToken</code> configuration key to the access key obtained earlier.</p>
-<code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
-        font-size: 32px; 
-        padding: 8px; 
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, .3); 
-        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
-&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
-</code-playground>
 <h2>Next</h2>
 <dl>
 <dt><a href="/mathlive/guides/static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
@@ -578,10 +593,10 @@ MathLive.makeMathField(document.getElementById('mathfield'));
         
 
 
-        <meta itemprop="datePublished" content="May 23, 2021">
+        <meta itemprop="datePublished" content="June 04, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun May 23 2021 19:02:42 GMT+0200 (Central European Summer Time)">May 23, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 04 2021 17:09:21 GMT+0200 (Central European Summer Time)">June 04, 2021</time></p>
         
       </footer>
 
