@@ -448,6 +448,10 @@
     padding: 10px;
     list-style: none;
   }
+  td code {
+    font-size: 32px;
+    font-weight:normal;
+  }
 </style>
 <h2>Keybindings</h2>
 <p>Commands to edit and modify a formula can be invoked by pressing some key
@@ -649,17 +653,12 @@ combinations.</p>
 <td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
 <td style="text-align:left"><code>\</code></td>
 <td style="text-align:left">〃</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>[INTLBACKSLASH]</code></td>
+<td style="text-align:left"><code>Intl Backslash</code></td>
 <td style="text-align:left">〃</td>
 <td style="text-align:right"></td>
 </tr>
@@ -680,7 +679,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇥</code></td>
-<td style="text-align:left">complete(“accept-suggestion”)</td>
+<td style="text-align:left">In Latex mode: accept-suggestion</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -696,16 +695,6 @@ combinations.</p>
 <tr>
 <td style="text-align:left"><code>⇧esc</code></td>
 <td style="text-align:left">complete(“reject”)</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇣</code></td>
-<td style="text-align:left">next suggestion</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇡</code></td>
-<td style="text-align:left">previous suggestion</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -889,252 +878,16 @@ combinations.</p>
 <td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃2</code></td>
-<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃5</code></td>
-<td style="text-align:left">move to opposite</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃6</code></td>
-<td style="text-align:left">move to superscript</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃-</code></td>
-<td style="text-align:left">move to subscript</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥[</code></td>
-<td style="text-align:left">$$\left\lbrack #0 \right\rbrack$$  —<code>$$\left\lbrack #0 \right\rbrack$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥[</code></td>
-<td style="text-align:left">$$\left\lbrace #0 \right\rbrace$$  —<code>$$\left\lbrace #0 \right\rbrace$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃⏎</code></td>
-<td style="text-align:left">add row after</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃⌤</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌘⏎</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌘⌤</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃;</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌘;</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌃;</code></td>
-<td style="text-align:left">add row before</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌘;</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃,</code></td>
-<td style="text-align:left">add column after</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌘,</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌃,</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌘,</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥P</code></td>
-<td style="text-align:left">$$\pi$$  —<code>$$\pi$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥V</code></td>
-<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥W</code></td>
-<td style="text-align:left">$$\sum_{i=#?}^{#?}$$  —<code>$$\sum_{i=#?}^{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
 <td style="text-align:left"><code>⌥B</code></td>
-<td style="text-align:left">$$\int_{#?}^{#?}$$  —<code>$$\int_{#?}^{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥U</code></td>
-<td style="text-align:left">$$\cup$$  —<code>$$\cup$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥N</code></td>
-<td style="text-align:left">$$\cap$$  —<code>$$\cap$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥O</code></td>
-<td style="text-align:left">$$\emptyset$$  —<code>$$\emptyset$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥D</code></td>
-<td style="text-align:left">$$\differentialD$$  —<code>$$\differentialD$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥O</code></td>
-<td style="text-align:left">$$\varnothing$$  —<code>$$\varnothing$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥D</code></td>
-<td style="text-align:left">$$\partial$$  —<code>$$\partial$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥P</code></td>
-<td style="text-align:left">$$\prod_{i=#?}^{#?}$$  —<code>$$\prod_{i=#?}^{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥U</code></td>
-<td style="text-align:left">$$\bigcup$$  —<code>$$\bigcup$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥N</code></td>
-<td style="text-align:left">$$\bigcap$$  —<code>$$\bigcap$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥A</code></td>
-<td style="text-align:left">$$\forall$$  —<code>$$\forall$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥E</code></td>
-<td style="text-align:left">$$\exists$$  —<code>$$\exists$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥5</code></td>
-<td style="text-align:left">$$$\infty$$  —<code>$\infty$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥6</code></td>
-<td style="text-align:left">$$\wedge$$  —<code>$$\wedge$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥6</code></td>
-<td style="text-align:left">$$\vee$$  —<code>$$\vee$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥9</code></td>
-<td style="text-align:left">$$($$  —<code>(</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥0</code></td>
-<td style="text-align:left">$$)$$  —<code>)</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left">`⌥</td>
-<td style="text-align:left">`</td>
-<td style="text-align:right">$$</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥\</code></td>
-<td style="text-align:left">$$\backslash$$  —<code>$$\backslash$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>/</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥/</code></td>
-<td style="text-align:left">$$/$$  —<code>$$\/$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[NUMPADDIVIDE]</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥[NUMPADDIVIDE]</code></td>
-<td style="text-align:left">$$\frac{#?}{\unicode{&quot;2B1A}}$$  —<code>\frac{#?}{#@}</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧[BACKQUOTE]</code></td>
-<td style="text-align:left">$$~$$  —<code>$$\~$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧⌥K</code></td>
-<td style="text-align:left">toggle keystroke caption</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥space</code></td>
-<td style="text-align:left">toggle virtual keyboard</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥⌃⇡</code></td>
-<td style="text-align:left">speak(“parent”)</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥⌃⇣</code></td>
-<td style="text-align:left">speak(“all”)</td>
+<td style="text-align:left">$$\int_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 </tbody>
 </table>
+<p>| <code>⇧⌥K</code> | toggle keystroke caption | |
+| <code>⌥space</code> | toggle virtual keyboard | |
+| <code>⌥⌃⇡</code> | speak(“parent”) | |
+| <code>⌥⌃⇣</code> | speak(“all”) | |</p>
 <h3>Math Mode Only</h3>
 <table>
 <thead>
@@ -1192,7 +945,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌃2</code></td>
-<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:left">$$\sqrt{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1212,12 +965,12 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥[</code></td>
-<td style="text-align:left">$$\left\lbrack #0 \right\rbrack$$  —<code>$$\left\lbrack #0 \right\rbrack$$</code></td>
+<td style="text-align:left">$$\left\lbrack \unicode{&quot;2B1A}\right\rbrack$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧⌥[</code></td>
-<td style="text-align:left">$$\left\lbrace #0 \right\rbrace$$  —<code>$$\left\lbrace #0 \right\rbrace$$</code></td>
+<td style="text-align:left">$$\left\lbrace \unicode{&quot;2B1A} \right\rbrace$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1287,12 +1040,12 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥V</code></td>
-<td style="text-align:left">$$\sqrt{#0}$$  —<code>$$\sqrt{#0}$$</code></td>
+<td style="text-align:left">$$\sqrt{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥W</code></td>
-<td style="text-align:left">$$\sum_{i=#?}^{#?}$$  —<code>$$\sum_{i=#?}^{#?}$$</code></td>
+<td style="text-align:left">$$\sum_{i=\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1327,7 +1080,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧⌥P</code></td>
-<td style="text-align:left">$$\prod_{i=#?}^{#?}$$  —<code>$$\prod_{i=#?}^{#?}$$</code></td>
+<td style="text-align:left">$$\prod_{i=\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1387,27 +1140,22 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>/</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥/</code></td>
-<td style="text-align:left">$$/$$  —<code>$$\/$$</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>[NUMPADDIVIDE]</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{#?}$$  —<code>$$\frac{#@}{#?}$$</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥[NUMPADDIVIDE]</code></td>
-<td style="text-align:left">$$\frac{#?}{\unicode{&quot;2B1A}}$$  —<code>\frac{#?}{#@}</code></td>
+<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧[BACKQUOTE]</code></td>
-<td style="text-align:left">$$~$$  —<code>$$\~$$</code></td>
+<td style="text-align:left"><code>\~</code></td>
 <td style="text-align:right"></td>
 </tr>
 </tbody>
@@ -1445,79 +1193,79 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>pi</code></td>
-<td style="text-align:left">$$\pi$$ <code>\pi</code></td>
+<td style="text-align:left">$$\pi$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>pi </code></td>
-<td style="text-align:left">$$\pi $$ <code>\pi </code></td>
+<td style="text-align:left">$$\pi $$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Pi</code></td>
-<td style="text-align:left">$$\Pi$$ <code>\Pi</code></td>
+<td style="text-align:left">$$\Pi$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>theta</code></td>
-<td style="text-align:left">$$\theta$$ <code>\theta</code></td>
+<td style="text-align:left">$$\theta$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Theta</code></td>
-<td style="text-align:left">$$\Theta$$ <code>\Theta</code></td>
+<td style="text-align:left">$$\Theta$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>ii</code></td>
-<td style="text-align:left">$$\imaginaryI$$ <code>\imaginaryI</code></td>
+<td style="text-align:left">$$\imaginaryI$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>jj</code></td>
-<td style="text-align:left">$$\imaginaryJ$$ <code>\imaginaryJ</code></td>
+<td style="text-align:left">$$\imaginaryJ$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>ee</code></td>
-<td style="text-align:left">$$\exponentialE$$ <code>\exponentialE</code></td>
+<td style="text-align:left">$$\exponentialE$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>nabla</code></td>
-<td style="text-align:left">$$\nabla$$ <code>\nabla</code></td>
+<td style="text-align:left">$$\nabla$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>grad</code></td>
-<td style="text-align:left">$$\nabla$$ <code>\nabla</code></td>
+<td style="text-align:left">$$\nabla$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>del</code></td>
-<td style="text-align:left">$$\partial$$ <code>\partial</code></td>
+<td style="text-align:left">$$\partial$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>infty</code></td>
-<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+<td style="text-align:left">$$\infty$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>∞</code></td>
-<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+<td style="text-align:left">$$\infty$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>oo</code></td>
-<td style="text-align:left">$$\infty$$ <code>\infty</code></td>
+<td style="text-align:left">$$\infty$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>∑</code></td>
-<td style="text-align:left">$$\sum$$ <code>\sum</code></td>
+<td style="text-align:left">$$\sum$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>sum</code></td>
-<td style="text-align:left">$$\sum_{#?}^{#?}$$ <code>\sum_{#?}^{#?}</code></td>
+<td style="text-align:left">$$\sum_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$ <code>\sum_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>int</code></td>
-<td style="text-align:left">$$\int_{#?}^{#?}$$ <code>\int_{#?}^{#?}</code></td>
+<td style="text-align:left">$$\int_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$ <code>\int_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>prod</code></td>
-<td style="text-align:left">$$\prod_{#?}^{#?}$$ <code>\prod_{#?}^{#?}</code></td>
+<td style="text-align:left">$$\prod_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$ <code>\prod_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>sqrt</code></td>
-<td style="text-align:left">$$\sqrt{#?}$$ <code>\sqrt{#?}</code></td>
+<td style="text-align:left">$$\sqrt{\unicode{&quot;2B1A}}$$ <code>\sqrt{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>∆</code></td>
@@ -1589,7 +1337,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>lim</code></td>
-<td style="text-align:left">$$\lim_{#?}$$ <code>\lim_{#?}</code></td>
+<td style="text-align:left">$$\lim_{\unicode{&quot;2B1A}}$$ <code>\lim_{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>dx</code></td>
@@ -1873,19 +1621,19 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>liminf</code></td>
-<td style="text-align:left">$$\operatorname*{lim~inf}_{#?}$$ <code>\operatorname*{lim~inf}_{#?}</code></td>
+<td style="text-align:left">$$\operatorname*{lim~inf}_{\unicode{&quot;2B1A}}$$ <code>\operatorname*{lim~inf}_{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>limsup</code></td>
-<td style="text-align:left">$$\operatorname*{lim~sup}_{#?}$$ <code>\operatorname*{lim~sup}_{#?}</code></td>
+<td style="text-align:left">$$\operatorname*{lim~sup}_{\unicode{&quot;2B1A}}$$ <code>\operatorname*{lim~sup}_{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>argmin</code></td>
-<td style="text-align:left">$$\operatorname*{arg~min}_{#?}$$ <code>\operatorname*{arg~min}_{#?}</code></td>
+<td style="text-align:left">$$\operatorname*{arg~min}_{\unicode{&quot;2B1A}}$$ <code>\operatorname*{arg~min}_{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>argmax</code></td>
-<td style="text-align:left">$$\operatorname*{arg~max}_{#?}$$ <code>\operatorname*{arg~max}_{#?}</code></td>
+<td style="text-align:left">$$\operatorname*{arg~max}_{\unicode{&quot;2B1A}}$$ <code>\operatorname*{arg~max}_{\unicode{&quot;2B1A}}</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>det</code></td>
@@ -1993,47 +1741,47 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>--&gt;</code></td>
-<td style="text-align:left">$$\longrightarrow$$ <code>\longrightarrow</code></td>
+<td style="text-align:left">$$\longrightarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&lt;--</code></td>
-<td style="text-align:left">$$\longleftarrow$$ <code>\longleftarrow</code></td>
+<td style="text-align:left">$$\longleftarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>=&gt;</code></td>
-<td style="text-align:left">$$\Rightarrow$$ <code>\Rightarrow</code></td>
+<td style="text-align:left">$$\Rightarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>==&gt;</code></td>
-<td style="text-align:left">$$\Longrightarrow$$ <code>\Longrightarrow</code></td>
+<td style="text-align:left">$$\Longrightarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&lt;=&gt;</code></td>
-<td style="text-align:left">$$\Leftrightarrow$$ <code>\Leftrightarrow</code></td>
+<td style="text-align:left">$$\Leftrightarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&lt;-&gt;</code></td>
-<td style="text-align:left">$$\leftrightarrow$$ <code>\leftrightarrow</code></td>
+<td style="text-align:left">$$\leftrightarrow$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>(.)</code></td>
-<td style="text-align:left">$$\odot$$ <code>\odot</code></td>
+<td style="text-align:left">$$\odot$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>(+)</code></td>
-<td style="text-align:left">$$\oplus$$ <code>\oplus</code></td>
+<td style="text-align:left">$$\oplus$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>(/)</code></td>
-<td style="text-align:left">$$\oslash$$ <code>\oslash</code></td>
+<td style="text-align:left">$$\oslash$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>(*)</code></td>
-<td style="text-align:left">$$\otimes$$ <code>\otimes</code></td>
+<td style="text-align:left">$$\otimes$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>(-)</code></td>
-<td style="text-align:left">$$\ominus$$ <code>\ominus</code></td>
+<td style="text-align:left">$$\ominus$$</td>
 </tr>
 <tr>
 <td style="text-align:left">`</td>
@@ -2049,7 +1797,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>*</code></td>
-<td style="text-align:left">$$\cdot$$ <code>\cdot</code></td>
+<td style="text-align:left">$$\cdot$$</td>
 </tr>
 </tbody>
 </table>
@@ -2080,19 +1828,19 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>*</code></td>
-<td style="text-align:left">$$\cdot$$ <code>\cdot</code></td>
+<td style="text-align:left">$$\cdot$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>**</code></td>
-<td style="text-align:left">$$\ast$$ <code>\ast</code></td>
+<td style="text-align:left">$$\ast$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>***</code></td>
-<td style="text-align:left">$$\star$$ <code>\star</code></td>
+<td style="text-align:left">$$\star$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>//</code></td>
-<td style="text-align:left">$$\slash$$ <code>\slash</code></td>
+<td style="text-align:left">$$\slash$$</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>\\</code></td>
@@ -2341,10 +2089,10 @@ combinations.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 14, 2021">
+        <meta itemprop="datePublished" content="June 05, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 14 2021 11:56:41 GMT+0200 (Central European Summer Time)">May 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:18:40 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
         
       </footer>
 

@@ -464,13 +464,13 @@
 </script>
 <h1>Interacting with a Mathfield</h1>
 <h2>Reading the Content of a Mathfield</h2>
-<p>The content of a mathfield is available with the <code>value</code> property, just like
-with a <code>&lt;textarea&gt;</code>.</p>
+<p>The content of a mathfield is available by reading the <code>value</code>
+property of the mathfield element, just like with a <code>&lt;textarea&gt;</code>.</p>
 <p>To be notified as soon as the content of the mathfield is modified listen for
 an <code>'input'</code> event.</p>
-<p class="notice--info"><strong>Try</strong>: modify the <code>'input'</code> event to a <code>'change'</code> event. Notice how this event
+<p class="notice--info"><strong>Try</strong>: modify the <code>'input'</code> event below to a <code>'change'</code> event. Notice how the <code>'change'</code> event
 is only sent if you press the <strong>Return</strong> or <strong>Enter</strong> key, or when the mathfield
-loses focus and the content has been modified</p>
+loses focus and the content has been modified.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
       .output:focus-within {
@@ -490,8 +490,9 @@ loses focus and the content has been modified</p>
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
-<p>The <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
-no argument. To control how the result is formatted, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
+<p>Reading the <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
+no argument.</p>
+<p>To control how the result is formatted, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
 For example to get the content as a MathJSON expression, use <code>getValue('math-json')</code>.</p>
 <p class="notice--info">The MathJSON format is a lightweight data interchange format for mathematical notation. <a href="/math-json/">Learn more about MathJSON</a>.</p>
 <p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'math-json'</code> to <code>'spoken-text'</code>.</p>
@@ -519,13 +520,18 @@ triggered and creating an infinite loop.</p>
     mf.addEventListener('input',(ev) => {
         document.getElementById('latex').value = mf.value;
     });
-    //
+//
     document.getElementById('latex').value = mf.value;
-    //
+//
     // Listen for changes in the latex text field, and reflect its value in 
     // the mathfield.
-    document.getElementById('latex').addEventListener('input', (ev) => {
-        mf.setValue(ev.target.value, {suppressChangeNotifications: true});
+//
+    document.getElementById('latex').
+      addEventListener('input', (ev) => {
+        mf.setValue(
+          ev.target.value, 
+          {suppressChangeNotifications: true}
+        );
     });
   </div>
   <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
@@ -542,6 +548,8 @@ triggered and creating an infinite loop.</p>
 <p>The text color (“ink”) and background color (“paper”), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using <code>applyStyle()</code>.</p>
+<p class="notice--info">This style applies to the content of the formula and will be reflected in the Latex output. To change the appearance of the mathfield but not
+the content of the formula, see <a href="mathlive/guides/customizing/">Customizing</a>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
       .output:focus-within {
@@ -555,7 +563,10 @@ using <code>applyStyle()</code>.</p>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
-mf.applyStyle({backgroundColor: "yellow" });
+mf.applyStyle(
+  {backgroundColor: 'yellow' }, 
+  {range: [0, -1]}
+);
 </div>
 <div slot="html">
 &lt;math-field id="formula"&gt;
@@ -627,7 +638,7 @@ may not be able to reliably trigger this event.</p>
 <p>Instead, to detect when a mathfield is being clicked on, listern for a <code>focus</code>
 event or a <code>pointerdown</code> event. The <code>focus</code> event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.</p>
-<h2>Detecting When the user has Finished Editing a Mathfield</h2>
+<h2>Detecting When the User has Finished Editing a Mathfield</h2>
 <p>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield,
 listen for the <code>change</code> event. Note that this event is not fired when in Latex
 editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to exit the mode.</p>
@@ -652,10 +663,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="June 04, 2021">
+        <meta itemprop="datePublished" content="June 05, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 04 2021 17:15:37 GMT+0200 (Central European Summer Time)">June 04, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:02:15 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
         
       </footer>
 
