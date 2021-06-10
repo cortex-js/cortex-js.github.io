@@ -117,11 +117,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -161,19 +161,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -374,7 +361,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -642,6 +642,53 @@ with both mouse and keyboard, which makes this solution more accessible.</p>
 <p>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield,
 listen for the <code>change</code> event. Note that this event is not fired when in Latex
 editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to exit the mode.</p>
+<h2>Interacting with the Clipboard</h2>
+<p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
+commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>C</kbd>).</p>
+<p>Multiple flavors are put on the clipboard, and the recipient of the <strong>Paste</strong> operation can pick whichever is most appropriate:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>text/plain</code></td>
+<td style="text-align:left">Latex wrapped with a <code>\begin{equation*}</code> and <code>\end{equation*}</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>application/x-latex</code></td>
+<td style="text-align:left">Raw Latex</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>application/json</code></td>
+<td style="text-align:left">A MathJSON representation of the formula.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>application/mathml+xml</code></td>
+<td style="text-align:left">A MathML representation of the formula.</td>
+</tr>
+</tbody>
+</table>
+<p>The Latex in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn’t really a standard format for this, but testing of several Latex-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
+<p class="notice--info">For improved interoperability, the exported Latex uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
+<p>To customize the content of the <code>text/plain</code> flavor, use the <code>onExport()</code> hook.</p>
+<p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
+</code></pre>
+<p>To export the “raw” (not expanded) Latex), use:</p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
+  <span class="hljs-string">`\\(<span class="hljs-subst">${mg.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
+});
+</code></pre>
+<p>The exported format doesn’t have to be Latex. To export ASCIIMath instead:</p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
+  <span class="hljs-string">&quot;`&quot;</span> + mg.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>.
+});
+</code></pre>
+<p class="notice--info">The standard delimiter for AsciiMath is the <kbd>`</kbd> (backtick) character .</p>
 <!-- Intercepting navigate out of and multiple fields -->
 <!-- MathfieldListeners --> 
 <!-- $insert() -->
@@ -663,10 +710,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 07, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:02:15 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:33:08 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
         
       </footer>
 

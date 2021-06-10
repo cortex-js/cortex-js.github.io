@@ -553,7 +553,7 @@ simplified</li>
 <code>format()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { format } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
 
-<span class="hljs-built_in">console</span>.log(format([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-string">&#x27;canonical&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">format</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-string">&#x27;canonical&#x27;</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
 </code></pre>
 <h2><code>BaseForm</code></h2>
@@ -563,7 +563,7 @@ simplified</li>
 <li><em>value</em> should be an integer.</li>
 <li><em>base</em> should be an integer from 2 to 36.</li>
 </ul>
-<pre><code class="language-json">[<span class="hljs-string">&quot;Latex&quot;</span>, [<span class="hljs-string">&quot;BaseForm&quot;</span>, <span class="hljs-number">42</span>, <span class="hljs-number">16</span>]]
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;BaseForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">16</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ (\mathtt(2a))_{16}</span>
 </code></pre>
 <pre><code class="language-cortex">Latex(BaseForm(42, 16))
@@ -607,10 +607,10 @@ BaseForm(42, 16)
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 07, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:19:33 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:40:34 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
         
       </footer>
 

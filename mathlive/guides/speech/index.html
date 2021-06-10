@@ -117,11 +117,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -161,19 +161,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -374,7 +361,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -471,11 +471,11 @@
 <li><strong>alt/⌥ + ctrl + ⇣</strong>: speak the selection</li>
 </ul>
 <p>To programatically trigger speech output, use:</p>
-<pre><code class="language-js">mf.executeCommand(<span class="hljs-string">&#x27;speak&#x27;</span>);
+<pre><code class="language-js">mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;speak&#x27;</span>);
 </code></pre>
 <p>The command above will speak the entire formula. To speak a subset of the
 formula use:</p>
-<pre><code class="language-js">mf.executeCommand([<span class="hljs-string">&#x27;speak&#x27;</span>, <span class="hljs-string">&#x27;selection&#x27;</span>);
+<pre><code class="language-js">mf.<span class="hljs-title function_">executeCommand</span>([<span class="hljs-string">&#x27;speak&#x27;</span>, <span class="hljs-string">&#x27;selection&#x27;</span>);
 </code></pre>
 <p>The options to specify the speech “scope” are:</p>
 <table>
@@ -514,7 +514,7 @@ formula use:</p>
 </table>
 <p>To get a textual representation of a spoken description of the formula, use
 the <code>spoken-text</code> format:</p>
-<pre><code class="language-js">mf.getValue(<span class="hljs-string">&#x27;spoken-text&#x27;</span>);
+<pre><code class="language-js">mf.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;spoken-text&#x27;</span>);
 </code></pre>
 <h2>Configuring Speech Options</h2>
 <p>There are two aspects that can be configured independently:</p>
@@ -537,7 +537,7 @@ text.</p>
 <li>Set the <code>textToSpeechRules</code> configuration key to <code>'sre'</code>.</li>
 </ol>
 <p>To configure SRE, set the <code>textToSpeechRulesOptions</code> configuration key. For example:</p>
-<pre><code class="language-javascript">textToSpeechRulesOptions: {
+<pre><code class="language-javascript"><span class="hljs-attr">textToSpeechRulesOptions</span>: {
     <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;mathspeak&#x27;</span>, <span class="hljs-comment">// &#x27;mathspeak&#x27; or &#x27;chromevox&#x27;</span>
     <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
 },
@@ -553,10 +553,10 @@ This may be as simple as adding this:</li>
 </ol>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://sdk.amazonaws.com/js/aws-sdk-2.657.0.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-        AWS.config.region = <span class="hljs-string">&#x27;eu-west-1&#x27;</span>;
-        AWS.config.accessKeyId = <span class="hljs-string">&#x27;YOUR-KEY&#x27;</span>;
-        AWS.config.secretAccessKey = <span class="hljs-string">&#x27;YOUR-SECRET&#x27;</span>;
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+        <span class="hljs-variable constant_">AWS</span>.<span class="hljs-property">config</span>.<span class="hljs-property">region</span> = <span class="hljs-string">&#x27;eu-west-1&#x27;</span>;
+        <span class="hljs-variable constant_">AWS</span>.<span class="hljs-property">config</span>.<span class="hljs-property">accessKeyId</span> = <span class="hljs-string">&#x27;YOUR-KEY&#x27;</span>;
+        <span class="hljs-variable constant_">AWS</span>.<span class="hljs-property">config</span>.<span class="hljs-property">secretAccessKey</span> = <span class="hljs-string">&#x27;YOUR-SECRET&#x27;</span>;
     </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
 </code></pre>

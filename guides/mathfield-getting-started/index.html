@@ -86,11 +86,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -130,19 +130,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -343,7 +330,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -437,14 +437,14 @@ approach. The Advanced Setup section will discuss other options.</p>
 <li>Use the <code>&lt;math-field&gt;</code> tag to create a mathfield</li>
 <li>Use properties and methods of the mathfield element to interact with it</li>
 </ol>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>f(x)<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.js&#x27;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-    <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&#x27;math-field&#x27;</span>).addEventListener(<span class="hljs-string">&#x27;input&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
-      <span class="hljs-built_in">console</span>.log(ev.target.value);
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;input&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>);
     });
   </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
@@ -454,9 +454,9 @@ approach. The Advanced Setup section will discuss other options.</p>
 must use the strict mode, indicated by a <code>&lt;!DOCTYPE html&gt;</code> directive at the top
 of the page.</p>
 <p>You can also programmatically create mathfield elements:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
-mfe.value = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
-<span class="hljs-built_in">document</span>.body.appendChild(mfe);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
+mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
 </code></pre>
 <p>See the <a href="http://localhost:8080/docs/mathlive/#(%22mathfield-element%22%3Amodule)">MathfieldElement</a>
 documentation in the <a href="/docs/mathlive/">SDK Reference</a> for more details about the attributes, properties, methods and
@@ -483,13 +483,13 @@ to use MathLive APIS in your project.</p>
 <p>With this setup, MathLive will dynamically insert one or more stylesheets in
 the page, as needed, for example when the mathfield is created. MathLive will
 also dynamically download the required fonts from the CDN as well.</p>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
         <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
-        renderMathInDocument();
+        <span class="hljs-title function_">renderMathInDocument</span>();
     </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
@@ -513,7 +513,7 @@ scripts are loaded out of order therefore the <code>MathLive</code> global may b
 <li>Just like with modules, the necessary stylesheets and fonts will be loaded
 when required.</li>
 </ol>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
@@ -543,8 +543,8 @@ corresponds to the content of the <code>/dist/</code> directory in the MathLive 
 on GitHub.</p>
 <p>After you’ve completed this step, you can use MathLive as any other modules
 in your project:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { MathfieldElement} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
-<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MathfieldElement</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
 </code></pre>
 <p>Your bundler/transpiler (for example <code>Rollup</code>, <code>WebPack</code>, <code>Babel</code>, <code>TypeScript</code>)
 will locate the MathLive library in the <code>node_modules</code> directory and apply
@@ -558,9 +558,9 @@ library.</p>
 for example locating all the static assets in a <code>/assets/</code> directory and all the
 JavaScript code in a <code>/js/</code> directory, you can specify where those assets can
 be found using the <code>fontsDirectory</code> configutation option.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { MathfieldElement} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
-<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> MathfieldElement();
-mfe.setOptions({
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MathfieldElement</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
+mfe.<span class="hljs-title function_">setOptions</span>({
     <span class="hljs-attr">fontsDirectory</span>: <span class="hljs-string">&#x27;../assets/mathlive-fonts&#x27;</span>
 });
 </code></pre>
@@ -590,7 +590,7 @@ stylesheet in your page and will not attempt to dynamically load the fonts,
 relying instead on the regular process to do so. This may result in some
 redrawing of formulas, or incorrect drawing while the browser completes the
 font loading.</p>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;mathlive-fonts.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
@@ -615,17 +615,17 @@ mathfield will be sufficient to correctly render the static formulas.</p>
 MathLive library being loaded, use the <code>mathlive-static.css</code> stylesheet
 which can be found in the <code>/dist/</code> directory on GitHub or in the
 <code>node_modules/mathlive</code> directory via NPM.</p>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive-static.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
         <span class="hljs-keyword">import</span> {convertLatexToMarkup} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
-        <span class="hljs-built_in">window</span>.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;formula&quot;</span>).innerHTML = convertLatexToMarkup(
+        <span class="hljs-variable language_">window</span>.<span class="hljs-property">onload</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+            <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = <span class="hljs-title function_">convertLatexToMarkup</span>(
             <span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>
             );
         };

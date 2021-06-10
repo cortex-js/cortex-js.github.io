@@ -117,11 +117,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -161,19 +161,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -374,7 +361,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -585,7 +585,7 @@ is an array of <code>VirtualKeyboardKeycap</code>. As a shortcut, a string can a
 used, which is equivalent to a <code>VirtualKeyboardKeycap</code> with a <code>latex</code> property
 equal to the string, that is, it will display the latex string as the keycap
 label and insert it when the key is pressed.</p>
-<pre><code class="language-js">rows: [
+<pre><code class="language-js"><span class="hljs-attr">rows</span>: [
   [
     { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-attr">variants</span>: [<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;\\Alpha&quot;</span>] }
     ...
@@ -624,7 +624,7 @@ property:</p>
     <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>]
   },
 </code></pre>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> HIGH_SCHOOL_KEYBOARD_LAYER = {
+<pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span> = {
       <span class="hljs-string">&quot;high-school-layer&quot;</span>: {
         <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
         <span class="hljs-attr">rows</span>: [
@@ -724,7 +724,7 @@ displayed to further explain what the keyboard is about.</p>
 <code>layer</code> property to the name of the layer.</p>
 <p>If we had several layers, we could set the property <code>layers</code> to an
 array of their names.</p>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> HIGH_SCHOOL_KEYBOARD = {
+<pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD</span> = {
       <span class="hljs-string">&quot;high-school-keyboard&quot;</span>: {
         <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;High School&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
         <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;High School Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
@@ -741,9 +741,9 @@ Here we only want our keyboard, so we’ll just pass its name.</p>
 example <code>&quot;numeric high-school-keyboard symbols&quot;</code>. If we wanted all the default
 keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortcut:
 <code>&quot;all high-school-keyboard&quot;</code>.</p>
-<pre><code class="language-js">  mf.setOptions({
-    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: HIGH_SCHOOL_KEYBOARD_LAYER,
-    <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: HIGH_SCHOOL_KEYBOARD,
+<pre><code class="language-js">  mf.<span class="hljs-title function_">setOptions</span>({
+    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span>,
+    <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD</span>,
     <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;high-school-keyboard&quot;</span>
   });
 }
@@ -832,7 +832,7 @@ main document.</p>
 <p>This can be solved by using a “shared” virtual keyboard.</p>
 <p>To use a shared virtual keyboard, call the <code>makeSharedVirtualKeyboard()</code>
 function in the context of the main document.</p>
-<pre><code class="language-javascript">makeSharedVirtualKeyboard({
+<pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
   <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
 });
 </code></pre>

@@ -638,7 +638,7 @@ cube(5)
 <li><em><code>expr-n</code></em>: one or more expressions</li>
 <li>Returns a string, a Latex string corresponding to the input expressions.</li>
 </ul>
-<pre><code class="language-json">[<span class="hljs-string">&quot;Latex&quot;</span>, [<span class="hljs-string">&quot;Divide&quot;</span>, <span class="hljs-string">&quot;Pi&quot;</span>, <span class="hljs-number">2</span>]]
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>If the argument is a string, it is interpreted as a Latex token or fragment:</p>
@@ -653,7 +653,7 @@ cube(5)
 <li>string that starts with <code>/</code>: a Latex command</li>
 <li>other strings: ordinary symbols</li>
 </ul>
-<pre><code class="language-json">[<span class="hljs-string">&quot;Latex&quot;</span>, <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span>]
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
@@ -673,7 +673,7 @@ matches the <em><code>pattern</code></em>.</li>
 and capture any subexpression at this position as the <code>_</code>name<code>_</code> capture group
 <strong>if</strong> the subexpression matches any of the <em><code>pattern-n</code></em>.</li>
 </ul>
-<pre><code class="language-js">match([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Pattern&quot;</span>], [<span class="hljs-string">&quot;Pattern&quot;</span>]], [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]))
+<pre><code class="language-js"><span class="hljs-title function_">match</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Pattern&quot;</span>], [<span class="hljs-string">&quot;Pattern&quot;</span>]], [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]))
 <span class="hljs-comment">// ➔ {}</span>
 </code></pre>
 <h3><code>Piecewise</code></h3>
@@ -714,14 +714,14 @@ the arguments are identical.</li>
 even if they are otherwise identical. Other metadata does not affect the
 comparison.</p>
 <pre><code class="language-js"><span class="hljs-comment">// Greek letter vs. ratio of the circumference of a circle to its diameter</span>
-same({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
+<span class="hljs-title function_">same</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
 <span class="hljs-comment">// ➔ false</span>
 </code></pre>
 <p>Using a canonical format will result in more positive matches.</p>
-<pre><code class="language-js">Same(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x);
+<pre><code class="language-js"><span class="hljs-title class_">Same</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x);
 <span class="hljs-comment">// ➔ False</span>
 
-Same(Canonical(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
+<span class="hljs-title class_">Same</span>(<span class="hljs-title class_">Canonical</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
 <span class="hljs-comment">// ➔ True</span>
 </code></pre>
 <h3>Superscript/subscript</h3>
@@ -747,10 +747,10 @@ conjugate.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 07, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:19:33 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:40:34 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
         
       </footer>
 

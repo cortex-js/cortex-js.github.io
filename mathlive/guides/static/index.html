@@ -122,11 +122,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -166,19 +166,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -379,7 +366,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -471,9 +471,9 @@
 <p>To render math contained in a document as a static (non-editable) formula,
 call <a href="/docs/mathlive/?q=renderMathInDocument"><code>renderMathInDocument()</code></a> at the end of your document, or in a <code>onload</code>
 handler .</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="javascript">
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
-  renderMathInDocument();
+  <span class="hljs-title function_">renderMathInDocument</span>();
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 <p>By default, any LaTeX code that is enclosed with the following delimiters will
@@ -532,10 +532,10 @@ will not automatically be rendered. (true by default)</li>
 will trigger a render of the content in ‘textstyle’ or ‘displaystyle’ style,
 respectively.</li>
 </ul>
-<pre><code class="language-javascript">MathLive.renderMathInElement(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;formulas&#x27;</span>), {
+<pre><code class="language-javascript"><span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">renderMathInElement</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;formulas&#x27;</span>), {
   <span class="hljs-comment">// Elements with a class of &quot;instruction&quot; or &quot;source will be skipped</span>
   <span class="hljs-attr">ignoreClass</span>: <span class="hljs-string">&#x27;instruction|source&#x27;</span>,
-  <span class="hljs-attr">TeX</span>: {
+  <span class="hljs-title class_">Te</span><span class="hljs-attr">X</span>: {
     <span class="hljs-attr">delimiters</span>: {
       <span class="hljs-comment">// Allow math formulas surround by $...$ or \(...\)</span>
       <span class="hljs-comment">// to be rendered as textstyle content.</span>

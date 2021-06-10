@@ -122,11 +122,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -198,7 +198,7 @@
             
           
 
-          <a href="/guides/mathfield-getting-started/"><span class="nav__sub-title">MathLive</span></a>
+          <a href="/mathlive/"><span class="nav__sub-title">MathLive</span></a>
         
 
         
@@ -211,7 +211,7 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -334,10 +334,10 @@ U+FF41-U+FF46</p>
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:19:33 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 11:58:30 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

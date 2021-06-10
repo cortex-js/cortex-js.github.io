@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css">
+  
+    
+      
+    
+    <link rel="stylesheet" href="/assets/js/ui.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cortex/" >Cortex</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Compute Engine</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/compute-engine/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-assumptions/" class="">Assumptions</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/domains/" class="">Domains</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/forms/" class="">Forms</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/compute-engine/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Dictionary</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/arithmetic/" class="">Arithmetic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/calculus/" class="">Calculus</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/collections/" class="">Collections</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/core/" class="">Core</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/logic/" class="">Logic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/sets/" class="">Sets</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathJSON</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/math-json/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathjson/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/mathlive/"><span class="nav__sub-title">MathLive</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import { renderMathInDocument } from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: { display: [ ['$$', '$$'] ] },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+</script>
+<h1>MathJSON Format</h1>
+<p>The MathJSON format is a lightweight data interchange format for mathematical
+notation.</p>
+<p>MathJSON is built on the <a href="https://www.json.org/">JSON format</a>. Its focus is on
+interoperability between software programs to facilitate the exchange of
+mathematical data, as well as the building of scientific software through the
+integration of software components communicating with a common format.</p>
+<p>It is human-readable, while being easy for machines to generate and parse. It is
+simple enough that it can be generated, consumed and manipulated using any
+programming languages.</p>
+<p>MathJSON can be transformed from (parsing) and to (serialization) other formats,
+using a syntax specific to those formats.</p>
+<p>The MathJSON library provides an implementation in Javascript/Typescript of
+utilities that parse Latex to MathJSON, serialize MathJSON to Latex, and provide
+a collection of functions for symbolic manipulation and numerical evaluations of
+MathJSON expressions. Read more about
+<a href="/guides/math-json-dictionary/">MathJSON for Latex</a> and the
+<a href="/guides/compute-engine/">Compute Engine</a>.</p>
+<p>Mathematical notation is used in a broad array of fields, from elementary school
+arithmetic, engineering, applied mathematics to physics and more. New notations
+are invented regularly and need to be represented. To address those needs
+MathJSON is flexible, extensible and customizable. Extensible dictionaries can
+be used to define new syntax and new semantic.</p>
+<p>MathJSON is not intended to be suitable as a visual representation of arbitrary
+mathematical notations, and as such is not a replacement for LaTeX or MathML.</p>
+<h2>Examples</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Latex</th>
+<th style="text-align:left">MathJSON</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">$$\frac{a}{1+x}$$</td>
+<td style="text-align:left"><code>[&quot;Divide&quot;, &quot;a&quot;, [&quot;Add&quot;, 1, &quot;x&quot;]]</code></td>
+</tr>
+<tr>
+<td style="text-align:left">$$e^{\imaginaryI \pi }+1=0$$</td>
+<td style="text-align:left"><code>[&quot;Eq&quot;, [&quot;Add&quot;, [&quot;Power&quot;, &quot;E&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryI&quot;], 1]], 0]</code></td>
+</tr>
+<tr>
+<td style="text-align:left">$$\sin^{-1}\prime(x)$$</td>
+<td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Structure of a MathJSON Expression</h2>
+<p>A MathJSON expression is a combination of <strong>numbers</strong>, <strong>strings</strong>, <strong>symbols</strong>,
+<strong>functions</strong> and <strong>dictionaries</strong>.</p>
+<p><strong>Number</strong></p>
+<pre><code class="language-json"><span class="hljs-number">3.14</span>
+<span class="hljs-number">314e-2</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.14&quot;</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-Infinity&quot;</span><span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>Symbol</strong></p>
+<pre><code class="language-json"><span class="hljs-string">&quot;x&quot;</span>
+<span class="hljs-string">&quot;Pi&quot;</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;sym&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;wikidata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Q167&quot;</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>String</strong></p>
+<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Diameter of a circle&#x27;&quot;</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;str&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Radius&quot;</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>Function</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">{</span>sym<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>num<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>sym<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>Dictionary</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;dict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;hello&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;world&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>Numbers</strong>, <strong>symbols</strong>, <strong>strings</strong> and <strong>functions</strong> can be expressed either
+as an object literal with a <code>&quot;num&quot;</code>, <code>&quot;str&quot;</code>, <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key,
+respectively, or as a short-hand notation using a JSON number, string or array.</p>
+<p>The short-hand notation is more concise and easier to read, but cannot include
+metadata properties.</p>
+<h2>Numbers</h2>
+<p>A MathJSON <strong>number</strong> is either:</p>
+<ul>
+<li>an object literal with a <code>&quot;num&quot;</code> key</li>
+<li>a JSON number</li>
+</ul>
+<h3>Numbers as Object Literals</h3>
+<p><strong>Numbers</strong> can be represented as an object literal with a <code>&quot;num&quot;</code> key. The
+value of the key is a string representation of the number.</p>
+<pre><code class="language-typescript">{
+    <span class="hljs-string">&quot;num&quot;</span>: <span class="hljs-built_in">string</span>
+}
+</code></pre>
+<p>The string representing a number follows the
+<a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>.</p>
+<h3>JSON numbers</h3>
+<p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
+representation of numbers, a JSON number can be used.</p>
+<p>Specifically:</p>
+<ul>
+<li>the number has to be in the range $$[-(2^{53})+1, (2^{53})-1]$$ to fit in a
+64-bit float (<strong>IEEE 754-2008</strong>, 52-bit, about 15 digits of precision).</li>
+<li>the number has to be finite: it cannot be <code>Infinity</code>, <code>-Infinity</code> or <code>NaN</code>.</li>
+</ul>
+<h3>Examples</h3>
+<pre><code class="language-json"><span class="hljs-number">0</span>
+
+<span class="hljs-number">-234.534e-46</span>
+
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-234.534e-46&quot;</span> <span class="hljs-punctuation">}</span>
+
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span>
+    <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105&quot;</span>
+<span class="hljs-punctuation">}</span>
+
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-Infinity&quot;</span> <span class="hljs-punctuation">}</span>
+
+</code></pre>
+<h2>Strings</h2>
+<p>A MathJSON <strong>string</strong> is either</p>
+<ul>
+<li>an object literal with a <code>&quot;str&quot;</code> key</li>
+<li>a <a href="https://tools.ietf.org/html/rfc7159#section-7">JSON string</a> that starts and
+ends with <strong>U+0027 APOSTROPHE</strong> : <strong><code>'</code></strong>.</li>
+</ul>
+<p>Strings can contain any character represented by a Unicode scalar value (in the
+[0…0x10FFFF] range, except for [0xD800…0xDFFF]), but the following
+characters must be escaped as indicated:</p>
+<ul>
+<li><strong>U+0000</strong> to <strong>U+001F</strong>: <code>\u0000</code> to <code>\u001f</code></li>
+<li><strong>U+0008</strong>, Backspace: <code>\b</code> or <code>\u0008</code></li>
+<li><strong>U+0009</strong>, Tab : <code>\t</code> or <code>\u0009</code></li>
+<li><strong>U+000a</strong>, Line feed: <code>\n</code> or <code>\u000a</code></li>
+<li><strong>U+000c</strong>, Form Feed: <code>\f</code> or <code>\u000c</code></li>
+<li><strong>U+000d</strong>, Carriage Return: <code>\r</code> or <code>\u000d</code></li>
+<li><strong>U+005c</strong>, Backslash/Reverse Solidus: <code>\\</code> or <code>\u005c</code></li>
+<li><strong>U+0022</strong>, Quotation mark: <code>\&quot;</code> or <code>\u0022</code></li>
+</ul>
+<p>The encoding of the string follows the encoding of the JSON payload: UTF-8,
+UTF-16LE, UTF-16BE, etc…</p>
+<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
+</code></pre>
+<h2>Symbols</h2>
+<p>A MathJSON <strong>symbol</strong> is either:</p>
+<ul>
+<li>an object literal with a <code>&quot;sym&quot;</code> key</li>
+<li>a JSON string</li>
+</ul>
+<p><strong>Symbols</strong> are identifiers that represent the name of constants, variables and
+functions.</p>
+<p>Symbols are strings of valid Unicode characters, except:</p>
+<ul>
+<li><strong>U+0000</strong> to <strong>U+0020</strong></li>
+<li><strong>U+0022 DOUBLE QUOTE</strong>: <strong><code>&quot;</code></strong></li>
+<li><strong>U+005C REVERSE SOLIDUS</strong> : <strong><code>\</code></strong></li>
+<li><strong>U+0060 GRAVE ACCENT</strong> backtick : <strong><code>`</code></strong></li>
+<li><strong>U+FFFE</strong></li>
+<li><strong>U+FFFF</strong></li>
+</ul>
+<p>In addition, the first character of a symbol should not be:</p>
+<ul>
+<li><strong>U+0021 EXCLAMATION MARK</strong> : <strong><code>!</code></strong></li>
+<li><strong>U+0022 QUOTATION MARK</strong> : <strong><code>&quot;</code></strong></li>
+<li><strong>U+0023 NUMBER SIGN</strong> : <strong><code>#</code></strong></li>
+<li><strong>U+0024 DOLLAR SIGN</strong> : <strong><code>$</code></strong></li>
+<li><strong>U+0025 PERCENT</strong> : <strong><code>%</code></strong></li>
+<li><strong>U+0026 AMPERSAND</strong> : <strong><code>&amp;</code></strong></li>
+<li><strong>U+0027 APOSTROPHE</strong> : <strong><code>'</code></strong></li>
+<li><strong>U+0028 LEFT PARENTHESIS</strong> : <strong><code>(</code></strong></li>
+<li><strong>U+0029 RIGHT PARENTHESIS</strong> : <strong><code>)</code></strong></li>
+<li><strong>U+002E FULL STOP</strong> : <strong><code>'</code></strong></li>
+<li><strong>U+003A COLON</strong> : <strong><code>:</code></strong></li>
+<li><strong>U+003C LESS THAN SIGN</strong> : <strong><code>:</code></strong></li>
+<li><strong>U+003F QUESTION MARK</strong> : <strong><code>?</code></strong></li>
+<li><strong>U+0040 COMMERCIAL AT</strong> : <strong><code>@</code></strong></li>
+<li><strong>U+005B LEFT SQUARE BRACKET</strong> : <strong><code>[</code></strong></li>
+<li><strong>U+005D RIGHT SQUARE BRACKET</strong> : <strong><code>]</code></strong></li>
+<li><strong>U+005E CIRCUMFLEX ACCENT</strong> : <strong><code>^</code></strong></li>
+<li><strong>U+007B LEFT CURLY BRACKET</strong> : <strong><code>{</code></strong></li>
+<li><strong>U+007D RIGHT CURLY BRACKET</strong> : <strong><code>}</code></strong></li>
+<li><strong>U+007E TILDE</strong> : <strong><code>~</code></strong></li>
+</ul>
+<p>Before they are used, symbols are normalized to the Unicode Normalization Form C
+(NFC). They must be stored internally and compared using the NFC.</p>
+<p>JSON escape sequences are applied before Unicode normalization.</p>
+<p>These four strings represent the same symbol:</p>
+<ul>
+<li><code>&quot;Å&quot;</code></li>
+<li><code>&quot;A\u030a&quot;</code></li>
+<li><code>&quot;\u00c5&quot;</code> <strong>LATIN CAPITAL LETTER A WITH RING ABOVE</strong> (“Å”) and</li>
+<li><code>&quot;\u0041\u030a&quot;</code> <strong>LATIN CAPITAL LETTER A</strong> + <strong>COMBINING RING ABOVE</strong> (“A‌ ̊”)</li>
+</ul>
+<p>The following naming convention are recommended.</p>
+<h3>Patterns</h3>
+<p>Symbols that begin with <strong><code>_</code></strong> (<strong>U+005F LOW LINE</strong>, underscore) are reserved
+to denote pattern matches and other placeholders.</p>
+<h3>Variables</h3>
+<ul>
+<li>
+<p>The first character of a variable should be a lowercase or uppercase letter
+(<code>a</code>-<code>z</code> or <code>A</code>-<code>Z</code>)</p>
+</li>
+<li>
+<p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
+<p>So for example use, <code>Gamma</code> rather than <code>ɣ</code> and <code>Total</code> rather than <code>∑</code>
+(<strong>U+2211 N-ARY SUMMATION</strong>), which looks like <code>Σ</code> (<strong>U+03A3 GREEK CAPITAL
+LETTER SIGMA</strong>). This visual ambiguity of some Unicode symbols frequently used
+in math is why we recommend a more restricted character set.</p>
+</li>
+<li>
+<p>If a variable is made of several words, use camelCase, i.e. <code>newDeterminant</code></p>
+</li>
+<li>
+<p>Prefer clarity over brevity and avoid obscure abbreviations.</p>
+<p>Use <code>newDeterminant</code> rather than <code>newDet</code> or <code>nDet</code></p>
+</li>
+<li>
+<p>The following variables are usually real numbers: <code>x</code>, <code>y</code>, <code>t</code></p>
+</li>
+<li>
+<p>The following variables are usually integers: <code>i</code>, <code>n</code>, <code>p</code>, <code>q</code></p>
+</li>
+<li>
+<p>The following variables are usually complex numbers: <code>z</code>, <code>w</code></p>
+</li>
+<li>
+<p>The following variables are usually lists: <code>xs</code>, <code>ys</code>, <code>ns</code></p>
+</li>
+</ul>
+<h3>Constants</h3>
+<ul>
+<li>The first character of a constant should an uppercase letter (<code>A</code>-<code>Z</code>)</li>
+<li>Subsequent characters should a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</li>
+<li>If a constant is made up of several words, use camelCase, e.g. <code>SpeedOfLight</code></li>
+</ul>
+<h2>Functions</h2>
+<p>A MathJSON function is either:</p>
+<ul>
+<li>an object literal with a <code>&quot;fn&quot;</code> key.</li>
+<li>a JSON array</li>
+</ul>
+<h3>Functions as Object Literal</h3>
+<p>The default representations of <strong>functions</strong> is as an object literal with a
+<code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head and
+its arguments.</p>
+<pre><code class="language-typescript">{
+    <span class="hljs-string">&quot;fn&quot;</span>: <span class="hljs-title class_">Expression</span>[]
+}
+</code></pre>
+<p>The <strong>head</strong> of the function is the first element in the array. Its presence is
+required. It indicates the ‘function name’ or ‘what’ the function is about.</p>
+<p>It frequently is a string, but it can also be another expression.</p>
+<p>Following the head are zero or more <strong>arguments</strong> to the function, which are
+expressions as well. The <strong>arguments</strong> form the <strong>tail</strong> of the function.</p>
+<p>The expression corresponding to $$\sin^{-1}(x)$$ is</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code>, and the argument is
+“x”.</p>
+<h3>JSON array</h3>
+<p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
+<p>For example these two expressions are equivalent:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<h2>Dictionary</h2>
+<p>A <strong>dictionary</strong> is a collection of key-value pairs. In some languages it is
+called a map or associative array.</p>
+<p>The keys are strings and the values are MathJSON expressions.</p>
+<p>A <strong>dictionary</strong> is represented as an object literal with a <code>&quot;dict&quot;</code> key. The
+value of the key is a JSON object literal holding the content of the dictionary.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;dict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;one&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;two&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;three&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h2>Metadata</h2>
+<p>MathJSON object literals can be annotated with supplemental information.</p>
+<p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> represented as a JSON
+string, or a <strong>function</strong> represented as a JSON array must be transformed into
+the equivalent object literal before being annotated.</p>
+<p>The following metadata keys are recommended:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Key</th>
+<th style="text-align:left">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>wikidata</code></td>
+<td style="text-align:left">A short string indicating an entry in a wikibase.<br>This information can be used to disambiguate the meaning of a symbol</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>comment</code></td>
+<td style="text-align:left">A human readable plain string to annotate an expression, since JSON does not allow comments in its encoding</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>documentation</code></td>
+<td style="text-align:left">A Markdown-encoded string providing documentation about this expression.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>latex</code></td>
+<td style="text-align:left">A visual representation in LaTeX of the expression. <br> This can be useful to preserve non-semantic details, for example parentheses in an expression or styling attributes</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sourceUrl</code></td>
+<td style="text-align:left">A URL to the source of this expression</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sourceContent</code></td>
+<td style="text-align:left">The source from which this expression was generated.<br> It could be a Latex expression, or some other source language.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sourceOffsets</code></td>
+<td style="text-align:left">A pairs of character offsets in <code>sourceContent</code> or <code>sourceUrl</code> from which this expression was produced</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>hash</code></td>
+<td style="text-align:left">A string representing a digest of this expression.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-json"><span class="hljs-comment">// The ratio of the circumference of a circle to its diameter</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;sym&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;wikidata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Q167&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;latex&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\pi&quot;</span>
+<span class="hljs-punctuation">}</span>
+
+<span class="hljs-comment">// The greek letter ∏</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;sym&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;wikidata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Q168&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;comment&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;The greek letter π&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="June 10, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 11:58:30 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

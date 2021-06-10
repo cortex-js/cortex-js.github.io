@@ -494,19 +494,19 @@
 <p>To transform MathJSON to Latex, use the <code>serialize()</code> function.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
 
-<span class="hljs-keyword">const</span> expr = parse(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-built_in">console</span>.log(expr);
+<span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
 <span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
 
-<span class="hljs-keyword">const</span> latex = serialize(expr);
-<span class="hljs-built_in">console</span>.log(latex);
+<span class="hljs-keyword">const</span> latex = <span class="hljs-title function_">serialize</span>(expr);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
 <span class="hljs-comment">// ➔ \frac{\pi}{2}</span>
 </code></pre>
 <p>The behavior of parse and serialize can be customized by passing an optional
 argument:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
 
-<span class="hljs-built_in">console</span>.log(serialize(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
     <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
     <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;,&quot;</span>
 }););
@@ -517,26 +517,26 @@ argument:</p>
 repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is
 constructed, the dictionaries defining the syntax are compiled, and subsequent
 invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { LatexSyntax } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-<span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> LatexSyntax();
-<span class="hljs-keyword">const</span> expr = latexSyntax.parse(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-built_in">console</span>.log(expr);
-<span class="hljs-keyword">const</span> latex = latexSyntax.serialize(expr);
-<span class="hljs-built_in">console</span>.log(latex);
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+<span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
+<span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
+<span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
 </code></pre>
 <p>To customize the syntax, provide options to the constructor of <code>LatexSyntax</code>.</p>
 <p>For example, the configuration below will result in parsing a Latex string as a
 sequence of Latex tokens.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> LatexSyntax({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
   <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
   <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
-  invisibleOperator: <span class="hljs-string">&#x27;&#x27;</span>,
+  <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">dictionary</span>: [],
   <span class="hljs-attr">skipSpace</span>: <span class="hljs-literal">false</span>,
 });
-<span class="hljs-keyword">const</span> expr = rawLatex.parse(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-built_in">console</span>.log(expr);
+<span class="hljs-keyword">const</span> expr = rawLatex.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
 <span class="hljs-comment">// ➔ [&quot;Latex&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
 </code></pre>
 
@@ -548,10 +548,10 @@ sequence of Latex tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 07, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:19:33 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:40:34 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
         
       </footer>
 

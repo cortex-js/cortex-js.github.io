@@ -117,11 +117,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -161,19 +161,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -374,7 +361,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -501,7 +501,7 @@ if there is a temporary networking issue.</p>
 <li>you can read and change the <code>disabled</code>, <code>value</code>, <code>options</code>, <code>selection</code> and
 <code>position</code> properties on the element.</li>
 </ul>
-<pre><code class="language-javascript"><span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&#x27;math-field&#x27;</span>).value = <span class="hljs-string">&#x27;\\sin x&#x27;</span>;
+<pre><code class="language-javascript"><span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\sin x&#x27;</span>;
 </code></pre>
 <p>However, some of those properties behave in limited way. For example, the <code>options</code>
 property usually return the default value for the options. However, at this stage,
@@ -515,8 +515,8 @@ attributes and the properties are independent, so if you set for example the
 since the element has not been upgraded yet.</li>
 </ul>
 <p>To be notified when the registration takes place, use the <code>whenDefined()</code> method.</p>
-<pre><code class="language-javascript">customElements.whenDefined(<span class="hljs-string">&#x27;math-field&#x27;</span>).then(<span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;&lt;math-field&gt; is defined&#x27;</span>);
+<pre><code class="language-javascript">customElements.<span class="hljs-title function_">whenDefined</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;&lt;math-field&gt; is defined&#x27;</span>);
 });
 </code></pre>
 <p>If all goes well, the element will be constructed next.</p>
@@ -556,11 +556,11 @@ vice versa).</li>
 </ul>
 <p>To be notified when this stage is reached, listen for the <code>mount</code> event on
 the element:</p>
-<pre><code class="language-javascript">md.addEventListener(<span class="hljs-string">&#x27;mount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;mf is mounted&#x27;</span>);
+<pre><code class="language-javascript">md.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;mount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is mounted&#x27;</span>);
   <span class="hljs-comment">// You can now read default options value for example, or </span>
   <span class="hljs-comment">//call `setValue()` with format options other than Latex.</span>
-  <span class="hljs-built_in">console</span>.log(ev.target.getOption(<span class="hljs-string">&#x27;macros&#x27;</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-title function_">getOption</span>(<span class="hljs-string">&#x27;macros&#x27;</span>));
 });
 </code></pre>
 <h2>Detached/Unmounted</h2>
@@ -574,10 +574,10 @@ apply.</p>
 or to be re-attached.</p>
 <p>To be notified when this stage is reached, listen for the <code>unmount</code> event on
 the element:</p>
-<pre><code class="language-javascript">md.addEventListener(<span class="hljs-string">&#x27;unmount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;mf is about to be unmounted&#x27;</span>);
+<pre><code class="language-javascript">md.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;unmount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is about to be unmounted&#x27;</span>);
   <span class="hljs-comment">// Last change to interact with the mathfield</span>
-  <span class="hljs-built_in">console</span>.log(ev.target.getValue(<span class="hljs-string">&#x27;ascii-math&#x27;</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;ascii-math&#x27;</span>));
 });
 </code></pre>
 <h2>Next</h2>

@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+  
+    
+      
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+  
+
+
+
+  
+    
+      
+    
+    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+  
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css">
+  
+    
+      
+    
+    <link rel="stylesheet" href="/assets/js/ui.css">
+  
+
+
+
+
+
+    <link
+    crossorigin
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
+    rel="stylesheet"
+/>
+
+<link
+    crossorigin
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
+/>
+
+
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
+            </li><li class="masthead__menu-item">
+              <a href="/cortex/" >Cortex</a>
+            </li><li class="masthead__menu-item">
+              <a href="/docs/" >Docs</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">Compute Engine</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/compute-engine/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine-assumptions/" class="">Assumptions</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/domains/" class="">Domains</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/forms/" class="">Forms</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/compute-engine/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Dictionary</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/arithmetic/" class="">Arithmetic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/calculus/" class="">Calculus</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/collections/" class="">Collections</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/core/" class="active">Core</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/logic/" class="">Logic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/sets/" class="">Sets</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathJSON</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/math-json/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathjson/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/mathlive/"><span class="nav__sub-title">MathLive</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
+  <ul class="nav__items">
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <script type='module'>
+    import {  renderMathInDocument } 
+      from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({
+      TeX: {
+        delimiters: {
+          inline: [ ['$', '$'], ['\\(', '\\)']],
+          display: [['$$', '$$'],['\\[', '\\]']],
+        },
+      },
+      asciiMath: null,
+      processEnvironments : false,
+      renderAccessibleContent: false,
+    });
+</script>
+<h1>Core</h1>
+<h2>Constants</h2>
+<h3><code>Missing</code></h3>
+<p>This symbol is used when a required expression is not present.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">Latex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>[&quot;Divide&quot;, 2, &quot;Missing&quot;]</code></td>
+<td style="text-align:left"><code>\frac{2}{\placeholder{}}</code></td>
+</tr>
+</tbody>
+</table>
+<h3><code>Nothing</code></h3>
+<p>This symbol is used when an optional expression is not present.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">Latex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>[&quot;List&quot;, 2, &quot;Nothing&quot;, 3]</code></td>
+<td style="text-align:left"><code>\lrback 2,,3 \rbrack</code></td>
+</tr>
+</tbody>
+</table>
+<h3><code>None</code></h3>
+<p>This symbol is used to indicate that out of multiple possible values, none
+apply.</p>
+<h3><code>All</code></h3>
+<p>This symbol is used to indicate that out of multiple possible values, all apply.</p>
+<h2>Functions</h2>
+<h3><code>About</code></h3>
+<p><code>About(</code><em><code>symbol</code></em><code>)</code></p>
+<p>Return information about a symbol such as its domain, its attributes, its value,
+etc…</p>
+<h3><code>Domain</code></h3>
+<p><code>Domain(</code><em><code>expression</code></em><code>)</code></p>
+<p>Return the domain of the expression.</p>
+<h3><code>Evaluate</code></h3>
+<p><code>Evaluate(</code><em><code>expression</code></em><code>)</code> <code>Evaluate(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
+<p>Apply a sequence of definitions to an expression in order to reduce and simplify
+it.</p>
+<p>An evaluation can consist of:</p>
+<ul>
+<li>a computation</li>
+</ul>
+<pre><code class="language-cortex">Evaluate(2 + 3)
+// ➔ 5
+</code></pre>
+<ul>
+<li>an execution</li>
+</ul>
+<pre><code class="language-cortex">Evaluate(Length([5, 7]))
+// ➔ 2
+</code></pre>
+<ul>
+<li>a simplification</li>
+</ul>
+<pre><code class="language-cortex">Evaluate(2 + x + 3)
+// ➔ 5 + x
+</code></pre>
+<h3><code>Identity</code></h3>
+<p>Always return its argument.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">Latex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>[&quot;Identity&quot;, &quot;x&quot;]</code></td>
+<td style="text-align:left"><code>\operatorname{id}(x)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;Identity&quot;</code></td>
+<td style="text-align:left"><code>\operatorname{id}</code></td>
+</tr>
+</tbody>
+</table>
+<h3><code>InverseFunction</code></h3>
+<p>Return the inverse function of its argument.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">Latex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code></td>
+<td style="text-align:left"><code>\sin^{-1}</code></td>
+</tr>
+</tbody>
+</table>
+<h3><code>Lambda</code></h3>
+<p><code>Lambda&quot;(</code><em><code>variables:List</code></em><code>, </code><em><code>expression</code></em><code>)</code></p>
+<p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
+also called <strong>anonymous function</strong>.</p>
+<p>The first argument is a symbol or a list of symbols which are the bound
+variables (parameters) of the Lambda-function.</p>
+<p>The second argument is an expression expressed as a function of the bound
+variables of the Lambda-function.</p>
+<p>To apply a Lambda-function to some arguments, use:</p>
+<pre><code class="language-cortex">Lambda([x], x * x)(3)
+// ➔ 9
+</code></pre>
+<p>You can avoid naming the parameters by using the following shorthands:</p>
+<ul>
+<li><code>_</code> or <code>_0</code> : the first argument</li>
+<li><code>_1</code> : the second argument</li>
+<li><code>_2</code> : the third argument, etc…</li>
+<li><code>__</code>: the sequence of arguments, so <code>Length(__)</code> is the number of arguments</li>
+</ul>
+<pre><code class="language-cortex">Lambda(_ * _)(4)
+// ➔ 16
+</code></pre>
+<p>You can assign a Lambda expression to a symbol for later use:</p>
+<pre><code class="language-cortex">cube = Lambda(_ * _ * _)
+cube(5)
+// ➔ 125
+</code></pre>
+<h3><code>Latex</code></h3>
+<p><code>[&quot;Latex&quot;, </code><em><code>expr-1</code></em><code>, </code><em><code>expr-2</code></em><code>, ...</code><em><code>expr-n</code></em><code>]</code></p>
+<ul>
+<li><em><code>expr-n</code></em>: one or more expressions</li>
+<li>Returns a string, a Latex string corresponding to the input expressions.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
+</code></pre>
+<p>If the argument is a string, it is interpreted as a Latex token or fragment:</p>
+<ul>
+<li><code>&lt;{&gt;</code>: begin group</li>
+<li><code>&lt;}&gt;</code>: end group</li>
+<li><code>&lt;space&gt;</code>: blank space</li>
+<li><code>&lt;$$&gt;</code>: display mode shift</li>
+<li><code>&lt;$&gt;</code>: inline mode shift</li>
+<li><code>#0</code>-<code>#9</code>: argument</li>
+<li><code>#?</code>: placeholder</li>
+<li>string that starts with <code>/</code>: a Latex command</li>
+<li>other strings: ordinary symbols</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
+</code></pre>
+<p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
+<h3><code>Pattern</code></h3>
+<p class="notice--info">Work in progress</p>
+<p>The <code>Pattern</code> function is used with the <code>match()</code> function to pattern-match an
+expression. The pattern expression can include one or more <code>Pattern</code> function
+calls.</p>
+<ul>
+<li><code>[&quot;Pattern&quot;]</code> - Any sub-expression at this position will match.</li>
+<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>]</code> - Match and capture any subexpression at this
+position as the capture group <em><code>name</code></em>.</li>
+<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern</code></em><code>]</code> - Match and capture any subexpression
+at this position as the <code>_</code>name<code>_</code> capture group <strong>if</strong> the subexpression
+matches the <em><code>pattern</code></em>.</li>
+<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern-1</code></em><code>, </code><em><code>pattern-2</code></em><code>, </code><em><code>...</code></em><code>]</code> - Match
+and capture any subexpression at this position as the <code>_</code>name<code>_</code> capture group
+<strong>if</strong> the subexpression matches any of the <em><code>pattern-n</code></em>.</li>
+</ul>
+<pre><code class="language-js"><span class="hljs-title function_">match</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Pattern&quot;</span>], [<span class="hljs-string">&quot;Pattern&quot;</span>]], [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]))
+<span class="hljs-comment">// ➔ {}</span>
+</code></pre>
+<h3><code>Piecewise</code></h3>
+<h3><code>Prime</code></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">Latex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;]</code></td>
+<td style="text-align:left"><code>f^\prime</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;, 2]</code></td>
+<td style="text-align:left"><code>f^\doubleprime</code></td>
+</tr>
+</tbody>
+</table>
+<h3><code>Same</code></h3>
+<p><em><code>expr1</code></em> <code>===</code> <em><code>expr2</code></em></p>
+<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
+<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>, ...</code><em><code>expr-n</code></em><code>)</code></p>
+<p>Indicate if two (or more) expressions are structurally identical, using a
+literal symbolic identity.</p>
+<p>Two expressions are the same if:</p>
+<ul>
+<li>they have the same domain.</li>
+<li>if they are numbers, if their value and domain are identical.</li>
+<li>if they are symbols, if their names are identical.</li>
+<li>if they are functions, if the head of the functions are identical, and if all
+the arguments are identical.</li>
+</ul>
+<p>Two expressions that have a different <code>wikidata</code> metadata will not be the same,
+even if they are otherwise identical. Other metadata does not affect the
+comparison.</p>
+<pre><code class="language-js"><span class="hljs-comment">// Greek letter vs. ratio of the circumference of a circle to its diameter</span>
+<span class="hljs-title function_">same</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
+<span class="hljs-comment">// ➔ false</span>
+</code></pre>
+<p>Using a canonical format will result in more positive matches.</p>
+<pre><code class="language-js"><span class="hljs-title class_">Same</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x);
+<span class="hljs-comment">// ➔ False</span>
+
+<span class="hljs-title class_">Same</span>(<span class="hljs-title class_">Canonical</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
+<span class="hljs-comment">// ➔ True</span>
+</code></pre>
+<h3>Superscript/subscript</h3>
+<ul>
+<li><code>Subminus</code> - $$x_-$$</li>
+<li><code>Subplus</code> - $$x_+$$</li>
+<li><code>Subscript</code></li>
+<li><code>Substar</code> - $$x_*$$</li>
+<li><code>Superdagger</code> - $$x^\dagger$$</li>
+<li><code>Superminus</code> - $$x^-$$</li>
+<li><code>Superplus</code> - $$x^+$$</li>
+<li><code>Superstar</code> - $$x^*$$. When the argument is a complex number, indicate the
+conjugate.</li>
+</ul>
+<h3><code>String</code></h3>
+<h3><code>Symbol</code></h3>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="June 10, 2021">
+        
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 11:58:30 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+        
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+         
+         
+         
+         
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="/about" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

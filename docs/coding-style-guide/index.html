@@ -86,11 +86,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -233,23 +233,23 @@ key/value pairs spelling out the meaning of the boolean.</li>
 necessary, use an optional object literal as the last argument.</li>
 </ul>
 <pre><code class="language-javascript"><span class="hljs-comment">// 💩</span>
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderText</span>(<span class="hljs-params">text: string,
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">renderText</span>(<span class="hljs-params">text: string,
     fontFamily = <span class="hljs-string">&#x27;Helvetica&#x27;</span>,
     fontSize = <span class="hljs-number">12</span>,
     lineSpacing = <span class="hljs-number">1.2</span>,
     style = <span class="hljs-string">&#x27;&#x27;</span>
-</span>)</span>;
-renderText(<span class="hljs-string">&quot;hello world&quot;</span>, <span class="hljs-string">&quot;Helvetica&quot;</span>, <span class="hljs-number">18</span>, <span class="hljs-number">1.5</span>, <span class="hljs-string">&quot;bold&quot;</span>);
+</span>);
+<span class="hljs-title function_">renderText</span>(<span class="hljs-string">&quot;hello world&quot;</span>, <span class="hljs-string">&quot;Helvetica&quot;</span>, <span class="hljs-number">18</span>, <span class="hljs-number">1.5</span>, <span class="hljs-string">&quot;bold&quot;</span>);
 
 <span class="hljs-comment">// 👍</span>
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderText</span>(<span class="hljs-params">text: string, {
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">renderText</span>(<span class="hljs-params">text: string, {
     fontFamily = <span class="hljs-string">&#x27;Helvetica&#x27;</span>,
     fontSize = <span class="hljs-number">12</span>,
     lineSpacing = <span class="hljs-number">1.2</span>,
     style = <span class="hljs-string">&#x27;&#x27;</span>
-}</span>)</span>;
-renderText(<span class="hljs-string">&quot;hello world&quot;</span>);
-renderText(<span class="hljs-string">&quot;hello world&quot;</span>, {
+}</span>);
+<span class="hljs-title function_">renderText</span>(<span class="hljs-string">&quot;hello world&quot;</span>);
+<span class="hljs-title function_">renderText</span>(<span class="hljs-string">&quot;hello world&quot;</span>, {
     <span class="hljs-attr">fontFamily</span>: <span class="hljs-string">&quot;Helvetica&quot;</span>,
     <span class="hljs-attr">fontSize</span>: <span class="hljs-number">18</span>,
     <span class="hljs-attr">lineSpacing</span>: <span class="hljs-number">1.5</span>,
@@ -260,8 +260,8 @@ renderText(<span class="hljs-string">&quot;hello world&quot;</span>, {
 <li>Avoid providing an explicit type when the compiler can infer it.</li>
 </ul>
 <pre><code class="language-javascript"><span class="hljs-comment">// 💩</span>
-<span class="hljs-keyword">let</span> action: string = <span class="hljs-string">&#x27;fly&#x27;</span>;
-<span class="hljs-keyword">let</span> distance: number = <span class="hljs-number">100</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-attr">action</span>: string = <span class="hljs-string">&#x27;fly&#x27;</span>;
+<span class="hljs-keyword">let</span> <span class="hljs-attr">distance</span>: number = <span class="hljs-number">100</span>;
 
 <span class="hljs-comment">// 👍</span>
 <span class="hljs-keyword">let</span> action = <span class="hljs-string">&#x27;fly&#x27;</span>;
@@ -298,8 +298,8 @@ standardization process.</li>
     <span class="hljs-attr">aliases</span>: [<span class="hljs-string">&#x27;Mithrandir&#x27;</span>, <span class="hljs-string">&#x27;Tharkûn&#x27;</span>, <span class="hljs-string">&#x27;Olórin&#x27;</span>, <span class="hljs-string">&#x27; Incánus&#x27;</span>],
 };
 
-<span class="hljs-keyword">const</span> deepClone = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-built_in">JSON</span>.stringify(object));
-<span class="hljs-keyword">const</span> arrayDeepCopy = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-built_in">JSON</span>.stringify(array));
+<span class="hljs-keyword">const</span> deepClone = <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">stringify</span>(object));
+<span class="hljs-keyword">const</span> arrayDeepCopy = <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">stringify</span>(array));
 </code></pre>
 
         

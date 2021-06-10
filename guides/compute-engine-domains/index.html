@@ -505,10 +505,10 @@
 that the arguments of functions are compatible. This information is also useful
 to select appropriate algorithms, and to optimized compiled expressions.</p>
 <p>Domains can be defined as a union or intersection of domains:</p>
-<pre><code class="language-json">[<span class="hljs-string">&quot;Union&quot;</span>, <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-string">&quot;Boolean&quot;</span>][(<span class="hljs-string">&quot;SetMinus&quot;</span>, <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-number">1</span>)] <span class="hljs-comment">//  A number or a boolean. // Any number except &quot;1&quot;.</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Union&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Boolean&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;SetMinus&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span>)<span class="hljs-punctuation">]</span> <span class="hljs-comment">//  A number or a boolean. // Any number except &quot;1&quot;.</span>
 </code></pre>
 <p>Parametric domains can be used as functions:</p>
-<pre><code class="language-json">[<span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&quot;+Infinity&quot;</span>] <span class="hljs-comment">// Range of non-negative numbers</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-comment">// Range of non-negative numbers</span>
 </code></pre>
 <p>Parametric domains define a subset or ‘specialization’ of a domain. Not all
 domains are parametric, and the precise semantic of the parametric form depends
@@ -528,28 +528,28 @@ domain represent a ‘is-a’/‘subset-of’ relationship, for example, a <code
 <h2>Obtaining the Domain of an Expression</h2>
 <p>To obtain the domain of an expression, use the <code>ComputeEngine.domain()</code>
 function.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> ComputeEngine();
+<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
-engine.domain(<span class="hljs-string">&#x27;Pi&#x27;</span>);
+engine.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-comment">// ➔ &quot;TranscendentalNumber&quot;</span>
 
-engine.domain(<span class="hljs-string">&#x27;Add&#x27;</span>);
+engine.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Add&#x27;</span>);
 <span class="hljs-comment">// ➔ &quot;Function&quot;: domain of the symbol &quot;Add&quot;</span>
 
-engine.domain([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
+engine.<span class="hljs-title function_">domain</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
 <span class="hljs-comment">// ➔ &quot;Number&quot;: the result of the &quot;Add&quot; function</span>
 <span class="hljs-comment">// (its codomain) in general is a &quot;Number&quot;</span>
 
-engine.domain(engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]));
+engine.<span class="hljs-title function_">domain</span>(engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]));
 <span class="hljs-comment">// ➔ &quot;PrimeNumber&quot;</span>
 </code></pre>
 <h2>Convertion Domains to a Canonical Form</h2>
 <p>Domains can be converted to a canonical form using the <code>'canonical-domain'</code>
 form.</p>
-<pre><code class="language-js">format([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;IrrationalNumber&#x27;</span>], <span class="hljs-string">&#x27;canonical-domain&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-title function_">format</span>([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;IrrationalNumber&#x27;</span>], <span class="hljs-string">&#x27;canonical-domain&#x27;</span>);
 <span class="hljs-comment">// ➔ &quot;RationalNumber&quot;</span>
 
-format(
+<span class="hljs-title function_">format</span>(
   [<span class="hljs-string">&#x27;Union&#x27;</span>, [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;+Infinity&#x27;</span>], [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">5</span>]],
   <span class="hljs-string">&#x27;canonical-domain&#x27;</span>
 );
@@ -674,10 +674,10 @@ for example <code>[&quot;Matrix&quot;, 5]</code> to define the domain of 5x5 mat
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 07, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 09:19:33 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:40:34 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
         
       </footer>
 

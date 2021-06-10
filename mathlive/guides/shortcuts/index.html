@@ -117,11 +117,11 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/math-json/" >MathJSON</a>
+              <a href="/mathlive/" >MathLive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/compute-engine/" >Compute Engine</a>
             </li><li class="masthead__menu-item">
               <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
             </li><li class="masthead__menu-item">
               <a href="/docs/" >Docs</a>
             </li><li class="masthead__menu-item">
@@ -161,19 +161,6 @@
   <input id="ac-toc" name="accordion-toc" type="checkbox" />
   <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
   <ul class="nav__items">
-    
-      <li>
-        
-          
-          
-            
-          
-
-          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
-        
-
-        
-      </li>
     
       <li>
         
@@ -374,7 +361,20 @@
             
           
 
-          <a href="/math-json/"><span class="nav__sub-title">MathJSON</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
         
@@ -550,7 +550,7 @@ mf.setOptions({
 <p>The <code>mode</code> key, if present, indicate the mode in which this shortcut should apply, either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut apply in both modes.</p>
 <p>To constraint the context in which a shortcut should apply, use the <code>after</code>
 key:</p>
-<pre><code class="language-javascript">mf.setOptions({
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">setOptions</span>({
   <span class="hljs-attr">inlineShortcuts</span>: {
     <span class="hljs-attr">in</span>: {
         <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;math&#x27;</span>,
@@ -600,90 +600,90 @@ represent mathematical symbols and expressions.</p>
 <p>The most common ASCIIMath shortcuts are part of the default inline shortcuts.
 To support additional ASCIIMath shortcuts, add them to the <code>inlineShortcuts</code>
 setting.</p>
-<pre><code class="language-js">mf.setOptions({
-  inlineShortcuts: {
-    //
-    // ASCIIIMath
-    //
-   // Binary operation symbols
-    &#x27;*&#x27;: &#x27;\\cdot&#x27;,
-    &#x27;**&#x27;: &#x27;\\ast&#x27;,
-    &#x27;***&#x27;: &#x27;\\star&#x27;,
-    &#x27;//&#x27;: &#x27;\\slash&#x27;,
-    &#x27;\\\\\&#x27;: &#x27;\\backslash&#x27;,
-    &#x27;setminus&#x27;: &#x27;\\backslash&#x27;,
-    &#x27;|&gt;&lt;&#x27;: &#x27;\\ltimes&#x27;,
-    &#x27;&gt;&lt;|&#x27;: &#x27;\\rtimes&#x27;,
-    &#x27;|&gt;&lt;|&#x27;: &#x27;\\bowtie&#x27;,
-    &#x27;-:&#x27;: &#x27;\\div&#x27;,
-    &#x27;divide&#x27;: &#x27;\\div&#x27;,
-    &#x27;@&#x27;: &#x27;\\circ&#x27;,
-    &#x27;o+&#x27;: &#x27;\\oplus&#x27;,
-    &#x27;ox&#x27;: &#x27;\\otimes&#x27;,
-    &#x27;o.&#x27;: &#x27;\\odot&#x27;,
-    &#x27;^^&#x27;: &#x27;\\wedge&#x27;,
-    &#x27;^^^&#x27;: &#x27;\\bigwedge&#x27;,
-    &#x27;vv&#x27;: &#x27;\\vee&#x27;,
-    &#x27;vvv&#x27;: &#x27;\\bigvee&#x27;,
-    &#x27;nn&#x27;: &#x27;\\cap&#x27;,
-    &#x27;nnn&#x27;: &#x27;\\bigcap&#x27;,
-    &#x27;uu&#x27;: &#x27;\\cup&#x27;,
-    &#x27;uuu&#x27;: &#x27;\\bigcup&#x27;,
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({
+  <span class="hljs-attr">inlineShortcuts</span>: {
+    <span class="hljs-comment">//</span>
+    <span class="hljs-comment">// ASCIIIMath</span>
+    <span class="hljs-comment">//</span>
+   <span class="hljs-comment">// Binary operation symbols</span>
+    <span class="hljs-string">&#x27;*&#x27;</span>: <span class="hljs-string">&#x27;\\cdot&#x27;</span>,
+    <span class="hljs-string">&#x27;**&#x27;</span>: <span class="hljs-string">&#x27;\\ast&#x27;</span>,
+    <span class="hljs-string">&#x27;***&#x27;</span>: <span class="hljs-string">&#x27;\\star&#x27;</span>,
+    <span class="hljs-string">&#x27;//&#x27;</span>: <span class="hljs-string">&#x27;\\slash&#x27;</span>,
+    <span class="hljs-string">&#x27;\\\\\&#x27;: &#x27;</span>\\backslash<span class="hljs-string">&#x27;,
+    &#x27;</span>setminus<span class="hljs-string">&#x27;: &#x27;</span>\\backslash<span class="hljs-string">&#x27;,
+    &#x27;</span>|&gt;&lt;<span class="hljs-string">&#x27;: &#x27;</span>\\ltimes<span class="hljs-string">&#x27;,
+    &#x27;</span>&gt;&lt;|<span class="hljs-string">&#x27;: &#x27;</span>\\rtimes<span class="hljs-string">&#x27;,
+    &#x27;</span>|&gt;&lt;|<span class="hljs-string">&#x27;: &#x27;</span>\\bowtie<span class="hljs-string">&#x27;,
+    &#x27;</span>-:<span class="hljs-string">&#x27;: &#x27;</span>\\div<span class="hljs-string">&#x27;,
+    &#x27;</span>divide<span class="hljs-string">&#x27;: &#x27;</span>\\div<span class="hljs-string">&#x27;,
+    &#x27;</span>@<span class="hljs-string">&#x27;: &#x27;</span>\\circ<span class="hljs-string">&#x27;,
+    &#x27;</span>o+<span class="hljs-string">&#x27;: &#x27;</span>\\oplus<span class="hljs-string">&#x27;,
+    &#x27;</span>ox<span class="hljs-string">&#x27;: &#x27;</span>\\otimes<span class="hljs-string">&#x27;,
+    &#x27;</span>o.<span class="hljs-string">&#x27;: &#x27;</span>\\odot<span class="hljs-string">&#x27;,
+    &#x27;</span>^^<span class="hljs-string">&#x27;: &#x27;</span>\\wedge<span class="hljs-string">&#x27;,
+    &#x27;</span>^^^<span class="hljs-string">&#x27;: &#x27;</span>\\bigwedge<span class="hljs-string">&#x27;,
+    &#x27;</span>vv<span class="hljs-string">&#x27;: &#x27;</span>\\vee<span class="hljs-string">&#x27;,
+    &#x27;</span>vvv<span class="hljs-string">&#x27;: &#x27;</span>\\bigvee<span class="hljs-string">&#x27;,
+    &#x27;</span>nn<span class="hljs-string">&#x27;: &#x27;</span>\\cap<span class="hljs-string">&#x27;,
+    &#x27;</span>nnn<span class="hljs-string">&#x27;: &#x27;</span>\\bigcap<span class="hljs-string">&#x27;,
+    &#x27;</span>uu<span class="hljs-string">&#x27;: &#x27;</span>\\cup<span class="hljs-string">&#x27;,
+    &#x27;</span>uuu<span class="hljs-string">&#x27;: &#x27;</span>\\bigcup<span class="hljs-string">&#x27;,
 
     // Binary relation symbols
-    &#x27;-=&#x27;: &#x27;\\equiv&#x27;,
-    &#x27;~=&#x27;: &#x27;\\cong&#x27;,
-    &#x27;lt&#x27;: &#x27;&lt;&#x27;,
-    &#x27;lt=&#x27;: &#x27;\\leq&#x27;,
-    &#x27;gt&#x27;: &#x27;&gt;&#x27;,
-    &#x27;gt=&#x27;: &#x27;\\geq&#x27;,
-    &#x27;-&lt;&#x27;: &#x27;\\prec&#x27;,
-    &#x27;-lt&#x27;: &#x27;\\prec&#x27;,
-    &#x27;-&lt;=&#x27;: &#x27;\\preceq&#x27;,
-    // &#x27;&gt;-&#x27;: &#x27;\\succ&#x27;,
-    &#x27;&gt;-=&#x27;: &#x27;\\succeq&#x27;,
-    &#x27;prop&#x27;: &#x27;\\propto&#x27;,
-    &#x27;diamond&#x27;: &#x27;\\diamond&#x27;,
-    &#x27;square&#x27;: &#x27;\\square&#x27;,
-    &#x27;iff&#x27;: &#x27;\\iff&#x27;,
+    &#x27;</span>-=<span class="hljs-string">&#x27;: &#x27;</span>\\equiv<span class="hljs-string">&#x27;,
+    &#x27;</span>~=<span class="hljs-string">&#x27;: &#x27;</span>\\cong<span class="hljs-string">&#x27;,
+    &#x27;</span>lt<span class="hljs-string">&#x27;: &#x27;</span>&lt;<span class="hljs-string">&#x27;,
+    &#x27;</span>lt=<span class="hljs-string">&#x27;: &#x27;</span>\\leq<span class="hljs-string">&#x27;,
+    &#x27;</span>gt<span class="hljs-string">&#x27;: &#x27;</span>&gt;<span class="hljs-string">&#x27;,
+    &#x27;</span>gt=<span class="hljs-string">&#x27;: &#x27;</span>\\geq<span class="hljs-string">&#x27;,
+    &#x27;</span>-&lt;<span class="hljs-string">&#x27;: &#x27;</span>\\prec<span class="hljs-string">&#x27;,
+    &#x27;</span>-lt<span class="hljs-string">&#x27;: &#x27;</span>\\prec<span class="hljs-string">&#x27;,
+    &#x27;</span>-&lt;=<span class="hljs-string">&#x27;: &#x27;</span>\\preceq<span class="hljs-string">&#x27;,
+    // &#x27;</span>&gt;-<span class="hljs-string">&#x27;: &#x27;</span>\\succ<span class="hljs-string">&#x27;,
+    &#x27;</span>&gt;-=<span class="hljs-string">&#x27;: &#x27;</span>\\succeq<span class="hljs-string">&#x27;,
+    &#x27;</span>prop<span class="hljs-string">&#x27;: &#x27;</span>\\propto<span class="hljs-string">&#x27;,
+    &#x27;</span>diamond<span class="hljs-string">&#x27;: &#x27;</span>\\diamond<span class="hljs-string">&#x27;,
+    &#x27;</span>square<span class="hljs-string">&#x27;: &#x27;</span>\\square<span class="hljs-string">&#x27;,
+    &#x27;</span>iff<span class="hljs-string">&#x27;: &#x27;</span>\\iff<span class="hljs-string">&#x27;,
 
-    &#x27;sub&#x27;: &#x27;\\subset&#x27;,
-    &#x27;sup&#x27;: &#x27;\\supset&#x27;,
-    &#x27;sube&#x27;: &#x27;\\subseteq&#x27;,
-    &#x27;supe&#x27;: &#x27;\\supseteq&#x27;,
-    &#x27;uarr&#x27;: &#x27;\\uparrow&#x27;,
-    &#x27;darr&#x27;: &#x27;\\downarrow&#x27;,
-    &#x27;rarr&#x27;: &#x27;\\rightarrow&#x27;,
-    &#x27;rArr&#x27;: &#x27;\\Rightarrow&#x27;,
-    &#x27;larr&#x27;: &#x27;\\leftarrow&#x27;,
-    &#x27;lArr&#x27;: &#x27;\\Leftarrow&#x27;,
-    &#x27;harr&#x27;: &#x27;\\leftrightarrow&#x27;,
-    &#x27;hArr&#x27;: &#x27;\\Leftrightarrow&#x27;,
-    &#x27;aleph&#x27;: &#x27;\\aleph&#x27;,
+    &#x27;</span>sub<span class="hljs-string">&#x27;: &#x27;</span>\\subset<span class="hljs-string">&#x27;,
+    &#x27;</span>sup<span class="hljs-string">&#x27;: &#x27;</span>\\supset<span class="hljs-string">&#x27;,
+    &#x27;</span>sube<span class="hljs-string">&#x27;: &#x27;</span>\\subseteq<span class="hljs-string">&#x27;,
+    &#x27;</span>supe<span class="hljs-string">&#x27;: &#x27;</span>\\supseteq<span class="hljs-string">&#x27;,
+    &#x27;</span>uarr<span class="hljs-string">&#x27;: &#x27;</span>\\uparrow<span class="hljs-string">&#x27;,
+    &#x27;</span>darr<span class="hljs-string">&#x27;: &#x27;</span>\\downarrow<span class="hljs-string">&#x27;,
+    &#x27;</span>rarr<span class="hljs-string">&#x27;: &#x27;</span>\\rightarrow<span class="hljs-string">&#x27;,
+    &#x27;</span>rArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Rightarrow</span><span class="hljs-string">&#x27;,
+    &#x27;</span>larr<span class="hljs-string">&#x27;: &#x27;</span>\\leftarrow<span class="hljs-string">&#x27;,
+    &#x27;</span>lArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Leftarrow</span><span class="hljs-string">&#x27;,
+    &#x27;</span>harr<span class="hljs-string">&#x27;: &#x27;</span>\\leftrightarrow<span class="hljs-string">&#x27;,
+    &#x27;</span>hArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Leftrightarrow</span><span class="hljs-string">&#x27;,
+    &#x27;</span>aleph<span class="hljs-string">&#x27;: &#x27;</span>\\aleph<span class="hljs-string">&#x27;,
 
     // Logic
-    &#x27;and&#x27;: &#x27;\\land&#x27;,
-    &#x27;or&#x27;: &#x27;\\lor&#x27;,
-    &#x27;not&#x27;: &#x27;\\neg&#x27;,
-    &#x27;_|_&#x27;: &#x27;\\bot&#x27;,
-    &#x27;TT&#x27;: &#x27;\\top&#x27;,
-    &#x27;|--&#x27;: &#x27;\\vdash&#x27;,
-    &#x27;|==&#x27;: &#x27;\\models&#x27;,
+    &#x27;</span>and<span class="hljs-string">&#x27;: &#x27;</span>\\land<span class="hljs-string">&#x27;,
+    &#x27;</span>or<span class="hljs-string">&#x27;: &#x27;</span>\\lor<span class="hljs-string">&#x27;,
+    &#x27;</span>not<span class="hljs-string">&#x27;: &#x27;</span>\\neg<span class="hljs-string">&#x27;,
+    &#x27;</span>_|_<span class="hljs-string">&#x27;: &#x27;</span>\\bot<span class="hljs-string">&#x27;,
+    &#x27;</span><span class="hljs-variable constant_">TT</span><span class="hljs-string">&#x27;: &#x27;</span>\\top<span class="hljs-string">&#x27;,
+    &#x27;</span>|--<span class="hljs-string">&#x27;: &#x27;</span>\\vdash<span class="hljs-string">&#x27;,
+    &#x27;</span>|==<span class="hljs-string">&#x27;: &#x27;</span>\\models<span class="hljs-string">&#x27;,
 
     // Other functions
-    &#x27;|__&#x27;: &#x27;\\lfloor&#x27;,
-    &#x27;__|&#x27;: &#x27;\\rfloor&#x27;,
+    &#x27;</span>|__<span class="hljs-string">&#x27;: &#x27;</span>\\lfloor<span class="hljs-string">&#x27;,
+    &#x27;</span>__|<span class="hljs-string">&#x27;: &#x27;</span>\\rfloor<span class="hljs-string">&#x27;,
 
-    &#x27;|~&#x27;: &#x27;\\lceiling&#x27;,
-    &#x27;~|&#x27;: &#x27;\\rceiling&#x27;,
+    &#x27;</span>|~<span class="hljs-string">&#x27;: &#x27;</span>\\lceiling<span class="hljs-string">&#x27;,
+    &#x27;</span>~|<span class="hljs-string">&#x27;: &#x27;</span>\\rceiling<span class="hljs-string">&#x27;,
 
     // Arrows
-    &#x27;&gt;-&gt;&#x27;: &#x27;\\rightarrowtail&#x27;,
-    &#x27;-&gt;&gt;&#x27;: &#x27;\\twoheadrightarrow&#x27;,
-    &#x27;&gt;-&gt;&gt;&#x27;: &#x27;\\twoheadrightarrowtail&#x27;
+    &#x27;</span>&gt;-&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\rightarrowtail<span class="hljs-string">&#x27;,
+    &#x27;</span>-&gt;&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\twoheadrightarrow<span class="hljs-string">&#x27;,
+    &#x27;</span>&gt;-&gt;&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\twoheadrightarrowtail<span class="hljs-string">&#x27;
   }
 });
-</code></pre>
+</span></code></pre>
 <h2>Next</h2>
 <dl>
 <dt><a href="/mathlive/guides/speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
