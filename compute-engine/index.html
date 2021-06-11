@@ -161,7 +161,31 @@
               
             
 
-            <li><a href="/guides/compute-engine-assumptions/" class="">Assumptions</a></li>
+            <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/transforming/" class="">Transforming an Expression</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/assumptions/" class="">Assumptions</a></li>
           
             
             
@@ -185,7 +209,7 @@
               
             
 
-            <li><a href="/guides/compute-engine/forms/" class="">Forms</a></li>
+            <li><a href="/guides/compute-engine/forms/" class="">Canonical Forms</a></li>
           
             
             
@@ -341,7 +365,7 @@
               
             
 
-            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+            <li><a href="/guides/math-json/format/" class="">MathJSON Format</a></li>
           
             
             
@@ -469,10 +493,7 @@
       TeX: { 
         delimiters: {
           inline: [['\\(', '\\)']],
-          display: [
-            ['$$', '$$'],
-            ['\\[', '\\]'],
-          ],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
         processEnvironments : false 
       },
@@ -481,12 +502,18 @@
 </script>
 <h1>Compute Engine</h1>
 <img src='/assets/Compute-Engine-2.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
-<p>The <strong>CortexJS Compute Engine</strong> performs calculations on MathJSON expressions.</p>
+<p>The <strong>CortexJS Compute Engine</strong> is a software environment for educators, students, scientists and engineers to perform manipulation of mathematical expressions.</p>
+<p>The CortexJS Compute Engine is built for the web platform and is available
+as a JavaScript library that can be used in the browser or in server-side
+environments such as Node.</p>
+<p>The Compute Engine can be used to simplify, solve and evaluate expressions
+expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and to <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from
+and to Latex.</p>
 <h2>Evaluating</h2>
-<p>Use the <code>ComputeEngine.evaluate()</code> function to evaluate an expression.</p>
+<p><strong>To evaluate an expression</strong>, use the <code>evaluate()</code> function.</p>
 <p>The result of <code>evaluate()</code> is an expression. If the expression can
 be evaluated numerically, the expression is a number. If it can’t be
-evaluated numerically, the expression will be a symbolic expression.</p>
+evaluated numerically, the expression is a symbolic expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { evaluate } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
@@ -495,10 +522,11 @@ evaluated numerically, the expression will be a symbolic expression.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 5, x]</span>
 </code></pre>
 <h2>Formating</h2>
-<p>A given mathematical expression can be represented in multiple equivalent ways
-as a MathJSON expression. A <strong>form</strong> is used to specify a representation. The most common forms are <code>&quot;full&quot;</code> where only transformations necessary to make the expression a valid JSON expression are applied and <code>&quot;canonical&quot;</code> that applies rules to perform some basic simplifications and ordering of the
+<p>A mathematical expression can be represented in multiple equivalent ways
+as a MathJSON expression. A <strong>form</strong> is used to specify a representation.</p>
+<p>The most common forms are <code>&quot;full&quot;</code> where only transformations necessary to make the expression a valid JSON expression are applied and <code>&quot;canonical&quot;</code> that applies rules to perform some basic simplifications and ordering of the
 elements of the expression.</p>
-<p>To transform an expression using the rules for a particular form, use the
+<p><strong>To transform an expression using the rules for a particular form</strong>, use the
 <code>format()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { format } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
@@ -510,7 +538,7 @@ elements of the expression.</p>
 </code></pre>
 <p>See <a href="/guides/compute-engine/forms/">Compute Engine Forms</a> for more info.</p>
 <h2>Comparing</h2>
-<p>Use the <code>ComputeEngine.same()</code> function to compare two expressions.</p>
+<p><strong>To compare two expressions</strong>, use the <code>ComputeEngine.same()</code> function.</p>
 <p>The comparison between expressions is structural so that \(x + 1\) is not equal
 to \(1 + x\). To obtain the desired result, you may need to apply a canonical
 form to the expressions using <code>ComputeEngine.canonical()</code>, or evaluate them using <code>ComputeEngine.evaluate()</code>.</p>
@@ -548,10 +576,11 @@ form to the expressions using <code>ComputeEngine.canonical()</code>, or evaluat
 <span class="hljs-comment">// ➔ true: the two expressions are the same once evaluated</span>
 </code></pre>
 <h2>Advanced Usage</h2>
-<p>To improve performance, particularly when calling <code>format()</code>/<code>evaluate()</code>
-repeatedly, use an instance of the <code>ComputeEngine</code> class. When the instance is
-constructed, the dictionaries defining the symbols are compiled, and subsequent
-invocations of the <code>format()</code> and <code>evaluate()</code> methods can skip that step.</p>
+<p>For improved performance, particularly when calling <code>format()</code>/<code>evaluate()</code>
+repeatedly, use an instance of the <code>ComputeEngine</code> class.</p>
+<p>When the instance is constructed, the dictionaries defining the symbols are
+compiled, and subsequent invocations of the <code>format()</code> and <code>evaluate()</code> methods
+can skip that step.</p>
 <p>Using a compute engine instance, it is possible to customize which symbol
 dictionaries are used.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
@@ -569,7 +598,7 @@ engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="
         <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 10:24:00 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 23:58:43 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

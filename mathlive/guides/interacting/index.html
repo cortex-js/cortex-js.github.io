@@ -466,7 +466,7 @@
 <h2>Reading the Content of a Mathfield</h2>
 <p>The content of a mathfield is available by reading the <code>value</code>
 property of the mathfield element, just like with a <code>&lt;textarea&gt;</code>.</p>
-<p>To be notified as soon as the content of the mathfield is modified listen for
+<p><strong>To be notified as soon as the content of the mathfield is modified</strong> listen for
 an <code>'input'</code> event.</p>
 <p class="notice--info"><strong>Try</strong>: modify the <code>'input'</code> event below to a <code>'change'</code> event. Notice how the <code>'change'</code> event
 is only sent if you press the <strong>Return</strong> or <strong>Enter</strong> key, or when the mathfield
@@ -492,7 +492,7 @@ loses focus and the content has been modified.</p>
 </code-playground>
 <p>Reading the <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
 no argument.</p>
-<p>To control how the result is formatted, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
+<p><strong>To control how the result is formatted</strong>, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
 For example to get the content as a MathJSON expression, use <code>getValue('math-json')</code>.</p>
 <p class="notice--info">The MathJSON format is a lightweight data interchange format for mathematical notation. <a href="/math-json/">Learn more about MathJSON</a>.</p>
 <p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'math-json'</code> to <code>'spoken-text'</code>.</p>
@@ -574,7 +574,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;                
 </div>
 </code-playground>
-<p>To change the style of a portion of the mathfield, specify a selection range
+<p><strong>To change the style of a portion of the mathfield</strong>, specify a selection range
 to <code>applyStyle()</code>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -639,7 +639,7 @@ may not be able to reliably trigger this event.</p>
 event or a <code>pointerdown</code> event. The <code>focus</code> event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.</p>
 <h2>Detecting When the User has Finished Editing a Mathfield</h2>
-<p>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield,
+<p><strong>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield</strong>,
 listen for the <code>change</code> event. Note that this event is not fired when in Latex
 editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to exit the mode.</p>
 <h2>Interacting with the Clipboard</h2>
@@ -674,11 +674,11 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </table>
 <p>The Latex in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn’t really a standard format for this, but testing of several Latex-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
 <p class="notice--info">For improved interoperability, the exported Latex uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
-<p>To customize the content of the <code>text/plain</code> flavor, use the <code>onExport()</code> hook.</p>
+<p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
 </code></pre>
-<p>To export the “raw” (not expanded) Latex), use:</p>
+<p><strong>To export the “raw” (not expanded) Latex)</strong>, use:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
   <span class="hljs-string">`\\(<span class="hljs-subst">${mg.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
 });
@@ -710,10 +710,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="June 07, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 07 2021 10:33:08 GMT+0200 (Central European Summer Time)">June 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:30:05 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

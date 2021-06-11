@@ -431,7 +431,10 @@
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
@@ -2528,7 +2531,7 @@ formated:</p>
 <li><code>c</code>: centered</li>
 <li><code>r</code>: right-aligned</li>
 </ul>
-<p>To add a vertical line separating columns, add <code>|</code> character in the column format:</p>
+<p><strong>To add a vertical line separating columns</strong>, add <code>|</code> character in the column format:</p>
 <div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l|c}
@@ -2537,7 +2540,7 @@ formated:</p>
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
 </div>
-<p>To add a double vertical line separating columns, add two <code>|</code> characters in the
+<p><strong>To add a double vertical line separating columns</strong>, add two <code>|</code> characters in the
 column format:</p>
 <div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
@@ -2547,7 +2550,7 @@ column format:</p>
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
 </div>
-<p>To add a dashed vertical line between two columns, use <code>:</code>:</p>
+<p><strong>To add a dashed vertical line between two columns</strong>, use <code>:</code>:</p>
 <div class='side-by-side'>
 <div class="math frame">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{array}{l:c}
@@ -2567,7 +2570,7 @@ argument to specify the format of the columns.</p>
 <span class="hljs-keyword">\end</span>{matrix}
 </code></pre>
 </div>
-<p>To specify the format of the columns, use the starred version and an optional
+<p><strong>To specify the format of the columns</strong>, use the starred version and an optional
 argument. This applies to all the other <code>matrix</code> environments.</p>
 <div class='side-by-side'>
 <div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
@@ -2657,7 +2660,7 @@ $$</div>
 <span class="hljs-keyword">\end</span>{cases}
 </code></pre>
 </div>
-<p>To typeset the content in Display style, use <code>dcases</code> instead:</p>
+<p><strong>To typeset the content in Display style</strong>, use <code>dcases</code> instead:</p>
 <div class='side-by-side'>
 <div class='math frame'>$$f(n) = \begin{dcases}
   1 & \text{if } n = 0  \\\\ 
@@ -2671,7 +2674,7 @@ $$</div>
 
 </code></pre>
 </div>
-<p>To display the brace on the right, use <code>rcases</code>.</p>
+<p><strong>To display the brace on the right</strong>, use <code>rcases</code>.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{rcases}
   1 & \text{if } n = 0  \\\\ 
@@ -2877,10 +2880,10 @@ command spaces will be preserved in Math Mode.</li>
         
 
 
-        <meta itemprop="datePublished" content="May 21, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri May 21 2021 20:28:30 GMT+0200 (Central European Summer Time)">May 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 23:47:20 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

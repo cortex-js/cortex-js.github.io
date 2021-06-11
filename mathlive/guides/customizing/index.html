@@ -558,10 +558,10 @@ content of the <code>&lt;math-field&gt;</code> custom component.</p>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
 <h3>Color</h3>
-<p>To change the foreground (“ink”) and background (“paper”) colors of a formula
-programmatically, use the <code>applyStyle()</code> function.</p>
-<p>To change the foreground color, use the <code>\textcolor{}{}</code> command.
-To change the background color, use the <code>\colorbox{}{}</code> command.</p>
+<p><strong>To change the foreground (“ink”) and background (“paper”) colors of a formula
+programmatically</strong>, use the <code>applyStyle()</code> function.</p>
+<p><strong>To change the foreground color</strong>, use the <code>\textcolor{}{}</code> command.
+<strong>To change the background color</strong>, use the <code>\colorbox{}{}</code> command.</p>
 <p>The first argument of these commands is a color specified as:</p>
 <ul>
 <li>a RGB color using the standard CSS format (<code>#d7170b</code>)</li>
@@ -578,10 +578,10 @@ hues on the color circle, with similar lightness and intensity. They will map to
 <p class="notice--info">To have proper legibility based on usage, these color names will map to
 different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.</p>
-<p class="notice--info">To customize how the color names are interpreted provide a <code>colorMap</code>
+<p class="notice--info"><strong>To customize how the color names are interpreted</strong> provide a <code>colorMap</code>
 or <code>backgroundColorMap</code> function.</p>
 <h3>Size</h3>
-<p>To change the base font size, set the <code>font-size</code> CSS property to the desired
+<p><strong>To change the base font size</strong>, set the <code>font-size</code> CSS property to the desired
 value on the <code>mathfield</code> or static element.</p>
 <p>Within a formula, the size can be specified from a font scale with 10 values,
 where 1 em is the base font size of the mathfield or static element.</p>
@@ -650,7 +650,7 @@ where 1 em is the base font size of the mathfield or static element.</p>
 Other implementations of TeX may also interpret the sizing commands
 differently.</p>
 <h3>Math Layout</h3>
-<p>To control some aspects of the math typesetting, change the mathstyle with
+<p><strong>To control some aspects of the math typesetting</strong>, change the mathstyle with
 the commands <code>\displaystyle</code>, <code>\textstyle</code>, <code>\scriptstyle</code>, <code>\scriptscriptstyle</code>.</p>
 <p><img src="/assets/images/mathfield/mathstyles.png" alt=""></p>
 <p>The <code>displaystyle</code> style is most appropriate when there is plenty of space around
@@ -671,7 +671,7 @@ when using the <code>displaystyle</code> or <code>textstyle</code>, the limits o
 or the superscript or subscript of a symbol are displayed using these styles.
 Notice for example that <code>n=0</code> in <code>displaystyle</code> does not include space around
 the <code>=</code> sign because the limit is displayed in <code>scriptstyle</code>.</p>
-<p>To set the default mathstyle of a mathfield, use the <code>defaultMode</code> option
+<p><strong>To set the default mathstyle of a mathfield</strong>, use the <code>defaultMode</code> option
 (or the <code>default-mode</code> attribute).</p>
 <p>Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
 <p>By default, the mathfield element behaves as if it had a <code>display: block</code>
@@ -694,7 +694,7 @@ used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h3>Letter Shape Style</h3>
-<p>To control which letters are automatically italicized, use the <code>letterShapeStyle</code> configuration option.</p>
+<p><strong>To control which letters are automatically italicized</strong>, use the <code>letterShapeStyle</code> configuration option.</p>
 <table>
 <thead>
 <tr>
@@ -788,10 +788,10 @@ details about these and other available options.</p>
 <p>In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
 relational, binary or unary operators, etc…</p>
-<p>To control spacing in a formula, use some of the Latex spacing commands: <code>\quad</code>,
+<p><strong>To control spacing in a formula</strong>, use some of the Latex spacing commands: <code>\quad</code>,
 <code>\qquad</code>, <code>\!</code>, <code>\,</code> (thin space), <code>\:</code> (medium space), <code>\;</code> (thick space), <code>\enskip</code> or <code>\enspace</code>.</p>
-<p>By default, pressing the spacebar when in math mode does not insert anything.
-To insert a Latex command when the spacebar is pressed, set the value of the
+<p>By default, pressing the spacebar when in math mode does not insert anything.</p>
+<p><strong>To insert a Latex command when the spacebar is pressed</strong>, set the value of the
 <code>mathModeSpace</code> option to that command:</p>
 <pre><code class="language-js">md.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">mathModeSpace</span>: <span class="hljs-string">&#x27;\\:&#x27;</span>});
 
@@ -840,10 +840,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 05 2021 11:13:45 GMT+0200 (Central European Summer Time)">June 05, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:29:21 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

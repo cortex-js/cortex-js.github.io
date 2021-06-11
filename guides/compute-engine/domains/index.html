@@ -197,7 +197,31 @@
               
             
 
-            <li><a href="/guides/compute-engine-assumptions/" class="">Assumptions</a></li>
+            <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/transforming/" class="">Transforming an Expression</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/assumptions/" class="">Assumptions</a></li>
           
             
             
@@ -221,7 +245,7 @@
               
             
 
-            <li><a href="/guides/compute-engine/forms/" class="">Forms</a></li>
+            <li><a href="/guides/compute-engine/forms/" class="">Canonical Forms</a></li>
           
             
             
@@ -377,7 +401,7 @@
               
             
 
-            <li><a href="/guides/math-json-format/" class="">MathJSON Format</a></li>
+            <li><a href="/guides/math-json/format/" class="">MathJSON Format</a></li>
           
             
             
@@ -528,25 +552,34 @@
     });
 </script>
 <h1>Domains</h1>
-<p>A domain represents a set of values, such as <code>&quot;Number&quot;</code> or <code>&quot;Boolean&quot;</code>.</p>
-<p>Domains are analogous to types in programming languages and are used to ensure
+<p>A domain represents a set of values, such as <code>Number</code> or <code>Boolean</code>.</p>
+<p>Domains are similar to types in programming languages. They are used to ensure
 that the arguments of functions are compatible. This information is also useful
-to select appropriate algorithms, and to optimized compiled expressions.</p>
+to select appropriate algorithms and to optimize compiled expressions.</p>
 <p>Domains can be defined as a union or intersection of domains:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Union&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Boolean&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;SetMinus&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span>)<span class="hljs-punctuation">]</span> <span class="hljs-comment">//  A number or a boolean. // Any number except &quot;1&quot;.</span>
+<pre><code class="language-json"><span class="hljs-comment">//  A number or a boolean.</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Union&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Boolean&quot;</span><span class="hljs-punctuation">]</span>
+
+<span class="hljs-comment">// Any number except &quot;1&quot;.</span>
+<span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;SetMinus&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span>)<span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Parametric domains can be used as functions:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-comment">// Range of non-negative numbers</span>
+<h2>Parametric Domains</h2>
+<p>Parametric domains are functions that define a domain:</p>
+<pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Parametric domains define a subset or ‘specialization’ of a domain. Not all
-domains are parametric, and the precise semantic of the parametric form depends
-on the domain.</p>
-<p>For example, the <code>&quot;Number&quot;</code> parametric domain implies a result in
-<code>&quot;ExtendedRealNumber&quot;</code>, not <code>&quot;ExtendedComplexNumber&quot;</code>.</p>
+<p>The <code>[&quot;Range&quot;, &lt;min&gt;, &lt;max&gt;]</code> parametric domain defines a set of integers such
+that \( \mathord{min} \le n \le \mathord{max}, n \in \N \).</p>
+<p>The <code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> parametric domain defines a set of real numbers
+such that \( \mathord{min} \le x \le \mathord{max}, n \in \R \).</p>
+<p><strong>To represent an open interval</strong>, use the <code>Open</code> function:
+<code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> \( \operatorname{min} \lt x \le \operatorname{max},
+n \in \R \) or \(x \in \rbrack \operatorname{min}, \operatorname{max} \rbrack \).</p>
+<h2>Domains Lattice</h2>
 <p>Domains are defined in a hierarchy (a lattice). The upper bound of the domain
-lattice is <code>&quot;Anything&quot;</code> and the lower bound is <code>&quot;Nothing&quot;</code>. The ‘parent’ of a
-domain represent a ‘is-a’/‘subset-of’ relationship, for example, a <code>&quot;List&quot;</code>
-“is-a” <code>&quot;Collection&quot;</code>.</p>
+lattice is <code>Anything</code> and the lower bound is <code>Nothing</code>. The <em>parent</em> of a domain
+represent a <em>is-a</em>/<em>subset-of</em> relationship, for example, a <code>List</code> <em>is-a</em>
+<code>Collection</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains">
 <img src="/assets/domains.002.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
 <img src="/assets/domains.003.jpeg" alt="Function domains" title="The Function sub-domains">
@@ -554,7 +587,7 @@ domain represent a ‘is-a’/‘subset-of’ relationship, for example, a <code
 <p>The implementation of the CortexJS domains is based on
 <a href="https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties">Weibel, Trudy &amp; Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749. </a></p>
 <h2>Obtaining the Domain of an Expression</h2>
-<p>To obtain the domain of an expression, use the <code>ComputeEngine.domain()</code>
+<p><strong>To obtain the domain of an expression</strong>, use the <code>ComputeEngine.domain()</code>
 function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
@@ -571,7 +604,7 @@ engine.<span class="hljs-title function_">domain</span>([<span class="hljs-strin
 engine.<span class="hljs-title function_">domain</span>(engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]));
 <span class="hljs-comment">// ➔ &quot;PrimeNumber&quot;</span>
 </code></pre>
-<h2>Convertion Domains to a Canonical Form</h2>
+<h2>Converting Domains to a Canonical Form</h2>
 <p>Domains can be converted to a canonical form using the <code>'canonical-domain'</code>
 form.</p>
 <pre><code class="language-js"><span class="hljs-title function_">format</span>([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;IrrationalNumber&#x27;</span>], <span class="hljs-string">&#x27;canonical-domain&#x27;</span>);
@@ -584,32 +617,32 @@ form.</p>
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
 </code></pre>
 <h2>List of Domains</h2>
-<h3><code>&quot;Boolean&quot;</code> and <code>&quot;MaybeBoolean&quot;</code></h3>
-<p>A <code>&quot;Boolean&quot;</code> is either <code>&quot;True&quot;</code> or <code>&quot;False&quot;</code>.</p>
-<p>A <code>&quot;MaybeBoolean&quot;</code> is a <code>&quot;Boolean&quot;</code> or <code>&quot;Maybe&quot;</code>.</p>
-<h3><code>&quot;String&quot;</code> and <code>&quot;Symbol&quot;</code></h3>
-<p><code>&quot;String&quot;</code> is the domain of all the strings.</p>
-<p>A <code>&quot;Symbol&quot;</code> is a string used to represent the name of a constant, variable or
+<h3><code>Boolean</code> and <code>MaybeBoolean</code></h3>
+<p>A <code>Boolean</code> is either <code>True</code> or <code>False</code>.</p>
+<p>A <code>MaybeBoolean</code> is a <code>True</code>, <code>False</code> or <code>Maybe</code>.</p>
+<h3><code>String</code> and <code>Symbol</code></h3>
+<p><code>String</code> is the domain of all the strings.</p>
+<p>A <code>Symbol</code> is a string used to represent the name of a constant, variable or
 function in a MathJSON expression.</p>
-<h3><code>&quot;Number&quot;</code></h3>
+<h3><code>Number</code></h3>
 <p>Any numerical value.</p>
 <ul>
-<li><code>&quot;PrimeNumber&quot;</code> - An integer that cannot be produced as the product of 2 or
+<li><code>PrimeNumber</code> - An integer that cannot be produced as the product of 2 or more
+integers.</li>
+<li><code>CompositeNumber</code> - An integer that can be produced by the product of 2 or
 more integers.</li>
-<li><code>&quot;CompositeNumber&quot;</code> - An integer that can be produced by the product of 2 or
-more integers.</li>
-<li><code>&quot;Integer&quot;</code> \(= \mathbb{Z}\). The set of whole numbers: \(0, 1, 2, 3\ldots\)
-and their additive inverse: \(-1, -2, -3, \ldots\).</li>
-<li><code>&quot;NumberZero&quot;</code> - The number \(0\): a composite number and an imaginary number.</li>
+<li><code>&quot;Integer&quot;</code> \(= \mathbb{Z}\). The set of whole numbers: \(0, 1, 2,
+3\ldots\) and their additive inverse: \(-1, -2, -3, \ldots\).</li>
+<li><code>&quot;NumberZero&quot;</code> - The number \(0\): a composite number and an imaginary
+number.</li>
 <li><code>&quot;RationalNumber&quot;</code> \(= \mathbb{Q}\). A number which can be expressed as the
 quotient \(\frac{p}{q}\) of two integers \(p, q \in \mathbb{Z}\).</li>
 <li><code>&quot;RealNumber&quot;</code> \(= \mathbb{R}\).</li>
 <li><code>&quot;NaturalNumber&quot;</code> \(= \mathbb{N}\). Counting numbers, \(0, 1, 2, 3\ldots\)
 Note that \(0\) is included, following the convention from
 <a href="https://en.wikipedia.org/wiki/ISO_80000-2">ISO/IEC 80000</a>.</li>
-<li><code>&quot;IrrationalNumber&quot;</code> \(= \mathbb{Q^{\prime}}\). Numbers such as
-\(\sqrt{5}, \pi, \exponentialE\) that cannot be written as a quotient of two
-integers.</li>
+<li><code>&quot;IrrationalNumber&quot;</code> \(= \mathbb{Q^{\prime}}\). Numbers such as \(\sqrt{5},
+\pi, \exponentialE\) that cannot be written as a quotient of two integers.</li>
 <li><code>&quot;ImaginaryNumber&quot;</code> - Any purely imaginary value (including zero).</li>
 <li><code>&quot;ComplexNumber&quot;</code> \(= \mathbb{C}\). A real or imaginary number</li>
 </ul>
@@ -636,63 +669,59 @@ inverse: \(Q^{\mathrm{T}}=Q^{-1}\)</li>
 in each row and column.</li>
 <li><code>&quot;DiagonalMatrix&quot;</code> - A matrix in which the elements outside the main diagonal
 are zero.</li>
-<li><code>&quot;IdentityMatrix&quot;</code> - A diagonal matrix whose diagonal elements are 1.</li>
-<li><code>&quot;ZeroMatrix&quot;</code> a matrix whose elements are 0.</li>
-<li><code>&quot;SymmetricMatrix&quot;</code> - A real matrix that is equal to its transpose.</li>
-<li><code>&quot;HermitianMatrix&quot;</code> - A complex matrix that is equal to its conjugate
-transpose.</li>
+<li><code>IdentityMatrix</code> - A diagonal matrix whose diagonal elements are 1.</li>
+<li><code>ZeroMatrix</code> a matrix whose elements are 0.</li>
+<li><code>SymmetricMatrix</code> - A real matrix that is equal to its transpose.</li>
+<li><code>HermitianMatrix</code> - A complex matrix that is equal to its conjugate transpose.</li>
 </ul>
-<h3><code>&quot;Function&quot;</code></h3>
+<h3><code>Function</code></h3>
 <p>A function maps some expressions, its arguments, to another expression.</p>
 <ul>
 <li><code>[&quot;Function&quot;, ...</code><em><code>arg-domain</code></em><code>, </code><em><code>co-domain</code></em><code>]</code> is the parametric version
-of the <code>&quot;Function&quot;</code> domain. For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code>
-is the domain of the functions that have a single argument, a number, and
-return a boolean (has a boolean codomain).</li>
-<li><code>&quot;ContinuousFunction&quot;</code> - A
+of the <code>Function</code> domain. For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code> is
+the domain of the functions that have a single argument, a number, and return
+a boolean (has a boolean codomain).</li>
+<li><code>ContinuousFunction</code> - A
 <a href="https://en.wikipedia.org/wiki/Continuous_function">continuous function</a> is a
 function that has no abrupt change in value (no discontinuity). The
 <a href="https://en.wikipedia.org/wiki/Weierstrass_function">Weirestrass function</a> is
 continuous, but not differentiable.</li>
-<li><code>&quot;TranscendentalFunction&quot;</code> - A function not expressible as a finite
-combination of the algebraic operations of addition, subtraction,
-multiplication, division, raising to a power, and extracting a root. Example:
-“Log”, “Sin”…</li>
-<li><code>&quot;AlgebraicFunction&quot;</code> - A function that can be defined as the root of a
+<li><code>TranscendentalFunction</code> - A function not expressible as a finite combination
+of the algebraic operations of addition, subtraction, multiplication,
+division, raising to a power, and extracting a root. Example: “Log”, “Sin”…</li>
+<li><code>AlgebraicFunction</code> - A function that can be defined as the root of a
 polynomial equation.</li>
-<li><code>&quot;PeriodicFunction&quot;</code> - A function that repeats its values at regular
-intervals.</li>
-<li><code>&quot;TrigonometricFunction&quot;</code> - Real functions which relate an angle of a
+<li><code>PeriodicFunction</code> - A function that repeats its values at regular intervals.</li>
+<li><code>TrigonometricFunction</code> - Real functions which relate an angle of a
 right-angled triangle to ratios of two side lengths</li>
-<li><code>&quot;HyperbolicFunction&quot;</code></li>
-<li><code>&quot;MonotonicFunction&quot;</code> - A function that is either entirely non-increasing, or
+<li><code>HyperbolicFunction</code></li>
+<li><code>MonotonicFunction</code> - A function that is either entirely non-increasing, or
 entirely non-decreasing.</li>
-<li><code>&quot;StrictMonotonicFunction&quot;</code></li>
-<li><code>&quot;DifferentiableFunction&quot;</code> - A function whose derivative exists at each point
-in its domain.</li>
-<li><code>&quot;InfinitelyDifferentiableFunction&quot;</code></li>
-<li><code>&quot;RationalFunction&quot;</code> - A function that can be expressed as the ratio of two
+<li><code>StrictMonotonicFunction</code></li>
+<li><code>DifferentiableFunction</code> - A function whose derivative exists at each point in
+its domain.</li>
+<li><code>InfinitelyDifferentiableFunction</code></li>
+<li><code>RationalFunction</code> - A function that can be expressed as the ratio of two
 polynomials.</li>
-<li><code>&quot;PolynomialFunction&quot;</code> - A function expressed only with the operations of
+<li><code>PolynomialFunction</code> - A function expressed only with the operations of
 addition, subtraction, multiplication, and non-negative integer
 exponentiation.</li>
 <li><code>&quot;QuadraticFunction&quot;</code> - A function of the form \(f(x) = ax^2+ bx + c\)</li>
 <li><code>&quot;LinearFunction&quot;</code> = \(f(x) = ax+ b\) A function that is the product of an
 argument plus a constant.</li>
-<li><code>&quot;ConstantFunction&quot;</code> - A function that always return the same value.</li>
-<li><code>&quot;MonotonicFunction&quot;</code></li>
-<li><code>&quot;StrictMonotonicFunction&quot;</code></li>
+<li><code>ConstantFunction</code> - A function that always return the same value.</li>
+<li><code>MonotonicFunction</code></li>
+<li><code>StrictMonotonicFunction</code></li>
 </ul>
-<h3><code>&quot;Predicate&quot;</code> and <code>&quot;LogicalFunction&quot;</code></h3>
+<h3><code>Predicate</code> and <code>LogicalFunction</code></h3>
 <p>A predicate is a function with a codomain of <code>MaybeBoolean</code>.</p>
 <p>It may have one, two or more arguments of any domain.</p>
 <p>A <code>LogicalFunction</code> is a predicate whose arguments are in the <code>MaybeBoolean</code>
-domain, for example the domain of <code>And</code> is <code>&quot;LogicalFunction&quot;</code>.</p>
-<h3><code>&quot;Domain&quot;</code> and <code>&quot;ParametricDomain&quot;</code></h3>
-<p>The domain of all the domains is <code>&quot;Domain&quot;</code>.</p>
-<p><code>&quot;ParametricDomain&quot;</code> is the domain of all the parametric domains, that is the
-domains that can accept one or more parameters to define a more precise domain,
-for example <code>[&quot;Matrix&quot;, 5]</code> to define the domain of 5x5 matrices.</p>
+domain, for example the domain of <code>And</code> is <code>LogicalFunction</code>.</p>
+<h3><code>Domain</code> and <code>ParametricDomain</code></h3>
+<p>The domain of all the domains is <code>Domain</code>.</p>
+<p><code>ParametricDomain</code> is the domain of all the parametric domains, that is the
+functions that can define a domain.</p>
 
         
       </section>
@@ -702,10 +731,10 @@ for example <code>[&quot;Matrix&quot;, 5]</code> to define the domain of 5x5 mat
         
 
 
-        <meta itemprop="datePublished" content="June 10, 2021">
+        <meta itemprop="datePublished" content="June 11, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 11:58:30 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 11 2021 11:42:54 GMT+0200 (Central European Summer Time)">June 11, 2021</time></p>
         
       </footer>
 

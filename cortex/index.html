@@ -250,14 +250,18 @@
         
         <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
+    renderMathInDocument({     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
     });
+
 </script>
 <h1>Cortex</h1>
 <p>Cortex is a programming language for scientific computing.</p>
@@ -286,7 +290,7 @@ process when executed from a <code>node</code> process. In Unix, they are set us
 shell-specific syntax (<code>export VARIABLE=value</code> in bash shells, for example).</p>
 <p>Environment variables are not available when the compilation/parsing is taking
 place in a browser process.</p>
-<p>To access an environment variable, use the <code>#env()</code> pragma.</p>
+<p><strong>To access an environment variable</strong>, use the <code>#env()</code> pragma.</p>
 <pre><code class="language-cortex">#env(&quot;DEBUG&quot;)
 </code></pre>
 <p>Some common environment variables include:</p>
@@ -300,20 +304,20 @@ place in a browser process.</p>
 <h3>Navigator Properties</h3>
 <p>The navigator properties are available when the compilation/parsing is taking
 place in a browser process.</p>
-<p>To access the properties of the <code>navigator</code> Javascript global object use the
-<code>#navigator()</code> pragma function. It returns ‘Nothing’ if the property is not
+<p><strong>To access the properties of the <code>navigator</code> Javascript global object</strong>, use
+the <code>#navigator()</code> pragma function. It returns ‘Nothing’ if the property is not
 available.</p>
 <pre><code class="language-cortex">#navigator(&quot;userAgent&quot;)
 </code></pre>
 <h3>Compile-Time Diagnostic Statement</h3>
 <p>A compile-time diagnostic statement causes the compiler to emit an error or a
 warning during compilation.</p>
-<p>To output a message to the console and immediately interrupt the
-parsing/compilation, use the <code>#error()</code> pragma function.</p>
+<p><strong>To output a message to the console and immediately interrupt the
+parsing/compilation</strong>, use the <code>#error()</code> pragma function.</p>
 <pre><code class="language-cortex">#error(&quot;File cannot be compiled&quot;)
 </code></pre>
-<p>To output a message to the console, but continue the parsing/compilation, use
-the <code>#warning()</code> pragma function.</p>
+<p><strong>To output a message to the console</strong>, but continue the parsing/compilation,
+use the <code>#warning()</code> pragma function.</p>
 <pre><code class="language-cortex">#warning(&quot;TODO: Implement function&quot;)
 </code></pre>
 <h3>Line Control Statements</h3>
@@ -326,10 +330,10 @@ source URL and line of the current file, use the <code>#sourceLocation()</code> 
 function.</p>
 <pre><code class="language-cortex">#sourceLocation(145, &quot;file://localhost/~user/dev/source.ctx&quot;)
 </code></pre>
-<p>To number the following line to 146, use:</p>
+<p><strong>To number the following line to 146</strong>, use:</p>
 <pre><code class="language-cortex">#sourceLocation(145)
 </code></pre>
-<p>To reset the source location to the actual source and line, use
+<p><strong>To reset the source location to the actual source and line</strong>, use
 <code>#sourceLocation()</code>.</p>
 <h3>Other Pragmas</h3>
 <p>The following pragmas are replaced with the indicated value:</p>
@@ -348,8 +352,8 @@ line 1.</li>
 end of the line.</p>
 <p><strong>Block (multi-line) Comments</strong> start with <code>/*</code> and end with <code>*/</code>. Block
 comments can be nested.</p>
-<p>To indicate that a comment is part of the documentation and is formatted using
-markdown use <code>///</code> for single line comments and <code>/** */</code> for block comments.</p>
+<p><strong>To indicate that a comment is part of the documentation and is formatted using
+markdown</strong>, use <code>///</code> for single line comments and <code>/** */</code> for block comments.</p>
 <p><strong>Hashbang Comment</strong> can be included as the first line of a Cortex source file
 prefixed with <code>#!</code>. Its content indicate the command line interpreter to use:</p>
 <pre><code>#!/usr/bin/cortex
@@ -537,7 +541,7 @@ for a complete list of the characters with the <strong>White_Space</strong> or
 <code>while</code>, <code>with</code>, <code>xor</code>, <code>yield</code>.</p>
 </li>
 </ul>
-<p>To write a symbol with the <strong>Verbatim Form</strong> put a backtick <strong><code>`</code></strong>
+<p><strong>To write a symbol with the <em>Verbatim Form</em></strong> , put a backtick <strong><code>`</code></strong>
 (<strong>U+0060 GRAVE ACCENT</strong>) before and after its name.</p>
 <p>The string between the two backticks can be a reserved word or it can include
 characters with the <strong>Pattern_Syntax</strong> property or the <strong>White_Space</strong> property,
@@ -644,10 +648,10 @@ are not indexable.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 10, 2021">
+        <meta itemprop="datePublished" content="June 11, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 11:58:30 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 11 2021 11:42:54 GMT+0200 (Central European Summer Time)">June 11, 2021</time></p>
         
       </footer>
 

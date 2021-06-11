@@ -469,7 +469,7 @@ shortcuts and inline shortcuts</a> can help, mobile
 devices require another solution. A virtual keyboard is a keyboard displayed
 on screen that can be customized with specialized symbols for math input.</p>
 <p><img src="/assets/images/mathfield/virtual-keyboard.png" alt=""></p>
-<p>To display variants related to a key, press and hold it. Not all keys have
+<p><strong>To display variants related to a key</strong>, press and hold it. Not all keys have
 variants, though.</p>
 <p><img src="/assets/images/mathfield/alt-keys.png" alt="" class="max-w-md"></p>
 <p><img src="/assets/images/mathfield/more-alt-keys.png" alt="" class="max-w-md"></p>
@@ -499,7 +499,7 @@ can specify different virtual keyboard panel configurations.</p>
 <p>The virtual keyboard panel displays multiple keyboards which can be
 toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
 and <code>greek</code>.</p>
-<p>To choose which keyboards are available, use the <code>virtualKeyboards</code>
+<p><strong>To choose which keyboards are available</strong>, use the <code>virtualKeyboards</code>
 configuration property. The value of this property is a space-separated string
 of the name of the keyboards that should be displayed.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -525,7 +525,7 @@ document.getElementById('mf').setOptions({
 set of keys that can be toggled using another key. For example, the <code>roman</code>
 keyboard has a regular layer and a layer for symbols. Most keyboards have a
 single layer.</p>
-<p>To define a custom virtual keyboard layout, use an object literal as described
+<p><strong>To define a custom virtual keyboard layout</strong>, use an object literal as described
 below.</p>
 <h3>Defining a Layer</h3>
 <p>First, let’s define a layer, which we’ll call <code>&quot;high-school-layer&quot;</code>.</p>
@@ -571,7 +571,7 @@ the shift key.</li>
 they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
 <p>When the keycap is pressed, the following properties are used, in order, to
 determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.</p>
-<p>To associate a CSS stylesheet with this layer, use the <code>styles</code> property of the
+<p><strong>To associate a CSS stylesheet with this layer</strong>, use the <code>styles</code> property of the
 layer.</p>
 <p>The appearance of the layer can be further customized by providing a CSS class
 name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
@@ -605,7 +605,7 @@ key (<code>action</code>).</p>
   { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\mu_0&quot;</span> },
   { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> },
 </code></pre>
-<p>To display the key label as a some HTML markup instead, use the <code>label</code>
+<p><strong>To display the key label as some HTML markup instead</strong>, use the <code>label</code>
 property:</p>
 <pre><code class="language-js">  { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
   { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, 
@@ -616,7 +616,7 @@ property:</p>
 <p>The keycap label is displayed using the system font when the <code>label</code> property
 is used. To display it using the TeX fonts instead, set the value of the <code>class</code>
 property to <code>tex</code>.</p>
-<p>To perform a command other than inserting some Latex, use the <code>command</code>
+<p><strong>To perform a command other than inserting some Latex</strong>, use the <code>command</code>
 property:</p>
 <pre><code class="language-js">  {
     <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
@@ -749,9 +749,9 @@ keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortc
 }
 </code></pre>
 <h2>Customizing the Appearance of the Virtual Keyboard Toggle</h2>
-<p>To apply a CSS rule to the virtual keyboard toggle, use
+<p><strong>To apply a CSS rule to the virtual keyboard toggle</strong>, use
 the <code>math-field::part(virtual-keyboard-toggle)</code> CSS selector.</p>
-<p>To change the icon of the virtual keyboard toggle use the
+<p><strong>To change the icon of the virtual keyboard toggle</strong>, use the
 <code>virtualKeyboardToggleGlyph</code>
 configuration property.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -784,7 +784,7 @@ math-field::part(virtual-keyboard-toggle) {
 <p>By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
 countries, etc…).</p>
-<p>To select a different alphabetic keyboard layouts, such as DVORAK or COLEMAK,
+<p><strong>To select a different alphabetic keyboard layout</strong>, such as DVORAK or COLEMAK,
 use the <code>virtualKeyboardLayout</code> configuration property.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -807,7 +807,7 @@ document.getElementById('mf').setOptions({
 </div>
 </code-playground>
 <h2>Customizing the Appearance of the Virtual Keyboard Keycaps</h2>
-<p>To control the appearance of keycaps use the following CSS variables.</p>
+<p><strong>To control the appearance of keycaps</strong>, use the following CSS variables.</p>
 <ul>
 <li><code>--keycap-height</code></li>
 <li><code>--keycap-font-size</code></li>
@@ -830,7 +830,7 @@ default virtual keyboard will not display correctly when use in an <em>iframe</e
 as it will be attached to the <em>iframe</em> instead of being attached to the
 main document.</p>
 <p>This can be solved by using a “shared” virtual keyboard.</p>
-<p>To use a shared virtual keyboard, call the <code>makeSharedVirtualKeyboard()</code>
+<p><strong>To use a shared virtual keyboard</strong>, call the <code>makeSharedVirtualKeyboard()</code>
 function in the context of the main document.</p>
 <pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
   <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
@@ -859,10 +859,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="June 04, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 04 2021 16:54:37 GMT+0200 (Central European Summer Time)">June 04, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:35:45 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

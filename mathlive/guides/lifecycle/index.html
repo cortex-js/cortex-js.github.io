@@ -514,7 +514,7 @@ attributes and the properties are independent, so if you set for example the
 <li>the only methods on the element that can be invoked are those of <code>HTMLElement</code>
 since the element has not been upgraded yet.</li>
 </ul>
-<p>To be notified when the registration takes place, use the <code>whenDefined()</code> method.</p>
+<p><strong>To be notified when the registration takes place</strong>, use the <code>whenDefined()</code> method.</p>
 <pre><code class="language-javascript">customElements.<span class="hljs-title function_">whenDefined</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;&lt;math-field&gt; is defined&#x27;</span>);
 });
@@ -554,7 +554,7 @@ each other (changing an attribute will update the corresponding property and
 vice versa).</li>
 <li>you can invoke all properties of <code>MathfieldElement</code> without limitations</li>
 </ul>
-<p>To be notified when this stage is reached, listen for the <code>mount</code> event on
+<p><strong>To be notified when this stage is reached</strong>, listen for the <code>mount</code> event on
 the element:</p>
 <pre><code class="language-javascript">md.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;mount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is mounted&#x27;</span>);
@@ -572,7 +572,7 @@ is immediately disposed of.</p>
 apply.</p>
 <p>Note that the next stage could be either for element to be disposed of
 or to be re-attached.</p>
-<p>To be notified when this stage is reached, listen for the <code>unmount</code> event on
+<p><strong>To be notified when this stage is reached</strong>, listen for the <code>unmount</code> event on
 the element:</p>
 <pre><code class="language-javascript">md.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;unmount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is about to be unmounted&#x27;</span>);
@@ -594,10 +594,10 @@ the element:</p>
         
 
 
-        <meta itemprop="datePublished" content="May 20, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu May 20 2021 08:30:41 GMT+0200 (Central European Summer Time)">May 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:30:26 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

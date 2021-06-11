@@ -476,7 +476,7 @@ triggers a command.</p>
 a square root. Pressing <code>ctrl/cmd</code> and the <code>Z</code> key at the same time will undo
 the last command.</p>
 <p>MathLive has an extensive set of <a href="https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts">default key bindings</a>.</p>
-<p>To override, customize or add to the list of supported key bindings, provide a
+<p><strong>To override, customize or add to the list of supported key bindings</strong>, provide a
 <code>onKeystroke</code> handler.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -548,7 +548,7 @@ mf.setOptions({
 </div>
 </code-playground>
 <p>The <code>mode</code> key, if present, indicate the mode in which this shortcut should apply, either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut apply in both modes.</p>
-<p>To constraint the context in which a shortcut should apply, use the <code>after</code>
+<p><strong>To constraint the context in which a shortcut should apply</strong>, use the <code>after</code>
 key:</p>
 <pre><code class="language-javascript">mf.<span class="hljs-title function_">setOptions</span>({
   <span class="hljs-attr">inlineShortcuts</span>: {
@@ -578,8 +578,8 @@ key:</p>
 <li><code>'text'</code> Some plain text</li>
 </ul>
 <h3>Customizing the Inline Shortcut Sensitivity</h3>
-<p>To change how quickly a set of keys must be typed to be considered a shortcut
-set the  <code>inlineShortcutTimeout</code> option.</p>
+<p><strong>To change how quickly a set of keys must be typed to be considered a shortcut</strong>
+set the <code>inlineShortcutTimeout</code> option.</p>
 <p>It represents the maximum amount of time, in milliseconds, between consecutive characters for them to be
 considered part of the same shortcut sequence.</p>
 <p>A value of 0 is the same as infinity: any consecutive
@@ -597,8 +597,8 @@ the focus on the mathfield, will automatically timeout the shortcuts.</p>
 <h3>ASCIIMath Inline Shortcuts</h3>
 <p><a href="https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js">ASCIIMath</a> defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.</p>
-<p>The most common ASCIIMath shortcuts are part of the default inline shortcuts.
-To support additional ASCIIMath shortcuts, add them to the <code>inlineShortcuts</code>
+<p>The most common ASCIIMath shortcuts are part of the default inline shortcuts.</p>
+<p><strong>To support additional ASCIIMath shortcuts</strong>, add them to the <code>inlineShortcuts</code>
 setting.</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({
   <span class="hljs-attr">inlineShortcuts</span>: {
@@ -698,10 +698,10 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 04, 2021">
+        <meta itemprop="datePublished" content="June 10, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 04 2021 16:49:16 GMT+0200 (Central European Summer Time)">June 04, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:32:04 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
         
       </footer>
 

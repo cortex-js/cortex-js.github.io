@@ -169,7 +169,7 @@
     
       <li>
         
-          <span class="nav__sub-title">Cortex</span>
+          <span class="nav__sub-title">Compute Engine</span>
         
 
         
@@ -185,7 +185,235 @@
               
             
 
-            <li><a href="/cortex/" class="">Reference</a></li>
+            <li><a href="/compute-engine/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/transforming/" class="active">Transforming an Expression</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/assumptions/" class="">Assumptions</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/domains/" class="">Domains</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/forms/" class="">Canonical Forms</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/compute-engine/" class="">SDK Reference</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Dictionary</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/arithmetic/" class="">Arithmetic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/calculus/" class="">Calculus</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/collections/" class="">Collections</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/core/" class="">Core</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/logic/" class="">Logic</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/sets/" class="">Sets</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathJSON</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/math-json/" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/guides/math-json/format/" class="">MathJSON Format</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathjson/" class="">SDK Reference</a></li>
           
         </ul>
         
@@ -211,9 +439,69 @@
             
           
 
-          <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
         
 
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
         
       </li>
     
@@ -262,68 +550,69 @@
       asciiMath: null,
     });
 </script>
-<h1>Inside Cortex</h1>
-<p>A Cortex program is an expression that gets transformed into an IR (Intermediate
-Representation) expressed in MathJSON, compiled and evaluated by the Cortex
-Compute Engine.</p>
-<p>The process to convert a Cortex program into a MathJSON expression is pretty
-straightforward:</p>
+<h1>Transforming an Expression</h1>
+<p>The CortexJS Compute Engine essentially applies transformations to a MathJSON
+expression that results in another MathJSON expression.</p>
+<p>There are several ways to apply transformations, depending on the desired
+result:</p>
+<h2>Canonical Forms</h2>
+<p>The canonical form of an expression is obtained by rewriting an expression
+without making assumptions about any variables in the expression.</p>
+<p>For example:</p>
 <ul>
-<li>Function calls gets converted into MathJSON functions:</li>
+<li>terms can be rearranged to be in a specific order</li>
+<li>some operations may be replaced with more elementary ones, for example
+substraction replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2,
+-3)\)</li>
+<li>some integer values may be replaced by their computed value, for example
+\(1 + 2 \longrightarrow 3\).</li>
 </ul>
-<pre><code class="language-cortex">Print(&quot;x =&quot;, x)
+<p>Canonical forms may be useful to compare some expressions, for example \( 1 + x
+\) and \(x + 1\) are different expressions, but they have the same canonical
+form.</p>
+<p>Canonical forms are somewhat arbitrary, and not necessarily “the simplest” way
+to represent an expression. But just like the order of the letters of the
+alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
+search and compare expressions.</p>
+<p><strong>To obtain the canonical form of an expression</strong>, use the
+<code>ComputeEngine.format()</code> function.</p>
+<pre><code class="language-js"><span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">format</span>(expr);
 </code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;x =&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
-</code></pre>
+<p>Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
+<h2>Simplify</h2>
+<p><strong>To obtain a simpler form of a symbolic expression</strong>, use the
+<code>ComputeEngine.simplify()</code> function.</p>
+<p>Assumptions are additional information available about some symbols, for example
+\( x &gt; 0 \) or \(n \in \N\). To apply some transformations, available
+assumptions may be used. For example, if no assumptions about \(x \) is
+available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
+assumption that \( x &gt; 0 \) is available, then the expression can be
+simplified to \( x \).</p>
+<p>The result of <code>ComputeEngine.simplify()</code> may be further simplified by calling `</p>
+<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">assumptions</a>,
+.</p>
+<h2>Numerical Evaluation</h2>
+<p><strong>To obtain a numerical approximation of the value of an expression</strong>, use the
+<code>ComputeEngine.N()</code> function.</p>
 <ul>
-<li>String get converted into MathJSON string. Interpolated strings get converted
-into MathJSON <code>String</code> functions:</li>
+<li>Due to limitations in the representation of numbers, some arithmetic
+operations cannot produce exact results. For example, \(\frac{1}{3} \approx
+1.333333333\). Because the machine representation of floating points is using
+a binary format (and not the base-10 we are used to), the results may
+sometimes be surprising. For example, \(0.1 + 0.2 = 0.30000000000000004 \).</li>
+<li>No rewriting of the expression is done before attempting to evaluate it.
+Because of the limitations on the representation of numbers, the result may
+again be surprising, for example \( x - x = 2.7755575615628914\cdot 10^{-17}\)
+when \( x = 0.1 + 0.2\). The result from <code>ComputeEngine.simplify()</code> would
+be \( 0 \).</li>
 </ul>
-<pre><code class="language-cortex">&quot;The solution is \(x)&quot;
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;String&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;The solution is &#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<ul>
-<li>Operators get converted into equivalent MathJSON functions:</li>
-</ul>
-<pre><code class="language-cortex">2x + 1
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<ul>
-<li>Collections (List, Set, Tuple, Sequence, Dicitionary) get converted into a
-corresponding MathJSON expression:</li>
-</ul>
-<pre><code class="language-cortex">set =  {2, 5, 7, 11, 13}
-list = [2, 7, 2, 4, 2]
-tuple = (1.5, 0.5)
-sequence = 2, 5, 7
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">,</span> <span class="hljs-number">13</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;list&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>)<span class="hljs-punctuation">]</span>
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1.5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.5</span><span class="hljs-punctuation">]</span>)<span class="hljs-punctuation">]</span>
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>(<span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;sequence&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sequence&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span>)<span class="hljs-punctuation">]</span>
-</code></pre>
-<ul>
-<li>Control structures get converted to an appropriate expression:</li>
-</ul>
-<pre><code class="language-cortex">if (x in PrimeNumber) {
-  Print(x);
-   x += 1;
-} else {
-  x += 2;
-}
-</code></pre>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>
-  <span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Element&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;PrimeNumber&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Do&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-punctuation">]</span>
-</code></pre>
+<h2>Evaluation</h2>
+<p><strong>To combine a symbolic simplification followed by a numeric evaluation</strong>, use
+the <code>ComputeEngine.evaluate()</code>.</p>
+<p>Invoking the <code>evaluate()</code> function is roughly equivalent to calling in sequence
+<code>simplify()</code>, <code>N()</code> then <code>format()</code>.</p>
+<p>Some functions may perform additional computations when <code>evaluate()</code> is
+invoked.</p>
 
         
       </section>

@@ -197,7 +197,7 @@
               
             
 
-            <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
+            <li><a href="/guides/math-json/latex-syntax/" class="active">Latex Syntax</a></li>
           
             
             
@@ -329,7 +329,7 @@
               
             
 
-            <li><a href="/guides/compute-engine/core/" class="active">Core</a></li>
+            <li><a href="/guides/compute-engine/core/" class="">Core</a></li>
           
             
             
@@ -536,260 +536,60 @@
 
       <section class="page__content" itemprop="text">
         
-        <script type='module'>
-    import {  renderMathInDocument } 
-      from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({
-      TeX: {
-        delimiters: {
-          inline: [ ['$', '$'], ['\\(', '\\)']],
-          display: [['$$', '$$'],['\\[', '\\]']],
-        },
-      },
-      asciiMath: null,
-      processEnvironments : false,
-      renderAccessibleContent: false,
-    });
-</script>
-<h1>Core</h1>
-<h2>Constants</h2>
-<h3><code>Missing</code></h3>
-<p>This symbol is used when a required expression is not present.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Divide&quot;, 2, &quot;Missing&quot;]</code></td>
-<td style="text-align:left"><code>\frac{2}{\placeholder{}}</code></td>
-</tr>
-</tbody>
-</table>
-<h3><code>Nothing</code></h3>
-<p>This symbol is used when an optional expression is not present.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;List&quot;, 2, &quot;Nothing&quot;, 3]</code></td>
-<td style="text-align:left"><code>\lrback 2,,3 \rbrack</code></td>
-</tr>
-</tbody>
-</table>
-<h3><code>None</code></h3>
-<p>This symbol is used to indicate that out of multiple possible values, none
-apply.</p>
-<h3><code>All</code></h3>
-<p>This symbol is used to indicate that out of multiple possible values, all apply.</p>
-<h2>Functions</h2>
-<h3><code>About</code></h3>
-<p><code>About(</code><em><code>symbol</code></em><code>)</code></p>
-<p>Return information about a symbol such as its domain, its attributes, its value,
-etc…</p>
-<h3><code>Domain</code></h3>
-<p><code>Domain(</code><em><code>expression</code></em><code>)</code></p>
-<p>Return the domain of the expression.</p>
-<h3><code>Evaluate</code></h3>
-<p><code>Evaluate(</code><em><code>expression</code></em><code>)</code> <code>Evaluate(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
-<p>Apply a sequence of definitions to an expression in order to reduce and simplify
-it.</p>
-<p>An evaluation can consist of:</p>
-<ul>
-<li>a computation</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(2 + 3)
-// ➔ 5
-</code></pre>
-<ul>
-<li>an execution</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(Length([5, 7]))
-// ➔ 2
-</code></pre>
-<ul>
-<li>a simplification</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(2 + x + 3)
-// ➔ 5 + x
-</code></pre>
-<h3><code>Identity</code></h3>
-<p>Always return its argument.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Identity&quot;, &quot;x&quot;]</code></td>
-<td style="text-align:left"><code>\operatorname{id}(x)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;Identity&quot;</code></td>
-<td style="text-align:left"><code>\operatorname{id}</code></td>
-</tr>
-</tbody>
-</table>
-<h3><code>InverseFunction</code></h3>
-<p>Return the inverse function of its argument.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code></td>
-<td style="text-align:left"><code>\sin^{-1}</code></td>
-</tr>
-</tbody>
-</table>
-<h3><code>Lambda</code></h3>
-<p><code>Lambda&quot;(</code><em><code>variables:List</code></em><code>, </code><em><code>expression</code></em><code>)</code></p>
-<p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
-also called <strong>anonymous function</strong>.</p>
-<p>The first argument is a symbol or a list of symbols which are the bound
-variables (parameters) of the Lambda-function.</p>
-<p>The second argument is an expression expressed as a function of the bound
-variables of the Lambda-function.</p>
-<p><strong>To apply a Lambda-function to some arguments</strong>, use:</p>
-<pre><code class="language-cortex">Lambda([x], x * x)(3)
-// ➔ 9
-</code></pre>
-<p>You can avoid naming the parameters by using the following shorthands:</p>
-<ul>
-<li><code>_</code> or <code>_0</code> : the first argument</li>
-<li><code>_1</code> : the second argument</li>
-<li><code>_2</code> : the third argument, etc…</li>
-<li><code>__</code>: the sequence of arguments, so <code>Length(__)</code> is the number of arguments</li>
-</ul>
-<pre><code class="language-cortex">Lambda(_ * _)(4)
-// ➔ 16
-</code></pre>
-<p>You can assign a Lambda expression to a symbol for later use:</p>
-<pre><code class="language-cortex">cube = Lambda(_ * _ * _)
-cube(5)
-// ➔ 125
-</code></pre>
-<h3><code>Latex</code></h3>
-<p><code>[&quot;Latex&quot;, </code><em><code>expr-1</code></em><code>, </code><em><code>expr-2</code></em><code>, ...</code><em><code>expr-n</code></em><code>]</code></p>
-<ul>
-<li><em><code>expr-n</code></em>: one or more expressions</li>
-<li>Returns a string, a Latex string corresponding to the input expressions.</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
-</code></pre>
-<p>If the argument is a string, it is interpreted as a Latex token or fragment:</p>
-<ul>
-<li><code>&lt;{&gt;</code>: begin group</li>
-<li><code>&lt;}&gt;</code>: end group</li>
-<li><code>&lt;space&gt;</code>: blank space</li>
-<li><code>&lt;$$&gt;</code>: display mode shift</li>
-<li><code>&lt;$&gt;</code>: inline mode shift</li>
-<li><code>#0</code>-<code>#9</code>: argument</li>
-<li><code>#?</code>: placeholder</li>
-<li>string that starts with <code>/</code>: a Latex command</li>
-<li>other strings: ordinary symbols</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
-</code></pre>
-<p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
-<h3><code>Pattern</code></h3>
-<p class="notice--info">Work in progress</p>
-<p>The <code>Pattern</code> function is used with the <code>match()</code> function to pattern-match an
-expression. The pattern expression can include one or more <code>Pattern</code> function
-calls.</p>
-<ul>
-<li><code>[&quot;Pattern&quot;]</code> - Any sub-expression at this position will match.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>]</code> - Match and capture any subexpression at this
-position as the capture group <em><code>name</code></em>.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern</code></em><code>]</code> - Match and capture any subexpression
-at this position as the <code>_</code>name<code>_</code> capture group <strong>if</strong> the subexpression
-matches the <em><code>pattern</code></em>.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern-1</code></em><code>, </code><em><code>pattern-2</code></em><code>, </code><em><code>...</code></em><code>]</code> - Match
-and capture any subexpression at this position as the <code>_</code>name<code>_</code> capture group
-<strong>if</strong> the subexpression matches any of the <em><code>pattern-n</code></em>.</li>
-</ul>
-<pre><code class="language-js"><span class="hljs-title function_">match</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Pattern&quot;</span>], [<span class="hljs-string">&quot;Pattern&quot;</span>]], [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]))
-<span class="hljs-comment">// ➔ {}</span>
-</code></pre>
-<h3><code>Piecewise</code></h3>
-<h3><code>Prime</code></h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;]</code></td>
-<td style="text-align:left"><code>f^\prime</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;, 2]</code></td>
-<td style="text-align:left"><code>f^\doubleprime</code></td>
-</tr>
-</tbody>
-</table>
-<h3><code>Same</code></h3>
-<p><em><code>expr1</code></em> <code>===</code> <em><code>expr2</code></em></p>
-<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
-<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>, ...</code><em><code>expr-n</code></em><code>)</code></p>
-<p>Indicate if two (or more) expressions are structurally identical, using a
-literal symbolic identity.</p>
-<p>Two expressions are the same if:</p>
-<ul>
-<li>they have the same domain.</li>
-<li>if they are numbers, if their value and domain are identical.</li>
-<li>if they are symbols, if their names are identical.</li>
-<li>if they are functions, if the head of the functions are identical, and if all
-the arguments are identical.</li>
-</ul>
-<p>Two expressions that have a different <code>wikidata</code> metadata will not be the same,
-even if they are otherwise identical. Other metadata does not affect the
-comparison.</p>
-<pre><code class="language-js"><span class="hljs-comment">// Greek letter vs. ratio of the circumference of a circle to its diameter</span>
-<span class="hljs-title function_">same</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
-<span class="hljs-comment">// ➔ false</span>
-</code></pre>
-<p>Using a canonical format will result in more positive matches.</p>
-<pre><code class="language-js"><span class="hljs-title class_">Same</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x);
-<span class="hljs-comment">// ➔ False</span>
+        <h2>Parsing and Serializing Latex</h2>
+<p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
+convert Latex strings to MathJSON expression (parsing) and output MathJSON
+expressions as Latex string (serializing).</p>
+<p><strong>To transform Latex to MathJSON</strong>, use the <code>parse()</code> function.</p>
+<p><strong>To transform MathJSON to Latex</strong>, use the <code>serialize()</code> function.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
 
-<span class="hljs-title class_">Same</span>(<span class="hljs-title class_">Canonical</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
-<span class="hljs-comment">// ➔ True</span>
+<span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
+
+<span class="hljs-keyword">const</span> latex = <span class="hljs-title function_">serialize</span>(expr);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
+<span class="hljs-comment">// ➔ \frac{\pi}{2}</span>
 </code></pre>
-<h3>Superscript/subscript</h3>
-<ul>
-<li><code>Subminus</code> - $$x_-$$</li>
-<li><code>Subplus</code> - $$x_+$$</li>
-<li><code>Subscript</code></li>
-<li><code>Substar</code> - $$x_*$$</li>
-<li><code>Superdagger</code> - $$x^\dagger$$</li>
-<li><code>Superminus</code> - $$x^-$$</li>
-<li><code>Superplus</code> - $$x^+$$</li>
-<li><code>Superstar</code> - $$x^*$$. When the argument is a complex number, indicate the
-conjugate.</li>
-</ul>
-<h3><code>String</code></h3>
-<h3><code>Symbol</code></h3>
+<p>The behavior of <code>parse()</code> and <code>serialize()</code> can be customized by passing an
+optional argument:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
+    <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
+    <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;,&quot;</span>
+}););
+<span class="hljs-comment">// ➔ 0,333</span>
+</code></pre>
+<h2>Advanced Usage</h2>
+<p>For improved performance, particularly when calling <code>parse()</code> or <code>serialize()</code>
+repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is
+constructed, the dictionaries defining the syntax are compiled, and subsequent
+invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+<span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
+<span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
+<span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
+</code></pre>
+<p><strong>To customize the syntax</strong>, provide options to the constructor of
+<code>LatexSyntax</code>.</p>
+<p>For example, the configuration below will result in parsing a Latex string as a
+sequence of Latex tokens.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
+  <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
+  <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
+  <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
+  <span class="hljs-attr">dictionary</span>: [],
+  <span class="hljs-attr">skipSpace</span>: <span class="hljs-literal">false</span>,
+});
+<span class="hljs-keyword">const</span> expr = rawLatex.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
+<span class="hljs-comment">// ➔ [&quot;Latex&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
+</code></pre>
 
         
       </section>
