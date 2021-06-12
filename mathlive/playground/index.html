@@ -24,17 +24,17 @@
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.js" crossorigin='anonymous'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -54,12 +54,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.59.1/codemirror.min.css">
-  
-    
-      
-    
-    <link rel="stylesheet" href="/assets/js/ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css">
   
 
 
@@ -169,7 +164,7 @@
     
       <li>
         
-          <span class="nav__sub-title">Cortex</span>
+          <span class="nav__sub-title">MathLive</span>
         
 
         
@@ -185,7 +180,187 @@
               
             
 
-            <li><a href="/cortex/" class="">Reference</a></li>
+            <li><a href="/guides/mathfield-getting-started/" class="">Getting Started</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/mathlive/" class="">SDK Reference</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/commands/" class="">Supported Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/reference/keybindings/" class="">Keyboard Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/playground/" class="active">Example</a></li>
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive Guides</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/introduction" class="">Introduction</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/interacting" class="">Interacting</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/customizing" class="">Customize</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/commands" class="">Commands</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/macros" class="">Macros</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/shortcuts" class="">Shortcuts</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/speech" class="">Speech</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/static" class="">Static</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/virtual-keyboards" class="">Virtual Keyboards</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/mathlive/guides/lifecycle" class="">Lifecycle</a></li>
           
         </ul>
         
@@ -198,7 +373,7 @@
             
           
 
-          <a href="/mathlive/"><span class="nav__sub-title">MathLive</span></a>
+          <a href="/cortex/"><span class="nav__sub-title">Cortex</span></a>
         
 
         
@@ -214,6 +389,66 @@
           <a href="/compute-engine/"><span class="nav__sub-title">Compute Engine</span></a>
         
 
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/reporting-issues/" class="">Reporting Issues</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/funding/" class="">Funding</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/code-of-conduct/" class="">Code of Conduct</a></li>
+          
+            
+            
+              
+            
+
+            
+            
+              
+            
+
+            <li><a href="/docs/license/" class="">License</a></li>
+          
+        </ul>
         
       </li>
     
@@ -234,86 +469,59 @@
 
       <section class="page__content" itemprop="text">
         
-        <script type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
-        },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
+        <script>
+    moduleMap = {
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        "html-to-image": "///assets/js/html-to-image.js",
+    };
 </script>
-<h1>Cortex Syntax</h1>
-<h2>Notation</h2>
-<p>In the grammar below, the following notation is used:</p>
-<ul>
-<li>An arrow (→) marks grammar productions and can be read as “can consist of”</li>
-<li>Syntactic categories are written in lowercase italic (<em>newline</em>) on both sides
-of a production rule.</li>
-<li>Placeholders for recursive syntactic categories are indicated by <em>···</em>.</li>
-<li>Literal words and punctuation are indicated in bold (<strong>+</strong>) or as a Unicode
-codepoint (U+00A0) or as a Unicode codepoint range (U+2000-U+200A).</li>
-<li>Alternatives are indicated by a vertical bar (|)</li>
-<li>Optional elements are indicated in square brackets</li>
-<li>Elements that can repeat 1 or more times are indicated by a trailing plus sign</li>
-<li>Elements that can repeat 0 or more times are indicated by a trailing star sign</li>
-<li>Elements that can repeat 0 or more times, separated by a another element are
-indicated with a trailing hash sign, followed by the separator. If no
-separator is provided, the comma (,) is implied.</li>
-</ul>
-<h2>Grammar</h2>
-<p><em>quoted-text-item</em> → U+0000-U+0009 U+000B-U+000C U+000E-U+0021 U+0023-U+2027
-U+202A-U+D7FF | U+E000-U+10FFFF</p>
-<p><em>linebreak</em> → (U+000A [U+000D]) | U+000D | U+2028 | U+2029</p>
-<p><em>unicode-char</em> → <em>quoted-text-item</em> | <em>linebreak</em> | U+0022</p>
-<p><em>pattern-syntax</em> → U+0021-U+002F | U+003A-U+0040 | U+005b-U+005E | U+0060 |
-U+007b-U+007e | U+00A1-U+00A7 | U+00A9 | U+00AB-U+00AC | U+00AE | U+00B0-U+00B1
-| U+00B6 | U+00BB | U+00BF | U+00D7 | U+00F7 | U+2010-U+203E | U+2041-U+2053 |
-U+2190-U+2775 | U+2794-U+27EF | U+3001-U+3003 | U+3008-U+3020 | U+3030 | U+FD3E
-| U+FD3F | U+FE45 | U+FE46</p>
-<p><em>inline-space</em> → U+0009 | U+0020</p>
-<p><em>pattern-whitespace</em> → <em>inline-space</em> | U+000A | U+000B | U+000C | U+000D |
-U+0085 | U+200E | U+200F | U+2028 | U+2029</p>
-<p><em>whitespace</em> → <em>pattern-whitespace</em> | U+0000 | U+00A0 | U+1680 | U+180E |
-U+2000-U+200A | U+202f | U+205f | U+3000</p>
-<p><em>line-comment</em> → <strong><code>//</code></strong> (<em>unicode-char</em>)* <em>linebreak</em>)</p>
-<p><em>block-comment</em> → <strong><code>/*</code></strong> (((<em>unicode-char</em>)* <em>linebreak</em>)) | <em>block-comment</em>)
-<strong><code>*/</code></strong></p>
-<p><em>digit</em> → U+0030-U+0039 | U+FF10-U+FF19</p>
-<p><em>hex-digit</em> → <em>digit</em> | U+0041-U+0046 | U+0061-U+0066 | U+FF21-FF26 |
-U+FF41-U+FF46</p>
-<p><em>binary-digit</em> → U+0030 | U+0031 | U+FF10 | U+FF11</p>
-<p><em>numerical-constant</em> → <strong><code>NaN</code></strong> | <strong><code>Infinity</code></strong> | <strong><code>+Infinity</code></strong> |
-<strong><code>-Infinity</code></strong></p>
-<p><em>base-10-exponent</em> → (<strong><code>e</code></strong> | <strong><code>E</code></strong>) [<em>sign</em>](<em>digit</em>)+</p>
-<p><em>base-2-exponent</em> → (<strong><code>p</code></strong> | <strong><code>P</code></strong>) [<em>sign</em>](<em>digit</em>)+</p>
-<p><em>binary-number</em> → <strong><code>0b</code></strong> (<em>binary-digit</em>)+ [<strong><code>.</code></strong> (<em>binary-digit</em>)+
-][<em>exponent</em>]</p>
-<p><em>hexadecimal-number</em> → <strong><code>0x</code></strong> (<em>hex-digit</em>)+ [<strong><code>.</code></strong> (<em>hex-digit</em>)+
-][<em>exponent</em>]</p>
-<p><em>decimal-number</em> → (<em>digit</em>)+ [<strong><code>.</code></strong> (<em>digit</em>)+ ][<em>exponent</em>]</p>
-<p><em>sign</em> → <strong><code>+</code></strong> | <strong><code>-</code></strong></p>
-<p><em>signed-number</em> → <em>numerical-constant</em> | ([<em>sign</em>] (<em>binary-number</em> |
-<em>hexadecimal-number</em> | <em>decimal-number</em>)</p>
-<p><em>symbol</em> → <em>verbatim-symbol</em> | <em>inline-symbol</em></p>
-<p><em>verbatim-symbol</em> → <strong><code>`</code></strong> (<em>escape-sequence</em> | <em>symbol_start</em>)
-(<em>escape-sequence</em> | <em>symbol_continue</em>)* <strong><code>`</code></strong></p>
-<p><em>inline-symbol</em> → <em>symbol-start</em> (<em>symbol_continue</em>)*</p>
-<p><em>escape-expression</em> → <strong><code>\(</code></strong> <em>expression</em> <strong><code>)</code></strong></p>
-<p><em>single-line-string</em> → <strong><code>&quot;</code></strong> (<em>escape-sequence</em> | <em>escape-expression</em> |
-<em>quoted-text-item</em>)* <strong><code>&quot;</code></strong></p>
-<p><em>multiline-string</em> → <strong><code>&quot;&quot;&quot;</code></strong> <em>multiline-string-line</em> <strong><code>&quot;&quot;&quot;</code></strong></p>
-<p><em>extended-string</em> →</p>
-<p><em>string</em> → <em>single-line-string</em> | <em>multiline-string</em> | <em>extended-string</em></p>
-<p><em>primary</em> → <em>signed-number</em> | <em>symbol</em> | <em>string</em></p>
-<p><em>expression</em> → <em>primary</em></p>
-<p><em>shebang</em> → <strong><code>#!</code></strong> (unicode-char)* (<em>linebreak | _eof</em>)</p>
-<p><em>cortex</em> → ([<em>shebang</em>] (<em>expression</em>)* <em>eof</em>)!</p>
+<h1>MathLive Example</h1>
+<p>Experiment with the options available to setup and customize a
+mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.</p>
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output {
+        background: #f9f9f9;
+        padding: 16px;
+      }
+      .output:focus-within {
+        outline: none;
+      }
+      .output math-field, #latex {
+        background: #fff;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      .output math-field { font-size: 24px; } 
+      .output math-field:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      #latex {
+        margin-top: 1em;
+        font-family: 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.querySelector('#formula');
+const latexField = document.querySelector('#latex');
+latexField.addEventListener('input', () => 
+  mf.setValue(latexField.value)
+);
+function updateLatex() {
+  document.querySelector('#latex').value = mf.value;
+}
+mf.addEventListener('input', updateLatex);
+updateLatex();</div>
+    <div slot="html">
+&lt;math-field id="formula" virtual-keyboard-mode=manual&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+&lt;textarea id="latex"&gt;&lt;/textarea&gt;</div>
+</code-playground>
+<!-- htmlmin:ignore -->
 
         
       </section>
@@ -326,7 +534,7 @@ U+FF41-U+FF46</p>
         <meta itemprop="datePublished" content="June 12, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 12 2021 21:33:22 GMT+0200 (Central European Summer Time)">June 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 12 2021 21:15:54 GMT+0200 (Central European Summer Time)">June 12, 2021</time></p>
         
       </footer>
 
