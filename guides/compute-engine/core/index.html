@@ -508,20 +508,6 @@
   </ul>
 </nav>
     
-      
-      
-      
-
-      
-<nav class="nav__list">
-  
-  <input id="ac-toc" name="accordion-toc" type="checkbox" />
-  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h" style="width:32px; height: 32px;" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M192 256c0 17.7-14.3 32-32 32s-32-14.3-32-32 14.3-32 32-32 32 14.3 32 32zm88-32c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32zm-240 0c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z"></path></svg></label>
-  <ul class="nav__items">
-    
-  </ul>
-</nav>
-    
   </div>
 
 
@@ -553,101 +539,90 @@
 </script>
 <h1>Core</h1>
 <h2>Constants</h2>
-<h3><code>Missing</code></h3>
-<p>This symbol is used when a required expression is not present.</p>
+<div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
+<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>Missing</code></td>
+<td style="text-align:left">A <strong>required</strong> expression is not present.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Nothing</code></td>
+<td style="text-align:left">An <strong>optional</strong> expression is not present</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>None</code></td>
+<td style="text-align:left">None of the possible values, none apply</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>All</code></td>
+<td style="text-align:left">All the possible values apply</td>
+</tr>
+</tbody>
+</table>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Example</th>
+<th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><code>[&quot;Divide&quot;, 2, &quot;Missing&quot;]</code></td>
-<td style="text-align:left"><code>\frac{2}{\placeholder{}}</code></td>
+<td style="text-align:left">\[\frac{2}{\unicode{&quot;2B1A}}\]</td>
 </tr>
-</tbody>
-</table>
-<h3><code>Nothing</code></h3>
-<p>This symbol is used when an optional expression is not present.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td style="text-align:left"><code>[&quot;List&quot;, 2, &quot;Nothing&quot;, 3]</code></td>
-<td style="text-align:left"><code>\lrback 2,,3 \rbrack</code></td>
+<td style="text-align:left">\[\lbrack 2, ,3 \rbrack\]</td>
 </tr>
 </tbody>
 </table>
-<h3><code>None</code></h3>
-<p>This symbol is used to indicate that out of multiple possible values, none
-apply.</p>
-<h3><code>All</code></h3>
-<p>This symbol is used to indicate that out of multiple possible values, all apply.</p>
 <h2>Functions</h2>
-<h3><code>About</code></h3>
-<p><code>About(</code><em><code>symbol</code></em><code>)</code></p>
-<p>Return information about a symbol such as its domain, its attributes, its value,
-etc…</p>
-<h3><code>Domain</code></h3>
-<p><code>Domain(</code><em><code>expression</code></em><code>)</code></p>
-<p>Return the domain of the expression.</p>
-<h3><code>Evaluate</code></h3>
-<p><code>Evaluate(</code><em><code>expression</code></em><code>)</code> <code>Evaluate(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
-<p>Apply a sequence of definitions to an expression in order to reduce and simplify
-it.</p>
-<p>An evaluation can consist of:</p>
-<ul>
-<li>a computation</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(2 + 3)
-// ➔ 5
-</code></pre>
-<ul>
-<li>an execution</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(Length([5, 7]))
-// ➔ 2
-</code></pre>
-<ul>
-<li>a simplification</li>
-</ul>
-<pre><code class="language-cortex">Evaluate(2 + x + 3)
-// ➔ 5 + x
-</code></pre>
-<h3><code>Identity</code></h3>
-<p>Always return its argument.</p>
+<div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
+<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Operation</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>[&quot;Identity&quot;, &quot;x&quot;]</code></td>
-<td style="text-align:left"><code>\operatorname{id}(x)</code></td>
+<td style="text-align:left"><code>About</code></td>
+<td style="text-align:left"><code>(<em>symbol</em>)</code><br> Return information about a symbol such as its domain, its attributes, its value, etc…</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>&quot;Identity&quot;</code></td>
-<td style="text-align:left"><code>\operatorname{id}</code></td>
+<td style="text-align:left"><code>Domain</code></td>
+<td style="text-align:left"><code>(<em>expression</em>)</code><br> Return the domain of the expression</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Evaluate</code></td>
+<td style="text-align:left"><code>(<em>expression</em>)</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Identity</code></td>
+<td style="text-align:left"><code>(<em>symbol</em>)</code><br> Always return its argument</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>InverseFunction</code></td>
+<td style="text-align:left"><code>(<em>expression</em>)</code><br> Return the inverse function of its argument, for example \( \arcsin \) for \(\sin\)</td>
 </tr>
 </tbody>
 </table>
-<h3><code>InverseFunction</code></h3>
-<p>Return the inverse function of its argument.</p>
+</div>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
+<th style="text-align:left">Example</th>
+<th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
@@ -684,13 +659,13 @@ variables of the Lambda-function.</p>
 cube(5)
 // ➔ 125
 </code></pre>
-<h3><code>Latex</code></h3>
-<p><code>[&quot;Latex&quot;, </code><em><code>expr-1</code></em><code>, </code><em><code>expr-2</code></em><code>, ...</code><em><code>expr-n</code></em><code>]</code></p>
+<h3><code>LatexSymbols</code></h3>
+<p><code>[&quot;LatexSymbols&quot;, </code><em><code>expr-1</code></em><code>, </code><em><code>expr-2</code></em><code>, ...</code><em><code>expr-n</code></em><code>]</code></p>
 <ul>
 <li><em><code>expr-n</code></em>: one or more expressions</li>
 <li>Returns a string, a Latex string corresponding to the input expressions.</li>
 </ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexSymbols&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>If the argument is a string, it is interpreted as a Latex token or fragment:</p>
@@ -776,18 +751,60 @@ comparison.</p>
 <span class="hljs-title class_">Same</span>(<span class="hljs-title class_">Canonical</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
 <span class="hljs-comment">// ➔ True</span>
 </code></pre>
-<h3>Superscript/subscript</h3>
-<ul>
-<li><code>Subminus</code> - $$x_-$$</li>
-<li><code>Subplus</code> - $$x_+$$</li>
-<li><code>Subscript</code></li>
-<li><code>Substar</code> - $$x_*$$</li>
-<li><code>Superdagger</code> - $$x^\dagger$$</li>
-<li><code>Superminus</code> - $$x^-$$</li>
-<li><code>Superplus</code> - $$x^+$$</li>
-<li><code>Superstar</code> - $$x^*$$. When the argument is a complex number, indicate the
-conjugate.</li>
-</ul>
+<h3>Superscripts and Subscripts</h3>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Symbol</th>
+<th style="text-align:left"></th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>Subminus</code></td>
+<td style="text-align:left">\[ x_- \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Subplus</code></td>
+<td style="text-align:left">\[ x_+\]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Subscript</code></td>
+<td style="text-align:left">\[ x_{n} \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Substar</code></td>
+<td style="text-align:left">\[ x_*\]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Superdagger</code></td>
+<td style="text-align:left">\[ x^\dagger\]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Superminus</code></td>
+<td style="text-align:left">\[ x^-\]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Superplus</code></td>
+<td style="text-align:left">\[ x^+\]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Superstar</code></td>
+<td style="text-align:left">\[ x^*\]</td>
+<td style="text-align:left">When the argument is a complex number, indicate the conjugate.</td>
+</tr>
+</tbody>
+</table>
+</div>
 <h3><code>String</code></h3>
 <h3><code>Symbol</code></h3>
 
@@ -799,10 +816,10 @@ conjugate.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 11, 2021">
+        <meta itemprop="datePublished" content="June 12, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Fri Jun 11 2021 11:42:54 GMT+0200 (Central European Summer Time)">June 11, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 12 2021 10:37:19 GMT+0200 (Central European Summer Time)">June 12, 2021</time></p>
         
       </footer>
 
