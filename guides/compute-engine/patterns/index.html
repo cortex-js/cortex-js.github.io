@@ -221,7 +221,7 @@
               
             
 
-            <li><a href="/guides/compute-engine/assumptions/" class="active">Assumptions</a></li>
+            <li><a href="/guides/compute-engine/assumptions/" class="">Assumptions</a></li>
           
             
             
@@ -245,7 +245,7 @@
               
             
 
-            <li><a href="/guides/compute-engine/patterns/" class="">Patterns</a></li>
+            <li><a href="/guides/compute-engine/patterns/" class="active">Patterns</a></li>
           
             
             
@@ -534,62 +534,58 @@
 
       <section class="page__content" itemprop="text">
         
-        <script type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
-        },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
-</script>
-<h1>Assumptions</h1>
-<p>The Cortex Compute Engine has a robust system to specify properties and
-relationship between symbols.</p>
-<p>The assumptions are used to select appropriate algorithms, to validate some
-simplifications and to optimize computation.</p>
-<h2>Defining New Assumptions: <code>assume()</code></h2>
-<p><strong>To specify a predicate about a symbol</strong>, use the <code>assume()</code> function.</p>
-<p>For example, to indicate that \(x\) is a real number:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
-</code></pre>
-<p>If the <code>assume(_arg1_, _arg2_)</code> function is invoked with two arguments, it is equivalent
-to <code>ce.assume([&quot;MemberOf&quot;, _arg1_, _arg2_]</code>.</p>
-<p>When there is a single argument, the head of the argument can be one of the following:</p>
-<ul>
-<li><code>MemberOf</code>: indicate the domain of a symbol</li>
-<li>Inequality such as <code>Less</code>, <code>LessEqual</code>, <code>Greater</code>, <code>GreaterEqual</code>. When an inequality
-is used, both sides are assumed to be <code>RealNumber</code>.</li>
-<li>Equality: <code>Equal</code></li>
-<li>Boolean expression: <code>And</code>, <code>Or</code>, <code>Not</code></li>
-</ul>
-<h2><code>forget()</code></h2>
-<p>Each call to <code>assume()</code> is additive: the previous assumptions are preserved.</p>
-<p><strong>To remove previous assumptions</strong>, use <code>forget()</code>.</p>
-<h2>Testing Assumptions: <code>is()</code></h2>
-<p><strong>To test if a particular assumption is valid</strong>, use the <code>is()</code> function.</p>
-<p>The first argument of <code>is()</code> is a symbol, and the second argument is a domain.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
-ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
-</code></pre>
-<p>Alternatively, the <code>is()</code> function can be invoked with a single argument,
-a predicate:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;MemberOf&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+        <h1>Patterns</h1>
+<p>Patterns are a powerful tool to identify the structure of expressions.</p>
+<p>Patterns in the Cortex Compute Engine are similar to Regular Expressions but
+they can be used to describe MathJSON expressions instead of strings.</p>
+<h2>Capture Variables</h2>
+<p>A pattern is an expression which can include special symbols called capture
+variables. These symbols start with a <code>_</code>. In fact, they can be just <code>_</code>. A <code>_</code>
+capture variable matches anything that is in the corresponding position in the
+target expression.</p>
+<p>The <code>__</code> (two <code>_</code>) capture variable matches any sequence of 1 or more
+expressions in its corresponding position. It is useful to capture the arguments
+of a function.</p>
+<p>The <code>___</code> (three <code>_</code>) capture variables matches any sequence of 0 or more
+expressions in its corresponding position.</p>
+<h2>Matching an Expressin to a Pattern</h2>
+<p><strong>To check if an expression matches a pattern</strong>, use the <code>match()</code> function.</p>
+<p>If there is a match, it returns an object literal with keys corresponding to the
+captured variables.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { match } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
+<span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
 
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>], pattern));
+<span class="hljs-comment">// -&gt; { &quot;_&quot;: &quot;1&quot; } : one match</span>
 </code></pre>
-<p>The function <code>is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
-not, and <code>undefined</code> if it cannot be determined.</p>
-<h2>Domain</h2>
-<p><strong>To query the domain of an expressio</strong>, use the <code>domain()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;Pi&quot;</span>);
-<span class="hljs-comment">// -&gt; IrrationallNumber</span>
+<p>The <code>match()</code> function returns <code>null</code> if the expression does not match the
+pattern.</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>], pattern));
+<span class="hljs-comment">// -&gt; null : no match</span>
 </code></pre>
+<p>The commutativity of operations such as Addition is taken into account:</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], pattern));
+<span class="hljs-comment">// -&gt; { &quot;_&quot;: &quot;1&quot; } : one match (commutative operation)</span>
+</code></pre>
+<p>If the same capture variable is used multiple times, all its values must match.</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>]));
+<span class="hljs-comment">// -&gt; null</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>]));
+<span class="hljs-comment">// -&gt; { &quot;_&quot;: &quot;x&quot; }</span>
+</code></pre>
+<p>Capture variables can be used to capture the head of functions:</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;_&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>]));
+<span class="hljs-comment">// -&gt; { &quot;_&quot;: &quot;Add&quot; }</span>
+</code></pre>
+<p>More descriptive names can beused for capture variables, which is particularly
+useful if you need to use multiple capture variables:</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_b&#x27;</span>]));
+<span class="hljs-comment">// -&gt; { &quot;_a&quot;: &quot;x&quot;, &quot;_b&quot;: &quot;1&quot; }</span>
+</code></pre>
+<h2><code>count()</code></h2>
+<h2><code>matchList()</code></h2>
 
         
       </section>
