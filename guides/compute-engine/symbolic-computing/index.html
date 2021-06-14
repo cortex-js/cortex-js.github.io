@@ -205,7 +205,7 @@
                 
               
 
-              <li><a href="/guides/math-json/latex-syntax/" class="active">Latex Syntax</a></li>
+              <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
             
           
             
@@ -219,7 +219,7 @@
                 
               
 
-              <li><a href="/guides/compute-engine/symbolic-computing/" class="">Symbolic Computing</a></li>
+              <li><a href="/guides/compute-engine/symbolic-computing/" class="active">Symbolic Computing</a></li>
             
           
             
@@ -614,60 +614,72 @@
 
       <section class="page__content" itemprop="text">
         
-        <h2>Parsing and Serializing Latex</h2>
-<p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
-convert Latex strings to MathJSON expression (parsing) and output MathJSON
-expressions as Latex string (serializing).</p>
-<p><strong>To transform Latex to MathJSON</strong>, use the <code>parse()</code> function.</p>
-<p><strong>To transform MathJSON to Latex</strong>, use the <code>serialize()</code> function.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-
-<span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
-
-<span class="hljs-keyword">const</span> latex = <span class="hljs-title function_">serialize</span>(expr);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
-<span class="hljs-comment">// ➔ \frac{\pi}{2}</span>
+        <script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+</script>
+<h1>Symbolic Computing</h1>
+<p>The CortexJS Compute Engine essentially applies transformations to a MathJSON
+expression that results in another MathJSON expression.</p>
+<p>There are several ways to apply transformations, depending on the desired
+result:</p>
+<ul>
+<li>Format</li>
+<li>Simplify</li>
+<li>Evaluate</li>
+</ul>
+<h2>Format with a Canonical Form</h2>
+<p>The canonical form of an expression is obtained by rewriting an expression
+without making assumptions about any variables in the expression.</p>
+<p>For example:</p>
+<ul>
+<li>terms can be rearranged to be in a specific order</li>
+<li>some operations may be replaced with more elementary ones, for example
+substraction replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2,
+-3)\)</li>
+<li>some integer values may be replaced by their computed value, for example
+\(1 + 2 \longrightarrow 3\).</li>
+</ul>
+<p>Canonical forms may be useful to compare some expressions, for example \( 1 + x
+\) and \(x + 1\) are different expressions, but they have the same canonical
+form.</p>
+<p>Canonical forms are somewhat arbitrary, and not necessarily “the simplest” way
+to represent an expression. But just like the order of the letters of the
+alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
+search and compare expressions.</p>
+<p><strong>To obtain the canonical form of an expression</strong>, use the
+<code>ComputeEngine.canonical()</code> function.</p>
+<pre><code class="language-js"><span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">canonical</span>(expr);
 </code></pre>
-<p>The behavior of <code>parse()</code> and <code>serialize()</code> can be customized by passing an
-optional argument:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
-    <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
-    <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;,&quot;</span>
-}););
-<span class="hljs-comment">// ➔ 0,333</span>
-</code></pre>
-<h2>Advanced Usage</h2>
-<p>For improved performance, particularly when calling <code>parse()</code> or <code>serialize()</code>
-repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is
-constructed, the dictionaries defining the syntax are compiled, and subsequent
-invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-<span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
-<span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
-</code></pre>
-<p><strong>To customize the syntax</strong>, provide options to the constructor of
-<code>LatexSyntax</code>.</p>
-<p>For example, the configuration below will result in parsing a Latex string as a
-sequence of Latex tokens.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
-  <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
-  <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
-  <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
-  <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
-  <span class="hljs-attr">dictionary</span>: [],
-  <span class="hljs-attr">skipSpace</span>: <span class="hljs-literal">false</span>,
-});
-<span class="hljs-keyword">const</span> expr = rawLatex.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-comment">// ➔ [&quot;Latex&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
-</code></pre>
+<p>Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
+<h2>Simplify</h2>
+<p><strong>To obtain a simpler form of a symbolic expression</strong>, use the
+<code>ComputeEngine.simplify()</code> function.</p>
+<p>Assumptions are additional information available about some symbols, for example
+\( x &gt; 0 \) or \(n \in \N\). To apply some transformations, available
+assumptions may be used. For example, if no assumptions about \(x \) is
+available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
+assumption that \( x &gt; 0 \) is available, then the expression can be
+simplified to \( x \).</p>
+<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">assumptions</a>,
+.</p>
+<h2>Evaluate</h2>
+<p><strong>To combine a symbolic simplification followed by a <a href="/guides/compute-engine/numerical-evaluation">numerical evaluation</a></strong>, use
+the <code>ComputeEngine.evaluate()</code>.</p>
+<p>Invoking the <code>evaluate()</code> function is roughly equivalent to calling in sequence
+<code>simplify()</code>, <code>N()</code> then <code>format()</code>.</p>
+<p>Some functions may perform additional computations when <code>evaluate()</code> is
+invoked.</p>
 
         
       </section>

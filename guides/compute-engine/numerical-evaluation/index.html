@@ -205,7 +205,7 @@
                 
               
 
-              <li><a href="/guides/math-json/latex-syntax/" class="active">Latex Syntax</a></li>
+              <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
             
           
             
@@ -233,7 +233,7 @@
                 
               
 
-              <li><a href="/guides/compute-engine/numerical-evaluation/" class="">Numerical Evaluation</a></li>
+              <li><a href="/guides/compute-engine/numerical-evaluation/" class="active">Numerical Evaluation</a></li>
             
           
             
@@ -614,60 +614,21 @@
 
       <section class="page__content" itemprop="text">
         
-        <h2>Parsing and Serializing Latex</h2>
-<p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
-convert Latex strings to MathJSON expression (parsing) and output MathJSON
-expressions as Latex string (serializing).</p>
-<p><strong>To transform Latex to MathJSON</strong>, use the <code>parse()</code> function.</p>
-<p><strong>To transform MathJSON to Latex</strong>, use the <code>serialize()</code> function.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-
-<span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
-
-<span class="hljs-keyword">const</span> latex = <span class="hljs-title function_">serialize</span>(expr);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
-<span class="hljs-comment">// ➔ \frac{\pi}{2}</span>
-</code></pre>
-<p>The behavior of <code>parse()</code> and <code>serialize()</code> can be customized by passing an
-optional argument:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
-    <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
-    <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;,&quot;</span>
-}););
-<span class="hljs-comment">// ➔ 0,333</span>
-</code></pre>
-<h2>Advanced Usage</h2>
-<p>For improved performance, particularly when calling <code>parse()</code> or <code>serialize()</code>
-repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is
-constructed, the dictionaries defining the syntax are compiled, and subsequent
-invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
-<span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
-<span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
-</code></pre>
-<p><strong>To customize the syntax</strong>, provide options to the constructor of
-<code>LatexSyntax</code>.</p>
-<p>For example, the configuration below will result in parsing a Latex string as a
-sequence of Latex tokens.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
-  <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
-  <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
-  <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
-  <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
-  <span class="hljs-attr">dictionary</span>: [],
-  <span class="hljs-attr">skipSpace</span>: <span class="hljs-literal">false</span>,
-});
-<span class="hljs-keyword">const</span> expr = rawLatex.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-comment">// ➔ [&quot;Latex&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
-</code></pre>
+        <h2>Numerical Evaluation</h2>
+<p><strong>To obtain a numerical approximation of the value of an expression</strong>, use the
+<code>ComputeEngine.N()</code> function.</p>
+<ul>
+<li>Due to limitations in the representation of numbers, some arithmetic
+operations cannot produce exact results. For example, \(\frac{1}{3} \approx
+1.333333333\). Because the machine representation of floating points is using
+a binary format (and not the base-10 we are used to), the results may
+sometimes be surprising. For example, \(0.1 + 0.2 = 0.30000000000000004 \).</li>
+<li>No rewriting of the expression is done before attempting to evaluate it.
+Because of the limitations on the representation of numbers, the result may
+again be surprising, for example \( x - x = 2.7755575615628914\cdot 10^{-17}\)
+when \( x = 0.1 + 0.2\). The result from <code>ComputeEngine.simplify()</code> would
+be \( 0 \).</li>
+</ul>
 
         
       </section>
