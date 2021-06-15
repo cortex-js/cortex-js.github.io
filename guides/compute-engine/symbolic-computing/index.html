@@ -334,7 +334,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="">Introduction</a></li>
             
           
             
@@ -637,6 +637,7 @@ result:</p>
 <li>Format</li>
 <li>Simplify</li>
 <li>Evaluate</li>
+<li>Compare, find patterns and substitute</li>
 </ul>
 <h2>Format with a Canonical Form</h2>
 <p>The canonical form of an expression is obtained by rewriting an expression
@@ -659,7 +660,8 @@ alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
 search and compare expressions.</p>
 <p><strong>To obtain the canonical form of an expression</strong>, use the
 <code>ComputeEngine.canonical()</code> function.</p>
-<pre><code class="language-js"><span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">canonical</span>(expr);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
 </code></pre>
 <p>Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
 <h2>Simplify</h2>
@@ -680,6 +682,7 @@ the <code>ComputeEngine.evaluate()</code>.</p>
 <code>simplify()</code>, <code>N()</code> then <code>format()</code>.</p>
 <p>Some functions may perform additional computations when <code>evaluate()</code> is
 invoked.</p>
+<h2>Comparing, Pattern Matching and Substitution</h2>
 
         
       </section>
@@ -689,10 +692,10 @@ invoked.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 14, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 14 2021 09:42:38 GMT+0200 (Central European Summer Time)">June 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 

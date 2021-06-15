@@ -334,7 +334,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="">Introduction</a></li>
             
           
             
@@ -616,17 +616,17 @@
         
         <h1>Patterns</h1>
 <p>Pattern matching is a powerful symbolic computing tool to identify the structure of expressions.</p>
+<p>A pattern is an expression which can include one or more wildcard symbols.</p>
 <p>Patterns in the Cortex Compute Engine are similar to Regular Expressions but
 they can be used to describe MathJSON expressions instead of strings.</p>
-<p>A pattern is an expression which can include one or more wildcard symbols.</p>
 <p>Given a pattern and an expression, usually called the <strong>subject</strong>, the goal of pattern matching is to find a substitution for all the wildcards such that the pattern becomes the subject.</p>
 <p>For example, the subject <code>[&quot;Add&quot;, 3, &quot;x&quot;]</code> can become the pattern <code>[&quot;Add&quot;, 3, &quot;_&quot;]</code> by
-replacing <code>&quot;_&quot;</code> with <code>&quot;x&quot;</code>. The subject is then said to match the pattern.</p>
-<p>On the other hand, the subject <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the pattern <code>[&quot;Add&quot;, 3, &quot;_&quot;]</code>: no substitution exist to transform the subject into the pattern by replacing terms.</p>
+replacing the wildcard <code>&quot;_&quot;</code> with <code>&quot;x&quot;</code>. The subject is then said to match the pattern.</p>
+<p>On the other hand, the subject <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the pattern <code>[&quot;Add&quot;, 3, &quot;_&quot;]</code>: no substitution exist to transform the subject into the pattern by replacing wildcard symbols.</p>
 <h2>Wildcards</h2>
 <p>Wildcard symbols start with a <code>_</code>.</p>
 <p>The <code>&quot;_&quot;</code> wildcard matches anything that is in the corresponding position in the
-target expression.</p>
+subject expression.</p>
 <p>The <code>&quot;__&quot;</code> wildcard matches any sequence of 1 or more expressions in its
 corresponding position. It is useful to capture the arguments
 of a function.</p>
@@ -640,7 +640,7 @@ can be used multiple times to match different values.</p>
 <p><strong>To check if an expression matches a pattern</strong>, use the <code>match()</code> function.</p>
 <p>If there is a match, it returns an object literal with keys corresponding to the
 matchign named wildcards. If no named wildcards are used and there is a match
-it returns an empty object literal</p>
+it returns an empty object literal.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { match } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
 <span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
@@ -683,6 +683,45 @@ it was derived from, use the <code>substitute()</code> function.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">substitute</span>(pattern, { <span class="hljs-attr">a</span>: <span class="hljs-string">&quot;x&quot;</span> }));
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, &quot;x&quot;]</span>
 </code></pre>
+<h2>Comparing</h2>
+<p><strong>To compare two expressions</strong>, use the <code>ComputeEngine.same()</code> function.</p>
+<p>The comparison between expressions is structural so that \(x + 1\) is not equal
+to \(1 + x\). To obtain the desired result, you may need to apply a canonical
+form to the expressions using <code>ComputeEngine.canonical()</code>, or evaluate them
+using <code>ComputeEngine.evaluate()</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
+
+<span class="hljs-keyword">const</span> variable = <span class="hljs-string">&#x27;x&#x27;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], 
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, variable, <span class="hljs-number">1</span>]
+));
+<span class="hljs-comment">// ➔ true: the two expressions are the same</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], 
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>]
+));
+<span class="hljs-comment">// ➔ false: the two expressions are **not** the same</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
+  engine.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>]),
+  engine.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>])
+));
+<span class="hljs-comment">// ➔ true: the two expressions are the same in canonical form</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>],
+  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>]
+));
+<span class="hljs-comment">// ➔ false: the two expressions are **not** the same</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
+  engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>]),
+  engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>])
+));
+<span class="hljs-comment">// ➔ true: the two expressions are the same once evaluated</span>
+</code></pre>
 <h2><code>count()</code></h2>
 <h2><code>matchList()</code></h2>
 
@@ -694,10 +733,10 @@ it was derived from, use the <code>substitute()</code> function.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 14, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 14 2021 09:42:38 GMT+0200 (Central European Summer Time)">June 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 

@@ -334,7 +334,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="">Introduction</a></li>
             
           
             
@@ -614,21 +614,36 @@
 
       <section class="page__content" itemprop="text">
         
-        <h2>Numerical Evaluation</h2>
+        <script type='module'>
+    import {  renderMathInDocument } 
+      from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({
+      TeX: {
+        delimiters: {
+          inline: [ ['$', '$'], ['\\(', '\\)']],
+          display: [['$$', '$$'],['\\[', '\\]']],
+        },
+      },
+      asciiMath: null,
+      processEnvironments : false,
+      renderAccessibleContent: false,
+    });
+</script>
+<h2>Numerical Evaluation</h2>
 <p><strong>To obtain a numerical approximation of the value of an expression</strong>, use the
 <code>ComputeEngine.N()</code> function.</p>
-<ul>
-<li>Due to limitations in the representation of numbers, some arithmetic
-operations cannot produce exact results. For example, \(\frac{1}{3} \approx
-1.333333333\). Because the machine representation of floating points is using
+<p><strong>Due to limitations in the machine representation of numbers, some arithmetic
+operations cannot produce exact results.</strong></p>
+<p>For example, \(\frac{1}{3} \approx 1.333333333\).</p>
+<p>Because the machine representation of floating point numbers is using
 a binary format (and not the base-10 we are used to), the results may
-sometimes be surprising. For example, \(0.1 + 0.2 = 0.30000000000000004 \).</li>
-<li>No rewriting of the expression is done before attempting to evaluate it.
-Because of the limitations on the representation of numbers, the result may
-again be surprising, for example \( x - x = 2.7755575615628914\cdot 10^{-17}\)
-when \( x = 0.1 + 0.2\). The result from <code>ComputeEngine.simplify()</code> would
-be \( 0 \).</li>
-</ul>
+sometimes be surprising.</p>
+<p>For example, \(0.1 + 0.2 = 0.30000000000000004 \).</p>
+<p><strong>No rewriting of the expression is done before attempting to evaluate it.</strong></p>
+<p>Because of the limitations on the representation of numbers, this may
+again produce surprising results.</p>
+<p>For example when \( x = 0.1 + 0.2\), \( x - x = 2.7755575615628914\cdot 10^{-17}\).</p>
+<p>The result from <code>ComputeEngine.simplify()</code> would  be \( 0 \).</p>
 
         
       </section>
@@ -638,10 +653,10 @@ be \( 0 \).</li>
         
 
 
-        <meta itemprop="datePublished" content="June 14, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 14 2021 09:42:38 GMT+0200 (Central European Summer Time)">June 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 

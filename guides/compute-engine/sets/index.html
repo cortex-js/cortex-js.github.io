@@ -334,7 +334,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="">Introduction</a></li>
             
           
             
@@ -614,7 +614,125 @@
 
       <section class="page__content" itemprop="text">
         
-        <h1>Sets</h1>
+        <script type='module'>
+    import {  renderMathInDocument } 
+      from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({
+      TeX: {
+        delimiters: {
+          inline: [ ['$', '$'], ['\\(', '\\)']],
+          display: [['$$', '$$'],['\\[', '\\]']],
+        },
+      },
+      asciiMath: null,
+      processEnvironments : false,
+      renderAccessibleContent: false,
+    });
+</script>
+<h1>Sets</h1>
+<h2>Constants</h2>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Value</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>NaturalNumber</code></td>
+<td style="text-align:left">\[ \N \]</td>
+<td style="text-align:left">\[ 0, 1, 2, 3…\]</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Integer</code></td>
+<td style="text-align:left">\[ \Z \]</td>
+<td style="text-align:left">\[ … -2, -1, 0, 1, 2…\]</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>RationalNumber</code></td>
+<td style="text-align:left">\[ \Q \]</td>
+<td style="text-align:left">Can be written as \( \frac{p}{q} \) where \( p, q \in \Z \)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>AlgebraicNumber</code></td>
+<td style="text-align:left">\[ \mathbb{A} \]</td>
+<td style="text-align:left">Is the root of a polynomial</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>RealNumber</code></td>
+<td style="text-align:left">\[ \R \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ComplexNumber</code></td>
+<td style="text-align:left">\[ \C \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>EmptySet</code></td>
+<td style="text-align:left">\( \varnothing \) or \( \emptyset \)</td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Functions</h2>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Operation</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>CartesianProduct</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left">Aka the product set, the set direct product or cross product. <a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Intersection</code></td>
+<td style="text-align:left">\[ A \cap B \]</td>
+<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q185837">Q185837</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Complement</code></td>
+<td style="text-align:left">\[ A \complement B\]</td>
+<td style="text-align:left">Return the elements of the first argument that are not in any of  the subsequent sets.  <a href="https://www.wikidata.org/wiki/Q242767">Q242767</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Union</code></td>
+<td style="text-align:left">\[ A \cup B \]</td>
+<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>SymmetricDifference</code></td>
+<td style="text-align:left">\[  A \triangle B \]</td>
+<td style="text-align:left">Disjunctive union = \( (A \setminus B) \cup (B \setminus A)\) <a href="https://www.wikidata.org/wiki/Q1147242">Q1147242</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Subset</code></td>
+<td style="text-align:left">\[ A \subset B \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>SubsetEqual</code></td>
+<td style="text-align:left">\[ A \subseteq B \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>SetMinus</code></td>
+<td style="text-align:left">\[ A \setminus B \]</td>
+<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q18192442">Q18192442</a></td>
+</tr>
+</tbody>
+</table>
+</div>
 
         
       </section>
@@ -624,10 +742,10 @@
         
 
 
-        <meta itemprop="datePublished" content="June 14, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 14 2021 09:42:38 GMT+0200 (Central European Summer Time)">June 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 

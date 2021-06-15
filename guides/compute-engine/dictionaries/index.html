@@ -122,18 +122,18 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="/mathlive/" >MathLive</a>
-            </li><li class="masthead__menu-item">
-              <a href="/compute-engine/" >Compute Engine</a>
-            </li><li class="masthead__menu-item">
-              <a href="/cortex/" >Cortex</a>
-            </li><li class="masthead__menu-item">
-              <a href="/docs/" >Docs</a>
-            </li><li class="masthead__menu-item">
-              <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
-            </li><li class="masthead__menu-item">
-              <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
-            </li></ul>
+                <a href="/mathlive/" >MathLive</a>
+              </li><li class="masthead__menu-item">
+                <a href="/compute-engine/" >Compute Engine</a>
+              </li><li class="masthead__menu-item">
+                <a href="/cortex/" >Cortex</a>
+              </li><li class="masthead__menu-item separator"></li><li class="masthead__menu-item">
+                <a href="/docs/" >Docs</a>
+              </li><li class="masthead__menu-item">
+                <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+              </li><li class="masthead__menu-item">
+                <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+              </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle menu</span>
@@ -206,20 +206,6 @@
               
 
               <li><a href="/guides/math-json/latex-syntax/" class="">Latex Syntax</a></li>
-            
-          
-            
-            
-              
-                
-              
-
-              
-              
-                
-              
-
-              <li><a href="/guides/compute-engine/transforming/" class="active">Transforming an Expression</a></li>
             
           
             
@@ -308,6 +294,11 @@
           
             
             
+              <li class="separator"></li>
+            
+          
+            
+            
               
                 
               
@@ -343,7 +334,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="active">Introduction</a></li>
             
           
             
@@ -491,6 +482,11 @@
           
             
             
+              <li class="separator"></li>
+            
+          
+            
+            
               
                 
               
@@ -632,69 +628,85 @@
       asciiMath: null,
     });
 </script>
-<h1>Transforming an Expression</h1>
-<p>The CortexJS Compute Engine essentially applies transformations to a MathJSON
-expression that results in another MathJSON expression.</p>
-<p>There are several ways to apply transformations, depending on the desired
-result:</p>
-<h2>Canonical Forms</h2>
-<p>The canonical form of an expression is obtained by rewriting an expression
-without making assumptions about any variables in the expression.</p>
+<h1>Dictionaries</h1>
+<h2>Syntax and Symbol Dictionaries</h2>
+<p>The <a href ="/guides/math-json/format/">MathJSON format</a> is independent of any source or target language (Latex,
+MathASCII, etc…) or of any specific interpretation of the symbols used in a
+MathJSON expression (<code>&quot;Pi&quot;</code>, <code>&quot;Sin&quot;</code>, etc…).</p>
+<p>A <strong>syntax dictionary</strong> defines how a MathJSON expression can be expressed into
+a specific target language (<strong>serialization</strong>) or constructed from a source
+language (<strong>parsing</strong>).</p>
+<p>It includes definitions such as:</p>
+<ul>
+<li>“<em>The <code>Power</code> function is represented as “<code>x^{n}</code>”</em>”</li>
+<li>“<em>The <code>Divide</code> function is represented as “<code>\frac{x}{y}</code>”</em>”.</li>
+</ul>
+<p>A <strong>symbol dictionary</strong> defines the <strong>vocabulary</strong> used by a MathJSON
+expression. This dictionary is independent of the syntax used to parse/serialize
+from another language but it defines the meaning of the symbols used in a
+MathJSON expression.</p>
+<p>An entry in a symbol dictionary includes information necessary to correctly
+interpret it.</p>
 <p>For example:</p>
 <ul>
-<li>terms can be rearranged to be in a specific order</li>
-<li>some operations may be replaced with more elementary ones, for example
-substraction replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2,
--3)\)</li>
-<li>some integer values may be replaced by their computed value, for example
-\(1 + 2 \longrightarrow 3\).</li>
+<li>“<em><code>Pi</code> is a transcendental number whose value is approximately 3.14159265…</em>”</li>
+<li>“<em>The <code>Add</code> function is associative, commutative, pure, idempotent and can be
+applied to arbitrary number of Real or Complex numbers</em>”.</li>
 </ul>
-<p>Canonical forms may be useful to compare some expressions, for example \( 1 + x
-\) and \(x + 1\) are different expressions, but they have the same canonical
-form.</p>
-<p>Canonical forms are somewhat arbitrary, and not necessarily “the simplest” way
-to represent an expression. But just like the order of the letters of the
-alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
-search and compare expressions.</p>
-<p><strong>To obtain the canonical form of an expression</strong>, use the
-<code>ComputeEngine.format()</code> function.</p>
-<pre><code class="language-js"><span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">format</span>(expr);
-</code></pre>
-<p>Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
-<h2>Simplify</h2>
-<p><strong>To obtain a simpler form of a symbolic expression</strong>, use the
-<code>ComputeEngine.simplify()</code> function.</p>
-<p>Assumptions are additional information available about some symbols, for example
-\( x &gt; 0 \) or \(n \in \N\). To apply some transformations, available
-assumptions may be used. For example, if no assumptions about \(x \) is
-available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
-assumption that \( x &gt; 0 \) is available, then the expression can be
-simplified to \( x \).</p>
-<p>The result of <code>ComputeEngine.simplify()</code> may be further simplified by calling `</p>
-<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">assumptions</a>,
-.</p>
-<h2>Numerical Evaluation</h2>
-<p><strong>To obtain a numerical approximation of the value of an expression</strong>, use the
-<code>ComputeEngine.N()</code> function.</p>
-<ul>
-<li>Due to limitations in the representation of numbers, some arithmetic
-operations cannot produce exact results. For example, \(\frac{1}{3} \approx
-1.333333333\). Because the machine representation of floating points is using
-a binary format (and not the base-10 we are used to), the results may
-sometimes be surprising. For example, \(0.1 + 0.2 = 0.30000000000000004 \).</li>
-<li>No rewriting of the expression is done before attempting to evaluate it.
-Because of the limitations on the representation of numbers, the result may
-again be surprising, for example \( x - x = 2.7755575615628914\cdot 10^{-17}\)
-when \( x = 0.1 + 0.2\). The result from <code>ComputeEngine.simplify()</code> would
-be \( 0 \).</li>
-</ul>
-<h2>Evaluation</h2>
-<p><strong>To combine a symbolic simplification followed by a numeric evaluation</strong>, use
-the <code>ComputeEngine.evaluate()</code>.</p>
-<p>Invoking the <code>evaluate()</code> function is roughly equivalent to calling in sequence
-<code>simplify()</code>, <code>N()</code> then <code>format()</code>.</p>
-<p>Some functions may perform additional computations when <code>evaluate()</code> is
-invoked.</p>
+<h2>Domains</h2>
+<p>A domain is similar to a type in a traditional programming
+language.</p>
+<p>The domain of a symbol provides some contextual information about this symbol, for example: <em>“x is a positive integer”</em>.</p>
+<p>The codomain of a function indicates the set of values that a function maps to,
+or the domain of the “result” of the function.</p>
+<p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
+functions its codomain.</p>
+<h2>Customizing the Dictionaries</h2>
+<p>It is possible to provide custom syntax and symbol dictionaries, or to modify
+the default ones.</p>
+<p>When no dictionaries are provided, default ones are used automatically.</p>
+<h2>Default Dictionaries</h2>
+<p>The default dictionaries are organized by topic as follow:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Dictionary</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/arithmetic/">Arithmetic</a></td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/calculus/">Calculus</a></td>
+<td style="text-align:left"><code>Derive</code> <code>Integrate</code>, etc…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/collections/">Collections</a></td>
+<td style="text-align:left"><code>Sequence</code> <code>List</code> <code>Dictionary</code> <code>Set</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/core/">Core</a></td>
+<td style="text-align:left"><code>Missing</code> <code>Nothing</code> <code>None</code> <code>All</code>  <code>Identity</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/logic/">Logic</a></td>
+<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/sets/">Sets</a></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/trigonometry/">Trigonometry</a></td>
+<td style="text-align:left"><code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
+</tr>
+</tbody>
+</table>
+</div>
 
         
       </section>
@@ -704,10 +716,10 @@ invoked.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 14, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 14 2021 08:35:02 GMT+0200 (Central European Summer Time)">June 14, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 

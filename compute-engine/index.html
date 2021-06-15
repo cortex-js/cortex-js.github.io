@@ -298,7 +298,7 @@
                 
               
 
-              <li><a href="/guides/math-json-dictionary/" class="">Introduction</a></li>
+              <li><a href="/guides/compute-engine/dictionaries/" class="">Introduction</a></li>
             
           
             
@@ -594,90 +594,59 @@
 </script>
 <h1>Compute Engine</h1>
 <img src='/assets/Compute-Engine-2.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
-<p>The <strong>CortexJS Compute Engine</strong> is a software environment for educators, students, scientists and engineers to perform manipulation of mathematical expressions.</p>
-<p>The CortexJS Compute Engine is built for the web platform and is available
-as a JavaScript library that can be used in the browser or in server-side
+<p>The <strong>CortexJS Compute Engine</strong> is a JavaScript library to manipulate
+mathematical expressions.</p>
+<p>The Compute Engine is built for educators, students, scientists and engineers
+who want to make technical computing applications in the browser or in server-side
 environments such as Node.</p>
-<p>The Compute Engine can be used to simplify, solve and evaluate expressions
-expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and to <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from
-and to Latex.</p>
-<h2>Evaluating</h2>
-<p><strong>To evaluate an expression</strong>, use the <code>evaluate()</code> function.</p>
+<p>The Compute Engine can simplify, solve and evaluate math expressions expressed
+in the <a href ="/guides/math-json/format/">MathJSON format</a>, and <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex.</p>
+<h2>Parse and Serialize Latex</h2>
+<p><strong>To parse and serialize an expression</strong>, use <code>parse()</code> and `serialize().</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>));
+<span class="hljs-comment">// -&gt;  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Power&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
+<span class="hljs-comment">// -&gt;  x^3 + 2</span>
+
+</code></pre>
+<p><strong>To provide an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
+<p>A MathLive mathfield can provide its content either as Latex or as a MathJSON
+expression.</p>
+<p>Read more about <a href="/guides/math-json/latex-syntax/">Parsing and Serializing the Latex Syntax</a>.</p>
+<h2>Symbolic Computing</h2>
+<p><strong>To evaluate a symbolic expression</strong>, use the <code>evaluate()</code> function.</p>
 <p>The result of <code>evaluate()</code> is an expression. If the expression can
 be evaluated numerically, the expression is a number. If it can’t be
 evaluated numerically, the expression is a symbolic expression.</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { evaluate } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { evaluate, parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
 <span class="hljs-comment">// ➔ 5</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]);
-<span class="hljs-comment">// ➔ [&quot;Add&quot;, 5, x]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2x + 3x&#x27;</span>)));
+<span class="hljs-comment">// ➔ 5x</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\sqrt{5}}{3}&#x27;</span>));
+<span class="hljs-comment">// ➔ 0.7453559925</span>
 </code></pre>
-<h2>Formating</h2>
-<p>A mathematical expression can be represented in multiple equivalent ways
-as a MathJSON expression. A <strong>form</strong> is used to specify a representation.</p>
-<p>The most common forms are <code>&quot;full&quot;</code> where only transformations necessary to make the expression a valid JSON expression are applied and <code>&quot;canonical&quot;</code> that applies rules to perform some basic simplifications and ordering of the
-elements of the expression.</p>
-<p><strong>To transform an expression using the rules for a particular form</strong>, use the
-<code>format()</code> function.</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { format } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">format</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, +<span class="hljs-title class_">Infinity</span>], <span class="hljs-string">&#x27;full&#x27;</span>);
-<span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, &quot;+Infinity&quot;]</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">format</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-string">&#x27;canonical&#x27;</span>);
-<span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
-</code></pre>
-<p>See <a href="/guides/compute-engine/forms/">Compute Engine Forms</a> for more info.</p>
-<h2>Comparing</h2>
-<p><strong>To compare two expressions</strong>, use the <code>ComputeEngine.same()</code> function.</p>
-<p>The comparison between expressions is structural so that \(x + 1\) is not equal
-to \(1 + x\). To obtain the desired result, you may need to apply a canonical
-form to the expressions using <code>ComputeEngine.canonical()</code>, or evaluate them using <code>ComputeEngine.evaluate()</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-
-<span class="hljs-keyword">const</span> variable = <span class="hljs-string">&#x27;x&#x27;</span>;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], 
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, variable, <span class="hljs-number">1</span>]
-));
-<span class="hljs-comment">// ➔ true: the two expressions are the same</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], 
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>]
-));
-<span class="hljs-comment">// ➔ false: the two expressions are **not** the same</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
-  engine.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>]),
-  engine.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>])
-));
-<span class="hljs-comment">// ➔ true: the two expressions are the same in canonical form</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>],
-  [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>]
-));
-<span class="hljs-comment">// ➔ false: the two expressions are **not** the same</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(engine.<span class="hljs-title function_">same</span>(
-  engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>]),
-  engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>])
-));
-<span class="hljs-comment">// ➔ true: the two expressions are the same once evaluated</span>
-</code></pre>
-<h2>Advanced Usage</h2>
-<p>For improved performance, particularly when calling <code>format()</code>/<code>evaluate()</code>
-repeatedly, use an instance of the <code>ComputeEngine</code> class.</p>
-<p>When the instance is constructed, the dictionaries defining the symbols are
-compiled, and subsequent invocations of the <code>format()</code> and <code>evaluate()</code> methods
-can skip that step.</p>
-<p>Using a compute engine instance, it is possible to customize which symbol
-dictionaries are used.</p>
+<p>The Compute Engine can also simplify, find patterns, substitute terms, compare and format
+expressions.</p>
+<p>Read more about <a href="/guides/compute-engine/symbolic-computing/">Symbolic Computing</a>.</p>
+<p>Read more about <a href="/guides/compute-engine/numerical-evaluation/">Numerical Evaluation</a>.</p>
+<h2>Customization</h2>
+<p>The Compute Engine includes a robust library of mathematical functions.
+The dictionaries that define these functions, and how they are parsed and
+serialized to Latex can be customized by creating a <code>ComputeEngine</code> instance.</p>
+<p>The <code>ComputeEngine</code> instance also provides access to additional features
+such as defining <a href="/guides/compute-engine/assumptions/">assumptions</a> about
+symbols (e.g. <code>x is a positive number, n is an integer</code>).</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
 engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
 </code></pre>
+<p>Read more about <a href="/guides/compute-engine/numerical-evaluation/">Dictionaries</a>.</p>
 
         
       </section>
@@ -687,10 +656,10 @@ engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="
         
 
 
-        <meta itemprop="datePublished" content="June 10, 2021">
+        <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 23:58:43 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:47:37 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 
