@@ -827,7 +827,7 @@ functions.</p>
 <p>The following naming convention are recommended.</p>
 <h3>Patterns</h3>
 <p>Symbols that begin with <strong><code>_</code></strong> (<strong>U+005F LOW LINE</strong>, underscore) are reserved
-to denote pattern matches and other placeholders.</p>
+to denote wildcards and other placeholders.</p>
 <h3>Variables</h3>
 <ul>
 <li>
@@ -863,8 +863,8 @@ in math is why we recommend a more restricted character set.</p>
 </ul>
 <h3>Constants</h3>
 <ul>
-<li>The first character of a constant should an uppercase letter (<code>A</code>-<code>Z</code>)</li>
-<li>Subsequent characters should a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</li>
+<li>The first character of a constant should be an uppercase letter (<code>A</code>-<code>Z</code>)</li>
+<li>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</li>
 <li>If a constant is made up of several words, use camelCase, e.g. <code>SpeedOfLight</code></li>
 </ul>
 <h2>Functions</h2>
@@ -874,7 +874,7 @@ in math is why we recommend a more restricted character set.</p>
 <li>a JSON array</li>
 </ul>
 <h3>Functions as Object Literal</h3>
-<p>The default representations of <strong>functions</strong> is as an object literal with a
+<p>The default representation of <strong>functions</strong> is as an object literal with a
 <code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head and
 its arguments.</p>
 <pre><code class="language-typescript">{
@@ -883,9 +883,9 @@ its arguments.</p>
 </code></pre>
 <p>The <strong>head</strong> of the function is the first element in the array. Its presence is
 required. It indicates the ‘function name’ or ‘what’ the function is about.</p>
-<p>It frequently is a string, but it can also be another expression.</p>
-<p>Following the head are zero or more <strong>arguments</strong> to the function, which are
-expressions as well. The <strong>arguments</strong> form the <strong>tail</strong> of the function.</p>
+<p>The head is frequently is a string, but it can also be another expression.</p>
+<p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
+well. The arguments form the <strong>tail</strong> of the function.</p>
 <p>The expression corresponding to $$\sin^{-1}(x)$$ is</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
@@ -894,21 +894,21 @@ expressions as well. The <strong>arguments</strong> form the <strong>tail</stron
 <h3>JSON array</h3>
 <p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
 <p>For example these two expressions are equivalent:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
 
-<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <h2>Dictionary</h2>
-<p>A <strong>dictionary</strong> is a collection of key-value pairs. In some languages it is
-called a map or associative array.</p>
+<p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
+languages it is called a map or associative array.</p>
 <p>The keys are strings and the values are MathJSON expressions.</p>
 <p>A <strong>dictionary</strong> is represented as an object literal with a <code>&quot;dict&quot;</code> key. The
 value of the key is a JSON object literal holding the content of the dictionary.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;dict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">&quot;one&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;two&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;three&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+    <span class="hljs-attr">&quot;first&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;second&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;third&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
@@ -953,7 +953,7 @@ the equivalent object literal before being annotated.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>sourceOffsets</code></td>
-<td style="text-align:left">A pairs of character offsets in <code>sourceContent</code> or <code>sourceUrl</code> from which this expression was produced</td>
+<td style="text-align:left">A pair of character offsets in <code>sourceContent</code> or <code>sourceUrl</code> from which this expression was produced</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>hash</code></td>
@@ -988,7 +988,7 @@ the equivalent object literal before being annotated.</p>
         <meta itemprop="datePublished" content="June 15, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:58:04 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 09:26:23 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
         
       </footer>
 
