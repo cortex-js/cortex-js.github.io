@@ -833,14 +833,14 @@ the arguments are identical.</li>
 even if they are otherwise identical. Other metadata does not affect the
 comparison.</p>
 <pre><code class="language-js"><span class="hljs-comment">// Greek letter vs. ratio of the circumference of a circle to its diameter</span>
-<span class="hljs-title function_">same</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
-<span class="hljs-comment">// ➔ false</span>
+<span class="hljs-title function_">match</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
+<span class="hljs-comment">// ➔ null (does not match)</span>
 </code></pre>
 <p>Using a canonical format will result in more positive matches.</p>
-<pre><code class="language-js"><span class="hljs-title class_">Same</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x);
-<span class="hljs-comment">// ➔ False</span>
+<pre><code class="language-js"><span class="hljs-title function_">match</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>), <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>)));
+<span class="hljs-comment">// ➔ null</span>
 
-<span class="hljs-title class_">Same</span>(<span class="hljs-title class_">Canonical</span>(x + <span class="hljs-number">1</span>, <span class="hljs-number">1</span> + x));
+<span class="hljs-title function_">match</span>(ce.<span class="hljs-title function_">canonical</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>), <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>)));
 <span class="hljs-comment">// ➔ True</span>
 </code></pre>
 <h3>Superscripts and Subscripts</h3>
@@ -908,10 +908,10 @@ comparison.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 16, 2021">
+        <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Jun 16 2021 08:10:17 GMT+0200 (Central European Summer Time)">June 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

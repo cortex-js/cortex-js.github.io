@@ -638,13 +638,14 @@ simplifications and to optimize computation.</p>
 <p>For example, to indicate that \(x\) is a real number:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
 </code></pre>
-<p>If the <code>assume(_arg1_, _arg2_)</code> function is invoked with two arguments, it is equivalent
-to <code>ce.assume([&quot;MemberOf&quot;, _arg1_, _arg2_]</code>.</p>
-<p>When there is a single argument, the head of the argument can be one of the following:</p>
+<p>If the <code>assume(_arg1_, _arg2_)</code> function is invoked with two arguments, it is
+equivalent to <code>ce.assume([&quot;Element&quot;, _arg1_, _arg2_]</code>.</p>
+<p>When there is a single argument, the head of the argument can be one of the
+following:</p>
 <ul>
-<li><code>MemberOf</code>: indicate the domain of a symbol</li>
-<li>Inequality such as <code>Less</code>, <code>LessEqual</code>, <code>Greater</code>, <code>GreaterEqual</code>. When an inequality
-is used, both sides are assumed to be <code>RealNumber</code>.</li>
+<li><code>Element</code>: indicate the domain of a symbol</li>
+<li>Inequality such as <code>Less</code>, <code>LessEqual</code>, <code>Greater</code>, <code>GreaterEqual</code>. When an
+inequality is used, both sides are assumed to be <code>RealNumber</code>.</li>
 <li>Equality: <code>Equal</code></li>
 <li>Boolean expression: <code>And</code>, <code>Or</code>, <code>Not</code></li>
 </ul>
@@ -654,20 +655,18 @@ is used, both sides are assumed to be <code>RealNumber</code>.</li>
 <h2>Testing Assumptions: <code>is()</code></h2>
 <p><strong>To test if a particular assumption is valid</strong>, use the <code>is()</code> function.</p>
 <p>The first argument of <code>is()</code> is a symbol, and the second argument is a domain.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
-ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
+ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
-<p>Alternatively, the <code>is()</code> function can be invoked with a single argument,
-a predicate:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;MemberOf&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-
-
+<p>Alternatively, the <code>is()</code> function can be invoked with a single argument, a
+predicate:</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 </code></pre>
 <p>The function <code>is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
 not, and <code>undefined</code> if it cannot be determined.</p>
 <h2>Domain</h2>
 <p><strong>To query the domain of an expressio</strong>, use the <code>domain()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;Pi&quot;</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-comment">// -&gt; IrrationallNumber</span>
 </code></pre>
 
@@ -679,10 +678,10 @@ not, and <code>undefined</code> if it cannot be determined.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 16, 2021">
+        <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Jun 16 2021 08:10:17 GMT+0200 (Central European Summer Time)">June 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

@@ -689,7 +689,7 @@ symbols.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>canonical</code></td>
-<td style="text-align:left">Apply the following transformations, in order: <ul><li> <code>canonical-number</code></li><li><code>canonical-exp</code></li><li><code>canonical-root</code></li><li><code>canonical-subtract</code></li><li><code>canonical-divide</code></li><li><code>canonical-power</code></li><li><code>canonical-multiply</code></li><li><code>canonical-negate</code></li><li><code>canonical-add</code></li><li><code>flatten</code></li><li><code>sorted</code></li><li><code>full</code></li></ul></td>
+<td style="text-align:left">Apply the following transformations, in order: <ul><li> <code>canonical-number</code></li><li><code>canonical-exp</code></li><li><code>canonical-root</code></li><li><code>canonical-subtract</code></li><li><code>canonical-divide</code></li><li><code>canonical-power</code></li><li><code>canonical-multiply</code></li><li><code>canonical-negate</code></li><li><code>canonical-add</code></li><li><code>flatten</code></li><li><code>canonical-list</code></li><li><code>canonical-domain</code></li><li><code>canonical-rational</code></li><li><code>canonical-constants</code></li><li><code>sorted</code></li><li><code>json</code></li></ul></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-add</code></td>
@@ -700,6 +700,10 @@ symbols.</p>
 <td style="text-align:left"></td>
 </tr>
 <tr>
+<td style="text-align:left"><code>canonical-constants</code></td>
+<td style="text-align:left">Simplify some arithmetic and trigonometric constants \( \frac{1}{2}, \frac{\pi}{4}, \ldots \)</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>canonical-divide</code></td>
 <td style="text-align:left">Division by 1 is simplified</td>
 </tr>
@@ -708,8 +712,12 @@ symbols.</p>
 <td style="text-align:left"></td>
 </tr>
 <tr>
+<td style="text-align:left"><code>canonical-exp</code></td>
+<td style="text-align:left"><code>['Power', 'ExponentialE'] is simplified to </code>Exp`</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>canonical-multiply</code></td>
-<td style="text-align:left">Multiplication by \( 1 \)  or \( -1 \) is simplified</td>
+<td style="text-align:left">Multiplication by \( 1 \)  or \( -1 \) is simplified. Square roots are grouped. Negative constant is pulled first.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-negate</code></td>
@@ -717,7 +725,7 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-list</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left">In <code>List</code>, <code>Sequence</code> and <code>Sequence2</code>, simplify <code>Identity</code>. Flattens <code>Sequence</code> and <code>Sequence2</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-number</code></td>
@@ -725,7 +733,11 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-power</code></td>
-<td style="text-align:left"><code>Power</code> with a first or second argument of 1 is simplified</td>
+<td style="text-align:left"><ul><li>$$x^{\tilde\infty} \rightarrow \operatorname{NaN}$$</li><li>$$x^0 \rightarrow 1$$</li><li>$$x^1 \rightarrow x$$</li><li>$$(\pm 1)^{-1} \rightarrow -1$$</li><li>$$(\pm\infty)^{-1} \rightarrow 0$$</li><li>$$0^{\infty} \rightarrow \tilde\infty$$</li><li>$$(\pm 1)^{\pm \infty} \rightarrow \operatorname{NaN}$$</li><li>$$\infty^{\infty} \rightarrow \infty$$</li><li>\infty^{-\infty} \rightarrow 0</li><li>$$(-\infty)^{\pm \infty} \rightarrow \operatorname{NaN}$$</li>&lt;/ul</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>canonical-root</code></td>
+<td style="text-align:left"><code>Power</code> is replaced with <code>Root</code> and <code>Sqrt</code> or simplified</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-subtract</code></td>
@@ -763,12 +775,7 @@ symbols.</p>
 </table>
 </div>
 <ul>
-<li>
-<p><strong><code>'canonical-exp'</code></strong>: <code>exp</code> is replaced with <code>power</code></p>
-</li>
-<li>
-<p><strong><code>'canonical-root'</code></strong>: <code>root</code> is replaced with <code>power</code></p>
-</li>
+<li><strong><code>'canonical-exp'</code></strong>: <code>exp</code> is replaced with <code>power</code></li>
 </ul>
 <p><strong>To transform an expression using the rules for a particular form</strong>, use the
 <code>format()</code> function.</p>
@@ -801,10 +808,10 @@ BaseForm(42, 16)
         
 
 
-        <meta itemprop="datePublished" content="June 16, 2021">
+        <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Jun 16 2021 08:10:17 GMT+0200 (Central European Summer Time)">June 16, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 
