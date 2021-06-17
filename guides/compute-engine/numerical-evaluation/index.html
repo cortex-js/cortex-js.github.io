@@ -93,6 +93,11 @@
   </head>
 
   <body class="layout--single">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <defs>
+          <symbol id='svg-chevron' aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
+      </defs>
+    </svg>
     <nav class="skip-links">
   <h2 class="screen-reader-text">Skip links</h2>
   <ul>
@@ -661,7 +666,8 @@ produce surprising results.</p>
 <p>If <code>ce.N()</code> cannot provide a numerical evaluation, a symbolic representation
 of the expression is returned.</p>
 <h2>Choosing the Numeric Format and Precision</h2>
-<p>Numerical computations can be performed using one of these formats:</p>
+<p><strong>To change the numeric format for numeric computations</strong>, set the <code>numericFormat</code>
+property of a <code>ComputeEngine</code> instance to one of these values:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -683,10 +689,14 @@ of the expression is returned.</p>
 <td style="text-align:left"><code>decimal</code></td>
 <td style="text-align:left">Arbitrary precision floating point. Slower, but more precise, however computations with complex numbers cannot be performed.</td>
 </tr>
+<tr>
+<td style="text-align:left"><code>auto</code></td>
+<td style="text-align:left">Determine the best numeric format based on the desired precision and the content of the expression.</td>
+</tr>
 </tbody>
 </table>
 </div>
-<p><strong>To change the number of significant digits of the numerical evaluations</strong>, set the <code>precision</code> property of an instance of <code>ComputeEngine</code>.</p>
+<p><strong>To change the number of significant digits of the numerical evaluations</strong>, set the <code>precision</code> property of <code>ComputeEngine</code> instance.</p>
 <p>A value of 15 or less will automatically be set to 15 and use the <code>machine</code>
 numeric format. A value over 1,000 will result in inaccurate results for
 trigonometric functions.</p>
@@ -700,12 +710,12 @@ the <code>decimal</code> numeric format is used.</p>
 <p><strong>To use a complex number</strong>, add and multiply the imaginary unit: \(5 + 3\imaginaryI = \) <code>[&quot;Add&quot;, 5, [&quot;Multiply&quot;, 3, &quot;ImaginaryUnit&quot;]]</code>.</p>
 <p>The <code>Complex</code> function is a convenient shorthand: \(5 + 3\imaginaryI = \)<code>[&quot;Complex&quot;, 5, 3]</code>.</p>
 <h2>Operations</h2>
-<p>The functions in the category below can provide a numerical evaluation.</p>
+<p>The functions below can be numerically evaluated.</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Numeric Format</th>
+<th style="text-align:left"></th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
@@ -715,7 +725,7 @@ the <code>decimal</code> numeric format is used.</p>
 <td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Sqrt</code> <code>Log</code> <code>Abs</code> <code>Round</code>…</td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/guides/compute-engine/trigonometry/">Trigonometric</a></td>
+<td style="text-align:left"><a href="/guides/compute-engine/trigonometry/">Trigonometry</a></td>
 <td style="text-align:left"><code>Sin</code> <code>Cos</code> <code>Tan</code> <code>Sinh</code> <code>Arcsin</code>…</td>
 </tr>
 <tr>
@@ -737,7 +747,7 @@ the <code>decimal</code> numeric format is used.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 22:08:02 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

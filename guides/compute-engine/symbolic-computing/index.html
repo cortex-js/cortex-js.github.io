@@ -93,6 +93,11 @@
   </head>
 
   <body class="layout--single">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <defs>
+          <symbol id='svg-chevron' aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
+      </defs>
+    </svg>
     <nav class="skip-links">
   <h2 class="screen-reader-text">Skip links</h2>
   <ul>
@@ -644,15 +649,37 @@
 </script>
 <h1>Symbolic Computing</h1>
 <p>The CortexJS Compute Engine essentially applies transformations to a MathJSON
-expression that results in another MathJSON expression.</p>
-<p>There are several ways to apply transformations, depending on the desired
+expression by applying rewriting rules.</p>
+<p>There are several kind of transformations, depending on the desired
 result:</p>
-<ul>
-<li>Format</li>
-<li>Simplify</li>
-<li>Evaluate</li>
-<li>Compare, find patterns and substitute</li>
-</ul>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Transformation</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Format</strong></td>
+<td style="text-align:left">Put an expression in canonical (“standard”) form, for easier sorting, comparing and computing</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Simplify</strong></td>
+<td style="text-align:left">Replace the expression with an equivalent, simpler one</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Evaluate</strong></td>
+<td style="text-align:left">Simplify, calculate, and evaluate numerically an expression</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Other</strong></td>
+<td style="text-align:left">Compare, find patterns and substitute parts of an expression</td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="notice--info">The <code>evaluate()</code> function is a convenient shorthand to evaluate an expression
 with a single call. Other functions such as <code>ce.simplify()</code>, <code>ce.is()</code>, <code>ce.N()</code>, <code>ce.canonical()</code>, etc… require a <code>ComputeEngine</code> instance which is denoted by the <code>ce.</code> prefix.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span>, parse } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
@@ -678,7 +705,7 @@ search and compare expressions.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
 </code></pre>
-<p class="notice--info">Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
+<div class='read-more'><a href="/guides/compute-engine/forms/">Read more about <strong>Canonical Forms</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Simplify</h2>
 <p><strong>To obtain a simpler expression of a symbolic expression</strong>, use the
 <code>ce.simplify()</code> function.</p>
@@ -688,7 +715,7 @@ assumptions may be used. For example, if no assumptions about \(x \) is
 available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
 assumption that \( x &gt; 0 \) is available, then the expression can be
 simplified to \( x \).</p>
-<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">Assumptions</a>.</p>
+<div class='read-more'><a href="/guides/compute-engine/assumptions/">Read more about <strong>Assumptions</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Evaluate</h2>
 <p><strong>To combine a symbolic simplification followed by a <a href="/guides/compute-engine/numerical-evaluation">numerical evaluation</a></strong>, use
 the <code>ce.evaluate()</code> function.</p>
@@ -699,7 +726,7 @@ invoked.</p>
 <h2>Other Symbolic Manipulation</h2>
 <p>You can compare two expressions, check if an expression match a pattern or
 apply a substitution to some elements in an expression.</p>
-<p>Learn more about using <a href="guides/compute-engine/patterns">Patterns</a> for these operations.</p>
+<div class='read-more'><a href="/guides/compute-engine/patterns/">Read more about using <strong>Patterns</strong> for these operations<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -712,7 +739,7 @@ apply a substitution to some elements in an expression.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 22:08:02 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

@@ -93,6 +93,11 @@
   </head>
 
   <body class="layout--single">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <defs>
+          <symbol id='svg-chevron' aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
+      </defs>
+    </svg>
     <nav class="skip-links">
   <h2 class="screen-reader-text">Skip links</h2>
   <ul>
@@ -630,8 +635,8 @@
         
         <h2>Parsing and Serializing Latex</h2>
 <p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
-convert Latex strings to MathJSON expression (parsing) and output MathJSON
-expressions as Latex string (serializing).</p>
+convert Latex strings to MathJSON expressions (<strong>parsing</strong>) and output MathJSON
+expressions as Latex string (<strong>serializing</strong>).</p>
 <p><strong>To transform Latex to MathJSON</strong>, use the <code>parse()</code> function.</p>
 <p><strong>To transform MathJSON to Latex</strong>, use the <code>serialize()</code> function.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
@@ -655,10 +660,7 @@ optional argument:</p>
 <span class="hljs-comment">// ➔ 0,333</span>
 </code></pre>
 <h2>Advanced Usage</h2>
-<p>For improved performance, particularly when calling <code>parse()</code> or <code>serialize()</code>
-repeatedly, use an instance of the <code>LatexSyntax</code> class. When the instance is
-constructed, the dictionaries defining the syntax are compiled, and subsequent
-invocations of the <code>parse()</code> and <code>serialize()</code> methods can skip that step.</p>
+<p><strong>To customize the Latex syntax</strong>, including defining the vocabulary and syntax, create an instance of <code>LatexSyntax</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
 <span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
 <span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
@@ -666,10 +668,10 @@ invocations of the <code>parse()</code> and <code>serialize()</code> methods can
 <span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
 </code></pre>
-<p><strong>To customize the syntax</strong>, provide options to the constructor of
-<code>LatexSyntax</code>.</p>
+<p>The <code>LatexSyntax</code> constructor can be passed options to customize the parsing, as well as dictionaries defining the syntax and vocabulary.</p>
+<div class='read-more'><a href="/guides/compute-engine/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>For example, the configuration below will result in parsing a Latex string as a
-sequence of Latex tokens.</p>
+sequence of Latex tokens. It uses no dictionary (since only tokens are returned) and set the options to avoid modifying the raw stream of Latex tokens.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
   <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
   <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
@@ -680,7 +682,7 @@ sequence of Latex tokens.</p>
 });
 <span class="hljs-keyword">const</span> expr = rawLatex.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
-<span class="hljs-comment">// ➔ [&quot;Latex&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;LatexTokens&quot;, &quot;&#x27;\frac&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;, &quot;&#x27;\pi&#x27;&quot;, &quot;&#x27;&lt;}&gt;&#x27;&quot;, &quot;&#x27;&lt;{&gt;&#x27;&quot;,  2, &quot;&#x27;&lt;}&gt;&#x27;&quot;]</span>
 </code></pre>
 
         
@@ -694,7 +696,7 @@ sequence of Latex tokens.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 22:08:02 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 
