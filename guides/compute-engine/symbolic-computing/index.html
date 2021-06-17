@@ -437,6 +437,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/special-functions/" class="">Special Functions</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
             
           
@@ -639,50 +653,53 @@ result:</p>
 <li>Evaluate</li>
 <li>Compare, find patterns and substitute</li>
 </ul>
+<p class="notice--info">The <code>evaluate()</code> function is a convenient shorthand to evaluate an expression
+with a single call. Other functions such as <code>ce.simplify()</code>, <code>ce.is()</code>, <code>ce.N()</code>, <code>ce.canonical()</code>, etc… require a <code>ComputeEngine</code> instance which is denoted by the <code>ce.</code> prefix.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span>, parse } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
+<span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
+ce.<span class="hljs-title function_">simplify</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>));
+</code></pre>
 <h2>Format with a Canonical Form</h2>
 <p>The canonical form of an expression is obtained by rewriting an expression
 without making assumptions about any variables in the expression.</p>
 <p>For example:</p>
 <ul>
-<li>terms can be rearranged to be in a specific order</li>
-<li>some operations may be replaced with more elementary ones, for example
+<li>terms can be sorted in a specific order</li>
+<li>some operations may be substituted with others, for example
 substraction replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2,
 -3)\)</li>
-<li>some integer values may be replaced by their computed value, for example
-\(1 + 2 \longrightarrow 3\).</li>
 </ul>
-<p>Canonical forms may be useful to compare some expressions, for example \( 1 + x
-\) and \(x + 1\) are different expressions, but they have the same canonical
-form.</p>
 <p>Canonical forms are somewhat arbitrary, and not necessarily “the simplest” way
 to represent an expression. But just like the order of the letters of the
 alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
 search and compare expressions.</p>
-<p><strong>To obtain the canonical form of an expression</strong>, use the
-<code>ComputeEngine.canonical()</code> function.</p>
+<p>For example \( 1 + x\) and \(x + 1\) are two expressions with the same canonical form.</p>
+<p><strong>To obtain the canonical form of an expression</strong>, use the <code>ce.canonical()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
 </code></pre>
-<p>Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
+<p class="notice--info">Learn more about <a href="/guides/compute-engine/forms/">Canonical Forms</a>.</p>
 <h2>Simplify</h2>
-<p><strong>To obtain a simpler form of a symbolic expression</strong>, use the
-<code>ComputeEngine.simplify()</code> function.</p>
+<p><strong>To obtain a simpler expression of a symbolic expression</strong>, use the
+<code>ce.simplify()</code> function.</p>
 <p>Assumptions are additional information available about some symbols, for example
 \( x &gt; 0 \) or \(n \in \N\). To apply some transformations, available
 assumptions may be used. For example, if no assumptions about \(x \) is
 available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
 assumption that \( x &gt; 0 \) is available, then the expression can be
 simplified to \( x \).</p>
-<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">assumptions</a>,
-.</p>
+<p class="notice--info">Read more about <a href="/guides/compute-engine/assumptions">Assumptions</a>.</p>
 <h2>Evaluate</h2>
 <p><strong>To combine a symbolic simplification followed by a <a href="/guides/compute-engine/numerical-evaluation">numerical evaluation</a></strong>, use
-the <code>ComputeEngine.evaluate()</code>.</p>
-<p>Invoking the <code>evaluate()</code> function is roughly equivalent to calling in sequence
-<code>simplify()</code>, <code>N()</code> then <code>format()</code>.</p>
-<p>Some functions may perform additional computations when <code>evaluate()</code> is
+the <code>ce.evaluate()</code> function.</p>
+<p>Invoking the <code>ce.evaluate()</code> function is roughly equivalent to calling in sequence
+<code>ce.simplify()</code>, <code>ce.N()</code> then <code>ce.canonical()</code>.</p>
+<p>Some functions may perform additional computations when <code>ce.evaluate()</code> is
 invoked.</p>
-<h2>Comparing, Pattern Matching and Substitution</h2>
+<h2>Other Symbolic Manipulation</h2>
+<p>You can compare two expressions, check if an expression match a pattern or
+apply a substitution to some elements in an expression.</p>
+<p>Learn more about using <a href="guides/compute-engine/patterns">Patterns</a> for these operations.</p>
 
         
       </section>
@@ -695,7 +712,7 @@ invoked.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

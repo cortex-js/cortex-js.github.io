@@ -437,6 +437,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/special-functions/" class="">Special Functions</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
             
           
@@ -631,10 +645,10 @@
 <h1>Assumptions</h1>
 <p>The Cortex Compute Engine has a robust system to specify properties and
 relationship between symbols.</p>
-<p>The assumptions are used to select appropriate algorithms, to validate some
+<p>These assumptions are used to select appropriate algorithms, to validate some
 simplifications and to optimize computation.</p>
 <h2>Defining New Assumptions: <code>assume()</code></h2>
-<p><strong>To specify a predicate about a symbol</strong>, use the <code>assume()</code> function.</p>
+<p><strong>To specify a predicate about a symbol</strong>, use the <code>ce.assume()</code> function.</p>
 <p>For example, to indicate that \(x\) is a real number:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
 </code></pre>
@@ -649,23 +663,27 @@ inequality is used, both sides are assumed to be <code>RealNumber</code>.</li>
 <li>Equality: <code>Equal</code></li>
 <li>Boolean expression: <code>And</code>, <code>Or</code>, <code>Not</code></li>
 </ul>
-<h2><code>forget()</code></h2>
-<p>Each call to <code>assume()</code> is additive: the previous assumptions are preserved.</p>
-<p><strong>To remove previous assumptions</strong>, use <code>forget()</code>.</p>
-<h2>Testing Assumptions: <code>is()</code></h2>
-<p><strong>To test if a particular assumption is valid</strong>, use the <code>is()</code> function.</p>
-<p>The first argument of <code>is()</code> is a symbol, and the second argument is a domain.</p>
+<h2>Forgetting Assumptions: <code>forget()</code></h2>
+<p>Each call to <code>ce.assume()</code> is additive: the previous assumptions are preserved.</p>
+<p><strong>To remove previous assumptions</strong>, use <code>ce.forget()</code>.</p>
+<h2>Testing Assumptions: <code>is()</code> and <code>ask()</code></h2>
+<p><strong>To test if a particular assumption is valid</strong>, use the <code>ce.is()</code> function.</p>
+<p>The first argument of <code>ce.is()</code> is a symbol, and the second argument is a domain.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
 ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
-<p>Alternatively, the <code>is()</code> function can be invoked with a single argument, a
+<p>Alternatively, the <code>ce.is()</code> function can be invoked with a single argument, a
 predicate:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 </code></pre>
-<p>The function <code>is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
+<p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
 not, and <code>undefined</code> if it cannot be determined.</p>
+<p>While <code>ce.is()</code> is appropriate to get boolean answers, more complex queries
+can also be made.</p>
+<p><strong>To query the assumptions knowledge base</strong> use the <code>ce.ask()</code> function.</p>
+<p>Learn more about <a href="compute-engine/patterns">patterns</a>.</p>
 <h2>Domain</h2>
-<p><strong>To query the domain of an expressio</strong>, use the <code>domain()</code> function.</p>
+<p><strong>To query the domain of an expression</strong>, use the <code>domain()</code> function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-comment">// -&gt; IrrationallNumber</span>
 </code></pre>
@@ -681,7 +699,7 @@ not, and <code>undefined</code> if it cannot be determined.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

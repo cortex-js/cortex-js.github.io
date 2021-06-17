@@ -401,6 +401,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/special-functions/" class="">Special Functions</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
             
           
@@ -639,12 +653,12 @@ expressions.</p>
 <h2>Customization</h2>
 <p>The Compute Engine includes a robust library of mathematical functions.
 The dictionaries that define these functions, and how they are parsed and
-serialized to Latex can be customized by creating a <code>ComputeEngine</code> instance.</p>
+serialized to Latex, can be customized by creating a <code>ComputeEngine</code> instance.</p>
 <p>The <code>ComputeEngine</code> instance also provides access to additional features
 such as defining <a href="/guides/compute-engine/assumptions/">assumptions</a> about
 symbols (e.g. <code>x is a positive number, n is an integer</code>).</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> engine = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
-engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
+ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
 </code></pre>
 <p>Read more about <a href="/guides/compute-engine/numerical-evaluation/">Dictionaries</a>.</p>
 
@@ -656,10 +670,10 @@ engine.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="
         
 
 
-        <meta itemprop="datePublished" content="June 15, 2021">
+        <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 15 2021 08:47:37 GMT+0200 (Central European Summer Time)">June 15, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 17:34:56 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 

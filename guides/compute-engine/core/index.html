@@ -437,6 +437,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/special-functions/" class="">Special Functions</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/trigonometry/" class="">Trigonometry</a></li>
             
           
@@ -697,7 +711,11 @@
 </tr>
 <tr>
 <td style="text-align:left"><code>Evaluate</code></td>
-<td style="text-align:left"><code>(<em>expression</em>)</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it</td>
+<td style="text-align:left"><code>(<em>expression</em>)</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it. Overrides <code>Hold</code> and hold attributes of a function.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Hold</code></td>
+<td style="text-align:left"><code>(<em>expression</em>)</code><br> Maintain an expression in an unevaluated form.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Identity</code></td>
@@ -751,50 +769,69 @@ variables of the Lambda-function.</p>
 cube(5)
 // ➔ 125
 </code></pre>
-<h3><code>LatexSymbols</code></h3>
-<p><code>[&quot;LatexSymbols&quot;, </code><em><code>expr-1</code></em><code>, </code><em><code>expr-2</code></em><code>, ...</code><em><code>expr-n</code></em><code>]</code></p>
+<h3><code>Latex</code> and <code>LatexSymbols</code></h3>
+<p><code>[&quot;Latex&quot;, </code><em><code>expr</code></em><code> </code>]`</p>
 <ul>
-<li><em><code>expr-n</code></em>: one or more expressions</li>
-<li>Returns a string, a Latex string corresponding to the input expressions.</li>
+<li><em><code>expr</code></em>: a MathJSON expression</li>
+<li>Returns a Latex string representing the expression.</li>
 </ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexSymbols&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
-<p>If the argument is a string, it is interpreted as a Latex token or fragment:</p>
-<ul>
-<li><code>&lt;{&gt;</code>: begin group</li>
-<li><code>&lt;}&gt;</code>: end group</li>
-<li><code>&lt;space&gt;</code>: blank space</li>
-<li><code>&lt;$$&gt;</code>: display mode shift</li>
-<li><code>&lt;$&gt;</code>: inline mode shift</li>
-<li><code>#0</code>-<code>#9</code>: argument</li>
-<li><code>#?</code>: placeholder</li>
-<li>string that starts with <code>/</code>: a Latex command</li>
-<li>other strings: ordinary symbols</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
+<p><code>[&quot;LatexSymbols&quot;, </code><em><code>str-1</code></em><code>, </code><em><code>str-2</code></em><code>, ...</code><em><code>str-n</code></em><code>]</code></p>
+<p>The arguments <code>_</code>str-n<code>_</code> are interpreted as Latex tokens:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Token</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&lt;{&gt;</code></td>
+<td style="text-align:left">begin group</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;}&gt;</code></td>
+<td style="text-align:left">end group</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;space&gt;</code></td>
+<td style="text-align:left">blank space</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;$$&gt;</code></td>
+<td style="text-align:left">display mode shift</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&lt;$&gt;</code></td>
+<td style="text-align:left">inline mode shift</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>#0</code>-<code>#9</code></td>
+<td style="text-align:left">argument</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>#?</code></td>
+<td style="text-align:left">placeholder</td>
+</tr>
+<tr>
+<td style="text-align:left">string that starts with <code>/</code></td>
+<td style="text-align:left">a Latex command</td>
+</tr>
+<tr>
+<td style="text-align:left">other strings</td>
+<td style="text-align:left">ordinary symbols</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexSymbols&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
-<h3><code>Pattern</code></h3>
-<p class="notice--info">Work in progress</p>
-<p>The <code>Pattern</code> function is used with the <code>match()</code> function to pattern-match an
-expression. The pattern expression can include one or more <code>Pattern</code> function
-calls.</p>
-<ul>
-<li><code>[&quot;Pattern&quot;]</code> - Any sub-expression at this position will match.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>]</code> - Match and capture any subexpression at this
-position as the capture group <em><code>name</code></em>.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern</code></em><code>]</code> - Match and capture any subexpression
-at this position as the <code>_</code>name<code>_</code> capture group <strong>if</strong> the subexpression
-matches the <em><code>pattern</code></em>.</li>
-<li><code>[&quot;Pattern&quot;, </code><em><code>name</code></em><code>, </code><em><code>pattern-1</code></em><code>, </code><em><code>pattern-2</code></em><code>, </code><em><code>...</code></em><code>]</code> - Match
-and capture any subexpression at this position as the <code>_</code>name<code>_</code> capture group
-<strong>if</strong> the subexpression matches any of the <em><code>pattern-n</code></em>.</li>
-</ul>
-<pre><code class="language-js"><span class="hljs-title function_">match</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Pattern&quot;</span>], [<span class="hljs-string">&quot;Pattern&quot;</span>]], [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]))
-<span class="hljs-comment">// ➔ {}</span>
-</code></pre>
 <h3><code>Piecewise</code></h3>
 <h3><code>Prime</code></h3>
 <table>
@@ -815,10 +852,10 @@ and capture any subexpression at this position as the <code>_</code>name<code>_<
 </tr>
 </tbody>
 </table>
-<h3><code>Same</code></h3>
+<h3><code>Match</code></h3>
 <p><em><code>expr1</code></em> <code>===</code> <em><code>expr2</code></em></p>
-<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
-<p><code>Same(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>, ...</code><em><code>expr-n</code></em><code>)</code></p>
+<p><code>Match(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
+<p><code>Match(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>, ...</code><em><code>expr-n</code></em><code>)</code></p>
 <p>Indicate if two (or more) expressions are structurally identical, using a
 literal symbolic identity.</p>
 <p>Two expressions are the same if:</p>
@@ -911,7 +948,7 @@ comparison.</p>
         <meta itemprop="datePublished" content="June 17, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 10:14:07 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 18:20:27 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
         
       </footer>
 
