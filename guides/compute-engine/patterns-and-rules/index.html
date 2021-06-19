@@ -764,16 +764,16 @@ them using <code>ce.evaluate()</code>.</p>
 );
 <span class="hljs-comment">// ➔ {}: the two expressions are the same once evaluated</span>
 </code></pre>
-<h2>Rewrite Rules</h2>
+<h2>Applying Rewrite Rules</h2>
 <p>A rewrite rule is a triplet of:</p>
 <ul>
 <li>a left-hand-side pattern,  <code>lhs</code></li>
 <li>a right-hand-side pattern, <code>rhs</code></li>
-<li>an optional condition</li>
+<li>an optional <code>condition</code></li>
 </ul>
 <p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> and
-the condition applies to the resulting substitution, the result of the
-rule if the substitution applied to the <code>rhs</code>.</p>
+the <code>condition</code> applies to the resulting substitution, the result of the
+rule is the substitution applied to the <code>rhs</code>.</p>
 <p><strong>To apply a set of rules to an expression</strong>, use the <code>ce.replace()</code> function.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = [[<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>], [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]];
 
@@ -788,8 +788,8 @@ ce.<span class="hljs-title function_">replace</span>([squareRule], [<span class=
 ce.<span class="hljs-title function_">replace</span>([sqrtRule], [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]);
 <span class="hljs-comment">// -&gt; 17</span>
 </code></pre>
-<p>The <code>ce.simplify()</code> method applies a collection of built-in rewrite rules
-to simplify an expression. You can define your own rules and apply them
+<p>The <code>ce.replace()</code> function continues applying all the rules in the ruleset until no rules are applicable.</p>
+<p>The <code>ce.simplify()</code> method applies a collection of built-in rewrite rules. You can define your own rules and apply them
 using <code>ce.replace()</code>.</p>
 <h2><code>count()</code></h2>
 
@@ -804,8 +804,10 @@ using <code>ce.replace()</code>.</p>
         <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 17:17:51 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 19:14:32 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
+
+          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 
