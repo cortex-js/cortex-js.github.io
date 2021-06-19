@@ -611,15 +611,16 @@
       asciiMath: null,
     });
 </script>
-<h1>Compute Engine</h1>
-<img src='/assets/Compute-Engine-2.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
-<p>The <strong>CortexJS Compute Engine</strong> is a JavaScript library to manipulate
-mathematical expressions.</p>
-<p>The Compute Engine is built for educators, students, scientists and engineers
-who want to make technical computing apps in the browser or in server-side
-environments such as Node.</p>
-<p>You can use the Compute Engine to simplify, solve and evaluate math expressions
-expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex.</p>
+<img alt="Compute Engine" src='/assets/Compute-Engine-2.png' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
+<p>The <strong>CortexJS Compute Engine</strong> is a JavaScript library for symbolic
+computing and numerical evaluation of mathematical expressions.</p>
+<p>The Compute Engine is for anyone who wants to make technical computing apps
+in the browser or in server-side environments such as NodeL: educators, students, scientists and engineers.</p>
+<p>The Compute Engine can:</p>
+<ul>
+<li><a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Late</li>
+<li>simplify, solve and evaluate math expressions expressed in the <a href ="/guides/math-json/format/">MathJSON format</a></li>
+</ul>
 <h2>Parse and Serialize Latex</h2>
 <p><strong>To parse and serialize an expression</strong>, use the <code>parse()</code> and <code>serialize()</code>
 functions.</p>
@@ -636,7 +637,7 @@ functions.</p>
 <p>A MathLive mathfield works like a textarea, but for math, and it can provide
 its content as a Latex string or a MathJSON expression.</p>
 <div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Symbolic Computing</h2>
+<h2>Symbolic Computing and Numerical Evaluation</h2>
 <p><strong>To evaluate a symbolic expression</strong>, use the <code>evaluate()</code> function.</p>
 <p>The result of <code>evaluate()</code> is an expression. If the expression can
 be evaluated numerically, the expression is a number. If it can’t be
@@ -646,26 +647,72 @@ evaluated numerically, the expression is a symbolic expression.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
 <span class="hljs-comment">// ➔ 5</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2x + 3x&#x27;</span>)));
-<span class="hljs-comment">// ➔ 5x</span>
-
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\sqrt{5}}{3}&#x27;</span>));
 <span class="hljs-comment">// ➔ 0.7453559925</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2x + 3x&#x27;</span>)));
+<span class="hljs-comment">// ➔ 5x</span>
 </code></pre>
-<p>The Compute Engine can also simplify, find patterns, substitute terms, compare and format
-expressions.</p>
-<div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>The Compute Engine supports arbitrary precision floating points and complex
+numbers.</p>
+<p>The Compute Engine can also simplify, find patterns, substitute terms,
+compare and format expressions.</p>
 <div class='read-more'><a href="/guides/compute-engine/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/guides/compute-engine/patterns/">Read more about <strong>Patterns</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Customization</h2>
 <p>The Compute Engine includes a robust library of mathematical functions.</p>
-<p>The dictionaries that define these functions, and how they are parsed and
-serialized to Latex, can be customized by creating a <code>ComputeEngine</code> instance.</p>
+<p>The dictionaries that define these functions can be customized by creating a <code>ComputeEngine</code> instance.</p>
 <p>The <code>ComputeEngine</code> instance also provides access to additional features
 such as defining <a href="/guides/compute-engine/assumptions/">assumptions</a> about
 symbols: <em>x is a positive Real number, n is an Integer</em>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
 ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]);
 </code></pre>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Dictionary</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/arithmetic/">Arithmetic</a></td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/calculus/">Calculus</a></td>
+<td style="text-align:left"><code>Derive</code> <code>Integrate</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/collections/">Collections</a></td>
+<td style="text-align:left"><code>Sequence</code> <code>List</code> <code>Dictionary</code> <code>Set</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/core/">Core</a></td>
+<td style="text-align:left"><code>Missing</code> <code>Nothing</code> <code>None</code> <code>All</code>  <code>Identity</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/logic/">Logic</a></td>
+<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/sets/">Sets</a></td>
+<td style="text-align:left"><code>Union</code> <code>Intersection</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/special-functions/">Special Functions</a></td>
+<td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/guides/compute-engine/trigonometry/">Trigonometry</a></td>
+<td style="text-align:left"><code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class='read-more'><a href="/guides/compute-engine/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -676,10 +723,10 @@ ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs
         
 
 
-        <meta itemprop="datePublished" content="June 17, 2021">
+        <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 21:58:35 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 08:36:58 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 

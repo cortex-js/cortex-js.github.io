@@ -671,6 +671,31 @@ inequality is used, both sides are assumed to be <code>RealNumber</code>.</li>
 <h2>Forgetting Assumptions: <code>forget()</code></h2>
 <p>Each call to <code>ce.assume()</code> is additive: the previous assumptions are preserved.</p>
 <p><strong>To remove previous assumptions</strong>, use <code>ce.forget()</code>.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<span class="hljs-comment">// -&gt;  true</span>
+
+ce.<span class="hljs-title function_">forget</span>(<span class="hljs-string">&quot;x&quot;</span>);
+
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<span class="hljs-comment">// -&gt;  undefined</span>
+</code></pre>
+<h2>Scopes</h2>
+<p>When an assumption is made, it is only valid in the current scope.</p>
+<p><strong>To temporarily define define a series of assumptions</strong>, create a new scope.</p>
+<pre><code class="language-js">
+ce.<span class="hljs-title function_">pushScope</span>();
+
+ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<span class="hljs-comment">// -&gt;  true</span>
+
+ce.<span class="hljs-title function_">popScope</span>();  <span class="hljs-comment">// all assumptions made in the current scope are forgotten</span>
+
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<span class="hljs-comment">// -&gt;  undefined</span>
+
+</code></pre>
 <h2>Testing Assumptions: <code>is()</code> and <code>ask()</code></h2>
 <p><strong>To test if a particular assumption is valid</strong>, use the <code>ce.is()</code> function.</p>
 <p>The first argument of <code>ce.is()</code> is a symbol, and the second argument is a domain.</p>
@@ -678,7 +703,7 @@ inequality is used, both sides are assumed to be <code>RealNumber</code>.</li>
 ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
 <p>Alternatively, the <code>ce.is()</code> function can be invoked with a single argument, a
-predicate:</p>
+proposition:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 </code></pre>
 <p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
@@ -690,7 +715,7 @@ can also be made.</p>
 <h2>Domain</h2>
 <p><strong>To query the domain of an expression</strong>, use the <code>domain()</code> function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
-<span class="hljs-comment">// -&gt; IrrationallNumber</span>
+<span class="hljs-comment">// -&gt; &quot;IrrationalNumber&quot;</span>
 </code></pre>
 
         
@@ -701,10 +726,10 @@ can also be made.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 17, 2021">
+        <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 17 2021 22:08:02 GMT+0200 (Central European Summer Time)">June 17, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:40:29 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 

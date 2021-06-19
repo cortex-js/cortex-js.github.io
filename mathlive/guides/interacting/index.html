@@ -603,7 +603,6 @@ triggered and creating an infinite loop.</p>
   autocorrect="off" spellcheck="false"></textarea></textarea>
   </div>
 </code-playground>
-</section>
 <h2>Applying Style to a Mathfield</h2>
 <p>The text color (“ink”) and background color (“paper”), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
@@ -706,6 +705,7 @@ editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
 commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>C</kbd>).</p>
 <p>Multiple flavors are put on the clipboard, and the recipient of the <strong>Paste</strong> operation can pick whichever is most appropriate:</p>
+<div class='symbols-table'>
 <table>
 <thead>
 <tr>
@@ -732,6 +732,7 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </tr>
 </tbody>
 </table>
+</div>
 <p>The Latex in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn’t really a standard format for this, but testing of several Latex-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
 <p class="notice--info">For improved interoperability, the exported Latex uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
@@ -753,14 +754,8 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 <!-- MathfieldListeners --> 
 <!-- $insert() -->
 <!-- ## Performing editing commands -->
-<h2>Next</h2>
-<dl>
-<dt><a href="/mathlive/guides/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
-<dd>How to customize the behavior and appearance of a mathfield.</dd>
-<dt><a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a></dt>
-<dd>Understand in depth the lifecycle of a MathfieldElement: construction,
-interaction with the DOM and when can you communicate with it.</dd>
-</dl>
+<div class='read-more'><a href="/mathlive/guides/customizing/">Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/guides/lifecycle/">Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -770,10 +765,10 @@ interaction with the DOM and when can you communicate with it.</dd>
         
 
 
-        <meta itemprop="datePublished" content="June 10, 2021">
+        <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 17:30:05 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:29:00 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 

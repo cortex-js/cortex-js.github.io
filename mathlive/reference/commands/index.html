@@ -500,7 +500,10 @@
       asciiMath: null,
     });
     document.body.classList.add('ready');
-    document.getElementById('version').innerHTML = version;
+
+    document.getElementById('mathlive-version').innerHTML = version.mathlive;
+    document.getElementById('mathjson-version').innerHTML = version.mathJson;
+
 </script>
 <style>
   ul.command-list {
@@ -572,11 +575,19 @@
   .thin-line td:not(:last-child) {
     border-right: 0.5px solid rgba(0, 0, 0, .07);
   }
-  .two-col td {
+  .two-col table tr td, 
+  .two-col table tr td:first-child {
     width: 50%;
   }
-  .three-col td {
+  .two-col table tr td .math {
+    text-align: center;
+  }
+  .three-col table tr td, 
+  .three-col table tr td:first-child {
     width: 33%;
+  }
+  .three-col table tr td .math {
+    text-align: center;
   }
   .math-80px span.math {
     display: inline-block;
@@ -767,7 +778,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\cdot $$</span>   <code>\cdot</code></li>
 <li><span class='math'>$$\times $$</span>   <code>\times</code></li>
 <li><span class='math'>$$a / b $$</span>   <code>a / b</code></li>
-<li><span class='math'>$$\nicefrac{3}{4}$$</span>   <code>nicefrac{3}{4}</code> (macro)</li>
+<li><span class='math'>$$\nicefrac{3}{4}$$</span>   <code>\nicefrac{3}{4}</code> (macro)</li>
 <li><span class='math'>$$\div $$</span>   <code>\div</code></li>
 <li><span class='math'>$$\divides $$</span>   <code>\divides</code></li>
 <li><span class='math'>$$\sqrt{\unicode{&quot;2B1A}} $$</span> <code>\sqrt{}</code></li>
@@ -873,31 +884,31 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\operatorname{argth}(\theta) $$</span> <code>\operatorname{argth}(\theta)</code></li>
 </ul>
 <h2>Unicode</h2>
-<ul>
-<li><code>\unicode{}</code> - The argument is a Unicode codepoint expressed as a number. To
-use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use
-<strong>uppercase</strong> <code>A</code>-<code>F</code> for hexadecimal digits.
-<ul>
-<li><span class='math'>$$\unicode{10775} $$</span> <code>\unicode{10775}</code></li>
-<li><span class='math'>$$\unicode{&quot;2A17} $$</span> <code>\unicode{&quot;2A17}</code></li>
-<li><span class='math'>$$\unicode{x2A17} $$</span> <code>\unicode{x2A17}</code></li>
-</ul>
-</li>
-<li><code>\char</code> - The argument is also a Unicode codepoint, but the <code>{</code>…<code>}</code>
-delimiters are optional when using <code>&quot;</code>
-<ul>
-<li><span class='math'>$$\char&quot;2A17 $$</span> <code>\char&quot;2A17</code></li>
-</ul>
-</li>
-<li><code>^^</code> and <code>^^^^</code> - Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong>
-<code>a</code>-<code>f</code> to specify a Unicode codepoint
-<ul>
-<li><span class='math'>$$^^4a $$</span> <code>^^4a</code></li>
-<li><span class='math'>$$^^^^2a17 $$</span> <code>^^^^2a17</code></li>
-</ul>
-</li>
-</ul>
-<p class="notice--info">The codepoint of the Unicode character ⨗ <strong>U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK</strong> is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter J is 004A<sub>16</sub> in hexadecimal</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>\unicode{}</code></td>
+<td style="text-align:left">The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with <code>x</code> or <code>&quot;</code> and use <strong>uppercase</strong> <code>A</code>-<code>F</code> for hexadecimal digits.<br><ul><li><span class='math'>\(\unicode{10775} \)</span> <code>\unicode{10775}</code></li><li><span class='math'>\(\unicode{&quot;2A17} \)</span> <code>\unicode{&quot;2A17}</code></li><li><span class='math'>\(\unicode{x2A17} \)</span> <code>\unicode{x2A17}</code></li></ul></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\char</code></td>
+<td style="text-align:left">The argument is also a Unicode codepoint, but the <code>{</code>…<code>}</code> delimiters are optional when using <code>&quot;</code>. <br> <ul><li><span class='math'>\(\char&quot;2A17 \)</span> <code>\char&quot;2A17</code>  </li></ul></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>^^</code> <br> <code>^^^^</code></td>
+<td style="text-align:left">Followed by 2 or 4 hexadecimal digits with <strong>lowercase</strong> <code>a</code>-<code>f</code> to specify a Unicode codepoint.<br><ul><li><span class='math'>\(^^4a \)</span> <code>^^4a</code></li><li><span class='math'>\(^^^^2a17 \)</span> <code>^^^^2a17</code></li></ul></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="notice--info">The codepoint of the Unicode character ⨗ <strong>U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK</strong> is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter <code>J</code> is 004A<sub>16</sub> in hexadecimal. Learn more about <a href="https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode">Mathematical Operators and Symbols in Unicode on Wikipedia</a>.</p>
 <h2>Large Operators</h2>
 <p>Large operators display their limits above and below or adjacent to the operator,
 depending on the math style (<strong>Display Style</strong> or <strong>Text Style</strong>) and on the
@@ -1177,7 +1188,7 @@ above and below by default, while the <code>\int</code> command display its limi
 </table>
 </section>
 <h3>Negated Arrows</h3>
-<section class='full-width no-header center thin-line two-col math-80px'>
+<section class='full-width no-header center thin-line three-col math-80px'>
 <table>
 <thead>
 <tr>
@@ -1451,7 +1462,7 @@ if there is an equivalent Unicode character available.
 </ul>
 <h3>Negated Relational Operators</h3>
 <p>To negate other relational operators, use the <code>\not</code> command, e.g.
-<span class='math'>$$\not\equiv$$</span> <code>\not\equiv</code>.</p>
+<span class='math'>\( \not\equiv \)</span> <code>\not\equiv</code>.</p>
 <ul class="command-list">
 <li><span class='math'>$$\ne $$</span> <code>\ne</code></li>
 <li><span class='math'>$$\neq $$</span> <code>\neq</code></li>
@@ -1667,6 +1678,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\Im $$</span> <code>\Im</code></li>
 </ul>
 <h2>Delimiters</h2>
+<p>A delimiter, also called a <strong>fence</strong>, is a symbol used to group some symbols, for example parentheses, brackets, braces, etc…</p>
 <p>To grow delimiters based on their content, use <code>\left...\right</code>.</p>
 <div class='no-line two-col'>
 <table>
@@ -1688,10 +1700,11 @@ if there is an equivalent Unicode character available.
 </tbody>
 </table>
 </div>
+<p class="notice--warning">Internally, Mathlive uses the non-standard <code>\mleft</code> and <code>\mright</code> command. These commands are use to indicate some delimiters that have been automatically converted to “smart” delimiters when the <code>smartFence</code> option is on. However, because they are not standard Latex commands, they may not be recognized by other Latex-compatible software. When exporting using the <code>latex-expanded</code> format, or when using the clipboard, those commands are automatically removed.</p>
 <p>The left and right delimiters do not have to match:</p>
-<p><span class='math'>$$\left\lparen \frac1x \right\rbrack$$</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
+<p><span class='math'>\(\displaystyle \left\lparen \frac1x \right\rbrack\)</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
 <p>To omit a delimiter, use <code>.</code>:</p>
-<p><span class='math'>$$\left\lparen \frac1x \right.$$</span> <code>\left\lparen \frac1x \right.</code></p>
+<p><span class='math'>\(\displaystyle \left\lparen \frac1x \right.\)</span> <code>\left\lparen \frac1x \right.</code></p>
 <hr>
 <p>The argument to <code>\left</code>, <code>\right</code> and <code>\middle</code> can be one of the
 following commands.</p>
@@ -1994,7 +2007,7 @@ which are required:</p>
 </table>
 </section>
 <p>They can be combined:</p>
-<p><span class='math'>$$\enclose{roundedbox updiagonalstrike}{x=0} $$</span>  <code>roundedbox, updiagonalstrike</code></p>
+<p><span class='math'>\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \)</span>  <code>roundedbox, updiagonalstrike</code></p>
 <ul>
 <li><code>&lt;style&gt;</code> an optional list of comma separated key-value pairs including:
 <ul>
@@ -2274,6 +2287,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 </section>
 <p>The size of delimiters can be controlled manually with the commands below. The <code>\left...\right...</code> commands calculate automatically the size of the
 delimiters based on the content.</p>
+<p class="notice--warning"><strong>The command must be followed by a delimiter</strong>, for example <code>(</code> or <code>\lbrace</code> or <code>\lbrack</code>. If the command is used on its own, nothing is displayed.</p>
 <section class="no-header center">
 <table>
 <thead>
@@ -2286,33 +2300,27 @@ delimiters based on the content.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><span class='math'>$$\bigl( \bigm| \bigr) $$</span></td>
-<td style="text-align:left"><code>\bigl( \bigm| \bigr)</code></td>
+<td style="text-align:left"><code>\bigl(</code> <code>\bigm|</code> <code>\bigr)</code></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Bigl( \Bigm| \Bigr) $$</span></td>
-<td style="text-align:left"><code>\Bigl( \Bigm| \Bigr)</code></td>
+<td style="text-align:left"><code>\Bigl(</code> <code>\Bigm|</code> <code>\Bigr)</code></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\biggl( \biggm| \biggr) $$</span></td>
-<td style="text-align:left"><code>\biggl( \biggm| \biggr)</code></td>
+<td style="text-align:left"><code>\biggl(</code> <code>\biggm|</code> <code>\biggr)</code></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Biggl( \Biggm| \Biggr) $$</span></td>
-<td style="text-align:left"><code>\Biggl( \Biggm| \Biggr)</code></td>
+<td style="text-align:left"><code>\Biggl(</code> <code>\Biggm|</code> <code>\Biggr)</code></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
 </section>
-<ul class="command-list">
-<li><span class='math'>$$\big(\big) $$</span> <code>\big{}</code></li>
-<li><span class='math'>$$\Big(\Big) $$</span> <code>\Big{}</code></li>
-<li><span class='math'>$$\bigg(\bigg) $$</span> <code>\bigg{}</code></li>
-<li><span class='math'>$$\Bigg(\Bigg) $$</span> <code>\Bigg{}</code></li>
-</ul>
 <h2>Various</h2>
 <ul class="command-list command-list">
 <li>
@@ -2860,6 +2868,7 @@ can be used as building blocks for more elaborate structures:</p>
 <p>The math typesetting is influenced by some “constants” that are stored
 in “registers”. Those registers can be set globally on a mathfield using
 the <code>registers</code> option.</p>
+<div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -2914,23 +2923,64 @@ the <code>registers</code> option.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <h2>TeX Primitives</h2>
 <p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
-<ul>
-<li><code>%</code>: anything after a <code>%</code> character and an end of line character is
-interpreted as a comment and ignored</li>
-<li><code>\limits</code> and <code>\nolimits</code></li>
-<li><code>\relax</code></li>
-<li><code>\noexpand</code></li>
-<li><code>\obeyspaces</code> – In Math Mode, spaces are normally ignored. Using this
-command spaces will be preserved in Math Mode.</li>
-<li><code>\bgroup</code> and <code>\egroup</code></li>
-<li><code>\string</code></li>
-<li><code>\csname</code> and <code>\endcsname</code></li>
-<li><code>\ensuremath{}</code> – If in Math Mode, does nothing. Otherwise, switch to Math Mode.</li>
-</ul>
-<footer class="page__meta"><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='version'></span></footer>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>%</code></td>
+<td style="text-align:left">Anything after a <code>%</code> character and an end of line character is interpreted as a comment and ignored</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\limits</code> <br> <code>\nolimits</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\relax</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\noexpand</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\obeyspaces</code></td>
+<td style="text-align:left">In Math Mode, spaces are normally ignored. Using this command spaces will be preserved even in Math Mode.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\bgroup</code> <br> <code>\egroup</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\string</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\csname</code> <br> <code>\endcsname</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\ensuremath{}</code></td>
+<td style="text-align:left">If in Math Mode, does nothing. Otherwise, switch to Math Mode.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<footer class="page__meta">
+<p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='mathlive-version'></span></p>
+</footer>
+<footer class="page__meta">
+<p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version: </strong> <span id='mathjson-version'></span></p>
+</footer>
 
         
       </section>
@@ -2940,10 +2990,10 @@ command spaces will be preserved in Math Mode.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 10, 2021">
+        <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 10 2021 23:47:20 GMT+0200 (Central European Summer Time)">June 10, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:39:43 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 
