@@ -280,7 +280,7 @@
                 
               
 
-              <li><a href="/guides/compute-engine/patterns/" class="">Patterns</a></li>
+              <li><a href="/guides/compute-engine/patterns-and-rules/" class="">Patterns and Rules</a></li>
             
           
             
@@ -688,7 +688,7 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 </tr>
 <tr>
 <td style="text-align:left">$$e^{\imaginaryI \pi }+1=0$$</td>
-<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryI&quot;], 1], 0]</code></td>
+<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryUnit&quot;], 1], 0]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">$$\sin^{-1\prime}(x)$$</td>
@@ -747,12 +747,13 @@ value of the key is a string representation of the number.</p>
 </code></pre>
 <p>The string representing a number follows the
 <a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>.</p>
-<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represented
-an undefined results, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
+<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represented an
+undefined results, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
 positive infinity and negative infinity, respectively.</p>
-<p>When a number is outside the bounds of a JSON number (i.e. a 64-bit
-floating point representation), it is represented by a string of digits <code>0</code>…<code>9</code>, decimal
-point <code>.</code>, plus <code>+</code> and minus <code>-</code> sign  and exponent sign <code>e</code>, followed by a letter:</p>
+<p>When a number is outside the bounds of a JSON number (i.e. a 64-bit floating
+point representation), it is represented by a string of digits <code>0</code>…<code>9</code>,
+decimal point <code>.</code>, plus <code>+</code> and minus <code>-</code> sign and exponent sign <code>e</code>, followed
+by a letter:</p>
 <ul>
 <li><code>n</code> to indicate the number is a large integer (type <code>BigInt</code> in JavaScript)</li>
 <li><code>d</code> to indicate the number is an arbitrary precision floating point number
@@ -1026,20 +1027,22 @@ functions.</p>
 </tbody>
 </table>
 </div>
-<p>Before they are used, symbols are normalized to the <a href="https://unicode.org/reports/tr15/">Unicode Normalization Form C
-(NFC)</a>. They must be stored internally and compared using the NFC.</p>
+<p>Before they are used, symbols are normalized to the
+<a href="https://unicode.org/reports/tr15/">Unicode Normalization Form C (NFC)</a>. They
+must be stored internally and compared using the NFC.</p>
 <p>JSON escape sequences are applied before Unicode normalization.</p>
 <p>These four strings represent the same symbol:</p>
 <ul>
 <li><code>&quot;Å&quot;</code></li>
 <li><code>&quot;A\u030a&quot;</code></li>
 <li><code>&quot;\u00c5&quot;</code> <strong>LATIN CAPITAL LETTER A WITH RING ABOVE</strong> <code>Å</code> and</li>
-<li><code>&quot;\u0041\u030a&quot;</code> <strong>LATIN CAPITAL LETTER A</strong> + <strong>COMBINING RING ABOVE</strong> <code>A‌</code>  + <code> ̊</code></li>
+<li><code>&quot;\u0041\u030a&quot;</code> <strong>LATIN CAPITAL LETTER A</strong> + <strong>COMBINING RING ABOVE</strong> <code>A‌</code> +
+<code> ̊</code></li>
 </ul>
 <p>The following naming convention are recommended.</p>
 <h3>Patterns</h3>
-<p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) are reserved
-to denote wildcards and other placeholders.</p>
+<p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) are reserved to
+denote wildcards and other placeholders.</p>
 <h3>Variables</h3>
 <ul>
 <li>
@@ -1048,10 +1051,10 @@ to denote wildcards and other placeholders.</p>
 </li>
 <li>
 <p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
-<p>So for example use, <code>Gamma</code> rather than <code>ɣ</code> and <code>Total</code> rather than
-<strong>U+2211 N-ARY SUMMATION</strong> <code>∑</code>, which looks like  <strong>U+03A3 GREEK CAPITAL
-LETTER SIGMA</strong> <code>Σ</code>. This visual ambiguity of some Unicode symbols frequently used
-in math is why we recommend a more restricted character set.</p>
+<p>So for example use, <code>Gamma</code> rather than <code>ɣ</code> and <code>Total</code> rather than <strong>U+2211
+N-ARY SUMMATION</strong> <code>∑</code>, which looks like <strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong>
+<code>Σ</code>. This visual ambiguity of some Unicode symbols frequently used in math is
+why we recommend a more restricted character set.</p>
 </li>
 <li>
 <p>If a variable is made of several words, use camelCase, i.e. <code>newDeterminant</code></p>
@@ -1200,7 +1203,7 @@ the equivalent object literal before being annotated.</p>
         <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:40:29 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 16:30:50 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 
