@@ -280,6 +280,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/execution-constraints/" class="">Execution Constraints</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/patterns-and-rules/" class="">Patterns and Rules</a></li>
             
           
@@ -667,36 +681,37 @@ object:</p>
 <td style="text-align:left">\[  2.15346 \times 10^2\]</td>
 </tr>
 <tr>
-<td style="text-align:left">\[ x - 1 \]</td>
-<td style="text-align:left">\[-1 + x \]</td>
-<td style="text-align:left">\[  -(1) + x\]</td>
+<td style="text-align:left">\[ 1 - x \]</td>
+<td style="text-align:left">\[-x + 1 \]</td>
+<td style="text-align:left">\[  1 + (-x)\]</td>
 </tr>
 <tr>
 <td style="text-align:left">\[ -2x^{-1}\]</td>
 <td style="text-align:left">\[ -\frac{2}{x} \]</td>
-<td style="text-align:left">\[ 2 \left( \frac{-1}{x} \right) \]</td>
+<td style="text-align:left">\[ \frac{-2}{x} \]</td>
 </tr>
 </tbody>
 </table>
-<p>By applying some conventions, for example wether to write constants before
-or after variables in a sum, how to sort variables and functions, we define a <strong>canonical</strong>
-representation. A canonical representation is somewhat arbitrary, but using
-it consistently can make some operations easier, for example, comparing two
-expressions for equality.</p>
+<p>By applying some conventions — for example wether to write constants before
+or after variables in a sum, how to sort variables and functions when they are an argument in a commutative function — we define a <strong>canonical</strong>
+representation.</p>
+<p>A canonical representation is somewhat arbitrary, but using it consistently
+can make some operations easier, for example, comparing two expressions for
+equality.</p>
 <p>The canonical form used by the Compute Engine has been selected to follow
-common (but by no mean universal)  conventions in writing mathematical
+common (but by no mean universal) conventions in writing mathematical
 expressions, as well as expressing them in a way that can optimize their computation.</p>
 <p><strong>To obtain the canonical representation of an expression</strong>, use the
 <code>ce.canonical()</code> function.</p>
-<p>The default canonical representation applies a series of transformation to
-put sums, products, numbers, roots, etc… in canonical form. Each of
-these steps  can also be applied separately for more control over the result.
-The list of available formats is listed below.</p>
 <p>Applying a canonical form is applying some rewriting rules to an expression.
 In that sense, it is similar to simplifying an expression with
 <code>ce.simplify()</code>, but it is more conservative in which transformations
 it will consider, and it will not take into account any assumptions about
 symbols.</p>
+<p>The default canonical representation applies a series of transformation to
+put sums, products, numbers, roots, etc… in canonical form. Each of
+these steps/format can also be applied separately for more control over the result.</p>
+<p>The list of available formats is listed below.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -720,7 +735,7 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-constants</code></td>
-<td style="text-align:left">Simplify some arithmetic and trigonometric constants \( \frac{1}{2}, \frac{\pi}{4}, \ldots \)</td>
+<td style="text-align:left">Simplify some arithmetic and trigonometric constants: \( \frac{1}{2}, \frac{\pi}{4}, \ldots \)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-divide</code></td>
@@ -732,7 +747,7 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-exp</code></td>
-<td style="text-align:left"><code>['Power', 'ExponentialE'] is simplified to </code>Exp`</td>
+<td style="text-align:left"><code>[&quot;Power&quot;, &quot;ExponentialE&quot;, &quot;x&quot;]</code> \( \longrightarrow \) <code>[&quot;Exp&quot;, &quot;x&quot;</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-multiply</code></td>
@@ -740,7 +755,7 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-negate</code></td>
-<td style="text-align:left"><code>Negate</code> of a number is replaced by the negative of the number. Negation of negation is simplified</td>
+<td style="text-align:left"><code>Negate</code> of a number \( \longrightarrow \) the negative of the number. Negation of negation is simplified</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-list</code></td>
@@ -752,15 +767,15 @@ symbols.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-power</code></td>
-<td style="text-align:left"><ul><li>\[x^{\tilde\infty} \rightarrow \operatorname{NaN}\]</li><li>\[x^0 \rightarrow 1\]</li><li>\[x^1 \rightarrow x\]</li><li>\[(\pm 1)^{-1} \rightarrow -1\]</li><li>\[(\pm\infty)^{-1} \rightarrow 0\]</li><li>\[0^{\infty} \rightarrow \tilde\infty\]</li><li>\[(\pm 1)^{\pm \infty} \rightarrow \operatorname{NaN}\]</li><li>\[\infty^{\infty} \rightarrow \infty\]</li><li>\[\infty^{-\infty} \rightarrow 0\]</li><li>\[(-\infty)^{\pm \infty} \rightarrow \operatorname{NaN}\]</li></ul></td>
+<td style="text-align:left"><ul><li>\[x^{\tilde\infty} \longrightarrow \operatorname{NaN}\]</li><li>\[x^0 \longrightarrow 1\]</li><li>\[x^1 \longrightarrow x\]</li><li>\[(\pm 1)^{-1} \longrightarrow -1\]</li><li>\[(\pm\infty)^{-1} \longrightarrow 0\]</li><li>\[0^{\infty} \longrightarrow \tilde\infty\]</li><li>\[(\pm 1)^{\pm \infty} \longrightarrow \operatorname{NaN}\]</li><li>\[\infty^{\infty} \longrightarrow \infty\]</li><li>\[\infty^{-\infty} \longrightarrow 0\]</li><li>\[(-\infty)^{\pm \infty} \longrightarrow \operatorname{NaN}\]</li></ul></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-root</code></td>
-<td style="text-align:left"><code>Power</code> is replaced with <code>Root</code> and <code>Sqrt</code> or simplified</td>
+<td style="text-align:left"><code>Power</code> \( \longrightarrow \) <code>Root</code> and <code>Sqrt</code> or simplified</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>canonical-subtract</code></td>
-<td style="text-align:left"><code>Subtract</code> is replaced with <code>Add</code> and <code>Negate</code></td>
+<td style="text-align:left"><code>Subtract</code> \( \longrightarrow \) <code>Add</code> and <code>Negate</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>flatten</code></td>
@@ -775,16 +790,12 @@ symbols.</p>
 <td style="text-align:left">Each term of the expression is expressed as an object literal: no shorthand representation is used. For example, the number \( 4\) is represented as <code>{ num: &quot;4&quot; }</code> not as <code>4</code>.</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>shorthand</code></td>
-<td style="text-align:left">Each term of the expression is expressed as a shorthand when possible, for example a number or a string.</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>sorted</code></td>
 <td style="text-align:left">The arguments of commutative functions are sorted such that: <ul><li> numbers are first, sorted numerically </li><li> complex numbers are next, sorted numerically by imaginary value </li><li> symbols are next, sorted lexicographically </li><li> <code>add</code> functions are next </li><li> <code>multiply</code> functions are next </li><li> <code>power</code> functions are next, sorted by their first argument, then by their second argument </li><li> other functions follow, sorted lexicographically</li></ul></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>stripped-metadata</code></td>
-<td style="text-align:left">Any metadata associated with elements of the expression is removed, for example associated WikiData or Latex properties</td>
+<td style="text-align:left">Any metadata associated with elements of the expression is removed, for example associated <code>wikidata</code>, <code>comment</code> or <code>latex</code> properties</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>sum-product</code></td>
@@ -793,9 +804,6 @@ symbols.</p>
 </tbody>
 </table>
 </div>
-<ul>
-<li><strong><code>'canonical-exp'</code></strong>: <code>exp</code> is replaced with <code>power</code></li>
-</ul>
 <p><strong>To transform an expression using the rules for a particular form</strong>, use the
 <code>format()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { format } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
@@ -815,9 +823,13 @@ symbols.</p>
 </code></pre>
 <pre><code class="language-cortex">Latex(BaseForm(42, 16))
 // ➔ (\mathtt(2a))_{16}
-BaseForm(42, 16)
-// ➔ 0x2a
+String(BaseForm(42, 16))
+// ➔ &quot;'0x2a'&quot;
 </code></pre>
+<h2>Applying Custom  Rules</h2>
+<p>You can define and apply your own custom rewriting rules using patterns,
+rules and the <code>ce.replace()</code> function.</p>
+<div class='read-more'><a href="/guides/compute-engine/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -830,7 +842,7 @@ BaseForm(42, 16)
         <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 16:30:50 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 17:17:51 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 

@@ -280,6 +280,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/execution-constraints/" class="">Execution Constraints</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/patterns-and-rules/" class="active">Patterns and Rules</a></li>
             
           
@@ -755,27 +769,28 @@ them using <code>ce.evaluate()</code>.</p>
 <ul>
 <li>a left-hand-side pattern,  <code>lhs</code></li>
 <li>a right-hand-side pattern, <code>rhs</code></li>
-<li>a condition</li>
+<li>an optional condition</li>
 </ul>
 <p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> and
 the condition applies to the resulting substitution, the result of the
 rule if the substitution applied to the <code>rhs</code>.</p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">rule</span>([[<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>], [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]], [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]);
+<p><strong>To apply a set of rules to an expression</strong>, use the <code>ce.replace()</code> function.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = [[<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>], [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]];
+
+ce.<span class="hljs-title function_">replace</span>([squareRule], [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]);
 <span class="hljs-comment">// -&gt; [&#x27;Square&#x27;, 4]</span>
 
-ce.<span class="hljs-title function_">rule</span>(
-  [
-    [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>,  <span class="hljs-string">&#x27;_x&#x27;</span>]], 
-    <span class="hljs-string">&#x27;_x&#x27;</span>,
-    <span class="hljs-function">(<span class="hljs-params">ce, sub</span>) =&gt;</span> ce.<span class="hljs-title function_">isPositive</span>(sub.<span class="hljs-property">_x</span>)
-  ],
-  [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]
-);
+<span class="hljs-keyword">const</span> sqrtRule =   [
+  [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>,  <span class="hljs-string">&#x27;_x&#x27;</span>]], 
+  <span class="hljs-string">&#x27;_x&#x27;</span>,
+  <span class="hljs-function">(<span class="hljs-params">ce, sub</span>) =&gt;</span> ce.<span class="hljs-title function_">isPositive</span>(sub.<span class="hljs-property">_x</span>)
+];
+ce.<span class="hljs-title function_">replace</span>([sqrtRule], [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]);
 <span class="hljs-comment">// -&gt; 17</span>
 </code></pre>
 <p>The <code>ce.simplify()</code> method applies a collection of built-in rewrite rules
 to simplify an expression. You can define your own rules and apply them
-using <code>ce.rule()</code>.</p>
+using <code>ce.replace()</code>.</p>
 <h2><code>count()</code></h2>
 
         
@@ -789,7 +804,7 @@ using <code>ce.rule()</code>.</p>
         <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 16:30:50 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 17:17:51 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 

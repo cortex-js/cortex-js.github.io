@@ -244,6 +244,20 @@
                 
               
 
+              <li><a href="/guides/compute-engine/execution-constraints/" class="">Execution Constraints</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/guides/compute-engine/patterns-and-rules/" class="">Patterns and Rules</a></li>
             
           
@@ -615,14 +629,19 @@
 <p>The <strong>CortexJS Compute Engine</strong> is a JavaScript library for symbolic
 computing and numerical evaluation of mathematical expressions.</p>
 <p>The Compute Engine is for anyone who wants to make technical computing apps
-in the browser or in server-side environments such as NodeL: educators, students, scientists and engineers.</p>
+in the browser or in server-side environments such as Node: educators, students, scientists and engineers.</p>
 <p>The Compute Engine can:</p>
 <ul>
-<li><a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Late</li>
+<li><a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex</li>
 <li>simplify, solve and evaluate math expressions expressed in the <a href ="/guides/math-json/format/">MathJSON format</a></li>
 </ul>
 <h2>Parse and Serialize Latex</h2>
-<p><strong>To parse and serialize an expression</strong>, use the <code>parse()</code> and <code>serialize()</code>
+<p>Internally, the Compute Engine manipulates expressions represented with the MathJSON format. It’s a JSON representation of an Abstract Syntax Tree
+of the expression. It is easy to manipulate programatically and can be
+written by hand. However, you might prefer to use a more concise and
+familiar syntax, such as Latex. The Compute Engine includes utilities
+to convert to and from Latex strings.</p>
+<p><strong>To parse a Latex string and serialize to a Latex string</strong>, use the <code>parse()</code> and <code>serialize()</code>
 functions.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
@@ -633,15 +652,18 @@ functions.</p>
 <span class="hljs-comment">// -&gt;  x^3 + 2</span>
 
 </code></pre>
-<p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
-<p>A MathLive mathfield works like a textarea, but for math, and it can provide
-its content as a Latex string or a MathJSON expression.</p>
 <div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
+<p>A MathLive mathfield works like a textarea in HTML, but for math. It provide
+its content as a Latex string or a MathJSON expression, ready to be used with the Compute Engine.</p>
+<div class='read-more'><a href="/mathlive/">Read more about <strong>MathLive</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Symbolic Computing and Numerical Evaluation</h2>
 <p><strong>To evaluate a symbolic expression</strong>, use the <code>evaluate()</code> function.</p>
-<p>The result of <code>evaluate()</code> is an expression. If the expression can
-be evaluated numerically, the expression is a number. If it can’t be
-evaluated numerically, the expression is a symbolic expression.</p>
+<p>The result of <code>evaluate()</code> is an expression:</p>
+<ul>
+<li>If the expression can be evaluated numerically, the result is a number</li>
+<li>If it can’t be evaluated numerically, the result is a symbolic expression.</li>
+</ul>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { evaluate, parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(evaluate([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
@@ -653,16 +675,16 @@ evaluated numerically, the expression is a symbolic expression.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2x + 3x&#x27;</span>)));
 <span class="hljs-comment">// ➔ 5x</span>
 </code></pre>
-<p>The Compute Engine supports arbitrary precision floating points and complex
-numbers.</p>
-<p>The Compute Engine can also simplify, find patterns, substitute terms,
+<p>The Compute Engine supports <strong>arbitrary precision floating points</strong> and <strong>complex
+numbers</strong>.</p>
+<p>The Compute Engine can also simplify, find patterns, substitute terms, apply rewrite rules,
 compare and format expressions.</p>
 <div class='read-more'><a href="/guides/compute-engine/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/guides/compute-engine/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Customization</h2>
 <p>The Compute Engine includes a robust library of mathematical functions.</p>
-<p>The dictionaries that define these functions can be customized by creating a <code>ComputeEngine</code> instance.</p>
+<p><strong>To customize the dictionaries that define the math functions</strong>, create and configure a <code>ComputeEngine</code> instance.</p>
 <p>The <code>ComputeEngine</code> instance also provides access to additional features
 such as defining <a href="/guides/compute-engine/assumptions/">assumptions</a> about
 symbols: <em>x is a positive Real number, n is an Integer</em>.</p>
@@ -726,7 +748,7 @@ ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs
         <meta itemprop="datePublished" content="June 19, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 15:59:34 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 17:00:24 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
         
       </footer>
 
