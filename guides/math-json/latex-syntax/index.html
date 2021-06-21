@@ -659,10 +659,162 @@ optional argument:</p>
 <span class="hljs-keyword">const</span> latex = latexSyntax.<span class="hljs-title function_">serialize</span>(expr);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(latex);
 </code></pre>
-<p>The <code>LatexSyntax</code> constructor can be passed options to customize the parsing, as well as dictionaries defining the syntax and vocabulary.</p>
+<p>The <code>LatexSyntax</code> constructor can be passed some options to customize the
+parsing and serializing, as well as dictionaries defining the syntax and vocabulary.</p>
 <div class='read-more'><a href="/guides/compute-engine/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p>For example, the configuration below will result in parsing a Latex string as a
-sequence of Latex tokens. It uses no dictionary (since only tokens are returned) and set the options to avoid modifying the raw stream of Latex tokens.</p>
+<p><strong>To change the Latex syntax options after a <code>LatexSyntax</code> instance has been
+created</strong>, change the <code>options</code> property.</p>
+<p>The <code>LatexSyntax</code> class has an <code>options</code> property with the following keys.</p>
+<h3>Number Formatting Options</h3>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Option</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>precision</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>positiveInfinity</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>negativeInfinity</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>notANumber</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>decimalMarker</code></td>
+<td style="text-align:left">The string separating the whole portion of a number from the fractional portion, i.e. the ‘.’ in <code>3.1415</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>groupSeparator</code></td>
+<td style="text-align:left">The separator between groups of digits, used to improve readability of numbers with many digits</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>exponentProduct</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>beginExponentMarker</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>endExponentMarker</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>notation</code></td>
+<td style="text-align:left"><code>engineering</code> <code>auto</code> <code>scientific</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>truncationMarker</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>beginRepeatingDigits</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>endRepeatingDigits</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>imaginaryNumber</code></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Serialization Options</h3>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Option</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>invisibleMultiply</code></td>
+<td style="text-align:left">Latex string used to render an invisible multiply, e.g. in <code>2x</code>. Leave it empty to join the adjacent terms, or use <code>\cdot</code> to insert a <code>\cdot</code> operator between them, i.e. <code>2\cdot x</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>invisiblePlus</code></td>
+<td style="text-align:left">Latex string used for an invisible plus, e.g. in ‘1 3/4’. Leave it empty to join the main number and the fraction, i.e. render it as <code>1\frac{3}{4}</code>, or use <code>+</code> to insert a <code>+</code> operator between them, i.e. <code>1+\frac{3}{4}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>multiply</code></td>
+<td style="text-align:left">Latex string used for an explicit multiply operator: for example <code>\times</code> or <code>\cdot</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Parsing Options</h3>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Option</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>invisibleOperator</code></td>
+<td style="text-align:left">If a symbol follows a number, consider them separated by this invisible operator. Default: <code>Multiply</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>skipSpace</code></td>
+<td style="text-align:left">If true, ignore space characters</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>parseArgumentsOfUnknownLatexCommands</code></td>
+<td style="text-align:left">When an unknown latex command is encountered, attempt to parse any arguments it may have.<br> For example, <code>\foo{x+1}</code> would produce <code>['\foo', ['add', 'x', 1]]</code> if this property is true, <code>['LatexSymbols', '\foo', '&lt;{&gt;', 'x', '+', 1, '&lt;{&gt;']</code> otherwise.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>parseNumbers</code></td>
+<td style="text-align:left">When a number is encountered, parse it.<br> Otherwise, return each token making up the number (minus sign, digits, decimal separator, etc…)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>invisiblePlusOperator</code></td>
+<td style="text-align:left">If this setting is not empty, when a number is immediately followed by a fraction, assume that the fraction should be added to the number, that is that there is an invisible plus operator between the two.<br> For example with <code>2\frac{3}{4}</code><ul><li> when <code>invisiblePlusOperator</code> is <code>&quot;add&quot;</code> : <code>[&quot;add&quot;, 2, [&quot;divide&quot;, 3, 4]]</code></li><li> when <code>invisiblePlusOperator</code> is <code>&quot;&quot;</code>: <code>[&quot;multiply&quot;, 2, [&quot;divide&quot;, 3, 4]]</code></li></ul></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>promoteUnknownSymbols</code></td>
+<td style="text-align:left">When a token is encountered at a position where a symbol could be parsed, if the token matches <code>promoteUnknownSymbols</code> it will be accepted as a symbol (an <code>unknown-symbol</code> error will still be triggered so that the caller can be notified). Otherwise, the symbol is rejected.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ignoreCommands</code></td>
+<td style="text-align:left">When one of these commands is encountered, it is skipped.<br> Useful for purely presentational commands such as <code>\displaystyle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>idempotentCommands</code></td>
+<td style="text-align:left">When one these commands is encountered, its argument is parsed, as if the command was not present.<br> Useful for some presentational commands such as <code>\left</code>, <code>\bigl</code>, etc…</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>promoteUnknownFunctions</code></td>
+<td style="text-align:left">When a token is encountered at a position that could match a function call, and it is followed by an apply function operator (typically, parentheses), consider them to a be a function if the string of tokens match this regular expression.<br>While this is a convenient shortcut, it is recommended to more explicitly define custom functions by providing an entry for them in a function dictionary (providing additional information about their arguments, etc…) and in a Latex translation dictionary (indicating what Latex markup corresponds to the function).<br>Example:<br> By default, <code>f(x)</code> is parsed as <code>[&quot;multiply&quot;, &quot;f&quot;, &quot;x&quot;]</code>.<br>After <code>promoteUnknownFunctions = /^[fg]$/``` , </code>f(x)<code>is parsed as</code>[“f”, “x”]`</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>preserveLatex</code></td>
+<td style="text-align:left">If true, the expression will be decorated with the Latex fragments corresponding to each elements of the expression</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Example: Parsing Raw Latex</h3>
+<p>The configuration below will result in parsing a Latex string as a
+sequence of Latex tokens, without any interpration. It uses no dictionary (since only tokens are returned) and set the options to avoid modifying the raw stream of Latex tokens.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
   <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
   <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
@@ -684,10 +836,10 @@ sequence of Latex tokens. It uses no dictionary (since only tokens are returned)
         
 
 
-        <meta itemprop="datePublished" content="June 20, 2021">
+        <meta itemprop="datePublished" content="June 21, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sun Jun 20 2021 14:14:33 GMT+0200 (Central European Summer Time)">June 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 21 2021 11:21:01 GMT+0200 (Central European Summer Time)">June 21, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
