@@ -196,6 +196,20 @@
           
             
             
+              
+                
+              
+
+              
+              
+                
+              
+
+              <li><a href="/compute-engine/demo/" class="">Demo</a></li>
+            
+          
+            
+            
               <li class="separator"></li>
             
           
@@ -327,21 +341,7 @@
                 
               
 
-              <li><a href="/math-json/" class="">Introduction to MathJSON</a></li>
-            
-          
-            
-            
-              
-                
-              
-
-              
-              
-                
-              
-
-              <li><a href="/guides/math-json/format/" class="">MathJSON Format</a></li>
+              <li><a href="/math-json/" class="">The MathJSON Format</a></li>
             
           
             
@@ -569,6 +569,20 @@
                 
               
 
+              <li><a href="/docs/contributing-code/" class="">Contributing Code</a></li>
+            
+          
+            
+            
+              
+                
+              
+
+              
+              
+                
+              
+
               <li><a href="/funding/" class="">Funding</a></li>
             
           
@@ -621,13 +635,13 @@
 
       <section class="page__content" itemprop="text">
         
-        <h2>Parsing and Serializing Latex</h2>
+        <h1>Parsing and Serializing Latex</h1>
 <p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
 convert Latex strings to MathJSON expressions (<strong>parsing</strong>) and output MathJSON
 expressions as Latex string (<strong>serializing</strong>).</p>
 <p><strong>To transform Latex to MathJSON</strong>, use the <code>parse()</code> function.</p>
 <p><strong>To transform MathJSON to Latex</strong>, use the <code>serialize()</code> function.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>
 
 <span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
@@ -639,7 +653,7 @@ expressions as Latex string (<strong>serializing</strong>).</p>
 </code></pre>
 <p>The behavior of <code>parse()</code> and <code>serialize()</code> can be customized by passing an
 optional argument:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {  serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>(<span class="hljs-number">1</span>/<span class="hljs-number">3</span>, {
     <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
@@ -652,7 +666,7 @@ optional argument:</p>
 <div class='read-more'><a href="/docs/compute-engine/#(SerializeLatexOptions%3Atype)">Read more about <strong><kbd>SerializeLatexOptions</kbd></strong> which apply to <kbd>serialize()</kbd><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Advanced Usage</h2>
 <p><strong>To customize the Latex syntax</strong>, including defining the vocabulary and syntax, create an instance of <code>LatexSyntax</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;math-json&#x27;</span>;
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">LatexSyntax</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>
 <span class="hljs-keyword">const</span> latexSyntax = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>();
 <span class="hljs-keyword">const</span> expr = latexSyntax.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr);
@@ -779,7 +793,7 @@ created</strong>, change the <code>options</code> property.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>parseArgumentsOfUnknownLatexCommands</code></td>
-<td style="text-align:left">When an unknown latex command is encountered, attempt to parse any arguments it may have.<br> For example, <code>\foo{x+1}</code> would produce <code>['\foo', ['add', 'x', 1]]</code> if this property is true, <code>['LatexSymbols', '\foo', '&lt;{&gt;', 'x', '+', 1, '&lt;{&gt;']</code> otherwise.</td>
+<td style="text-align:left">When an unknown latex command is encountered, attempt to parse any arguments it may have.<br> For example, <code>\foo{x+1}</code> would produce <code>[&quot;\foo&quot;, [&quot;Add&quot;, &quot;x&quot;, 1]]</code> if this property is true, <code>[&quot;LatexSymbols&quot;, &quot;\foo&quot;, &quot;&lt;{&gt;&quot;, &quot;x&quot;, &quot;+&quot;, 1, &quot;&lt;{&gt;&quot;]</code> otherwise.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>parseNumbers</code></td>
@@ -787,7 +801,7 @@ created</strong>, change the <code>options</code> property.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>invisiblePlusOperator</code></td>
-<td style="text-align:left">If this setting is not empty, when a number is immediately followed by a fraction, assume that the fraction should be added to the number, that is that there is an invisible plus operator between the two.<br> For example with <code>2\frac{3}{4}</code><ul><li> when <code>invisiblePlusOperator</code> is <code>&quot;add&quot;</code> : <code>[&quot;add&quot;, 2, [&quot;divide&quot;, 3, 4]]</code></li><li> when <code>invisiblePlusOperator</code> is <code>&quot;&quot;</code>: <code>[&quot;multiply&quot;, 2, [&quot;divide&quot;, 3, 4]]</code></li></ul></td>
+<td style="text-align:left">If this setting is not empty, when a number is immediately followed by a fraction, assume that the fraction should be added to the number, that is that there is an invisible plus operator between the two.<br> For example with <code>2\frac{3}{4}</code><ul><li> when <code>invisiblePlusOperator</code> is <code>&quot;Add&quot;</code> : <code>[&quot;Add&quot;, 2, [&quot;Divide&quot;, 3, 4]]</code></li><li> when <code>invisiblePlusOperator</code> is <code>&quot;&quot;</code>: <code>[&quot;Multiply&quot;, 2, [&quot;Divide&quot;, 3, 4]]</code></li></ul></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>promoteUnknownSymbols</code></td>
@@ -803,7 +817,7 @@ created</strong>, change the <code>options</code> property.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>promoteUnknownFunctions</code></td>
-<td style="text-align:left">When a token is encountered at a position that could match a function call, and it is followed by an apply function operator (typically, parentheses), consider them to a be a function if the string of tokens match this regular expression.<br>While this is a convenient shortcut, it is recommended to more explicitly define custom functions by providing an entry for them in a function dictionary (providing additional information about their arguments, etc…) and in a Latex translation dictionary (indicating what Latex markup corresponds to the function).<br>Example:<br> By default, <code>f(x)</code> is parsed as <code>[&quot;multiply&quot;, &quot;f&quot;, &quot;x&quot;]</code>.<br>After <code>promoteUnknownFunctions = /^[fg]$/``` , </code>f(x)<code>is parsed as</code>[“f”, “x”]`</td>
+<td style="text-align:left">When a token is encountered at a position that could match a function call, and it is followed by an apply function operator (typically, parentheses), consider them to a be a function if the string of tokens match this regular expression.<br>While this is a convenient shortcut, it is recommended to more explicitly define custom functions by providing an entry for them in a function dictionary (providing additional information about their arguments, etc…) and in a Latex translation dictionary (indicating what Latex markup corresponds to the function).<br>Example:<br> By default, <code>f(x)</code> is parsed as <code>[&quot;Multiply&quot;, &quot;f&quot;, &quot;x&quot;]</code>.<br>After <code>promoteUnknownFunctions = /^[fg]$/``` , </code>f(x)<code>is parsed as</code>[“f”, “x”]`</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>preserveLatex</code></td>
@@ -836,10 +850,10 @@ sequence of Latex tokens, without any interpration. It uses no dictionary (since
         
 
 
-        <meta itemprop="datePublished" content="June 21, 2021">
+        <meta itemprop="datePublished" content="June 22, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Mon Jun 21 2021 11:21:01 GMT+0200 (Central European Summer Time)">June 21, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Tue Jun 22 2021 12:13:46 GMT+0200 (Central European Summer Time)">June 22, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
