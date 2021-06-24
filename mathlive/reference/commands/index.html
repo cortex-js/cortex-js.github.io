@@ -4,6 +4,8 @@
     <meta charset="utf-8">
 
 
+
+
 <title>
     CortexJS
 </title>
@@ -15,7 +17,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
-<script>
+<script defer>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
@@ -500,7 +502,7 @@
 
       <section class="page__content" itemprop="text">
         
-        <script type='module'>
+        <script defer type='module'>
     import {renderMathInDocument, version} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
     renderMathInDocument({ 
       renderAccessibleContent: false,
@@ -637,8 +639,8 @@
   
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
-<p>To find the name of a LaTeX command matching a shape you can draw, use
-<a href="http://detexify.kirelabs.org/classify.html">Detexify</a>.</p>
+<p>MathLive supports over 800 LaTeX commands.</p>
+<div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Text Mode, Math Mode and Math Style</h2>
 <h3>Math Mode</h3>
 <p>When in <strong>Math Mode</strong>, the content is laid out using typesetting rules specific
@@ -3004,10 +3006,10 @@ TeX packages or macros.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 19, 2021">
+        <meta itemprop="datePublished" content="June 24, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:39:43 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 24 2021 16:46:15 GMT+0200 (Central European Summer Time)">June 24, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -3069,13 +3071,6 @@ TeX packages or macros.</p>
          
         
         <li>
-            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
-            >
-        </li>
-         
-         
-        
-        <li>
             <a href="/about" rel="nofollow noopener noreferrer">About Us</a
             >
         </li>
@@ -3089,7 +3084,7 @@ TeX packages or macros.</p>
     </div>
 
     
-  <!-- <script src="/assets/js/main.min.js"></script> -->
+  <!-- <script defer src="/assets/js/main.min.js"></script> -->
 
 
 

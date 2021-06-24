@@ -4,6 +4,8 @@
     <meta charset="utf-8">
 
 
+
+
 <title>
     CortexJS
 </title>
@@ -15,7 +17,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
-<script>
+<script defer>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
@@ -24,17 +26,17 @@
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -43,12 +45,12 @@
     
       
     
-    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script type="module" src="//unpkg.com/mathlive/dist/mathlive.min.mjs" crossorigin='anonymous'></script>
+    <script defer type="module" src="//unpkg.com/mathlive/dist/mathlive.min.mjs" crossorigin='anonymous'></script>
   
 
 
@@ -545,7 +547,7 @@
 <p><strong>To render math contained in a document as a static (non-editable) formula</strong>,
 call <a href="/docs/mathlive/?q=renderMathInDocument"><code>renderMathInDocument()</code></a> at the end of your document, or in a <code>onload</code>
 handler .</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">defer</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
   <span class="hljs-title function_">renderMathInDocument</span>();
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
@@ -660,10 +662,10 @@ element.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 19, 2021">
+        <meta itemprop="datePublished" content="June 23, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:39:30 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Wed Jun 23 2021 12:24:52 GMT+0200 (Central European Summer Time)">June 23, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -725,13 +727,6 @@ element.</p>
          
         
         <li>
-            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
-            >
-        </li>
-         
-         
-        
-        <li>
             <a href="/about" rel="nofollow noopener noreferrer">About Us</a
             >
         </li>
@@ -745,7 +740,7 @@ element.</p>
     </div>
 
     
-  <!-- <script src="/assets/js/main.min.js"></script> -->
+  <!-- <script defer src="/assets/js/main.min.js"></script> -->
 
 
 

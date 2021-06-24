@@ -4,6 +4,8 @@
     <meta charset="utf-8">
 
 
+
+
 <title>
     CortexJS
 </title>
@@ -15,7 +17,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
-<script>
+<script defer>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
@@ -24,17 +26,17 @@
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -43,12 +45,12 @@
     
       
     
-    <script type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script type="module" src="//unpkg.com/mathlive/dist/mathlive.min.mjs" crossorigin='anonymous'></script>
+    <script defer type="module" src="//unpkg.com/mathlive/dist/mathlive.min.mjs" crossorigin='anonymous'></script>
   
 
 
@@ -769,10 +771,11 @@ used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
 <!-- htmlmin:ignore -->
 <h3>Letter Shape Style</h3>
 <p><strong>To control which letters are automatically italicized</strong>, use the <code>letterShapeStyle</code> configuration option.</p>
+<div class='symbols-table'>
 <table>
 <thead>
 <tr>
-<th style="text-align:right"><code>letterShapeStyle</code></th>
+<th style="text-align:left"><code>letterShapeStyle</code></th>
 <th>xyz</th>
 <th>ABC</th>
 <th>αβɣ</th>
@@ -781,28 +784,28 @@ used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:right"><code>iso</code></td>
+<td style="text-align:left"><code>iso</code></td>
 <td><em>xyz</em></td>
 <td><em>ABC</em></td>
 <td><em>αβɣ</em></td>
 <td><em>ΓΔΘ</em></td>
 </tr>
 <tr>
-<td style="text-align:right"><code>tex</code></td>
+<td style="text-align:left"><code>tex</code></td>
 <td><em>xyz</em></td>
 <td><em>ABC</em></td>
 <td><em>αβɣ</em></td>
 <td>ΓΔΘ</td>
 </tr>
 <tr>
-<td style="text-align:right"><code>french</code></td>
+<td style="text-align:left"><code>french</code></td>
 <td><em>xyz</em></td>
 <td>ABC</td>
 <td>αβɣ</td>
 <td>ΓΔΘ</td>
 </tr>
 <tr>
-<td style="text-align:right"><code>upright</code></td>
+<td style="text-align:left"><code>upright</code></td>
 <td>xyz</td>
 <td>ABC</td>
 <td>αβɣ</td>
@@ -810,6 +813,7 @@ used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>In the <a href="https://www.nist.gov/pml/special-publication-811">ISO</a> style, lower and
 uppercase roman letter and lower and upper case greek letters are italicized
 when used as a variable. Mathematical constants such as \(e\) are written upright.</p>
@@ -858,7 +862,7 @@ line 3 to <code>scriptDepth: 0</code>, then try to type “x^2” in the mathfie
 <!-- htmlmin:ignore -->
 <p>See <a href="http://cortexjs.io/docs/mathlive/?q=EditingOptions">EditingOptions</a> for more
 details about these and other available options.</p>
-<h2>Handling the Space bar</h2>
+<h2>Handling the Space Bar</h2>
 <p>In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
 relational, binary or unary operators, etc…</p>
@@ -910,10 +914,10 @@ console.log(mf.getOptions().strings[locale]);
         
 
 
-        <meta itemprop="datePublished" content="June 19, 2021">
+        <meta itemprop="datePublished" content="June 24, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Sat Jun 19 2021 09:38:49 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="Thu Jun 24 2021 16:42:40 GMT+0200 (Central European Summer Time)">June 24, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Got a question?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -975,13 +979,6 @@ console.log(mf.getOptions().strings[locale]);
          
         
         <li>
-            <a href="/funding" rel="nofollow noopener noreferrer">Funding</a
-            >
-        </li>
-         
-         
-        
-        <li>
             <a href="/about" rel="nofollow noopener noreferrer">About Us</a
             >
         </li>
@@ -995,7 +992,7 @@ console.log(mf.getOptions().strings[locale]);
     </div>
 
     
-  <!-- <script src="/assets/js/main.min.js"></script> -->
+  <!-- <script defer src="/assets/js/main.min.js"></script> -->
 
 
 
