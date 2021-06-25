@@ -809,8 +809,12 @@
 <td style="text-align:left">An <strong>optional</strong> expression is not present</td>
 </tr>
 <tr>
+<td style="text-align:left"><code>Undefined</code></td>
+<td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> and for booleans, <code>Maybe</code></td>
+</tr>
+<tr>
 <td style="text-align:left"><code>None</code></td>
-<td style="text-align:left">None of the possible values, none apply</td>
+<td style="text-align:left">None of the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>All</code></td>
@@ -919,13 +923,13 @@ cube(5)
 <p><code>[&quot;Latex&quot;, </code><em><code>expr</code></em><code> </code>]`</p>
 <ul>
 <li><em><code>expr</code></em>: a MathJSON expression</li>
-<li>Returns a Latex string representing the expression.</li>
+<li>Returns a LaTeX string representing the expression.</li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p><code>[&quot;LatexSymbols&quot;, </code><em><code>str-1</code></em><code>, </code><em><code>str-2</code></em><code>, ...</code><em><code>str-n</code></em><code>]</code></p>
-<p>The arguments <code>_</code>str-n<code>_</code> are interpreted as Latex tokens:</p>
+<p>The arguments <code>_</code>str-n<code>_</code> are interpreted as LaTeX tokens:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -965,7 +969,7 @@ cube(5)
 </tr>
 <tr>
 <td style="text-align:left">string that starts with <code>/</code></td>
-<td style="text-align:left">a Latex command</td>
+<td style="text-align:left">a LaTeX command</td>
 </tr>
 <tr>
 <td style="text-align:left">other strings</td>
@@ -984,7 +988,7 @@ cube(5)
 <thead>
 <tr>
 <th style="text-align:left">MathJSON</th>
-<th style="text-align:left">Latex</th>
+<th style="text-align:left">LaTeX</th>
 </tr>
 </thead>
 <tbody>
@@ -1094,7 +1098,7 @@ comparison.</p>
         <meta itemprop="datePublished" content="June 25, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jun 25 2021 15:30:53 GMT+0200 (Central European Summer Time)">June 25, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jun 25 2021 18:14:27 GMT+0200 (Central European Summer Time)">June 25, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
