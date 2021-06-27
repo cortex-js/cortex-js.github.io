@@ -766,11 +766,6 @@
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-      
-        <header>
-          
-        </header>
-      
 
       <section class="page__content" itemprop="text">
         
@@ -790,47 +785,20 @@
     });
 </script>
 <h1>Sets</h1>
+<p>A <strong>set</strong> is a collection of distinct elements.</p>
+<p>A <strong>domain</strong>, such as <code>Integer</code> <code>Boolean</code>, is a <strong>set</strong> used to represent the possible values of an expression.</p>
+<div class='read-more'><a href="/guides/compute-engine/domains/">Learn more about <strong>Domains</strong> <svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Constants</h2>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">Symbol</th>
-<th style="text-align:left">Value</th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Notation</th>
+<th style="text-align:left">Definition</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left"><code>NaturalNumber</code></td>
-<td style="text-align:left">\[ \N \]</td>
-<td style="text-align:left">\[ 0, 1, 2, 3…\]</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Integer</code></td>
-<td style="text-align:left">\[ \Z \]</td>
-<td style="text-align:left">\[ … -2, -1, 0, 1, 2…\]</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>RationalNumber</code></td>
-<td style="text-align:left">\[ \Q \]</td>
-<td style="text-align:left">Can be written as \( \frac{p}{q} \) where \( p, q \in \Z \)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>AlgebraicNumber</code></td>
-<td style="text-align:left">\[ \mathbb{A} \]</td>
-<td style="text-align:left">Is the root of a polynomial</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>RealNumber</code></td>
-<td style="text-align:left">\[ \R \]</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>ComplexNumber</code></td>
-<td style="text-align:left">\[ \C \]</td>
-<td style="text-align:left"></td>
-</tr>
 <tr>
 <td style="text-align:left"><code>EmptySet</code></td>
 <td style="text-align:left">\( \varnothing \) or \( \emptyset \)</td>
@@ -839,7 +807,9 @@
 </tbody>
 </table>
 </div>
+<p>The <a href="/guides/compute-engine/domains/">domains</a> also define a number of sets.</p>
 <h2>Functions</h2>
+<p>New sets can be defined using a <strong>set expression</strong>. A set expression is an expression with one of the following head functions.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -852,43 +822,92 @@
 <tbody>
 <tr>
 <td style="text-align:left"><code>CartesianProduct</code></td>
-<td style="text-align:left"></td>
-<td style="text-align:left">Aka the product set, the set direct product or cross product. <a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Intersection</code></td>
-<td style="text-align:left">\[ A \cap B \]</td>
-<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q185837">Q185837</a></td>
+<td style="text-align:left">\[ \mathrm{A} \times \mathrm{B} \]</td>
+<td style="text-align:left">A.k.a the product set, the set direct product or cross product. <a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Complement</code></td>
-<td style="text-align:left">\[ A \complement B\]</td>
-<td style="text-align:left">Return the elements of the first argument that are not in any of  the subsequent sets.  <a href="https://www.wikidata.org/wiki/Q242767">Q242767</a></td>
+<td style="text-align:left">\[ \mathrm{A}^\complement \]</td>
+<td style="text-align:left">The set of elements that are not in \( \mathrm{A} \). If \(\mathrm{A}\) is a numeric domain, the universe is assumed to be the set of all numbers. <a href="https://www.wikidata.org/wiki/Q242767">Q242767</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Intersection</code></td>
+<td style="text-align:left">\[ \mathrm{A} \cap \mathrm{B} \]</td>
+<td style="text-align:left">The set of elements that are in  \(\mathrm{A}\) and in \(\mathrm{B}\) <a href="https://www.wikidata.org/wiki/Q185837">Q185837</a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Union</code></td>
-<td style="text-align:left">\[ A \cup B \]</td>
-<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
+<td style="text-align:left">\[ \mathrm{A} \cup \mathrm{B} \]</td>
+<td style="text-align:left">The set of elements that are in \(\mathrm{A}\) or in \(\mathrm{B}\) <a href="https://www.wikidata.org/wiki/Q173740">Q173740</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Set</code></td>
+<td style="text-align:left">\(\lbrace 1, 2, 3 \rbrace \)</td>
+<td style="text-align:left">Set builder notation</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>SetMinus</code></td>
+<td style="text-align:left">\[ \mathrm{A} \setminus \mathrm{B} \]</td>
+<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q18192442">Q18192442</a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>SymmetricDifference</code></td>
-<td style="text-align:left">\[  A \triangle B \]</td>
-<td style="text-align:left">Disjunctive union = \( (A \setminus B) \cup (B \setminus A)\) <a href="https://www.wikidata.org/wiki/Q1147242">Q1147242</a></td>
+<td style="text-align:left">\[  \mathrm{A} \triangle \mathrm{B} \]</td>
+<td style="text-align:left">Disjunctive union = \( (\mathrm{A} \setminus \mathrm{B}) \cup (\mathrm{B} \setminus \mathrm{A})\) <a href="https://www.wikidata.org/wiki/Q1147242">Q1147242</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Relations</h2>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Function</th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>Element</code></td>
+<td style="text-align:left">\[ x \in \mathrm{A} \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>NotElement</code></td>
+<td style="text-align:left">\[ x \not\in \mathrm{A} \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>NotSubset</code></td>
+<td style="text-align:left">\[ A \nsubset \mathrm{B} \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>NotSuperset</code></td>
+<td style="text-align:left">\[ A \nsupset \mathrm{B} \]</td>
+<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Subset</code></td>
-<td style="text-align:left">\[ A \subset B \]</td>
+<td style="text-align:left">\[ \mathrm{A} \subset \mathrm{B} \] <br> \[ \mathrm{A} \subsetneq \mathrm{B} \] <br> \[ \mathrm{A} \varsubsetneqq \mathrm{B} \]</td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>SubsetEqual</code></td>
-<td style="text-align:left">\[ A \subseteq B \]</td>
+<td style="text-align:left">\[ \mathrm{A} \subseteq \mathrm{B} \]</td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>SetMinus</code></td>
-<td style="text-align:left">\[ A \setminus B \]</td>
-<td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q18192442">Q18192442</a></td>
+<td style="text-align:left"><code>Superset</code></td>
+<td style="text-align:left">\[ \mathrm{A} \supset \mathrm{B} \]<br>  \[ \mathrm{A} \supsetneq \mathrm{B} \]<br>\[ \mathrm{A} \varsupsetneq \mathrm{B} \]</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>SupersetEqual</code></td>
+<td style="text-align:left">\[ \mathrm{A} \supseteq \mathrm{B} \]</td>
+<td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
@@ -902,10 +921,10 @@
         
 
 
-        <meta itemprop="datePublished" content="June 25, 2021">
+        <meta itemprop="datePublished" content="June 27, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jun 25 2021 18:14:27 GMT+0200 (Central European Summer Time)">June 25, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sun Jun 27 2021 10:30:42 GMT+0200 (Central European Summer Time)">June 27, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
