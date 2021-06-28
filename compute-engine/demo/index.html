@@ -1059,7 +1059,10 @@
       </math-field>
       <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
     </div>
-    <div id='mathfield-latex' class="output toggle-field"></div>
+    <div class = 'toggle-field'>
+      <div id='mathfield-latex' class="output"></div>
+      <div id='mathfield-math-json' class="output mathjson"></div>
+    </div>
   </div>
 
   <!-- 2{xy}     1+|a+|2|+b| -->
@@ -1305,6 +1308,16 @@
         errors = [];
 
         expr = defaultLatex.parse(latex);
+
+        const mathJsonEl = document.getElementById('mathfield-math-json')
+        if (mathJsonEl) {
+          mathJsonEl.innerHTML =
+            exprToString(expr) +
+            '<br><div style="font-weight: bold; color: hsl(4deg, 90%, 50%)">' +
+            errors.join('<br>') + '</div>';
+        }
+
+
       } catch (e) {
         console.error("parse(%c " + latex + '%c) ' +
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
@@ -1488,10 +1501,10 @@
         
 
 
-        <meta itemprop="datePublished" content="June 25, 2021">
+        <meta itemprop="datePublished" content="June 28, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jun 25 2021 15:23:49 GMT+0200 (Central European Summer Time)">June 25, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jun 28 2021 12:01:15 GMT+0200 (Central European Summer Time)">June 28, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
