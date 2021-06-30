@@ -10,6 +10,13 @@
     CortexJS
 </title>
 <meta name="description" content="" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ECEC8YT7XS');
+</script>
 
 
 <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
@@ -1192,6 +1199,15 @@
       <div class="output mathjson toggle-field"></div>
     </div>
 
+    <div class="output-section" id="solve">
+      <div class='row'>
+        <code class="label">solve(f, ["x"]))&nbsp;=&nbsp;</code>
+        <math-field class="latex" read-only></math-field>
+        <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
+      </div>
+      <div class="output mathjson toggle-field"></div>
+    </div>
+
   </main>
 
 
@@ -1374,6 +1390,12 @@
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
       }
 
+      try {
+        updateExpr(await ce.solve(expr, ['x']), 'solve');
+      } catch (e) {
+        console.error("solve(%c " + latex + '%c, ["x"]) ' +
+          e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+      }
     }
 
     function updateExpr(expr, id) {
@@ -1436,7 +1458,8 @@
       'domain', 
       'simplify', 
       'evaluate-numerically', 
-      'evaluate'].forEach(id => {
+      'evaluate', 
+      'solve'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         const toggle = el.querySelector('.toggle');
@@ -1504,7 +1527,7 @@
         <meta itemprop="datePublished" content="June 28, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jun 28 2021 12:01:15 GMT+0200 (Central European Summer Time)">June 28, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jun 28 2021 18:17:15 GMT+0200 (Central European Summer Time)">June 28, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
