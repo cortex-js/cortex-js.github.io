@@ -12,10 +12,12 @@
 <meta name="description" content="" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ECEC8YT7XS');
+  if(/cortexjs\.io/.test(window.location.hostname)) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ECEC8YT7XS');
+  }
 </script>
 
 
@@ -48,13 +50,6 @@
 
 
 
-  
-    
-      
-    
-    <script defer type="module" src="/assets/js/code-playground.js" crossorigin='anonymous'></script>
-  
-
 
 
 <link rel="stylesheet" href="/assets/css/main.css">
@@ -70,20 +65,13 @@
 
 
 
-    <link
-    crossorigin
-    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
-    rel="stylesheet"
-/>
-
-<link
-    crossorigin
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
-/>
-
-
+    <link rel="preconnect" href="https://kit.fontawesome.com">
 <script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
 
 <!-- <script>
   // ((window.gitter = {}).chat = {}).options = {
@@ -797,10 +785,10 @@ This may be as simple as adding this:</li>
         
 
 
-        <meta itemprop="datePublished" content="June 19, 2021">
+        <meta itemprop="datePublished" content="July 01, 2021">
         
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jun 19 2021 09:39:24 GMT+0200 (Central European Summer Time)">June 19, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Thu Jul 01 2021 10:10:10 GMT+0200 (Central European Summer Time)">July 01, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

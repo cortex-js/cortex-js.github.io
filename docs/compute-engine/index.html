@@ -13,10 +13,12 @@
 <meta name="description" content="" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ECEC8YT7XS');
+  if(/cortexjs\.io/.test(window.location.hostname)) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ECEC8YT7XS');
+  }
 </script>
 
 
@@ -41,20 +43,13 @@
 
 
     <!-- <link rel="stylesheet" href="/assets/css/sdk-documentation-layout.css"> -->
-    <link
-    crossorigin
-    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:100,100i,400,400i,700,700i,900,900i&display=block"
-    rel="stylesheet"
-/>
-
-<link
-    crossorigin
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=block"
-/>
-
-
+    <link rel="preconnect" href="https://kit.fontawesome.com">
 <script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
 
 <!-- <script>
   // ((window.gitter = {}).chat = {}).options = {
@@ -1245,7 +1240,7 @@ transformations.</p>
 </div>
 
 </section>
-<section data-keywords="function, format" id="(format%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(format%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Transform an expression by applying one or more rewriting rules to it,
+<section data-keywords="function, format" id="(format%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(format%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Transform an expression by applying one or more rewriting rules to it,
 recursively.</p>
 
 <p>There are many ways to symbolically manipulate an expression, but
@@ -1286,7 +1281,7 @@ for example subtraction is replaced with addition</li>
 </div>
 
 </section>
-<section data-keywords="function, match" id="(match%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>match</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(match%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>The function attempts to match a <a href="http://cortexjs.io/compute-engine/guides/patterns-and-rules/">pattern</a>
+<section data-keywords="function, match" id="(match%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>match</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(match%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>The function attempts to match a <a href="http://cortexjs.io/compute-engine/guides/patterns-and-rules/">pattern</a>
 with a subject expression.</p>
 
 <p>If the match is successful, it returns a <code>Substitution</code> indicating how to
@@ -1329,7 +1324,7 @@ use the <code>ce.match()</code> function instead.</p>
 </div>
 
 </section>
-<section data-keywords="function, parse" id="(parse%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(parse%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, parse" id="(parse%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(parse%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>parse</strong><span class="punctuation">(</span><var>latex</var><span class="punctuation">: </span>LatexString<span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>NumberFormattingOptions<span class="punctuation"> &amp; </span>ParseLatexOptions<span class="punctuation"> &amp; </span><span class="punctuation">{</span>dictionary<span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Readonly" class="externallink">Readonly<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>LatexDictionary<span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">&gt;</span><span class="punctuation">; </span>onError<span class="punctuation">: </span><a href="#(ErrorListener%3Atype)">ErrorListener</a><span class="punctuation">&lt;</span><a href="#(ErrorCode%3Atype)">ErrorCode</a><span class="punctuation">&gt;</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a></div>
@@ -1391,7 +1386,7 @@ use the <code>ce.match()</code> function instead.</p>
 </div>
 
 </section>
-<section data-keywords="function, substitute" id="(substitute%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>substitute</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(substitute%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, substitute" id="(substitute%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>substitute</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(substitute%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>substitute</strong><span class="punctuation">(</span><var>expr</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">, </span><var>substitution</var><span class="punctuation">: </span>Substitution<span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span></div>
@@ -1431,7 +1426,7 @@ use the <code>ce.match()</code> function instead.</p>
 </section>
 
 
-<section><section id="(ComputeEngine%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
+<section><section id="(ComputeEngine%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>ComputeEngine</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
 <div><p><span class="class-label">Implements </span>ComputeEngineInterface</p></div>
 <p>Create a <code>CustomEngine</code> instance to customize its behavior and the syntax
 and operation dictionaries it uses.</p>
@@ -1596,11 +1591,11 @@ as domains (<code>Boolean</code>, <code>Number</code>, etc…) that are used by 
 </ul>
 
 </div>
-<section data-keywords="instance, assumptions" id="(ComputeEngine%3Aclass).(assumptions%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get </span><strong>assumptions</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(assumptions%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="instance, assumptions" id="(ComputeEngine%3Aclass).(assumptions%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get </span><strong>assumptions</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(assumptions%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>assumptions<span class="punctuation">: </span>ExpressionMap<span class="punctuation">&lt;</span>T<span class="punctuation">, </span><span class="keyword">boolean</span><span class="punctuation">&gt;</span>&nbsp;&nbsp;<span class="modifier-tag">read only</span></div>
 
 </section>
-<section data-keywords="instance, context" id="(ComputeEngine%3Aclass).(context%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get </span><strong>context</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(context%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="instance, context" id="(ComputeEngine%3Aclass).(context%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get </span><strong>context</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(context%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>context<span class="punctuation">: </span>RuntimeScope<span class="punctuation">&lt;</span><span class="keyword">any</span><span class="punctuation">&gt;</span>&nbsp;&nbsp;<span class="modifier-tag">read only</span></div>
 <p>The current executin context, a runtime scope.</p>
 
@@ -1610,7 +1605,7 @@ scopes can obscure definitions from older scopes.</p>
 
 
 </section>
-<section data-keywords="instance, numericformat" id="(ComputeEngine%3Aclass).(numericFormat%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>numericFormat</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(numericFormat%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="instance, numericformat" id="(ComputeEngine%3Aclass).(numericFormat%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>numericFormat</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(numericFormat%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>numericFormat<span class="punctuation">: </span>NumericFormat</div>
 <p>Internal format to represent numbers:</p>
 <ul>
@@ -1626,7 +1621,7 @@ of precision).</li>
 
 
 </section>
-<section data-keywords="instance, precision" id="(ComputeEngine%3Aclass).(precision%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>precision</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(precision%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="instance, precision" id="(ComputeEngine%3Aclass).(precision%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>precision</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(precision%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>precision<span class="punctuation">: </span><span class="keyword">number</span></div>
 <p>The default precision of the compute engine: the number of significant
 digits when performing numeric evaluations, such as when calling <code>ce.N()</code>.</p>
@@ -1642,7 +1637,7 @@ the compute engine is used.</p>
 
 
 </section>
-<section data-keywords="instance, tolerance" id="(ComputeEngine%3Aclass).(tolerance%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>tolerance</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(tolerance%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="instance, tolerance" id="(ComputeEngine%3Aclass).(tolerance%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">get/set </span><strong>tolerance</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(tolerance%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>tolerance<span class="punctuation">: </span><span class="keyword">number</span></div>
 <p>Values smaller than the tolerance are considered to be zero for the
 purpose of comparison, i.e. if <code>|b - a| &lt;= tolerance</code>, <code>b</code> is considered
@@ -1676,7 +1671,7 @@ equal to <code>a</code>.</p>
 </div>
 
 </section>
-<section data-keywords="function, ask" id="(ComputeEngine%3Aclass).(ask%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>ask</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(ask%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return a list of all the assumptions that match a pattern.</p>
+<section data-keywords="function, ask" id="(ComputeEngine%3Aclass).(ask%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>ask</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(ask%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return a list of all the assumptions that match a pattern.</p>
 
 <pre><code class="language-js"> ce.<span class="hljs-title function_">assume</span>(x, <span class="hljs-string">&#x27;PositiveInteger&#x27;</span>);
  ce.<span class="hljs-title function_">ask</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_val&#x27;</span>])
@@ -1707,7 +1702,7 @@ equal to <code>a</code>.</p>
 </div>
 
 </section>
-<section data-keywords="function, assume" id="(ComputeEngine%3Aclass).(assume%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>assume</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(assume%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Add an assumption.</p>
+<section data-keywords="function, assume" id="(ComputeEngine%3Aclass).(assume%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>assume</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(assume%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Add an assumption.</p>
 
 <p>Return <code>contradiction</code> if the new assumption is incompatible with previous
 ones.</p>
@@ -1793,7 +1788,7 @@ ones.</p>
 </div>
 
 </section>
-<section data-keywords="function, canonical" id="(ComputeEngine%3Aclass).(canonical%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>canonical</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(canonical%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression to the canonical form.</p>
+<section data-keywords="function, canonical" id="(ComputeEngine%3Aclass).(canonical%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>canonical</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(canonical%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Format the expression to the canonical form.</p>
 
 <p>In the canonical form, some operations are simplified (subtractions
 becomes additions of negative, division become multiplications of inverse,
@@ -1824,7 +1819,7 @@ subsequent operations easier.</p>
 </div>
 
 </section>
-<section data-keywords="function, checkcontinueexecution" id="(ComputeEngine%3Aclass).(checkContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>checkContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(checkContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, checkcontinueexecution" id="(ComputeEngine%3Aclass).(checkContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>checkContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(checkContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>checkContinueExecution</strong><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
@@ -1836,7 +1831,7 @@ subsequent operations easier.</p>
 </div>
 
 </section>
-<section data-keywords="function, chop" id="(ComputeEngine%3Aclass).(chop%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>chop</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(chop%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, chop" id="(ComputeEngine%3Aclass).(chop%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>chop</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(chop%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>chop</strong><span class="punctuation">(</span><var>n</var><span class="punctuation">: </span><span class="keyword">any</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">any</span></div>
@@ -1860,7 +1855,7 @@ subsequent operations easier.</p>
 </div>
 
 </section>
-<section data-keywords="function, domain" id="(ComputeEngine%3Aclass).(domain%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(domain%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the domain of the expression</p>
+<section data-keywords="function, domain" id="(ComputeEngine%3Aclass).(domain%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>domain</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(domain%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the domain of the expression</p>
 
 
 <div>
@@ -1930,7 +1925,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, format" id="(ComputeEngine%3Aclass).(format%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(format%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, format" id="(ComputeEngine%3Aclass).(format%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>format</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(format%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>format</strong><span class="punctuation">(</span><var>expr</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">, </span><var>forms</var><span class="modifier">?</span><span class="punctuation">: </span>Form<span class="punctuation"> | </span>Form<span class="punctuation">[]</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span></div>
@@ -2007,7 +2002,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, getfunctiondefinition" id="(ComputeEngine%3Aclass).(getFunctionDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getFunctionDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getFunctionDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getfunctiondefinition" id="(ComputeEngine%3Aclass).(getFunctionDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getFunctionDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getFunctionDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getFunctionDefinition</strong><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span>FunctionDefinition<span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span></div>
@@ -2031,7 +2026,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, getsetdefinition" id="(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSetDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getsetdefinition" id="(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSetDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSetDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getSetDefinition</strong><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span>SetDefinition<span class="punctuation">&lt;</span><span class="keyword">any</span><span class="punctuation">&gt;</span></div>
@@ -2055,7 +2050,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, getsymboldefinition" id="(ComputeEngine%3Aclass).(getSymbolDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSymbolDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSymbolDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getsymboldefinition" id="(ComputeEngine%3Aclass).(getSymbolDefinition%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getSymbolDefinition</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getSymbolDefinition%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getSymbolDefinition</strong><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span>SymbolDefinition<span class="punctuation">&lt;</span><span class="keyword">any</span><span class="punctuation">&gt;</span></div>
@@ -2079,7 +2074,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, getvars" id="(ComputeEngine%3Aclass).(getVars%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getVars</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getVars%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the variables in the expression</p>
+<section data-keywords="function, getvars" id="(ComputeEngine%3Aclass).(getVars%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getVars</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getVars%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return the variables in the expression</p>
 
 
 <div>
@@ -2105,7 +2100,7 @@ blocking.</p>
 </div>
 
 </section>
-<section data-keywords="function, is" id="(ComputeEngine%3Aclass).(is%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>is</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(is%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Determines if the predicate is satisfied based on the known assumptions.</p>
+<section data-keywords="function, is" id="(ComputeEngine%3Aclass).(is%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>is</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(is%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Determines if the predicate is satisfied based on the known assumptions.</p>
 
 <p>Return <code>undefined</code> if the value of the predicate cannot be determined.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Equal&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">0</span>]);
@@ -2238,7 +2233,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isequal" id="(ComputeEngine%3Aclass).(isEqual%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isEqual</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isEqual%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isequal" id="(ComputeEngine%3Aclass).(isEqual%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isEqual</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isEqual%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isEqual</strong><span class="punctuation">(</span><var>lhs</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">, </span><var>rhs</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2290,7 +2285,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isfinite" id="(ComputeEngine%3Aclass).(isFinite%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isFinite</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isFinite%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isfinite" id="(ComputeEngine%3Aclass).(isFinite%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isFinite</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isFinite%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isFinite</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2370,7 +2365,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isinfinity" id="(ComputeEngine%3Aclass).(isInfinity%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isInfinity</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isInfinity%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isinfinity" id="(ComputeEngine%3Aclass).(isInfinity%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isInfinity</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isInfinity%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isInfinity</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2394,7 +2389,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isinteger" id="(ComputeEngine%3Aclass).(isInteger%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isInteger</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isInteger%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isinteger" id="(ComputeEngine%3Aclass).(isInteger%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isInteger</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isInteger%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isInteger</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2446,7 +2441,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, islessequal" id="(ComputeEngine%3Aclass).(isLessEqual%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isLessEqual</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isLessEqual%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, islessequal" id="(ComputeEngine%3Aclass).(isLessEqual%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isLessEqual</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isLessEqual%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isLessEqual</strong><span class="punctuation">(</span><var>lhs</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">, </span><var>rhs</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2498,7 +2493,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isnegativeone" id="(ComputeEngine%3Aclass).(isNegativeOne%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNegativeOne</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNegativeOne%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isnegativeone" id="(ComputeEngine%3Aclass).(isNegativeOne%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNegativeOne</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNegativeOne%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isNegativeOne</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2522,7 +2517,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isnonnegative" id="(ComputeEngine%3Aclass).(isNonNegative%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNonNegative</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNonNegative%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isnonnegative" id="(ComputeEngine%3Aclass).(isNonNegative%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNonNegative</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNonNegative%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isNonNegative</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2594,7 +2589,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isnumeric" id="(ComputeEngine%3Aclass).(isNumeric%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNumeric</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNumeric%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isnumeric" id="(ComputeEngine%3Aclass).(isNumeric%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isNumeric</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isNumeric%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isNumeric</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2618,7 +2613,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isone" id="(ComputeEngine%3Aclass).(isOne%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isOne</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isOne%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isone" id="(ComputeEngine%3Aclass).(isOne%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isOne</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isOne%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isOne</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2690,7 +2685,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, isreal" id="(ComputeEngine%3Aclass).(isReal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isReal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isReal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, isreal" id="(ComputeEngine%3Aclass).(isReal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isReal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isReal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isReal</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2714,7 +2709,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, issubsetof" id="(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isSubsetOf</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, issubsetof" id="(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isSubsetOf</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isSubsetOf%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isSubsetOf</strong><span class="punctuation">(</span><var>lhs</var><span class="punctuation">: </span>Domain<span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">, </span><var>rhs</var><span class="punctuation">: </span>Domain<span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2742,7 +2737,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, iszero" id="(ComputeEngine%3Aclass).(isZero%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isZero</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isZero%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, iszero" id="(ComputeEngine%3Aclass).(isZero%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>isZero</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(isZero%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>isZero</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
@@ -2766,7 +2761,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, parse" id="(ComputeEngine%3Aclass).(parse%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(parse%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, parse" id="(ComputeEngine%3Aclass).(parse%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(parse%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>parse</strong><span class="punctuation">(</span><var>s</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span></div>
@@ -2858,7 +2853,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, serialize" id="(ComputeEngine%3Aclass).(serialize%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>serialize</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(serialize%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, serialize" id="(ComputeEngine%3Aclass).(serialize%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>serialize</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(serialize%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>serialize</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
@@ -2882,7 +2877,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, shouldcontinueexecution" id="(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>shouldContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return false if the execution should stop.</p>
+<section data-keywords="function, shouldcontinueexecution" id="(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>shouldContinueExecution</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(shouldContinueExecution%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return false if the execution should stop.</p>
 
 <p>This can occur if:</p>
 <ul>
@@ -2908,7 +2903,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
 </div>
 
 </section>
-<section data-keywords="function, signal" id="(ComputeEngine%3Aclass).(signal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>signal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(signal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Call this function if an unexpected condition occurs during execution of a
+<section data-keywords="function, signal" id="(ComputeEngine%3Aclass).(signal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>signal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(signal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Call this function if an unexpected condition occurs during execution of a
 function in the engine.</p>
 
 <p>An <code>ErrorSignal</code> is a problem that cannot be recovered from.</p>
@@ -2934,7 +2929,7 @@ execution to continue.</p>
 </div>
 
 </section>
-<section data-keywords="function, simplify" id="(ComputeEngine%3Aclass).(simplify%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>simplify</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(simplify%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Attempt to simplify an expression, that is rewrite it in a simpler form,
+<section data-keywords="function, simplify" id="(ComputeEngine%3Aclass).(simplify%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>simplify</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(simplify%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Attempt to simplify an expression, that is rewrite it in a simpler form,
 making use of the available assumptions.</p>
 
 <p>The simplification steps will proceed multiple times until either:
@@ -3001,7 +2996,7 @@ values are an infinite amount of iterations and a 2s time limit.</p>
 </div>
 
 </section>
-<section data-keywords="function, getdictionaries" id="(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionaries</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return dictionaries suitable for the specified categories, or <code>&quot;all&quot;</code>
+<section data-keywords="function, getdictionaries" id="(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionaries</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(getDictionaries%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>Return dictionaries suitable for the specified categories, or <code>&quot;all&quot;</code>
 for all categories (<code>&quot;arithmetic&quot;</code>, <code>&quot;algebra&quot;</code>, etc…).</p>
 
 <p>A symbol dictionary defines how the symbols and function names in a MathJSON
@@ -3036,15 +3031,15 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </section>
 
 
-<section><section data-keywords="internal" id="(ComputeEngine%3Aclass).(internal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head">ComputeEngine.<strong>internal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(internal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>InternalComputeEngine
+<section><section data-keywords="internal" id="(ComputeEngine%3Aclass).(internal%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>ComputeEngine</strong></span><span class="highlighting-mark-container"><span class="head">ComputeEngine.<strong>internal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ComputeEngine%3Aclass).(internal%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>InternalComputeEngine
 </section>
 
 </section>
 
 </section>
-<section id="(CortexError%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>CortexError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(CortexError%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
+<section id="(CortexError%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>CortexError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(CortexError%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
 <div><p><span class="class-label">Extends </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="externallink">Error<svg><use xlink:href="#external-link"></use></svg></a></p></div>
-<section><section data-keywords="new cortexerror" id="CortexError%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>CortexError</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>CortexError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#CortexError%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section><section data-keywords="new cortexerror" id="CortexError%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>CortexError</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>CortexError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#CortexError%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><span class="keyword">new </span><strong>CortexError</strong><span class="punctuation">(</span><var>errorSignal</var><span class="punctuation">: </span><a href="#(Signal%3Atype)">Signal</a><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(CortexError%3Aclass)">CortexError</a></div>
@@ -3072,7 +3067,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </section>
 
 
-<section><section data-keywords="function, tostring" id="(CortexError%3Aclass).(toString%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>CortexError</strong></span><span class="highlighting-mark-container"><span class="head"><strong>toString</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(CortexError%3Aclass).(toString%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section><section data-keywords="function, tostring" id="(CortexError%3Aclass).(toString%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>CortexError</strong></span><span class="highlighting-mark-container"><span class="head"><strong>toString</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(CortexError%3Aclass).(toString%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>toString</strong><span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
@@ -3094,9 +3089,9 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </section>
 
 </section>
-<section id="(LatexSyntax%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>LatexSyntax</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
+<section id="(LatexSyntax%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>LatexSyntax</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
 <div></div>
-<section><section data-keywords="new latexsyntax" id="LatexSyntax%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>LatexSyntax</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#LatexSyntax%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section><section data-keywords="new latexsyntax" id="LatexSyntax%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>LatexSyntax</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#LatexSyntax%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><span class="keyword">new </span><strong>LatexSyntax</strong><span class="punctuation">(</span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>NumberFormattingOptions<span class="punctuation"> &amp; </span>ParseLatexOptions<span class="punctuation"> &amp; </span>SerializeLatexOptions<span class="punctuation"> &amp; </span><span class="punctuation">{</span>dictionary<span class="punctuation">: </span><span class="keyword">readonly </span>LatexDictionaryEntry<span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">[]</span><span class="punctuation">; </span>onError<span class="punctuation">: </span><a href="#(ErrorListener%3Atype)">ErrorListener</a><span class="punctuation">&lt;</span><a href="#(ErrorCode%3Atype)">ErrorCode</a><span class="punctuation">&gt;</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(LatexSyntax%3Aclass)">LatexSyntax</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span></div>
@@ -3140,7 +3135,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </ul>
 
 </div>
-<section data-keywords="function, parse" id="(LatexSyntax%3Aclass).(parse%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(parse%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, parse" id="(LatexSyntax%3Aclass).(parse%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><strong>parse</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(parse%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>parse</strong><span class="punctuation">(</span><var>latex</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span><span class="keyword">number</span><span class="punctuation">&gt;</span></div>
@@ -3188,7 +3183,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </div>
 
 </section>
-<section data-keywords="function, getdictionary" id="(LatexSyntax%3Aclass).(getDictionary%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(getDictionary%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="function, getdictionary" id="(LatexSyntax%3Aclass).(getDictionary%3Astatic)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(getDictionary%3Astatic)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div>
 <div>
 <div class="code"><strong>getDictionary</strong><span class="punctuation">(</span><var>domain</var><span class="punctuation">: </span><a href="#(DictionaryCategory%3Atype)">DictionaryCategory</a><span class="punctuation"> | </span><span class="string-literal">"all"</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">readonly </span>LatexDictionaryEntry<span class="punctuation">&lt;</span><span class="keyword">any</span><span class="punctuation">&gt;</span><span class="punctuation">[]</span></div>
@@ -3228,7 +3223,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </ul>
 
 </div>
-<section data-keywords="onerror" id="(LatexSyntax%3Aclass).(onError%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head">LatexSyntax.<strong>onError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(onError%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><a href="#(ErrorListener%3Atype)">ErrorListener</a><span class="punctuation">&lt;</span><a href="#(ErrorCode%3Atype)">ErrorCode</a><span class="punctuation">&gt;</span>
+<section data-keywords="onerror" id="(LatexSyntax%3Aclass).(onError%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head">LatexSyntax.<strong>onError</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(onError%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><a href="#(ErrorListener%3Atype)">ErrorListener</a><span class="punctuation">&lt;</span><a href="#(ErrorCode%3Atype)">ErrorCode</a><span class="punctuation">&gt;</span>
 </section>
 <section data-keywords="options" id="(LatexSyntax%3Aclass).(options%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>LatexSyntax</strong></span><span class="highlighting-mark-container"><span class="head">LatexSyntax.<strong>options</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(LatexSyntax%3Aclass).(options%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><ul class="type-block"><li><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Required" class="externallink">Required<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>NumberFormattingOptions<span class="punctuation">&gt;</span><span class="punctuation"> &amp; </span></li>
 <li><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Required" class="externallink">Required<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>ParseLatexOptions<span class="punctuation">&gt;</span><span class="punctuation"> &amp; </span></li>
@@ -3287,7 +3282,7 @@ expression should be interpreted, i.e. how to evaluate and manipulate them.</p>
 </ul>
 
 </div>
-<section data-keywords="type, attributes" id="(Attributes%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Attributes</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Attributes%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, attributes" id="(Attributes%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Attributes</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(Attributes%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><div><dl><dt>comment<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd><p>A human readable string to annotate an expression, since JSON does not
 allow comments in its encoding</p>
 
@@ -3334,7 +3329,7 @@ for the <code>Pi</code> constant.</p>
 </dd></dl></div></div>
 
 </section>
-<section data-keywords="type, dictionarycategory" id="(DictionaryCategory%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>DictionaryCategory</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(DictionaryCategory%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, dictionarycategory" id="(DictionaryCategory%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>DictionaryCategory</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(DictionaryCategory%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><span class="punctuation">| </span><span class="string-literal">"algebra"</span></li>
 <li><span class="punctuation">| </span><span class="string-literal">"arithmetic"</span></li>
 <li><span class="punctuation">| </span><span class="string-literal">"calculus"</span></li>
@@ -3457,20 +3452,20 @@ a single argument was encountered with no arguments or more than one argument</p
 <li><span class="punctuation">| </span><span class="string-literal">"syntax-error"</span></li></ul></div>
 
 </section>
-<section data-keywords="type, errorlistener" id="(ErrorListener%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorListener</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ErrorListener%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, errorlistener" id="(ErrorListener%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorListener</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ErrorListener%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation"> = </span><span class="punctuation">(</span><var>err</var><span class="punctuation">: </span><span class="punctuation">{</span>after<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>arg<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>before<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>code<span class="punctuation">: </span>T<span class="punctuation">; </span>latex<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
 
 </section>
-<section data-keywords="type, errorsignal" id="(ErrorSignal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorSignal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ErrorSignal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, errorsignal" id="(ErrorSignal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorSignal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(ErrorSignal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><a href="#(Signal%3Atype)">Signal</a><span class="punctuation"> &amp; </span></li>
 <li><div><dl><dt>severity<span class="punctuation">: </span><span class="string-literal">"error"</span><span class="punctuation">;</span></dt><dd></dd></dl></div></li></ul></div>
 
 </section>
-<section data-keywords="type, errorsignalhandler" id="(ErrorSignalHandler%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorSignalHandler</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(ErrorSignalHandler%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, errorsignalhandler" id="(ErrorSignalHandler%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>ErrorSignalHandler</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(ErrorSignalHandler%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><span class="punctuation">(</span><var>error</var><span class="punctuation">: </span><a href="#(ErrorSignal%3Atype)">ErrorSignal</a><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
 
 </section>
-<section data-keywords="type, expression" id="(Expression%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Expression</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(Expression%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A MathJSON expression is a recursive data structure.</p>
+<section data-keywords="type, expression" id="(Expression%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Expression</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Expression%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A MathJSON expression is a recursive data structure.</p>
 
 <p>The leaf nodes of an expression are numbers, strings and symbols.
 The dictionary and function nodes can contain expressions themselves.</p>
@@ -3493,17 +3488,17 @@ Compute Engine also uses <code>Decimal</code> and <code>Complex</code> classes.<
 <li><span class="punctuation">| </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">[]</span></li></ul></div>
 
 </section>
-<section data-keywords="type, mathjsondictionary" id="(MathJsonDictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathJsonDictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, mathjsondictionary" id="(MathJsonDictionary%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonDictionary</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathJsonDictionary%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><span class="punctuation">&lt;</span>T<span class="keyword"> extends </span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation"> = </span><ul class="type-block"><li><div><dl><dt>dict<span class="punctuation">: </span><span class="punctuation">{</span><span class="punctuation">}</span><span class="punctuation">;</span></dt><dd></dd></dl></div><span class="punctuation"> &amp; </span></li>
 <li><a href="#(Attributes%3Atype)">Attributes</a></li></ul></div>
 
 </section>
-<section data-keywords="type, mathjsonfunction" id="(MathJsonFunction%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonFunction</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathJsonFunction%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, mathjsonfunction" id="(MathJsonFunction%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonFunction</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathJsonFunction%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><span class="punctuation">&lt;</span>T<span class="keyword"> extends </span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation"> = </span><ul class="type-block"><li><div><dl><dt>fn<span class="punctuation">: </span><a href="#(Expression%3Atype)">Expression</a><span class="punctuation">&lt;</span>T<span class="punctuation">&gt;</span><span class="punctuation">[]</span><span class="punctuation">;</span></dt><dd></dd></dl></div><span class="punctuation"> &amp; </span></li>
 <li><a href="#(Attributes%3Atype)">Attributes</a></li></ul></div>
 
 </section>
-<section data-keywords="type, mathjsonnumber" id="(MathJsonNumber%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonNumber</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathJsonNumber%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A MathJSON numeric quantity.</p>
+<section data-keywords="type, mathjsonnumber" id="(MathJsonNumber%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonNumber</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathJsonNumber%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3><p>A MathJSON numeric quantity.</p>
 
 <p>The string is a string of:</p>
 <ul>
@@ -3533,19 +3528,19 @@ optional <code>-</code> minus sign, followed by a string of digits).</li>
 <li><a href="#(Attributes%3Atype)">Attributes</a></li></ul></div>
 
 </section>
-<section data-keywords="type, mathjsonsymbol" id="(MathJsonSymbol%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonSymbol</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathJsonSymbol%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, mathjsonsymbol" id="(MathJsonSymbol%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>MathJsonSymbol</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathJsonSymbol%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><div><dl><dt>sym<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd></dd></dl></div><span class="punctuation"> &amp; </span></li>
 <li><a href="#(Attributes%3Atype)">Attributes</a></li></ul></div>
 
 </section>
-<section data-keywords="type, runtimesignalcode" id="(RuntimeSignalCode%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>RuntimeSignalCode</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(RuntimeSignalCode%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, runtimesignalcode" id="(RuntimeSignalCode%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>RuntimeSignalCode</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(RuntimeSignalCode%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><span class="punctuation">| </span><span class="string-literal">"timeout"</span></li>
 <li><span class="punctuation">| </span><span class="string-literal">"out-of-memory"</span></li>
 <li><span class="punctuation">| </span><span class="string-literal">"recursion-depth-exceeded"</span></li>
 <li><span class="punctuation">| </span><span class="string-literal">"iteration-limit-exceeded"</span></li></ul></div>
 
 </section>
-<section data-keywords="type, signal" id="(Signal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Signal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(Signal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, signal" id="(Signal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>Signal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(Signal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><div><dl><dt>head<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd><p>If applicable, the head of the function about which the
 signal was raised</p>
 
@@ -3557,21 +3552,21 @@ the signal code.</p>
 </dd><dt>severity<span class="punctuation">: </span><span class="string-literal">"warning"</span><span class="punctuation"> | </span><span class="string-literal">"error"</span><span class="punctuation">;</span></dt><dd></dd></dl></div></div>
 
 </section>
-<section data-keywords="type, signalcode" id="(SignalCode%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalCode</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(SignalCode%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, signalcode" id="(SignalCode%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalCode</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(SignalCode%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><span class="punctuation">| </span><a href="#(RuntimeSignalCode%3Atype)">RuntimeSignalCode</a></li>
 <li><span class="punctuation">| </span><span class="string-literal">"syntax-error"</span><span class="punctuation"> | </span><span class="string-literal">"invalid-name"</span><span class="punctuation"> | </span><span class="string-literal">"expected-predicate"</span><span class="punctuation"> | </span><span class="string-literal">"expected-symbol"</span><span class="punctuation"> | </span><span class="string-literal">"cyclic-definition"</span><span class="punctuation"> | </span><span class="string-literal">"invalid-supersets"</span><span class="punctuation"> | </span><span class="string-literal">"expected-supersets"</span><span class="punctuation"> | </span><span class="string-literal">"unknown-domain"</span><span class="punctuation"> | </span><span class="string-literal">"duplicate-wikidata"</span><span class="punctuation"> | </span><span class="string-literal">"invalid-dictionary-entry"</span></li></ul></div>
 
 </section>
-<section data-keywords="type, signalmessage" id="(SignalMessage%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalMessage</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(SignalMessage%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, signalmessage" id="(SignalMessage%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalMessage</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(SignalMessage%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><span class="punctuation">| </span><a href="#(SignalCode%3Atype)">SignalCode</a></li>
 <li><span class="punctuation">| </span><span class="punctuation">[</span><a href="#(SignalCode%3Atype)">SignalCode</a><span class="punctuation">, </span>...<span class="keyword">any</span><span class="punctuation">[]</span><span class="punctuation">]</span></li></ul></div>
 
 </section>
-<section data-keywords="type, signalorigin" id="(SignalOrigin%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalOrigin</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(SignalOrigin%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, signalorigin" id="(SignalOrigin%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>SignalOrigin</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(SignalOrigin%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><div><dl><dt>around<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd></dd><dt>column<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">;</span></dt><dd></dd><dt>line<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">;</span></dt><dd></dd><dt>offset<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">;</span></dt><dd></dd><dt>source<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd></dd><dt>url<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">;</span></dt><dd></dd></dl></div></div>
 
 </section>
-<section data-keywords="type, warningsignal" id="(WarningSignal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>WarningSignal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(WarningSignal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<section data-keywords="type, warningsignal" id="(WarningSignal%3Atype)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>WarningSignal</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(WarningSignal%3Atype)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
 <div class="code"><ul class="type-block"><li><a href="#(Signal%3Atype)">Signal</a><span class="punctuation"> &amp; </span></li>
 <li><div><dl><dt>severity<span class="punctuation">: </span><span class="string-literal">"warning"</span><span class="punctuation">;</span></dt><dd></dd></dl></div></li></ul></div>
 
