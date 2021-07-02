@@ -737,12 +737,6 @@ Table of Content</label>
     font-size: .9em;
     white-space: break-spaces;
   }
-
-
-  .footer-version {
-
-  }
-  
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
 <p>MathLive supports over 800 LaTeX commands.</p>
@@ -756,56 +750,48 @@ and white spaces are ignored.</p>
 <p>In Math Mode, the layout and size of some math elements is adjusted based on the
 context in which they are used. For example, superscripts and subscripts are
 displayed in a smaller font.</p>
-<p>The appropriate <em>math style</em> is selected automatically, but it can be overridden
-with the following commands:</p>
-<ul>
-<li><code>\displaystyle</code>: <strong>Display Style</strong> for standalone equations</li>
-<li><code>\textstyle</code>: <strong>Text Style</strong> is the confusing name for inline math, not for text mode.</li>
-<li><code>\scriptstyle</code>: <strong>Script Style</strong> for subscripts and superscripts</li>
-<li><code>\scriptscriptstyle</code>: <strong>Scriptscript Style</strong> for subscripts and superscripts
-of subscripts and superscripts</li>
-</ul>
-<div class='no-line two-col'>
+<p><strong>To override the default <strong><em>math style</em></strong></strong>, use the following commands:</p>
+<div class='symbols-table'>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Display Style</th>
-<th style="text-align:left">Text Style (inline math)</th>
+<th style="text-align:left">Math Style</th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
-<td style="text-align:left"><span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left"><code>\displaystyle</code></td>
+<td style="text-align:left"><code>\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left">For equations in their own paragraph</td>
+<td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
-<td style="text-align:left"><code>\textstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Script Style</th>
-<th style="text-align:left">Scriptscript Style</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
-<td style="text-align:left"><span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left"><code>\textstyle</code></td>
+<td style="text-align:left"><code>\textstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left">Confusingly, for <strong>inline math</strong>, not for text mode</td>
+<td style="text-align:left"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
-<td style="text-align:left"><code>\scriptscripstyle \sum_{i=0}^n \frac{a_i}{1+x}</code></td>
+<td style="text-align:left"><code>\scriptstyle</code></td>
+<td style="text-align:left"><code>\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left">For subscripts and superscripts</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>\scriptscriptstyle</code></td>
+<td style="text-align:left"><code>\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
+<td style="text-align:left">For subscripts and superscripts of subscripts and superscripts</td>
+<td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
 </div>
 <h3>Text Mode</h3>
-<p>To include some textual comments, switch to <strong>Text Mode</strong> using the
-<code>\text{}</code> command.</p>
+<p><strong>To include some textual comments</strong>, use the <code>\text{}</code> command to switch
+to <strong>Text Mode</strong>.</p>
 <div class='no-line two-col'>
 <table>
 <thead>
@@ -3097,17 +3083,13 @@ TeX packages or macros.</p>
 </tbody>
 </table>
 </div>
-<footer class="page__meta">
-<p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version </strong> <span id='mathlive-version'></span></p>
-</footer>
-<footer class="page__meta">
-<p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version </strong> <span id='mathjson-version'></span></p>
-</footer>
 <script type='module'>
-    document.body.classList.add('ready');
+import { version } from "https://unpkg.com/mathlive/dist/mathlive.min.mjs";
+document.body.classList.add('ready');
 
-    document.getElementById('mathlive-version').innerHTML = version.mathlive;
-    document.getElementById('mathjson-version').innerHTML = version.mathJson;
+
+
+    document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / Cortex Compute Engine ${ version.computeEngine }`;
 
 </script>
 
@@ -3119,10 +3101,14 @@ TeX packages or macros.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2021">
+        <meta itemprop="datePublished" content="July 02, 2021">
+                
+
+        <p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Version </strong> <span id='version'></span></p>
+
+
         
-        
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jun 30 2021 08:56:59 GMT+0200 (Central European Summer Time)">June 30, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jul 02 2021 08:34:23 GMT+0200 (Central European Summer Time)">July 02, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
