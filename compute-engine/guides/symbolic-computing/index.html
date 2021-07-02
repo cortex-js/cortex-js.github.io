@@ -797,27 +797,49 @@ result:</p>
 <tbody>
 <tr>
 <td style="text-align:left"><strong>Format</strong></td>
-<td style="text-align:left">Put an expression in canonical (“standard”) form, for easier sorting, comparing and computing</td>
+<td style="text-align:left">Put an expression in canonical (“standard”) form, for easier sorting, comparing and computing. Typically limited to accounting for the flags <code>associative</code> <code>idempotent</code> <code>involution</code> and for sorting the arguments if <code>commutative</code>. Independent of the assumptions.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Simplify</strong></td>
-<td style="text-align:left">Replace the expression with an equivalent, simpler one</td>
+<td style="text-align:left">Apply rewriting rules specific to each function, eliminating constants and common sub-expressions. Use available assumptions to determine which rules are applicable. Limit calculations to exact results using integers. The result is in canonical format.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Evaluate</strong></td>
-<td style="text-align:left">Simplify, calculate, and evaluate numerically an expression</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Replace</strong></td>
-<td style="text-align:left">Apply conditional rewriting rules to an expression</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Other</strong></td>
-<td style="text-align:left">Compare, find patterns and substitute parts of an expression</td>
+<td style="text-align:left">Calculate the value of an expression and all its terms. Replace symbols with their value. Can perform approximate calculations using floating point numbers. The result is simplified and canonical.</td>
 </tr>
 </tbody>
 </table>
 </div>
+<p>Example, given <code>f</code> is \( 2 + (\sqrt{x^2 \times 4} + 1) \) and <code>x</code> is 3:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>ce.format(f)</code></td>
+<td style="text-align:left"><code>1 + 2 + \sqrt{4x^2}</code></td>
+<td style="text-align:left">Arguments sorted, distributed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ce.simplify(f)</code></td>
+<td style="text-align:left"><code>2 + 2x</code></td>
+<td style="text-align:left">Exact calculations of numeric constants,  simplification</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ce.evaluate(f)</code></td>
+<td style="text-align:left"><code>8</code></td>
+<td style="text-align:left">Evaluation of symbols</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Other operations can be performed on an expression: comparing it to a pattern, replacing part of it, and applying conditional rewrite rules.</p>
 <p class="notice--info">The <code>evaluate()</code> function is a convenient shorthand to evaluate an expression
 with a single call. Other functions such as <code>ce.simplify()</code>, <code>ce.is()</code>, <code>ce.N()</code>, <code>ce.canonical()</code>, etc… require a <code>ComputeEngine</code> instance which is denoted by the <code>ce.</code> prefix.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span>, parse } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
@@ -881,7 +903,7 @@ apply a substitution to some elements in an expression or apply a conditional re
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jul 02 2021 08:38:05 GMT+0200 (Central European Summer Time)">July 02, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jul 02 2021 15:28:17 GMT+0200 (Central European Summer Time)">July 02, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
