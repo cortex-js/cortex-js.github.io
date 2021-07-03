@@ -170,14 +170,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/</loc>
+    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
+    <loc>https://cortexjs.io/compute-engine/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -233,14 +233,42 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
+    <loc>https://cortexjs.io/compute-engine/guides/execution-constraints/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/execution-constraints/</loc>
+    <loc>https://cortexjs.io/compute-engine/guides/symbolic-computing/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/calculus/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/sets/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -275,28 +303,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/symbolic-computing/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/reference/arithmetic/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/calculus/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -318,13 +325,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/logic/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/sets/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>

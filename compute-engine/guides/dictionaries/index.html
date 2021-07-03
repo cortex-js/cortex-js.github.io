@@ -815,12 +815,45 @@ for example: <em>“x is a positive integer”</em>.</p>
 or the domain of the “result” of the function.</p>
 <p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
 functions its codomain.</p>
+<h2>Functions</h2>
+<p>A MathJSON function such as <code>Add</code>, <code>Sin</code> or <code>Equal</code> can be used for a variety
+of purposes. It can be helpful to classify them in some broad categories:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Category</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class='tags'><span class='tag inert'>inert</span></span></td>
+<td style="text-align:left">The result of evaluating an inert function is the function and its arguments. This is more useful than it sounds: it can be used to ‘tag’ an input an indicate how it should be interpreted. Examples: <code>Hold</code> <code>Evaluate</code> <code>Complex</code> <code>Latex</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='tags'><span class='tag constructor'>constructor</span></span></td>
+<td style="text-align:left">A function that takes a variety of inputs and return a new kind of object. Examples: <code>Symbol</code> <code>String</code> <code>Interval</code> <code>Range</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='tags'><span class='tag numeric'>numeric</span></span></td>
+<td style="text-align:left">A function whose arguments and return value are all numeric. Examples: <code>Add</code> <code>Sin</code> <code>Exp</code> <code>Sqrt</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left">A predicate function returns a boolean. It can evaluate if a proposition is true or false. Examples: <code>Equal</code> <code>IsPrime</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class='tags'><span class='tag predicate'>logical</span></span></td>
+<td style="text-align:left">A predicate whose arguments are also booleans. Examples: <code>And</code> <code>Not</code> <code>Or</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 <h2>Customizing the Dictionaries</h2>
-<p>It is possible to provide custom syntax and symbol dictionaries, or to modify
-the default ones.</p>
-<p>When no dictionaries are provided, default ones are used automatically.</p>
-<h2>Default Dictionaries</h2>
-<p>The default dictionaries are organized by topic as follow:</p>
+<p><strong>To define a custom syntax</strong>, provide custom syntax and custom symbol
+dictionaries when creating a <code>ComputeEngine</code> instance.</p>
+<p>If no custom dictionaries are provided, the default ones are used. They are organized by topic as follow:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -881,7 +914,7 @@ the default ones.</p>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 16:41:21 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
