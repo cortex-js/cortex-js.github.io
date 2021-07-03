@@ -879,7 +879,7 @@ Table of Content</label>
 </tr>
 <tr>
 <td style="text-align:left"><code>LatexString</code></td>
-<td style="text-align:left"><code>[“LatexTokens”, <em>string</em>]</code><br> A LaTeX string (inert function)</td>
+<td style="text-align:left"><code>[“LatexString”, <em>string</em>]</code><br> A LaTeX string (inert function)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>LatexTokens</code></td>
@@ -888,6 +888,14 @@ Table of Content</label>
 <tr>
 <td style="text-align:left"><code>Parse</code></td>
 <td style="text-align:left"><code>[“Parse”, <em>expr</em>]</code><br> <code>expr</code> should be a <code>LatexString</code> or <code>LatexTokens</code> and the result is an expression corresponding to the parsing of the LaTeX string</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Symbol</code></td>
+<td style="text-align:left"><code>[“Symbol”, …<em>expr</em>[]]</code><br> Return a new symbol made of a concatenation of the arguments. For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left"><code>[“String”, …<em>expr</em>[]]</code><br> Return a string made from the concatenation of the arguments.</td>
 </tr>
 </tbody>
 </table>
@@ -1018,34 +1026,6 @@ LaTeX tokens.</p>
 </tr>
 </tbody>
 </table>
-<h3><code>Match</code></h3>
-<p><em><code>expr1</code></em> <code>===</code> <em><code>expr2</code></em></p>
-<p><code>Match(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>)</code></p>
-<p><code>Match(</code><em><code>expr1</code></em><code>, </code><em><code>expr2</code></em><code>, ...</code><em><code>expr-n</code></em><code>)</code></p>
-<p>Indicate if two (or more) expressions are structurally identical, using a
-literal symbolic identity.</p>
-<p>Two expressions are the same if:</p>
-<ul>
-<li>they have the same domain.</li>
-<li>if they are numbers, if their value and domain are identical.</li>
-<li>if they are symbols, if their names are identical.</li>
-<li>if they are functions, if the head of the functions are identical, and if all
-the arguments are identical.</li>
-</ul>
-<p>Two expressions that have a different <code>wikidata</code> metadata will not be the same,
-even if they are otherwise identical. Other metadata does not affect the
-comparison.</p>
-<pre><code class="language-js"><span class="hljs-comment">// Greek letter vs. ratio of the circumference of a circle to its diameter</span>
-<span class="hljs-title function_">match</span>({ <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q168&#x27;</span> }, { <span class="hljs-attr">sym</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>, <span class="hljs-attr">wikidata</span>: <span class="hljs-string">&#x27;Q167&#x27;</span> });
-<span class="hljs-comment">// ➔ null (does not match)</span>
-</code></pre>
-<p>Using a canonical format will result in more positive matches.</p>
-<pre><code class="language-js"><span class="hljs-title function_">match</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>), <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>)));
-<span class="hljs-comment">// ➔ null</span>
-
-<span class="hljs-title function_">match</span>(ce.<span class="hljs-title function_">canonical</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>), <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>)));
-<span class="hljs-comment">// ➔ True</span>
-</code></pre>
 <h3>Superscripts and Subscripts</h3>
 <div class=symbols-table>
 <table>
@@ -1118,7 +1098,7 @@ comparison.</p>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:25:25 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 16:38:17 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
