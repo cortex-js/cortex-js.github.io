@@ -753,12 +753,12 @@ for the space bar).</li>
 the <code>latex</code> value is used. If no <code>key</code>, <code>command</code> or <code>insert</code> property is
 provided, the label (stripped of any HTML markup) is what will be inserted
 when the keycap is pressed.</li>
-<li><code>latex</code>: a Latex fragment used as a label and as the content to insert when
+<li><code>latex</code>: a LaTeX fragment used as a label and as the content to insert when
 the keycap is pressed.</li>
 <li><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</li>
 <li><code>aside</code>: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.</li>
-<li><code>insert</code>: a Latex fragment to insert when the keycap is pressed. The <code>latex</code>
+<li><code>insert</code>: a LaTeX fragment to insert when the keycap is pressed. The <code>latex</code>
 property is usually sufficient,</li>
 <li><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
 long-pressed.</li>
@@ -796,7 +796,7 @@ label and insert it when the key is pressed.</p>
 <h3>Keycap Examples</h3>
 <p>Each keycap must define its label and what happens when the keycap is pressed.
 There are many different ways of doing this using the properties above.</p>
-<p>The simplest case is when pressing a key insert some Latex and its label
+<p>The simplest case is when pressing a key insert some LaTeX and its label
 is the fragment to be inserted. In that case, the <code>latex</code> property can be
 used to specify both the label and what happens when the key is pressed.</p>
 <p>They <code>keycap</code> class indicates that the appearance of the key should be
@@ -817,7 +817,7 @@ property:</p>
 <p>The keycap label is displayed using the system font when the <code>label</code> property
 is used. To display it using the TeX fonts instead, set the value of the <code>class</code>
 property to <code>tex</code>.</p>
-<p><strong>To perform a command other than inserting some Latex</strong>, use the <code>command</code>
+<p><strong>To perform a command other than inserting a LaTeX string</strong>, use the <code>command</code>
 property:</p>
 <pre><code class="language-js">  {
     <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
@@ -1052,14 +1052,14 @@ the <code>math-field</code> elements.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 01, 2021">
+        <meta itemprop="datePublished" content="July 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Thu Jul 01 2021 10:09:01 GMT+0200 (Central European Summer Time)">July 01, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:24:26 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -233,7 +233,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Latex Syntax
+                  LaTeX Syntax
                 </a></li>
             
           
@@ -816,30 +816,43 @@ pattern by replacing the wildcards.</p>
 <h2>Matching an Expression to a Pattern</h2>
 <p><strong>To check if an expression matches a pattern</strong>, use the
 <code>ce.match(&lt;expression&gt;, &lt;pattern&gt;)</code> function.</p>
-<p>The <code>ce.match()</code> function is not recursive.</p>
-<p>The <code>ce.match()</code> function takes into account information about the functions,
-such as which are commutative and associative.</p>
 <p>If there is a match, <code>ce.match()</code> returns a <code>Substitution</code> object literal with
 keys corresponding to the matching named wildcards. If no named wildcards are
 used and there is a match it returns an empty object literal. If there is no
 match, it returns <code>null</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>], pattern));
-<span class="hljs-comment">// -&gt; { } : the subject matched the pattern</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
+<span class="hljs-comment">// -&gt; { } : the expression matches the pattern</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>], pattern));
-<span class="hljs-comment">// -&gt; null : the subject does not match the pattern</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
+<span class="hljs-comment">// -&gt; null : the expression does not match the pattern</span>
+</code></pre>
+<p>The <code>ce.match()</code> function accounts for the commutativity and associativity
+of functions.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
+<span class="hljs-comment">// -&gt; { } : the expression matches the pattern</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], pattern));
+<span class="hljs-comment">// -&gt; { } : the expression matches the pattern by commutativity</span>
+</code></pre>
+<p>The <code>ce.match()</code> does not consider sub-expressions, it is not recursive.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">2</span>, [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>]], pattern));
+<span class="hljs-comment">// -&gt; null : the expression does not match the pattern</span>
 </code></pre>
 <p>If the same named wildcard is used multiple times, all its values must match.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]));
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]));
 <span class="hljs-comment">// -&gt; null</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]));
 <span class="hljs-comment">// -&gt; { &quot;a&quot;: &quot;x&quot; }</span>
 </code></pre>
 <p>Wildcards can be used to capture the head of functions:</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;_f&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>]));
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;_f&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>]));
 <span class="hljs-comment">// -&gt; { &quot;f&quot;: &quot;Add&quot; }</span>
 </code></pre>
 <h2>Substitution</h2>
@@ -847,10 +860,10 @@ match, it returns <code>null</code>.</p>
 mapping from wildcard names to expressions.</p>
 <p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression it
 was derived from, use the <code>substitute()</code> function.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> subject = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>];
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expression = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>];
 <span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;_a&#x27;</span>];
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>(subject, pattern));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>(expression, pattern));
 <span class="hljs-comment">// -&gt; { a: &quot;x&quot; }</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">substitute</span>(pattern, { <span class="hljs-attr">a</span>: <span class="hljs-string">&#x27;x&#x27;</span> }));
@@ -923,14 +936,14 @@ You can define your own rules and apply them using <code>ce.replace()</code>.</p
         
 
 
-        <meta itemprop="datePublished" content="July 02, 2021">
+        <meta itemprop="datePublished" content="July 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jul 02 2021 22:15:44 GMT+0200 (Central European Summer Time)">July 02, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:25:25 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

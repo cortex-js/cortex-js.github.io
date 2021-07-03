@@ -233,7 +233,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Latex Syntax
+                  LaTeX Syntax
                 </a></li>
             
           
@@ -793,8 +793,16 @@ Table of Content</label>
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left"><code>All</code></td>
+<td style="text-align:left">All the possible values apply</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>Missing</code></td>
 <td style="text-align:left">A <strong>required</strong> expression is not present.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>None</code></td>
+<td style="text-align:left">None of the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Nothing</code></td>
@@ -804,17 +812,10 @@ Table of Content</label>
 <td style="text-align:left"><code>Undefined</code></td>
 <td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> and for booleans, <code>Maybe</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>None</code></td>
-<td style="text-align:left">None of the possible values apply</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>All</code></td>
-<td style="text-align:left">All the possible values apply</td>
-</tr>
 </tbody>
 </table>
 </div>
+<div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -833,6 +834,7 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
+</div>
 <h2>Functions</h2>
 <div class=symbols-table>
 <table>
@@ -845,27 +847,47 @@ Table of Content</label>
 <tbody>
 <tr>
 <td style="text-align:left"><code>About</code></td>
-<td style="text-align:left"><code>(<em>symbol</em>)</code><br> Return information about a symbol such as its domain, its attributes, its value, etc…</td>
+<td style="text-align:left"><code>[“About”, <em>symbol</em>]</code><br> Return information about a symbol such as its domain, its attributes, its value, etc…</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Domain</code></td>
-<td style="text-align:left"><code>(<em>expression</em>)</code><br> Return the domain of the expression</td>
+<td style="text-align:left"><code>[“Domain”, <em>expression</em>]</code><br> Return the domain of the expression</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Evaluate</code></td>
-<td style="text-align:left"><code>(<em>expression</em>)</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it. Overrides <code>Hold</code> and hold attributes of a function.</td>
+<td style="text-align:left"><code>[“Evaluate”, <em>expression</em>]</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it. Overrides <code>Hold</code> and hold attributes of a function.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Error</code></td>
+<td style="text-align:left"><code>[“Error”, <em>expression</em>]</code><br>The expression could not be interpreted correctly. It may have a syntax error, a reference to an unknwon symbol or function or some other problem.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Hold</code></td>
-<td style="text-align:left"><code>(<em>expression</em>)</code><br> Maintain an expression in an unevaluated form.</td>
+<td style="text-align:left"><code>[“Hold”, <em>expression</em>]</code><br> Maintain an expression in an unevaluated form (inert function)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Identity</code></td>
-<td style="text-align:left"><code>(<em>symbol</em>)</code><br> Always return its argument</td>
+<td style="text-align:left"><code>[“Identity”, <em>symbol</em>]</code><br> Always return its argument</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>InverseFunction</code></td>
-<td style="text-align:left"><code>(<em>expression</em>)</code><br> Return the inverse function of its argument, for example \( \arcsin \) for \(\sin\)</td>
+<td style="text-align:left"><code>[“InverseFunction”, <em>expression</em>]</code><br> Return the inverse function of its argument, for example \( \arcsin \) for \(\sin\)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Latex</code></td>
+<td style="text-align:left"><code>[“Latex”, <em>expr</em>]</code><br> Return a string which is the expression serialized to LaTeX</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>LatexString</code></td>
+<td style="text-align:left"><code>[“LatexTokens”, <em>string</em>]</code><br> A LaTeX string (inert function)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>LatexTokens</code></td>
+<td style="text-align:left"><code>[“LatexTokens”, …<em>token</em>[]]</code><br> A sequence of LaTeX tokens. See below (inert function)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Parse</code></td>
+<td style="text-align:left"><code>[“Parse”, <em>expr</em>]</code><br> <code>expr</code> should be a <code>LatexString</code> or <code>LatexTokens</code> and the result is an expression corresponding to the parsing of the LaTeX string</td>
 </tr>
 </tbody>
 </table>
@@ -880,12 +902,12 @@ Table of Content</label>
 <tbody>
 <tr>
 <td style="text-align:left"><code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code></td>
-<td style="text-align:left"><code>\sin^{-1}</code></td>
+<td style="text-align:left">\[ \sin^{-1} \]</td>
 </tr>
 </tbody>
 </table>
 <h3><code>Lambda</code></h3>
-<p><code>Lambda&quot;(</code><em><code>variables:List</code></em><code>, </code><em><code>expression</code></em><code>)</code></p>
+<p><code>[“Lambda”, <em>variables:List</em>, <em>expression</em>]</code></p>
 <p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
 also called <strong>anonymous function</strong>.</p>
 <p>The first argument is a symbol or a list of symbols which are the bound
@@ -911,17 +933,17 @@ variables of the Lambda-function.</p>
 cube(5)
 // ➔ 125
 </code></pre>
-<h3><code>Latex</code> and <code>LatexSymbols</code></h3>
-<p><code>[&quot;Latex&quot;, </code><em><code>expr</code></em><code> </code>]`</p>
+<h3><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h3>
+<p><code>[“Latex”, <em>expr</em> ]</code></p>
 <ul>
-<li><em><code>expr</code></em>: a MathJSON expression</li>
+<li><code><em>expr</em></code>: a MathJSON expression</li>
 <li>Returns a LaTeX string representing the expression.</li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
-<p><code>[&quot;LatexSymbols&quot;, </code><em><code>str-1</code></em><code>, </code><em><code>str-2</code></em><code>, ...</code><em><code>str-n</code></em><code>]</code></p>
-<p>The arguments <code>_</code>str-n<code>_</code> are interpreted as LaTeX tokens:</p>
+<p><code>[“LatexTokens”, <em>token-1</em>, <em>token-2</em>, …<em>token-n</em>]</code></p>
+<p>The arguments <code><em>token-n</em></code> are interpreted as LaTeX tokens:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -970,10 +992,12 @@ cube(5)
 </tbody>
 </table>
 </div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexSymbols&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexTokens&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
+<p>This function can be returned when the parser fails to parse a sequence of
+LaTeX tokens.</p>
 <h3><code>Piecewise</code></h3>
 <h3><code>Prime</code></h3>
 <table>
@@ -1087,14 +1111,14 @@ comparison.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 02, 2021">
+        <meta itemprop="datePublished" content="July 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Fri Jul 02 2021 22:15:44 GMT+0200 (Central European Summer Time)">July 02, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:25:25 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

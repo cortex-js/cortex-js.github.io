@@ -748,7 +748,7 @@ triggered and creating an infinite loop.</p>
 <p>The text color (“ink”) and background color (“paper”), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using <code>applyStyle()</code>.</p>
-<p class="notice--info">This style applies to the content of the formula and will be reflected in the Latex output. To change the appearance of the mathfield but not
+<p class="notice--info">This style applies to the content of the formula and will be reflected in the LaTeX output. To change the appearance of the mathfield but not
 the content of the formula, see <a href="mathlive/guides/customizing/">Customizing</a>.</p>
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -798,7 +798,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </div>
 </code-playground>
 <h2>Detecting a Click on a Mathfield</h2>
-<p>In most cases Mathlive will respond to mouse and keyboard interactions with
+<p>In most cases MathLive will respond to mouse and keyboard interactions with
 the mathfield. However, in some cases it might be useful to detect when a
 mathfield is clicked on. For example, you could display one or more read-only
 mathfields in a list and prompt the user to pick one by clicking on it.</p>
@@ -840,7 +840,7 @@ event or a <code>pointerdown</code> event. The <code>focus</code> event has the 
 with both mouse and keyboard, which makes this solution more accessible.</p>
 <h2>Detecting When the User has Finished Editing a Mathfield</h2>
 <p><strong>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield</strong>,
-listen for the <code>change</code> event. Note that this event is not fired when in Latex
+listen for the <code>change</code> event. Note that this event is not fired when in LaTeX
 editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to exit the mode.</p>
 <h2>Interacting with the Clipboard</h2>
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
@@ -857,11 +857,11 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 <tbody>
 <tr>
 <td style="text-align:left"><code>text/plain</code></td>
-<td style="text-align:left">Latex wrapped with a <code>\begin{equation*}</code> and <code>\end{equation*}</code>.</td>
+<td style="text-align:left">LaTeX wrapped with a <code>\begin{equation*}</code> and <code>\end{equation*}</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>application/x-latex</code></td>
-<td style="text-align:left">Raw Latex</td>
+<td style="text-align:left">Raw LaTeX</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>application/json</code></td>
@@ -874,18 +874,18 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </tbody>
 </table>
 </div>
-<p>The Latex in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn’t really a standard format for this, but testing of several Latex-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
-<p class="notice--info">For improved interoperability, the exported Latex uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
+<p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn’t really a standard format for this, but testing of several LaTeX-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
+<p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
 </code></pre>
-<p><strong>To export the “raw” (not expanded) Latex)</strong>, use:</p>
+<p><strong>To export the “raw” (not expanded) LaTeX)</strong>, use:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
   <span class="hljs-string">`\\(<span class="hljs-subst">${mg.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
 });
 </code></pre>
-<p>The exported format doesn’t have to be Latex. To export ASCIIMath instead:</p>
+<p>The exported format doesn’t have to be LaTeX. To export ASCIIMath instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
   <span class="hljs-string">&quot;`&quot;</span> + mg.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>.
 });
@@ -906,14 +906,14 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
         
 
 
-        <meta itemprop="datePublished" content="July 01, 2021">
+        <meta itemprop="datePublished" content="July 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Thu Jul 01 2021 10:08:33 GMT+0200 (Central European Summer Time)">July 01, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:23:52 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

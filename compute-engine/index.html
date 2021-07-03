@@ -204,7 +204,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Latex Syntax
+                  LaTeX Syntax
                 </a></li>
             
           
@@ -759,17 +759,17 @@ computing and numerical evaluation of mathematical expressions.</p>
 in the browser or in server-side environments such as Node: educators, students, scientists and engineers.</p>
 <p>The Compute Engine can:</p>
 <ul>
-<li><a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to Latex</li>
+<li><a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to LaTeX</li>
 <li>simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a></li>
 </ul>
 <div class='read-more'><a href="/compute-engine/demo/">Try the <strong>interactive demo</strong> now<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Parse and Serialize Latex</h2>
+<h2>Parse and Serialize LaTeX</h2>
 <p>Internally, the Compute Engine manipulates expressions represented with the MathJSON format. It’s a JSON representation of an Abstract Syntax Tree
 of the expression. It is easy to manipulate programatically and can be
 written by hand. However, you might prefer to use a more concise and
-familiar syntax, such as Latex. The Compute Engine includes utilities
-to convert to and from Latex strings.</p>
-<p><strong>To parse a Latex string and serialize to a Latex string</strong>, use the <code>parse()</code> and <code>serialize()</code>
+familiar syntax, such as LaTeX. The Compute Engine includes utilities
+to convert to and from LaTeX strings.</p>
+<p><strong>To parse a LaTeX string and serialize to a LaTeX string</strong>, use the <code>parse()</code> and <code>serialize()</code>
 functions.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
 
@@ -780,10 +780,10 @@ functions.</p>
 <span class="hljs-comment">// -&gt;  x^3 + 2</span>
 
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the LaTeX Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
 <p>A MathLive mathfield works like a textarea in HTML, but for math. It provide
-its content as a Latex string or a MathJSON expression, ready to be used with the Compute Engine.</p>
+its content as a LaTeX string or a MathJSON expression, ready to be used with the Compute Engine.</p>
 <div class='read-more'><a href="/mathlive/">Read more about <strong>MathLive</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Symbolic Computing and Numerical Evaluation</h2>
 <p><strong>To evaluate a symbolic expression</strong>, use the <code>evaluate()</code> function.</p>
@@ -873,14 +873,14 @@ ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs
         
 
 
-        <meta itemprop="datePublished" content="July 01, 2021">
+        <meta itemprop="datePublished" content="July 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Thu Jul 01 2021 12:51:46 GMT+0200 (Central European Summer Time)">July 01, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:24:50 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
