@@ -226,6 +226,20 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/guides/dictionaries/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/guides/execution-constraints/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
@@ -289,42 +303,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/reference/domains/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/sets/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/dictionaries/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
-    <lastmod>2021-07-03</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/reference/core/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/domains/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -338,7 +324,21 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/reference/sets/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/reference/special-functions/</loc>
+    <lastmod>2021-07-03</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
     <lastmod>2021-07-03</lastmod>
     <changefreq></changefreq>
     <priority></priority>

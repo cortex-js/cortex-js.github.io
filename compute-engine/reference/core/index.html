@@ -890,12 +890,12 @@ Table of Content</label>
 <td style="text-align:left"><code>[“Parse”, <em>expr</em>]</code><br> <code>expr</code> should be a <code>LatexString</code> or <code>LatexTokens</code> and the result is an expression corresponding to the parsing of the LaTeX string</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Symbol</code></td>
-<td style="text-align:left"><code>[“Symbol”, …<em>expr</em>[]]</code><br> Return a new symbol made of a concatenation of the arguments. For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></td>
-</tr>
-<tr>
 <td style="text-align:left"><code>String</code></td>
 <td style="text-align:left"><code>[“String”, …<em>expr</em>[]]</code><br> Return a string made from the concatenation of the arguments.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Symbol</code></td>
+<td style="text-align:left"><code>[“Symbol”, …<em>expr</em>[]]</code><br> Return a new symbol made of a concatenation of the arguments. For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1027,11 +1027,12 @@ LaTeX tokens.</p>
 </tbody>
 </table>
 <h3>Superscripts and Subscripts</h3>
+<p>These functions are all inert functions, that is they evaluate to themselves.</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Function</th>
 <th style="text-align:left"></th>
 <th style="text-align:left">Description</th>
 </tr>
@@ -1080,8 +1081,6 @@ LaTeX tokens.</p>
 </tbody>
 </table>
 </div>
-<h3><code>String</code></h3>
-<h3><code>Symbol</code></h3>
 
         
       </section>
@@ -1098,7 +1097,7 @@ LaTeX tokens.</p>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 16:38:17 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 16:41:21 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
