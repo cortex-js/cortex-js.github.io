@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/reference/collections/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -783,7 +806,7 @@ Table of Content</label>
         
         <h1>Collections</h1>
 <h2><code>Sequence</code></h2>
-<p>The most primitive collection: a series of expressions separated by a <code>,</code>.</p>
+<p>The most primitive collection: a series of expressions.</p>
 <table>
 <thead>
 <tr>
@@ -793,32 +816,12 @@ Table of Content</label>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>[&quot;Sequence&quot;, &quot;x&quot;, &quot;y&quot;]</code></td>
-<td style="text-align:left">\( x, y \)</td>
+<td style="text-align:left"><code>[&quot;Sequence&quot;, 1, 2]</code></td>
+<td style="text-align:left">\( 1 2 \)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>[&quot;Sequence&quot;, [&quot;Add&quot;, &quot;x&quot;, 1], &quot;y&quot;]</code></td>
-<td style="text-align:left">\( x + 1, y \)</td>
-</tr>
-</tbody>
-</table>
-<h2><code>Sequence2</code></h2>
-<p>A series of expressions separated by a <code>;</code>.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">LaTeX</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Sequence2&quot;, &quot;x&quot;, &quot;y&quot;]</code></td>
-<td style="text-align:left">\( x; y \)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Sequence2&quot;, [&quot;Sequence&quot;, &quot;a&quot;, &quot;b&quot;], &quot;y&quot;]</code></td>
-<td style="text-align:left">\(a, b; y \)</td>
+<td style="text-align:left">\( x + 1 y \)</td>
 </tr>
 </tbody>
 </table>
@@ -859,9 +862,10 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
-<h2><code>Parentheses</code></h2>
-<p>One or more expressions in a sequence, enclosed with parentheses.</p>
-<p>Use to represent function arguments, or to group arithmetic expressions.</p>
+<h2><code>Delimiter</code></h2>
+<p>One or more expressions in a sequence, enclosed with some delimiters and
+separated by a separator</p>
+<p>Use to represent function arguments and to group arithmetic expressions.</p>
 <table>
 <thead>
 <tr>
@@ -871,24 +875,16 @@ Table of Content</label>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>[&quot;Parentheses&quot;, &quot;x&quot;, &quot;y&quot;, &quot;7&quot;, &quot;11&quot;]</code></td>
+<td style="text-align:left"><code>[&quot;Parentheses&quot;, [&quot;Sequence&quot;, &quot;x&quot;, &quot;y&quot;, &quot;7&quot;, &quot;11&quot;]</code></td>
 <td style="text-align:left"><code>(x, y, 7, 11)</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>[&quot;Parentheses&quot;]</code></td>
+<td style="text-align:left"><code>[&quot;Delimiter&quot;]</code></td>
 <td style="text-align:left"><code>()</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>[&quot;Parentheses&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code></td>
+<td style="text-align:left"><code>[&quot;Delimiter&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code></td>
 <td style="text-align:left"><code>(a, b, c)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Parentheses&quot;, [&quot;Sequence, &quot;a&quot;, &quot;b&quot;], [&quot;Sequence&quot;, &quot;c&quot;, &quot;d&quot;]]</code></td>
-<td style="text-align:left"><code>(a, b; c, d)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Sequence&quot;, &quot;a&quot;, [&quot;Parentheses&quot;, &quot;b&quot;, &quot;c&quot;]]</code></td>
-<td style="text-align:left"><code>a, (b, c)</code></td>
 </tr>
 </tbody>
 </table>
@@ -901,14 +897,14 @@ Table of Content</label>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

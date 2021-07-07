@@ -186,6 +186,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -245,6 +246,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -351,6 +372,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -396,6 +418,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -752,39 +775,49 @@ Table of Content</label>
 
       <section class="page__content" itemprop="text">
         
-        <img alt="Compute Engine" src='/assets/Compute-Engine-2.jpg' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
+        <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 <p>The <strong>CortexJS Compute Engine</strong> is a JavaScript library for symbolic
 computing and numerical evaluation of mathematical expressions.</p>
 <p>The Compute Engine is for anyone who wants to make technical computing apps
-in the browser or in server-side environments such as Node: educators, students, scientists and engineers.</p>
+in the browser or in server-side environments such as Node: educators,
+students, scientists and engineers.</p>
 <p>The Compute Engine can:</p>
 <ul>
 <li><a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to LaTeX</li>
 <li>simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a></li>
 </ul>
-<div class='read-more'><a href="/compute-engine/demo/">Try the <strong>interactive demo</strong> now<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/demo/">
+Try the <strong>interactive demo</strong> now
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Parse and Serialize LaTeX</h2>
-<p>Internally, the Compute Engine manipulates expressions represented with the MathJSON format. It’s a JSON representation of an Abstract Syntax Tree
+<p>Internally, the Compute Engine manipulates expressions represented with the
+MathJSON format. It’s a JSON representation of the Abstract Syntax Tree
 of the expression. It is easy to manipulate programatically and can be
 written by hand. However, you might prefer to use a more concise and
 familiar syntax, such as LaTeX. The Compute Engine includes utilities
 to convert to and from LaTeX strings.</p>
-<p><strong>To parse a LaTeX string and serialize to a LaTeX string</strong>, use the <code>parse()</code> and <code>serialize()</code>
-functions.</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
+<p><strong>To parse a LaTeX string and serialize to a LaTeX string</strong>, use the <code>ce.parse()</code>
+and <code>ce.serialize()</code>  functions.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>));
+<span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>));
 <span class="hljs-comment">// -&gt;  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Power&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Power&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
 <span class="hljs-comment">// -&gt;  x^3 + 2</span>
 
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the LaTeX Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">
+Read more about <strong>Parsing and Serializing the LaTeX Syntax</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
 <p>A MathLive mathfield works like a textarea in HTML, but for math. It provide
 its content as a LaTeX string or a MathJSON expression, ready to be used with the Compute Engine.</p>
-<div class='read-more'><a href="/mathlive/">Read more about <strong>MathLive</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/">
+Read more about <strong>MathLive</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Symbolic Computing and Numerical Evaluation</h2>
 <p><strong>To evaluate a symbolic expression</strong>, use the <code>evaluate()</code> function.</p>
 <p>The result of <code>evaluate()</code> is an expression:</p>
@@ -807,9 +840,15 @@ its content as a LaTeX string or a MathJSON expression, ready to be used with th
 numbers</strong>.</p>
 <p>The Compute Engine can also simplify, find patterns, substitute terms, apply rewrite rules,
 compare and format expressions.</p>
-<div class='read-more'><a href="/compute-engine/guides/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/numerical-evaluation/">
+Read more about <strong>Numerical Evaluation</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">
+Read more about <strong>Symbolic Computing</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">
+Read more about <strong>Patterns and Rules</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Customization</h2>
 <p>The Compute Engine includes a robust library of mathematical functions.</p>
 <p><strong>To customize the dictionaries that define the math functions</strong>, create and configure a <code>ComputeEngine</code> instance.</p>
@@ -863,7 +902,9 @@ ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs
 </tbody>
 </table>
 </div>
-<div class='read-more'><a href="/compute-engine/guides/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/dictionaries/">
+Read more about <strong>Dictionaries</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -873,14 +914,14 @@ ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 06, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 20:51:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Jul 06 2021 09:19:12 GMT+0200 (Central European Summer Time)">July 06, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

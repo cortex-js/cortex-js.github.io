@@ -186,6 +186,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -411,6 +412,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -740,12 +742,14 @@ Table of Content</label>
 </style>
 <h1>Supported TeX/LaTeX Commands</h1>
 <p>MathLive supports over 800 LaTeX commands.</p>
-<div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">
+If you can draw a shape but don’t know the name of the corresponding LaTeX, use <strong>Detexify</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Text Mode, Math Mode and Math Style</h2>
 <h3>Math Mode</h3>
 <p>When in <strong>Math Mode</strong>, the content is laid out using typesetting rules specific
 to math. For example, variables are displayed in italics, an appropriate amount
-of space is inserted around some letters such as “f” to improve their legibility
+of space is inserted around some letters such as &quot;f&quot; to improve their legibility
 and white spaces are ignored.</p>
 <p>In Math Mode, the layout and size of some math elements is adjusted based on the
 context in which they are used. For example, superscripts and subscripts are
@@ -766,25 +770,21 @@ displayed in a smaller font.</p>
 <td style="text-align:left"><code>\displaystyle</code></td>
 <td style="text-align:left"><code>\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
 <td style="text-align:left">For equations in their own paragraph</td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>\textstyle</code></td>
 <td style="text-align:left"><code>\textstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
 <td style="text-align:left">Confusingly, for <strong>inline math</strong>, not for text mode</td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>\scriptstyle</code></td>
 <td style="text-align:left"><code>\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
 <td style="text-align:left">For subscripts and superscripts</td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>\scriptscriptstyle</code></td>
 <td style="text-align:left"><code>\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x}</code><br><span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span></td>
 <td style="text-align:left">For subscripts and superscripts of subscripts and superscripts</td>
-<td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
@@ -1155,17 +1155,14 @@ above and below by default, while the <code>\int</code> command display its limi
 <tr>
 <td style="text-align:left"><span class='math'>$$\twoheadrightarrow $$</span>   <code>\twoheadrightarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\twoheadleftarrow $$</span>   <code>\twoheadleftarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightarrowtail $$</span>   <code>\rightarrowtail</code></td>
 <td style="text-align:left"><span class='math'>$$\leftarrowtail $$</span>   <code>\leftarrowtail</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\dashrightarrow $$</span>   <code>\dashrightarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\dashleftarrow $$</span>   <code>\dashleftarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\longrightarrow $$</span>   <code>\longrightarrow</code></td>
@@ -1175,7 +1172,6 @@ above and below by default, while the <code>\int</code> command display its limi
 <tr>
 <td style="text-align:left"><span class='math'>$$\Rightarrow $$</span>   <code>\Rightarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\Leftarrow $$</span>   <code>\Leftarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Longrightarrow $$</span>   <code>\Longrightarrow</code></td>
@@ -1200,97 +1196,76 @@ above and below by default, while the <code>\int</code> command display its limi
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightharpoonup $$</span>   <code>\rightharpoonup</code></td>
 <td style="text-align:left"><span class='math'>$$\leftharpoonup $$</span>   <code>\leftharpoonup</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightharpoondown $$</span>   <code>\rightharpoondown</code></td>
 <td style="text-align:left"><span class='math'>$$\leftharpoondown $$</span>   <code>\leftharpoondown</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightleftharpoons $$</span>   <code>\rightleftharpoons</code></td>
 <td style="text-align:left"><span class='math'>$$\leftrightharpoons $$</span>   <code>\leftrightharpoons</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\searrow $$</span>   <code>\searrow</code></td>
 <td style="text-align:left"><span class='math'>$$\nearrow $$</span>   <code>\nearrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\swarrow $$</span>   <code>\swarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\nwarrow $$</span>   <code>\nwarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Rrightarrow $$</span>   <code>\Rrightarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\Lleftarrow $$</span>   <code>\Lleftarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\leftrightarrows $$</span>   <code>\leftrightarrows</code></td>
 <td style="text-align:left"><span class='math'>$$\rightleftarrows $$</span>   <code>\rightleftarrows</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\curvearrowright $$</span>   <code>\curvearrowright</code></td>
 <td style="text-align:left"><span class='math'>$$\curvearrowleft $$</span>   <code>\curvearrowleft</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\hookrightarrow $$</span>   <code>\hookrightarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\hookleftarrow $$</span>   <code>\hookleftarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\looparrowright $$</span>   <code>\looparrowright</code></td>
 <td style="text-align:left"><span class='math'>$$\looparrowleft $$</span>   <code>\looparrowleft</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\circlearrowright $$</span>   <code>\circlearrowright</code></td>
 <td style="text-align:left"><span class='math'>$$\circlearrowleft $$</span>   <code>\circlearrowleft</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightrightarrows $$</span>   <code>\rightrightarrows</code></td>
 <td style="text-align:left"><span class='math'>$$\leftleftarrows $$</span>   <code>\leftleftarrows</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\upuparrows $$</span>   <code>\upuparrows</code></td>
 <td style="text-align:left"><span class='math'>$$\downdownarrows $$</span>   <code>\downdownarrows</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Rsh $$</span>   <code>\Rsh</code></td>
 <td style="text-align:left"><span class='math'>$$\Lsh $$</span>   <code>\Lsh</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\upharpoonright $$</span>   <code>\upharpoonright</code></td>
 <td style="text-align:left"><span class='math'>$$\upharpoonleft $$</span>   <code>\upharpoonleft</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\downharpoonright $$</span>   <code>\downharpoonright</code></td>
 <td style="text-align:left"><span class='math'>$$\downharpoonleft $$</span>   <code>\downharpoonleft</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\restriction $$</span>   <code>\restriction</code></td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\rightsquigarrow $$</span>   <code>\rightsquigarrow</code></td>
 <td style="text-align:left"><span class='math'>$$\leftrightsquigarrow $$</span>   <code>\leftrightsquigarrow</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\leadsto $$</span>   <code>\leadsto</code></td>
-<td style="text-align:left"></td>
-<td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
@@ -1349,7 +1324,6 @@ the arrows, which is specified as an argument (and optional argument):</p>
 <tbody>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xlongequal[below]{above} $$</span> <code>\xlongequal[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xrightarrow[below]{above} $$</span> <code>\xrightarrow[]{}</code></td>
@@ -1357,11 +1331,9 @@ the arrows, which is specified as an argument (and optional argument):</p>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xleftrightarrow[below]{above} $$</span> <code>\xleftrightarrow[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xrightleftarrows[below]{above} $$</span> <code>\xrightleftarrows[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xtwoheadrightarrow[below]{above} $$</span> <code>\xtwoheadrightarrow[]{}</code></td>
@@ -1385,7 +1357,6 @@ the arrows, which is specified as an argument (and optional argument):</p>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xleftrightharpoons[below]{above} $$</span> <code>\xleftrightharpoons[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xhookrightarrow[below]{above} $$</span> <code>\xhookrightarrow[]{}</code></td>
@@ -1393,11 +1364,9 @@ the arrows, which is specified as an argument (and optional argument):</p>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xmapsto[below]{above} $$</span> <code>\xmapsto[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xtofrom[below]{above} $$</span> <code>\xtofrom[]{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\xrightequilibrium[below]{above} $$</span> <code>\xrightequilibrium[]{}</code></td>
@@ -1472,7 +1441,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
 </ul>
 <h2>Relational Operators</h2>
-<p>To display a vertical “stack” of two symbols as a relational operator, use the
+<p>To display a vertical &quot;stack&quot; of two symbols as a relational operator, use the
 <code>\stackrel</code> command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}b</code>.</p>
 <ul class="command-list">
 <li><span class='math'>$$= $$</span>   <code>=</code></li>
@@ -1802,13 +1771,13 @@ if there is an equivalent Unicode character available.
 <td style="text-align:left"><span class='math'>$$\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace $$</span></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\lbrace x | \frac{x}{2} &gt; 0\rbrace</code></td>
-<td style="text-align:left"><code>\left\lbrace x \middle| \frac{x}{2} &gt; 0\right\rbrace</code></td>
+<td style="text-align:left"><code>\lbrace x \| \frac{x}{2} &gt; 0\rbrace</code></td>
+<td style="text-align:left"><code>\left\lbrace x \middle\| \frac{x}{2} &gt; 0\right\rbrace</code></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="notice--warning">Internally, MathLive uses the non-standard <code>\mleft</code> and <code>\mright</code> command. These commands are use to indicate some delimiters that have been automatically converted to “smart” delimiters when the <code>smartFence</code> option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the <code>latex-expanded</code> format, or when using the clipboard, those commands are automatically removed.</p>
+<p class="notice--warning">Internally, MathLive uses the non-standard <code>\mleft</code> and <code>\mright</code> command. These commands are use to indicate some delimiters that have been automatically converted to &quot;smart&quot; delimiters when the <code>smartFence</code> option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the <code>latex-expanded</code> format, or when using the clipboard, those commands are automatically removed.</p>
 <p>The left and right delimiters do not have to match:</p>
 <p><span class='math'>\(\displaystyle \left\lparen \frac1x \right\rbrack\)</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
 <p>To omit a delimiter, use <code>.</code>:</p>
@@ -1995,7 +1964,6 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <tr>
 <td style="text-align:left"><span class='math'>$${\color{blue}x+1=0}} $$</span></td>
 <td style="text-align:left"><code>{\color{blue} x+1=0}}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\colorbox{yellow}{\[ax^2+bx+c\]} $$</span></td>
@@ -2005,12 +1973,10 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <tr>
 <td style="text-align:left"><span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{&quot;2B1A}} $$</span></td>
 <td style="text-align:left"><code>\fcolorbox{}{}{}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\boxed{1+\frac{1}{x}} $$</span></td>
 <td style="text-align:left"><code>\boxed{1+\frac{1}{x}}</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{&quot;2B1A}} $$</span></td>
@@ -2130,12 +2096,12 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 <code>&quot;2px solid red&quot;</code>.</li>
 </ul>
 </li>
-<li><code>&lt;body&gt;</code> a math expression that is “enclosed” by the specified notations</li>
+<li><code>&lt;body&gt;</code> a math expression that is &quot;enclosed&quot; by the specified notations</li>
 </ul>
 <p class="notice--info"><code>\enclose</code> is a LaTeX extension introduced by MathJax that follows the <code>&lt;menclose&gt;</code> definition of <a href="">MathML</a>.</p>
 <ul>
-<li><span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=“#fbc0bd”]{x=0} $$</span> <code>\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=&quot;#fbc0bd&quot;]{x=0}</code></li>
-<li><span class='math'>$$\enclose{circle}[mathbackground=“#fbc0bd”]{\frac1x}$$</span> <code>\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}</code></li>
+<li><span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=&quot;#fbc0bd&quot;]{x=0} $$</span> <code>\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground=&quot;#fbc0bd&quot;]{x=0}</code></li>
+<li><span class='math'>$$\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}$$</span> <code>\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}</code></li>
 <li><span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> <code>\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}</code></li>
 </ul>
 <h4><code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code></h4>
@@ -2164,7 +2130,7 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 </table>
 </div>
 <p class="notice--info">The <code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code> commands are part of the
-<a href="https://www.ctan.org/pkg/cancel">“cancel”</a> LaTeX package.</p>
+<a href="https://www.ctan.org/pkg/cancel">&quot;cancel&quot;</a> LaTeX package.</p>
 <h3>Colors</h3>
 <p>To change the foreground color, use the <code>\textcolor{}{}</code> command.</p>
 <p>To change the background, use the <code>\colorbox{}{}</code> command.</p>
@@ -2343,52 +2309,42 @@ but their use is generally discouraged when creating new LaTeX content</p>
 <tr>
 <td style="text-align:left"><span class='math'>$$\tiny{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\tiny</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\scriptsize{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\scriptsize</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\footnotesize{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\footnotesize</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\small{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\small</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\normalsize{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\normalsize</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\large{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\large</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Large{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\Large</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\LARGE{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\LARGE</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\huge{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\huge</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Huge{e^{i\pi}+1=0} $$</span></td>
 <td style="text-align:left"><code>\Huge</code></td>
-<td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
@@ -2408,23 +2364,19 @@ delimiters based on the content.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><span class='math'>$$\bigl( \bigm| \bigr) $$</span></td>
-<td style="text-align:left"><code>\bigl(</code> <code>\bigm|</code> <code>\bigr)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>\bigl(</code> <code>\bigm\|</code> <code>\bigr)</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Bigl( \Bigm| \Bigr) $$</span></td>
-<td style="text-align:left"><code>\Bigl(</code> <code>\Bigm|</code> <code>\Bigr)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>\Bigl(</code> <code>\Bigm\|</code> <code>\Bigr)</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\biggl( \biggm| \biggr) $$</span></td>
-<td style="text-align:left"><code>\biggl(</code> <code>\biggm|</code> <code>\biggr)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>\biggl(</code> <code>\biggm\|</code> <code>\biggr)</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><span class='math'>$$\Biggl( \Biggm| \Biggr) $$</span></td>
-<td style="text-align:left"><code>\Biggl(</code> <code>\Biggm|</code> <code>\Biggr)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>\Biggl(</code> <code>\Biggm\|</code> <code>\Biggr)</code></td>
 </tr>
 </tbody>
 </table>
@@ -2973,8 +2925,8 @@ can be used as building blocks for more elaborate structures:</p>
 </code></pre>
 </div>
 <h2>TeX Registers</h2>
-<p>The math typesetting is influenced by some “constants” that are stored
-in “registers”. Those registers can be set globally on a mathfield using
+<p>The math typesetting is influenced by some &quot;constants&quot; that are stored
+in &quot;registers&quot;. Those registers can be set globally on a mathfield using
 the <code>registers</code> option.</p>
 <div class=symbols-table>
 <table>
@@ -3101,14 +3053,14 @@ document.body.classList.add('ready');
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 04, 2021">
                 
 
         <p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Version </strong> <span id='version'></span></p>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 15:25:08 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sun Jul 04 2021 07:48:19 GMT+0200 (Central European Summer Time)">July 04, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

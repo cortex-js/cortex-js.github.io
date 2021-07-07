@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/guides/assumptions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -786,6 +809,7 @@ Table of Content</label>
 relationships between symbols.</p>
 <p>These assumptions are used to select algorithms, to validate some
 simplifications and to optimize computations.</p>
+<section id='defining-new-assumptions'>
 <h2>Defining New Assumptions</h2>
 <p><strong>To make an assumption about a symbol</strong>, use the <code>ce.assume()</code> function.</p>
 <p>For example, to indicate \(\beta \in \R\):</p>
@@ -839,15 +863,20 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 <span class="hljs-comment">// ... or ...</span>
 ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Interval&quot;</span>, [<span class="hljs-string">&quot;Open&quot;</span>, <span class="hljs-number">0</span>], <span class="hljs-string">&quot;Infinity&quot;</span>]]);
 </code></pre>
+<section id='multivariate-assumptions'>
 <h3>Multivariate Assumptions</h3>
 <p>Assumptions are frequently describing the property of a symbol. However, it
 is also possible to describe relationships betwen multiple symbols.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;xy + 1 = 0&#x27;</span>))<span class="hljs-string">&#x27;
 </span></code></pre>
+</section>
+<section id='using-assumptions-to-declare-symbols'>
 <h3>Using Assumptions to Declare Symbols</h3>
 <p>Before a symbol can be used in an expression, the symbol must be known by the
 Compute Engine. A dictionary definition of a symbol can be used for this
 purpose, but an assumption that defines a domain for the symbol is sufficient.</p>
+</section>
+<section id='default-assumptions'>
 <h3>Default Assumptions</h3>
 <p>When creating an instance of a Compute Engine, the following assumptions
 are made:</p>
@@ -890,6 +919,9 @@ when creating a Compute Engine instance:</p>
 <p>To have no assumptions at all, set the <code>assumptions</code> option to <code>null</code>:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({<span class="hljs-attr">assumptions</span>: <span class="hljs-literal">null</span>});
 </code></pre>
+</section>
+</section>
+<section id='testing-assumptions'>
 <h2>Testing Assumptions</h2>
 <p><strong>To test if a particular assumption is valid</strong>, use the <code>ce.is()</code> function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
@@ -915,7 +947,11 @@ ce.<span class="hljs-title function_">ask</span>([<span class="hljs-string">&#x2
 
 <span class="hljs-comment">//  -&gt; [{&#x27;val&#x27;: 0}] &quot;It is greater than 0&quot;</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">
+Read more about <strong>Patterns and Rules</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</section>
+<section id='forgetting-assumptions'>
 <h2>Forgetting Assumptions</h2>
 <p>Each call to <code>ce.assume()</code> is additive: the previous assumptions are preserved.</p>
 <p><strong>To remove previous assumptions</strong>, use <code>ce.forget()</code>.</p>
@@ -933,6 +969,8 @@ ce.<span class="hljs-title function_">forget</span>(<span class="hljs-string">&q
 ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
 <span class="hljs-comment">// -&gt;  undefined</span>
 </code></pre>
+</section>
+<section id='scoped-assumptions'>
 <h2>Scoped Assumptions</h2>
 <p>When an assumption is made, it is only valid in the current scope.</p>
 <p><strong>To temporarily define a series of assumptions</strong>, create a new scope.</p>
@@ -968,6 +1006,7 @@ ce.<span class="hljs-title function_">popScope</span>();
 ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
 <span class="hljs-comment">// -&gt;  undefined</span>
 </code></pre>
+</section>
 
         
       </section>
@@ -977,14 +1016,14 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

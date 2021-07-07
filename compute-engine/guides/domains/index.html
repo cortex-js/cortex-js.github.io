@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -787,21 +810,28 @@ Table of Content</label>
 select the correct function definition. For example a function <code>Add</code> could operate
 either on numbers or matrixes. The domain of the arguments indicates the appropriate function definition. Symbolic manipulation algorithms use domains to decide when certain manipulations are applicable. For example,
 \( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
-<div class='read-more'><a href="/compute-engine/reference/domains/">Read more about the <strong>Domains</strong> included in the standard dictionary of the Compute Engine<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/reference/domains/">
+Read more about the <strong>Domains</strong> included in the standard dictionary of the Compute Engine
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To query the domain of an expression</strong>, use the <code>domain()</code> function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-comment">// -&gt; &quot;IrrationalNumber&quot;</span>
 </code></pre>
-<h2>Domains Lattice</h2>
+<section id='domain-lattice'>
+<h2>Domain Lattice</h2>
 <p><strong>Domains are defined in a hierarchy (a lattice).</strong> The upper bound of the
-lattice is <code>Anything</code> and the lower bound is <code>Nothing</code>.</p>
-<p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship, for example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
+domain lattice is the <code>Anything</code> domain and its lower bound is the <code>Nothing</code>
+domain.</p>
+<p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship,
+for example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains">
 <img src="/assets/domains.002.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
 <img src="/assets/domains.003.jpeg" alt="Function domains" title="The Function sub-domains">
 <img src="/assets/domains.004.jpeg" alt="Number domains" title="The Number sub-domains"></p>
 <p class="notice--info">The implementation of the CortexJS domains is based on
 <a href="https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties">Weibel, Trudy &amp; Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749. </a>.</p>
+</section>
+<section id='obtaining-the-domain-of-an-expression>
 <h2>Obtaining the Domain of an Expression</h2>
 <p><strong>To obtain the domain of an expression</strong>, use the <code>ce.domain()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
@@ -819,6 +849,8 @@ ce.<span class="hljs-title function_">domain</span>([<span class="hljs-string">&
 ce.<span class="hljs-title function_">domain</span>(ce.evaluate([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]));
 <span class="hljs-comment">// ➔ &quot;Integer&quot;: once evaluated, the domain of the result may be more specific</span>
 </code></pre>
+</section>
+<section id='defining-new-domains'>
 <h2>Defining New Domains</h2>
 <p>A new domain can be defined using a <strong>domain expression</strong>, that is a <strong>set
 expression</strong> using any of the <strong>set functions</strong>: <code>Union</code>
@@ -829,7 +861,9 @@ expression</strong> using any of the <strong>set functions</strong>: <code>Union
 <span class="hljs-comment">// Any number except &quot;1&quot;.</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;SetMinus&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/reference/sets/">Read more about <strong>Sets</strong> and the set functions<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/reference/sets/">
+Read more about <strong>Sets</strong> and the set functions
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>Parametric domains</strong> are functions that define a domain:</p>
 <pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span>
@@ -869,6 +903,8 @@ n \in \R \) or \(x \in \rbrack \operatorname{min}, \operatorname{max} \rbrack \)
 </tbody>
 </table>
 </div>
+</section>
+<section id='simplifying-domains'>
 <h2>Simplifying Domains</h2>
 <p><strong>To simplify a domain expression</strong>, use <code>ce.simplify(&lt;domain&gt;)</code>.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">simplify</span>([<span class="hljs-string">&quot;SetMinus&quot;</span>, <span class="hljs-string">&quot;Integer&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-string">&quot;-Infinity&quot;</span>, <span class="hljs-number">0</span>]]);
@@ -879,6 +915,7 @@ ce.<span class="hljs-title function_">simplify</span>(
 );
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
 </code></pre>
+</section>
 
         
       </section>
@@ -888,14 +925,14 @@ ce.<span class="hljs-title function_">simplify</span>(
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

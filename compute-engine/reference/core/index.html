@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/reference/core/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -782,8 +805,8 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Core</h1>
+<section id='constants'>
 <h2>Constants</h2>
-<div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -798,7 +821,7 @@ Table of Content</label>
 </tr>
 <tr>
 <td style="text-align:left"><code>Missing</code></td>
-<td style="text-align:left">A <strong>required</strong> expression is not present.</td>
+<td style="text-align:left">A <strong>required</strong> expression is not present</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>None</code></td>
@@ -810,12 +833,10 @@ Table of Content</label>
 </tr>
 <tr>
 <td style="text-align:left"><code>Undefined</code></td>
-<td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> and for booleans, <code>Maybe</code></td>
+<td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -834,72 +855,71 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
-</div>
-<h2>Functions</h2>
-<div class=symbols-table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Function</th>
-<th style="text-align:left">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>About</code></td>
-<td style="text-align:left"><code>[“About”, <em>symbol</em>]</code><br> Return information about a symbol such as its domain, its attributes, its value, etc…</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Domain</code></td>
-<td style="text-align:left"><code>[“Domain”, <em>expression</em>]</code><br> Return the domain of the expression</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Evaluate</code></td>
-<td style="text-align:left"><code>[“Evaluate”, <em>expression</em>]</code><br> Apply a sequence of definitions to an expression in order to reduce and simplify it. Overrides <code>Hold</code> and hold attributes of a function.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Error</code></td>
-<td style="text-align:left"><code>[“Error”, <em>expression</em>]</code><span class='tags'><span class='tag inert'>inert</span></span><br>The expression could not be interpreted correctly. It may have a syntax error, a reference to an unknown symbol or function or some other problem.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Hold</code></td>
-<td style="text-align:left"><code>[“Hold”, <em>expression</em>]</code><span class='tags'><span class='tag inert'>inert</span></span><br> Maintain an expression in an unevaluated form (inert function)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Identity</code></td>
-<td style="text-align:left"><code>[“Identity”, <em>symbol</em>]</code><br> Always return its argument</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>InverseFunction</code></td>
-<td style="text-align:left"><code>[“InverseFunction”, <em>expression</em>]</code><br> Return the inverse function of its argument, for example \( \arcsin \) for \(\sin\)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Latex</code></td>
-<td style="text-align:left"><code>[“Latex”, <em>expr</em>]</code><br> Return a string which is the expression serialized to LaTeX</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>LatexString</code></td>
-<td style="text-align:left"><code>[“LatexString”, <em>string</em>]</code><span class='tags'><span class='tag constructor'>constructor</span></span><br> A LaTeX string (inert function)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>LatexTokens</code></td>
-<td style="text-align:left"><code>[“LatexTokens”, …<em>token</em>[]]</code><br> A sequence of LaTeX tokens. See below (inert function)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Parse</code></td>
-<td style="text-align:left"><code>[“Parse”, <em>expr</em>]</code><br> <code>expr</code> should be a <code>LatexString</code> or <code>LatexTokens</code> and the result is an expression corresponding to the parsing of the LaTeX string</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>String</code></td>
-<td style="text-align:left"><code>[“String”, …<em>expr</em>[]]</code><span class='tags'><span class='tag constructor'>constructor</span></span><br> Return a string made from the concatenation of the arguments.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Symbol</code></td>
-<td style="text-align:left"><code>[“Symbol”, …<em>expr</em>[]]</code><span class='tags'><span class='tag constructor'>constructor</span></span><br> Return a new symbol made of a concatenation of the arguments. For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></td>
-</tr>
-</tbody>
-</table>
-</div>
+</section>
+<section id='core-functions'>
+<h2>Core Functions</h2>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>About</code></td><td>
+<p><code>[&quot;About&quot;, <em>symbol</em>]</code></p>
+<p>Evaluate to a dictionary containing information about a symbol such as its domain, its attributes, its value, etc…</p>
+</td></tr>
+<tr><td><code>Domain</code></td><td>
+<p><code>[&quot;Domain&quot;, <em>expression</em>]</code></p>
+<p>Evaluate to the domain of <em>expression</em></p>
+</td></tr>
+<tr><td><code>Evaluate</code></td><td>
+<p><code>[&quot;Evaluate&quot;, <em>expression</em>]</code></p>
+<p>Apply a sequence of definitions to an expression in order to reduce, simplify
+and calculate its value. Overrides <code>Hold</code> and hold attributes of a function.</p>
+</td></tr>
+<tr><td><code>Error</code></td><td>
+<p><code>[&quot;Error&quot;, <em>expression</em>, <em>string</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p>Tag an expression that could not be interpreted correctly. It may have a syntax error, a reference to an unknown symbol or function or some other problem.</p>
+</td></tr>
+<tr><td><code>Hold</code></td><td>
+<p><code>[&quot;Hold&quot;, <em>expression</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p>Tag an expression that should be kept in an unevaluated form</p>
+</td></tr>
+<tr><td><code>Html</code></td><td>
+<p><code>[&quot;Html&quot;, <em>expr</em>]</code></p>
+<p>Evaluate to a string which is the HTML markup corresponding to the expression. If the head of <em>expr</em> is <code>LatexString</code>, <code>Latex</code> or <code>LatexTokens</code>, renders the LaTeX to HTML markup</p>
+</td></tr>
+<tr><td><code>Identity</code></td><td>
+<p><code>[&quot;Identity&quot;, <em>expression</em>]</code></p>
+<p>Evaluate to its argument</p>
+</td></tr>
+<tr><td><code>InverseFunction</code></td><td>
+<p><code>[&quot;InverseFunction&quot;, <em>expression</em>]</code></p>
+<p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code></p>
+</td></tr>
+<tr><td><code>Latex</code></td><td>
+<p><code>[&quot;Latex&quot;, <em>expr</em>]</code></p>
+<p>Evaluate to a <code>LatexString</code> which is the expression serialized to LaTeX</p>
+</td></tr>
+<tr><td><code>LatexString</code></td><td>
+<p><code>[&quot;LatexString&quot;, <em>string</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p>Tag a string as a LaTeX string</p>
+</td></tr>
+<tr><td><code>LatexTokens</code></td><td>
+<p><code>[&quot;LatexTokens&quot;, …<em>token</em>[]]</code></p>
+<p>Evaluate to a <code>LatexString</code> made of the concatenation of the token arguments</p>
+</td></tr>
+<tr><td><code>Parse</code></td><td>
+<p><code>[&quot;Parse&quot;, <em>expr</em>]</code></p>
+<p>If <em>expr</em> is a <code>LatexString</code> or <code>LatexTokens</code>, evaluate to a MathJSON expression
+corresponding to the LaTeX string.</p>
+</td></tr>
+<tr><td><code>String</code></td><td>
+<p><code>[&quot;String&quot;, …<em>expr</em>[]]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+<p>Evaluate to a string made from the concatenation of the arguments converted
+to string</p>
+</td></tr>
+<tr><td><code>Symbol</code></td><td>
+<p><code>[&quot;Symbol&quot;, …<em>expr</em>[]]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+<p>Evaluate to a new symbol made of a concatenation of the arguments.</p>
+<p>For example `[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</p>
+</td></tr>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -914,8 +934,26 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
+<section id='core-functions'>
+<h2>Styling Functions</h2>
+<p>The functions in this section represent a visual difference that is not usually
+material to the interpretation of an expression such as text color and size or
+other typographic variations.</p>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Style</code></td><td>
+<p><code>[&quot;Style&quot;, <em>expr</em>, <em>css</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p>Apply CSS styles to an expression</p>
+</td></tr>
+<tr><td><code>Delimiter</code></td><td>
+<p><code>[&quot;Delimiter&quot;, <em>expr</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p><code>[&quot;Delimiter&quot;, <em>expr</em>, <em>sep</em>]</code></p>
+<p><code>[&quot;Delimiter&quot;, <em>expr</em>, <em>open</em>, <em>close</em>]</code></p>
+<p><code>[&quot;Delimiter&quot;, <em>expr</em>, <em>open</em>, <em>sep</em>, <em>close</em>]</code></p>
+<p>Display <em>expr</em> wrapped in a delimiter.</p>
+</td></tr>
+</tbody></table>
 <h3><code>Lambda</code></h3>
-<p><code>[“Lambda”, <em>variables:List</em>, <em>expression</em>]</code></p>
+<p><code>[&quot;Lambda&quot;, <em>variables:List</em>, <em>expression</em>]</code></p>
 <p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
 also called <strong>anonymous function</strong>.</p>
 <p>The first argument is a symbol or a list of symbols which are the bound
@@ -942,7 +980,7 @@ cube(5)
 // ➔ 125
 </code></pre>
 <h3><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h3>
-<p><code>[“Latex”, <em>expr</em> ]</code></p>
+<p><code>[&quot;Latex&quot;, <em>expr</em> ]</code></p>
 <ul>
 <li><code><em>expr</em></code>: a MathJSON expression</li>
 <li>Returns a LaTeX string representing the expression.</li>
@@ -950,7 +988,7 @@ cube(5)
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
-<p><code>[“LatexTokens”, <em>token-1</em>, <em>token-2</em>, …<em>token-n</em>]</code></p>
+<p><code>[&quot;LatexTokens&quot;, <em>token-1</em>, <em>token-2</em>, …<em>token-n</em>]</code></p>
 <p>The arguments <code><em>token-n</em></code> are interpreted as LaTeX tokens:</p>
 <div class=symbols-table>
 <table>
@@ -1004,8 +1042,8 @@ cube(5)
 <span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
 </code></pre>
 <p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
-<p>This function can be returned when the parser fails to parse a sequence of
-LaTeX tokens.</p>
+<p>This function can be returned when the parser fails to parse a sequence of LaTeX
+tokens.</p>
 <h3><code>Piecewise</code></h3>
 <h3><code>Prime</code></h3>
 <table>
@@ -1081,6 +1119,7 @@ LaTeX tokens.</p>
 </tbody>
 </table>
 </div>
+</section>
 
         
       </section>
@@ -1090,14 +1129,14 @@ LaTeX tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

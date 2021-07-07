@@ -186,6 +186,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -411,6 +412,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -902,7 +904,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">switchMode(“latex”)</td>
+<td style="text-align:left">switchMode(&quot;latex&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -917,7 +919,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥</code> <code>=</code></td>
-<td style="text-align:left">applyStyle({“mode”:“text”})</td>
+<td style="text-align:left">applyStyle({&quot;mode&quot;:&quot;text&quot;})</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -927,7 +929,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">complete(“complete”)</td>
+<td style="text-align:left">complete(&quot;complete&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -947,7 +949,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧esc</code></td>
-<td style="text-align:left">complete(“reject”)</td>
+<td style="text-align:left">complete(&quot;reject&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1086,14 +1088,10 @@ combinations.</p>
 <td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> B`</td>
-<td style="text-align:left">move to previous word</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><code>⌥</code> <code>⌃</code> B` | move to previous word | |</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> F`</td>
-<td style="text-align:left">move to next word</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><code>⌥</code> <code>⌃</code> F` | move to next word | |</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>⌃</code> <code>B</code></td>
@@ -1142,12 +1140,12 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>⇡</code></td>
-<td style="text-align:left">speak(“parent”)</td>
+<td style="text-align:left">speak(&quot;parent&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>⇣</code></td>
-<td style="text-align:left">speak(“all”)</td>
+<td style="text-align:left">speak(&quot;all&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 </tbody>
@@ -1185,7 +1183,7 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">switchMode(“latex”)</td>
+<td style="text-align:left">switchMode(&quot;latex&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1200,12 +1198,12 @@ combinations.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>⌥</code> <code>=</code></td>
-<td style="text-align:left">applyStyle({“mode”:“text”})</td>
+<td style="text-align:left">applyStyle({&quot;mode&quot;:&quot;text&quot;})</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>⇧</code> <code>'</code></td>
-<td style="text-align:left">switchMode(“text”)</td>
+<td style="text-align:left">switchMode(&quot;text&quot;)</td>
 <td style="text-align:right"></td>
 </tr>
 <tr>
@@ -1394,7 +1392,7 @@ combinations.</p>
 <td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>|</code></td>
+<td style="text-align:left"><code>⌥</code> <code>\|</code></td>
 <td style="text-align:left">$$|$$</td>
 <td style="text-align:right"></td>
 </tr>
@@ -1421,13 +1419,13 @@ combinations.</p>
 <tr>
 <td style="text-align:left"><code>⇧</code> <kbd>`</kbd></td>
 <td style="text-align:left"><code>\~</code></td>
-<td style="text-align:right"></td>
+<td style="text-align:right" colspan="2"></td>
 </tr>
 </tbody>
 </table>
 <h2>Inline Shortcuts</h2>
-<p>Some sequence of characters can be automatically translated to symbols. For example, typing p followed by i will result in “π”.</p>
-<p>If the conversion was not desired, for example you actually meant “pi”, type ctrl/⌘ Z to undo it.</p>
+<p>Some sequence of characters can be automatically translated to symbols. For example, typing p followed by i will result in &quot;π&quot;.</p>
+<p>If the conversion was not desired, for example you actually meant &quot;pi&quot;, type ctrl/⌘ Z to undo it.</p>
 <table>
 <thead>
 <tr>
@@ -2001,8 +1999,8 @@ combinations.</p>
 <td style="text-align:left">$$\to$$ <code>\to</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">-&gt;`</td>
+<td style="text-align:left"><code>|-&gt;</code></td>
+<td style="text-align:left">$$\mapsto$$ <code>\mapsto</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>--&gt;</code></td>
@@ -2049,7 +2047,7 @@ combinations.</p>
 <td style="text-align:left">$$\ominus$$</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>||</code></td>
+<td style="text-align:left"><code>\|\|</code></td>
 <td style="text-align:left">$$\Vert$$</td>
 </tr>
 <tr>
@@ -2116,16 +2114,16 @@ combinations.</p>
 <td style="text-align:left">$$\backslash$$ <code>\backslash</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">&gt;&lt;`</td>
+<td style="text-align:left"><code>|&gt;&lt;</code></td>
+<td style="text-align:left">$$\ltimes$$ <code>\ltimes</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`&gt;&lt;</td>
-<td style="text-align:left">`</td>
+<td style="text-align:left"><code>&gt;&lt;|</code></td>
+<td style="text-align:left">$$\rtimes$$ <code>\rtimes</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">&gt;&lt;</td>
+<td style="text-align:left"><code>|&gt;&lt;|</code></td>
+<td style="text-align:left">$$\bowtie$$ <code>\bowtie</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>-:</code></td>
@@ -2300,36 +2298,36 @@ combinations.</p>
 <td style="text-align:left">$$\neg$$ <code>\neg</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`_</td>
-<td style="text-align:left">_`</td>
+<td style="text-align:left"><code>_|_</code></td>
+<td style="text-align:left">$$\bot$$ <code>\bot</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>TT</code></td>
 <td style="text-align:left">$$\top$$ <code>\top</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">–`</td>
+<td style="text-align:left"><code>|--</code></td>
+<td style="text-align:left">$$\vdash$$ <code>\vdash</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">==`</td>
+<td style="text-align:left"><code>|==</code></td>
+<td style="text-align:left">$$\models$$ <code>\models</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">__`</td>
+<td style="text-align:left"><code>|__</code></td>
+<td style="text-align:left">$$\lfloor$$ <code>\lfloor</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`__</td>
-<td style="text-align:left">`</td>
+<td style="text-align:left"><code>__|</code></td>
+<td style="text-align:left">$$\rfloor$$ <code>\rfloor</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`</td>
-<td style="text-align:left">~`</td>
+<td style="text-align:left"><code>|~</code></td>
+<td style="text-align:left">$$\lceiling$$ <code>\lceiling</code></td>
 </tr>
 <tr>
-<td style="text-align:left">`~</td>
-<td style="text-align:left">`</td>
+<td style="text-align:left"><code>~|</code></td>
+<td style="text-align:left">$$\rceiling$$ <code>\rceiling</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&gt;-&gt;</code></td>

@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -797,7 +820,7 @@ result:</p>
 <tbody>
 <tr>
 <td style="text-align:left"><strong>Format</strong></td>
-<td style="text-align:left">Put an expression in canonical (“standard”) form, for easier sorting, comparing and computing. Typically limited to accounting for the flags <code>associative</code> <code>idempotent</code> <code>involution</code> and for sorting the arguments if <code>commutative</code>. Independent of the assumptions.</td>
+<td style="text-align:left">Put an expression in canonical (&quot;standard&quot;) form, for easier sorting, comparing and computing. Typically limited to accounting for the flags <code>associative</code> <code>idempotent</code> <code>involution</code> and for sorting the arguments if <code>commutative</code>. Independent of the assumptions.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Simplify</strong></td>
@@ -840,11 +863,12 @@ result:</p>
 </table>
 </div>
 <p>Other operations can be performed on an expression: comparing it to a pattern, replacing part of it, and applying conditional rewrite rules.</p>
-<p class="notice--info">The <code>evaluate()</code> function is a convenient shorthand to evaluate an expression
-with a single call. Other functions such as <code>ce.simplify()</code>, <code>ce.is()</code>, <code>ce.N()</code>, <code>ce.canonical()</code>, etc… require a <code>ComputeEngine</code> instance which is denoted by the <code>ce.</code> prefix.</p>
+<p class="notice--info">Functions such as <code>ce.simplify()</code>, <code>ce.evaluate()</code>, <code>ce.is()</code>, <code>ce.N()</code>,
+<code>ce.canonical()</code>, etc… require a <code>ComputeEngine</code> instance which is denoted by
+the <code>ce.</code> prefix.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span>, parse } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
 <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-ce.<span class="hljs-title function_">simplify</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>));
+ce.<span class="hljs-title function_">simplify</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>));
 </code></pre>
 <h2>Format with a Canonical Form</h2>
 <p>The canonical form of an expression is obtained by rewriting an expression
@@ -856,7 +880,7 @@ without making assumptions about any variables in the expression.</p>
 substraction replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2,
 -3)\)</li>
 </ul>
-<p>Canonical forms are somewhat arbitrary, and not necessarily “the simplest” way
+<p>Canonical forms are somewhat arbitrary, and not necessarily &quot;the simplest&quot; way
 to represent an expression. But just like the order of the letters of the
 alphabet is arbitrary, the canonical forms are nonetheless convenient to sort,
 search and compare expressions.</p>
@@ -865,17 +889,18 @@ search and compare expressions.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">canonical</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, 3, &quot;x&quot;]</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/forms/">Read more about <strong>Canonical Forms</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/forms/">
+Read more about <strong>Canonical Forms</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Simplify</h2>
 <p><strong>To obtain a simpler expression of a symbolic expression</strong>, use the
 <code>ce.simplify()</code> function.</p>
-<p>Assumptions are additional information available about some symbols, for example
-\( x &gt; 0 \) or \(n \in \N\). To apply some transformations, available
-assumptions may be used. For example, if no assumptions about \(x \) is
-available the expression \( \sqrt{x^2} \) cannot be simplified. However, if an
-assumption that \( x &gt; 0 \) is available, then the expression can be
-simplified to \( x \).</p>
-<div class='read-more'><a href="/compute-engine/guides/assumptions/">Read more about <strong>Assumptions</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>The <code>ce.simplify()</code> function makes use of available assumptions about symbols
+and return an exact result: there are no numerical evaluation done that could
+result in a loss of precision.</p>
+<div class='read-more'><a href="/compute-engine/guides/simplify/">
+Read more about <strong>Simplify</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Evaluate</h2>
 <p><strong>To combine a symbolic simplification followed by a <a href="/compute-engine/guides/numerical-evaluation">numerical evaluation</a></strong>, use
 the <code>ce.evaluate()</code> function.</p>
@@ -886,7 +911,9 @@ invoked.</p>
 <h2>Other Symbolic Manipulation</h2>
 <p>You can compare two expressions, check if an expression match a pattern,
 apply a substitution to some elements in an expression or apply a conditional rewriting rule to an expression.</p>
-<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong> for these operations<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">
+Read more about <strong>Patterns and Rules</strong> for these operations
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -896,14 +923,14 @@ apply a substitution to some elements in an expression or apply a conditional re
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -784,6 +807,7 @@ Table of Content</label>
         <h1>Patterns and Rules</h1>
 <p>Recognizing patterns and applying rules is a powerful symbolic computing tool
 to identify and manipulate the structure of expressions.</p>
+<section id='wildcards'>
 <h2>Wildcards</h2>
 <p>Wildcard symbols are placeholders in an expression. They start with a <code>_</code>.</p>
 <p>The <code>&quot;_&quot;</code> wildcard matches anything that is in the corresponding position in an
@@ -797,6 +821,8 @@ matching expression. When using a named wildcard, all instances of the named
 wildcard must match. In contrast, an un-named wildcard (a universal wildcard
 such as <code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple times to match
 different values.</p>
+</section>
+<section id='patterns'>
 <h2>Patterns</h2>
 <p>A pattern is an expression which can include one or more placeholders in the
 form of wildcard symbols.</p>
@@ -813,6 +839,8 @@ is <code>{&quot;c&quot; : &quot;x&quot;}</code>.</p>
 <p>On the other hand, the expression <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the pattern
 <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code>: no substitution exists to transform the expression into the
 pattern by replacing the wildcards.</p>
+</section>
+<section id='matching-an-expression-to-a-pattern'>
 <h2>Matching an Expression to a Pattern</h2>
 <p><strong>To check if an expression matches a pattern</strong>, use the
 <code>ce.match(&lt;expression&gt;, &lt;pattern&gt;)</code> function.</p>
@@ -855,6 +883,8 @@ of functions.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;_f&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>]));
 <span class="hljs-comment">// -&gt; { &quot;f&quot;: &quot;Add&quot; }</span>
 </code></pre>
+</section>
+<section id='substitution'>
 <h2>Substitution</h2>
 <p>The return value of the <code>match()</code> function is a <code>Substitution</code> object: a
 mapping from wildcard names to expressions.</p>
@@ -869,6 +899,8 @@ was derived from, use the <code>substitute()</code> function.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">substitute</span>(pattern, { <span class="hljs-attr">a</span>: <span class="hljs-string">&#x27;x&#x27;</span> }));
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, &quot;x&quot;]</span>
 </code></pre>
+</section>
+<section id='comparing'>
 <h2>Comparing</h2>
 <p><strong>To compare two expressions</strong>, use the <code>match()</code> function.</p>
 <p>The function returns <code>null</code> if the two expressions do not match. It returns an
@@ -898,6 +930,8 @@ To check if the expressions simply match or not, check if the return value is
 );
 <span class="hljs-comment">// ➔ {}: the two expressions are the same once evaluated</span>
 </code></pre>
+</section>
+<section id='applying-rewrite-rules'>
 <h2>Applying Rewrite Rules</h2>
 <p>A rewrite rule is a triplet of:</p>
 <ul>
@@ -926,7 +960,10 @@ ce.<span class="hljs-title function_">replace</span>([sqrtRule], [<span class="h
 until no rules are applicable.</p>
 <p>The <code>ce.simplify()</code> method applies a collection of built-in rewrite rules.
 You can define your own rules and apply them using <code>ce.replace()</code>.</p>
+</section>
+<section id='count'>
 <h2><code>count()</code></h2>
+</section>
 
         
       </section>
@@ -936,14 +973,14 @@ You can define your own rules and apply them using <code>ce.replace()</code>.</p
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -215,6 +215,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -274,6 +275,26 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Numerical Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/simplify/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Simplify
                 </a></li>
             
           
@@ -380,6 +401,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -425,6 +447,7 @@ Table of Content</label>
             
             
               <li class="separator"></li>
+              </ul></li><li><ul>
             
           
             
@@ -792,14 +815,16 @@ of the partially evaluated expression is returned.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">N</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>));
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, [&quot;Sqrt&quot;, &quot;x&quot;], 343]</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">
+Read more about <strong>Symbolic Computing</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Numeric Formats</h2>
 <p>Three numeric formats may be used to perform numerical evaluations with the Compute Engine: <code>machine</code> <code>decimal</code> and <code>complex</code>.</p>
 <h3>Machine Numbers</h3>
 <p>The <code>machine</code> format uses a common representation of numbers in computers: a <a href="https://en.wikipedia.org/wiki/IEEE_754">64-bit binary floating point format</a>. It is well suited for the CPU to do fast computations. It uses a fixed amount of memory and represent significant digits in base-2. This numeric format has about 15 signficant digits.</p>
 <p><strong>Using the <code>machine</code> numeric format some numerical evaluations cannot produce exact results.</strong></p>
 <p>For example: \(0.1 + 0.2 = 0.30000000000000004 \).</p>
-<p>Indeed, while \(0.1\) and \(0.2\) look like “round numbers” in base-10, they are only represented approximately in base-2.</p>
+<p>Indeed, while \(0.1\) and \(0.2\) look like &quot;round numbers&quot; in base-10, they are only represented approximately in base-2.</p>
 <h3>Decimal Numbers</h3>
 <p>The <code>decimal</code> numeric format is an arbitrary-precision representation of floating points. In this format, floating point numbers are represented in base-10, and use a variable amount of memory depending on the number of significant digits (<strong>precision</strong>) desired.</p>
 <p>When using Decimal numbers, the return value of <code>ce.N()</code> may be a MathJSON number that looks like this:</p>
@@ -829,11 +854,11 @@ property of a <code>ComputeEngine</code> instance to one of these values:</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>complex</code></td>
-<td style="text-align:left">Two 64-bit floating point numbers. Support provided by the “complex.js” library.</td>
+<td style="text-align:left">Two 64-bit floating point numbers. Support provided by the &quot;complex.js&quot; library.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>decimal</code></td>
-<td style="text-align:left">Arbitrary precision floating point. Slower, but more precise, however computations with complex numbers cannot be performed. Support provided by the “decimal.js” library</td>
+<td style="text-align:left">Arbitrary precision floating point. Slower, but more precise, however computations with complex numbers cannot be performed. Support provided by the &quot;decimal.js&quot; library</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>auto</code></td>
@@ -909,14 +934,14 @@ will be considered equal to 0.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2021">
+        <meta itemprop="datePublished" content="July 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sat Jul 03 2021 21:19:54 GMT+0200 (Central European Summer Time)">July 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
