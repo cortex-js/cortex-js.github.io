@@ -902,12 +902,20 @@ result in a loss of precision.</p>
 Read more about <strong>Simplify</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Evaluate</h2>
-<p><strong>To combine a symbolic simplification followed by a <a href="/compute-engine/guides/numerical-evaluation">numerical evaluation</a></strong>, use
-the <code>ce.evaluate()</code> function.</p>
-<p>Invoking the <code>ce.evaluate()</code> function is roughly equivalent to calling in sequence
-<code>ce.simplify()</code>, <code>ce.N()</code> then <code>ce.canonical()</code>.</p>
-<p>Some functions may perform additional computations when <code>ce.evaluate()</code> is
-invoked.</p>
+<p><strong>To apply a sequence of definitions to an expression in order to reduce,
+simplify and calculate its value</strong>, use the <code>ce.evaluate()</code> function.</p>
+<p>An expression to be evaluated will also be simplified, evaluated numerically and put into canonical form.</p>
+<p>When a function is evaluated, its arguments are first evaluated left to right,
+the the function is applied to the arguments.</p>
+<p>However, a function definition can specify that some or all of its arguments
+should not be evaluated. This can be useful for a function that needs to
+perform symbolic manipulation of an expression: otherwise, the expression would
+be evaluated without giving a chance to the function to access the symbolic
+expression.</p>
+<p>While a function definition will usually indicate which arguments should be
+evaluated or not, it is possible to override this.</p>
+<p><strong>To prevent an argument from being evaluated</strong>, use the <code>Hold</code> function.</p>
+<p><strong>To force an argument to be evaluated</strong>, use the <code>Evaluate</code> function.</p>
 <h2>Other Symbolic Manipulation</h2>
 <p>You can compare two expressions, check if an expression match a pattern,
 apply a substitution to some elements in an expression or apply a conditional rewriting rule to an expression.</p>
@@ -923,14 +931,14 @@ Read more about <strong>Patterns and Rules</strong> for these operations
         
 
 
-        <meta itemprop="datePublished" content="July 07, 2021">
+        <meta itemprop="datePublished" content="July 12, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 09:32:03 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

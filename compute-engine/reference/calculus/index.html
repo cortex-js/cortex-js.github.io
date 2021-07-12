@@ -805,6 +805,33 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Calculus</h1>
+<h3>Functions</h3>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Integrate</code></td><td>
+<p><code>[&quot;Integrate&quot;, <em>expression</em>]</code></p>
+<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>symbol</em>]</code></p>
+<p>Indefinite integral</p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, x], &quot;x&quot;]</code></p>
+<p>$$ \int \sin x ,\mathrm{d}x $$</p>
+<hr>
+<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>predicate</em>]</code></p>
+<p>Definite integral.</p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
+<p>$$ \int_0^\infty \sin x ,\mathrm{d}x $$</p>
+<hr>
+<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
+<p>Multiple integral.</p>
+<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  x [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, y, [&quot;Interval&quot;, 0, 1]]]</code></p>
+<p>$$ \int_0^1 \int_0^2 x\sin y ,\mathrm{d}x,\mathrm{d}y $$</p>
+</td></tr>
+<tr><td><code>D</code></td><td>
+<p><code>[&quot;D&quot;, <em>f</em>, <em>x</em>]</code></p>
+<p>Evaluate to the partial derivative ( \frac{\partialD f}{\partialD x} ) or ( f^{\prime}(x) )</p>
+<hr>
+<p><code>[&quot;D&quot;, <em>f</em>, [&quot;Tuple&quot;, <em>x</em>, <em>n</em>]]</code></p>
+<p>Evaluate to the multiple derivative ( \frac{\partialD^n f}{\partialD x^n} ) (Leibniz notation) or ( f^{(n)}(x) ) (Lagrange notation)</p>
+</td></tr>
+</tbody></table>
 <h3>Lagrange Notation</h3>
 <table>
 <thead>
@@ -816,7 +843,7 @@ Table of Content</label>
 <tbody>
 <tr>
 <td style="text-align:left"><code>f'(x)</code></td>
-<td style="text-align:left"><code>[&quot;Derive&quot;, f, x]</code></td>
+<td style="text-align:left"><code>[&quot;D&quot;, f, x]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f''(x)</code></td>
@@ -925,14 +952,14 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="July 07, 2021">
+        <meta itemprop="datePublished" content="July 12, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 09:32:03 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

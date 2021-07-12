@@ -983,22 +983,6 @@ created</strong>, change the <code>options</code> property.</p>
 <td style="text-align:left">If this setting is not empty, when a number is immediately followed by a fraction, assume that the fraction should be added to the number, that is that there is an invisible plus operator between the two.<br> For example with <code>2\frac{3}{4}</code><ul><li> when <code>invisiblePlusOperator</code> is <code>&quot;Add&quot;</code> : <code>[&quot;Add&quot;, 2, [&quot;Divide&quot;, 3, 4]]</code></li><li> when <code>invisiblePlusOperator</code> is <code>&quot;&quot;</code>: <code>[&quot;Multiply&quot;, 2, [&quot;Divide&quot;, 3, 4]]</code></li></ul></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>promoteUnknownSymbols</code></td>
-<td style="text-align:left">When a token is encountered at a position where a symbol could be parsed, if the token matches <code>promoteUnknownSymbols</code> it will be accepted as a symbol (an <code>unknown-symbol</code> error will still be triggered so that the caller can be notified). Otherwise, the symbol is rejected.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>ignoreCommands</code></td>
-<td style="text-align:left">When one of these commands is encountered, it is skipped.<br> Useful for purely presentational commands such as <code>\displaystyle</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>idempotentCommands</code></td>
-<td style="text-align:left">When one these commands is encountered, its argument is parsed, as if the command was not present.<br> Useful for some presentational commands such as <code>\left</code>, <code>\bigl</code>, etc…</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>promoteUnknownFunctions</code></td>
-<td style="text-align:left">When a token is encountered at a position that could match a function call, and it is followed by an apply function operator (typically, parentheses), consider them to a be a function if the string of tokens match this regular expression.<br>While this is a convenient shortcut, it is recommended to more explicitly define custom functions by providing an entry for them in a function dictionary (providing additional information about their arguments, etc…) and in a LaTeX translation dictionary (indicating what LaTeX markup corresponds to the function).<br>Example:<br> By default, <code>f(x)</code> is parsed as <code>[&quot;Multiply&quot;, &quot;f&quot;, &quot;x&quot;]</code>.<br>After <code>promoteUnknownFunctions = /^[fg]$/``` , </code>f(x)<code>is parsed as</code>[&quot;f&quot;, &quot;x&quot;]` |</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>preserveLatex</code></td>
 <td style="text-align:left">If true, the expression will be decorated with the LaTeX fragments corresponding to each elements of the expression</td>
 </tr>
@@ -1012,7 +996,7 @@ are returned) and set the options to avoid modifying the raw stream of LaTeX
 tokens.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> rawLatex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LatexSyntax</span>({
   <span class="hljs-attr">parseArgumentsOfUnknownLatexCommands</span>: <span class="hljs-literal">false</span>,
-  <span class="hljs-attr">promoteUnknownSymbols</span>: <span class="hljs-regexp">/./</span>,
+  <span class="hljs-attr">parseUnknownToken</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&#x27;symbol&#x27;</span>,
   <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">dictionary</span>: [],
@@ -1031,14 +1015,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 07, 2021">
+        <meta itemprop="datePublished" content="July 12, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Jul 07 2021 08:03:25 GMT+0200 (Central European Summer Time)">July 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 09:32:03 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
