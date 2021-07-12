@@ -72,13 +72,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/demo/</loc>
-    <lastmod>2021-07-01</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/demo/</loc>
     <lastmod>2021-07-02</lastmod>
     <changefreq></changefreq>
@@ -100,20 +93,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/guides/interacting/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/getting-started/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/mathlive/guides/lifecycle/</loc>
     <lastmod>2021-07-04</lastmod>
     <changefreq></changefreq>
@@ -121,49 +100,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/guides/shortcuts/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/mathlive/guides/speech/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/static/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/virtual-keyboards/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/customizing/</loc>
-    <lastmod>2021-07-04</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/macros/</loc>
     <lastmod>2021-07-04</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -185,6 +122,69 @@
 
   <url>
     <loc>https://cortexjs.io/mathlive/reference.html</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/getting-started/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/customizing/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/interacting/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/macros/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/shortcuts/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/static/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/virtual-keyboards/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/demo/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -240,6 +240,13 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/guides/execution-constraints/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
@@ -247,7 +254,21 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/guides/forms/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/guides/latex-syntax/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/numerical-evaluation/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -262,6 +283,20 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/simplify/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/symbolic-computing/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/arithmetic/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -289,6 +324,13 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/reference/domains/</loc>
+    <lastmod>2021-07-12</lastmod>
+    <changefreq></changefreq>
+    <priority></priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/reference/logic/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
@@ -303,35 +345,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/domains/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/forms/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/numerical-evaluation/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/symbolic-computing/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/arithmetic/</loc>
+    <loc>https://cortexjs.io/compute-engine/reference/special-functions/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
     <priority></priority>
@@ -339,20 +353,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/domains/</loc>
-    <lastmod>2021-07-12</lastmod>
-    <changefreq></changefreq>
-    <priority></priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/special-functions/</loc>
     <lastmod>2021-07-12</lastmod>
     <changefreq></changefreq>
     <priority></priority>
