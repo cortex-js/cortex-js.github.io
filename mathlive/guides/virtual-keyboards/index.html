@@ -682,6 +682,7 @@ The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, 
 <p>These keyboards  include the most common math symbols and they can be
 customized to fit your specific needs. For example you can remove some
 keyboards, or create new ones.</p>
+<section id='controlling-when-the-virtual-keyboard-panel-is-displayed'>
 <h2>Controlling when the Virtual Keyboard Panel is Displayed</h2>
 <p>The default behavior of the virtual keyboard panel is to only be displayed on
 touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
@@ -698,7 +699,9 @@ mathfield</li>
 </ul>
 <p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations.</p>
-<h2>Controling Which Keyboards Are Displayed</h2>
+</section>
+<section id='controlling-which-keyboards-are-displayed'>
+<h2>Controlling Which Keyboards Are Displayed</h2>
 <p>The virtual keyboard panel displays multiple keyboards which can be
 toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
 and <code>greek</code>.</p>
@@ -723,6 +726,8 @@ document.getElementById('mf').setOptions({
   virtualKeyboards: 'numeric symbols'
 });</div>
 </code-playground>
+</section>
+<section id='defining-custom-virtual-keyboards'>
 <h2>Defining Custom Virtual Keyboards</h2>
 <p>A virtual keyboard is made up of one or more &quot;layers&quot;. A keyboard layer is a
 set of keys that can be toggled using another key. For example, the <code>roman</code>
@@ -951,6 +956,8 @@ keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortc
   });
 }
 </code></pre>
+</section>
+<section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
 <h2>Customizing the Appearance of the Virtual Keyboard Toggle</h2>
 <p><strong>To apply a CSS rule to the virtual keyboard toggle</strong>, use
 the <code>math-field::part(virtual-keyboard-toggle)</code> CSS selector.</p>
@@ -983,6 +990,8 @@ math-field::part(virtual-keyboard-toggle) {
 &lt;/math-field&gt;
 </div>
 </code-playground>
+</section>
+<section id='changing-the-alphabetical-keyboard-layout'>
 <h2>Changing the Alphabetical Keyboard Layout</h2>
 <p>By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
@@ -1009,6 +1018,8 @@ document.getElementById('mf').setOptions({
 &lt;/math-field&gt;
 </div>
 </code-playground>
+</section>
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
 <h2>Customizing the Appearance of the Virtual Keyboard Keycaps</h2>
 <p><strong>To control the appearance of keycaps</strong>, use the following CSS variables.</p>
 <ul>
@@ -1021,7 +1032,9 @@ document.getElementById('mf').setOptions({
 <p class="notice--info">Set these CSS variables on any selector inherited by the
 <code>math-field</code> tag, for example, <code>body</code>: although CSS styles are &quot;invisible&quot; to custom components, CSS variables
 are &quot;passed through&quot; and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
-<h2>Sharing Virtual Keyboards Amongst Multiple Instances</h2>
+</section>
+<section id='sharing-virtual-keyboards-amongts-multiple-instances'>
+## Sharing Virtual Keyboards Amongst Multiple Instances
 <p>When there are multiple mathfield elements in a page, they usually each have
 their own virtual keyboard.</p>
 <p>However, in some cases it might be desirable to have the virtual keyboard
@@ -1043,6 +1056,7 @@ function in the context of the main document.</p>
 the <code>math-field</code> elements.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
+</section>
 <div class='read-more'><a href="/mathlive/guides/lifecycle/">
 Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1058,14 +1072,14 @@ Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
         
 
 
-        <meta itemprop="datePublished" content="July 12, 2021">
+        <meta itemprop="datePublished" content="November 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 10:54:25 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Nov 03 2021 16:29:05 GMT+0100 (Central European Standard Time)">November 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -890,6 +890,8 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 <p><strong>Numbers</strong>, <strong>symbols</strong>, <strong>strings</strong> and <strong>functions</strong> can be expressed either
 as an object literal with a <code>&quot;num&quot;</code>, <code>&quot;str&quot;</code>, <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key,
 respectively, or as a short-hand notation using a JSON number, string or array.</p>
+<p><strong>Dictionaries</strong> do not have a short-hand notation and are always expressed
+as an object literal with a <code>&quot;dict&quot;</code> key.</p>
 <p>The short-hand notation is more concise and easier to read, but cannot include
 metadata properties.</p>
 <h2>Numbers</h2>
@@ -907,7 +909,7 @@ value of the key is a string representation of the number.</p>
 </code></pre>
 <p>The string representing a number follows the
 <a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>.</p>
-<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represented an
+<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represent an
 undefined results, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
 positive infinity and negative infinity, respectively.</p>
 <p>When a number is outside the bounds of a JSON number (i.e. a 64-bit floating
@@ -1019,7 +1021,9 @@ UTF-16LE, UTF-16BE, etc…</p>
 </ul>
 <p><strong>Symbols</strong> are identifiers that represent the name of constants, variables and
 functions.</p>
-<p>Symbols are strings of valid Unicode characters, except:</p>
+<p>Symbols are strings of valid Unicode characters (including Greek, Cyrillic,
+Hebrew, Arabic, mathematical symbols, Ideographic and CJK symbols and emojis),
+except:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1253,12 +1257,12 @@ why we recommend a more restricted character set.</p>
 <code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head and
 its arguments.</p>
 <pre><code class="language-typescript">{
-    <span class="hljs-string">&quot;fn&quot;</span>: <span class="hljs-title class_">Expression</span>[]
+    <span class="hljs-string">&quot;fn&quot;</span>: [<span class="hljs-title class_">Expression</span>, ...<span class="hljs-title class_">Expression</span>[]]
 }
 </code></pre>
 <p>The <strong>head</strong> of the function is the first element in the array. Its presence is
 required. It indicates the ‘function name’ or ‘what’ the function is about.</p>
-<p>The head is frequently is a string, but it can also be another expression.</p>
+<p>The head is frequently a string, but it can be another expression.</p>
 <p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
 well. The arguments form the <strong>tail</strong> of the function.</p>
 <p>The expression corresponding to \(\sin^{-1}(x)\) is</p>
@@ -1273,6 +1277,8 @@ well. The arguments form the <strong>tail</strong> of the function.</p>
 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
+<p>Note that an array representing a function must have at least one element,
+the head of the function. Therefore <code>[]</code> is not a valid expression.</p>
 <h2>Dictionary</h2>
 <p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
 languages it is called a map or associative array.</p>
@@ -1360,14 +1366,14 @@ the equivalent object literal before being annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 20, 2021">
+        <meta itemprop="datePublished" content="November 03, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Jul 20 2021 23:17:29 GMT+0200 (Central European Summer Time)">July 20, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Nov 03 2021 16:54:16 GMT+0100 (Central European Standard Time)">November 03, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
