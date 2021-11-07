@@ -2344,48 +2344,6 @@ combinations.</p>
 </tr>
 </tbody>
 </table>
-<h2>International Keyboards</h2>
-<p>Correctly handling keyboard shortcuts while accounting for international
-keyboard layout is surprisingly difficult. MathLive uses some heuristics that
-may occasionally result in a surprising result.</p>
-<p>This section details how MathLive uses keyboard events to determine which
-keyboard shortcut to activate.</p>
-<p>Let’s consider the keyboard shortcut <code>Ctrl+Alt/Option-A</code>.</p>
-<p>When the user presses this key combination on a keyboard with a US keyboard
-layout, the event received will have the properties <code>code = &quot;KeyA&quot;</code> and  <code>key = &quot;\u00e5&quot;</code>.</p>
-<p>On a French AZERTY keyboard layout, the event received will have <code>code = &quot;KeyQ&quot;</code> and  <code>key = &quot;\u00e6&quot;</code>.</p>
-<p>Why is the code <code>KeyQ</code> even though the user pressed the key labeled <code>A</code> on their
-AZERTY keyboard? On this keyboard layout, the Q and A keys are swapped compared
-to the US layout and the <code>code</code> property reflects the &quot;physical&quot; key pressed.</p>
-<p>This is not unusual. While some keys retain their positions, many keys are
-swapped around or altogether unique in some layouts, particularly for
-punctuations and symbols. The code property of the event does not
-represent the label of the key, but indicates the physical position of the key
-as if it was on a US keyboard, in this case &quot;the key immediately to the right of
-the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
-French keyboard&quot;.</p>
-<p>What we want to know is that the user pressed a key labeled &quot;A&quot;. But none of the
-information in the event record tells us that. The value of the key field varies
-depending on the keyboard layout and the modifiers pressed.</p>
-<p>However, if we know the keyboard layout, we can use a table that maps the value
-of the key field to infer the label of the key  the user pressed, i.e. what the
-user sees printed on the top of the key cap, regardless of its physical location
-on the keyboard. Once we have the label, we can figure out that the user pressed
-<code>Ctrl+Alt+A</code> using the modifier fields of the event.</p>
-<p>But how do we know what is the current keyboard layout? There is unfortunately
-no web platform API (broadly supported) to obtain that information.
-So one approach is to indicate programmatically to MathLive which keyboard
-layout the user is using. Otherwise, MathLive will use the user locale to
-guess the keyboard (for example, guessing to use the French AZERTY keyboard
-if the user locale is France).</p>
-<p>Finally, MathLive uses a heuristic to refine its guess: with each keyboard
-event, MathLive checks that the info in the event record (specifically the code
-and key fields) are consistent with the current keyboard layout. If not, it
-finds a better matching keyboard layout, and will switch to that keyboard layout
-if it is confident enough of that guess.</p>
-<p>MathLive currently has a limited set of &quot;known&quot; keyboard layouts. If you happen
-to use a keyboard layout MathLive doesn’t know, it will guess the wrong keyboard
-layout. As a result some keyboard shortcuts may produce unexpected results.</p>
 
         
       </section>
@@ -2395,14 +2353,14 @@ layout. As a result some keyboard shortcuts may produce unexpected results.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 03, 2021">
+        <meta itemprop="datePublished" content="November 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Nov 03 2021 16:40:54 GMT+0100 (Central European Standard Time)">November 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Sun Nov 07 2021 14:28:34 GMT+0100 (Central European Standard Time)">November 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
