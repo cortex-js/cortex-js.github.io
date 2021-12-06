@@ -674,8 +674,9 @@ Table of Content</label>
 <h1>Customizing a mathfield</h1>
 <p>The appearance and behavior of the mathfield is highly customizable. Here are a few common examples.</p>
 <h2>Styling</h2>
-<p>The mathfield can be styled using the <code>style</code> attribute on the <code>&lt;math-field&gt;</code> tag,
-for example to change the base font size or add a border.</p>
+<p>The mathfield can be styled using the <code>style</code> attribute on the <code>&lt;math-field&gt;</code>
+tag or by defining a CSS rule targeting the mathfield.</p>
+<p>This can be used to change the base font size or add a border.</p>
 <p>Change line 2-6 of the HTML in the playground below with <code>color: #dde; background: #256291;</code>.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
@@ -692,33 +693,28 @@ for example to change the base font size or add a border.</p>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<p>The content of the mathfield is displayed using a family of high-quality
-fonts based on the original Computer Modern font from TeX. The mathfield
-will not display correctly using another font. By default, the directory containing
-the fonts is located next to the file containing the mathlive library.
-If your bundler or asset management system require a different configuration
-you can specify where the fonts can be located using the <a href="http://cortexjs.io/docs/mathlive/?q=fontsDirectory"><code>fontsDirectory</code></a> option or the <code>fonts-directory</code> attribute.</p>
+<h3>Focus Ring</h3>
+<p>To change the appearance of the focus ring, use the <code>:focus-within</code> pseudo-element.</p>
 <!-- htmlmin:ignore -->
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+<code-playground layout="stack" >
+    <div slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;
+</div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<p class="notice--warning">Note that changing the fonts directory for one mathfield will change the fonts
-used by all the other mathfield elements in the page.</p>
-<div class='read-more'><a href="/mathlive/guides/integration/">
-Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p class="notice--warning">Removing outlines in CSS creates issues for people navigating the web
+with  a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element. </p>
 <h2>CSS Variables</h2>
 <p>Some CSS variables (custom properties) can be used to modify the appearance of
 the mathfield:</p>
@@ -1032,6 +1028,34 @@ console.log(mf.getOptions().strings[locale]);
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
+<h2>Fonts</h2>
+<p>The content of the mathfield is displayed using a family of high-quality
+fonts based on the original Computer Modern font from TeX. The mathfield
+will not display correctly using another font. By default, the directory containing
+the fonts is located next to the file containing the mathlive library.
+If your bundler or asset management system require a different configuration
+you can specify where the fonts can be located using the <a href="http://cortexjs.io/docs/mathlive/?q=fontsDirectory"><code>fontsDirectory</code></a> option or the <code>fonts-directory</code> attribute.</p>
+<!-- htmlmin:ignore -->
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+<p class="notice--warning">Note that changing the fonts directory for one mathfield will change the fonts
+used by all the other mathfield elements in the page.</p>
+<div class='read-more'><a href="/mathlive/guides/integration/">
+Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/mathlive/guides/commands/">
 Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1044,14 +1068,14 @@ Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
         
 
 
-        <meta itemprop="datePublished" content="July 12, 2021">
+        <meta itemprop="datePublished" content="December 06, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 10:53:30 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Dec 06 2021 10:22:02 GMT+0100 (Central European Standard Time)">December 06, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
