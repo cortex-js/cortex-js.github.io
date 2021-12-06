@@ -693,6 +693,7 @@ tag or by defining a CSS rule targeting the mathfield.</p>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
+<section id='focus-ring'>
 <h3>Focus Ring</h3>
 <p>To change the appearance of the focus ring, use the <code>:focus-within</code> pseudo-element.</p>
 <!-- htmlmin:ignore -->
@@ -715,6 +716,8 @@ with  a keyboard. However, you can change the appearance of the outline,
 for example to indicate an error condition. If you remove the outline on the
 mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element. </p>
+</section>
+<section id='css-variable'>
 <h2>CSS Variables</h2>
 <p>Some CSS variables (custom properties) can be used to modify the appearance of
 the mathfield:</p>
@@ -754,6 +757,8 @@ content of the <code>&lt;math-field&gt;</code> custom component.</p>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
+</section>
+<section id='display-options'>
 <h2>Display Options</h2>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
@@ -946,6 +951,8 @@ letters and lowercase greek letters, but not uppercase greek letters.</p>
 <p>The French typographical convention is to only italicize lowercase roman letters.</p>
 <p>The default letter shape style is <code>auto</code>: if the system locale is &quot;french&quot;,
 the <code>french</code> style is used, <code>tex</code> otherwise.</p>
+</section>
+<section id='editing-options'>
 <h2>Editing Options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
 the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
@@ -986,6 +993,8 @@ line 3 to <code>scriptDepth: 0</code>, then try to type &quot;x^2&quot; in the m
 <!-- htmlmin:ignore -->
 <p>See <a href="http://cortexjs.io/docs/mathlive/?q=EditingOptions">EditingOptions</a> for more
 details about these and other available options.</p>
+</section>
+<section id='space-bar'>
 <h2>Handling the Space Bar</h2>
 <p>In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
@@ -998,6 +1007,8 @@ relational, binary or unary operators, etc…</p>
 <pre><code class="language-js">md.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">mathModeSpace</span>: <span class="hljs-string">&#x27;\\:&#x27;</span>});
 
 </code></pre>
+</section>
+<section id='localization'>
 <h2>Localization</h2>
 <p>The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.</p>
@@ -1028,6 +1039,7 @@ console.log(mf.getOptions().strings[locale]);
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
+</section>
 <h2>Fonts</h2>
 <p>The content of the mathfield is displayed using a family of high-quality
 fonts based on the original Computer Modern font from TeX. The mathfield
@@ -1075,7 +1087,7 @@ Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Dec 06 2021 10:22:02 GMT+0100 (Central European Standard Time)">December 06, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Dec 06 2021 10:28:07 GMT+0100 (Central European Standard Time)">December 06, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
