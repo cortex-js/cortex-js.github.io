@@ -805,8 +805,7 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'>
-<p>The MathJSON format is a lightweight data interchange format for mathematical
-notation.</p>
+<p>The MathJSON format is a lightweight mathematical notation interchange format.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -822,11 +821,11 @@ notation.</p>
 </tr>
 <tr>
 <td style="text-align:left">\[e^{\imaginaryI \pi }+1=0\]</td>
-<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryUnit&quot;], 1]], 0]</code></td>
+<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;ImaginaryUnit&quot;, &quot;Pi&quot;], 1]], 0]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">\[\sin^{-1}^\prime(x)\]</td>
-<td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
+<td style="text-align:left"><code>[[&quot;Derivative&quot;, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
 </tr>
 </tbody>
 </table>
@@ -854,7 +853,7 @@ Read more about the <strong>Compute Engine</strong>
 arithmetic, engineering, applied mathematics to physics and more. New notations
 are invented regularly and need to be represented. To address those needs
 MathJSON is flexible, extensible and customizable. Extensible dictionaries can
-be used to define new syntax and new semantic.</p>
+be used to define new syntax and new semantics.</p>
 <p>MathJSON is not intended to be suitable as a visual representation of arbitrary
 mathematical notations, and as such is not a replacement for LaTeX or MathML.</p>
 <h2>Structure of a MathJSON Expression</h2>
@@ -898,7 +897,7 @@ metadata properties.</p>
 <p>A MathJSON <strong>number</strong> is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;num&quot;</code> key</li>
-<li>a JSON number</li>
+<li>a finite JSON number</li>
 </ul>
 <h3>Numbers as Object Literals</h3>
 <p><strong>Numbers</strong> can be represented as an object literal with a <code>&quot;num&quot;</code> key. The
@@ -909,8 +908,8 @@ value of the key is a string representation of the number.</p>
 </code></pre>
 <p>The string representing a number follows the
 <a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>.</p>
-<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represent an
-undefined results, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
+<p>In  addition, the values <code>&quot;NaN&quot;</code>, <code>&quot;+Infinity&quot;</code> and <code>&quot;-Infinity&quot;</code> are used to represent an
+undefined result, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
 positive infinity and negative infinity, respectively.</p>
 <p>When a number is outside the bounds of a JSON number (i.e. a 64-bit floating
 point representation), it is represented by a string of digits <code>0</code>…<code>9</code>,
@@ -921,7 +920,7 @@ by a letter:</p>
 <li><code>d</code> to indicate the number is an arbitrary precision floating point number
 (decimal).</li>
 </ul>
-<h3>JSON numbers</h3>
+<h3>JSON Numbers</h3>
 <p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
 representation of numbers, a JSON number can be used.</p>
 <p>Specifically:</p>
@@ -947,14 +946,14 @@ representation of numbers, a JSON number can be used.</p>
 
 </code></pre>
 <h2>Strings</h2>
-<p>A MathJSON <strong>string</strong> is either</p>
+<p>A MathJSON <strong>string</strong> is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;str&quot;</code> key</li>
 <li>a <a href="https://tools.ietf.org/html/rfc7159#section-7">JSON string</a> that starts and
 ends with <strong>U+0027 APOSTROPHE</strong> <code>'</code>.</li>
 </ul>
 <p>Strings can contain any character represented by a Unicode scalar value (in the
-[0…0x10FFFF] range, except for [0xD800…0xDFFF]), but the following
+range [U+0000…U+10FFFF], except for [U+D800…U+DFFF]), but the following
 characters must be escaped as indicated:</p>
 <div class=symbols-table>
 <table>
@@ -1011,7 +1010,11 @@ characters must be escaped as indicated:</p>
 </div>
 <p>The encoding of the string follows the encoding of the JSON payload: UTF-8,
 UTF-16LE, UTF-16BE, etc…</p>
-<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
+<pre><code class="language-json">
+<span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
+
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;str&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;All your base are belong to us&quot;</span> <span class="hljs-punctuation">}</span>
+
 </code></pre>
 <h2>Symbols</h2>
 <p>A MathJSON <strong>symbol</strong> is either:</p>
@@ -1051,8 +1054,8 @@ except:</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+0060</strong></td>
-<td style="text-align:left"><strong>GRAVE ACCENT</strong> backtick</td>
-<td style="text-align:left"><code>`</code> |</td>
+<td style="text-align:left"><strong>GRAVE ACCENT</strong></td>
+<td style="text-align:left"><code>`</code> backtick |</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+FFFE</strong></td>
@@ -1288,14 +1291,14 @@ value of the key is a JSON object literal holding the content of the dictionary.
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;dict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">&quot;first&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;second&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;second&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">&quot;third&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <h2>Metadata</h2>
 <p>MathJSON object literals can be annotated with supplemental information.</p>
-<p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> represented as a JSON
+<p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> or a <strong>string</strong> represented as a JSON
 string, or a <strong>function</strong> represented as a JSON array must be transformed into
 the equivalent object literal before being annotated.</p>
 <p>The following metadata keys are recommended:</p>
@@ -1366,14 +1369,14 @@ the equivalent object literal before being annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 06, 2021">
+        <meta itemprop="datePublished" content="December 07, 2021">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Dec 06 2021 10:28:42 GMT+0100 (Central European Standard Time)">December 06, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
