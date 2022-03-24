@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -805,102 +845,163 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Numerical Evaluation</h1>
-<p><strong>To obtain a numerical approximation of the value of an expression</strong>, use the
-<code>ce.N()</code> function.</p>
-<p>If <code>ce.N()</code> cannot provide a numerical evaluation, a <a href="/compute-engine/guides/forms/">canonical</a> symbolic representation
+<p><strong>To obtain a numerical approximation of the value of an expression</strong>, call the
+<code>expr.N()</code> function.</p>
+<p>If <code>expr.N()</code> cannot provide a numerical evaluation, a symbolic representation
 of the partially evaluated expression is returned.</p>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">N</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>))
-<span class="hljs-comment">// -&gt; 345.2360679774998</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">N</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>));
-<span class="hljs-comment">// -&gt; [&quot;Add&quot;, [&quot;Sqrt&quot;, &quot;x&quot;], 343]</span>
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 5 + x&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;8  + x&quot;</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">
-Read more about <strong>Symbolic Computing</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Numeric Formats</h2>
-<p>Three numeric formats may be used to perform numerical evaluations with the Compute Engine: <code>machine</code> <code>decimal</code> and <code>complex</code>.</p>
-<h3>Machine Numbers</h3>
-<p>The <code>machine</code> format uses a common representation of numbers in computers: a <a href="https://en.wikipedia.org/wiki/IEEE_754">64-bit binary floating point format</a>. It is well suited for the CPU to do fast computations. It uses a fixed amount of memory and represent significant digits in base-2. This numeric format has about 15 signficant digits.</p>
-<p><strong>Using the <code>machine</code> numeric format some numerical evaluations cannot produce exact results.</strong></p>
-<p>For example: \(0.1 + 0.2 = 0.30000000000000004 \).</p>
-<p>Indeed, while \(0.1\) and \(0.2\) look like &quot;round numbers&quot; in base-10, they are only represented approximately in base-2.</p>
-<h3>Decimal Numbers</h3>
-<p>The <code>decimal</code> numeric format is an arbitrary-precision representation of floating points. In this format, floating point numbers are represented in base-10, and use a variable amount of memory depending on the number of significant digits (<strong>precision</strong>) desired.</p>
-<p>When using Decimal numbers, the return value of <code>ce.N()</code> may be a MathJSON number that looks like this:</p>
+<p>If the expression is <a href="/compute-engine/guides/expressions#pure/">pure</a>, the value
+of the expression can be obtained with <code>expr.numericValue</code>.</p>
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;345.2360679774998&quot;</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;345.2360679774998&quot;</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;\sqrt{x} + 343&quot;</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ undefined</span>
+</code></pre>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
+<strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2>Numeric Modes</h2>
+<p>Four numeric modes may be used to perform numerical evaluations with the Compute
+Engine: <code>machine</code> <code>decimal</code> <code>complex</code> and <code>auto</code>. The default mode is <code>auto</code>.</p>
+<section id='machine-numeric-mode'>
+<h3>Machine Numeric Mode</h3>
+<p>Calculations in the <code>machine</code> numeric mode use a
+<a href="https://en.wikipedia.org/wiki/IEEE_754">64-bit binary floating point format</a>.</p>
+<p>This format is implemented in hardware and well suited to do fast computations.
+It uses a fixed amount of memory and represent significant digits in base-2 with
+about 15 digits of precision and with a minimum value of \( \pm5\times
+10^{-324} \) and a maximum value of \( \pm1.7976931348623157\times 10^{+308}
+\)</p>
+<p><strong>To change the numeric mode to the <code>machine</code> mode</strong>, use
+<code>engine.numericMode = &quot;machine&quot;</code>.</p>
+<p>Changing the numeric mode to <code>machine</code> automatically sets the precision to 15.</p>
+<p>Calculations that have a complex value, for example \( \sqrt{-1} \) will
+return <code>NaN</code>. Some calculations that have a value very close to 0 may return 0.
+Some calculations that have a value greater than the maximum value representable
+by a machine number may return \( \pm\infty \).</p>
+<p notice--warning=""><strong>Warning</strong> Some numerical evaluations using machine numbers cannot produce
+exact results…</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">numericMode</span> = <span class="hljs-string">&#x27;machine&#x27;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;0.30000000000000004&quot;</span>
+</code></pre>
+<p>While \(0.1\) and \(0.2\) look like &quot;round numbers&quot; in base-10, they can
+only be represented by an approximation in base-2, which introduces cascading
+errors when manipulating them.</p>
+<div class='read-more'><a href="https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">
+Read <strong>&quot;What Every Computer Scientist Should Know About Floating-Point
+Arithmetic&quot;</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</section>
+<section id='decimal-numeric-mode'>
+<h3>Decimal Numeric Mode</h3>
+<p>In the <code>decimal</code> numeric mode, numbers are represented in Decimal format, using
+base-10 and a variable amount of memory depending on the number of significant
+digits (<strong>precision</strong>) desired.</p>
+<p>Numbers in the Decimal format have a minimum value of \( \pm
+10^{-9000000000000000} \) and a maximum value of \( \pm9.99999\ldot\times
+10^{+9000000000000000} \).</p>
+<p><strong>To change the numeric mode to the <code>decimal</code> mode</strong>, use
+<code>engine.numericMode = &quot;decimal&quot;</code>.</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">numericMode</span> = <span class="hljs-string">&#x27;decimal&#x27;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;0.3&quot;</span>
+</code></pre>
+<p>When using the <code>decimal</code> mode, the precision of computation (number of
+significant digits used) can be changed. By default, the precision is 100.</p>
+<p>Trigonometric operations are accurate for precision up to 1,000.</p>
+<p><strong>To change the precision of calculations in <code>decimal</code> mode</strong>, set the
+<code>engine.precision</code> property.</p>
+<p>The <code>precision</code> property affects how the computations are performed. To change
+how numbers are displayed when serialized to LaTeX, use
+<code>engine.latexOptions = { precision: 6 }</code> to set it to 6 significant digits, for
+example.</p>
+<p>The LaTeX precision is adjusted automatically when the <code>precision</code> is changed so
+that the display precision is never greater than the computation precision.</p>
+<p>When using the <code>decimal</code> mode, the return value of <code>expr.N().json</code> may be a
+MathJSON number that looks like this:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  num<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450284102701938521105559644622948954930381964428810975665933446128475648233786783165271201909145648566923460348610454326648213393607260249141273724587006606315588174881520920962829254091715364367892590360011330530548820466521384146951941511609433057270365759591953092186117381932611793105118548074462379962749567351885752724891227938183011949129833673362440656643086021394946395224737190702179860943702770539217176293176752384674818467669405132000568127145263560827785771342757789609173637178721468440901224953430146549585371050792279689258923542019956112129021960864034418159813629774771309960518707211349999998372978049951059731732816096318595024459455346908302642522308253344685035261931188171010003137838752886587533208381420617177669147303598253490428755468731159562863882353787593751957781857780532171226806613001927876611195909216420199d&quot;</span>
+  <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105820974944592307
+  8164062862089986280348253421170679821480865132823066470938446095505822317253
+  5940812848111745028410270193852110555964462294895493038196442881097566593344
+  6128475648233786783165271201909145648566923460348610454326648213393607260249
+  1412737245870066063155881748815209209628292540917153643678925903600113305305
+  4882046652138414695194151160943305727036575959195309218611738193261179310511
+  8548074462379962749567351885752724891227938183011949129833673362440656643086
+  0213949463952247371907021798609437027705392171762931767523846748184676694051
+  3200056812714526356082778577134275778960917363717872146844090122495343014654
+  9585371050792279689258923542019956112129021960864034418159813629774771309960
+  5187072113499999983729780499510597317328160963185950244594553469083026425223
+  0825334468503526193118817101000313783875288658753320838142061717766914730359
+  8253490428755468731159562863882353787593751957781857780532171226806613001927
+  876611195909216420199&quot;</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
-<p>Note that the string of digits ends with a <code>d</code> indicating this is a <code>decimal</code> number.</p>
-<h3>Complex Numbers</h3>
-<p>The <code>complex</code> numeric format can represent complex numbers as a pair of real and imaginary components. The real and imaginary components are stored as 64-bit floating point numbers and have thus the same limitations as the <code>machine</code> format.</p>
-<p>The complex number \(1 + 2\imaginaryI\) is represented as <code>[&quot;Complex&quot;, 1, 2]</code>. This is a convenient shorthand for <code>[&quot;Add&quot;, 1, [&quot;Multiply&quot;, 2, &quot;ImaginaryUnit&quot;]]</code>.</p>
-<h2>Choosing the Numeric Format and Precision</h2>
-<p><strong>To change the numeric format for numeric evaluations</strong>, set the <code>numericFormat</code>
-property of a <code>ComputeEngine</code> instance to one of these values:</p>
-<div class=symbols-table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Numeric Format</th>
-<th style="text-align:left"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>machine</code></td>
-<td style="text-align:left">64-bit IEEE floating point number with about 15 digits of precision. Fastest.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>complex</code></td>
-<td style="text-align:left">Two 64-bit floating point numbers. Support provided by the &quot;complex.js&quot; library.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>decimal</code></td>
-<td style="text-align:left">Arbitrary precision floating point. Slower, but more precise, however computations with complex numbers cannot be performed. Support provided by the &quot;decimal.js&quot; library</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>auto</code></td>
-<td style="text-align:left">Use <code>number</code> <code>machine</code> or <code>auto</code> based on the desired precision and the content of the expression</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><strong>To change the number of significant digits for numerical evaluations</strong>, set the <code>precision</code> property of a <code>ComputeEngine</code> instance.</p>
-<p>A value of 15 or less will automatically be set to 15 and use the <code>machine</code>
-numeric format.</p>
-<p>A value over 1,000 will result in inaccurate results for trigonometric functions. Other arithmetic operations are not affected.</p>
-<p>The default numeric format is <code>auto</code>: if the precision is 15 or less
-the <code>machine</code> numeric format is used, unless the computations requires some
-calculations with complex numbers. If the precision is greater than 15,
-the <code>decimal</code> numeric format is used.</p>
+<div class='read-more'><a href="https://mikemcl.github.io/decimal.js/"> Support for the <code>decimal</code>
+mode is implemented using the <strong>decimal.js</strong> library.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</section>
+<section id='complex-numeric-mode'>
+<h3>Complex Numeric Mode</h3>
+<p>The <code>complex</code> numeric mode can represent complex numbers as a pair of real and
+imaginary components. The real and imaginary components are stored as 64-bit
+floating point numbers and have thus the same limitations as the <code>machine</code>
+format.</p>
+<p>The complex number \(1 + 2\imaginaryI\) is represented as <code>[&quot;Complex&quot;, 1, 2]</code>.
+This is a convenient shorthand for
+<code>[&quot;Add&quot;, 1, [&quot;Multiply&quot;, 2, &quot;ImaginaryUnit&quot;]]</code>.</p>
+<p><strong>To change the numeric mode to the <code>complex</code> mode</strong>, use
+<code>engine.numericMode = &quot;complex&quot;</code>.</p>
+<p>Changing the numeric mode to <code>complex</code> automatically sets the precision to 15.</p>
+<div class='read-more'><a href="https://github.com/infusion/Complex.js"> Support for the
+<code>complex</code> mode is implemented using the <strong>Complex.js</strong> library.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</section>
+<section id='auto-numeric-mode'>
+<h3><code>Auto</code> Numeric Mode</h3>
+<p>When using the <code>auto</code> numeric mode, calculations are performed using machine
+numbers if the precision is 15 or less. If the precision is more than 15,
+Decimal numbers are used.</p>
+<p>Computations with a result in the Complex domain will return a Complex number.</p>
+</section>
 <h2>Simplifying Before Evaluating</h2>
-<p><strong>When using <code>ce.N()</code>, no rewriting of the expression is done before it is evaluated.</strong></p>
+<p><strong>When using <code>expr.N()</code>, no rewriting of the expression is done before it is
+evaluated.</strong></p>
 <p>Because of the limitations of machine numbers, this may produce surprising
 results.</p>
 <p>For example:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> x = ce.<span class="hljs-title function_">N</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>));
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">N</span>([<span class="hljs-string">&#x27;Subtract&#x27;</span>, x, x]));
-<span class="hljs-comment">// -&gt; 2.7755575615628914e-17</span>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> x = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Subtract&#x27;</span>, x, x]).<span class="hljs-title function_">N</span>());
+<span class="hljs-comment">// ➔ 2.7755575615628914e-17</span>
 </code></pre>
-<p>However, the result of \( x - x \) from <code>ce.simplify()</code> is \( 0 \) since the simplification is done symbolically, before any floating point calculations are made.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> x = ce.<span class="hljs-title function_">N</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>));
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">simplify</span>([<span class="hljs-string">&#x27;Subtract&#x27;</span>, x, x]));
-<span class="hljs-comment">// -&gt; 0</span>
+<p>However, the result of \( x - x \) from <code>ce.simplify()</code> is \( 0 \) since the
+simplification is done symbolically, before any floating point calculations are
+made.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> x = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x - x&#x27;</span>).<span class="hljs-title function_">simplify</span>());
+<span class="hljs-comment">// ➔ 0</span>
 </code></pre>
-<p>In some cases, it may be advantageous to invoke <code>ce.simplify()</code> before using <code>ce.N()</code>.</p>
+<p>In some cases, it may be advantageous to invoke <code>expr.simplify()</code> before using
+<code>expr.N()</code>.</p>
 <h2>Tolerance</h2>
 <p>Two numbers that are sufficiently close to each other are considered equal.</p>
-<p><strong>To control how close two numbers have to be before they are considered equal</strong>,
-set the <code>tolerance</code> property of a <code>ComputeEngine</code> instance.</p>
+<p><strong>To control how close two numbers have to be before they are considered
+equal</strong>, set the <code>tolerance</code> property of a <code>ComputeEngine</code> instance.</p>
 <p>By default, the tolerance is \( 10^{-10} \).</p>
 <p>The tolerance is accounted for by the <code>Chop</code> function to determine when to
 replace a number of a small magnitude with the exact integer 0.</p>
-<p>It is also used when doing some comparison to zero: a number whose absolute value is smaller than the tolerance
-will be considered equal to 0.</p>
+<p>It is also used when doing some comparison to zero: a number whose absolute
+value is smaller than the tolerance will be considered equal to 0.</p>
 <h2>Numeric Functions</h2>
-<p>The dictionaries below can provide numerical evaluations for their numeric functions:</p>
+<p>The dictionaries below can provide numerical evaluations for their numeric
+functions:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -934,14 +1035,14 @@ will be considered equal to 0.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

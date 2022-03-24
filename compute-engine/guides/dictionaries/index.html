@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/dictionaries/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/dictionaries/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/dictionaries/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -806,10 +846,9 @@ Table of Content</label>
         
         <h1>Dictionaries</h1>
 <h2>Syntax and Symbol Dictionaries</h2>
-<p>The <a href ="/math-json/format/">MathJSON format</a> is independent of any
-source or target language (LaTeX, MathASCII, etc…) or of any specific
-interpretation of the symbols used in a MathJSON expression (<code>&quot;Pi&quot;</code>, <code>&quot;Sin&quot;</code>,
-etc…).</p>
+<p>The <a href ="/math-json/">MathJSON format</a> is independent of any source or
+target language (LaTeX, MathASCII, etc…) or of any specific interpretation of
+the symbols used in a MathJSON expression (<code>&quot;Pi&quot;</code>, <code>&quot;Sin&quot;</code>, etc…).</p>
 <p>A <strong>syntax dictionary</strong> defines how a MathJSON expression can be expressed into
 a specific target language (<strong>serialization</strong>) or constructed from a source
 language (<strong>parsing</strong>).</p>
@@ -839,8 +878,8 @@ or the domain of the &quot;result&quot; of the function.</p>
 <p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
 functions its codomain.</p>
 <h2>Functions</h2>
-<p>A MathJSON function such as <code>Add</code>, <code>Sin</code> or <code>Equal</code> can be used for a variety
-of purposes. It can be helpful to classify them in some broad categories:</p>
+<p>A MathJSON function such as <code>Add</code>, <code>Sin</code> or <code>Equal</code> can be used for a variety of
+purposes. It can be helpful to classify them in some broad categories:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -876,7 +915,8 @@ of purposes. It can be helpful to classify them in some broad categories:</p>
 <h2>Customizing the Dictionaries</h2>
 <p><strong>To define a custom syntax</strong>, provide custom syntax and custom symbol
 dictionaries when creating a <code>ComputeEngine</code> instance.</p>
-<p>If no custom dictionaries are provided, the default ones are used. They are organized by topic as follow:</p>
+<p>If no custom dictionaries are provided, the default ones are used. They are
+organized by topic as follow:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -930,14 +970,14 @@ dictionaries when creating a <code>ComputeEngine</code> instance.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

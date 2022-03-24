@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/simplify/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/simplify/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/simplify/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/simplify/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/simplify/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/simplify/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -805,14 +845,23 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Simplify</h1>
-<p>A complicated mathematical expression can often be transformed into a form
-that is easier to understand.</p>
-<p>The <code>ce.simplify()</code> function tries expanding, factoring and applying many
+<p>A complicated mathematical expression can often be transformed into a form that
+is easier to understand.</p>
+<p>The <code>expr.simplify()</code> function tries expanding, factoring and applying many
 other transformations to find a simple a simpler form of a symbolic expression.</p>
-<h2>Defining &quot;Simplest&quot;</h2>
-<p>In some cases there might be multiple equivalent forms for an expression.
-Deciding which is &quot;the simplest&quot; might depend on how the complexity is measured.</p>
-<p>For example: \( (x + 4)(x-5) \) and \(x^2 -x -20\) represent the same expression.</p>
+<p>Before the transformation rules are applied, the expression is put into a
+canonical form.</p>
+<p>When a function is simplified, its arguments are simplified as well, unless the
+argument is &quot;held&quot;. Which arguments are held is specified by the <code>hold</code> property
+of the function definition. In addition, any argument wrapped with a <code>Hold</code>
+function will be held, that is, not simplified. Conversely, a held argument
+wrapped with a <code>ReleaseHold</code> function will not be held, and it will be
+simplified.</p>
+<h2>Defining &quot;Simpler&quot;</h2>
+<p>An expression may be represented by several equivalent forms.</p>
+<p>For example \( (x + 4)(x-5) \) and \(x^2 -x -20\) represent the same
+expression.</p>
+<p>Determining which is &quot;the simplest&quot; depends on how the complexity is measured.</p>
 <p>By default, the complexity of an expression is measured by counting the number
 of operations in the expression, and giving an increasing cost to:</p>
 <ul>
@@ -830,26 +879,25 @@ of operations in the expression, and giving an increasing cost to:</p>
 <li>inverse hyperbolic functions</li>
 <li>other functions</li>
 </ul>
-<p><strong>To influence how the complexity of an expression is measured</strong>, specify a
-cost function in the compute engine.</p>
+<p><strong>To influence how the complexity of an expression is measured</strong>, set the
+<code>costFunction</code> property of the compute engine to a function assigning a cost to
+an expression.</p>
 <h2>Numeric Simplifications</h2>
-<p>The <code>ce.simplify()</code> function will apply some numeric simplifications, such
-as combining small integer and rational values, simplifying division by 1,
-addition or subtraction of 0, etc…</p>
-<p>It avoids making any simplification that could result in a loss of precision.
-For example, \( 10^{300} + 1\) cannot be simplified without losing the
-least significant digit, so <code>ce.simplify()</code> will return the experssion unmodified.</p>
+<p>The <code>expr.simplify()</code> function will apply some numeric simplifications, such as
+combining small integer and rational values, simplifying division by 1, addition
+or subtraction of 0, etc…</p>
+<p>It avoids making any simplification that could result in a loss of precision.</p>
+<p>For example, \( 10^{300} + 1\) cannot be simplified without losing the least
+significant digit, so <code>expr.simplify()</code> will return the expression unmodified.</p>
 <h2>Using Assumptions</h2>
 <p>Assumptions are additional information available about some symbols, for example
 \( x &gt; 0 \) or \(n \in \N\).</p>
 <p>Some transformations are only applicable if some assumptions can be verified.</p>
-<p>For example, if no assumptions about \(x \) is available the expression
-\( \sqrt{x^2} \) cannot be simplified. However, if an assumption that
-\( x \geq 0 \) is available, then the expression can be simplified to
-\( x \).</p>
-<div class='read-more'><a href="/compute-engine/guides/assumptions/">
-Read more about <strong>Assumptions</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>For example, if no assumptions about \(x \) is available the expression \(
+\sqrt{x^2} \) cannot be simplified. However, if an assumption that \( x \geq 0
+\) is available, then the expression can be simplified to \( x \).</p>
+<div class='read-more'><a href="/compute-engine/guides/assumptions/"> Read more about
+<strong>Assumptions</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -859,14 +907,14 @@ Read more about <strong>Assumptions</strong>
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/assumptions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/assumptions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/assumptions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/assumptions/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/assumptions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/assumptions/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -817,7 +857,7 @@ simplifications and to optimize computations.</p>
 
 <span class="hljs-comment">// or:</span>
 
-ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;Beta&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 </code></pre>
 <p>The head of the proposition can be one of the following:</p>
 <div class=symbols-table>
@@ -848,25 +888,25 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 </tbody>
 </table>
 </div>
-<p>If the <code>assume()</code> function is invoked with two arguments, it is
-equivalent to <code>ce.assume([&quot;Element&quot;, &lt;arg1&gt;, &lt;arg2&gt;])</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumber&quot;])</span>
+<p>If the <code>assume()</code> function is invoked with two arguments, it is equivalent to
+<code>ce.assume([&quot;Element&quot;, &lt;arg1&gt;, &lt;arg2&gt;])</code>.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumber&quot;])</span>
 </code></pre>
 <p>The argument to the <code>assume()</code> function is a <strong>proposition</strong>. That proposition
 is analyzed and the fact it describes are recorded in the Compute Engine
 assumptions knowledge base. Some propositions can be described in several
 different but equivalent ways. You can use whichever form you prefer. Similarly,
 when querying the knowledge base later, you can use any form you’d like.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;PositiveNumber&quot;</span>)
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveNumber&#x27;</span>);
 <span class="hljs-comment">// Equivalent to...</span>
-ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Greater&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">0</span>]);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">0</span>]);
 <span class="hljs-comment">// ... or ...</span>
-ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Interval&quot;</span>, [<span class="hljs-string">&quot;Open&quot;</span>, <span class="hljs-number">0</span>], <span class="hljs-string">&quot;Infinity&quot;</span>]]);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Interval&#x27;</span>, [<span class="hljs-string">&#x27;Open&#x27;</span>, <span class="hljs-number">0</span>], <span class="hljs-string">&#x27;Infinity&#x27;</span>]]);
 </code></pre>
 <section id='multivariate-assumptions'>
 <h3>Multivariate Assumptions</h3>
-<p>Assumptions are frequently describing the property of a symbol. However, it
-is also possible to describe relationships betwen multiple symbols.</p>
+<p>Assumptions are frequently describing the property of a symbol. However, it is
+also possible to describe relationships betwen multiple symbols.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;xy + 1 = 0&#x27;</span>))<span class="hljs-string">&#x27;
 </span></code></pre>
 </section>
@@ -878,8 +918,8 @@ purpose, but an assumption that defines a domain for the symbol is sufficient.</
 </section>
 <section id='default-assumptions'>
 <h3>Default Assumptions</h3>
-<p>When creating an instance of a Compute Engine, the following assumptions
-are made:</p>
+<p>When creating an instance of a Compute Engine, the following assumptions are
+made:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -908,48 +948,49 @@ are made:</p>
 </tbody>
 </table>
 </div>
-<p>This list of assumptions make it possible to immediately use common symbols
-such as <code>x</code> or <code>y</code> without having to declare them explicitly.</p>
+<p>This list of assumptions make it possible to immediately use common symbols such
+as <code>x</code> or <code>y</code> without having to declare them explicitly.</p>
 <p><strong>To specify a different list of assumptions</strong>, use the <code>assumptions</code> option
 when creating a Compute Engine instance:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({ 
-  <span class="hljs-attr">assumptions</span>: [[<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>], [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;y&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>]]
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
+  <span class="hljs-attr">assumptions</span>: [
+    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>],
+    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;y&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>],
+  ],
 });
 </code></pre>
 <p>To have no assumptions at all, set the <code>assumptions</code> option to <code>null</code>:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({<span class="hljs-attr">assumptions</span>: <span class="hljs-literal">null</span>});
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({ <span class="hljs-attr">assumptions</span>: <span class="hljs-literal">null</span> });
 </code></pre>
 </section>
 </section>
 <section id='testing-assumptions'>
 <h2>Testing Assumptions</h2>
-<p><strong>To test if a particular assumption is valid</strong>, use the <code>ce.is()</code> function.</p>
+<p><strong>To test if a particular assumption is valid</strong>, call the <code>ce.is()</code> function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 </code></pre>
 <p>As a shorthand, you can pass a symbol as a first argument and a domain as a
 second.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);   <span class="hljs-comment">// same as ce.is([&#x27;Element&#x27;, &#x27;x&#x27;, &#x27;RealNumber])</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>); <span class="hljs-comment">// same as ce.is([&#x27;Element&#x27;, &#x27;x&#x27;, &#x27;RealNumber])</span>
 ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
 <p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
 not, and <code>undefined</code> if it cannot be determined.</p>
-<p>While <code>ce.is()</code> is appropriate to get boolean answers, more complex queries
-can also be made.</p>
-<p><strong>To query the assumptions knowledge base</strong> use the <code>ce.ask()</code> function.</p>
-<p>The argument of <code>ask()</code> can be a pattern, and it returns an array of matches
-as <code>Substitution</code> objects.</p>
-<pre><code class="language-js">
-<span class="hljs-comment">// &quot;x is a positive integer&quot;</span>
+<p>While <code>ce.is()</code> is appropriate to get boolean answers, more complex queries can
+also be made.</p>
+<p><strong>To query the assumptions knowledge base</strong> call the <code>ce.ask()</code> function.</p>
+<p>The argument of <code>ask()</code> can be a pattern, and it returns an array of matches as
+<code>Substitution</code> objects.</p>
+<pre><code class="language-js"><span class="hljs-comment">// &quot;x is a positive integer&quot;</span>
 ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveInteger&#x27;</span>);
 
 <span class="hljs-comment">// &quot;What is x greater than?&quot;</span>
-ce.<span class="hljs-title function_">ask</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_val&#x27;</span>])
+ce.<span class="hljs-title function_">ask</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_val&#x27;</span>]);
 
 <span class="hljs-comment">//  -&gt; [{&#x27;val&#x27;: 0}] &quot;It is greater than 0&quot;</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">
-Read more about <strong>Patterns and Rules</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/"> Read more about
+<strong>Patterns and Rules</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='forgetting-assumptions'>
 <h2>Forgetting Assumptions</h2>
@@ -957,54 +998,54 @@ Read more about <strong>Patterns and Rules</strong>
 <p><strong>To remove previous assumptions</strong>, use <code>ce.forget()</code>.</p>
 <ul>
 <li>Calling <code>ce.forget()</code> with no arguments will remove all assumptions.</li>
-<li>Passing an array of symbol names will remove assumptions about each of the symbols.</li>
-<li>Passing a symbol name will only remove assumptions about that particular symbol.</li>
+<li>Passing an array of symbol names will remove assumptions about each of the
+symbols.</li>
+<li>Passing a symbol name will only remove assumptions about that particular
+symbol.</li>
 </ul>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  true</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  true</span>
 
-ce.<span class="hljs-title function_">forget</span>(<span class="hljs-string">&quot;\\alpha&quot;</span>);
+ce.<span class="hljs-title function_">forget</span>(<span class="hljs-string">&#x27;\\alpha&#x27;</span>);
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  undefined</span>
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  undefined</span>
 </code></pre>
 </section>
 <section id='scoped-assumptions'>
 <h2>Scoped Assumptions</h2>
 <p>When an assumption is made, it is only valid in the current scope.</p>
 <p><strong>To temporarily define a series of assumptions</strong>, create a new scope.</p>
-<pre><code class="language-js">
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt; undefined</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔ undefined</span>
 
 ce.<span class="hljs-title function_">pushScope</span>();
 
-ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>);
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  true</span>
+ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  true</span>
 
-ce.<span class="hljs-title function_">popScope</span>();  <span class="hljs-comment">// all assumptions made in the current scope are forgotten</span>
+ce.<span class="hljs-title function_">popScope</span>(); <span class="hljs-comment">// all assumptions made in the current scope are forgotten</span>
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  undefined</span>
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  undefined</span>
 </code></pre>
 <p>You can also specify a series of assumptions when creating the scope:</p>
-<pre><code class="language-js">
-ce.<span class="hljs-title function_">pushScope</span>({
-    <span class="hljs-attr">assumptions</span>: [
-      [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>],
-      [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\beta&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]
-    ]
-})
+<pre><code class="language-js">ce.<span class="hljs-title function_">pushScope</span>({
+  <span class="hljs-attr">assumptions</span>: [
+    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>],
+    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\beta&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>],
+  ],
+});
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  true</span>
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  true</span>
 
 ce.<span class="hljs-title function_">popScope</span>();
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-<span class="hljs-comment">// -&gt;  undefined</span>
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
+<span class="hljs-comment">// ➔  undefined</span>
 </code></pre>
 </section>
 
@@ -1016,14 +1057,14 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

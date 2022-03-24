@@ -177,7 +177,7 @@ Table of Content</label>
               <li>              
                 <a href="/mathlive/demo/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -431,7 +431,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
                   
-                  Supported Commands
+                  LaTeX Commands
                 </a></li>
             
           
@@ -527,7 +527,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -547,7 +547,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -567,7 +567,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -587,7 +587,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -607,7 +607,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/mathlive/reference/commands/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -1810,9 +1810,13 @@ if there is an equivalent Unicode character available.
 </div>
 <p class="notice--warning">Internally, MathLive uses the non-standard <code>\mleft</code> and <code>\mright</code> command. These commands are use to indicate some delimiters that have been automatically converted to &quot;smart&quot; delimiters when the <code>smartFence</code> option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the <code>latex-expanded</code> format, or when using the clipboard, those commands are automatically removed.</p>
 <p>The left and right delimiters do not have to match:</p>
-<p><span class='math'>\(\displaystyle \left\lparen \frac1x \right\rbrack\)</span> <code>\left\lparen \frac1x \right\rbrack</code></p>
+<ul>
+<li><span class='math'>\(\displaystyle \left\lparen \frac1x \right\rbrack\)</span> <code>\left\lparen \frac1x \right\rbrack</code></li>
+</ul>
 <p>To omit a delimiter, use <code>.</code>:</p>
-<p><span class='math'>\(\displaystyle \left\lparen \frac1x \right.\)</span> <code>\left\lparen \frac1x \right.</code></p>
+<ul>
+<li><span class='math'>\(\displaystyle \left\lparen \frac1x \right.\)</span> <code>\left\lparen \frac1x \right.</code></li>
+</ul>
 <hr>
 <p>The argument to <code>\left</code>, <code>\right</code> and <code>\middle</code> can be one of the
 following commands.</p>
@@ -2112,7 +2116,9 @@ which are required:</p>
 </table>
 </section>
 <p>They can be combined:</p>
-<p><span class='math'>\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \)</span>  <code>roundedbox, updiagonalstrike</code></p>
+<ul>
+<li><span class='math'>\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \)</span>  <code>roundedbox, updiagonalstrike</code></li>
+</ul>
 <ul>
 <li><code>&lt;style&gt;</code> an optional list of comma separated key-value pairs including:
 <ul>
@@ -3086,14 +3092,14 @@ document.body.classList.add('ready');
         
 
 
-        <meta itemprop="datePublished" content="July 12, 2021">
+        <meta itemprop="datePublished" content="February 12, 2022">
                 
 
         <p><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Version </strong> <span id='version'></span></p>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Jul 12 2021 10:38:52 GMT+0200 (Central European Summer Time)">July 12, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-12">February 12, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

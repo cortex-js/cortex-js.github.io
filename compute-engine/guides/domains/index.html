@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/domains/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/domains/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -805,25 +845,29 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Domains</h1>
-<p>A <strong>domain</strong>, such as <code>Integer</code> <code>Boolean</code>, is a <strong>set</strong> used to represent the possible values of an expression.</p>
+<p>A <strong>domain</strong>, such as <code>Integer</code> <code>Boolean</code>, is a <strong>set</strong> used to represent the
+possible values of an expression.</p>
 <p><strong>Domains are similar to <em>types</em> in programming languages.</strong> They are used to
-select the correct function definition. For example a function <code>Add</code> could operate
-either on numbers or matrixes. The domain of the arguments indicates the appropriate function definition. Symbolic manipulation algorithms use domains to decide when certain manipulations are applicable. For example,
-\( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
-<div class='read-more'><a href="/compute-engine/reference/domains/">
-Read more about the <strong>Domains</strong> included in the standard dictionary of the Compute Engine
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p><strong>To query the domain of an expression</strong>, use the <code>domain()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
-<span class="hljs-comment">// -&gt; &quot;IrrationalNumber&quot;</span>
+select the correct function definition. For example a function <code>Add</code> could
+operate either on numbers or matrixes. The domain of the arguments indicates the
+appropriate function definition. Symbolic manipulation algorithms use domains to
+decide when certain manipulations are applicable. For example, \( \sqrt{x^2} =
+x\) only if \(x \geq 0\)</p>
+<div class='read-more'><a href="/compute-engine/reference/domains/"> Read more about the
+<strong>Domains</strong> included in the standard dictionary of the Compute
+Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To query the domain of an expression</strong>, use the <code>domain</code> property of the
+expression.</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\pi&#x27;</span>).<span class="hljs-property">domain</span>);
+<span class="hljs-comment">// ➔ &quot;IrrationalNumber&quot;</span>
 </code></pre>
 <section id='domain-lattice'>
 <h2>Domain Lattice</h2>
 <p><strong>Domains are defined in a hierarchy (a lattice).</strong> The upper bound of the
 domain lattice is the <code>Anything</code> domain and its lower bound is the <code>Nothing</code>
 domain.</p>
-<p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship,
-for example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
+<p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship, for
+example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains">
 <img src="/assets/domains.002.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
 <img src="/assets/domains.003.jpeg" alt="Function domains" title="The Function sub-domains">
@@ -833,7 +877,8 @@ for example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 </section>
 <section id='obtaining-the-domain-of-an-expression>
 <h2>Obtaining the Domain of an Expression</h2>
-<p><strong>To obtain the domain of an expression</strong>, use the <code>ce.domain()</code> function.</p>
+<p><strong>To query the domain of an expression</strong>, read the <code>domain</code> property of the
+expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
 ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>);
@@ -853,17 +898,16 @@ ce.<span class="hljs-title function_">domain</span>(ce.evaluate([<span class="hl
 <section id='defining-new-domains'>
 <h2>Defining New Domains</h2>
 <p>A new domain can be defined using a <strong>domain expression</strong>, that is a <strong>set
-expression</strong> using any of the <strong>set functions</strong>: <code>Union</code>
-<code>Intersection</code> <code>SetMinus</code>…, combined with domains and <strong>parametric domain</strong> functions.</p>
+expression</strong> using any of the <strong>set functions</strong>: <code>Union</code> <code>Intersection</code>
+<code>SetMinus</code>…, combined with domains and <strong>parametric domain</strong> functions.</p>
 <pre><code class="language-json"><span class="hljs-comment">//  A number or a boolean.</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Union&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Boolean&quot;</span><span class="hljs-punctuation">]</span>
 
 <span class="hljs-comment">// Any number except &quot;1&quot;.</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;SetMinus&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Number&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/reference/sets/">
-Read more about <strong>Sets</strong> and the set functions
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/reference/sets/"> Read more about
+<strong>Sets</strong> and the set functions <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>Parametric domains</strong> are functions that define a domain:</p>
 <pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span>
@@ -873,8 +917,9 @@ that \( \mathord{min} \le n \le \mathord{max}, n \in \N \).</p>
 <p>The <code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> parametric domain defines a set of real numbers
 such that \( \mathord{min} \le x \le \mathord{max}, n \in \R \).</p>
 <p><strong>To represent an open interval</strong>, use the <code>Open</code> function:
-<code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> \( \operatorname{min} \lt x \le \operatorname{max},
-n \in \R \) or \(x \in \rbrack \operatorname{min}, \operatorname{max} \rbrack \).</p>
+<code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> \( \operatorname{min} \lt x \le
+\operatorname{max}, n \in \R \) or \(x \in \rbrack \operatorname{min},
+\operatorname{max} \rbrack \).</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -890,7 +935,7 @@ n \in \R \) or \(x \in \rbrack \operatorname{min}, \operatorname{max} \rbrack \)
 </tr>
 <tr>
 <td style="text-align:left"><code>Interval</code></td>
-<td style="text-align:left"><code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of real numbers between <code>&lt;min&gt;</code> and <code>&lt;max&gt;</code>. Use <code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> to indicate an  open interval.</td>
+<td style="text-align:left"><code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of real numbers between <code>&lt;min&gt;</code> and <code>&lt;max&gt;</code>. Use <code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> to indicate an open interval.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Multiple</code></td>
@@ -906,13 +951,15 @@ n \in \R \) or \(x \in \rbrack \operatorname{min}, \operatorname{max} \rbrack \)
 </section>
 <section id='simplifying-domains'>
 <h2>Simplifying Domains</h2>
-<p><strong>To simplify a domain expression</strong>, use <code>ce.simplify(&lt;domain&gt;)</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">simplify</span>([<span class="hljs-string">&quot;SetMinus&quot;</span>, <span class="hljs-string">&quot;Integer&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-string">&quot;-Infinity&quot;</span>, <span class="hljs-number">0</span>]]);
+<p><strong>To simplify a domain expression</strong>, call <code>domain.simplify()</code>.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">0</span>]]).<span class="hljs-title function_">simplify</span>();
 <span class="hljs-comment">// ➔ [&quot;Range&quot;, 1, &quot;+Infinity]]</span>
 
-ce.<span class="hljs-title function_">simplify</span>(
-  [<span class="hljs-string">&quot;Union&quot;</span>, [<span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&quot;+Infinity&quot;</span>], [<span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-string">&quot;-Infinity&quot;</span>, <span class="hljs-number">5</span>]],
-);
+ce.<span class="hljs-title function_">box</span>([
+  <span class="hljs-string">&#x27;Union&#x27;</span>,
+  [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;+Infinity&#x27;</span>],
+  [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">5</span>],
+]).<span class="hljs-title function_">simplify</span>();
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
 </code></pre>
 </section>
@@ -925,14 +972,14 @@ ce.<span class="hljs-title function_">simplify</span>(
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

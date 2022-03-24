@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/patterns-and-rules/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -805,8 +845,8 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Patterns and Rules</h1>
-<p>Recognizing patterns and applying rules is a powerful symbolic computing tool
-to identify and manipulate the structure of expressions.</p>
+<p>Recognizing patterns and applying rules is a powerful symbolic computing tool to
+identify and manipulate the structure of expressions.</p>
 <section id='wildcards'>
 <h2>Wildcards</h2>
 <p>Wildcard symbols are placeholders in an expression. They start with a <code>_</code>.</p>
@@ -816,11 +856,10 @@ expression.</p>
 corresponding position. It is useful to capture the arguments of a function.</p>
 <p>The <code>&quot;___&quot;</code> wildcard matches any sequence of 0 or more expressions in its
 corresponding position.</p>
-<p>A wildcard symbol may include a name which is used to <em>capture</em> the
-matching expression. When using a named wildcard, all instances of the named
-wildcard must match. In contrast, an un-named wildcard (a universal wildcard
-such as <code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple times to match
-different values.</p>
+<p>A wildcard symbol may include a name which is used to <em>capture</em> the matching
+expression. When using a named wildcard, all instances of the named wildcard
+must match. In contrast, an un-named wildcard (a universal wildcard such as
+<code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple times to match different values.</p>
 </section>
 <section id='patterns'>
 <h2>Patterns</h2>
@@ -831,14 +870,14 @@ but they are tailored to deal with MathJSON expressions instead of strings.</p>
 <p>Given a pattern and an expression the goal of pattern matching is to find a
 substitution for all the wildcards such that the pattern becomes the expression.</p>
 <p>An expression is said to match a pattern if there exists a set of values such
-that replacing the wildcards with those values match the expression. This set
-of values is called a <strong>substitution</strong>.</p>
+that replacing the wildcards with those values match the expression. This set of
+values is called a <strong>substitution</strong>.</p>
 <p>For example, the pattern <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code> becomes the expression
 <code>[&quot;Add&quot;, 3, &quot;x&quot;]</code> by replacing the wildcard <code>&quot;_c&quot;</code> with <code>&quot;x&quot;</code>. The substitution
 is <code>{&quot;c&quot; : &quot;x&quot;}</code>.</p>
-<p>On the other hand, the expression <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the pattern
-<code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code>: no substitution exists to transform the expression into the
-pattern by replacing the wildcards.</p>
+<p>On the other hand, the expression <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the
+pattern <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code>: no substitution exists to transform the expression
+into the pattern by replacing the wildcards.</p>
 </section>
 <section id='matching-an-expression-to-a-pattern'>
 <h2>Matching an Expression to a Pattern</h2>
@@ -851,65 +890,66 @@ match, it returns <code>null</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
-<span class="hljs-comment">// -&gt; { } : the expression matches the pattern</span>
+<span class="hljs-comment">// ➔ { } : the expression matches the pattern</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
-<span class="hljs-comment">// -&gt; null : the expression does not match the pattern</span>
+<span class="hljs-comment">// ➔ null : the expression does not match the pattern</span>
 </code></pre>
-<p>The <code>ce.match()</code> function accounts for the commutativity and associativity
-of functions.</p>
+<p>The <code>ce.match()</code> function accounts for the commutativity and associativity of
+functions.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>], pattern));
-<span class="hljs-comment">// -&gt; { } : the expression matches the pattern</span>
+<span class="hljs-comment">// ➔ { } : the expression matches the pattern</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], pattern));
-<span class="hljs-comment">// -&gt; { } : the expression matches the pattern by commutativity</span>
+<span class="hljs-comment">// ➔ { } : the expression matches the pattern by commutativity</span>
 </code></pre>
 <p>The <code>ce.match()</code> does not consider sub-expressions, it is not recursive.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">2</span>, [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">1</span>]], pattern));
-<span class="hljs-comment">// -&gt; null : the expression does not match the pattern</span>
+<span class="hljs-comment">// ➔ null : the expression does not match the pattern</span>
 </code></pre>
 <p>If the same named wildcard is used multiple times, all its values must match.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]));
-<span class="hljs-comment">// -&gt; null</span>
+<span class="hljs-comment">// ➔ null</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]));
-<span class="hljs-comment">// -&gt; { &quot;a&quot;: &quot;x&quot; }</span>
+<span class="hljs-comment">// ➔ { &quot;a&quot;: &quot;x&quot; }</span>
 </code></pre>
 <p>Wildcards can be used to capture the head of functions:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>], [<span class="hljs-string">&#x27;_f&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>]));
-<span class="hljs-comment">// -&gt; { &quot;f&quot;: &quot;Add&quot; }</span>
+<span class="hljs-comment">// ➔ { &quot;f&quot;: &quot;Add&quot; }</span>
 </code></pre>
 </section>
 <section id='substitution'>
 <h2>Substitution</h2>
-<p>The return value of the <code>match()</code> function is a <code>Substitution</code> object: a
-mapping from wildcard names to expressions.</p>
-<p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression it
-was derived from, use the <code>substitute()</code> function.</p>
+<p>The return value of the <code>match()</code> function is a <code>Substitution</code> object: a mapping
+from wildcard names to expressions.</p>
+<p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression
+it was derived from, use the <code>substitute()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expression = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;x&#x27;</span>];
 <span class="hljs-keyword">const</span> pattern = [<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;_a&#x27;</span>];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">match</span>(expression, pattern));
-<span class="hljs-comment">// -&gt; { a: &quot;x&quot; }</span>
+<span class="hljs-comment">// ➔ { a: &quot;x&quot; }</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">substitute</span>(pattern, { <span class="hljs-attr">a</span>: <span class="hljs-string">&#x27;x&#x27;</span> }));
-<span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, &quot;x&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, &quot;x&quot;]</span>
 </code></pre>
 </section>
 <section id='comparing'>
 <h2>Comparing</h2>
-<p><strong>To compare two expressions</strong>, use the <code>match()</code> function.</p>
+<p><strong>To check if an expression matches a pattern</strong>, use the <code>pattern.match()</code>
+function.</p>
 <p>The function returns <code>null</code> if the two expressions do not match. It returns an
 object literal if the expressions do match.</p>
-<p>If the second argument included wildcards the resulting object literal indicate
-the substitutions for those wildcards. If no wildcards were used and the
-expressions matched, an empty object literal, <code>{}</code> is returned.
-To check if the expressions simply match or not, check if the return value is
-<code>null</code> (indicating not a match) or not (indicating a match).</p>
+<p>If the argument to <code>match()</code> included wildcards the resulting object literal
+indicate the substitutions for those wildcards. If no wildcards were used and
+the expressions matched, an empty object literal, <code>{}</code> is returned. To check if
+the expressions simply match or not, check if the return value is <code>null</code>
+(indicating not a match) or not (indicating a match).</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
 <span class="hljs-keyword">const</span> variable = <span class="hljs-string">&#x27;x&#x27;</span>;
@@ -923,10 +963,7 @@ To check if the expressions simply match or not, check if the return value is
 <span class="hljs-comment">// ➔ null: the two expressions are **not** the same: they are not evaluated</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
-  <span class="hljs-title function_">match</span>(
-    ce.evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + 2 + x&#x27;</span>)),
-    ce.evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 1 + x&#x27;</span>))
-  )
+  <span class="hljs-title function_">match</span>(ce.evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + 2 + x&#x27;</span>)), ce.evaluate(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 1 + x&#x27;</span>)))
 );
 <span class="hljs-comment">// ➔ {}: the two expressions are the same once evaluated</span>
 </code></pre>
@@ -935,31 +972,35 @@ To check if the expressions simply match or not, check if the return value is
 <h2>Applying Rewrite Rules</h2>
 <p>A rewrite rule is a triplet of:</p>
 <ul>
-<li>a left-hand-side pattern,  <code>lhs</code></li>
+<li>a left-hand-side pattern, <code>lhs</code></li>
 <li>a right-hand-side pattern, <code>rhs</code></li>
 <li>an optional <code>condition</code></li>
 </ul>
-<p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> and
-the <code>condition</code> applies to the resulting substitution, the result of the
-rule is the substitution applied to the <code>rhs</code>.</p>
-<p><strong>To apply a set of rules to an expression</strong>, use the <code>ce.replace()</code> function.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = [[<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>], [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]];
-
-ce.<span class="hljs-title function_">replace</span>([squareRule], [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]);
-<span class="hljs-comment">// -&gt; [&#x27;Square&#x27;, 4]</span>
-
-<span class="hljs-keyword">const</span> sqrtRule =   [
-  [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>,  <span class="hljs-string">&#x27;_x&#x27;</span>]], 
-  <span class="hljs-string">&#x27;_x&#x27;</span>,
-  <span class="hljs-function">(<span class="hljs-params">ce, sub</span>) =&gt;</span> ce.<span class="hljs-title function_">isPositive</span>(sub.<span class="hljs-property">_x</span>)
+<p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> and the
+<code>condition</code> applies to the resulting substitution, the result of the rule is the
+substitution applied to the <code>rhs</code>.</p>
+<p><strong>To apply a set of rules to an expression</strong>, call the <code>expr.replace()</code>
+function.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = [
+  [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
+  [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
 ];
-ce.<span class="hljs-title function_">replace</span>([sqrtRule], [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]);
-<span class="hljs-comment">// -&gt; 17</span>
+
+ce.<span class="hljs-title function_">box</span>([squareRule], [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]).<span class="hljs-title function_">replace</span>();
+<span class="hljs-comment">// ➔ [&#x27;Square&#x27;, 4]</span>
+
+<span class="hljs-keyword">const</span> sqrtRule = [
+  [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]],
+  <span class="hljs-string">&#x27;_x&#x27;</span>,
+  <span class="hljs-function">(<span class="hljs-params">ce, sub</span>) =&gt;</span> ce.<span class="hljs-title function_">isPositive</span>(sub.<span class="hljs-property">_x</span>),
+];
+ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]).<span class="hljs-title function_">replace</span>([sqrtRule]);
+<span class="hljs-comment">// ➔ 17</span>
 </code></pre>
-<p>The <code>ce.replace()</code> function continues applying all the rules in the ruleset
+<p>The <code>expr.replace()</code> function continues applying all the rules in the ruleset
 until no rules are applicable.</p>
-<p>The <code>ce.simplify()</code> method applies a collection of built-in rewrite rules.
-You can define your own rules and apply them using <code>ce.replace()</code>.</p>
+<p>The <code>expr.simplify()</code> function applies a collection of built-in rewrite rules.
+You can define your own rules and apply them using <code>expr.replace()</code>.</p>
 </section>
 <section id='count'>
 <h2><code>count()</code></h2>
@@ -973,14 +1014,14 @@ You can define your own rules and apply them using <code>ce.replace()</code>.</p
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

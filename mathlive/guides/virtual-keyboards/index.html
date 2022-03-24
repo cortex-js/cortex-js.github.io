@@ -208,7 +208,7 @@ Table of Content</label>
               <li>              
                 <a href="/mathlive/demo/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -462,7 +462,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
                   
-                  Supported Commands
+                  LaTeX Commands
                 </a></li>
             
           
@@ -558,7 +558,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -578,7 +578,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -598,7 +598,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -618,7 +618,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -638,7 +638,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -1019,8 +1019,29 @@ document.getElementById('mf').setOptions({
 </div>
 </code-playground>
 </section>
+<h2>Displaying the Virtual Keyboard in a Custom Container</h2>
+<p>By default when a virtual keyboard is created, it is attached at the end of the
+document’s <code>body</code> element.</p>
+<p>In some cases you may want to display the virtual keyboard in some other
+container.</p>
+<p><strong>To select which DOM element the virtual keyboard is created into</strong>, set the
+<code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
+<p>The <code>position</code> attribute of this container element should be <code>relative</code> so that the virtual keyboard can correctly be placed relative to this element.</p>
+<p>For example when using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">full screen elements</a> that contain mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.</p>
+<h2>Customizing the Appearance of the Virtual Keyboard</h2>
 <section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-<h2>Customizing the Appearance of the Virtual Keyboard Keycaps</h2>
+<h3>Customizing the Virtual Keyboard</h3>
+<p><strong>To control the appearance of the virtual keyboard background</strong>, use the
+following CSS variable:</p>
+<ul>
+<li><code>--keyboard-background</code>, a color</li>
+<li><code>--keyboard-text</code>, a color</li>
+<li><code>--keyboard-text-active</code>, a color</li>
+<li><code>--keyboard-background-border</code>, a color</li>
+</ul>
+</section
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
+<h3>Customizing the keycaps</h3>
 <p><strong>To control the appearance of keycaps</strong>, use the following CSS variables.</p>
 <ul>
 <li><code>--keycap-height</code></li>
@@ -1028,13 +1049,23 @@ document.getElementById('mf').setOptions({
 <li><code>--keycap-small-font-size</code> (only if needed)</li>
 <li><code>--keycap-extra-small-font-size</code> (only if needed)</li>
 <li><code>--keycap-tt-font-size</code> (only if needed)</li>
+<li><code>--keycap-background</code>, a color</li>
+<li><code>--keycap-background-active</code>, a color</li>
+<li><code>--keycap-background-border</code>, a color</li>
+<li><code>--keycap-background-border-bottom</code>, a color</li>
+<li><code>--keycap-text</code>, a color</li>
+<li><code>--keycap-text-active</code>, a color</li>
+<li><code>--keycap-secondary-text</code>, a color</li>
+<li>`–keycap-modifier-background, a color</li>
+<li>`–keycap-modifier-border, a color</li>
+<li>`–keycap-modifier-border-bottom, a color</li>
 </ul>
 <p class="notice--info">Set these CSS variables on any selector inherited by the
 <code>math-field</code> tag, for example, <code>body</code>: although CSS styles are &quot;invisible&quot; to custom components, CSS variables
 are &quot;passed through&quot; and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 </section>
-<section id='sharing-virtual-keyboards-amongts-multiple-instances'>
-## Sharing Virtual Keyboards Amongst Multiple Instances
+<section id='sharing-virtual-keyboards-amongst-multiple-instances'>
+<h2>Sharing Virtual Keyboards Amongst Multiple Instances</h2>
 <p>When there are multiple mathfield elements in a page, they usually each have
 their own virtual keyboard.</p>
 <p>However, in some cases it might be desirable to have the virtual keyboard
@@ -1072,14 +1103,14 @@ Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
         
 
 
-        <meta itemprop="datePublished" content="November 03, 2021">
+        <meta itemprop="datePublished" content="February 24, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Wed Nov 03 2021 16:29:05 GMT+0100 (Central European Standard Time)">November 03, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-24">February 24, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

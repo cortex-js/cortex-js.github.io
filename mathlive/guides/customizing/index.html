@@ -213,7 +213,7 @@ Table of Content</label>
               <li>              
                 <a href="/mathlive/demo/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -467,7 +467,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
                   
-                  Supported Commands
+                  LaTeX Commands
                 </a></li>
             
           
@@ -563,7 +563,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -583,7 +583,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -603,7 +603,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -623,7 +623,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -643,7 +643,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/mathlive/guides/customizing/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -879,10 +879,11 @@ the <code>=</code> sign because the limit is displayed in <code>scriptstyle</cod
 <p><strong>To set the default mathstyle of a mathfield</strong>, use the <code>defaultMode</code> option
 (or the <code>default-mode</code> attribute).</p>
 <p>Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
-<p>By default, the mathfield element behaves as if it had a <code>display: block</code>
-CSS property. To get it to behave as a inline element, set
-<code>display: inline-block</code> on the mathfield. This is particularly useful when
-used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
+<p>By default, the mathfield element is laid out on the page as a block,
+that is with a <code>display: block</code> CSS property. To get it laid out as an inline
+element, set <code>display: inline-block</code> on the mathfield. To set a minimum width
+for the mathfield, use the <code>min-width</code> CSS property.</p>
+<p>Using <code>inline-block</code> is particularly useful when used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
   <div slot="html">The answer is &lt;math-field 
@@ -890,6 +891,7 @@ used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
   style="
     padding-left: 5px; padding-right: 5px;
     display: inline-block;
+    mind-width: 100px;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, .3); 
   "&gt;
@@ -1080,14 +1082,14 @@ Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
         
 
 
-        <meta itemprop="datePublished" content="December 06, 2021">
+        <meta itemprop="datePublished" content="March 02, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Mon Dec 06 2021 10:32:40 GMT+0100 (Central European Standard Time)">December 06, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-02">March 02, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

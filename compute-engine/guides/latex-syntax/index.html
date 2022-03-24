@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/latex-syntax/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/latex-syntax/ class="active">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/latex-syntax/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/compute-engine/guides/latex-syntax/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/compute-engine/guides/latex-syntax/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -808,8 +848,8 @@ Table of Content</label>
 <p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
 convert LaTeX strings to MathJSON expressions (<strong>parsing</strong>) and output MathJSON
 expressions as LaTeX string (<strong>serializing</strong>).</p>
-<p><strong>To transform LaTeX to MathJSON</strong>, use the <code>parse()</code> function.</p>
-<p><strong>To transform MathJSON to LaTeX</strong>, use the <code>serialize()</code> function.</p>
+<p><strong>To transform LaTeX to MathJSON</strong>, call the <code>ce.parse()</code> function.</p>
+<p><strong>To transform MathJSON to LaTeX</strong>, read the <code>expr.latex</code> property.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { parse, serialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
 
 <span class="hljs-keyword">const</span> expr = <span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>);
@@ -830,15 +870,15 @@ optional argument:</p>
 }););
 <span class="hljs-comment">// ➔ 0,333</span>
 </code></pre>
-<div class='read-more'><a href="/docs/compute-engine/#(NumberFormattingOptions%3Atype)">
-Read more about <strong><kbd>NumberFormattingOptions</kbd></strong> which apply to both <kbd>parse()</kbd> and <kbd>serialize()</kbd>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/docs/compute-engine/#(ParseLatexOptions%3Atype)">
-Read more about <strong><kbd>ParseLatexOptions</kbd></strong> which apply to <kbd>parse()</kbd>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/docs/compute-engine/#(SerializeLatexOptions%3Atype)">
-Read more about <strong><kbd>SerializeLatexOptions</kbd></strong> which apply to <kbd>serialize()</kbd>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/docs/compute-engine/#(NumberFormattingOptions%3Atype)"> Read
+more about <strong><kbd>NumberFormattingOptions</kbd></strong> which apply to
+both <kbd>parse()</kbd> and <kbd>serialize()</kbd> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/docs/compute-engine/#(ParseLatexOptions%3Atype)"> Read more
+about <strong><kbd>ParseLatexOptions</kbd></strong> which apply to
+<kbd>parse()</kbd> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/docs/compute-engine/#(SerializeLatexOptions%3Atype)"> Read more
+about <strong><kbd>SerializeLatexOptions</kbd></strong> which apply to
+<kbd>serialize()</kbd> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Advanced Usage</h2>
 <p><strong>To customize the LaTeX syntax</strong>, including defining the vocabulary and syntax,
 create an instance of <code>LatexSyntax</code>.</p>
@@ -852,9 +892,8 @@ create an instance of <code>LatexSyntax</code>.</p>
 <p>The <code>LatexSyntax</code> constructor can be passed some options to customize the
 parsing and serializing, as well as dictionaries defining the syntax and
 vocabulary.</p>
-<div class='read-more'><a href="/compute-engine/guides/dictionaries/">
-Read more about <strong>Dictionaries</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/dictionaries/"> Read more about
+<strong>Dictionaries</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To change the LaTeX syntax options after a <code>LatexSyntax</code> instance has been
 created</strong>, change the <code>options</code> property.</p>
 <p>The <code>LatexSyntax</code> class has an <code>options</code> property with the following keys.</p>
@@ -999,6 +1038,7 @@ tokens.</p>
   <span class="hljs-attr">parseUnknownToken</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&#x27;symbol&#x27;</span>,
   <span class="hljs-attr">invisibleOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">invisiblePlusOperator</span>: <span class="hljs-string">&#x27;&#x27;</span>,
+  <span class="hljs-attr">missingSymbol</span>: <span class="hljs-string">&#x27;&#x27;</span>,
   <span class="hljs-attr">dictionary</span>: [],
   <span class="hljs-attr">skipSpace</span>: <span class="hljs-literal">false</span>,
 });
@@ -1015,14 +1055,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

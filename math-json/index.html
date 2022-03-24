@@ -206,7 +206,7 @@ Table of Content</label>
               <li>              
                 <a href="/compute-engine/demo/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#demo"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
                   
                   Demo
                 </a></li>
@@ -230,11 +230,51 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/expressions/" data-url=/math-json/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Expressions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   LaTeX Syntax
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/math-json/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluate
                 </a></li>
             
           
@@ -390,11 +430,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/forms/" data-url=/math-json/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Forms
+                  Canonical Form
                 </a></li>
             
           
@@ -702,7 +742,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/reporting-issues/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
                   
                   Reporting Issues
                 </a></li>
@@ -722,7 +762,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/contributing-code/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
                   
                   Contributing Code
                 </a></li>
@@ -742,7 +782,7 @@ Table of Content</label>
               <li>              
                 <a href="/funding/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
                   
                   Funding
                 </a></li>
@@ -762,7 +802,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/code-of-conduct/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   Code of Conduct
                 </a></li>
@@ -782,7 +822,7 @@ Table of Content</label>
               <li>              
                 <a href="/docs/license/" data-url=/math-json/ class="">
                   
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
                   
                   License
                 </a></li>
@@ -805,7 +845,8 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'>
-<p>The MathJSON format is a lightweight mathematical notation interchange format.</p>
+<p>The MathJSON format is a lightweight data interchange format for mathematical
+notation.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -821,11 +862,11 @@ Table of Content</label>
 </tr>
 <tr>
 <td style="text-align:left">\[e^{\imaginaryI \pi }+1=0\]</td>
-<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;ImaginaryUnit&quot;, &quot;Pi&quot;], 1]], 0]</code></td>
+<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryUnit&quot;], 1]], 0]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">\[\sin^{-1}^\prime(x)\]</td>
-<td style="text-align:left"><code>[[&quot;Derivative&quot;, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
+<td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
 </tr>
 </tbody>
 </table>
@@ -843,17 +884,15 @@ using a syntax specific to those formats.</p>
 utilities that parse LaTeX to MathJSON, serialize MathJSON to LaTeX, and provide
 a collection of functions for symbolic manipulation and numerical evaluations of
 MathJSON expressions.</p>
-<div class='read-more'><a href="/compute-engine/guides/dictionaries/">
-Read more about <strong>MathJSON for LaTeX</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/">
-Read more about the <strong>Compute Engine</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/dictionaries/"> Read more about
+<strong>MathJSON for LaTeX</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/"> Read more about the <strong>Compute
+Engine</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>Mathematical notation is used in a broad array of fields, from elementary school
 arithmetic, engineering, applied mathematics to physics and more. New notations
 are invented regularly and need to be represented. To address those needs
 MathJSON is flexible, extensible and customizable. Extensible dictionaries can
-be used to define new syntax and new semantics.</p>
+be used to define new syntax and new semantic.</p>
 <p>MathJSON is not intended to be suitable as a visual representation of arbitrary
 mathematical notations, and as such is not a replacement for LaTeX or MathML.</p>
 <h2>Structure of a MathJSON Expression</h2>
@@ -889,15 +928,15 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 <p><strong>Numbers</strong>, <strong>symbols</strong>, <strong>strings</strong> and <strong>functions</strong> can be expressed either
 as an object literal with a <code>&quot;num&quot;</code>, <code>&quot;str&quot;</code>, <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key,
 respectively, or as a short-hand notation using a JSON number, string or array.</p>
-<p><strong>Dictionaries</strong> do not have a short-hand notation and are always expressed
-as an object literal with a <code>&quot;dict&quot;</code> key.</p>
+<p><strong>Dictionaries</strong> do not have a short-hand notation and are always expressed as
+an object literal with a <code>&quot;dict&quot;</code> key.</p>
 <p>The short-hand notation is more concise and easier to read, but cannot include
 metadata properties.</p>
 <h2>Numbers</h2>
 <p>A MathJSON <strong>number</strong> is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;num&quot;</code> key</li>
-<li>a finite JSON number</li>
+<li>a JSON number</li>
 </ul>
 <h3>Numbers as Object Literals</h3>
 <p><strong>Numbers</strong> can be represented as an object literal with a <code>&quot;num&quot;</code> key. The
@@ -907,27 +946,66 @@ value of the key is a string representation of the number.</p>
 }
 </code></pre>
 <p>The string representing a number follows the
-<a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>.</p>
-<p>In  addition, the values <code>&quot;NaN&quot;</code>, <code>&quot;+Infinity&quot;</code> and <code>&quot;-Infinity&quot;</code> are used to represent an
-undefined result, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>,
-positive infinity and negative infinity, respectively.</p>
-<p>When a number is outside the bounds of a JSON number (i.e. a 64-bit floating
-point representation), it is represented by a string of digits <code>0</code>…<code>9</code>,
-decimal point <code>.</code>, plus <code>+</code> and minus <code>-</code> sign and exponent sign <code>e</code>, followed
-by a letter:</p>
-<ul>
-<li><code>n</code> to indicate the number is a large integer (type <code>BigInt</code> in JavaScript)</li>
-<li><code>d</code> to indicate the number is an arbitrary precision floating point number
-(decimal).</li>
-</ul>
-<h3>JSON Numbers</h3>
+<a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>, with
+the following differences.</p>
+<p>The range or precision of MathJSON numbers may be greater than the range and
+precision supported by <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> 64-bit
+float.</p>
+<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represent an undefined
+result, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>, positive
+infinity and negative infinity, respectively.</p>
+<p>The following characters in the string are ignored:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>U+0009</strong></td>
+<td style="text-align:left"><strong>TAB</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+000A</strong></td>
+<td style="text-align:left"><strong>LINE FEED</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+000B</strong></td>
+<td style="text-align:left"><strong>VERTICAL TAB</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+000C</strong></td>
+<td style="text-align:left"><strong>FORM FEED</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+000D</strong></td>
+<td style="text-align:left"><strong>CARRIAGE RETURN</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+0020</strong></td>
+<td style="text-align:left"><strong>SPACE</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>U+00A0</strong></td>
+<td style="text-align:left"><strong>UNBREAKABLE SPACE</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If the string ends with the pattern <code>/\([0-9]+\)/</code> (that is a series of one or
+more digits enclosed in parentheses), that pattern should be interpreted as
+repeating digits.</p>
+<h3>JSON numbers</h3>
 <p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
 representation of numbers, a JSON number can be used.</p>
 <p>Specifically:</p>
 <ul>
 <li>the number has to be in the range \([-(2^{53})+1, (2^{53})-1]\) to fit in a
 64-bit float (<strong>IEEE 754-2008</strong>, 52-bit, about 15 digits of precision).</li>
-<li>the number has to be finite: it cannot be <code>Infinity</code>, <code>-Infinity</code> or <code>NaN</code>.</li>
+<li>the number has to be finite: it cannot be <code>+Infinity</code>, <code>-Infinity</code> or <code>NaN</code>.</li>
 </ul>
 <h3>Examples</h3>
 <pre><code class="language-json"><span class="hljs-number">0</span>
@@ -938,7 +1016,7 @@ representation of numbers, a JSON number can be used.</p>
 
 <span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span>
-    <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105d&quot;</span>
+    <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105&quot;</span>
 <span class="hljs-punctuation">}</span>
 
 
@@ -946,14 +1024,14 @@ representation of numbers, a JSON number can be used.</p>
 
 </code></pre>
 <h2>Strings</h2>
-<p>A MathJSON <strong>string</strong> is either:</p>
+<p>A MathJSON <strong>string</strong> is either</p>
 <ul>
 <li>an object literal with a <code>&quot;str&quot;</code> key</li>
 <li>a <a href="https://tools.ietf.org/html/rfc7159#section-7">JSON string</a> that starts and
 ends with <strong>U+0027 APOSTROPHE</strong> <code>'</code>.</li>
 </ul>
 <p>Strings can contain any character represented by a Unicode scalar value (in the
-range [U+0000…U+10FFFF], except for [U+D800…U+DFFF]), but the following
+[0…0x10FFFF] range, except for [0xD800…0xDFFF]), but the following
 characters must be escaped as indicated:</p>
 <div class=symbols-table>
 <table>
@@ -1010,11 +1088,7 @@ characters must be escaped as indicated:</p>
 </div>
 <p>The encoding of the string follows the encoding of the JSON payload: UTF-8,
 UTF-16LE, UTF-16BE, etc…</p>
-<pre><code class="language-json">
-<span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
-
-<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;str&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;All your base are belong to us&quot;</span> <span class="hljs-punctuation">}</span>
-
+<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
 </code></pre>
 <h2>Symbols</h2>
 <p>A MathJSON <strong>symbol</strong> is either:</p>
@@ -1025,14 +1099,14 @@ UTF-16LE, UTF-16BE, etc…</p>
 <p><strong>Symbols</strong> are identifiers that represent the name of constants, variables and
 functions.</p>
 <p>Symbols are strings of valid Unicode characters (including Greek, Cyrillic,
-Hebrew, Arabic, mathematical symbols, Ideographic and CJK symbols and emojis),
+Hebrew, Arabic, mathematical symbols, ideographic and CJK symbols and emojis),
 except:</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Codepoint</th>
+<th style="text-align:left">Name</th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
@@ -1044,39 +1118,34 @@ except:</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+0022</strong></td>
-<td style="text-align:left"><strong>DOUBLE QUOTE</strong></td>
+<td style="text-align:left"><strong>QUOTATION MARK</strong></td>
 <td style="text-align:left"><code>&quot;</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>U+005C</strong></td>
-<td style="text-align:left"><strong>REVERSE SOLIDUS</strong></td>
-<td style="text-align:left"><code>\</code></td>
-</tr>
-<tr>
 <td style="text-align:left"><strong>U+0060</strong></td>
-<td style="text-align:left"><strong>GRAVE ACCENT</strong></td>
-<td style="text-align:left"><code>`</code> backtick |</td>
+<td style="text-align:left"><strong>GRAVE ACCENT</strong><br>backtick</td>
+<td style="text-align:left"><code>`</code> |</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+FFFE</strong></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><strong>BYTE ORDER MARK</strong></td>
 <td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+FFFF</strong></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><strong>INVALID BYTE ORDER MARK</strong></td>
 <td style="text-align:left"></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>In addition, the first character of a symbol should not be:</p>
+<p>In addition, the first character of a symbol must not be:</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Codepoint</th>
+<th style="text-align:left">Name</th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
@@ -1090,21 +1159,6 @@ except:</p>
 <td style="text-align:left"><strong>U+0022</strong></td>
 <td style="text-align:left"><strong>QUOTATION MARK</strong></td>
 <td style="text-align:left"><code>&quot;</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>U+0021</strong></td>
-<td style="text-align:left"><strong>EXCLAMATION MARK</strong></td>
-<td style="text-align:left"><code>!</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>U+0022</strong></td>
-<td style="text-align:left"><strong>QUOTATION MARK</strong></td>
-<td style="text-align:left"><code>&quot;</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>U+0023</strong></td>
-<td style="text-align:left"><strong>NUMBER SIGN</strong></td>
-<td style="text-align:left"><code>#</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+0024</strong></td>
@@ -1144,11 +1198,6 @@ except:</p>
 <tr>
 <td style="text-align:left"><strong>U+003A</strong></td>
 <td style="text-align:left"><strong>COLON</strong></td>
-<td style="text-align:left"><code>:</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>U+003C</strong></td>
-<td style="text-align:left"><strong>LESS THAN SIGN</strong></td>
 <td style="text-align:left"><code>:</code></td>
 </tr>
 <tr>
@@ -1206,10 +1255,39 @@ must be stored internally and compared using the NFC.</p>
 <li><code>&quot;\u0041\u030a&quot;</code> <strong>LATIN CAPITAL LETTER A</strong> + <strong>COMBINING RING ABOVE</strong> <code>A‌</code> +
 <code> ̊</code></li>
 </ul>
-<p>The following naming convention are recommended.</p>
-<h3>Patterns</h3>
-<p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) are reserved to
-denote wildcards and other placeholders.</p>
+<p>The following naming convention for wildcards, variables, constants and
+functions are recommendations.</p>
+<h3>Wildcards</h3>
+<p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) should be used to
+denote wildcards and other placeholders:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Wildcards</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>_</code></td>
+<td style="text-align:left">Wildcard for a single symbol</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>__</code></td>
+<td style="text-align:left">Wildcard for a sequence of 1 or more symbols</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>___</code></td>
+<td style="text-align:left">Wildcard for a sequence of 0 or more symbols</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>_a</code></td>
+<td style="text-align:left">Capturing wildcard named <code>a</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 <h3>Variables</h3>
 <ul>
 <li>
@@ -1218,10 +1296,11 @@ denote wildcards and other placeholders.</p>
 </li>
 <li>
 <p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
-<p>So for example use, <code>Gamma</code> rather than <code>ɣ</code> and <code>Total</code> rather than <strong>U+2211
-N-ARY SUMMATION</strong> <code>∑</code>, which looks like <strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong>
-<code>Σ</code>. This visual ambiguity of some Unicode symbols frequently used in math is
-why we recommend a more restricted character set.</p>
+<p>For example, it is recommended to us <code>gamma</code> rather than <code>ɣ</code> and <code>Total</code>
+rather than <strong>U+2211 N-ARY SUMMATION</strong> <code>∑</code>, which looks like <strong>U+03A3 GREEK
+CAPITAL LETTER SIGMA</strong> <code>Σ</code>. Using a more limited set of common characters
+avoids visual ambiguity issues that might otherwise arise with some Unicode
+symbols.</p>
 </li>
 <li>
 <p>If a variable is made of several words, use camelCase, i.e. <code>newDeterminant</code></p>
@@ -1230,18 +1309,6 @@ why we recommend a more restricted character set.</p>
 <p>Prefer clarity over brevity and avoid obscure abbreviations.</p>
 <p>Use <code>newDeterminant</code> rather than <code>newDet</code> or <code>nDet</code></p>
 </li>
-<li>
-<p>The following variables are usually real numbers: <code>x</code>, <code>y</code>, <code>t</code></p>
-</li>
-<li>
-<p>The following variables are usually integers: <code>i</code>, <code>n</code>, <code>p</code>, <code>q</code></p>
-</li>
-<li>
-<p>The following variables are usually complex numbers: <code>z</code>, <code>w</code></p>
-</li>
-<li>
-<p>The following variables are usually lists: <code>xs</code>, <code>ys</code>, <code>ns</code></p>
-</li>
 </ul>
 <h3>Constants</h3>
 <ul>
@@ -1249,6 +1316,70 @@ why we recommend a more restricted character set.</p>
 <li>Subsequent characters should be a letter, digit <code>0</code>-<code>9</code> or underscore <code>_</code>.</li>
 <li>If a constant is made up of several words, use camelCase, e.g. <code>SpeedOfLight</code></li>
 </ul>
+<h3>Rendering Conventions</h3>
+<p>The following recommendations may be followed by clients displaying MathJSON
+symbols. They do not affect computation or manipulation of expressions following
+these conventions.</p>
+<ul>
+<li>Multi-letter variables, that is symbols with more than one character, may be
+rendered in LaTeX with a <code>\mathit{}</code> or <code>\mathrm{}</code> command.</li>
+<li>Symbol names containing a <code>_</code> may be split in a suffix (part before the <code>_</code>)
+and a prefix (part after the <code>_</code>) and the prefix may be displayed as a
+subscript of the suffix. A symbol fragment is either the entire symbol, or a
+suffix or a prefix of a symbol.</li>
+<li>The following common names, when they appear as a fragment, may be replaced
+with a corresponding LaTeX command: <code>alpha</code>, <code>beta</code>, <code>gamma</code>, <code>Gamma</code>,
+<code>delta</code>, <code>Delta</code>, <code>epsilon</code>, <code>zeta</code>, <code>eta</code>, <code>theta</code>, <code>Theta</code>, <code>iota</code>, <code>kappa</code>,
+<code>lambda</code>, <code>Lambda</code>, <code>mu</code>, <code>nu</code>, <code>xi</code>, <code>Xi</code>, <code>pi</code>, <code>Pi</code>, <code>rho</code>, <code>sigma</code>,
+<code>Sigma</code>, <code>tau</code>, <code>upsilon</code>, <code>phi</code>, <code>Phi</code>, <code>varphi</code>, <code>chi</code>, <code>psi</code>, <code>Psi</code>,
+<code>omega</code>, <code>Omega</code>, <code>aleph</code>, <code>ast</code>, <code>blacksquare</code>, <code>bot</code>, <code>bullet</code>, <code>circ</code>,
+<code>diamond</code>, <code>times</code>, <code>top</code>, <code>square</code>, <code>star</code>.</li>
+<li>Symbol fragments ending in digits may be displayed with a corresponding
+subscript</li>
+</ul>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Symbol</th>
+<th style="text-align:left">LaTeX</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>time</code></td>
+<td style="text-align:left"><code>\mathit{time}</code></td>
+<td>\( \mathit{time} \)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>alpha</code></td>
+<td style="text-align:left"><code>\alpha</code></td>
+<td>\( \alpha \)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>m56</code></td>
+<td style="text-align:left"><code>m_{56}</code></td>
+<td>\( m_{56} \)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>alpha0</code></td>
+<td style="text-align:left"><code>\alpha_0</code></td>
+<td>\( \alpha_0 \)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>m56_max</code></td>
+<td style="text-align:left"><code>m_{56_{\mathit{max}}</code></td>
+<td>\( m*{56*{\mathit{max}}} \)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>c_max</code></td>
+<td style="text-align:left"><code>c_{\mathit{max}}</code></td>
+<td>\( c_{\mathit{max}} \)</td>
+</tr>
+</tbody>
+</table>
+</div>
 <h2>Functions</h2>
 <p>A MathJSON function is either:</p>
 <ul>
@@ -1265,7 +1396,9 @@ its arguments.</p>
 </code></pre>
 <p>The <strong>head</strong> of the function is the first element in the array. Its presence is
 required. It indicates the ‘function name’ or ‘what’ the function is about.</p>
-<p>The head is frequently a string, but it can be another expression.</p>
+<p>The head is frequently a string, but it can be another expression. If it is a
+string, it should follow the conventions for constants in the section above on
+Symbols.</p>
 <p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
 well. The arguments form the <strong>tail</strong> of the function.</p>
 <p>The expression corresponding to \(\sin^{-1}(x)\) is</p>
@@ -1280,8 +1413,8 @@ well. The arguments form the <strong>tail</strong> of the function.</p>
 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Note that an array representing a function must have at least one element,
-the head of the function. Therefore <code>[]</code> is not a valid expression.</p>
+<p>Note that an array representing a function must have at least one element, the
+head of the function. Therefore <code>[]</code> is not a valid expression.</p>
 <h2>Dictionary</h2>
 <p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
 languages it is called a map or associative array.</p>
@@ -1291,14 +1424,14 @@ value of the key is a JSON object literal holding the content of the dictionary.
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;dict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">&quot;first&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">&quot;second&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;second&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">&quot;third&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <h2>Metadata</h2>
 <p>MathJSON object literals can be annotated with supplemental information.</p>
-<p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> or a <strong>string</strong> represented as a JSON
+<p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> represented as a JSON
 string, or a <strong>function</strong> represented as a JSON array must be transformed into
 the equivalent object literal before being annotated.</p>
 <p>The following metadata keys are recommended:</p>
@@ -1369,14 +1502,14 @@ the equivalent object literal before being annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 07, 2021">
+        <meta itemprop="datePublished" content="March 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="Tue Dec 07 2021 10:37:50 GMT+0100 (Central European Standard Time)">December 07, 2021</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
