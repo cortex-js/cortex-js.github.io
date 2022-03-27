@@ -731,15 +731,15 @@ layout, the event received will have the properties <code>code = &quot;KeyA&quot
 <p>On a French AZERTY keyboard layout, the event received will have <code>code = &quot;KeyQ&quot;</code> and  <code>key = &quot;\u00e6&quot;</code>.</p>
 <p>Why is the code <code>KeyQ</code> even though the user pressed the key labeled <code>A</code> on their
 AZERTY keyboard? On this keyboard layout, the Q and A keys are swapped compared
-to the US layout and the <code>code</code> property reflects the &quot;physical&quot; key pressed.</p>
+to the US layout and the <code>code</code> property reflects the “physical” key pressed.</p>
 <p>This is not unusual. While some keys retain their positions, many keys are
 swapped around or altogether unique in some layouts, particularly for
 punctuations and symbols. The code property of the event does not
 represent the label of the key, but indicates the physical position of the key
-as if it was on a US keyboard, in this case &quot;the key immediately to the right of
+as if it was on a US keyboard, in this case “the key immediately to the right of
 the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
-French keyboard&quot;.</p>
-<p>What we want to know is that the user pressed a key labeled &quot;A&quot;. But none of the
+French keyboard”.</p>
+<p>What we want to know is that the user pressed a key labeled “A”. But none of the
 information in the event record tells us that. The value of the key field varies
 depending on the keyboard layout and the modifiers pressed.</p>
 <p>However, if we know the keyboard layout, we can use a table that maps the value
@@ -758,7 +758,7 @@ event, MathLive checks that the info in the event record (specifically the code
 and key fields) is consistent with the current keyboard layout. If not, it
 finds a better matching keyboard layout, and will switch to that keyboard layout
 if it is confident enough of that guess.</p>
-<p>MathLive currently has a limited set of &quot;known&quot; keyboard layouts. If you happen
+<p>MathLive currently has a limited set of “known” keyboard layouts. If you happen
 to use a keyboard layout MathLive doesn’t know, it will guess the wrong keyboard
 layout. As a result some keyboard shortcuts may produce unexpected results.</p>
 <h2>Inline Shortcuts</h2>
@@ -830,8 +830,8 @@ interval between this character and the previous one.</p>
 <p>A value of 750 will indicate that the maximum interval between two
 characters to be considered part of the same inline shortcut sequence is
 3/4 of a second.</p>
-<p>This is useful to enter &quot;±&quot; as a sequence of two characters, while also
-supporting the &quot;±&quot; shortcut with the same sequence.</p>
+<p>This is useful to enter “±” as a sequence of two characters, while also
+supporting the “±” shortcut with the same sequence.</p>
 <p>The first result can be entered by pausing slightly between the first and
 second character if this option is set to a value of 250 or so.</p>
 <p>Note that some operations, such as clicking to change the selection, or losing
@@ -945,10 +945,10 @@ Next: Control <strong>Speech</strong> output
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-12">February 12, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-12">February 12, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

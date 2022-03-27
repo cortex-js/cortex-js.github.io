@@ -230,6 +230,32 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/changelog/" data-url=/math-json/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/expressions/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -270,26 +296,6 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/math-json/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluate
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -310,11 +316,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/math-json/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Canonical Form
                 </a></li>
             
           
@@ -335,6 +341,46 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/math-json/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/math-json/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Numerical Evaluation
                 </a></li>
             
           
@@ -390,51 +436,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/execution-constraints/" data-url=/math-json/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Execution Constraints
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/patterns-and-rules/" data-url=/math-json/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Patterns and Rules
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/math-json/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Canonical Form
                 </a></li>
             
           
@@ -873,30 +879,30 @@ notation.</p>
 </div>
 <p>MathJSON is built on the <a href="https://www.json.org/">JSON format</a>. Its focus is on
 interoperability between software programs to facilitate the exchange of
-mathematical data, as well as the building of scientific software through the
+mathematical data and the building of scientific software through the
 integration of software components communicating with a common format.</p>
 <p>It is human-readable, while being easy for machines to generate and parse. It is
 simple enough that it can be generated, consumed and manipulated using any
 programming languages.</p>
 <p>MathJSON can be transformed from (parsing) and to (serialization) other formats,
 using a syntax specific to those formats.</p>
-<p>The MathJSON library provides an implementation in Javascript/Typescript of
-utilities that parse LaTeX to MathJSON, serialize MathJSON to LaTeX, and provide
-a collection of functions for symbolic manipulation and numerical evaluations of
-MathJSON expressions.</p>
+<p>The <strong>Cortex Compute Engine</strong> library provides an implementation in
+JavaScript/TypeScript of utilities that parse LaTeX to MathJSON, serialize
+MathJSON to LaTeX, and provide a collection of functions for symbolic
+manipulation and numerical evaluations of MathJSON expressions.</p>
 <div class='read-more'><a href="/compute-engine/guides/dictionaries/"> Read more about
 <strong>MathJSON for LaTeX</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/compute-engine/"> Read more about the <strong>Compute
 Engine</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>Mathematical notation is used in a broad array of fields, from elementary school
 arithmetic, engineering, applied mathematics to physics and more. New notations
-are invented regularly and need to be represented. To address those needs
-MathJSON is flexible, extensible and customizable. Extensible dictionaries can
-be used to define new syntax and new semantic.</p>
+are invented regularly and need to be represented with MathJSON. To address
+those needs MathJSON is flexible, extensible and customizable. Extensible
+dictionaries can be used to define new syntax and new semantic.</p>
 <p>MathJSON is not intended to be suitable as a visual representation of arbitrary
 mathematical notations, and as such is not a replacement for LaTeX or MathML.</p>
 <h2>Structure of a MathJSON Expression</h2>
-<p>A MathJSON expression is a combination of <strong>numbers</strong>, <strong>strings</strong>, <strong>symbols</strong>,
+<p>A MathJSON expression is a combination of <strong>numbers</strong>, <strong>symbols</strong>, <strong>strings</strong>,
 <strong>functions</strong> and <strong>dictionaries</strong>.</p>
 <p><strong>Number</strong></p>
 <pre><code class="language-json"><span class="hljs-number">3.14</span>
@@ -926,11 +932,11 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <p><strong>Numbers</strong>, <strong>symbols</strong>, <strong>strings</strong> and <strong>functions</strong> can be expressed either
-as an object literal with a <code>&quot;num&quot;</code>, <code>&quot;str&quot;</code>, <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key,
-respectively, or as a short-hand notation using a JSON number, string or array.</p>
-<p><strong>Dictionaries</strong> do not have a short-hand notation and are always expressed as
+as an object literal with a <code>&quot;num&quot;</code> <code>&quot;str&quot;</code> <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key,
+respectively, or as a shorthand notation using a JSON number, string or array.</p>
+<p><strong>Dictionaries</strong> do not have a shorthand notation and are always expressed as
 an object literal with a <code>&quot;dict&quot;</code> key.</p>
-<p>The short-hand notation is more concise and easier to read, but cannot include
+<p>The shorthand notation is more concise and easier to read, but cannot include
 metadata properties.</p>
 <h2>Numbers</h2>
 <p>A MathJSON <strong>number</strong> is either:</p>
@@ -940,21 +946,37 @@ metadata properties.</p>
 </ul>
 <h3>Numbers as Object Literals</h3>
 <p><strong>Numbers</strong> can be represented as an object literal with a <code>&quot;num&quot;</code> key. The
-value of the key is a string representation of the number.</p>
+value of the key is a <strong>string</strong> representation of the number.</p>
 <pre><code class="language-typescript">{
     <span class="hljs-string">&quot;num&quot;</span>: <span class="hljs-built_in">string</span>
 }
 </code></pre>
 <p>The string representing a number follows the
 <a href="https://tools.ietf.org/html/rfc7159#section-6">JSON syntax for number</a>, with
-the following differences.</p>
+the following differences:</p>
+<ul>
+<li>
 <p>The range or precision of MathJSON numbers may be greater than the range and
 precision supported by <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> 64-bit
 float.</p>
-<p>The values <code>NaN</code>, <code>+Infinity</code> and <code>-Infinity</code> are used to represent an undefined
+</li>
+<li>
+<p>The values <code>NaN</code> <code>+Infinity</code> and <code>-Infinity</code> are used to represent an undefined
 result, as per <a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a>, positive
 infinity and negative infinity, respectively.</p>
-<p>The following characters in the string are ignored:</p>
+</li>
+<li>
+<p>If the string ends with the pattern <code>/\([0-9]+\)/</code> (that is a series of one or
+more digits enclosed in parentheses), that pattern should be interpreted as
+repeating digits.</p>
+</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>  <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.(3)&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span>  <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.(142857)&quot;</span> <span class="hljs-punctuation">}</span>
+</code></pre>
+<ul>
+<li>The following characters in the string are ignored:</li>
+</ul>
 <div class=symbols-table>
 <table>
 <thead>
@@ -995,19 +1017,15 @@ infinity and negative infinity, respectively.</p>
 </tbody>
 </table>
 </div>
-<p>If the string ends with the pattern <code>/\([0-9]+\)/</code> (that is a series of one or
-more digits enclosed in parentheses), that pattern should be interpreted as
-repeating digits.</p>
 <h3>JSON numbers</h3>
 <p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
 representation of numbers, a JSON number can be used.</p>
 <p>Specifically:</p>
 <ul>
-<li>the number has to be in the range \([-(2^{53})+1, (2^{53})-1]\) to fit in a
+<li>the number is in the range \([-(2^{53})+1, (2^{53})-1]\) to fit in a
 64-bit float (<strong>IEEE 754-2008</strong>, 52-bit, about 15 digits of precision).</li>
-<li>the number has to be finite: it cannot be <code>+Infinity</code>, <code>-Infinity</code> or <code>NaN</code>.</li>
+<li>the number is finite: it cannot be <code>+Infinity</code> <code>-Infinity</code> or <code>NaN</code>.</li>
 </ul>
-<h3>Examples</h3>
 <pre><code class="language-json"><span class="hljs-number">0</span>
 
 <span class="hljs-number">-234.534e-46</span>
@@ -1030,16 +1048,16 @@ representation of numbers, a JSON number can be used.</p>
 <li>a <a href="https://tools.ietf.org/html/rfc7159#section-7">JSON string</a> that starts and
 ends with <strong>U+0027 APOSTROPHE</strong> <code>'</code>.</li>
 </ul>
-<p>Strings can contain any character represented by a Unicode scalar value (in the
-[0…0x10FFFF] range, except for [0xD800…0xDFFF]), but the following
-characters must be escaped as indicated:</p>
+<p>Strings can contain any character represented by a Unicode scalar value (a
+codepoint in the <code>[0...0x10FFFF]</code> range, except for <code>[0xD800...0xDFFF]</code>), but
+the following characters must be escaped as indicated:</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Codepoint</th>
+<th style="text-align:left">Name</th>
+<th style="text-align:left">Escape Sequence</th>
 </tr>
 </thead>
 <tbody>
@@ -1098,8 +1116,8 @@ UTF-16LE, UTF-16BE, etc…</p>
 </ul>
 <p><strong>Symbols</strong> are identifiers that represent the name of constants, variables and
 functions.</p>
-<p>Symbols are strings of valid Unicode characters (including Greek, Cyrillic,
-Hebrew, Arabic, mathematical symbols, ideographic and CJK symbols and emojis),
+<p>Symbols are strings of valid Unicode characters, including Greek, Cyrillic,
+Hebrew, Arabic, mathematical symbols, ideographic and CJK symbols and emojis,
 except:</p>
 <div class=symbols-table>
 <table>
@@ -1124,7 +1142,7 @@ except:</p>
 <tr>
 <td style="text-align:left"><strong>U+0060</strong></td>
 <td style="text-align:left"><strong>GRAVE ACCENT</strong><br>backtick</td>
-<td style="text-align:left"><code>`</code> |</td>
+<td style="text-align:left"><code>`</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+FFFE</strong></td>
@@ -1193,7 +1211,7 @@ except:</p>
 <tr>
 <td style="text-align:left"><strong>U+002E</strong></td>
 <td style="text-align:left"><strong>FULL STOP</strong></td>
-<td style="text-align:left"><code>'</code></td>
+<td style="text-align:left"><code>.</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+003A</strong></td>
@@ -1264,25 +1282,25 @@ denote wildcards and other placeholders:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Wildcards</th>
+<th style="text-align:left">Wildcard</th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center"><code>_</code></td>
+<td style="text-align:left"><code>_</code></td>
 <td style="text-align:left">Wildcard for a single symbol</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>__</code></td>
+<td style="text-align:left"><code>__</code></td>
 <td style="text-align:left">Wildcard for a sequence of 1 or more symbols</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>___</code></td>
+<td style="text-align:left"><code>___</code></td>
 <td style="text-align:left">Wildcard for a sequence of 0 or more symbols</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>_a</code></td>
+<td style="text-align:left"><code>_a</code></td>
 <td style="text-align:left">Capturing wildcard named <code>a</code></td>
 </tr>
 </tbody>
@@ -1296,11 +1314,11 @@ denote wildcards and other placeholders:</p>
 </li>
 <li>
 <p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
-<p>For example, it is recommended to us <code>gamma</code> rather than <code>ɣ</code> and <code>Total</code>
-rather than <strong>U+2211 N-ARY SUMMATION</strong> <code>∑</code>, which looks like <strong>U+03A3 GREEK
-CAPITAL LETTER SIGMA</strong> <code>Σ</code>. Using a more limited set of common characters
-avoids visual ambiguity issues that might otherwise arise with some Unicode
-symbols.</p>
+<p>For example, it is recommended to use <code>gamma</code> rather than <code>ɣ</code> and <code>Total</code>
+rather than <strong>U+2211 N-ARY SUMMATION</strong> <code>∑</code>, which can be confused with
+<strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong> <code>Σ</code>.</p>
+<p>Using a more limited set of common characters avoids visual ambiguity issues
+that might otherwise arise with some Unicode symbols.</p>
 </li>
 <li>
 <p>If a variable is made of several words, use camelCase, i.e. <code>newDeterminant</code></p>
@@ -1341,39 +1359,39 @@ subscript</li>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">Symbol</th>
+<th style="text-align:left">Symbol</th>
 <th style="text-align:left">LaTeX</th>
 <th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center"><code>time</code></td>
+<td style="text-align:left"><code>time</code></td>
 <td style="text-align:left"><code>\mathit{time}</code></td>
 <td>\( \mathit{time} \)</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>alpha</code></td>
+<td style="text-align:left"><code>alpha</code></td>
 <td style="text-align:left"><code>\alpha</code></td>
 <td>\( \alpha \)</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>m56</code></td>
+<td style="text-align:left"><code>m56</code></td>
 <td style="text-align:left"><code>m_{56}</code></td>
 <td>\( m_{56} \)</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>alpha0</code></td>
+<td style="text-align:left"><code>alpha0</code></td>
 <td style="text-align:left"><code>\alpha_0</code></td>
 <td>\( \alpha_0 \)</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>m56_max</code></td>
+<td style="text-align:left"><code>m56_max</code></td>
 <td style="text-align:left"><code>m_{56_{\mathit{max}}</code></td>
-<td>\( m*{56*{\mathit{max}}} \)</td>
+<td>\( m_{56_{\mathit{max}}} \)</td>
 </tr>
 <tr>
-<td style="text-align:center"><code>c_max</code></td>
+<td style="text-align:left"><code>c_max</code></td>
 <td style="text-align:left"><code>c_{\mathit{max}}</code></td>
 <td>\( c_{\mathit{max}} \)</td>
 </tr>
@@ -1395,16 +1413,16 @@ its arguments.</p>
 }
 </code></pre>
 <p>The <strong>head</strong> of the function is the first element in the array. Its presence is
-required. It indicates the ‘function name’ or ‘what’ the function is about.</p>
+required. It indicates the “function name” or “what” the function is about.</p>
 <p>The head is frequently a string, but it can be another expression. If it is a
 string, it should follow the conventions for constants in the section above on
 Symbols.</p>
 <p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
-well. The arguments form the <strong>tail</strong> of the function.</p>
-<p>The expression corresponding to \(\sin^{-1}(x)\) is</p>
+well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong> of the function.</p>
+<p>The expression corresponding to \(\sin^{-1}(x)\) is:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code>, and the argument is
+<p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code> and the argument is
 <code>&quot;x&quot;</code>.</p>
 <h3>JSON array</h3>
 <p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
@@ -1502,17 +1520,17 @@ the equivalent object literal before being annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2022">
+        <meta itemprop="datePublished" content="March 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

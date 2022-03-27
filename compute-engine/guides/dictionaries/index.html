@@ -230,6 +230,32 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/changelog/" data-url=/compute-engine/guides/dictionaries/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -270,26 +296,6 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/dictionaries/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluate
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -310,11 +316,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/dictionaries/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Canonical Form
                 </a></li>
             
           
@@ -335,6 +341,46 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/dictionaries/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/dictionaries/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Numerical Evaluation
                 </a></li>
             
           
@@ -390,51 +436,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/execution-constraints/" data-url=/compute-engine/guides/dictionaries/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Execution Constraints
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/patterns-and-rules/" data-url=/compute-engine/guides/dictionaries/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Patterns and Rules
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/dictionaries/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Canonical Form
                 </a></li>
             
           
@@ -854,8 +860,8 @@ a specific target language (<strong>serialization</strong>) or constructed from 
 language (<strong>parsing</strong>).</p>
 <p>It includes definitions such as:</p>
 <ul>
-<li>&quot;<em>The <code>Power</code> function is represented as &quot;<code>x^{n}</code>&quot;</em>&quot;</li>
-<li>&quot;<em>The <code>Divide</code> function is represented as &quot;<code>\frac{x}{y}</code>&quot;</em>&quot;.</li>
+<li>“<em>The <code>Power</code> function is represented as “<code>x^{n}</code>”</em>”</li>
+<li>“<em>The <code>Divide</code> function is represented as “<code>\frac{x}{y}</code>”</em>”.</li>
 </ul>
 <p>A <strong>symbol dictionary</strong> defines the <strong>vocabulary</strong> used by a MathJSON
 expression. This dictionary is independent of the syntax used to parse/serialize
@@ -865,16 +871,16 @@ MathJSON expression.</p>
 interpret it.</p>
 <p>For example:</p>
 <ul>
-<li>&quot;<em><code>Pi</code> is a transcendental number whose value is approximately 3.14159265…</em>&quot;</li>
-<li>&quot;<em>The <code>Add</code> function is associative, commutative, pure, idempotent and can be
-applied to arbitrary number of Real or Complex numbers</em>&quot;.</li>
+<li>“<em><code>Pi</code> is a transcendental number whose value is approximately 3.14159265…</em>”</li>
+<li>“<em>The <code>Add</code> function is associative, commutative, pure, idempotent and can be
+applied to arbitrary number of Real or Complex numbers</em>”.</li>
 </ul>
 <h2>Domains</h2>
 <p>A domain is similar to a type in a traditional programming language.</p>
 <p>The domain of a symbol provides some contextual information about this symbol,
-for example: <em>&quot;x is a positive integer&quot;</em>.</p>
+for example: <em>“x is a positive integer”</em>.</p>
 <p>The codomain of a function indicates the set of values that a function maps to,
-or the domain of the &quot;result&quot; of the function.</p>
+or the domain of the “result” of the function.</p>
 <p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
 functions its codomain.</p>
 <h2>Functions</h2>
@@ -970,17 +976,17 @@ organized by topic as follow:</p>
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2022">
+        <meta itemprop="datePublished" content="March 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

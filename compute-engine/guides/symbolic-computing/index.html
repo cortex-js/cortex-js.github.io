@@ -230,6 +230,32 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/changelog/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/symbolic-computing/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -270,26 +296,6 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/symbolic-computing/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluate
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/symbolic-computing/ class="active">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -310,11 +316,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/symbolic-computing/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Canonical Form
                 </a></li>
             
           
@@ -335,6 +341,46 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Numerical Evaluation
                 </a></li>
             
           
@@ -390,51 +436,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/execution-constraints/" data-url=/compute-engine/guides/symbolic-computing/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Execution Constraints
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/patterns-and-rules/" data-url=/compute-engine/guides/symbolic-computing/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Patterns and Rules
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/symbolic-computing/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Canonical Form
                 </a></li>
             
           
@@ -845,9 +851,9 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Symbolic Computing</h1>
-<p>The CortexJS Compute Engine essentially transform a MathJSON expression by
-applying rewriting rules.</p>
-<p>There are several kind of transformations, depending on the desired result:</p>
+<p>The CortexJS Compute Engine essentially perform computation by
+applying rewriting rules to a MathJSON expression.</p>
+<p>There are several categories of transformations, depending on the desired result:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -859,11 +865,11 @@ applying rewriting rules.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><strong>Canonicalize</strong></td>
-<td style="text-align:left">Put an expression in canonical (&quot;standard&quot;) form, for easier sorting, comparing and computing.<br> Modify expressions according to the <code>associative</code> <code>idempotent</code> and <code>involution</code> function flags. Sort the arguments if the <code>commutative</code> flag is set. Independent of the assumptions.</td>
+<td style="text-align:left">Put an expression in canonical (“standard”) form, for easier sorting, comparing and computing.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Simplify</strong></td>
-<td style="text-align:left">Apply rewriting rules specific to each function, eliminating constants and common sub-expressions. Use available assumptions to determine which rules are applicable. Limit calculations to exact results using integers.</td>
+<td style="text-align:left">Eliminate constants and common sub-expressions. Use available assumptions to determine which rules are applicable. Limit calculations to exact results using integers.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Evaluate</strong></td>
@@ -875,15 +881,16 @@ applying rewriting rules.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
 <th style="text-align:left"></th>
-<th style="text-align:left"><code>canonicalize</code></th>
-<th style="text-align:left"><code>simplify</code></th>
-<th style="text-align:left"><code>evaluate</code></th>
-<th style="text-align:left"><code>N</code></th>
+<th style="text-align:left">Canonicalize</th>
+<th style="text-align:left">Simplify</th>
+<th style="text-align:left">Evaluate</th>
+<th style="text-align:left">N</th>
 </tr>
 </thead>
 <tbody>
@@ -911,7 +918,6 @@ applying rewriting rules.</p>
 </tbody>
 </table>
 </div>
-</div>
 <p>For example, given <code>f</code> is \( 2 + (\sqrt{x^2 \times 4} + 1) \) and <code>x</code> is 3:</p>
 <div class=symbols-table>
 <table>
@@ -925,30 +931,43 @@ applying rewriting rules.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>f.canonical</code></td>
-<td style="text-align:left">\(1 + 2 + \sqrt{4x^2}\)</td>
+<td style="text-align:left">\[1 + 2 + \sqrt{4x^2}\]</td>
 <td style="text-align:left">Arguments sorted, distributed</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f.simplify()</code></td>
-<td style="text-align:left">\(2 + 2x\)</td>
+<td style="text-align:left">\[2 + 2x\]</td>
 <td style="text-align:left">Exact calculations of some integer constants, simplification</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f.evaluate()</code></td>
-<td style="text-align:left">\(8\)</td>
+<td style="text-align:left">\[8\]</td>
 <td style="text-align:left">Evaluation of symbols</td>
 </tr>
 </tbody>
 </table>
 </div>
+<div class='read-more'><a href="/compute-engine/guides/canonical-form/">
+Read more about the <strong>Canonical Form</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/simplify/">
+Read more about <strong>Simplify</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/">
+Read more about <strong>Evaluate</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/numerical-evaluation/">
+Read more about <strong>Numerical Evaluation</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>Other operations can be performed on an expression: comparing it to a pattern,
 replacing part of it, and applying conditional rewrite rules.</p>
 <p class="notice--info">Functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a <code>ComputeEngine</code> instance
 which is denoted by a <code>ce.</code> prefix.<br>Functions that apply to a boxed
 expression, such as <code>expr.simplify()</code> are denoted with a <code>expr.</code> prefix.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine&#x27;</span>;
+<pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine?module&#x27;</span>;
 <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>).<span class="hljs-title function_">simplify</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>).<span class="hljs-title function_">simplify</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;5x^2 + x + 5&quot;</span>
 </code></pre>
 <h2>Format with a Canonical Form</h2>
 <p>The canonical form of an expression is obtained by rewriting an expression
@@ -960,7 +979,7 @@ specific order</li>
 <li>some operations may be substituted with others, for example substraction
 replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2, -3)\)</li>
 </ul>
-<p>The canonical form is somewhat arbitrary, and not necessarily &quot;the simplest&quot; way
+<p>The canonical form is somewhat arbitrary, and not necessarily “the simplest” way
 to represent an expression. But just like the order of the letters of the
 alphabet is arbitrary, the canonical form is nonetheless convenient to sort,
 search and compare expressions efficiently.</p>
@@ -971,16 +990,12 @@ property.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>]).<span class="hljs-property">canonical</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 5, &quot;x&quot;]</span>
 </code></pre>
-<div class='read-more'><a href="/compute-engine/guides/forms/"> Read more about <strong>Canonical
-Forms</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Simplify</h2>
 <p><strong>To obtain a simpler expression of a symbolic expression</strong>, call the
 <code>expr.simplify()</code> function.</p>
 <p>The <code>expr.simplify()</code> function makes use of available assumptions about symbols
 and return an exact result: there are no numerical evaluation done that could
 result in a loss of precision.</p>
-<div class='read-more'><a href="/compute-engine/guides/simplify/"> Read more about
-<strong>Simplify</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Evaluate</h2>
 <p><strong>To apply a sequence of definitions to an expression in order to reduce,
 simplify and calculate its value</strong>, call the <code>expr.evaluate()</code> function.</p>
@@ -1004,28 +1019,35 @@ evaluated or not, it is possible to override this.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;0.33333333333333&quot;</span>
 </code></pre>
-<h2>Comparing</h2>
+<section id='comparing'>
+<h2>Comparing Expressions</h2>
 <p>There are two useful ways to compare symbolic expressions:</p>
 <ul>
 <li>structural equality</li>
 <li>mathematical equality</li>
 </ul>
-<h3>Structural Equality</h3>
-<p>Structural equality (or syntactic) consider the symbolic structure used to
-represent an expression. If a symbol, is it the same symbol, if a function, does
-it have the same head, and are each arguments structurally equal, etc…</p>
-<p>Structural equality is very precise. <code>x + 1</code> and <code>1 + x</code> are structurally
-different, since the order of the arguments matter. \( x^2 \) and \( x \times
-x \) are structurally different since one is a multiplication and the other a
-power operation.</p>
-<p><strong>To check if two expressions are structurally equal, use <code>expr.isSame()</code></strong></p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + 2&#x27;</span>).<span class="hljs-title function_">isSame</span>(<span class="hljs-string">&#x27;4&#x27;</span>));
-<span class="hljs-comment">// ➔ false</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>).<span class="hljs-title function_">isSame</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>));
-<span class="hljs-comment">// ➔ false</span>
-</code></pre>
-<h3>Mathematical Equality</h3>
+<h3>Structural Equality: <code>isSame()</code></h3>
+<p>Structural equality (or syntactic equality) consider the symbolic structure
+used to represent an expression. If a symbol, is it the same symbol, if a
+function, does it have the same head, and are each arguments structurally
+equal, etc…</p>
+<p>The <code>lhs.isSame(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> are structurally
+exactly identical, that is each sub-expression is recursively identical in
+<code>lhs</code> and <code>rhs</code>.</p>
+<ul>
+<li>\(1 + 1 \) and \( 2 \) are not structurally equal, one is a sum of two integers,
+the other is an integer</li>
+<li>\(x + 1 \) and \( 1 + x \) are not structurally equal, the order of the
+arguments is different</li>
+<li>\( (x + 1)^2 \) and \( x^2 + 2x + 1 \) are not structural equal, one is a
+power of a sum, the other a sum of terms.</li>
+</ul>
+<p>For a less strict version of <code>isSame()</code>, you can use the canonical version
+of both expressions, that is <code>lhs.canonical.isSame(rhs.canonical)</code>. In this
+case, because the arguments are ordered in a standard way, the canonical
+form of \( x + 1 \) and  the canonical form of \(1 + x \) would be the same.
+However, \( (x + 1)^2 \) and \( x^2 + 2x + 1 \) would still be considered different.</p>
+<h3>Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
 problem. In fact,
 <a href="https://en.wikipedia.org/wiki/Richardson%27s_theorem">Richardson’s Theorem</a>
@@ -1033,17 +1055,56 @@ proves that it is impossible to determine if two symbolic expressions are
 identical in general.</p>
 <p>However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.</p>
-<p><strong>To check if two expressions are mathematically equal, use <code>expr.isEqual()</code></strong></p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + 2&#x27;</span>).<span class="hljs-title function_">isEqual</span>(<span class="hljs-string">&#x27;4&#x27;</span>));
-<span class="hljs-comment">// ➔ true</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x + 1&#x27;</span>).<span class="hljs-title function_">isEqual</span>(<span class="hljs-string">&#x27;1 + x&#x27;</span>));
-<span class="hljs-comment">// ➔ true</span>
-</code></pre>
+<p>The <code>lhs.isEqual(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> represent the
+same mathematical object. If <code>lhs</code> and <code>rhs</code> are numeric expressions, they
+are evaluated before being compared. They are considered equal if the
+absolute value of the difference between them  is less than <code>ce.tolerance</code>.</p>
 <p>Note that unlike <code>expr.isSame()</code>, <code>expr.isEqual()</code> can return <code>true</code>, <code>false</code> or
 <code>undefined</code>. The latter value indicates that there is not enough information to
 determine if the two expressions are mathematically equal. Adding some
 assumptions may result in a different answer.</p>
+<h3>Other Comparisons</h3>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>lhs === rhs</code></td>
+<td style="text-align:left">If true, same box expression instances</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lhs.isSame(rhs)</code></td>
+<td style="text-align:left">Structural equality</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lhs.isEqual(rhs)</code></td>
+<td style="text-align:left">Mathematical equality</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lhs.match(rhs) !== null</code></td>
+<td style="text-align:left">Pattern match</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>lhs.is(rhs)</code></td>
+<td style="text-align:left">Synonym for <code>isSame()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ce.box(['Equal', lhs, rhs]).evaluate()</code></td>
+<td style="text-align:left">Synonym for <code>isEqual()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ce.box(['Same', lhs, rhs]).evaluate()</code></td>
+<td style="text-align:left">Synonym for <code>isSame()</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <h2>Other Symbolic Manipulation</h2>
 <p>An expression can be created from MathJSON or LaTeX, simplified, or evaluated.
 An expression has many properties, such as <code>isZero</code>, <code>domain</code> or <code>symbol</code>.</p>
@@ -1062,17 +1123,17 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2022">
+        <meta itemprop="datePublished" content="March 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

@@ -230,6 +230,32 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/changelog/" data-url=/compute-engine/reference/calculus/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/reference/calculus/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -270,26 +296,6 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/reference/calculus/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluate
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/reference/calculus/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -310,11 +316,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/reference/calculus/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/reference/calculus/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Canonical Form
                 </a></li>
             
           
@@ -335,6 +341,46 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/reference/calculus/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/reference/calculus/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Numerical Evaluation
                 </a></li>
             
           
@@ -390,51 +436,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/execution-constraints/" data-url=/compute-engine/reference/calculus/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Execution Constraints
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/patterns-and-rules/" data-url=/compute-engine/reference/calculus/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Patterns and Rules
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/reference/calculus/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Canonical Form
                 </a></li>
             
           
@@ -848,27 +854,27 @@ Table of Content</label>
 <h3>Functions</h3>
 <table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Integrate</code></td><td>
-<p><code>[&quot;Integrate&quot;, <em>expression</em>]</code></p>
-<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>symbol</em>]</code></p>
+<p><code>[“Integrate”, <em>expression</em>]</code></p>
+<p><code>[“Integrate”, <em>expression</em>, <em>symbol</em>]</code></p>
 <p>Indefinite integral</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, x], &quot;x&quot;]</code></p>
+<p><code>[“Integrate”, [“Sin”, x], “x”]</code></p>
 <p>$$ \int \sin x ,\mathrm{d}x $$</p>
 <hr>
-<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>predicate</em>]</code></p>
+<p><code>[“Integrate”, <em>expression</em>, <em>predicate</em>]</code></p>
 <p>Definite integral.</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
+<p><code>[“Integrate”, [“Sin”, “x”], [“Element”, x, [“Interval”, 0, +Infinity]]]</code></p>
 <p>$$ \int_0^\infty \sin x ,\mathrm{d}x $$</p>
 <hr>
-<p><code>[&quot;Integrate&quot;, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
+<p><code>[“Integrate”, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
 <p>Multiple integral.</p>
-<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  x [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, y, [&quot;Interval&quot;, 0, 1]]]</code></p>
+<p><code>[“Integrate”, ['“Multiply”,  x [“Sin”, “y”]], [“Element”, x, [“Interval”, 0, 2]], [“Element”, y, [“Interval”, 0, 1]]]</code></p>
 <p>$$ \int_0^1 \int_0^2 x\sin y ,\mathrm{d}x,\mathrm{d}y $$</p>
 </td></tr>
 <tr><td><code>D</code></td><td>
-<p><code>[&quot;D&quot;, <em>f</em>, <em>x</em>]</code></p>
+<p><code>[“D”, <em>f</em>, <em>x</em>]</code></p>
 <p>Evaluate to the partial derivative ( \frac{\partialD f}{\partialD x} ) or ( f^{\prime}(x) )</p>
 <hr>
-<p><code>[&quot;D&quot;, <em>f</em>, [&quot;Tuple&quot;, <em>x</em>, <em>n</em>]]</code></p>
+<p><code>[“D”, <em>f</em>, [“Tuple”, <em>x</em>, <em>n</em>]]</code></p>
 <p>Evaluate to the multiple derivative ( \frac{\partialD^n f}{\partialD x^n} ) (Leibniz notation) or ( f^{(n)}(x) ) (Lagrange notation)</p>
 </td></tr>
 </tbody></table>
@@ -960,17 +966,17 @@ Table of Content</label>
 relative to time t</p>
 <h3>Integral</h3>
 <h2>Indefinite Integral</h2>
-<p><code>\int f dx</code> -&gt; [&quot;Integrate&quot;, f, x,] <code>\int\int f dxdy</code> -&gt; [&quot;Integrate&quot;, f, x, y]</p>
+<p><code>\int f dx</code> -&gt; [“Integrate”, f, x,] <code>\int\int f dxdy</code> -&gt; [“Integrate”, f, x, y]</p>
 <p>Note: <code>[&quot;Integrate&quot;, [&quot;Integrate&quot;, f , x], y]</code> is equivalent to
 <code>[&quot;Integrate&quot;, f , x, y]</code></p>
 <h2>Definite Integral</h2>
-<p><code>\int_{a}^{b} f dx</code> -&gt; [&quot;Integrate&quot;, f, [x, a, b]]
-<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [&quot;Integrate&quot;, f, [x, a, b], [y, c, d]]</p>
-<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [&quot;Integrate&quot;, [&quot;Power&quot;, f, -1], [x, a, b]]</p>
-<p><code>\int_{a}^{b}dx f</code> -&gt; [&quot;Integrate&quot;, f, [x, a, b]]</p>
+<p><code>\int_{a}^{b} f dx</code> -&gt; [“Integrate”, f, [x, a, b]]
+<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, f, [x, a, b], [y, c, d]]</p>
+<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, f, -1], [x, a, b]]</p>
+<p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, f, [x, a, b]]</p>
 <p>If <code>[a, b]</code> are numeric, numeric methods are used to approximate the integral.</p>
 <h2>Domain Integral</h2>
-<p><code>\int_{x\in D}</code> -&gt; [&quot;Integrate&quot;, f, [&quot;In&quot;, x, D]]</p>
+<p><code>\int_{x\in D}</code> -&gt; [“Integrate”, f, [“In”, x, D]]</p>
 <h3>Contour Integral</h3>
 <p><code>\oint f dx</code> -&gt; <code>[&quot;ContourIntegral&quot;, f, x,]</code></p>
 <p><code>\varointclockwise f dx</code> -&gt; <code>[&quot;ClockwiseContourIntegral&quot;, f, x]</code></p>
@@ -992,17 +998,17 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2022">
+        <meta itemprop="datePublished" content="March 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

@@ -729,7 +729,7 @@ document.getElementById('mf').setOptions({
 </section>
 <section id='defining-custom-virtual-keyboards'>
 <h2>Defining Custom Virtual Keyboards</h2>
-<p>A virtual keyboard is made up of one or more &quot;layers&quot;. A keyboard layer is a
+<p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
 set of keys that can be toggled using another key. For example, the <code>roman</code>
 keyboard has a regular layer and a layer for symbols. Most keyboards have a
 single layer.</p>
@@ -749,7 +749,7 @@ Using the <code>tex</code> class is not necessary if using the <code>latex</code
 define the label.</li>
 <li><code>small</code>: display the label in a smaller size</li>
 <li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
-<li><code>action</code>: an &quot;action&quot; keycap (for arrows, return, etc…)</li>
+<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
 <li><code>separator w5</code>: a half-width blank used as a separator. Other widths
 include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
 for the space bar).</li>
@@ -1061,22 +1061,22 @@ following CSS variable:</p>
 <li>`–keycap-modifier-border-bottom, a color</li>
 </ul>
 <p class="notice--info">Set these CSS variables on any selector inherited by the
-<code>math-field</code> tag, for example, <code>body</code>: although CSS styles are &quot;invisible&quot; to custom components, CSS variables
-are &quot;passed through&quot; and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
+<code>math-field</code> tag, for example, <code>body</code>: although CSS styles are “invisible” to custom components, CSS variables
+are “passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 </section>
 <section id='sharing-virtual-keyboards-amongst-multiple-instances'>
 <h2>Sharing Virtual Keyboards Amongst Multiple Instances</h2>
 <p>When there are multiple mathfield elements in a page, they usually each have
 their own virtual keyboard.</p>
 <p>However, in some cases it might be desirable to have the virtual keyboard
-instance &quot;detached&quot; from the mathfield, and potentially shared by multiple
+instance “detached” from the mathfield, and potentially shared by multiple
 mathfield elements.</p>
 <p>That’s the case for example when mathfield elements are displayed in an
 <em>iframe</em>. Since an <em>iframe</em> is essentially a mini embedded document, the
 default virtual keyboard will not display correctly when use in an <em>iframe</em>,
 as it will be attached to the <em>iframe</em> instead of being attached to the
 main document.</p>
-<p>This can be solved by using a &quot;shared&quot; virtual keyboard.</p>
+<p>This can be solved by using a “shared” virtual keyboard.</p>
 <p><strong>To use a shared virtual keyboard</strong>, call the <code>makeSharedVirtualKeyboard()</code>
 function in the context of the main document.</p>
 <pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
@@ -1110,10 +1110,10 @@ Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-24">February 24, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-02-24">February 24, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 

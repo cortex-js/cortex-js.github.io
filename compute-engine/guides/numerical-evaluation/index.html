@@ -230,6 +230,32 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/changelog/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/expressions/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -270,26 +296,6 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluate
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -310,11 +316,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/numerical-evaluation/ class="active">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Canonical Form
                 </a></li>
             
           
@@ -335,6 +341,46 @@ Table of Content</label>
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Evaluation
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/numerical-evaluation/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Numerical Evaluation
                 </a></li>
             
           
@@ -390,51 +436,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/execution-constraints/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Execution Constraints
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
                 <a href="/compute-engine/guides/patterns-and-rules/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Patterns and Rules
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/numerical-evaluation/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Canonical Form
                 </a></li>
             
           
@@ -850,7 +856,7 @@ Table of Content</label>
 <p>If <code>expr.N()</code> cannot provide a numerical evaluation, a symbolic representation
 of the partially evaluated expression is returned.</p>
 <pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 5 + x&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;8  + x&quot;</span>
+<span class="hljs-comment">// ➔ &quot;8 + x&quot;</span>
 </code></pre>
 <p>If the expression is <a href="/compute-engine/guides/expressions#pure/">pure</a>, the value
 of the expression can be obtained with <code>expr.numericValue</code>.</p>
@@ -863,7 +869,7 @@ of the expression can be obtained with <code>expr.numericValue</code>.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;\sqrt{x} + 343&quot;</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ undefined</span>
 </code></pre>
 <div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
@@ -893,12 +899,12 @@ exact results…</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;0.30000000000000004&quot;</span>
 </code></pre>
-<p>While \(0.1\) and \(0.2\) look like &quot;round numbers&quot; in base-10, they can
+<p>While \(0.1\) and \(0.2\) look like “round numbers” in base-10, they can
 only be represented by an approximation in base-2, which introduces cascading
 errors when manipulating them.</p>
 <div class='read-more'><a href="https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">
-Read <strong>&quot;What Every Computer Scientist Should Know About Floating-Point
-Arithmetic&quot;</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+Read <strong>“What Every Computer Scientist Should Know About Floating-Point
+Arithmetic”</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='decimal-numeric-mode'>
 <h3>Decimal Numeric Mode</h3>
@@ -1035,17 +1041,17 @@ functions:</p>
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2022">
+        <meta itemprop="datePublished" content="March 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-23">March 23, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
         
 
-          <p class='page__meta-link'><i class="fas fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File issues at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 
