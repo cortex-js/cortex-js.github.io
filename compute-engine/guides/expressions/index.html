@@ -75,7 +75,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -1129,6 +1129,17 @@ of the input as possible is reflected in the MathJSON result.</p>
 altogether, repace it with the <code>Nothing</code> symbol, then get the canonical form of
 the resulting expression.</p>
 </section>
+<h2>Errors</h2>
+<p>If an expression can only be partially parsed, a function with a <code>Error</code> head
+is returned.</p>
+<p>The <code>Error</code> function has the following arguments:</p>
+<ul>
+<li>A partial result,  i.e. the part that was successfully parsed. When an error
+expression is evaluated, its value is its first argument</li>
+<li>A error code, as a string</li>
+<li>An expression representing where the error occured,  for example a LaTeX
+string representing where the LaTeX parsing failed.</li>
+</ul>
 <h2>Return Value Conventions</h2>
 <p>The Compute Engine API uses the following conventions for the return values of a
 function and the values of an object property:</p>
@@ -1151,14 +1162,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1171,10 +1182,10 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

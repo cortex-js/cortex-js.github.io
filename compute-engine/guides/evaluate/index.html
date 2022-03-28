@@ -75,7 +75,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -851,35 +851,41 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Evaluation of Expressions</h1>
-<h2>Evaluating the Arguments of a Function</h2>
-<div class=symbols-table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Symbol</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>Hold</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>ReleaseHold</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Evaluate</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Simplify</code></td>
-<td style="text-align:left"></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p><strong>To apply a sequence of definitions to an expression in order to reduce,
+simplify and calculate its value</strong>, call the <code>expr.evaluate()</code> function.</p>
+<h2>Evaluation Loop</h2>
+<p>When a function is evaluated, the following steps are followed:</p>
+<ol>
+<li>
+<p>If the expression is not canonical, put it in canonical form</p>
+</li>
+<li>
+<p>Evaluate each argument of the function, left to right.</p>
+<p>An argument can be <strong>held</strong>, in which case it is not evaluated.
+Held arguments can be useful when you need to pass a symbolic expression to
+a function. If it wasn’t held, the result of evaluating the expression would
+be used, not the symbolic expression.</p>
+<p>A function definition can indicate that one or more of its arguments should
+be held.</p>
+<p>Alternatively, using the <code>Hold</code> function  will prevent its argument from
+being evaluated. Conversely, the <code>ReleaseHold</code> function will force
+an evaluation.</p>
+</li>
+<li>
+<p>If any argument is the <code>Nothing</code> symbol, remove it.</p>
+</li>
+<li>
+<p>If the function is associative, flatten its arguments as necessary.
+\[ f(f(a), b, f( c )) \to f(a, b, c) \]</p>
+</li>
+<li>
+<p>Apply the function to the arguments</p>
+</li>
+<li>
+<p>Return the canonical form of the result</p>
+</li>
+</ol>
+<p>The same evaluation loop is used for <code>expr.simplify()</code> and <code>expr.N()</code>.</p>
 
         
       </section>
@@ -889,14 +895,14 @@ Table of Content</label>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -909,10 +915,10 @@ Table of Content</label>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

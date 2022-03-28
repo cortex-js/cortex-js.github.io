@@ -77,7 +77,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -710,7 +710,7 @@ style='margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346'>
 <section>
   <h2>TeX Quality Typesetting</h2>
   <section class="fullwidth">
-    <div class='copy'>
+    <div class="copy">
       <p>TeX is the gold standard for typesetting of mathematical content.</p>
       <p>MathLive provides a JavaScript implementation that faithfully 
         reproduces the output of TeX.</p>
@@ -820,10 +820,10 @@ Read more about <strong>keybindings and inline shortcuts</strong>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

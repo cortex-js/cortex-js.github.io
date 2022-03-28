@@ -75,7 +75,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -928,13 +928,13 @@ organized by topic as follow:</p>
 <thead>
 <tr>
 <th style="text-align:left">Dictionary</th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/arithmetic/">Arithmetic</a></td>
-<td style="text-align:left"><code>Add</code> <code>Multiply</code>…</td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Power</code> <code>Exp</code> <code>Log</code> <code>ExponentialE</code> <code>ImaginaryUnit</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/calculus/">Calculus</a></td>
@@ -946,15 +946,15 @@ organized by topic as follow:</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/core/">Core</a></td>
-<td style="text-align:left"><code>Missing</code> <code>Nothing</code> <code>None</code> <code>All</code> <code>Identity</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+<td style="text-align:left"><code>Missing</code> <code>Nothing</code> <code>None</code> <code>All</code>  <code>Identity</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/logic/">Logic</a></td>
-<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code>…</td>
+<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code> <code>True</code> <code>False</code> <code>Maybe</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/sets/">Sets</a></td>
-<td style="text-align:left"><code>Union</code> <code>Intersection</code>…</td>
+<td style="text-align:left"><code>Union</code> <code>Intersection</code> <code>EmptySet</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
@@ -962,7 +962,7 @@ organized by topic as follow:</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
-<td style="text-align:left"><code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
+<td style="text-align:left"><code>Pi</code> <code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
 </tr>
 </tbody>
 </table>
@@ -976,14 +976,14 @@ organized by topic as follow:</p>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -996,10 +996,10 @@ organized by topic as follow:</p>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

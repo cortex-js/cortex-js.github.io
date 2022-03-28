@@ -46,7 +46,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -850,7 +850,8 @@ Try the <strong>interactive demo</strong> now
 <p>If you are using a modern environment, use the ESM version. The ESM version
 does make use of modern JavaScript features such as optional chaining and more.</p>
 <p>If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. For example, WebPack 4 does not support the optional chaining operator, so use the UMD version in this case,
+modern JavaScript features, use the UMD version. For example, WebPack 4 does
+not support the optional chaining operator, so use the UMD version in this case,
 which will make use of polyfills as necessary.</p>
 <p>A non-minified module, <code>compute-engine.esm.js</code>, is also available, which may
 be useful for debugging.</p>
@@ -860,45 +861,37 @@ be useful for debugging.</p>
     <span class="hljs-string">&#x27;https://unpkg.com/@cortex-js/compute-engine?module&#x27;</span>;
 
   <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;1 + 1&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-  <span class="hljs-comment">// ➔ &quot;2&quot;</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+  <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 </code></pre>
 <h2>Using Vintage JavaScript</h2>
-<pre><code class="language-html">  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/@cortex-js/compute-engine&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
-    <span class="hljs-variable language_">window</span>.<span class="hljs-property">onload</span> = <span class="hljs-function">() =&gt;</span> {
-      <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title class_">ComputeEngine</span>();
-      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;1 + 1&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-      <span class="hljs-comment">// ➔ &quot;2&quot;</span>
-    }
-  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/@cortex-js/compute-engine&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-variable language_">window</span>.<span class="hljs-property">onload</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title class_">ComputeEngine</span>();
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+    <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
+  }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
-<h2>Customization</h2>
-<p>The functions and symbols that can be used in an expression are
-defined in customizable dictionaries.</p>
-<p><strong>To customize the dictionaries that define the math functions and symbols</strong>, create and configure a <code>ComputeEngine</code> instance.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">json</span>);
-</code></pre>
-<p>Each entry in a dictionary define the properties of that function or
-symbols, as well as how to put expression in canonical form, simplify,
-and evaluate expressions using that function.</p>
+<h2>Dictionaries</h2>
+<p>Expressions reference symbols and functions that are defined in dictionaries.</p>
 <p>By default, new instances of the Compute Engine include a robust set of
-mathematical functions, grouped in several dictionaries.</p>
+functions and symbols, grouped in several dictionaries.</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">Dictionary</th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/arithmetic/">Arithmetic</a></td>
-<td style="text-align:left"><code>Add</code> <code>Multiply</code>…</td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Power</code> <code>Exp</code> <code>Log</code> <code>ExponentialE</code> <code>ImaginaryUnit</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/calculus/">Calculus</a></td>
@@ -914,11 +907,11 @@ mathematical functions, grouped in several dictionaries.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/logic/">Logic</a></td>
-<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code>…</td>
+<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code> <code>True</code> <code>False</code> <code>Maybe</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/sets/">Sets</a></td>
-<td style="text-align:left"><code>Union</code> <code>Intersection</code>…</td>
+<td style="text-align:left"><code>Union</code> <code>Intersection</code> <code>EmptySet</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
@@ -926,11 +919,24 @@ mathematical functions, grouped in several dictionaries.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
-<td style="text-align:left"><code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
+<td style="text-align:left"><code>Pi</code> <code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
 </tr>
 </tbody>
 </table>
 </div>
+<p><strong>To customize the dictionaries that define the math functions and symbols</strong>,
+use the constructor of the Compute Engine instance to define the dictionaries
+to use.</p>
+<p>In addition to the built-in dictionaries, you can define your own.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">json</span>);
+</code></pre>
+<p>Each entry in a dictionary define the properties of that function or
+symbols, as well as how to put expression in canonical form, simplify,
+and evaluate expressions using that function.</p>
+<p>There are separate dictionaries that define the LaTeX syntax, that is
+how to parse and serialize LaTeX to MathJSON. You can also customize these
+dictionaries.</p>
 <div class='read-more'><a href="/compute-engine/guides/dictionaries/">
 Read more about <strong>Dictionaries</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -943,14 +949,14 @@ Read more about <strong>Dictionaries</strong>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -963,10 +969,10 @@ Read more about <strong>Dictionaries</strong>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

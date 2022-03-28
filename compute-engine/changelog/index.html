@@ -46,7 +46,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -823,6 +823,12 @@ Table of Content</label>
         
         <h1>Changelog</h1>
 <h2>[Unreleased]</h2>
+<ul>
+<li>Ensure constructible trigonometric values are canonical</li>
+<li>Correct and simplify evaluation loop for <code>simplify()</code>, <code>evaluate()</code> and <code>N()</code>.</li>
+</ul>
+<h2>0.4.4</h2>
+<p><strong>Release Date</strong>: 2022-03-27</p>
 <h3>Improvements</h3>
 <ul>
 <li>Added option to specify custom LaTeX dictionaries in <code>ComputeEngine</code>
@@ -833,7 +839,8 @@ for improved compatibility with outdated toolchains (e.g. Webpack 4) and
 environments. The ESM build (<code>compute-engine.min.esm.js</code>) targets evergreen
 JavaScript (currently ECMAScript 2020).</li>
 </ul>
-<h2>0.4.3 (2022-03-21)</h2>
+<h2>0.4.3</h2>
+<p><strong>Release Date</strong>: 2022-03-21</p>
 <h3>Transition Guide from 0.4.2</h3>
 <p>The API has changed substantially between 0.4.2 and 0.4.3, however adapting code
 to the new API is very straightforward.</p>
@@ -975,7 +982,8 @@ such as <code>Equal</code>:</p>
 </tr>
 </tbody>
 </table>
-<h2>0.3.0 (2021-06-18)</h2>
+<h2>0.3.0</h2>
+<p><strong>Release Date</strong>: 2021-06-18</p>
 <h3>Improvements</h3>
 <ul>
 <li>In LaTeX, parse <code>\operatorname{foo}</code> as the MathJSON symbol <code>&quot;foo&quot;</code>.</li>
@@ -989,14 +997,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-26">March 26, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1009,10 +1017,10 @@ such as <code>Equal</code>:</p>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

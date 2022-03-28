@@ -53,7 +53,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
 
 
 <!-- <script>
@@ -846,8 +846,7 @@ Table of Content</label>
     --editable-border: #ddd;
     --on-editable: #333;
     --primary-light: #86a8cb;
-      --monospace: 'JetBrains Mono', 'IBM Plex Mono', 'Source Code Pro', Menlo,
-          Monaco, 'Courier New', monospace;
+    --monospace: 'IBM Plex Mono', 'Fira Code', monospace;
     --system: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
       'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
       'Helvetica Neue', sans-serif;
@@ -1099,8 +1098,8 @@ Table of Content</label>
   <main id="main" class="container">
 
     <div id="input">
+      <code class="label">expr = </code>
       <div class="row">
-        <code class="label">expr = </code>
         <math-field id="mf" class="mathfield" tabindex="0" virtual-keyboard-mode="manual">
           <!-- 2+3.001 -->
           e^{i\pi}
@@ -1203,8 +1202,8 @@ Table of Content</label>
     </div>
 
     <div class="output-section" id="canonical-form">
+      <code class="label">expr.canonical&nbsp;=&nbsp;</code>
       <div class="row">
-        <code class="label">expr.canonical&nbsp;=&nbsp;</code>
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
@@ -1212,8 +1211,8 @@ Table of Content</label>
     </div>
 
     <div class="output-section" id="domain">
+      <code class="label">expr.domain&nbsp;=&nbsp;</code>
       <div class="row">
-        <code class="label">expr.domain&nbsp;=&nbsp;</code>
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
@@ -1222,8 +1221,8 @@ Table of Content</label>
 
 
     <div class="output-section" id="simplify">
+      <code class="label">expr.simplify()&nbsp;=&nbsp;</code>
       <div class="row">
-        <code class="label">expr.simplify()&nbsp;=&nbsp;</code>
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
@@ -1231,8 +1230,8 @@ Table of Content</label>
     </div>
 
     <div class="output-section" id="evaluate">
+      <code class="label">expr.evaluate()&nbsp;=&nbsp;</code>
       <div class="row">
-        <code class="label">expr.evaluate()&nbsp;=&nbsp;</code>
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
@@ -1240,8 +1239,8 @@ Table of Content</label>
     </div>
 
     <div class="output-section" id="evaluate-numerically">
+      <code class="label">expr.N()&nbsp;=&nbsp;</code>
       <div class="row">
-        <code class="label">expr.N()&nbsp;=&nbsp;</code>
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
@@ -1271,17 +1270,7 @@ Table of Content</label>
     </div>
 
   </main>
-
-  <script src="//unpkg.com/@cortex-js/compute-engine"></script>
-  <script>
-    window.onload = () => {
-      const myCE = new ComputeEngine.ComputeEngine();
-      console.log(myCE.parse("1 + 1").N().latex);
-      // ➔ "2"
-    }
-  </script>
   
-
   <script type="module">
     import { convertLatexToMarkup } from 
       'https://unpkg.com/mathlive?module';
@@ -1531,14 +1520,14 @@ Table of Content</label>
         
 
 
-        <meta itemprop="datePublished" content="March 25, 2022">
+        <meta itemprop="datePublished" content="March 27, 2022">
                 
 
         <p><strong><i class="far fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version </strong> <span id='version'></span></p>
 
 
         
-          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-25">March 25, 2022</time></p>
+          <p class="page__date"><strong><i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated</strong> <time datetime="2022-03-27">March 27, 2022</time></p>
         
 
           <p class='page__meta-link'><i class="far fa-fw fa-bug" aria-hidden="true"></i> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1551,10 +1540,10 @@ Table of Content</label>
   </article>
 </div>
 
-<script type='module'>
-  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
+    renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {
