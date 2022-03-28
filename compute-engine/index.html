@@ -831,7 +831,7 @@ computing and numerical evaluation of mathematical expressions.</p>
 
 
 <span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;(a+b)^2&quot;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Expand&quot;</span>, [expr]).evaluate().<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Expand&quot;</span>, expr]).evaluate().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;a^2 + 2ab + b^2&quot;</span>
 
 </code></pre>
