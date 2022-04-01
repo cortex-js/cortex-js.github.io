@@ -83,7 +83,9 @@
   
 
 
-<div class="masthead">
+
+
+<div class="masthead ">
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
@@ -94,15 +96,25 @@
           Cortex<em>JS</em>
           
         </a>
-        <ul class="visible-links"><li class="masthead__menu-item">
+        <ul class="visible-links">
+              
+              <li class="masthead__menu-item  active ">
                 <a href="/mathlive/" >MathLive</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="/compute-engine/" >Compute Engine</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="/cortex/" >Cortex</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
               </li></ul>
         
@@ -634,6 +646,11 @@ Table of Content</label>
 simplest way to use MathLive in your page is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield in a web page.</p>
 <h2>Creating Mathfield Elements Programmatically</h2>
+<p>In most cases you can simply use a <code>&lt;mathfield&gt;</code> tag:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">mathfield</span>&gt;</span>e^{i\\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">mathfield</span>&gt;</span>
+</code></pre>
+<p>If you need to add a mathfield to your DOM dynamically, you can create
+new Mathfield DOM elements and add them to the DOM.</p>
 <p><strong>To create a Mathfield DOM element</strong>, use <code>new MathfieldElement()</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
 mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
@@ -647,17 +664,24 @@ Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Using MathLive with JavaScript Modules</h2>
 <p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions
-such as <code>renderMathInDocument()</code>. To access those functions, import the
-MathLive module.</p>
+such as <code>renderMathInDocument()</code>.</p>
+<p><strong>To access those functions</strong>, import the MathLive module.</p>
 <p>JavaScript modules offer several benefits (asynchronous, deterministics loading,
 no pollution of the global namespace, etc…). They are the recommended approach
-to use MathLive APIS in your project.</p>
+to use MathLive APIs in your project.</p>
 <p><strong>To use MathLive as a JavaScript module</strong>:</p>
 <ol>
-<li>Include a <code>&lt;script&gt;</code> tag, with a <code>type=&quot;module&quot;</code> attribute</li>
-<li>In the body of this <code>&lt;script&gt;</code> tag, use an <code>import</code> directive pointing to a
-CDN URL for MathLive, such as <code>https://unpkg.com/mathlive/dist/mathlive.min.mjs</code></li>
-<li>Invoke a MathLive API, such as <code>renderMathInDocument()</code>.</li>
+<li>
+<p>Include a <code>&lt;script&gt;</code> tag, with a <code>type=&quot;module&quot;</code> attribute</p>
+</li>
+<li>
+<p>In the body of this <code>&lt;script&gt;</code> tag, use an <code>import</code> directive pointing to a
+CDN URL for MathLive, such as <code>https://unpkg.com/mathlive?module</code>.</p>
+<p>Note the <code>?module</code> suffix which indicate to the CDN we need the ESM version of MathLive.</p>
+</li>
+<li>
+<p>Invoke a MathLive API, such as <code>renderMathInDocument()</code>.</p>
+</li>
 </ol>
 <p>With this setup, MathLive will dynamically insert one or more stylesheets in
 the page, as needed, for example when a mathfield is created. MathLive will
@@ -667,8 +691,7 @@ dynamically download the required fonts from the CDN as well.</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}$$<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-    <span class="hljs-keyword">import</span> { renderMathInDocument } 
-    <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
+    <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>;
 
     <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, 
       <span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">renderMathInDocument</span>()
@@ -687,20 +710,22 @@ configurations.</p>
 can use a <code>&lt;script&gt;</code> tag to load the MathLive library.</p>
 <p>A few things to note:</p>
 <ol>
-<li>Use the <code>.min.js</code> version, not the <code>.min.mjs</code> one. The later one only works
-with modules.</li>
 <li>After loading the script, the global <code>MathLive</code> object will provide access
 to the MathLive API. Unlike with modules, you may run into situations where the
 scripts are loaded out of order therefore the <code>MathLive</code> global may be
 <code>undefined</code> by the time your script is run.</li>
 <li>Just like with modules, the necessary stylesheets and fonts will be loaded
 when required.</li>
+<li>The <code>/dist</code> folder inside MathLive contains the various flavors of libraries.
+The <code>.mjs</code> suffix indicates ESM/module versions. The <code>.min</code> tag
+indicates a “minified” version. The ones without <code>.min</code> are more legible
+and may be useful for debugging.</li>
 </ol>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}$$<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
       <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, 
         <span class="hljs-function">() =&gt;</span> <span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">renderMathInDocument</span>()
@@ -813,7 +838,7 @@ MathLive library is not necessary to render the formula.</p>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
     <span class="hljs-keyword">import</span> {convertLatexToMarkup} 
-    <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive/dist/mathlive.min.mjs&#x27;</span>;
+    <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>;
     <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
       <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = 
         <span class="hljs-title function_">convertLatexToMarkup</span>(<span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>)
@@ -831,14 +856,14 @@ MathLive library is not necessary to render the formula.</p>
         
 
 
-        <meta itemprop="datePublished" content="February 12, 2022">
+        <meta itemprop="datePublished" content="March 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-02-12">February 12, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-29">March 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

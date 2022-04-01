@@ -112,7 +112,9 @@
   
 
 
-<div class="masthead">
+
+
+<div class="masthead ">
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
@@ -123,15 +125,25 @@
           Cortex<em>JS</em>
           
         </a>
-        <ul class="visible-links"><li class="masthead__menu-item">
+        <ul class="visible-links">
+              
+              <li class="masthead__menu-item ">
                 <a href="/mathlive/" >MathLive</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item  active ">
                 <a href="/compute-engine/" >Compute Engine</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="/cortex/" >Cortex</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
               </li></ul>
         
@@ -376,11 +388,11 @@ Table of Content</label>
               
 
               <li>              
-                <a href="/compute-engine/guides/numerical-evaluation/" data-url=/compute-engine/guides/symbolic-computing/ class="">
+                <a href="/compute-engine/guides/numeric-evaluation/" data-url=/compute-engine/guides/symbolic-computing/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Numerical Evaluation
+                  Numeric Evaluation
                 </a></li>
             
           
@@ -851,9 +863,10 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Symbolic Computing</h1>
-<p>The CortexJS Compute Engine essentially perform computation by
-applying rewriting rules to a MathJSON expression.</p>
-<p>There are several categories of transformations, depending on the desired result:</p>
+<p>The CortexJS Compute Engine essentially perform computation by applying
+rewriting rules to a MathJSON expression.</p>
+<p>There are several categories of transformations, depending on the desired
+result:</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -877,7 +890,7 @@ applying rewriting rules to a MathJSON expression.</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>N</strong></td>
-<td style="text-align:left">Calculate a numerical approximation of an expression using floating point numbers.</td>
+<td style="text-align:left">Calculate a numeric approximation of an expression using floating point numbers.</td>
 </tr>
 </tbody>
 </table>
@@ -947,18 +960,14 @@ applying rewriting rules to a MathJSON expression.</p>
 </tbody>
 </table>
 </div>
-<div class='read-more'><a href="/compute-engine/guides/canonical-form/">
-Read more about the <strong>Canonical Form</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/simplify/">
-Read more about <strong>Simplify</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/evaluate/">
-Read more about <strong>Evaluate</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/numerical-evaluation/">
-Read more about <strong>Numerical Evaluation</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
+<strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/simplify/"> Read more about
+<strong>Simplify</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/"> Read more about
+<strong>Evaluate</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/numeric-evaluation/"> Read more about
+<strong>Numerical Evaluation</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>Other operations can be performed on an expression: comparing it to a pattern,
 replacing part of it, and applying conditional rewrite rules.</p>
 <p class="notice--info">Functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a <code>ComputeEngine</code> instance
@@ -977,26 +986,25 @@ expression, such as <code>expr.simplify()</code> are denoted with a <code>expr.<
 <li>mathematical equality</li>
 </ul>
 <h3>Structural Equality: <code>isSame()</code></h3>
-<p>Structural equality (or syntactic equality) consider the symbolic structure
-used to represent an expression. If a symbol, is it the same symbol, if a
-function, does it have the same head, and are each arguments structurally
-equal, etc…</p>
+<p>Structural equality (or syntactic equality) consider the symbolic structure used
+to represent an expression. If a symbol, is it the same symbol, if a function,
+does it have the same head, and are each arguments structurally equal, etc…</p>
 <p>The <code>lhs.isSame(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> are structurally
-exactly identical, that is each sub-expression is recursively identical in
-<code>lhs</code> and <code>rhs</code>.</p>
+exactly identical, that is each sub-expression is recursively identical in <code>lhs</code>
+and <code>rhs</code>.</p>
 <ul>
-<li>\(1 + 1 \) and \( 2 \) are not structurally equal, one is a sum of two integers,
-the other is an integer</li>
+<li>\(1 + 1 \) and \( 2 \) are not structurally equal, one is a sum of two
+integers, the other is an integer</li>
 <li>\(x + 1 \) and \( 1 + x \) are not structurally equal, the order of the
 arguments is different</li>
 <li>\( (x + 1)^2 \) and \( x^2 + 2x + 1 \) are not structural equal, one is a
 power of a sum, the other a sum of terms.</li>
 </ul>
-<p>For a less strict version of <code>isSame()</code>, you can use the canonical version
-of both expressions, that is <code>lhs.canonical.isSame(rhs.canonical)</code>. In this
-case, because the arguments are ordered in a standard way, the canonical
-form of \( x + 1 \) and  the canonical form of \(1 + x \) would be the same.
-However, \( (x + 1)^2 \) and \( x^2 + 2x + 1 \) would still be considered different.</p>
+<p>For a less strict version of <code>isSame()</code>, you can use the canonical version of
+both expressions, that is <code>lhs.canonical.isSame(rhs.canonical)</code>. In this case,
+because the arguments are ordered in a standard way, the canonical form of \(
+x + 1 \) and the canonical form of \(1 + x \) would be the same. However, \(
+(x + 1)^2 \) and \( x^2 + 2x + 1 \) would still be considered different.</p>
 <h3>Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
 problem. In fact,
@@ -1006,9 +1014,9 @@ identical in general.</p>
 <p>However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.</p>
 <p>The <code>lhs.isEqual(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> represent the
-same mathematical object. If <code>lhs</code> and <code>rhs</code> are numeric expressions, they
-are evaluated before being compared. They are considered equal if the
-absolute value of the difference between them  is less than <code>ce.tolerance</code>.</p>
+same mathematical object. If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are
+evaluated before being compared. They are considered equal if the absolute value
+of the difference between them is less than <code>ce.tolerance</code>.</p>
 <p>Note that unlike <code>expr.isSame()</code>, <code>expr.isEqual()</code> can return <code>true</code>, <code>false</code> or
 <code>undefined</code>. The latter value indicates that there is not enough information to
 determine if the two expressions are mathematically equal. Adding some
@@ -1073,14 +1081,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="March 28, 2022">
+        <meta itemprop="datePublished" content="April 01, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-28">March 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-01">April 01, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

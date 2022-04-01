@@ -114,7 +114,9 @@
   
 
 
-<div class="masthead">
+
+
+<div class="masthead ">
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
@@ -125,15 +127,25 @@
           Cortex<em>JS</em>
           
         </a>
-        <ul class="visible-links"><li class="masthead__menu-item">
+        <ul class="visible-links">
+              
+              <li class="masthead__menu-item  active ">
                 <a href="/mathlive/" >MathLive</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="/compute-engine/" >Compute Engine</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="/cortex/" >Cortex</a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
-              </li><li class="masthead__menu-item">
+              </li>
+              
+              <li class="masthead__menu-item ">
                 <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
               </li></ul>
         
@@ -662,7 +674,7 @@ Table of Content</label>
         
         <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
     };
 </script>
 <h1>Interacting with a Mathfield</h1>
@@ -688,7 +700,7 @@ loses focus and the content has been modified.</p>
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.value);
 });</div>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -700,7 +712,7 @@ For example to get the content as a MathJSON expression, use <code>getValue('mat
 <p class="notice--info">The MathJSON format is a lightweight mathematical notation interchange format. <a href="/math-json/">Learn more about MathJSON</a>.</p>
 <p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'math-json'</code> to <code>'spoken-text'</code>.</p>
 <code-playground layout="stack">
-    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -912,14 +924,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="February 12, 2022">
+        <meta itemprop="datePublished" content="March 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-02-12">February 12, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-29">March 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

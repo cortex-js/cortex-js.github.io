@@ -1,0 +1,2159 @@
+<!doctype html>
+<html lang='en' class="no-js">
+<head>
+  
+  <meta charset="utf-8">
+
+
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
+<script>
+  if(/cortexjs\.io/.test(window.location.hostname)) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ECEC8YT7XS');
+  }
+</script>
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/sdk-documentation-layout.css">
+
+
+
+
+
+  <link rel="preconnect" href="https://kit.fontawesome.com">
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
+
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+</head>
+
+<body class="layout--sdk-documentation-layout">
+  <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+  <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+  
+  
+
+
+
+
+<div class="masthead ">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <input id="site-toc" name="site-toc" type="checkbox" />
+        <label for="site-toc"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></label>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links">
+              
+              <li class="masthead__menu-item ">
+                <a href="/mathlive/" >MathLive</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="/compute-engine/" >Compute Engine</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="/cortex/" >Cortex</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+              </li></ul>
+        
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+<div class="initial-content">
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+Table of Content</label>
+
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Introduction
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/demo/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
+                  
+                  Demo
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/getting-started/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                  
+                  Getting Started
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/integration/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Add MathLive to your Project
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/interacting/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Interacting
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/customizing/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Customize
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/commands/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/macros/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Macros
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/shortcuts/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Shortcuts
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/speech/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Speech
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/static/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Static
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/virtual-keyboards/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Virtual Keyboards
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/lifecycle/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Lifecycle
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/commands/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  LaTeX Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/keybindings/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Keyboard Shortcuts
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/mathlive/" data-url=/docs/mathlive/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#sdk"></use></svg>
+                  
+                  SDK Reference
+                </a></li>
+            
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <span class="nav__sub-title"><a href="/cortex/">Cortex</a></span>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <span class="nav__sub-title"><a href="/compute-engine/">Compute Engine</a></span>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/reporting-issues/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
+                  
+                  Reporting Issues
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/contributing-code/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
+                  
+                  Contributing Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/funding/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
+                  
+                  Funding
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/code-of-conduct/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
+                  
+                  Code of Conduct
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/license/" data-url=/docs/mathlive/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
+                  
+                  License
+                </a></li>
+            
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="MathLive">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      <section class="page__content" itemprop="text">
+        
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">MathLive</h1>
+          
+        </header>
+        
+        
+        <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<defs>
+    <symbol id='link' viewBox="0 0 512 512" >
+        <path fill="currentColor" d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z">
+        </path>
+    </symbol>
+    <symbol id='external-link' viewBox="0 0 512 512">
+        <path fill="currentColor" d="M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM474.67,0H316a28,28,0,0,0-28,28V46.71A28,28,0,0,0,316.79,73.9L384,72,135.06,319.09l-.06.06a24,24,0,0,0,0,33.94l23.94,23.85.06.06a24,24,0,0,0,33.91-.09L440,128l-1.88,67.22V196a28,28,0,0,0,28,28H484a28,28,0,0,0,28-28V37.33h0A37.33,37.33,0,0,0,474.67,0Z">
+        </path>
+    </symbol>
+
+    <symbol  id='highlighting-mark-1' viewBox="0 0 1300 369" preserveAspectRatio="none">
+        <path fill="currentColor" d="M587 53h1c1 0 0 0 0 0h-1zM82 114h0c-1 0-1 0 0 0zm-3 0v-1l1 1h-1zm6 1h1-1zm9 0h1v1l-1-1zm1129 176l1-1v1h-1zm-3 0h3a385 385 0 00-3 0zm-4 4h1l1 1h-1l-1-1zm2 5v-1l1 1h-1zm-5-1h2l-1 1-1-1zM167 309a356 356 0 00-38-1 429 429 0 001-1 93 93 0 0122 1h11a132 132 0 0012 0l-8 1zm43 0h2l-1 1-1-1zm-12 1c-2-1 0-2 3-1a143 143 0 008 0l-11 1zm-10 0l-5-1h-5 15l-2 1h-3zm33 0h-7a159 159 0 0121 0h-14zm23 1l-7-1h3a343 343 0 004 1zM111 124l-1-1v1h1zm1100 1c1-1-3-1-5-1-3 0-3 0-1 1h6zM71 139l-1-1c-1 0-2 0-1 1h2zm18 14l-2-1h-2l1 1h3zm10 103h-2c-1 0-1 0 0 0h2zm-5 9l-4-1-1 1h5zm1100 25h-1c-2 0-2 1 0 1l1-1zm-4 0h-2l1 1 1-1zm-3 0h-1c-2 0-2 1 0 1 1 0 2 0 1-1zm3 4h0s1 0 0 0zm-440 19l-1-1-1 1h2zm-136 2a834 834 0 00131-3l-50 1a2403 2403 0 01-105 0c-3 2-4 3 0 2h24zm99 4l-54-1a4602 4602 0 01-147-3h-16a15444 15444 0 01-234-5h4a505 505 0 0032-2l-15-1a806 806 0 01-61-2 734 734 0 00-46-1 591 591 0 01-85-10 297 297 0 0121 1l-6-3-4-1-3-1h1l-7-1-3-1 2-1h2l2-1h28a146 146 0 01-19-2 88 88 0 01-19-3c-3 0-5-1-5-2l1-1 4-2v-1h4c2 0 2-1-3-2l-7-2-2-1-1-1v-1c1-2 3-3 6-3h4c0-1-3-3-6-3l1-1c2 0 2-1 1-3-1-1-1-1 1-1h2l5-1h2-8l-5-1h-1l-2-1 1-1a745 745 0 0011-2c-5 0-7-1-8-2l-1-1c-2-1-2-2-1-2h8c9 0 15-1 14-2l-11-1-9-2h2l-2-2-3-2s-1 0 0 0l-1-1v-1l-1-2c-1-2-1-3 1-3l6-1-1-1c-2 0-2-1 0-1 2-1 2-1 1-2l-2-1-1-1-4-2-5-2-3-1h-2v-1c1-1 0-4-2-7l-2-4-1-2c-1-1-1-3 1-2h5c3 0 6 0 5-1l-2-1c-1 0-1 0 0 0 2-1 1-1-4-2-3-1-6-3-7-6l-1-1h9v-1l2-1h2c2 0 0-2-4-3h-2l-2-1-1-1c0-2 1-2 4-1l4 2 4-1-1-1-2-1-3-2c-6-1-6-1-2-1l5 1h7l3 1v1a129 129 0 0018 3l13 1a96 96 0 00-22-4l-5-1-5-2-6-1-1-1-5-1-2-1-3-2-2-2h-1c-1-1 2-3 4-2l20 2c3 0 1-1-7-3-6-2-10-2-13-2v-4h2l10 1-2-1h-3-2l-2-1-8-2-1-1-1-2h-1l-1-1c-2-1-1-2 4-1l7-1c1-1 5-2 9-1h9l-2-1h-2l-5-1c-5 0-9-2-9-3s-1-2-3-2l-3-2-3-2-1-1 4-1h6l1-1-14-3c-5 0-4-1 2-1l5-1c1 0 1-4-1-5l-2-1h16c1-1-1-1-4-1-4 0-7-1-7-2l-2-2c-2-1-2-1 0-1h4v-1c-1-1 0-1 1-1l4 1h15l12-1h15c4-1 5-2 2-2l-14-1c-1-1 5-1 16-1a257 257 0 0034-1 249 249 0 01-17-1c-9 0-13-1-13-2h-2l-2-2v-1c-1-1-1-1 1-1l3-1 1-1c4 0 5-2 0-2l-1-1c1-1-1-1-5-2l-4-2-3-2c-1-1 3-1 5-2l4-1 5-1c3 1 3 0 5-1l2-1 1-1-9-2c-3 0-4 0-4-2l-2-1c-2 0-3-1-3-2v-3l1-2c-1-2 0-2 2-3l6-2 1-1 1-1c0-1-1-2-3-2l-7-2 1-1c0-2 1-3 3-2v-1-1l1-2s0-1 0 0l-1-1h4l17-1-3-1c-4 0-4 0-3-1h2l19-1 29-2a343 343 0 0031-2h21a767 767 0 0188 1 7076 7076 0 00191 1 2196 2196 0 00173 1 1358 1358 0 01140 1l4-1 8-1a846 846 0 0132 1 4282 4282 0 00182 2 652 652 0 0083 2 4901 4901 0 0049 0h13l-1 1h-3l1 1h2l4 1c3 0 4 0 2 1l-1 1-2 2-1 1h3v1l-10 2 3 1c3 0 4 1 4 4 1 3 0 6-3 7-2 1-2 1-1 2l2 1h2c1 1 0 1-1 1l-1 1 3 1c5 0 4 2 0 2-8 1-7 3 1 3 6-1 7 0 1 1l-8 1-3 1h4l3 1v3c-2 0-2 0-2 2l1 2 2 2 4 1h3c1 1 1 1-1 2l-4 2c-2 0-2 1-1 1 1 1 0 2-1 3-2 0-1 1 2 1l2 1-3 1c-3 0-2 1 1 1a124 124 0 0126 5h7l-8 1c-6-1-7-1-6 1l-1 1c-2-1-3 0-2 1h7l6 1h-1c-4 0-5 0-4 1l9 1 7-1 1 1-2 1-3 1h-4l-1 1-9 1c0 1 7 2 15 2h7l1 3-1 3-1 1-1 1v1l-1 1-2 1h-11l8 1 1 1v3l6 1 5 1h2l1 1c0 1-3 2-5 1l-4 1c-2 2-2 4 1 4 2 1 2 1-2 1s-4 0-5 2v2l2 4c0 4 0 4-2 5l-3 1a176 176 0 00-15 1h5l3 1c5 0 9 0 9 2l2 1c2 0 2 1 2 2l4 1h4l-3 4-2 1h-1l-3 2 1 2c2 2 2 2-3 2l-4 1 2 1 4 1 2 1c1 0 1 0 0 0v3c0 2 3 6 4 6l1 1v3l-1 2c1 1 1 1-1 1s-3 0-3 2l1 2 3 4h-3c-3 0-3 0-3 2v1l-1 1c-1 1-1 1 2 1 2 0 2 0 1 1l-1 2-2 1-3 1-3 1h-7l4 1 4 2 3 1v1 2l-2 1-13 3-10 1-10 1v2h11c10 0 11 1 18 3l7 1c4 0 6 1 3 1a20 20 0 00-4 0l-1 3-1 2h-12c-5 0-6 1-5 2l4 2h8a333 333 0 00-5 2c-1 2 2 2 7 2 4 0 4 1 4 3s-1 2-7 2l-4 1c0 1 2 2 3 1 2 0 2 0 0 1v2h4l3 1v2l-1 4v2l-1 2-4 1h-3l-13 2h-12l9 1h6l-23 1 2 2 12 1h3c-7 0-13 1-13 3l6 1h12l-7 1a117 117 0 00-16 2c-4 0-5 0-4 2l4 3 3 1-3 3c-2 1-2 1-1 3h-1l-2 1 1 1c2 0 1 1-1 2h-13a615 615 0 00-62-3 249 249 0 01-24 0l-19 1-17 1h-39a19797 19797 0 00-180-2h-3l-2 1-3-1c0-1 0-1 0 0h-3-6-9a77 77 0 00-13-1 270 270 0 00-32-1c-1 1-9 3-11 2l-1 1a48 48 0 01-18 2 174 174 0 01-15 1h-2z"/>
+    </symbol>
+
+    <symbol id='highlighting-mark-2' viewBox="0 0 1100 737" preserveAspectRatio="none">
+        <path fill="currentColor" d="M244 485a1384 1384 0 00-72-5 95 95 0 01-20-3l-6-1h-6l-1-2c-1-3-1-3-6-4a61 61 0 01-12-3c-2-1-2-2 1-4l8-4 6-4-6-2-6-1-8-1-9-1c-7-1-10-1-11-3l-3-3-3-2c-2 1-5-1-6-2-1-2 0-4 1-4l1-1h4l3-1h2l1-1h1l1 1 2-1h1c0-1-1-2-4-1l-4-1a91 91 0 00-7-1c-2 0-2-1-1-2h1l3-1h1 9l2-1h3 1l6-1h5c3 0 2-2-1-4l-3-3h3l3-1c2 1 2 0 3-1l1-4v-1l1-1 1-3h-1l-2-1c1 0 1 0 0 0l-3-1-6-2c-5-3-8-3-20-4l-11-2-13-2-6-1-5-2-7-2 3-2h14l14-1 8 1 8 1h7l3 1 2-1a249 249 0 0035-1l-1-1h-1l-1-1h-1c0 1 0 1 0 0h-1l-2-1v-1l3-2-3-3c0 1 0 0 0 0l-1-1h-1c1-1-1-2-1-1h-1s-2-2-3-1v-1h-1c0 2-1 1-1 0s0-1 0 0l-1 2h-1v-1c1-1 0-1-2-1h-3c1 0 0 0 0 0l-1-1h-1s-1 0 0 0v-2c1-1 2-2 4-1l1 1c-2 0-1 1 0 1s2 0 1-1l1-1-1-1 1-1h1c1 0 1 0 0 0l-1-1 1-2c1 0 0-3-1-2v-1l-1-1c-1 0-1 0 0 0v-1l1-1 1-1c-1 0 0 0 0 0v-1h-1c0 1 0 1 0 0l1-3 1-2-1-1c-1-1-1-1 1-1h1v-1l2-1 1-1v-1c1 0 0 0 0 0h-1l-2-1h-1l-1-1h-1v-1l-1-1c1 0 1 0 0 0h-1l1-1 1-1c0-1 0-2-1-1l-1-1v-2l-2-1 2-1 2 1h3l3-1h4l9-1h8v-4l-1-2-1-1v-1l-1-1c-2 0-3-1-3-2h-1l-1-1-1-1v-2 1l2 1h1v-1l-2-1 1-1v-1l1-1 1-1-1-1v1h-1-1v2c1 0 0 0 0 0l-1-2 1-1 1-2h2l1-1v2l2 1c2 0 3-1 1-1s-2 0 0-1h1l-1-1c-2 0-2-1-1-1h1v1l1-1 1-1-1-1h-1-1v-1l2-1v-2h1l1-1h1v1 1l1-3c-1-1 0-2 3-2h2l3-1h6l2-1c1 0 1-1 0 0l-1-2-2-2-1-1-1-1h1l1 1c1 0 1 0 0 0v-2h1c0 1 0 1 0 0 0-2-1-3-2-3h1l1-1h-1c0-1 0-2 2-3v-2h2v-3-3l-1-1h-1c1-1 2-2 1-3v1h-1v-1h3s0-1 0 0l1 1v-1-1h2l2-1h2l1-1 5-1 3-1 1-1h14l3-1v-2l-10-1-6-1-2-1h-2l-2-1 1-1v-1h11a169 169 0 0113-1l4-1 2-2c1-2 3-3 3-2h20l12 1a1963 1963 0 0170 4h14a181 181 0 0032-1l10-1a720 720 0 0034-1 692 692 0 0155 0h5l6 1 1-1a558 558 0 0061 1 231 231 0 0119 1h5l5-1h6l2 1h6l14-1a376 376 0 0026 0l11-1h14a369 369 0 0064-3l12 1 19 1a300 300 0 0136 2 1121 1121 0 0177 3 773 773 0 0081 5l7 1 9 1 4 1a103 103 0 0118 3l5 1 1 1h1l14 2 2 2 8 4 11 1 1 1h1l1 1 5 3 7 2c4 0 5 1 4 3l-4 2-2 1h-2l-7 2 8 3a1050 1050 0 0020 2c1 2-7 7-13 10l-4 2c-1 3 0 4 3 6l2 2 1 1c1 2 1 3-1 4l-4 3c-2 2-3 2-5 2l-4 2v1h-1l-1 2s0 1 0 0l2 2c-1 1 0 1 0 0l-1 1-4 1-3 1h-1-1c-1 1 0 3 3 5l3 2 3 2c4 2 5 5 1 5-2 1-3 3-3 5v1c-1 0-2 1-2 3l-4 2-3 1-3 3-2 1-4 2c-3 0-4 1-4 2 0 2 2 4 3 4l4 4-6 2h-6l-13 2-1 2v3l-1 8-3 1-3 1-1 1v1h-1-4c-2 1-1 3 2 3l5 2h-9c-9 0-10 1-11 5l-2 4-2 5-2 1-2 1-1 1h-1l-2 2c-4 2-4 4-2 5s2 1 1 3 1 3 7 4c5 2 7 3 5 4-1 1-8 0-20-2-5-1-7-1-8 1s-2 3-6 3c-3 0-6 1-6 3l5 2c2 0 5 1 4 2l-2 1h-1l-4 2c0 2-3 3-4 3l-7 1 4 3c0-1 0 0 0 0v3c1 1 0 2-4 2l-6 1a247 247 0 01-20 3l-6 1-8 1h-22a1139 1139 0 01-73-4 250 250 0 01-27 1 460 460 0 01-62 2 498 498 0 00-62 1 363 363 0 00-59 6 220 220 0 00-24 2 183 183 0 01-27 2h-11a244 244 0 01-27 1 309 309 0 01-39 0 202 202 0 01-25 1 710 710 0 01-52 1 177 177 0 00-16 1 98 98 0 00-15 0l-7 1a2477 2477 0 01-73-2zm-108-68l-1-1-4-1h-4a1478 1478 0 019 2zm13-29h-1v1l1-1zm-27-16v-1h-1l1 1zm7-17h-1l1 1v-1zm4-7v1s0 1 0 0v-1zm-4-3h-1l1 1v-1zm22-24h-1 1zm0-2l-2-3h1v-1l-2 1v1l-1 1 1 1h1l1 1 1-1zm-3-1v-1l1 1h-1zm9-11c0-1 0-1 0 0h-1c1 2 1 1 1 0zm-2 0c0-1 0-2-1-1v1h1zm17-18v-1h-1l1 1zM83 428v-1l1 1-1 1v-1zm22-43h1-1zm8 0c-1 0-1 0 0 0l2-1h1v1h-1-2zm-3-1h1v1l-1-1zm14-8l1 1h-1v-1zm1-9c1-1 1-1 0 0v1-1zm3-19l1-1c2 0 2 0 1 1h-2zm12-36h1v1l-1-1zm2-2h1l-1 1v-1zm9-6l1-1v1h-1zm20-29l-1-1 1 1c1 0 1 0 0 0z"/>
+    </symbol>
+
+    <symbol id='highlighting-mark-3' viewBox="0 0 1100 767" preserveAspectRatio="none">
+        <path fill="currentColor" d="M311 516l-1-1-1-2-2-2s-1 0 0 0v-3-1l-1-1h1l1-1v-2-1c-1-1-2 0-2 1h-1v-1l-2-1h2l2-2h1l2-1 4-3h4l7-2h3l2-1 4-2 5-1 1-1v-3l3-1h7l5-1 7-2a383 383 0 00-42 0 48 48 0 00-4-2h-3-16a200 200 0 00-63 9l-6 1-4 1-2 1c1 1 0 1-10 2h-1l-1 1-2 2-8 1h-7l-3 1h-4l-2-1c-3-1-17 0-18 2v2h-1-1 5l4-1a239 239 0 004 0l3 1h1l-1 1-8 1h-6-4l-1-1-5 1a1080 1080 0 00-25-4l-2-2 3-1 6-1h1-2c-2-2-5-2-9-3l-9-1a65 65 0 00-22 0H87l-7 1-15 1c-4 1-6 0-8-1-1 0-1-1 1-2l7-2 14-2 2-2h-1l-1-1h1v-1-1l2-2 2-1h-5a141 141 0 00-12-1l1-1 1-1h1l6-2 6-1 4-1 9-2h-2a225 225 0 00-2-2l3-2 2-1 2-1-2-1-5-1H79l-7 1 1-1 1-2h-2-1l1-1c2-1 2-1-2-2-3-1-3-2-1-3l19-2h8l-2-2-2-1c-2 0-2-1-1-2 0-2 5-4 7-4l1-1h-1l-2-3c0-1-9 0-9 2l-16 2-2-1h2l10-2c9-2 11-3 5-3l-4-1h-6a162 162 0 00-15 2c0-1 2-3 4-3a490 490 0 01-7 0h-2l2-2 2-3h-3c-5-1-7-2-7-4l7-2 7-1 8-1 7-1 15-3-2-1-3-1 11-4 5-2 4-1c4-1 4-2-1-4l-1-1 4-2 1-1h-5l-3-1H94c-5 1-8 1-8-1l5-4 5-3c-1-1 0-1 4-3 5-1 9-4 9-6-1-1 1-1 10-3l9-1 4-2 14-3 2-1h3c1-1 1-1-1-1l-8-1-2-1c-1 1-1 0 0 0l2-1h4l2 1 1-1 4 1 4 1h2l-1-1-1-1-1-1 11-2 9-1-1-1-1-1 1-1c2 0 2-1 1-1h-6c-9 1-12 0-14-1h-2v-2c0-1-1-2-6-2-4 0-4 0-3-1l14-2 5-1c1-2 2-2 3-1l3 1 22-2c2 0 2-1 1-2v-3-1c-1-2 1-2 9-2h9l12-2 4-1h2l-2-1h-9a250 250 0 01-24 1 180 180 0 01-21 2l-2 1-1 1h-2c-1-1-1-1 0 0 1 0 1 0 0 0l-1 1h-2l-1-1-1 1h-1l-2-1-2 1h-2l-5-2c0-1 0-1 0 0l-1-1 2-4h1v-1l5-1h3c0 1 0 1 0 0l-2 1v1c1-1 1-1 0 0l1 2c1 0 2 0 1-1h7l1-2c-1 0 0 0 0 0l1-1 2-1 2-1h1v-1h4c0 1 0 1 0 0v-1l-2-2c1-1 2-2 5-2l4-2h2l7-1v-1h-19l-1-1-1-1-1-2v-1h2c-2-1-1-2 1-2l2 1h4l3-1c3 0 3-1 1-1l-2-1 1-1 1-1c1-1 3-2 4-1l1-1h2l4-1 2-1-10-1h-10-1a77 77 0 01-19 0l-1 1h-2-2l1-1 1-1h-2 9l4-1 4 1v-1l6-1 8-1 5-1 5-1h-5a845 845 0 01-37 3h-4c1 1 0 1-2 1l-7 1-14 1v-1l1-1 4-1 3-1a511 511 0 01106-13 141 141 0 0022-3h8c7-1 9-2 10-1s2 0 7-1a17080 17080 0 0194-16h9l1 2h2l1 1c-1 1 0 2 1 1l-1 2-3 1-2 2c1 1 0 1 36-4a169 169 0 0121-1 376 376 0 0136-3 170 170 0 0120 0l16 1 13-1 16-1h55a247 247 0 0025-1l5-1a1007 1007 0 0065 5 892 892 0 0094 4 223 223 0 0132 2l16 1a280 280 0 0141 3 42 42 0 018 2h4l6 1 7 1 1 1v-1h3l1 1c0 1 0 2-1 0-1-1-2-1-2 1h-5l-16-1a733 733 0 00-72-2h5a208 208 0 0029 3 189 189 0 0023 2 524 524 0 00-6 0 69 69 0 01-22-1h-1l-2 1h-20c3 1-1 2-8 1h-13a162 162 0 00-28-2 218 218 0 00-24-2 616 616 0 00-33 0l-9 1h-2l4 1h6l9 1a444 444 0 0042 3 1141 1141 0 01130 12 705 705 0 0144 5 559 559 0 00-60 2 505 505 0 0162 9h-4c-7 0-5 1 2 2a251 251 0 0030 3l7 1 5 1 4 1 5 1 5 1 6 1c8 0 13 1 13 2h-5v1h2c2 1 2 1 0 2-1 1 1 2 7 3 5 1 8 2 5 2l5 1 4 1 4 1c6 1 6 2 0 2l-4 1-6 1c-7-1-8-1-9 1l-1 1 4 1 4 1 4 1c3 0 3 1-2 1h-4l-6 1-4 1h1l4 1 7 1h5l1 1h2l-3 1-9 2 7 1 5 2h8l-3 3v-1l-2 1h-6c-7 0-9 0-8 2 2 2 11 5 17 5 4 0 5 1 5 2l-4 1-6-1a105 105 0 00-24 0l2 2a604 604 0 0129 4c7 1 10 1 9 3h-1l-1 1h-1l-1 1c-2 0-3 1-2 3v2l2 1 1 1v1h-14l-1 2c-1 0 0 3 2 4v1c-1 0-1 0 0 0 1 1-1 1-6 1-3 0-5 1-5 2l-1 1h-3v1l2 1 5 2 6 2 8 1h1l1 1c0 1-3 3-5 3h-1l-9 1a105 105 0 00-22 0 214 214 0 0114 4c-2 1-2 2 2 4l4 2 1 1-1 2h-1l-1 1-4 2h-2-5l-6 1-9 1h-3-1c-2 0-3 1-3 2h1l1 1 5 2c7 1 12 3 11 4l-1 1c0-1-1-1 0 0l-2 2c-1 1-1 2-2 1h-1l-2 1-5 1-4 1 1 1 2 2 2 1c2 0 2 0 1 2v2h-1-1l-2 1-1 1h1c2 0 3 2 2 2h-1l-2 1-4 2-3 1c-1 1-1 1-7-1-4-1-6-1-7 1h-15l4 1c6 1 6 2 5 2-1 1 6 4 13 4l4 1-1 2v4l-12-2c-4-1-13-2-14-1v1l9 3 3 2h-4l-4 1c-1 0-1 0 0 0l-9-1-10-2-1 1v1c-1 1 6 2 18 4l5 1 4 1c2 0 6 1 5 2h-7l-7 1 3 1c2 1 2 1 1 2h-8 2c3 1 2 2-1 2l-6 1h-3a252 252 0 00-40 0 214 214 0 00-42-4 330 330 0 00-31-4 430 430 0 00-54-2 396 396 0 01-36-1h-14-1-4l-3-1h-3c-3-1-6-2-8-1-1 0-4 0-3-1h-6l-11-2-1 1-1 1-2-1h-1l-1-1-1 1c1 0 1 0 0 0h-6l-34-1a494 494 0 01-29 0l-25 1c-4 0-9 3-6 3l-1 1-2 2h-13a1630 1630 0 01-52 2c-1 1-6 2-7 1l-5 1a13 13 0 01-5 0h-6l-8 1h-3l-2 1h-2l-4-1a213 213 0 01-25 2h-3v1l3 1h2v1h-5l-1 1a575 575 0 00-38 2l-24 2c-14 1-25 3-27 5l-3 2a252 252 0 00-38 3v-1zm0-5h-1l-1 1h1l1-1zm93-8c2-1 2-1-3-1l-13 2 16-1zm-257-7h-1l1 1v-1zm40-2h-1-1l1 1 1-1zm-26-3h-2c-1 1-1 1 1 1l1-1zm313 0c2 0 2 0 1-1l-29 2a247 247 0 0028-1zm19-1l-3-1-3 1h6zm-353 0c2 0 2 0 0-1l-2 1h2zm361-1h-5l2 1 3-1zm432-6l-3-1c-2 0-2 0-1 1h4zm-851-8h-1 1zm6-1l1-1-3 1h2zm8 0l1-1-3-1-2 1 2 1h2zm897-10h-1c-1 0-1 0 0 0h1zm-884-22h-1 1c1 0 1 0 0 0zm-4-2h-4c-2 1-1 2 1 1l3-1zm10 1h-2 2zm-4-1h-3 3zm920-64v-1l-1 1h1zm4-11h-1l1 1v-1zm-8-6h-1 1zm-25-5l-5-1-6-1h-1l5 1a96 96 0 017 1zm-806-5c1 0 1 0 0 0h-2 2zm802-3l-6-1h-7l6 1a155 155 0 017 0zm-833-7h-1l1 1v-1zm74-1h-1l1 1v-1zm-85-1h-2 2zm2 0l-1-1v1h1zm31-4l5-1a45 45 0 008-2l6-1c3-2 3-3 0-3h-2c0-1 3-2 7-1l8-2-6-1-6 1-5 2c-1 0-1 0 0 0l1 1c0-1 0 0 0 0l-5 1-2 1-2 1c0-1 0-1 0 0h-1l-3 1h-3c0-1 0-1 0 0l-6 2-1 1h7zm23-20h-1c-1 1-1 1 0 0h1zm667-2l-2-1h-1l3 1zm-666-4h2-5 3zm661 0h-1l1 1v-1zm3 0h-1v1l1-1zm-654-1h-1l1 1v-1zm-62-1h-1v1l1-1zm14-1l-1 1h1v-1zm6 0v-1l-1 1v1l1-1zm723-19h-1v1l1-1zm-509-11v-1l-1 1h1zM131 511v-1c1 0 0 0 0 0-2-1 0-2 2-2s2 0 1 1v1l2-1h7l1 3-1-1c1-1 0-1 0 0l-6 1-6-1zm-7-1v-2l1 2h-1zm11-5l1-1h2c2 0 2 0 1 1-1 2-3 2-4 0zm335-4h0zm6 0l1-1v1h-1zm-296-2l1-1h1v1h-2zm623-5h2l-1 1-1-1zm-9 0h1-1zm-548-1c0-1 1-2 3-1l1 1h-4zm478-1v-1l1 1h-1zm-8-1v-1l1 1h-1zm2 0v-1l1 1h-1zm265-3v-1l1 1h-1zm-686-3l1-1 1 1h-2zm5-1l2-1h5v1l-4 1-3-1zm-225-1l1-1v1h-1zm5-15h1c0-1 0 0 0 0h-1zm4 0h0zm962-72v-1l2 1v1l-2-1zm-907-41h3l-2 1-1-1zm24-8l-2-1 4-1h9l3 1h-4l-5 1-3 1-2-1zm-7 0h0s-1 0 0 0zm-11-8h1v1l-1-1zm16-4l-1-2c-1-1-1-1 2-2l4-1-1 1v1h2l1 1h-5v1c1 0 1 0 0 0l-1 1h-1s-1 0 0 0zm7-5v-1l1 1h-1zm-20-23h2v1l-2-1zm12-2l1-1-1 1c-1 0-1 0 0 0zm780-9l5-1v1h-5zm-3-1h0zm-14-1l-19-1-8-1h-11l3-2v1h3l1-1v1l2-1a203 203 0 0010 1l5 1h1v-1l6 1a86 86 0 0112 1l-3 2-2-1zm-23-2l-1-1-1 1h2zm30-2h-1-1c0-2 1-2 2-1v1zm-12-2l-1-1h-3c-3 1-6 0-5-1h12l-1 3-2-1zm6 0c-1 0-1 0 0 0h0zm-646-4h1c1 0 0 0 0 0h-1zm111-16h1v1l-1-1zm13 1c-1-1 0-2 1-2h1a403 403 0 011-3h1a605 605 0 0115-2l2 1c1-1 1-2-1-2-1 0-1 0 0 0l3-1h6a365 365 0 0171-2l-4 1-2 1 4 1c4 0 6 0 5 1h-7-17l-4 1-2-1h-6l-5-1h-1l-3 1h-2l-4 1h-7-2l-1 1-1-1-5 1-12 1s-1 0 0 0l-2 1h-1-3l-2 1-3-1-1-1-1 1v1h-1-2l-8 2zm-8-3h1v1l-1-1zm3-1h0c-1 1-1 0 0 0zm190-1l-2-1h3v1h-1zm-12-2h2l-2 1v-1zm4 0c-1 0 0 0 0 0l1 1-1-1zm-71-1c-1-1-1-1 6-1a102 102 0 0010 0l2 1c2-1 2 0 0 0h-2l-1 1h-4-1c-2 1-3 0-2-1h-1l-4 1-3-1zm44 1v-1l1 1h-1zm-22-1v-1l1 1h-1zm215 0c1-1-1-1-2-1h-3-4l-6-1h-1 1l1-1 1-1v1h5l1-1 1 1 1 1 2-1 4 1h4l2 1c1 0 1 0 0 0l-7 1zm9 0l1-1h2c2 0 3 1 1 1h-4zm-39-2l-2-1-3 1h-4a63 63 0 00-14-2h-7l-7 1-1-1v1h-11a1066 1066 0 00-67-2 4427 4427 0 00-55-2v-1l2-1 1-1h2s1 0 0 0v-1l1 1v2l2-2h3l20-1a1147 1147 0 01140 7l2-1c-1 0 0 0 0 0l4 1h4l2 1c2 0 2 0 0 0v1h-12zm-161-5l-1-1 1 2v-1zm-32 2v-1l-1-1 1-1 1 1c0 1 1 2 2 0l-1-1 3-1h3l2-1 1 1h2l-1 1v1l1-2 2-1 1 2v2h1l-3 1c-3 0-4 0-4-2-1-1-3-2-3 0h1l-1 1h-1c1 1-1 1-3 1h-3c-1 1-1 1 0 0zm15-2v-1l-1 1h1zm-22 2v-1l1-1v-1 3h-1zm3-2h1l-1 1v-1zm2-1l2-1 2 1h-1-3zm-7 0h0zm29-1c-1 0-1 0 0 0h0zm-3 0l1-1v1h-1z"/>
+    </symbol>
+
+</defs>
+</svg>
+<script>search = (function () {
+  // prettier-ignore
+  const STOP_WORDS = [
+        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your",
+        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
+        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
+        "theirs", "themselves", "what", "which", "who", "whom", "this", "that", 
+        "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", 
+        "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", 
+        "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", 
+        "at", "by", "for", "with", "about", "against", "between", "into", 
+        "through", "during", "before", "after", "above", "below", "to", "from", 
+        "up", "down", "in", "out", "on", "off", "over", "under", "again", 
+        "further", "then", "once", "here", "there", "when", "where", "why", 
+        "how", "all", "any", "both", "each", "few", "more", "most", "other", 
+        "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", 
+        "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"   
+    ];
+
+  function debounce(fn, wait) {
+    let timeout;
+    return () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        timeout = null;
+        fn();
+      }, wait);
+    };
+  }
+
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  }
+
+  function termsToRegExp(terms) {
+    return new RegExp(
+      '(' +
+        terms
+          .map((x) => {
+            if (/^".*"$/.test(x)) {
+              return '\\b' + escapeRegExp(x).substring(1, x.length - 1) + '\\b';
+            }
+            return escapeRegExp(x);
+          })
+          .join('|') +
+        ')',
+      'gi'
+    );
+  }
+
+  function findInElementRecursive(el, termsRE) {
+    if (el.nodeType === 1) {
+      // Element
+      const tag = el.nodeName.toLowerCase();
+      if (
+        !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
+          tag
+        ) &&
+        !el.classList.contains('sr-only')
+      ) {
+        let result = false;
+        for (const child of el.childNodes) {
+          result = findInElementRecursive(child, termsRE);
+          if (result) break;
+        }
+
+        return result;
+      }
+    } else if (el.nodeType === 3) {
+      // Text
+      return termsRE.test(el.textContent);
+    }
+    return false;
+  }
+
+  function findInElement(el, terms) {
+    if (!terms || terms.length === 0) {
+      return false;
+    }
+    return findInElementRecursive(el, termsToRegExp(terms));
+  }
+
+  // Recursively search el for terms.
+  // Return a tuple
+  // [
+  //      count of terms found,
+  //      markup with <mark> inserted for matching terms
+  // ]
+  function markInElementRecursive(el, termsRE) {
+    if (el.nodeType === 1) {
+      // Element
+      const tag = el.nodeName.toLowerCase();
+      if (
+        !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
+          tag
+        ) &&
+        !el.classList.contains('sr-only')
+      ) {
+        let score = 0;
+        let result = '';
+        for (const child of el.childNodes) {
+          const [childScore, childContent] = markInElementRecursive(
+            child,
+            termsRE
+          );
+          score += childScore;
+          result += childContent;
+        }
+
+        let outerHtml = '<' + tag + ' ';
+        for (const attr of el.attributes) {
+          if (attr.localName !== 'id') {
+            outerHtml += attr.localName + '="' + attr.value + '"  ';
+          }
+        }
+        outerHtml += '>' + result + '</' + tag + '>';
+
+        return [score, outerHtml];
+      }
+    } else if (el.nodeType === 3) {
+      // Text
+      let matchCount = 0;
+      let result = el.textContent;
+      // termsRE.forEach((term) => {
+      result = result.replace(termsRE, (match) => {
+        matchCount += 1;
+        return '<mark>' + match + '</mark>';
+      });
+      // });
+      result = result.replace(/<mark>|<\/mark>|\<|\>|&/gi, (match) => {
+        if (match === '<') return '&lt;';
+        if (match === '>') return '&gt;';
+        if (match === '&') return '&amp;';
+        return match;
+      });
+
+      return [matchCount, result];
+    }
+    return [0, el.outerHTML];
+  }
+
+  function markInElement(el, terms) {
+    const [count, result] = markInElementRecursive(el, termsToRegExp(terms));
+    if (count > 0) return result;
+    return '';
+  }
+
+  const NO_MATCH = 0;
+  const PARTIAL_MATCH = 1; // Match a substring of target
+  const INITIAL_MATCH = 2; // Match the start of target
+  const FULL_MATCH = 3; // Completely match target
+
+  // Return how closely 'str' matches 'target'.
+  // If 'target' is in quotes, the match is either full or none.
+  function match(str, target) {
+    if (/^".*"$/.test(target)) {
+      if (target.substring(1, target.length - 1) === str) {
+        return FULL_MATCH;
+      } else {
+        return NO_MATCH;
+      }
+    }
+    if (str === target) {
+      return FULL_MATCH;
+    }
+    if (str.startsWith(target)) {
+      return INITIAL_MATCH;
+    }
+    if (str.indexOf(target) >= 0) {
+      return PARTIAL_MATCH;
+    }
+    return NO_MATCH;
+  }
+
+  const updateResults = debounce(() => {
+    const text = document.getElementById('search-box').value.trim();
+    if (!text) {
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result-none').classList.add('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+
+      // Drop the anchor/query (if any)
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin + window.location.pathname
+      );
+    } else {
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin +
+          window.location.pathname +
+          '?q=' +
+          encodeURIComponent(text)
+      );
+
+      document.getElementById('all-content').classList.add('hidden');
+
+      let query = text.split(' ').map((x) => x.trim().toLowerCase());
+      query = [...new Set(query)];
+      query = query.filter((x) => !STOP_WORDS.includes(x));
+
+      const mandatory = query
+        .filter((x) => /^[+]+/.test(x))
+        .map((x) => x.slice(1))
+        .filter((x) => !!x);
+      const prohibited = query
+        .filter((x) => /^[-]+/.test(x))
+        .map((x) => x.slice(1))
+        .filter((x) => !!x);
+      const optional = query.filter((x) => /^[^-+]/.test(x));
+
+      let searchResults = [];
+      document
+        .getElementById('all-content')
+        .querySelectorAll('[data-keywords]')
+        .forEach((el) => {
+          const keywords = el
+            .getAttribute('data-keywords')
+            .split(',')
+            .map((x) => x.trim());
+
+          const hasProhibitedMatches = prohibited.some(
+            (q) =>
+              keywords.some((keyword) => match(keyword, q) > 0) ||
+              findInElement(el, prohibited)
+          );
+
+          if (!hasProhibitedMatches) {
+            const hasMandatoryMatches = mandatory.every(
+              (q) =>
+                keywords.some((keyword) => match(keyword, q) > 0) ||
+                findInElement(el, mandatory)
+            );
+
+            if (hasMandatoryMatches) {
+              let score = mandatory.length;
+              if (optional.length === 0) {
+                score = 1;
+              } else {
+                let hasInitialMatch = false;
+                let hasPartialMatch = false;
+                optional.forEach((q) => {
+                  keywords.forEach((keyword) => {
+                    let m = match(keyword, q);
+                    if (m === FULL_MATCH) {
+                      score += 10;
+                    } else if (m === INITIAL_MATCH) {
+                      hasInitialMatch = true;
+                    } else if (m === PARTIAL_MATCH) {
+                      hasPartialMatch = true;
+                    }
+                  });
+                  hasPartialMatch =
+                    hasPartialMatch || findInElement(el, optional);
+                });
+                if (hasInitialMatch) score += 5;
+                if (hasPartialMatch) score += 2;
+              }
+              if (score > 0) {
+                searchResults.push([
+                  score,
+                  markInElement(el, [...optional, ...mandatory]),
+                ]);
+              }
+            }
+          }
+        });
+
+      if (searchResults.length === 0) {
+        noResultsFound();
+      } else {
+        document.getElementById('search-result-none').classList.add('hidden');
+        document.getElementById('search-result').innerHTML = searchResults
+          .sort((a, b) => b[0] - a[0])
+          .map((x) => x[1])
+          .join('');
+        document.getElementById('search-result').classList.remove('hidden');
+      }
+    }
+  }, 500);
+
+  function noResultsFound() {
+    document.getElementById('all-content').classList.remove('hidden');
+    document.getElementById('search-result').classList.add('hidden');
+    document.getElementById('search-result').innerHTML = '';
+    document.getElementById('search-result-none').classList.remove('hidden');
+  }
+
+  function search() {
+    const empty =
+      document.getElementById('search-box').value.trim().length === 0;
+    if (empty) {
+      document.getElementById('clear-button').classList.add('hidden');
+    } else {
+      document.getElementById('clear-button').classList.remove('hidden');
+    }
+    updateResults();
+  }
+
+  window.addEventListener('load', () => {
+    document.getElementById('clear-button').addEventListener('click', () => {
+      document.getElementById('search-box').value = '';
+      document.getElementById('clear-button').classList.add('hidden');
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+      document.getElementById('search-result-none').classList.add('hidden');
+      document.getElementById('search-box').focus();
+    });
+
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById('search-box').value = params.get('q') || '';
+      search();
+    }
+  });
+
+  window.addEventListener(
+    'hashchange',
+    () => {
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+      document.getElementById('search-box').value = '';
+      document.getElementById('clear-button').classList.add('hidden');
+      const hash = window.location.hash;
+      const anchor = document.getElementById(hash.slice(1));
+      if (anchor) {
+        setTimeout(() => {
+          let motionPref = matchMedia('(prefers-reduced-motion)');
+          if (motionPref.matches) {
+            anchor.scrollIntoView({
+              block: 'start',
+              behavior: 'auto',
+            });
+          } else {
+            anchor.scrollIntoView({
+              block: 'start',
+              behavior: 'smooth',
+            });
+          }
+        }, 100);
+      }
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin + window.location.pathname + hash
+      );
+    },
+    false
+  );
+
+  window.addEventListener('keydown', (evt) => {
+    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+    let isFindShortcut = false;
+    if (isMac) {
+      isFindShortcut =
+        evt.which == 70 &&
+        evt.metaKey &&
+        !evt.ctrlKey &&
+        !evt.altKey &&
+        !evt.shiftKey;
+    } else {
+      isFindShortcut =
+        evt.which == 70 &&
+        !evt.metaKey &&
+        evt.ctrlKey &&
+        !evt.altKey &&
+        !evt.shiftKey;
+    }
+    if (
+      isFindShortcut &&
+      document.activeElement !== document.getElementById('search-box')
+    ) {
+      document.getElementById('search-box').focus();
+      evt.preventDefault();
+    }
+  });
+
+  return {
+    search: search,
+  };
+})().search;</script>
+<div class='search-box-container'>
+    <span class="icon" style="margin-top:4px;">
+        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+    </span>
+    <input type='text' 
+        autofocus="" 
+        id="search-box" 
+        aria-label="Search" 
+        maxlength="4096" 
+        spellcheck="false" 
+        autocapitalize="none" 
+        autocomplete="off" 
+        autocorrect="off" 
+        oninput="search()" 
+        placeholder="Search" >
+    <span class="icon hidden" id='clear-button'>
+        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+    </span>        
+</div>
+<section id="search-result" class="hidden"></section>
+<section id="search-result-none" class="hidden">No results found.</section>
+<section id="all-content"><section><h3><span class="stack"><span class="subhead"><span class="keyword">module </span><strong>mathlive</strong></span><span class="head">Modules</span></span></h3><section><section><section id="(MathfieldElement%3Aclass)"><h2><span class="stack"><span class="highlighting-mark-container"><span class="head"><span class="keyword">class </span><strong>MathfieldElement</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h2>
+<div><p><span class="class-label">Extends </span>HTMLElement</p><p><span class="class-label">Implements </span>Mathfield</p></div>
+<p>The <code>MathfieldElement</code> class provides special properties and
+methods to control the display and behavior of <code>&lt;math-field&gt;</code>
+elements.</p>
+
+<p>It inherits many useful properties and methods from <code>HTMLElement</code> such
+as <code>style</code>, <code>tabIndex</code>, <code>addEventListener()</code>, <code>getAttribute()</code>,  etc…</p>
+<p>To create a new <code>MathfieldElement</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// 1. Create a new MathfieldElement</span>
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
+<span class="hljs-comment">// 2. Attach it to the DOM</span>
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
+</code></pre>
+<p>The <code>MathfieldElement</code> constructor has an optional argument of
+<code>MathfieldOptions</code> to configure the element. The options can also
+be modified later:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Setting options during construction</span>
+<span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>({<span class="hljs-attr">smartFence</span>: <span class="hljs-literal">false</span>});
+<span class="hljs-comment">// Modifying options after construction</span>
+mfe.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">smartFence</span>: <span class="hljs-literal">true</span>});
+</code></pre>
+<h3>CSS Variables</h3>
+<p>To customize the appearance of the mathfield, declare the following CSS
+variables (custom properties) in a ruleset that applied to the mathfield.</p>
+<pre><code class="language-css">math-field {
+ --hue: 10       // Set the highlight color and caret to a reddish hue
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">CSS Variable</th>
+<th style="text-align:left">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>--hue</code></td>
+<td style="text-align:left">Hue of the highlight color and the caret</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--highlight</code></td>
+<td style="text-align:left">Color of the selection</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--contains-highlight</code></td>
+<td style="text-align:left">Backround property for items that contain the caret</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--highlight-inactive</code></td>
+<td style="text-align:left">Color of the selection, when the mathfield is not focused</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--caret</code></td>
+<td style="text-align:left">Color of the caret/insertion point</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--primary</code></td>
+<td style="text-align:left">Primary accent color, used for example in the virtual keyboard</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--text-font-family</code></td>
+<td style="text-align:left">The font stack used in text mode</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--keyboard-zindex</code></td>
+<td style="text-align:left">The z-index attribute of the virtual keyboard panel</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--smart-fence-opacity</code></td>
+<td style="text-align:left">Opacity of a smart gence (default is 50%)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--smart-fence-color</code></td>
+<td style="text-align:left">Color of a smart fence (default is current color)</td>
+</tr>
+</tbody>
+</table>
+<h3>CSS Parts</h3>
+<p>To style the virtual keyboard toggle, use the <code>virtual-keyboard-toggle</code> CSS
+part. To use it, define a CSS rule with a <code>::part()</code> selector
+for example:</p>
+<pre><code class="language-css">math-field::part(virtual-keyboard-toggle) {
+ color: red;
+}
+</code></pre>
+<h3>Attributes</h3>
+<p>An attribute is a key-value pair set as part of the tag:</p>
+<pre><code class="language-html">&lt;math-field locale=&quot;fr&quot;&gt;&lt;/math-field&gt;
+</code></pre>
+<p>The supported attributes are listed in the table below with their correspnding
+property.</p>
+<p>The property can be changed either directly on the
+<code>MathfieldElement</code> object, or using <code>setOptions()</code> if it is prefixed with
+<code>options.</code>, for example</p>
+<pre><code class="language-javascript"> <span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\sin x&#x27;</span>;
+ <span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">horizontalSpacingScale</span>: <span class="hljs-number">1.1</span>});
+</code></pre>
+<p>The values of attributes and properties are reflected, which means you can change one or the
+other, for example:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&#x27;virtual-keyboard-mode&#x27;</span>,  <span class="hljs-string">&#x27;manual&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-title function_">getOption</span>(<span class="hljs-string">&#x27;virtualKeyboardMode&#x27;</span>));
+<span class="hljs-comment">// Result: &quot;manual&quot;</span>
+<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">virtualKeyboardMode</span>: <span class="hljs-string">&#x27;onfocus&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>).<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&#x27;virtual-keyboard-mode&#x27;</span>);
+<span class="hljs-comment">// Result: &#x27;onfocus&#x27;</span>
+</code></pre>
+<p>An exception is the <code>value</code> property, which is not reflected on the <code>value</code>
+attribute: the <code>value</code> attribute remains at its initial value.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Attribute</th>
+<th style="text-align:left">Property</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>disabled</code></td>
+<td style="text-align:left"><code>disabled</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>default-mode</code></td>
+<td style="text-align:left"><code>options.defaultMode</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>fonts-directory</code></td>
+<td style="text-align:left"><code>options.fontsDirectory</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sounds-directory</code></td>
+<td style="text-align:left"><code>options.soundsDirectory</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>horizontal-spacing-scale</code></td>
+<td style="text-align:left"><code>options.horizontalSpacingScale</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>inline-shortcut-timeout</code></td>
+<td style="text-align:left"><code>options.inlineShortcutTimeout</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>keypress-vibration</code></td>
+<td style="text-align:left"><code>options.keypressVibration</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>keypress-sound</code></td>
+<td style="text-align:left"><code>options.keypressSound</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>plonk-sound</code></td>
+<td style="text-align:left"><code>options.plonkSound</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>letter-shape-style</code></td>
+<td style="text-align:left"><code>options.letterShapeStyle</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>locale</code></td>
+<td style="text-align:left"><code>options.locale</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>math-mode-space</code></td>
+<td style="text-align:left"><code>options.mathModeSpace</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>read-only</code></td>
+<td style="text-align:left"><code>options.readOnly</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>remove-extraneous-parentheses</code></td>
+<td style="text-align:left"><code>options.removeExtraneousParentheses</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>smart-fence</code></td>
+<td style="text-align:left"><code>options.smartFence</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>smart-mode</code></td>
+<td style="text-align:left"><code>options.smartMode</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>smart-superscript</code></td>
+<td style="text-align:left"><code>options.superscript</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>speech-engine</code></td>
+<td style="text-align:left"><code>options.speechEngine</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>speech-engine-rate</code></td>
+<td style="text-align:left"><code>options.speechEngineRate</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>speech-engine-voice</code></td>
+<td style="text-align:left"><code>options.speechEngineVoice</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>text-to-speech-markup</code></td>
+<td style="text-align:left"><code>options.textToSpeechMarkup</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>text-to-speech-rules</code></td>
+<td style="text-align:left"><code>options.textToSpeechRules</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>value</code></td>
+<td style="text-align:left">value</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>virtual-keyboard-layout</code></td>
+<td style="text-align:left"><code>options.keyboardLayout</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>virtual-keyboard-mode</code></td>
+<td style="text-align:left"><code>options.keyboardMode</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>virtual-keyboard-theme</code></td>
+<td style="text-align:left"><code>options.keyboardTheme</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>virtual-keyboards</code></td>
+<td style="text-align:left"><code>options.keyboards</code></td>
+</tr>
+</tbody>
+</table>
+<p>See <code>MathfieldOptions</code> for more details about these options.</p>
+<p>In addition, the following <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes">global attributes</a>
+can also be used:</p>
+<ul>
+<li><code>class</code></li>
+<li><code>data-*</code></li>
+<li><code>hidden</code></li>
+<li><code>id</code></li>
+<li><code>item*</code></li>
+<li><code>style</code></li>
+<li><code>tabindex</code></li>
+</ul>
+<h3>Events</h3>
+<p>Listen to these events by using <code>addEventListener()</code>. For events with additional
+arguments, the arguments are availble in <code>event.detail</code>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Event Name</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>input</code></td>
+<td style="text-align:left">The value of the mathfield has been modified. This happens on almost every keystroke in the mathfield.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>change</code></td>
+<td style="text-align:left">The user has commited the value of the mathfield. This happens when the user presses <strong>Return</strong> or leaves the mathfield.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>selection-change</code></td>
+<td style="text-align:left">The selection (or caret position) in the mathfield has changed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mode-change</code></td>
+<td style="text-align:left">The mode (<code>math</code>, <code>text</code>) of the mathfield has changed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>undo-state-change</code></td>
+<td style="text-align:left">The state of the undo stack has changed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>read-aloud-status-change</code></td>
+<td style="text-align:left">The status of a read aloud operation has changed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>virtual-keyboard-toggle</code></td>
+<td style="text-align:left">The visibility of the virtual keyboard panel has changed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>blur</code></td>
+<td style="text-align:left">The mathfield is losing focus</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>focus</code></td>
+<td style="text-align:left">The mathfield is gaining focus</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>focus-out</code></td>
+<td style="text-align:left">The user is navigating out of the mathfield, typically using the <strong>tab</strong> key<br> `detail: {direction: ‘forward’</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>move-out</code></td>
+<td style="text-align:left">The user has pressed an <strong>arrow</strong> key, but there is nowhere to go. This is an opportunity to change the focus to another element if desired. <br> `detail: {direction: ‘forward’</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>math-error</code></td>
+<td style="text-align:left">A parsing or configuration error happened <br> `detail: ErrorListener&lt;ParserErrorCode</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>keystroke</code></td>
+<td style="text-align:left">The user typed a keystroke with a physical keyboard <br> <code>detail: {keystroke: string, event: KeyboardEvent}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mount</code></td>
+<td style="text-align:left">The element has been attached to the DOM</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>unmount</code></td>
+<td style="text-align:left">The element is about to be removed from the DOM</td>
+</tr>
+</tbody>
+</table>
+<section><section data-keywords="new mathfieldelement" id="MathfieldElement%3Aconstructor" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><span class="keyword">new </span><strong>MathfieldElement</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#MathfieldElement%3Aconstructor" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><span class="keyword">new </span><strong>MathfieldElement</strong><span class="punctuation">(</span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Partial" class="externallink">Partial<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>MathfieldOptions<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="#(MathfieldElement%3Aclass)">MathfieldElement</a></div>
+<p>To create programmatically a new mahfield use:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();</code></pre>
+
+<p>// Set initial value and options
+mfe.value = “\frac{\sin(x)}{\cos(x)}”;</p>
+<p>// Options can be set either as an attribute (for simple options)…
+mfe.setAttribute(‘virtual-keyboard-layout’, ‘dvorak’);</p>
+<p>// … or using <code>setOptions()</code>
+mfe.setOptions({
+virtualKeyboardMode: ‘manual’,
+});</p>
+<p>// Attach the element to the DOM
+document.body.appendChild(mfe);</p>
+<pre><code></code></pre>
+</div>
+</div>
+
+</section>
+
+</section>
+
+
+<section>
+
+<h4>Accessing and changing the content</h4>
+
+<div class="index">
+<ul>
+
+<li><a href="#(MathfieldElement%3Aclass).(value%3Ainstance)">value</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(applyStyle%3Ainstance)">applyStyle</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(getValue%3Ainstance)">getValue</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(insert%3Ainstance)">insert</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(setValue%3Ainstance)">setValue</a></li>
+
+</ul>
+
+</div>
+
+
+
+<h4>Selection</h4>
+
+<div class="index">
+<ul>
+
+<li><a href="#(MathfieldElement%3Aclass).(caretPoint%3Ainstance)">caretPoint</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(lastOffset%3Ainstance)">lastOffset</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(position%3Ainstance)">position</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(selection%3Ainstance)">selection</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(select%3Ainstance)">select</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(setCaretPoint%3Ainstance)">setCaretPoint</a></li>
+
+</ul>
+
+</div>
+
+
+
+<h4>Other</h4>
+
+<div class="index">
+<ul>
+
+<li><a href="#(MathfieldElement%3Aclass).(defaultMode%3Ainstance)">defaultMode</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(disabled%3Ainstance)">disabled</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(fontsDirectory%3Ainstance)">fontsDirectory</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(inlineShortcutTimeout%3Ainstance)">inlineShortcutTimeout</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(keypressSound%3Ainstance)">keypressSound</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(keypressVibration%3Ainstance)">keypressVibration</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(letterShapeStyle%3Ainstance)">letterShapeStyle</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(locale%3Ainstance)">locale</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(mathModeSpace%3Ainstance)">mathModeSpace</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(mode%3Ainstance)">mode</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(plonkSound%3Ainstance)">plonkSound</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(readOnly%3Ainstance)">readOnly</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(readonly%3Ainstance)">readonly</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(removeExtraneousParentheses%3Ainstance)">removeExtraneousParentheses</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(sharedVirtualKeyboardTargetOrigin%3Ainstance)">sharedVirtualKeyboardTargetOrigin</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(smartFence%3Ainstance)">smartFence</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(smartMode%3Ainstance)">smartMode</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(smartSuperscript%3Ainstance)">smartSuperscript</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(speechEngine%3Ainstance)">speechEngine</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(speechEngineRate%3Ainstance)">speechEngineRate</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(speechEngineVoice%3Ainstance)">speechEngineVoice</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(textToSpeechMarkup%3Ainstance)">textToSpeechMarkup</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(textToSpeechRule%3Ainstance)">textToSpeechRule</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(textToSpeechRules%3Ainstance)">textToSpeechRules</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(useSharedVirtualKeyboard%3Ainstance)">useSharedVirtualKeyboard</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(virtualKeyboardLayout%3Ainstance)">virtualKeyboardLayout</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(virtualKeyboardMode%3Ainstance)">virtualKeyboardMode</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(virtualKeyboardState%3Ainstance)">virtualKeyboardState</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(virtualKeyboardTheme%3Ainstance)">virtualKeyboardTheme</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(virtualKeyboards%3Ainstance)">virtualKeyboards</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(observedAttributes%3Ainstance)">observedAttributes</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(optionsAttributes%3Ainstance)">optionsAttributes</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(addEventListener%3Ainstance)">addEventListener</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(executeCommand%3Ainstance)">executeCommand</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(find%3Ainstance)">find</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(getOffsetDepth%3Ainstance)">getOffsetDepth</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(getPlaceholderField%3Ainstance)">getPlaceholderField</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(removeEventListener%3Ainstance)">removeEventListener</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(replace%3Ainstance)">replace</a></li>
+
+</ul>
+
+</div>
+
+
+
+<h4>Focus</h4>
+
+<div class="index">
+<ul>
+
+<li><a href="#(MathfieldElement%3Aclass).(blur%3Ainstance)">blur</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(focus%3Ainstance)">focus</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(hasFocus%3Ainstance)">hasFocus</a></li>
+
+</ul>
+
+</div>
+
+
+
+<h4>Options</h4>
+
+<div class="index">
+<ul>
+
+<li><a href="#(MathfieldElement%3Aclass).(getOption%3Ainstance)">getOption</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(getOptions%3Ainstance)">getOptions</a></li>
+
+<li><a href="#(MathfieldElement%3Aclass).(setOptions%3Ainstance)">setOptions</a></li>
+
+</ul>
+
+</div>
+<h3 class="category-title"><span class="stack"><span class="head">Accessing and changing the content</span></span></h3><section data-keywords="instance, value" id="(MathfieldElement%3Aclass).(value%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>value</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(value%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="function, applystyle" id="(MathfieldElement%3Aclass).(applyStyle%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>applyStyle</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(applyStyle%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>applyStyle</strong><span class="punctuation">(</span><var>style</var><span class="punctuation">: </span>Style<span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>Range<span class="punctuation"> | </span><span class="punctuation">{</span>operation<span class="punctuation">: </span><span class="string-literal">"toggle"</span><span class="punctuation"> | </span><span class="string-literal">"set"</span><span class="punctuation">; </span>range<span class="punctuation">: </span>Range<span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+<p>Updates the style (color, bold, italic, etc…) of the selection or sets
+the style to be applied to future input.</p>
+
+<p>If there is no selection and no range is specified, the style will
+apply to the next character typed.</p>
+<p>If a range is specified, the style is applied to the range, otherwise,
+if there is a selection, the style is applied to the selection.</p>
+<p>If the operation is ‘toggle’ and the range already has this style,
+remove it. If the range
+has the style partially applied (i.e. only some sections), remove it from
+those sections, and apply it to the entire range.</p>
+<p>If the operation is ‘set’, the style is applied to the range,
+whether it already has the style or not.</p>
+<p>The default operation is ‘set’.</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, getvalue" id="(MathfieldElement%3Aclass).(getValue%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getValue</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(getValue%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>getValue</strong><span class="punctuation">(</span><var>format</var><span class="modifier">?</span><span class="punctuation">: </span>OutputFormat<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+
+<hr>
+
+<div>
+<div class="code"><strong>getValue</strong><span class="punctuation">(</span><var>start</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">, </span><var>end</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">, </span><var>format</var><span class="modifier">?</span><span class="punctuation">: </span>OutputFormat<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+
+<hr>
+
+<div>
+<div class="code"><strong>getValue</strong><span class="punctuation">(</span><var>range</var><span class="punctuation">: </span>Range<span class="punctuation">, </span><var>format</var><span class="modifier">?</span><span class="punctuation">: </span>OutputFormat<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+
+<hr>
+
+<div>
+<div class="code"><strong>getValue</strong><span class="punctuation">(</span><var>selection</var><span class="punctuation">: </span>Selection<span class="punctuation">, </span><var>format</var><span class="modifier">?</span><span class="punctuation">: </span>OutputFormat<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, insert" id="(MathfieldElement%3Aclass).(insert%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>insert</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(insert%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>insert</strong><span class="punctuation">(</span><var>s</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>InsertOptions<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
+<p>Inserts a block of text at the current insertion point.</p>
+
+<p>This method can be called explicitly or invoked as a selector with
+<code>executeCommand(&quot;insert&quot;)</code>.</p>
+<p>After the insertion, the selection will be set according to the
+<code>options.selectionMode</code>.</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, setvalue" id="(MathfieldElement%3Aclass).(setValue%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>setValue</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(setValue%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>setValue</strong><span class="punctuation">(</span><var>value</var><span class="modifier">?</span><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>InsertOptions<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+<h3 class="category-title"><span class="stack"><span class="head">Selection</span></span></h3><section data-keywords="instance, caretpoint" id="(MathfieldElement%3Aclass).(caretPoint%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>caretPoint</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(caretPoint%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div></div>
+
+<div><span class="keyword">get </span><strong>caretPoint</strong><span class="punctuation">(): </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="punctuation">{</span>x<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">; </span>y<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">}</span><p>The bottom location of the caret (insertion point) in viewport
+coordinates.</p>
+
+<p>See also <a href="#(MathfieldElement%3Aclass).(setCaretPoint%3Ainstance)"><code>setCaretPoint</code></a></p>
+
+
+</div>
+
+<div><span class="keyword">set </span><strong>caretPoint</strong><span class="punctuation">(</span><span class="keyword">null</span><span class="punctuation"> | </span><span class="punctuation">{</span>x<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">; </span>y<span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">}</span><span class="punctuation">)</span><p>The bottom location of the caret (insertion point) in viewport
+coordinates.</p>
+
+<p>See also <a href="#(MathfieldElement%3Aclass).(setCaretPoint%3Ainstance)"><code>setCaretPoint</code></a></p>
+</div>
+</div>
+
+</section>
+<section data-keywords="instance, lastoffset" id="(MathfieldElement%3Aclass).(lastOffset%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>lastOffset</strong><span class="punctuation">: </span><span class="keyword">number</span>&nbsp;&nbsp;<span class="modifier-tag">read only</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(lastOffset%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, position" id="(MathfieldElement%3Aclass).(position%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>position</strong><span class="punctuation">: </span><span class="keyword">number</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(position%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, selection" id="(MathfieldElement%3Aclass).(selection%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>selection</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(selection%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div></div>
+
+<div><span class="keyword">get </span><strong>selection</strong><span class="punctuation">(): </span>Selection<p>An array of ranges representing the selection.</p>
+
+<p>It is guaranteed there will be at least one element. If a discontinuous
+selection is present, the result will include more than one element.</p>
+
+
+</div>
+
+<div><span class="keyword">set </span><strong>selection</strong><span class="punctuation">(</span><span class="keyword">number</span><span class="punctuation"> | </span>Selection<span class="punctuation">)</span></div>
+</div>
+
+</section>
+<section data-keywords="function, select" id="(MathfieldElement%3Aclass).(select%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>select</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(select%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<dl>
+
+</dl>
+<p>Select the content of the mathfield.</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, setcaretpoint" id="(MathfieldElement%3Aclass).(setCaretPoint%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>setCaretPoint</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(setCaretPoint%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>setCaretPoint</strong><span class="punctuation">(</span><var>x</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">, </span><var>y</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">boolean</span></div>
+<p><code>x</code> and <code>y</code> are in viewport coordinates.</p>
+
+<p>Return true if the location of the point is a valid caret location.</p>
+<p>See also <a href="#(MathfieldElement%3Aclass).(caretPoint%3Ainstance)"><code>caretPoint</code></a></p>
+</div>
+</div>
+
+</section>
+<h3 class="category-title"><span class="stack"><span class="head">Other</span></span></h3><section data-keywords="instance, defaultmode" id="(MathfieldElement%3Aclass).(defaultMode%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>defaultMode</strong><span class="punctuation">: </span><span class="string-literal">"math"</span><span class="punctuation"> | </span><span class="string-literal">"text"</span><span class="punctuation"> | </span><span class="string-literal">"inline-math"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(defaultMode%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, disabled" id="(MathfieldElement%3Aclass).(disabled%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>disabled</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(disabled%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, fontsdirectory" id="(MathfieldElement%3Aclass).(fontsDirectory%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>fontsDirectory</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(fontsDirectory%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, inlineshortcuttimeout" id="(MathfieldElement%3Aclass).(inlineShortcutTimeout%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>inlineShortcutTimeout</strong><span class="punctuation">: </span><span class="keyword">number</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(inlineShortcutTimeout%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, keypresssound" id="(MathfieldElement%3Aclass).(keypressSound%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>keypressSound</strong><span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement<span class="punctuation"> | </span><span class="punctuation">{</span>default<span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement<span class="punctuation">; </span>delete<span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement<span class="punctuation">; </span>return<span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement<span class="punctuation">; </span>spacebar<span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement<span class="punctuation">}</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(keypressSound%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, keypressvibration" id="(MathfieldElement%3Aclass).(keypressVibration%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>keypressVibration</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(keypressVibration%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, lettershapestyle" id="(MathfieldElement%3Aclass).(letterShapeStyle%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>letterShapeStyle</strong><span class="punctuation">: </span><span class="string-literal">"tex"</span><span class="punctuation"> | </span><span class="string-literal">"french"</span><span class="punctuation"> | </span><span class="string-literal">"iso"</span><span class="punctuation"> | </span><span class="string-literal">"upright"</span><span class="punctuation"> | </span><span class="string-literal">"auto"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(letterShapeStyle%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, locale" id="(MathfieldElement%3Aclass).(locale%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>locale</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(locale%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, mathmodespace" id="(MathfieldElement%3Aclass).(mathModeSpace%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>mathModeSpace</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(mathModeSpace%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, mode" id="(MathfieldElement%3Aclass).(mode%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>mode</strong><span class="punctuation">: </span>ParseMode</span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(mode%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, plonksound" id="(MathfieldElement%3Aclass).(plonkSound%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>plonkSound</strong><span class="punctuation">: </span><span class="keyword">null</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation"> | </span>HTMLAudioElement</span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(plonkSound%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, readonly" id="(MathfieldElement%3Aclass).(readOnly%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>readOnly</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(readOnly%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, readonly" id="(MathfieldElement%3Aclass).(readonly%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>readonly</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(readonly%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, removeextraneousparentheses" id="(MathfieldElement%3Aclass).(removeExtraneousParentheses%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>removeExtraneousParentheses</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(removeExtraneousParentheses%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, sharedvirtualkeyboardtargetorigin" id="(MathfieldElement%3Aclass).(sharedVirtualKeyboardTargetOrigin%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>sharedVirtualKeyboardTargetOrigin</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(sharedVirtualKeyboardTargetOrigin%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, smartfence" id="(MathfieldElement%3Aclass).(smartFence%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>smartFence</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(smartFence%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, smartmode" id="(MathfieldElement%3Aclass).(smartMode%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>smartMode</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(smartMode%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, smartsuperscript" id="(MathfieldElement%3Aclass).(smartSuperscript%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>smartSuperscript</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(smartSuperscript%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, speechengine" id="(MathfieldElement%3Aclass).(speechEngine%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>speechEngine</strong><span class="punctuation">: </span><span class="string-literal">"local"</span><span class="punctuation"> | </span><span class="string-literal">"amazon"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(speechEngine%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, speechenginerate" id="(MathfieldElement%3Aclass).(speechEngineRate%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>speechEngineRate</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(speechEngineRate%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, speechenginevoice" id="(MathfieldElement%3Aclass).(speechEngineVoice%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>speechEngineVoice</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(speechEngineVoice%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, texttospeechmarkup" id="(MathfieldElement%3Aclass).(textToSpeechMarkup%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>textToSpeechMarkup</strong><span class="punctuation">: </span><span class="string-literal">""</span><span class="punctuation"> | </span><span class="string-literal">"ssml"</span><span class="punctuation"> | </span><span class="string-literal">"ssml_step"</span><span class="punctuation"> | </span><span class="string-literal">"mac"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(textToSpeechMarkup%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, texttospeechrule" id="(MathfieldElement%3Aclass).(textToSpeechRule%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>textToSpeechRule</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(textToSpeechRule%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div></div>
+
+<div><span class="keyword">set </span><strong>textToSpeechRule</strong><span class="punctuation">(</span><span class="string-literal">"mathlive"</span><span class="punctuation"> | </span><span class="string-literal">"sre"</span><span class="punctuation">)</span></div>
+</div>
+
+</section>
+<section data-keywords="instance, texttospeechrules" id="(MathfieldElement%3Aclass).(textToSpeechRules%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>textToSpeechRules</strong><span class="punctuation">: </span><span class="string-literal">"mathlive"</span><span class="punctuation"> | </span><span class="string-literal">"sre"</span>&nbsp;&nbsp;<span class="modifier-tag">read only</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(textToSpeechRules%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, usesharedvirtualkeyboard" id="(MathfieldElement%3Aclass).(useSharedVirtualKeyboard%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>useSharedVirtualKeyboard</strong><span class="punctuation">: </span><span class="keyword">boolean</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(useSharedVirtualKeyboard%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, virtualkeyboardlayout" id="(MathfieldElement%3Aclass).(virtualKeyboardLayout%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>virtualKeyboardLayout</strong><span class="punctuation">: </span><span class="string-literal">"auto"</span><span class="punctuation"> | </span><span class="string-literal">"qwerty"</span><span class="punctuation"> | </span><span class="string-literal">"azerty"</span><span class="punctuation"> | </span><span class="string-literal">"qwertz"</span><span class="punctuation"> | </span><span class="string-literal">"dvorak"</span><span class="punctuation"> | </span><span class="string-literal">"colemak"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(virtualKeyboardLayout%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, virtualkeyboardmode" id="(MathfieldElement%3Aclass).(virtualKeyboardMode%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>virtualKeyboardMode</strong><span class="punctuation">: </span><span class="string-literal">"auto"</span><span class="punctuation"> | </span><span class="string-literal">"manual"</span><span class="punctuation"> | </span><span class="string-literal">"onfocus"</span><span class="punctuation"> | </span><span class="string-literal">"off"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(virtualKeyboardMode%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, virtualkeyboardstate" id="(MathfieldElement%3Aclass).(virtualKeyboardState%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>virtualKeyboardState</strong><span class="punctuation">: </span><span class="string-literal">"hidden"</span><span class="punctuation"> | </span><span class="string-literal">"visible"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(virtualKeyboardState%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, virtualkeyboardtheme" id="(MathfieldElement%3Aclass).(virtualKeyboardTheme%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>virtualKeyboardTheme</strong><span class="punctuation">: </span><span class="string-literal">""</span><span class="punctuation"> | </span><span class="string-literal">"material"</span><span class="punctuation"> | </span><span class="string-literal">"apple"</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(virtualKeyboardTheme%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, virtualkeyboards" id="(MathfieldElement%3Aclass).(virtualKeyboards%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>virtualKeyboards</strong><span class="punctuation">: </span><span class="keyword">string</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(virtualKeyboards%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+</section>
+<section data-keywords="instance, observedattributes" id="(MathfieldElement%3Aclass).(observedAttributes%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>observedAttributes</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(observedAttributes%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div></div>
+</div>
+
+</section>
+<section data-keywords="instance, optionsattributes" id="(MathfieldElement%3Aclass).(optionsAttributes%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>optionsAttributes</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(optionsAttributes%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div></div>
+</div>
+
+</section>
+<section data-keywords="function, addeventlistener" id="(MathfieldElement%3Aclass).(addEventListener%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>addEventListener</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(addEventListener%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>addEventListener</strong><span class="punctuation">(</span><var>type</var><span class="punctuation">: </span>K<span class="punctuation">, </span><var>listener</var><span class="punctuation">: </span><span class="punctuation">(</span><var>this</var><span class="punctuation">: </span><a href="#(MathfieldElement%3Aclass)">MathfieldElement</a><span class="punctuation">, </span><var>ev</var><span class="punctuation">: </span>HTMLElementEventMap<span class="punctuation">[</span>K<span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">any</span><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span><span class="keyword">boolean</span><span class="punctuation"> | </span>AddEventListenerOptions<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, executecommand" id="(MathfieldElement%3Aclass).(executeCommand%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>executeCommand</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(executeCommand%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>executeCommand</strong><span class="punctuation">(</span><var>command</var><span class="punctuation">)</span></div>
+
+<dl>
+
+<dt>
+<strong><var>command</var></strong><span class="punctuation">: </span><ul class="type-block"><li><span class="punctuation">| </span>Selector</li>
+<li><span class="punctuation">| </span><span class="punctuation">[</span>Selector<span class="punctuation">, </span><span class="modifier">...</span><span class="keyword">any</span><span class="punctuation">[]</span><span class="punctuation">]</span></li></ul>
+</dt><dd>
+<p>A selector, or an array whose first element
+is a selector, and whose subsequent elements are arguments to the selector.</p>
+<p>Selectors can be passed either in camelCase or kebab-case.</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Both calls do the same thing</span>
+mfe.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;selectAll&#x27;</span>);
+mfe.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;select-all&#x27;</span>);
+</code></pre>
+
+</dd>
+
+<dt>
+<strong>→ </strong><span class="keyword">boolean</span>
+</dt><dd>
+
+</dd>
+
+</dl>
+<p>Execute a <code>Commands</code> defined by a selector.</p>
+<pre><code class="language-javascript">mfe.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;add-column-after&#x27;</span>);
+mfe.<span class="hljs-title function_">executeCommand</span>([<span class="hljs-string">&#x27;switch-mode&#x27;</span>, <span class="hljs-string">&#x27;math&#x27;</span>]);
+</code></pre>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, find" id="(MathfieldElement%3Aclass).(find%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>find</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(find%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>find</strong><span class="punctuation">(</span><var>pattern</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation"> | </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp" class="externallink">RegExp<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>FindOptions<span class="punctuation">)</span><span class="punctuation">: </span>Range<span class="punctuation">[]</span></div>
+<p>Return an array of ranges matching the argument.</p>
+
+<p>An array is always returned, but it has no element if there are no
+matching items.</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, getoffsetdepth" id="(MathfieldElement%3Aclass).(getOffsetDepth%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getOffsetDepth</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(getOffsetDepth%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>getOffsetDepth</strong><span class="punctuation">(</span><var>offset</var><span class="punctuation">: </span><span class="keyword">number</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">number</span></div>
+<p>The depth of an offset represent the depth in the expression tree.</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, getplaceholderfield" id="(MathfieldElement%3Aclass).(getPlaceholderField%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getPlaceholderField</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(getPlaceholderField%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>getPlaceholderField</strong><span class="punctuation">(</span><var>placeholderId</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span>Mathfield</div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, removeeventlistener" id="(MathfieldElement%3Aclass).(removeEventListener%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>removeEventListener</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(removeEventListener%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>removeEventListener</strong><span class="punctuation">(</span><var>type</var><span class="punctuation">: </span>K<span class="punctuation">, </span><var>listener</var><span class="punctuation">: </span><span class="punctuation">(</span><var>this</var><span class="punctuation">: </span><a href="#(MathfieldElement%3Aclass)">MathfieldElement</a><span class="punctuation">, </span><var>ev</var><span class="punctuation">: </span>HTMLElementEventMap<span class="punctuation">[</span>K<span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">any</span><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span><span class="keyword">boolean</span><span class="punctuation"> | </span>EventListenerOptions<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, replace" id="(MathfieldElement%3Aclass).(replace%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>replace</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(replace%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>replace</strong><span class="punctuation">(</span><var>pattern</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation"> | </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp" class="externallink">RegExp<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">, </span><var>replacement</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation"> | </span>ReplacementFunction<span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>FindOptions<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+<p>Replace the pattern items matching the <strong>pattern</strong> with the
+<strong>replacement</strong> value.</p>
+
+<p>If <strong>replacement</strong> is a function, the function is called
+for each match and the function return value will be
+used as the replacement.</p>
+</div>
+</div>
+
+</section>
+<h3 class="category-title"><span class="stack"><span class="head">Focus</span></span></h3><section data-keywords="function, blur" id="(MathfieldElement%3Aclass).(blur%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>blur</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(blur%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<dl>
+
+</dl>
+<p>Remove the focus from the mathfield (will no longer respond to keyboard
+input).</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, focus" id="(MathfieldElement%3Aclass).(focus%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>focus</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(focus%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<dl>
+
+</dl>
+<p>Sets the focus to the mathfield (will respond to keyboard input).</p>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, hasfocus" id="(MathfieldElement%3Aclass).(hasFocus%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>hasFocus</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(hasFocus%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<dl>
+
+<dt>
+<strong>→ </strong><span class="keyword">boolean</span>
+</dt><dd>
+
+</dd>
+
+</dl>
+<p>Return true if the mathfield is currently focused (responds to keyboard
+input).</p>
+</div>
+</div>
+
+</section>
+<h3 class="category-title"><span class="stack"><span class="head">Options</span></span></h3><section data-keywords="function, getoption" id="(MathfieldElement%3Aclass).(getOption%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getOption</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(getOption%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>getOption</strong><span class="punctuation">(</span><var>key</var><span class="punctuation">: </span>K<span class="punctuation">)</span><span class="punctuation">: </span>MathfieldOptions<span class="punctuation">[</span>K<span class="punctuation">]</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, getoptions" id="(MathfieldElement%3Aclass).(getOptions%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>getOptions</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(getOptions%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>getOptions</strong><span class="punctuation">(</span><var>keys</var><span class="punctuation">: </span>K<span class="punctuation">[]</span><span class="punctuation">)</span><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Pick" class="externallink">Pick<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>MathfieldOptions<span class="punctuation">, </span>K<span class="punctuation">&gt;</span></div>
+</div>
+
+<hr>
+
+<div>
+<dl>
+
+<dt>
+<strong>→ </strong>MathfieldOptions
+</dt><dd>
+
+</dd>
+
+</dl>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, setoptions" id="(MathfieldElement%3Aclass).(setOptions%3Ainstance)" class="card"><h3><span class="stack"><span class="subhead"><span class="keyword">class </span><strong>MathfieldElement</strong></span><span class="highlighting-mark-container"><span class="head"><strong>setOptions</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(MathfieldElement%3Aclass).(setOptions%3Ainstance)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>setOptions</strong><span class="punctuation">(</span><var>options</var><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Partial" class="externallink">Partial<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>MathfieldOptions<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+
+</section>
+
+</section>
+
+</section>
+
+
+<section><h3><span class="stack"><span class="subhead"><span class="keyword">module </span><strong>mathlive</strong></span><span class="head">Variables</span></span></h3>
+<div class="index">
+<ul>
+
+<li><a href="#(debug%3Avariable)">debug</a></li>
+
+<li><a href="#(version%3Avariable)">version</a></li>
+
+</ul>
+
+</div>
+<section data-keywords="variable, debug" id="(debug%3Avariable)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>debug</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(debug%3Avariable)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div><strong>debug</strong><span class="punctuation">: </span><span class="punctuation">{</span>DEFAULT_KEYBINDINGS<span class="punctuation">: </span>Keybinding<span class="punctuation">[]</span><span class="punctuation">; </span>ENVIRONMENTS<span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Record" class="externallink">Record<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><span class="keyword">string</span><span class="punctuation">, </span>EnvironmentDefinition<span class="punctuation">&gt;</span><span class="punctuation">; </span>FUNCTIONS<span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Record" class="externallink">Record<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><span class="keyword">string</span><span class="punctuation">, </span>FunctionDefinition<span class="punctuation">&gt;</span><span class="punctuation">; </span>MATH_SYMBOLS<span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Record" class="externallink">Record<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><span class="keyword">string</span><span class="punctuation">, </span>SymbolDefinition<span class="punctuation">&gt;</span><span class="punctuation">; </span>TEXT_SYMBOLS<span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Record" class="externallink">Record<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><span class="keyword">string</span><span class="punctuation">, </span><span class="keyword">number</span><span class="punctuation">&gt;</span><span class="punctuation">; </span>asciiMathToLatex<span class="punctuation">: </span><span class="punctuation">(</span><var>ascii</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>getKeybindingMarkup<span class="punctuation">: </span><span class="punctuation">(</span><var>keystroke</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>latexToAsciiMath<span class="punctuation">: </span><span class="punctuation">(</span><var>latex</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>mode</var><span class="punctuation">: </span>ParseMode<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">}</span></div>
+
+</section>
+<section data-keywords="variable, version" id="(version%3Avariable)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>version</strong></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(version%3Avariable)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div><strong>version</strong><span class="punctuation">: </span><span class="punctuation">{</span>computeEngine<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>mathlive<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">}</span></div>
+
+</section>
+
+</section>
+
+
+<section><h3><span class="stack"><span class="subhead"><span class="keyword">module </span><strong>mathlive</strong></span><span class="head">Functions</span></span></h3>
+<div class="index">
+<ul>
+
+<li><a href="#(convertLatexToMarkup%3Afunction)">convertLatexToMarkup</a></li>
+
+<li><a href="#(convertLatexToMathMl%3Afunction)">convertLatexToMathMl</a></li>
+
+<li><a href="#(convertLatexToSpeakableText%3Afunction)">convertLatexToSpeakableText</a></li>
+
+<li><a href="#(makeSharedVirtualKeyboard%3Afunction)">makeSharedVirtualKeyboard</a></li>
+
+<li><a href="#(renderMathInDocument%3Afunction)">renderMathInDocument</a></li>
+
+<li><a href="#(renderMathInElement%3Afunction)">renderMathInElement</a></li>
+
+</ul>
+
+</div>
+<section data-keywords="function, convertlatextomarkup" id="(convertLatexToMarkup%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>convertLatexToMarkup</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(convertLatexToMarkup%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>convertLatexToMarkup</strong><span class="punctuation">(</span><var>text</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">{</span>format<span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">; </span>letterShapeStyle<span class="punctuation">: </span><span class="string-literal">"tex"</span><span class="punctuation"> | </span><span class="string-literal">"french"</span><span class="punctuation"> | </span><span class="string-literal">"iso"</span><span class="punctuation"> | </span><span class="string-literal">"upright"</span><span class="punctuation"> | </span><span class="string-literal">"auto"</span><span class="punctuation">; </span>macros<span class="punctuation">: </span>MacroDictionary<span class="punctuation">; </span>mathstyle<span class="punctuation">: </span><span class="string-literal">"displaystyle"</span><span class="punctuation"> | </span><span class="string-literal">"textstyle"</span><span class="punctuation">; </span>onError<span class="punctuation">: </span>ErrorListener<span class="punctuation">&lt;</span>ParserErrorCode<span class="punctuation">&gt;</span><span class="punctuation">; </span>registers<span class="punctuation">: </span>Registers<span class="punctuation">; </span>backgroundColorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">; </span>colorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">}</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, convertlatextomathml" id="(convertLatexToMathMl%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>convertLatexToMathMl</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(convertLatexToMathMl%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>convertLatexToMathMl</strong><span class="punctuation">(</span><var>latex</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>options</var><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Partial" class="externallink">Partial<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span><span class="punctuation">{</span>generateID<span class="punctuation">: </span><span class="keyword">boolean</span><span class="punctuation">; </span>macros<span class="punctuation">: </span>MacroDictionary<span class="punctuation">; </span>onError<span class="punctuation">: </span>ErrorListener<span class="punctuation">&lt;</span>ParserErrorCode<span class="punctuation">&gt;</span><span class="punctuation">; </span>registers<span class="punctuation">: </span>Registers<span class="punctuation">; </span>backgroundColorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">; </span>colorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">}</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, convertlatextospeakabletext" id="(convertLatexToSpeakableText%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>convertLatexToSpeakableText</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-1"></use></svg></span></span><a class="permalink" href="#(convertLatexToSpeakableText%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>convertLatexToSpeakableText</strong><span class="punctuation">(</span><var>latex</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">, </span><var>options</var><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Partial" class="externallink">Partial<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>TextToSpeechOptions<span class="punctuation"> &amp; </span><span class="punctuation">{</span>macros<span class="punctuation">: </span>MacroDictionary<span class="punctuation">; </span>onError<span class="punctuation">: </span>ErrorListener<span class="punctuation">&lt;</span>ParserErrorCode<span class="punctuation"> | </span>MathfieldErrorCode<span class="punctuation">&gt;</span><span class="punctuation">; </span>registers<span class="punctuation">: </span>Registers<span class="punctuation">; </span>backgroundColorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">; </span>colorMap<span class="modifier">?</span><span class="punctuation">: </span><span class="punctuation">(</span><var>name</var><span class="punctuation">: </span><span class="keyword">string</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">undefined</span><span class="punctuation"> | </span><span class="keyword">string</span><span class="punctuation">}</span><span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">string</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, makesharedvirtualkeyboard" id="(makeSharedVirtualKeyboard%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>makeSharedVirtualKeyboard</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(makeSharedVirtualKeyboard%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>makeSharedVirtualKeyboard</strong><span class="punctuation">(</span><var>options</var><span class="punctuation">: </span><a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#Partial" class="externallink">Partial<svg><use xlink:href="#external-link"></use></svg></a><span class="punctuation">&lt;</span>RemoteVirtualKeyboardOptions<span class="punctuation">&gt;</span><span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, rendermathindocument" id="(renderMathInDocument%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>renderMathInDocument</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-3"></use></svg></span></span><a class="permalink" href="#(renderMathInDocument%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>renderMathInDocument</strong><span class="punctuation">(</span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>AutoRenderOptionsPrivate<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+<section data-keywords="function, rendermathinelement" id="(renderMathInElement%3Afunction)" class="card"><h3><span class="stack"><span class="highlighting-mark-container"><span class="head"><strong>renderMathInElement</strong><span class="punctuation">()</span></span><svg class="highlighting-mark"><use xlink:href="#highlighting-mark-2"></use></svg></span></span><a class="permalink" href="#(renderMathInElement%3Afunction)" title="Permalink"><span class="sr-only"> Permalink </span><svg><use xlink:href="#link"></use></svg></a></h3>
+<div>
+<div>
+<div class="code"><strong>renderMathInElement</strong><span class="punctuation">(</span><var>element</var><span class="punctuation">: </span>HTMLElement<span class="punctuation">, </span><var>options</var><span class="modifier">?</span><span class="punctuation">: </span>AutoRenderOptionsPrivate<span class="punctuation">)</span><span class="punctuation">: </span><span class="keyword">void</span></div>
+</div>
+</div>
+
+</section>
+
+</section>
+
+</section>
+
+</section>
+</section>
+<div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+  </article>
+
+
+</div>
+</div>
+
+
+
+<div id="footer" class="page__footer"><footer><!-- start custom footer snippets -->
+
+<!-- end custom footer snippets --><div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about/" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div></footer></div>
+
+
+  <!-- <script defer src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
+
