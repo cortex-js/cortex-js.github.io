@@ -834,10 +834,19 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>CortexJS Compute Engine Changelog</h1>
-<h2>[Unreleased]</h2>
+<h2>0.5.0</h2>
+<p><strong>Release Date:</strong> 2022-04-05</p>
+<h3>Improvements</h3>
 <ul>
+<li>Correctly parse tabular content (for example in
+<code>\begin{pmatrix}...\end{pmatrix}</code></li>
+<li>Correctly parse LaTeX groups, i.e. <code>{...}</code></li>
 <li>Ensure constructible trigonometric values are canonical</li>
 <li>Correct and simplify evaluation loop for <code>simplify()</code>, <code>evaluate()</code> and <code>N()</code>.</li>
+<li><strong>#41</strong> Preserve the parsed LaTeX verbatim for top-level expressions</li>
+<li><strong>#40</strong> Correctly calculate the synthetic LaTeX metadata for numbers</li>
+<li>Only require Node LTS (16.14.2)</li>
+<li>Improved documentation, including Dark Mode support</li>
 </ul>
 <h2>0.4.4</h2>
 <p><strong>Release Date</strong>: 2022-03-27</p>
