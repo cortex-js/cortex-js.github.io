@@ -1,0 +1,4041 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+
+
+
+<title>
+    CortexJS
+</title>
+<meta name="description" content="" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
+<script>
+  if(/cortexjs\.io/.test(window.location.hostname)) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ECEC8YT7XS');
+  }
+</script>
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+
+
+
+
+    <link rel="preconnect" href="https://kit.fontawesome.com">
+<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400&display=block" rel="stylesheet">
+
+
+<!-- <script>
+  // ((window.gitter = {}).chat = {}).options = {
+  //   room: 'cortex-js/community',
+  //   activationElement: '.my-special-button',
+  //   targetElement: '.my-special-target-element'
+  // };
+</script> -->
+<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
+
+  </head>
+
+  <body class="layout--single">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <defs>
+          <symbol id='svg-chevron' aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
+      </defs>
+    </svg>
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+  
+
+
+
+
+<div class="masthead ">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <input id="site-toc" name="site-toc" type="checkbox" />
+        <label for="site-toc"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></label>
+        
+        <a class="site-title" href="/">
+          Cortex<em>JS</em>
+          
+        </a>
+        <ul class="visible-links">
+              
+              <li class="masthead__menu-item  active ">
+                <a href="/mathlive/" >MathLive</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="/compute-engine/" >Compute Engine</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="/cortex/" >Cortex</a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://gitter.im/cortex-js" title="Chat on Gitter"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg></a>
+              </li></ul>
+        
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+    
+      
+      
+      
+
+      
+<nav class="nav__list">
+  
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg>
+Table of Content</label>
+
+  <ul class="nav__items">
+    
+      <li>
+        
+          <span class="nav__sub-title">MathLive</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Introduction
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/demo/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#flask"></use></svg>
+                  
+                  Demo
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/changelog/" data-url=/mathlive/changelog/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#log"></use></svg>
+                  
+                  Changelog
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/getting-started/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#checklist"></use></svg>
+                  
+                  Getting Started
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/integration/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Add MathLive to your Project
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/interacting/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Interacting
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/customizing/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Customize
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/commands/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/macros/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Macros
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/shortcuts/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Shortcuts
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/speech/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Speech
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/static/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Static
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/virtual-keyboards/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Virtual Keyboards
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/lifecycle/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Lifecycle
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+              </ul></li><li><ul>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/commands/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  LaTeX Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/keybindings/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Keyboard Shortcuts
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/mathlive/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#sdk"></use></svg>
+                  
+                  SDK Reference
+                </a></li>
+            
+          
+        </ul>
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <span class="nav__sub-title"><a href="/cortex/">Cortex</a></span>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          
+          
+            
+          
+
+          <span class="nav__sub-title"><a href="/compute-engine/">Compute Engine</a></span>
+        
+
+        
+      </li>
+    
+      <li>
+        
+          <span class="nav__sub-title">Contributing</span>
+        
+
+        
+        <ul>
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/reporting-issues/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#bug"></use></svg>
+                  
+                  Reporting Issues
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/contributing-code/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#code-branch"></use></svg>
+                  
+                  Contributing Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/funding/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#seedling"></use></svg>
+                  
+                  Funding
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/code-of-conduct/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
+                  
+                  Code of Conduct
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/docs/license/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#handshake"></use></svg>
+                  
+                  License
+                </a></li>
+            
+          
+        </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+    
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+
+      <section class="page__content" itemprop="text">
+        
+        <h1>MathLive Changelog</h1>
+<h2>0.70.0 (2022-04-05)</h2>
+<h3>Features</h3>
+<ul>
+<li>Uses new version of Compute Engine for serialization to MathJSON and parsing
+of LaTeX from MathJSON.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#934</strong> Improved display of the root horizontal bar in some browsers</li>
+<li><strong>#1385</strong> Typing <code>&amp;</code> is correctly interpreted as <code>\\&amp;</code> (and not <code>&amp;</code>)</li>
+<li><strong>#1363</strong> Commands in the <code>\overrightarrow{}</code> family can be deleted</li>
+<li><strong>#1375</strong> Inserting a smartfence which was not followed by some content would
+trigger some asserts</li>
+<li>Correctly handle deletion of the closing fence of a smartfence</li>
+<li><strong>#1412</strong> Correctly handle insertion of custom macros with <code>executeCommand</code></li>
+<li>On Windows/Linux with an AZERTY keyboard, the ² (supersript 2) is now handled
+correctly</li>
+<li><strong>#1362</strong> and <strong>#726</strong> Correctly handle backspacing over a multi-character
+operator, e.g. <code>&lt;=</code>.</li>
+<li><strong>#1366</strong> <code>pointerup</code> events in a mathfield would not bubble</li>
+<li>In Dark Mode, correctly display SVG shapes, such as <code>\overrightarrow{ABC}.</code></li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li><strong>#934</strong> Improved layout of <code>aligned</code> environment by adding missing gap
+between columns</li>
+<li>Added macros to the command popover</li>
+<li>Improved visual appearance when using dark mode. Also, added more CSS
+variables to customize the apperance of the mathfield.</li>
+</ul>
+<h2>0.69.10 (2022-02-23)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1024</strong> <code>\ne</code> and <code>\neq</code> render correctly (fix contributed by @AceGentile)</li>
+<li>Changes to the <code>read-only</code> attribute are now properly detected (fix
+contributed by @LuisMesa)</li>
+<li>Boxes in <code>\enclose</code> command render correctly (fix contributed by @Zahara-Nour</li>
+<li><strong>#1357</strong> Alternate (shifted) layers described in the virtual keyboard defined
+with an object literal would not trigger.</li>
+</ul>
+<h1>Features</h1>
+<ul>
+<li>Support for the <code>\htmlStyle</code> command (feature contributed by @neokazemi)</li>
+<li>Pressing the <code>\</code> key after a trigonometric function will not include the
+function in the numerator of the fraction.</li>
+</ul>
+<h2>0.69.9 (2022-01-06)</h2>
+<h3>Features</h3>
+<ul>
+<li>Support for Vue 3.x</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1240</strong> After a Select All (or other selection adjusting commands),
+inserting characters in Latex mode may result in unresponsive input.</li>
+<li>The z-index of the virtual keyboard <code>--keyboard-zindex</code> would not always be
+applied to the keyboard, resulting in some elements overlaping the virtual
+keyboard in some situations.</li>
+</ul>
+<h2>0.69.8 (2021-11-08)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1146</strong> When the pointer was over a mathfield, using the scrollwheel or
+scroll gesture to scroll the page was not possible</li>
+<li><strong>#1201</strong> In some cases, the scrim layer (used to display alternate keys in
+the virtual keyboard) was at the wrong depth</li>
+<li><strong>#951</strong> Fixed production of sup/sub in MathML</li>
+<li><strong>#1174</strong> The <code>virtual-keyboard-toggle</code> event was not dispatched</li>
+<li><strong>#1087</strong> When using the virtual keyboard, the mathfield would not scroll when
+necessary</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>Added <code>sounds-directory</code> as list of valid attributes (contributed by
+@bengolds)</li>
+<li>Improvements to handling of nested mathfields (“fill-in-the-blank”)
+(contributed by @caleb-flores)</li>
+<li>Use <code>serve-http</code> instead of <code>http-serve</code> for improved Linux compatibility
+(contributed by @AceGentile)</li>
+</ul>
+<h2>0.69.7 (2021-09-13)</h2>
+<h3>New Feature</h3>
+<ul>
+<li><strong>#1138</strong> <strong>PR#163</strong> “Fill in the blank”</li>
+</ul>
+<h2>0.69.6 (2021-08-31)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p><code>vue-cli</code> does not support optional chaining (see
+https://github.com/vuejs/vue-loader/issues/1697) There are workarounds for
+this, but debugging and fixing this is too difficult for many users.
+Therefore, sadly, this release rolls back emitting code including optional
+chaining, despite the fact it’s supported in every targeted browser, until the
+<code>vue</code> toolchain gets its act together. To be clear MathLive does not use or
+depend on <code>Vue</code>, but some users are integrating MathLive in projects that do
+use it, and this is sufficient to break MathLive. It appears that this isse
+affects also the React toolchain.</p>
+</li>
+<li>
+<p><strong>#1125</strong> don’t enable switching to Latex mode for read-only mathfields</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1124</strong> when setting the <code>inlineShortcuts</code> options to empty, don’t fallback
+to the default shortcuts</li>
+<li><strong>#1119</strong> <code>\overarc</code> and the <code>AccentAtom</code> family would not display their
+accent</li>
+<li><strong>#1115</strong> Clicking in the mathfield when virtual keyboard is displayed closed
+the keyboard</li>
+<li><strong>#1117</strong> and <strong>#1118</strong> Replacing a subset of a mathfield with a pattern that
+contains the target led to an infinite loop</li>
+</ul>
+<h2>0.69.5 (2021-08-05)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p>When using keybindings or virtual keyboard keys, insert the content in the
+current math style, rather than forcing display style.</p>
+</li>
+<li>
+<p>Correctly handle loading Mathlive in a non-browser context (e.g. Node)</p>
+</li>
+<li>
+<p>Updated localization strings</p>
+</li>
+</ul>
+<h2>0.69.4 (2021-06-22)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>Updated to ComputeEngine 0.4.2 for better parsing of Latex.</li>
+<li>When copying or cutting to the clipboard, if the MathJSON parsing fails,
+ignore the MathJSON and fallback to Latex. Previously, if there was a failure
+during parsing an empty MathJSON expression would be put on the clipboard,
+which result in subsequent attempts at pasting the content into a mathfield to
+fail.</li>
+<li>Updated various localizations (contributed by @physedo).</li>
+</ul>
+<h2>0.69.3 (2021-06-10)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>Added localization for Irish (contributed by @physedo).</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1000</strong> When serializing subscripts and superscripts, serialize the
+subscript first: <code>\int_0^{\infty}</code> instead of <code>\int^{\infty}_0</code>.</li>
+<li>In some page layouts, the virtual keyboard could be displayed at an incorrect
+location, or scroll with the page.</li>
+</ul>
+<h2>0.69.1 (2021-06-09)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>Attempt to fix installation of the npm package on some Windows configurations</li>
+</ul>
+<h2>0.69.0 (2021-06-09)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>
+<p>This release requires TypeScript 4.3 or later (the API uses assymetric
+getters/setters). If you are using VSCode, you may need to change the version
+of TypeScript used by the editor for language services (syntax checking). To
+do so, with a TypeScript file open, click the Typescript version in the bottom
+bar, then choose “Select TypeScript Version”, then “Use Workspace Version”
+(see
+https://code.visualstudio.com/docs/typescript/typescript-compiling#_using-newer-typescript-versions)</p>
+</li>
+<li>
+<p>All the default imports have been removed. Instead of</p>
+</li>
+</ul>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">MathLive</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">renderMathInDocument</span>();
+</code></pre>
+<p>use:</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-title function_">renderMathInDocument</span>();
+</code></pre>
+<p>If you are not calling a specific Mathlive function and just need to use the
+<code>&lt;math-field&gt;</code> tag, use:</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+</code></pre>
+<ul>
+<li>The following deprecated functions have been removed: <code>latexToMathML()</code> →
+<code>convertLatexToMathMl()</code>, <code>latexToSpeakableText</code> →
+<code>convertLatexToSpeakableText</code>, <code>latexToMarkup()</code> →
+<code>convertLatexToMarkup()</code>,</li>
+<li>The deprecated <code>revertToOriginalContent</code> functionality has been removed.</li>
+<li>The deprecated <code>overrideDefaultInlineShortcuts</code> property has been removed.
+Instead, use:</li>
+</ul>
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">setConfig</span>(<span class="hljs-string">&#x27;inlineShortcuts&#x27;</span>, {
+  ...mf.<span class="hljs-title function_">getConfig</span>(<span class="hljs-string">&#x27;inlineShortcuts&#x27;</span>),
+  ...newShortcuts,
+});
+</code></pre>
+<ul>
+<li>
+<p>The following Mathfield functions have been removed: <code>$setConfig()</code> →
+<code>setOptions()</code>, <code>getConfig()</code> → <code>getOptions()</code>, <code>$perform()</code> →
+<code>executeCommand()</code>, <code>$text()</code> → <code>getValue()</code>, <code>$selectedText()</code> →
+<code>getValue()</code>, <code>$selectionIsCollapsed()</code>, <code>$selectionDepth()</code>,
+<code>$selectionAtStart()</code>, <code>$selectionAtEnd()</code>, <code>$latex()</code> →
+<code>getValue()</code>and<code>setValue()</code>, <code>$el</code>, <code>$insert()</code> → <code>insert()</code>,
+<code>$hasFocus()</code> → <code>hasFocus()</code>, <code>$focus()</code> → <code>focus()</code>, <code>$blur()</code>
+→ <code>blur()</code>, <code>$select()</code> → <code>select()</code>, <code>$clearSelection()</code> →
+<code>executeCommand('delete-backward')</code>, <code>$applyStyle()</code> → <code>applyStyle()</code>,
+<code>$keystroke()</code>, <code>$typedText()</code></p>
+</li>
+<li>
+<p>The <code>makeMathField()</code> function has been removed. Use <code>new MathfieldElement()</code>
+or the <code>&lt;math-field&gt;</code> tag instead:</p>
+</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-comment">// Before</span>
+<span class="hljs-keyword">let</span> mf = <span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">makeMathField</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;div&#x27;</span>), {
+  <span class="hljs-attr">virtualKeyboardMode</span>: <span class="hljs-string">&#x27;manual&#x27;</span>,
+});
+mf.$latex(<span class="hljs-string">&#x27;f(x) = \\sin x&#x27;</span>);
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mf.$el());
+
+<span class="hljs-comment">// After</span>
+<span class="hljs-keyword">let</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>({
+  <span class="hljs-attr">virtualKeyboardMode</span>: <span class="hljs-string">&#x27;manual&#x27;</span>,
+});
+mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;f(x) = \\sin x&#x27;</span>;
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
+</code></pre>
+<p>or:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">virtual-keyboard-mode</span>=<span class="hljs-string">&quot;manual&quot;</span>&gt;</span>f(x) = \sin x<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
+<h2>Improvements</h2>
+<ul>
+<li>Added localization for Dutch (contributed by @harrisnl), Bosnian, Croatian,
+Czeck, Danish, Estonian, Finnish, Icelandic, Norwegian, Portuguese, Serbian,
+Slovak, Slovenian, Swedish, Turkish (contributed by @physedo).</li>
+<li>The selection can now be set using an offset, i.e. <code>mf.selection = 0</code> instead
+of <code>mf.selection = { ranges:[[0, 0]] }</code>.</li>
+<li>Map <code>\cdot</code> to “times” in <code>spoken-text</code> format.</li>
+<li><strong>#994</strong> When using <code>virtualKeyboardContainer</code>, the virtual keyboard is now
+displayed <strong>inside</strong> the container. The container should have a <code>position</code> of
+<code>relative</code>.</li>
+<li>When replacing a placeholder with a Latex command in Latex mode (by pressing
+the <code>\</code> key), remove the <code>\placeholder{}</code> command.</li>
+<li>In spoken text, correctly handle <code>\mathop</code> and <code>\operatorname</code>.</li>
+</ul>
+<h2>New Features</h2>
+<ul>
+<li>The <code>getOffsetDepth()</code> method can be used to query the depth of a specific
+offset. Use <code>mf.getOffsetDepth(mf.position)</code> for the depth of the current
+position.</li>
+<li>the <code>onExport()</code> hook provides an opportunity to customize the format exported
+to the Clipboard.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Actually change the keyboard toggle glyph when changed with <code>setOptions</code></li>
+<li>Reparse the formula when the <code>macros</code> dictionary is updated</li>
+<li><strong>#971</strong> In some browsers, when mathfield elements are contained in a
+container with <code>overflow: scroll</code>, the dimensions of the viewport would be
+incorrectly affected.</li>
+<li><strong>#974</strong> With non-US keyboard layout, always map the “/” key to a fraction.</li>
+</ul>
+<h2>0.68.1 (2021-06-02)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p>Keybindings: keybindings can now be associated with specific keyboard layouts.
+By default, the keybindings that are specific to the US keyboard layout are no
+longer applied with other keyboard layouts. This makes it easier to use
+punctuation with some keyboard layouts and prevent some error messages from
+being thrown (addresses <strong>#962</strong>).</p>
+</li>
+<li>
+<p>MathML: improved MathML output, especially for formulas with unbalanced
+delimiters</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#969</strong> and <strong>#967</strong> Changed the way the build is done so that Mathlive does
+not use MathJSON as a submodule but as a regular npm dependency, and builds
+correctly even in non-git environments.</li>
+<li><strong>#968</strong> navigating with arrow keys cannot navigate past a macro</li>
+</ul>
+<h2>0.68.0 (2021-05-31)</h2>
+<h3>Breaking Changes</h3>
+<p><strong>#500</strong> MathJSON support. The legacy MASTON/JSON format has been removed.<br>
+The MathJSON format is now integrated into Mathlive 🚀 🎆 🥳</p>
+<p>To get the MathJSON representation of a formula, use <code>mf.getValue('math-json')</code>.</p>
+<p>The <code>latexToAST()</code> and <code>astToLatex()</code> functions have been replaced by
+<a href="https://cortexjs.io/docs/mathjson/#(parse%3Afunction)">parseMathJson()</a> and
+<a href="https://cortexjs.io/docs/mathjson/#(serialize%3Afunction)">serializeMathJson()</a>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { parseMathJson, serializeMathJson } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+</code></pre>
+<p>MathJSON has an extensive API that supports parsing and serializing of custom
+Latex expressions. You can use it to define your own Latex “vocabulary” and
+“grammar” and transform it into MathJSON.</p>
+<p>You can also convert MathJSON expressions into several canonical forms, do
+symbolic computation with MathJSON expressions, for example to compare them, and
+more.</p>
+<p>Learn more at <a href="https://cortexjs.io/math-json/">cortexjs.io/math-json/</a>.</p>
+<h3>New Features</h3>
+<ul>
+<li><strong>#952</strong> It is now possible to define variants with keycaps in a custom
+keyboard. These variants are displayed with a long press on the keycap.</li>
+<li><strong>#955</strong> When navigating with the arrow keys but there is nowhere to go, a
+<code>move-out</code> event is dispatched (or the lower-level <code>onMoveOutOf</code> hook is
+invoked, but using the event is recommended). This is an opportunity to handle
+this situation, for example by changing the focus to another element. To get
+the default behavior, which is to play a “plonk” sound, do not cancel the
+event. To prevent the “plonk” sound from playing, use <code>evt.preventDefault()</code>.
+Note tha previously a <code>focus-out</code> event was dispatched in this case, but since
+the focus is actually not changed by default, this was incorrect.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>The <code>SpeechScope</code> argument of the <code>speak</code> command is now optional.</li>
+<li>Display the keys in the keystroke caption panel (alt/option+shift+K) in
+chronological order from left to right.</li>
+<li>Do not inject stylesheets or placeholder elements for the popover panel,
+keystroke caption panel or virtual keyboard until actually needed, which may
+be never and thus result in a smaller DOM.</li>
+</ul>
+<h3>Architecture</h3>
+<ul>
+<li>The library is now null-safe, i.e. it compiles with the Typescript flag
+<code>strictNullChecks</code>. This will ensure that the public Typescript declaration
+file also compile with <code>strictNullChecks</code> if you make use of it in your own
+project.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#948</strong> The Typescript declaration of <code>set plonkSound()</code> failed when compiled
+with <code>strictNullChecks</code>.</li>
+<li>When using a mathfield as a web component, the <code>speak</code> command would be
+inoperational.</li>
+<li>In Chrome/Blink, when a mathfield was in a <code>contentEditable</code> block, inserting
+a line before the component would make the component crash. Now the component
+is correctly disconnected, then reconnected and preserves its state across the
+disconnection.</li>
+<li><strong>#960</strong> Typing “e^pi” would result in <code>e\pi</code> instead of <code>e^\pi</code>. Also,
+serializing some partial formulas, such as “e^” would result in incorrect
+Latex (e.g. “e”).</li>
+<li>In MathML serialization, <code>2^3</code> was not serializing the superscript (<strong>#951</strong> )
+and subscripts were not serialized for various constructs( <strong>#534</strong>).</li>
+</ul>
+<h2>0.67.0 (2021-05-21)</h2>
+<h3>New Features</h3>
+<ul>
+<li>Added <code>\overarc</code>, <code>\underarc</code>, <code>\overparen</code> and <code>\underparen</code> commands.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>When replacing a selected range, snapshot in the undo state the collapsed
+selection before inserting the replacement.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Correctly calculate the padding for enclose atoms (broken in 0.66)</li>
+<li>Setting the <code>keypressSound</code> to <code>null</code> would not turn off the sounds. Setting
+it to the string <code>&quot;null&quot;</code> did, though.</li>
+<li>An <code>input</code> event would incorrectly bubble out of the mathfield, even in
+read-only mode.</li>
+<li>When calling <code>getOption()</code>, or when examining a property on
+<code>MathFieldElement</code>, return the actual value, rather than an object literal
+that contains the value.</li>
+<li>If the mathlive module was loaded before the <code>&lt;math-field&gt;</code> element was parsed
+in the document, the attributes of the mathfield would be ignored.</li>
+</ul>
+<h2>0.66.1 (2021-05-21)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Revert improvements where the <code>display</code> property of the mathfield would change
+depending on the <code>default-mode</code> property. This had unintended consequences in
+some cases. To control the layout of the mathfield, use
+<code>style=&quot;display:inline-block;&quot;</code> instead.</li>
+<li>When using <code>applyStyle()</code>, if a non-RGB color (e.g. <code>&quot;yellow&quot;</code>) was used, it
+would not be applied to the selection.</li>
+<li>When using <code>applyStyle()</code> if the font size was changed, it was always set to
+font size 1 (tiny).</li>
+<li>Macro packages were incorrectly parsed</li>
+</ul>
+<h2>0.66.0 (2021-05-20)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>The <code>horizontalSpacingScale</code> option is deprecated. It will be removed in an
+upcoming version and replaced by the standard TeX registers <code>\thinmuskip</code>,
+<code>\medmuskip</code> and <code>\thickmuskip</code>.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>When the <code>default-mode</code> attribute (or the <code>defaultMode</code> property) of a
+<code>&lt;math-field&gt;</code> element is set to <code>&quot;inline-math&quot;</code>, the element will be
+displayed as an inline element. Previously, the <code>defaultMode</code> affected the
+layout of the math content, but the element still behaved as a block.</li>
+<li><code>renderMathInDocument()</code> now creates a <code>&lt;div&gt;</code> when using Display Style, and a
+<code>&lt;span&gt;</code> when using Text Style (inline math).</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li><strong>#946</strong> Support addding a custom stylesheet to a <code>&lt;math-field&gt;</code> when using
+the <code>\class</code> command.</li>
+<li>The mathfield options which are reflected as attributes (e.g.
+<code>virtual-keyboard-mode</code>) are now reflected as a property on the element
+<code>mf.virtualKeyboardMode</code> as a shortcut to
+<code>mf.setOptions({virtualKeyboardMode:...}</code>. This also allows to set these
+properties before the component is connected to the document.</li>
+<li>Added the following attributes to <code>&lt;math-field&gt;</code>: <code>plonk-sound</code>,
+<code>keypress-sound</code>. Setting them to ‘none’ turn off these sounds.</li>
+<li>Added support for definition of macro packages (see <code>MacroPackageDefinition</code>)</li>
+<li>Added support to selectively expand macro definitions. This avoid expanding
+common macro definitions (for example from <code>amsmath.sty</code>) when
+copying/pasting, while still expanding custom macros for improved
+compatibility.</li>
+<li>Added support for MediaWiki commands:</li>
+</ul>
+<ul>
+<li><code>\darr</code></li>
+<li><code>\dArr</code></li>
+<li><code>\Darr</code></li>
+<li><code>\lang</code></li>
+<li><code>\rang</code></li>
+<li><code>\uarr</code></li>
+<li><code>\uArr</code></li>
+<li><code>\Uarr</code></li>
+<li><code>\N</code></li>
+<li><code>\R</code></li>
+<li><code>\Z</code></li>
+<li><code>\alef</code></li>
+<li><code>\alefsym</code></li>
+<li><code>\Alpha</code></li>
+<li><code>\Beta</code></li>
+<li><code>\bull</code></li>
+<li><code>\Chi</code></li>
+<li><code>\clubs</code></li>
+<li><code>\cnums</code></li>
+<li><code>\Complex</code></li>
+<li><code>\Dagger</code></li>
+<li><code>\diamonds</code></li>
+<li><code>\empty</code></li>
+<li><code>\Epsilon</code></li>
+<li><code>\Eta</code></li>
+<li><code>\exist</code></li>
+<li><code>\harr</code></li>
+<li><code>\hArr</code></li>
+<li><code>\Harr</code></li>
+<li><code>\hearts</code></li>
+<li><code>\image</code></li>
+<li><code>\infin</code></li>
+<li><code>\Iota</code></li>
+<li><code>\isin</code></li>
+<li><code>\Kappa</code></li>
+<li><code>\larr</code></li>
+<li><code>\lArr</code></li>
+<li><code>\Larr</code></li>
+<li><code>\lrarr</code></li>
+<li><code>\lrArr</code></li>
+<li><code>\Lrarr</code></li>
+<li><code>\Mu</code></li>
+<li><code>\natnums</code></li>
+<li><code>\Nu</code></li>
+<li><code>\Omicron</code></li>
+<li><code>\plusmn</code></li>
+<li><code>\rarr</code></li>
+<li><code>\rArr</code></li>
+<li><code>\Rarr</code></li>
+<li><code>\real</code></li>
+<li><code>\reals</code></li>
+<li><code>\Reals</code></li>
+<li><code>\Rho</code></li>
+<li><code>\sdot</code></li>
+<li><code>\sect</code></li>
+<li><code>\spades</code></li>
+<li><code>\sub</code></li>
+<li><code>\sube</code></li>
+<li><code>\supe</code></li>
+<li><code>\Tau</code></li>
+<li><code>\thetasym</code></li>
+<li><code>\weierp</code></li>
+<li><code>\Zeta</code></li>
+</ul>
+<ul>
+<li>Added support for some additional <code>amsmath</code> commands:</li>
+</ul>
+<ul>
+<li><code>\varGamma</code></li>
+<li><code>\varDelta</code></li>
+<li><code>\varTheta</code></li>
+<li><code>\varLambda</code></li>
+<li><code>\varXi</code></li>
+<li><code>\varPi</code></li>
+<li><code>\varSigma</code></li>
+<li><code>\varUpsilon</code></li>
+<li><code>\varPhi</code></li>
+<li><code>\varPsi</code></li>
+<li><code>\varOmega</code></li>
+</ul>
+<ul>
+<li>Added support for the <code>\displaylimits</code> command</li>
+</ul>
+<p>See
+<a href="https://cortexjs.io/mathlive/reference/commands/">Supported TeX/LaTeX Commands</a>
+for more details.</p>
+<h3>Bug Fixes</h3>
+<ul>
+<li>When a mathfield is created, then immediately removed from the document, do
+not crash. The creation of the mathfield triggered an asynchronous rendering
+and by the time the rendering was executed the mathfield was no longer valid.
+This situattion happened when using “tippyjs” and possibly other libraries.</li>
+<li>When a mathfield is read-only, do not display the focus outline.</li>
+<li><strong>#943</strong> When a tooltip for a custom virtual keyboard was provided, the label
+was set to “undefined”.</li>
+<li>The DVIPS colors were case sensitive, they should be case sensitive. (i.e.
+<code>LimeGreen</code> is a valid color, <code>Limegreen</code> is not)</li>
+<li><strong>#945</strong> Preserve more aggresively verbatim Latex. Also, avoid serializing
+superfluous spaces in Spacing atoms.</li>
+<li><strong>#770</strong> Correctly handle attaching limits to <code>\int</code> command using the
+keyboard.</li>
+<li>Return the correct <code>value</code> for the mathfield element when it is not attached
+yet, even if the output format is not specified.</li>
+<li>Color specified with the <code>rgb()</code> function would not render correctly if the
+arguments contained some spaces, e.g.<code>rgb ( 255 , 255 , 255 )</code>.</li>
+</ul>
+<h2>0.65.0 (2021-05-14)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>The <code>substituteTextArea</code> option has been removed. This option was in fact not
+working so removing it will presumably have no impact.</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li><strong>#939</strong> Added access to <code>\underline</code>, <code>\underbrace</code>, <code>\xleftarrow</code>, etc… to
+the virtual keyboard.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>On iPad OS and relevant Windows devices, support the detachable keyboard.</li>
+<li>In Latex mode, don’t consider <code>\\</code> (double-dash, i.e. end of line in tabular
+mode) as a valid command prefix.</li>
+<li>In Latex mode, don’t recommend <code>\{</code> as a command by default.</li>
+<li>Added <code>\bigstar</code> symbol</li>
+<li>Improved performance of <code>renderMathInDocument()</code> when there are many formulas
+on the page.</li>
+</ul>
+<h3>Architecture</h3>
+<ul>
+<li>Renamed <code>Span</code> to <code>Box</code>.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>When using Firefox on Windows, the layout of the formula could shift by a
+fraction of a pixel when moving the caret.</li>
+<li>In Latex mode with nested expressions, the edited Latex was incorrect.</li>
+</ul>
+<h2>0.64.0 (2021-05-09)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>
+<p>The <code>FontSize</code> type is now an integer between 1 and 10. It previously was
+<code>size1</code>, <code>size2</code>, etc… The default font size is <code>5</code>, the smallest is <code>1</code>.
+However, when using <code>applyStyle()</code>, the size can still be specified with
+<code>size1</code>, etc… The following size values can also be used: <code>tiny</code>,
+<code>scriptsize</code>, <code>footnotesize</code>, <code>small</code>, <code>normal</code> or <code>normalSize</code>, <code>large</code>,
+<code>Large</code>, <code>LARGE</code>, <code>huge</code>, <code>Huge</code>.</p>
+</li>
+<li>
+<p>Previously, named colors (<code>yellow</code>, <code>red</code>…) mapped to the <code>dvips</code> color set.
+They can now map to different values to improve their legibility. To ensure
+that a particular color is used, specify the colors as a hex triplet
+(<code>#dd2233</code>). See also the <code>colorMap</code> option.</p>
+<p>The following color names are recommended: they will map to values that have
+been optimized for legibility as a foreground or background color, they cover
+all the hues of the color circle and have been adjusted to provide similar
+apparent brightness and intensity:</p>
+<ul>
+<li>colors: <code>orange</code>, <code>yellow</code>, <code>lime</code>, <code>green</code>, <code>teal</code>, <code>blue</code>, <code>indigo</code>,
+<code>purple</code>, <code>magenta</code></li>
+<li>shades of grey: <code>black</code>, <code>dark-grey</code>, <code>grey</code>, <code>light-grey</code>, <code>white</code></li>
+</ul>
+</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li>
+<p>The background of fractions, radicals and parentheses group (<code>\left</code>/<code>\right</code>
+commands) is now highlited when they contain the caret. This makes it easier
+to distinguish some cases when the cursor is at the edge of the element and
+could be either inside or outside. The appearance of the highliting can be
+controlled with the <code>--contains-highlight</code> CSS variable. Set it to
+<code>transparent</code> to restore the previous behavior.</p>
+</li>
+<li>
+<p><strong><code>colorMap</code> option</strong>. To map a color name such as “yellow” to a custom RGB
+color, set the <code>colorMap</code> or <code>backgroundColorMap</code> option to a function that
+takes the color name as an argument and return a matching CSS RGB string.
+Return <code>undefined</code> to proceed with the default mapping.</p>
+</li>
+<li>
+<p>In macro dictionary, added option to expand or not the macro when using the
+<code>latex-expanded</code> output format (when copying to the clipboard, for example).</p>
+</li>
+<li>
+<p>Added the <code>\overunderset{}{}{}</code> command.</p>
+</li>
+<li>
+<p>Added the <code>\lparen</code> and <code>\rparen</code> delimiters.</p>
+</li>
+<li>
+<p>Added the <code>\mod</code>, <code>\pmod</code> and <code>\bmod</code> commands, defined as macros.</p>
+</li>
+<li>
+<p>Added support for dashed column separators in matrix, using “:” in the matrix
+preamble. See the
+<a href="https://mirrors.ircam.fr/pub/CTAN/macros/latex/contrib/arydshln/arydshln.pdf">arydshln</a>
+package.</p>
+</li>
+<li>
+<p>Added support for optional below argument to <code>\stackrel</code> and <code>\stackbin</code> as
+per the
+<a href="http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/oberdiek/stackrel.pdf">stackrel package</a></p>
+</li>
+<li>
+<p>When using <code>renderMathInDocument()</code> or <code>renderMathInElement()</code>, ASCII Math
+format can be used. The default delimiters for ASCII Math are
+&quot;<code>&quot; (backtick) and can be changed with the </code>asciiMath.delimiters<code>option. To turn off this conversion and revert to the previous behavior, call </code>renderMathInDocument({
+asciiMath: null })`</p>
+</li>
+</ul>
+<h3>Layout Improvements</h3>
+<ul>
+<li>Substantial rewrite of the stacked layout algorithm (fractions, superscripts,
+etc…). The previous algorithm did not work correctly when mixing absolute
+sizing commands (<code>\Huge</code>) and relative ones (<code>\scriptstyle</code>) and had various
+issues and inconsistenceis with what TeX produced. The result is now close to
+TeX.</li>
+</ul>
+<p><img src="assets/mathlive-0.64.jpg" alt=""></p>
+<ul>
+<li>
+<p>Display the placeholder symbol using the caret color.</p>
+</li>
+<li>
+<p>Added the <code>--smart-fence-opacity</code> and <code>--smart-fence-color</code> CSS variables.</p>
+</li>
+<li>
+<p>In the layout of superscript/subscript and accents, use the correct font
+metrics for spacing and layout (previously, the font metric for the base size
+was always used). This may result in very slightly different placement of
+superscripts, subscripts and limits (but closer to TeX).</p>
+</li>
+<li>
+<p>Fixed cases where the inter-atom spacing was incorrect (when spacing atoms or
+super/subscripts were used with a binary atom, or when some other atom types
+were used, such as BoxAtom and more).</p>
+</li>
+</ul>
+<h3>Clipboard Improvements</h3>
+<ul>
+<li>
+<p>When pasting from the clipboard, recognize text bracketed with
+<code>\begin{math}</code>…<code>\end{math}</code> or <code>\begin{displaymath}</code>…<code>\end{displaymath}</code>
+as LaTeX (in additon to <code>$</code>, <code>$$</code>, <code>\[</code>…<code>\]</code> and <code>\(</code>…<code>\)</code> which were
+recognized before). Also, recognize text that may contain a Latex expression
+surrounded by regular text (i.e. “if $x &gt; 0$”).</p>
+</li>
+<li>
+<p>When pasting ASCIIMath, recognize more expression using standard functions
+such as the trig functions.</p>
+</li>
+<li>
+<p>Recognize text content surrounded with “`” (backtick) delimiters as ASCII
+Math.</p>
+</li>
+<li>
+<p>When copying to the clipboard, roundtrip verbatim latex when available, i.e.
+the content of the clipboard will be exactly what has been pasted in if the
+formula has not been edited.</p>
+</li>
+</ul>
+<h3>Other Improvements</h3>
+<ul>
+<li>
+<p>The default color mapping function now returns different values when used as a
+line color or as a background color. This improves the legibility of colors.
+See
+<a href="https://cortexjs.io/mathlive/guides/customizing/">MathLive Guide: Customizing</a>.</p>
+</li>
+<li>
+<p>Paste operations are now undoable.</p>
+</li>
+</ul>
+<h3>Architecture</h3>
+<ul>
+<li>
+<p>Avoid generating unnecessary empty span for limits and other constructs.</p>
+</li>
+<li>
+<p>Avoid repeating color attributes on child elements by lifting them to an
+appropriate parent. As a consequence, when a background color is applied it is
+displayed more uniformly than previously.</p>
+</li>
+<li>
+<p>Reduced the size of the font-metrics table.</p>
+</li>
+<li>
+<p>Increased the number of automated and static tests.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>The size and spacing of fractions in superscript did not match the TeX layout.</li>
+<li>Correctly apply TeX inter-atom spacing rules as per TeXBook p. 270. The
+spacing of two consecutive binary atoms (e.g. <code>+-</code>) was incorrect, as well as
+some other combinations.</li>
+<li>Correctly render <code>\sqrt</code>, <code>\placeholder</code> and many other atoms when a mathstyle
+is applied with commands such as <code>\textstyle</code>, <code>\scriptstyle</code>, etc…</li>
+<li>Correctly render selection rectangle of accent commands (<code>\widehat</code>).</li>
+<li>If a document called <code>renderMathInDocument()</code> and the document contained a
+mathfield with a value that contained exclusively an environment, the
+mathfield would not render (the <code>\begin{}</code> would be incorrectly rendered by
+<code>renderMathInDocument()</code>).</li>
+<li>When using <code>renderMathInElement()</code> or <code>renderMathInDocument()</code> use the same
+default <code>letterShapeStyle</code> as when using a mathfield, that is, <code>french</code> if the
+locale is French, <code>tex</code> otherwise.</li>
+<li>Fixed verbatim latex: when the value of the mathfield is set, if it is not
+modified, <code>getValue('latex')</code> will return exactly what was input.</li>
+<li>Fixed latex output of <code>\exponentialE</code>: when a superscript/subscript was
+applied to a macro, the latex output would become blank.</li>
+<li>Math characters with a bold italic style were displayed in regular italic.</li>
+<li>An input consisting of only <code>\scriptstyle</code> would crash.</li>
+<li>Allow navigation inside an empty <code>skipBoundary</code> atom.</li>
+<li>After a copy (command/control+C) command, the content of clipboard was
+incorrect if the end of the selection included some content in text mode.</li>
+<li>When rendering a placeholder in static mode, use a non-breaking space instead
+of nothing, which helps preserve a more accurate layout in some cases (for
+example in <code>\sqrt[\placeholder{}}{x}</code></li>
+<li>Rules (e.g. from <code>\rule{}{}</code>) were not clickable and did not appear selected.</li>
+<li>Correctly roundtrip <code>\char</code> command when using <code>latex-expanded</code> format.</li>
+</ul>
+<h2>0.63.1 (2021-04-24)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>On the UK QWERTY keyboard, pressing the <code>\</code> key did not switch to Latex mode.
+This key, although it looks like an ordinary key, is unique to the UK QWERTY
+keyboard and distinct from the <code>\</code> on any other keyboard. Its official name is
+<code>IntlBackslash</code>, while the other, visually identical <code>\</code> key, is the
+<code>Backslash</code> key.</li>
+</ul>
+<h2>0.63.0 (2021-04-24)</h2>
+<h3>New Features</h3>
+<ul>
+<li><strong>#788</strong> Added <code>virtualKeyboardState</code> property to indicate if the virtual
+keyboard is currently visible or hidden. The property can also be modified to
+show or hide the virtual keyboard.</li>
+<li>In read-only mode, do not attempt to load the sounds and do not allow the
+virtual keyboard to be shown.</li>
+<li>Export <code>version</code> (previously available as <code>MathLive.version</code>).</li>
+<li><strong>#199</strong> Added <code>infty</code> and <code>int</code> inline shortcuts.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#708</strong> Pressing on the bottom part of the virtual keyboard keycap did not
+trigger the key action.</li>
+<li>The asset directory (fonts/sounds) was not properly located in some browsers
+when using a CDN to load Mathlive.</li>
+<li>Correctly focus the mathfield when the virtual keyboard is invoked.</li>
+</ul>
+<h2>0.62.0 (2021-04-23)</h2>
+<h3>Improvements</h3>
+<ul>
+<li><strong>#794</strong> When a keycap on the virtual keyboard with associated alternate keys
+is long pressed, the other UI elements on the screen are ignored (a scrim
+element is inserted behind the panel to capture events).</li>
+<li>On iPad OS prevent the document selection from being altered after
+long-pressing an alternate key in some cases.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>A $$\chi_{13}$$ (0.1em) gap between the nucleus and the above element was
+missing in <code>OverUnder</code> atoms (<code>\overset</code>, etc…).</li>
+<li>On Safari iOS, correctly display the keyboard toggle glyph.</li>
+<li><strong>#907</strong> When using <code>renderMathInElement()</code> or <code>renderMathInDocument()</code>,
+formulas containing styling information would get too aggressively coalesced,
+dropping some styling.</li>
+<li><strong>#910</strong> Fixed an issue introduced in 0.61.0 where some content would not get
+rendered when calling <code>renderMathInElement()</code> or <code>renderMathInDocument()</code>.</li>
+</ul>
+<h2>0.61.0 (2021-04-22)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>
+<p>Some format options have been renamed:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Before</th>
+<th style="text-align:left">Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;spoken-ssml-withHighlighting&quot;</code></td>
+<td style="text-align:left"><code>&quot;spoken-ssml-with-highlighting&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;mathML&quot;</code></td>
+<td style="text-align:left"><code>&quot;math-ml&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;ASCIIMath&quot;</code></td>
+<td style="text-align:left"><code>&quot;ascii-math&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<p>The old spelling is still accepted at runtime but it has been deprecated and
+you will be removed in a future update.</p>
+</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>In many cases, the layout of the formula is closer to the TeX layout.</li>
+<li>Improved performance of hit testing, selection tracking and selection
+rendering for complex formulas.</li>
+<li>Improved accuracy of hit-testing. Prevent children of elements with a
+<code>captureSelection</code> flag from being selectable.</li>
+<li>More efficient rendering by generating simpler markup in some cases.</li>
+<li>Dropped <code>woff</code> fonts. This change should be transparent, as all supported
+browsers support <code>woff2</code> at this point.</li>
+<li>Apply sizing commands (e.g. <code>\Huge</code>) to math mode. TeX is inconsistent in how
+it handles those. We choose to always apply them in math mode.</li>
+<li>Added support for <code>dcases</code> environment: like <code>cases</code> but in <code>displaystyle</code> by
+default.</li>
+<li>Correctly round trip <code>\mbox</code> by avoiding wrapping it with an unnecessary
+<code>\text</code> command.</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li><strong>#898</strong>. Setting the <code>plonkSound</code> or <code>keypressSound</code> option to <code>null</code> will
+suppress sound feedback.</li>
+<li><strong>PR#905</strong>. Added option to specify the container of the virtual keyboard.
+Contributed by Dominik Janković (https://github.com/djankovic). Thanks,
+Dominik!</li>
+<li>Simplified the specification of virtual keyboards: the <code>keycap</code> class no
+longer needs to be specified for each keycap.</li>
+<li>The <code>defaultMode</code> property or the <code>default-mode</code> attribute can be set to a
+value of <code>inline-math</code> to set the mathfield in inline math <code>\textstyle</code> by
+default.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed Latex output of <code>\htmlData</code>, <code>\cssId</code> and <code>\class</code> commands.</li>
+<li>Ignore commands that are only applicable in some modes when they are used in
+an incorrect mode.</li>
+<li>Fixed styling of some characters, such as the ones from <code>\cdot</code>. The incorrect
+styling resulted in incorrect measurement and vertical layout of some
+characters.</li>
+<li>Fixed rendering of <code>\ne</code>, <code>\neq</code> and <code>\not</code>.</li>
+<li>When using <code>renderMathInElement()</code> or <code>renderMathInDocument()</code> do not
+duplicate the accessible node.</li>
+<li>Correctly display <code>e^x</code> and <code>d/dx</code> in the <code>functions</code> virtual keyboard</li>
+<li>Ensure the correct spacing around fractions.</li>
+<li>In Safari, the fonts would not load. This was a regression due to a change in
+the behavior of the API to test if a font is loaded. Safari lies and always
+answer yes (to prevent fingerprinting).</li>
+<li>Correctly parse the <code>\displaystyle</code>, <code>\textstyle</code>, <code>\scriptstyle</code> and
+<code>\scriptscriptstyle</code> commands: they apply to the commands to their right.</li>
+<li>In a tabular environment (matrix, etc…) <code>\displaystyle</code> applies to the
+current cell only (not the whole array).</li>
+<li>Moving forward in a group with the <code>skipBoundary</code> flag would not skip it.</li>
+<li>In a sequence of atoms with <code>skipBoundary</code>, only the first one would be
+skipped.</li>
+<li>In the virtual keyboard, some keycaps in the greek keyboard were displayed
+with the system font instead of the TeX font.</li>
+<li>The selection rectangle for <code>\int</code> now accounts for the slant of the symbol.</li>
+<li>When using <code>convertLatexToMarkup()</code> or <code>renderMathInDocument()</code> properly wrap
+the generated atoms in a root atom. Without it, some atoms render differently
+in static mode than in interactive mode.</li>
+<li><strong>#654</strong> Added ASCII Math output for tabular environments (array, matrix,
+etc…)</li>
+<li>If the basefont of the mathfield was large (&gt;48px) the virtual keyboard toggle
+button would not be vertically centered in the field.</li>
+<li>Correctly layout superscripts after <code>\overset</code> (they are adjacent, not over,
+unlike <code>\overbrace</code>).</li>
+<li>The <code>cases</code> environment should be in inline mode (<code>textstyle</code>) by default.</li>
+<li>Fixed keyboard navigation of <code>\overbrace</code>, <code>\underbrace</code>, etc…</li>
+</ul>
+<h2>0.60.1 (2021-04-13)</h2>
+<h3>New Features</h3>
+<ul>
+<li><strong>#793</strong>. Added ‘%’ inline shortcut</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#896</strong>. Touch events were not properly detected on FireFox.</li>
+<li>When using the <code>vite</code> bundler, the library location could not be determined
+correctly. As a result, the assets (fonts and sounds) could not be loaded when
+in their default location.</li>
+<li><strong>#864</strong> Fixed layout of <code>\enclose{roundedbox}</code> and other variants.</li>
+<li><strong>#822</strong> When using the Vue.js wrapper, the caret would jump to end of input
+field when typing a character in the middle of the formula</li>
+<li>When changing options with <code>setOptions()</code> avoid changing the selection unless
+necessary (react-mathlive issue #4).</li>
+</ul>
+<h2>0.60.0 (2021-04-12)</h2>
+<h3>Breaking Change</h3>
+<ul>
+<li>
+<p>Renamed <code>getCaretPosition()</code> and <code>setCaretPosition()</code> to <code>get/set caretPoint</code>.</p>
+<p>“Position” refers to where the caret/insertion point is, as an offset inside
+the expression. These methods return client screen coordinates and the new
+name better reflect the correct terminology.</p>
+</li>
+<li>
+<p>Removed deprecated (April 2019) method <code>enterCommandMode()</code></p>
+</li>
+<li>
+<p>Replaced <code>ignoreSpacebarInMathMode</code> option with <code>mathModeSpace</code>. The
+<code>ignoreSpacebarInMathMode</code> was accidentally not working (<strong>#859</strong>). However,
+the boolean form is problematic as an element attribute (it defaults to true,
+but element attributes default to false). It has been replaced with
+<code>mathModeSpace</code> which is more flexible (you can specify which space to use)
+and doesn’t have the issue of the default boolean value.</p>
+</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li>
+<p>Support for <em>iframes</em>. Multiple mathfields in a single document but in
+different <em>iframes</em> can now share a single virtual keyboard. In the main
+document, use:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
+  <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
+});
+</code></pre>
+<p>And in the <em>iframes</em>, use the <code>use-shared-virtual-keyboard</code> attribute:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
+<p>See <code>examples/iframe</code> for more info.</p>
+<p>Contribution by https://github.com/alexprey. Thanks!</p>
+</li>
+<li>
+<p><strong>#555</strong> Support for IME (Input Method Engines) for Japanese, Chinese, Korean
+and other complex scripts.</p>
+</li>
+<li>
+<p><code>applyStyle()</code> has now more options. Previously it always toggled the style of
+the selection. Now it can either toggle or set the style, and modify the
+selection or a specific range.</p>
+</li>
+<li>
+<p><strong>#387</strong> <code>find()</code> method to search the fragments of an expression that match a
+Latex string or regular expression.</p>
+<p>For example the following code snippet will add a yellow background to the
+fractions in the expression:</p>
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">find</span>(<span class="hljs-regexp">/^\\frac{[^}]*}{[^}]*}\$/</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> {
+  mf.<span class="hljs-title function_">applyStyle</span>({ <span class="hljs-attr">backgroundColor</span>: <span class="hljs-string">&#x27;yellow&#x27;</span> }, x, {
+    <span class="hljs-attr">suppressChangeNotifications</span>: <span class="hljs-literal">true</span>,
+  });
+});
+</code></pre>
+</li>
+<li>
+<p><strong>#387</strong> <code>replace()</code> method to replace fragments of an expression.</p>
+<p>This method is similar to the <code>replace()</code> method of the <code>String</code> class. The
+search pattern can be specified using a string or regular expression, and the
+replacement pattern can be a string or a function. If using a regular
+expression, it can contain capture groups, and those can be references in the
+replacement pattern.</p>
+<p>The following snippet will invert fractions in a formula:</p>
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^\\frac{([^}]*)}{([^}]*)}$/</span>, <span class="hljs-string">&#x27;\\frac{$2}{$1}&#x27;</span>);
+</code></pre>
+</li>
+<li>
+<p>New <strong>Latex Mode</strong></p>
+<p>This mode replaces the previous <strong>Command Mode</strong>. While the <strong>Command Mode</strong>
+(triggered by pressing the <strong>\</strong> or <strong>ESC</strong> key) was only intended to insert
+a single Latex command (e.g. “\aleph”), the <strong>Latex Mode</strong> is a more
+comprehensive Latex editing mode.</p>
+<p>To enter the <strong>Latex Mode</strong>, press the <strong>ESC</strong> key or the <strong>\</strong> key. While in
+this mode, a complex Latex expression can be edited. Press the <strong>ESC</strong> or
+<strong>Return</strong> key to return to regular editing mode.</p>
+<p>To quickly peek at the Latex code of an expression, select it, then press
+<strong>ESC</strong>. Press <strong>ESC</strong> again to return to the regular editing mode.</p>
+<p>To insert a command, press the <strong>\</strong> key, followed by the command name. Press
+the <strong>TAB</strong> key to accept a suggestion, then the <strong>RETURN</strong> key to return to
+regular editing mode (previously pressing the <strong>TAB</strong> key would have exited
+the command mode).</p>
+</li>
+<li>
+<p>Added <code>soundsDirectory</code> option to customize the location of the sound files,
+similarly to <code>fontsDirectory</code>.</p>
+</li>
+<li>
+<p>Enabled audio feedback by default.</p>
+</li>
+<li>
+<p><strong>#707</strong> added support for <code>\begin{rcases}\end{rcases}</code> (reverse <code>cases</code>, with
+brace trailing instead of leading)</p>
+</li>
+<li>
+<p><strong>#730</strong> added new CSS variables to control the height of the virtual
+keyboard:</p>
+<ul>
+<li><code>--keycap-height</code></li>
+<li><code>--keycap-font-size</code></li>
+<li><code>--keycap-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-extra-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-tt-font-size</code> (only if needed)</li>
+</ul>
+</li>
+<li>
+<p><strong>#732</strong> Support for Dvorak keyboard layout</p>
+</li>
+<li>
+<p>Synchronize the virtual keyboard layout (QWERTY, AZERTY, etc…) with the
+physical keyboard layout.</p>
+</li>
+<li>
+<p>Added <code>\htmlData</code> command, which takes as argument a comma-delimited string of
+key/value pairs, e.g. <code>\htmlData{foo=green,bar=blue}</code>. A corresponding
+<code>data-foo</code> and <code>data-bar</code> DOM attribute is generated to the rendered DOM.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#805</strong>: exponent towers did not display correctly</li>
+<li><strong>#857</strong>: when a mathfield was in <code>read-only</code> mode, it was still possible to
+delete a portion of it by pressing the backspace key.</li>
+<li><strong>#818</strong>: on iPad OS 14 and later, Safari pretends to be macOS (“Desktop
+Mode”). This interfered with the handling of the MathLive virtual keyboard.</li>
+<li>The selection in an expression could render incorrectly if it was displayed
+before the fonts were fully loaded. This situation is now handled correctly
+and the selection is redrawn when fonts finish loading.</li>
+<li>The <code>typedText</code> selector dropped its options argument. As a result, the sound
+feedback from the virtual keyboard only played for some keys.</li>
+<li><strong>#697</strong> When using the <code>&lt;math-field&gt;</code> element the command popover did not
+display correctly.</li>
+<li>Fixed issues with copy/paste. Copying from a text zone will copy the text (and
+not a latex representation of it). Copy from a Latex zone now works.</li>
+<li><strong>#816</strong> Fixed some issues with keybindings on some keyboards, such as Swiss
+German. The physical keyboard layout was not always recognized, and some
+keybindings conflicted with each other.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>Improved handling of paste commands: if a JSON item is on the clipboard it is
+used in priority, before a <code>plain/text</code> item.</li>
+<li>It is now possible to type dead keys such as <code>alt+e</code>, and they are properly
+displayed as a composition (side effect of the fix for <strong>#555</strong>).</li>
+<li><strong>#807</strong> Support for AZERTY keyboard layout on Linux.</li>
+</ul>
+<h3>Architecture</h3>
+<ul>
+<li>
+<p><strong>Complete rewrite of selection handling.</strong></p>
+<p>This is mostly an internal change, but it will offer some benefits for new
+capabilities in the public API as well.</p>
+<p><strong>Warning</strong>: <em>This is a very disruptive change, and there might be some edge
+cases that will need to be cleaned up.</em></p>
+<p>The <em>position</em> of the insertion point is no longer represented by a <em>path</em>. It
+is now an <em>offset</em> from the start of the expression, with each possible
+insertion point position being assigned a sequential value.</p>
+<p>The <em>selection</em> is no longer represented with a <em>path</em> and a sibling-relative
+<em>offset</em>. It is now a <em>range</em>, i.e. a start and end <em>offset</em>. More precisely,
+the selection is an array of ranges (to represent discontinuous selections,
+for example a column in a matrix) and a direction.</p>
+<p>These changes have these benefits:</p>
+<ul>
+<li>The selection related code is more expressive and much simpler to read and
+debug</li>
+<li>The code is also simpler to change so that changes in UI behavior are much
+easier to implement. There are several open issues that will be much easier
+to fix now. In particular, the <code>onDelete</code> function now regroups all the
+special handling when pressing the <strong>Backspace</strong> and <strong>Delete</strong> keys.</li>
+<li>Instead of the esoteric paths, the concept of position as an offset is much
+easier to explain and understand, and can now be exposed in the public API.
+Consequently, new functionality can be exposed, such as the <code>find()</code> method
+which returns its results as an array of ranges. It is also possible now to
+query and change the current selection, and to apply styling to a portion of
+the expression other than the selection.</li>
+<li>The selection is represented as an <em>array</em> of ranges to support discontinous
+selections, which are useful to select for example all the cells in the
+column of a matrix column. This kind of selection was not previously
+possible.</li>
+<li>Incidentally this fixes a circular dependency, which was a smell test that
+there was a problem with the previous architecture.</li>
+</ul>
+<p>On a historical note, the reason for the original implementation with paths
+was based on the TeX implementation: when rendering a tree of atoms (which TeX
+calls <em>nodes</em>), the TeX layout algorithm never needs to find the parent of an
+atom. The MathLive rendering engine was implemented in the same way. However,
+for interactive editing, being able to locate the parent of an atom is
+frequetly necessary. The paths were a mechanism to maintain a separate data
+structure from the one needed by the rendering engine. However, they were a
+complex and clumsy mechanism. Now, a <code>parent</code> property has been introduced in
+instance of <code>Atom</code>, even though it is not necessary for the rendering phase.
+It does make the handling of the interactive manipulation of the formula much
+easier, though.</p>
+</li>
+<li>
+<p><strong>Changes to the handling of sentinel atoms (type <code>'first'</code>)</strong></p>
+<p>This is an internal change that does not affect the public API.</p>
+<p>Sentinel atoms are atoms of type <code>'first'</code> that are inserted as the first
+element in atom branches. Their purpose is to simplify the handling of “empty”
+lists, for example an empty numerator or superscript.</p>
+<p>Previously, these atoms where added when an editable atom tree was created,
+i.e. in the <code>editor</code> code branch, since they are not needed for pure
+rendering. However, this created situations where the tree had to be
+‘corrected’ by inserting missing <code>'first'</code>. This code was complex and resulted
+in some unexpected operations having the side effect of modifying the tree.</p>
+<p>The <code>'first'</code> atoms are now created during parsing and are present in editable
+and non-editable atom trees.</p>
+</li>
+<li>
+<p><strong>Refactoring of Atom classes</strong></p>
+<p>This is an internal change that does not affect the public API.</p>
+<p>Each ‘kind’ of atom (fraction, extensible symbol, boxed expression, etc…) is
+now represented by a separate class extending the <code>Atom</code> base class (for
+example <code>GenfracAtom</code>). Each of those classes have a <code>render()</code> method that
+generates a set of DOM virtual nodes representing the Atom and a <code>serialize()</code>
+method which generates a Latex string representing the atom.</p>
+<p>Previously the handling of the different kind of atoms was done procedurally
+and all over the code base. The core code is now much smaller and easier to
+read, while the specialized code specific to each kind of atom is grouped in
+their respective classes.</p>
+</li>
+<li>
+<p><strong>Unit testing using Jest snapshot</strong></p>
+<p>Rewrote the unit tests to use Jest snapshots for more comprehensive
+validation.</p>
+</li>
+</ul>
+<h2>0.59.0 (2020-11-04)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#685</strong> Virtual keyboard event listeners were not properly released when the
+mathfield was removed from the DOM</li>
+</ul>
+<h2>0.58.0 (2020-10-11)</h2>
+<h3>New Features</h3>
+<ul>
+<li>
+<p><strong>#225</strong> Added <code>onCommit</code> listener to <code>mf.options</code>. This listener is invoked
+when the user presses <strong>Enter</strong> or <strong>Return</strong> key, or when the field loses
+focus and its value has changed since it acquired it. In addition, a <code>change</code>
+event is triggered when using a <code>MathfieldElement</code>. The event previously named
+<code>change</code> has been renamed to <code>input</code>. This mimics the behavior of <code>&lt;input&gt;</code>
+and <code>&lt;textarea&gt;</code> elements.</p>
+</li>
+<li>
+<p><strong>#225</strong> Changed the keyboard shortcuts to add columns and rows:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Shortcut</th>
+<th style="text-align:left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>Return</strong>/<strong>Enter</strong></td>
+<td style="text-align:left"><code>addRowAfter</code></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> + <strong>Return</strong>/<strong>Enter</strong></td>
+<td style="text-align:left"><code>addRowBefore</code></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>;</strong></td>
+<td style="text-align:left"><code>addRowAfter</code></td>
+<td></td>
+<td><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> +</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>;</strong></td>
+<td style="text-align:left"><code>addRowBefore</code></td>
+<td></td>
+<td><strong>ctrl</strong>/<strong>cmd</strong> + <strong>,</strong></td>
+<td><code>addColumnAfter</code></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> + <strong>,</strong></td>
+<td style="text-align:left"><code>addColumnBefore</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note that <strong>Enter</strong>/<strong>Return</strong> no longer create a matrix/vector when inside a
+parenthesized expression. Use <strong>ctrl/cmd</strong> + <strong>Return</strong>/<strong>Enter</strong> instead.</p>
+</li>
+<li>
+<p>Added a <code>commit</code> command to programmatically trigger the <code>onCommit</code> listener
+<code>change</code> event.</p>
+</li>
+<li>
+<p>Added <code>mount</code> and <code>unmount</code> events to <code>MathfieldElement</code></p>
+</li>
+<li>
+<p>The <code>$text()</code> method, which is deprecated, was accidentally prematurely
+removed. It has been added back.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Inline shortcuts would not always be triggered correctly, for example <code>x=sin</code>
+→ <code>x\sin</code> instead of <code>x=\sin</code></li>
+<li>The text in tooltip was not vertically centered in narrow layouts (mobile
+devices)</li>
+<li><strong>#668</strong> Extensible symbols, such as <code>\xrightarrow</code> were incorrectly treated
+as if they had an invisible boundary, resulting in the cursor being positioned
+incorrectly when navigating with the keyboard.</li>
+</ul>
+<h2>0.57.0 (2020-10-09)</h2>
+<h3>Major New Feature</h3>
+<p>This release introduce two major new features which will require code changes.
+For now, the older API remains supported but it will be dropped in an upcoming
+release.</p>
+<h4><strong>#665: Web Component</strong></h4>
+<p>Support for <code>MathfieldElement</code> custom element/web component and <code>&lt;math-field&gt;</code>
+tag.</p>
+<p>The <code>makeMathField()</code> function is still supported, but it will be removed in an
+upcoming version. You should transition to using <code>&lt;math-field&gt;</code> or
+<code>MathfieldElement</code> instead.</p>
+<p>This transition require the following changes:</p>
+<ol>
+<li>Create mathfields using <code>MathfieldElement</code> or declaratively</li>
+</ol>
+<pre><code class="language-javascript"><span class="hljs-comment">// Before</span>
+<span class="hljs-keyword">let</span> mf = <span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">makeMathField</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;div&#x27;</span>), {
+  <span class="hljs-attr">virtualKeyboardMode</span>: <span class="hljs-string">&#x27;manual&#x27;</span>,
+});
+mf.$latex(<span class="hljs-string">&#x27;f(x) = \\sin x&#x27;</span>);
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mf.$el());
+
+<span class="hljs-comment">// After</span>
+<span class="hljs-keyword">let</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>({
+  <span class="hljs-attr">virtualKeyboardMode</span>: <span class="hljs-string">&#x27;manual&#x27;</span>,
+});
+mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;f(x) = \\sin x&#x27;</span>;
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
+</code></pre>
+<p>or:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">virtual-keyboard-mode</span>=<span class="hljs-string">&quot;manual&quot;</span>&gt;</span>f(x) = \sin x<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
+<ol start="2">
+<li>Use events instead of callbacks</li>
+</ol>
+<pre><code class="language-javascript">    <span class="hljs-comment">// Before</span>
+    mf.<span class="hljs-title function_">setConfig</span>({ <span class="hljs-attr">onContentDidChange</span>: <span class="hljs-function">(<span class="hljs-params">mf</span>) =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mf.$latex())
+    });
+
+    <span class="hljs-comment">// After</span>
+    mfe.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;input&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-property">value</span>);
+    });
+</code></pre>
+<h4><strong>#667 Modernized Public API</strong></h4>
+<p>Support for web component is an opportunity to revisit the MathLive public API
+and modernize it.</p>
+<p>The goals are:</p>
+<ul>
+<li>clarity. For example, the <code>$latex()</code> can be used to read or change the content
+of the mathfield.</li>
+<li>expressiveness. For example, <code>$selectedText()</code> can return the value of the
+selection, but there is no way to inspect (or save/restore) the selection.</li>
+<li>consistency with web platform APIs when applicable, otherwise following the
+<a href="https://github.com/Microsoft/monaco-editor/blob/master/monaco.d.ts"><strong>monaco</strong></a>
+(VSCode editor) or
+<a href="https://codemirror.net/doc/manual.html#api"><strong>CodeMirror</strong></a> conventions
+primarily. As part of this proposal, the APIs of <strong>TinyMCE</strong>, <strong>CKEditor</strong> and
+<strong>QuillJS</strong> were also considered. For example, the method equivalent to
+<code>getConfig()</code> is called <code>getOptions()</code> in most Javascript text editor
+libraries.</li>
+</ul>
+<p><strong>Mathfield methods</strong></p>
+<p>The following <code>Mathfield</code> methods have been renamed as indicated:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Before</th>
+<th style="text-align:left">After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>$setConfig()</code></td>
+<td style="text-align:left"><code>setOptions()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>getConfig()</code></td>
+<td style="text-align:left"><code>getOptions()</code> and <code>getOption()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$text()</code></td>
+<td style="text-align:left"><code>getValue()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$latex()</code></td>
+<td style="text-align:left"><code>value</code>, <code>getValue()</code> and <code>setValue()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$insert()</code></td>
+<td style="text-align:left"><code>insert()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$hasFocus()</code></td>
+<td style="text-align:left"><code>hasFocus()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$focus()</code></td>
+<td style="text-align:left"><code>focus()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$blur()</code></td>
+<td style="text-align:left"><code>blur()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$selectedText()</code></td>
+<td style="text-align:left"><code>mf.getValue(mf.selection)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$selectionIsCollapsed()</code></td>
+<td style="text-align:left"><code>mf.selection[0].collapsed</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$selectionDepth()</code></td>
+<td style="text-align:left"><code>mf.selection[0].depth</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$selectionAtStart()</code></td>
+<td style="text-align:left"><code>mf.position === 0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$selectionAtEnd()</code></td>
+<td style="text-align:left"><code>mf.position === mf.lastPosition</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$select()</code></td>
+<td style="text-align:left"><code>select()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$clearSelection()</code></td>
+<td style="text-align:left"><code>executeCommand('delete-backward')</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$keystroke()</code></td>
+<td style="text-align:left"><code>executeCommand()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$typedText()</code></td>
+<td style="text-align:left"><code>executeCommand('typed-text')</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$perform()</code></td>
+<td style="text-align:left"><code>executeCommand()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$revertToOriginalContent()</code></td>
+<td style="text-align:left">n/a</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>$el()</code></td>
+<td style="text-align:left">n/a</td>
+</tr>
+<tr>
+<td style="text-align:left">n/a</td>
+<td style="text-align:left"><code>selection</code></td>
+</tr>
+<tr>
+<td style="text-align:left">n/a</td>
+<td style="text-align:left"><code>position</code></td>
+</tr>
+</tbody>
+</table>
+<p>The methods indicated with “n/a” in the <strong>After</strong> column have been dropped.</p>
+<p>Only the new methods are available on <code>MathfieldElement</code> (i.e. when using web
+components). The <code>Mathfield</code> class retains both the old methods and the new ones
+to facilitate the transition, but the old ones will be dropped in an upcoming
+version.</p>
+<p>There is also a new <code>selection</code> property on <code>Mathfield</code> and <code>MathfieldElement</code>
+which can be used to inspect and change the selection and a <code>position</code> property
+to inspect and change the insertion point (caret).</p>
+<p>The <code>getValue()</code> method also now take an (optional) <code>Range</code>, which is the type
+of the <code>selection</code> property, to extract a fragment of the expression.</p>
+<p><strong>Default Exports</strong></p>
+<p>While default exports have the benefits of expediency, particularly when
+converting an existing code base to ES Modules, they are problematic for
+effective tree shaking. Therefore the default export will be eliminated.</p>
+<p>This means that instead of:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> <span class="hljs-title class_">Mathlive</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-title class_">Mathlive</span>.<span class="hljs-title function_">renderMathInDocument</span>();
+</code></pre>
+<p>you will need to use:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
+<span class="hljs-title function_">renderMathInDocument</span>();
+</code></pre>
+<p>The following functions have been renamed:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Before</th>
+<th style="text-align:left">After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>MathLive.latexToAST()</code></td>
+<td style="text-align:left">Use MathJSON</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MathLive.latexToMarkup()</code></td>
+<td style="text-align:left"><code>convertLatexToMarkup()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MathLive.latexToMathML()</code></td>
+<td style="text-align:left"><code>convertLatexToMathMl()</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MathLive.latexToSpeakableText()</code></td>
+<td style="text-align:left"><code>convertLatexToSpeakableText(</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3>New Features</h3>
+<ul>
+<li><strong>#101</strong>: added <code>getCaretPosition()</code> and <code>setCaretPosition()</code></li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>The Typescript types for <code>Selector</code> has been improved</li>
+<li>The Typescript type for <code>getOptions()</code> (<code>getConfig()</code>) are more accurate</li>
+<li>The “sqrt” inline shortcut now inserts an argument</li>
+<li>Don’t throw an error if the first argument of <code>\enclose</code> is empty</li>
+<li><strong>#591</strong>: add <code>upward</code> and <code>downward</code> hooks when navigating out of the
+mathfield (now also sent as a <code>focus-out</code> event)</li>
+<li>Improved layout of the virtual keyboard on narrow mobile devices (fill the
+available width).</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#198</strong>: typing backspace while typing inline shortcuts would prevent the
+shortcuts from being recognized</li>
+<li><strong>#573</strong>: brackets were not properly styled (i.e. color applied to them)</li>
+<li><strong>#543</strong>: spurious focus/blur events were dispatched if <code>tabIndex</code> was set to
+0 on the mathfield and some area of the mathfield were clicked on. The issue
+was that with <code>tabIndex=&quot;0&quot;</code> the mathfield frame would be focusable and when
+that happened the focus would correctly switch to the invisible <code>&lt;textarea&gt;</code>
+element which is normally focused to receive keyboard events, but this
+generated an incorrect <code>blur</code> event (for the container losing focus) and an
+incorrect <code>focus</code> event (for the <code>&lt;textarea&gt;</code> gaining focus)</li>
+<li><strong>#599</strong>: some characters, for example “ü”, would not be correctly parsed or
+displayed. Note that technically, those characters are ignored by TeX, but
+it’s a reasonable behavior nowadays to accept them as input.</li>
+<li><strong>#628</strong>: typing “e” repeatedly inside a matrix would corrupt the emited</li>
+<li><strong>#637</strong>: in Chrome, thin lines, such as fraction bars or square root lines
+would not display at some zoom levels</li>
+<li>The locale was not properly taking into account when it was set manually</li>
+<li>The <code>config.strings</code> property did not reflect the state of the localization
+strings</li>
+<li>When configs was updated (e.g. new macros added), the content of the mathfield
+was not properly re-parsed and rendered</li>
+<li>When making the virtual keyboard visible, the mathfield would not be focused</li>
+<li>The virtual keyboard would not display correctly when the mathfield was inside
+a shadow DOM</li>
+</ul>
+<h3>Special Thanks</h3>
+<ul>
+<li>Thanks to <code>@stefnotch</code> for contributing several of the improvements in this
+release</li>
+</ul>
+<h2>0.56.0 (2020-08-22)</h2>
+<h3>New Features</h3>
+<ul>
+<li>Added support for <code>\phantom</code>, <code>\vphantom</code>, <code>\hphantom</code> and <code>\smash[]</code></li>
+<li><strong>#182</strong> Added support for the mhchem package, with the commands <code>\ce</code> and
+<code>\pu</code> to display chemical equations</li>
+</ul>
+<h2>0.55.0 (2020-08-17)</h2>
+<h3>New Features</h3>
+<ul>
+<li>
+<p><strong>WebPack issues workaround and font loading configuation</strong></p>
+<p>Follow up to <strong>#508</strong>. The fonts can now be loaded either statically or
+dynamically.</p>
+<ul>
+<li>
+<p><strong>dynamic loading</strong> by default, the fonts will get loaded programmatically
+when they are needed and the rendering will be deferred until the fonts are
+available to avoid unnecessary redrawing. Use this technique if you have a
+simple build/bundle workflow. You can still customize the relative path to
+the fonts folder using the <code>fontsDirectory</code> configuration option.</p>
+</li>
+<li>
+<p><strong>static loading</strong> include the <code>mathlive-fonts.css</code> stylesheet in your page.
+The loading of this file will trigget the font to be loaded asynchronously
+by the browser. Use this technique if you are using WebPack or have a
+build/bundle workflow that renames the font files or in general require the
+bundler to know about the required assets.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>New packaging options</strong>. The distribution files have been split between
+minified and non-minified version. In the more common cases, the minified
+version (<code>mathlive.min.js</code> and <code>mathlive.min.mjs</code> should be used). The
+non-minified version (<code>mathlive.js</code> and <code>mathlive.mjs</code> can be used to help in
+debugging issues or to apply patches).</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p>The fonts failed to load when loading MathLive using a <code>&lt;script&gt;</code> tag and a
+CDN. The fonts folder is now resolved correctly with the following
+configurations:</p>
+<pre><code>- `&lt;script&gt;` tag and CDN
+- `&lt;script&gt;` tag and local file
+- `import` and CDN
+- `import` and local file
+</code></pre>
+</li>
+</ul>
+<h2>0.54.0 (2020-06-24)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p><strong>#490</strong> Firefox does not load fonts There is a bug in Firefox
+(https://bugzilla.mozilla.org/show_bug.cgi?id=1252821) where the status of
+fonts is reported incorrectly.</p>
+<p>Implemented a workaround by always loading fonts in Firefox.</p>
+</li>
+<li>
+<p><strong>#506</strong> Chrome was outputing a harmless warning about passive event
+listeners. The warning has been silenced.</p>
+</li>
+<li>
+<p><strong>#505</strong> Chrome was outputing a harmless warning about passive event
+listeners. The warning has been silenced with extreme prejudice.</p>
+</li>
+<li>
+<p><strong>#503</strong> Dynamic styles were not applied inside of shadow DOM</p>
+</li>
+</ul>
+<h2>0.53.3 (2020-06-24)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p><strong>#504</strong> “Spacing is inconsistent after editing”</p>
+<p>The spacing of operators should be adjusted depending on what’s around them:
+there is less space after a “-” sign when used as an infix operator than there
+is around a “-” sign used as a prefix operator (i.e. “-4” vs “3-4”).</p>
+<p>The code that was handling this was accounting for it by modifying the type of
+the element. This worked well enough for static rendering, but for dynamic
+rendering (i.e. editing), once modified the previous type of the element was
+lost and could not be restored (i.e. after deleting the atom in front of a “-”
+sign, the “-” was no longer a binary operator but a regular symbol).</p>
+<p>This is now handled during layout without modifying the type of the element.</p>
+</li>
+<li>
+<p>Workaround for a Safari bug where in some cases the caret would not blink.</p>
+</li>
+<li>
+<p><strong>#505</strong> More consistent spacing between elements. Previously some Unicode
+math spacing characters were used. However, these characters are not rendered
+consistently. Switched to using CSS margins instead.</p>
+</li>
+<li>
+<p>The Latex generated for a <code>\left</code> command with another command as a fence was
+lacking a space, e.g. <code>\left\lbracka\right\rbrack</code> instead of
+<code>\left\lbrack a\right\rbrack</code></p>
+</li>
+<li>
+<p>Smart fence for square brackets was not working correctly.</p>
+</li>
+<li>
+<p>Fixed smartmode to avoid converting a decimal point to text when entering,
+e.g. “314.1576”</p>
+</li>
+<li>
+<p>The alt/option+V shortcut now correctly inserts a placeholder in the square
+root</p>
+</li>
+<li>
+<p>The “\arcos” function was incorrectly spelled “\arccos”.</p>
+</li>
+</ul>
+<h3>New Feature</h3>
+<ul>
+<li>
+<p><strong>#508</strong> In order to better support some deployment configurations, added a
+‘mathlive-fonts.css’ file to the distribution package.</p>
+<p>This is intended to be used by build/bundle environements that have an asset
+pipeline that can move/rename assets, including the font-files</p>
+<p>Note that this method is <strong>not</strong> recommended. It will result in some cases
+where the layout is incorrect until the page is reloaded (especially for
+formulas using large symbols such as integrals or large parentheses).</p>
+<p>To use it, add the following to the web pages using MathLive:</p>
+</li>
+</ul>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;dist/mathlive-fonts.css&quot;</span> /&gt;</span>
+</code></pre>
+<h2>0.53.2 (2020-06-10)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Adjusted height of square root (there was some extra blank space above)</li>
+<li>Ensure that the ‘dt’ inline shortcut does not trigger when writing “width” (it
+should only apply in the math mode)</li>
+<li><strong>#492</strong> Typing “/” to insert as fraction when some items were selected would
+result in an eroneous output.</li>
+</ul>
+<h2>0.53.1 (2020-06-01)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>In the virtual keyboard, use <code>\scriptstyle</code> to display small symbols</li>
+<li>Better vertical alignment of extensible arrows</li>
+<li>Don’t display a double caret after a <code>\leftright</code></li>
+</ul>
+<h2>0.53.0 (2020-05-31)</h2>
+<h3>Breaking Change / New Feature</h3>
+<ul>
+<li>
+<p><strong>#158</strong> The CSS files <code>mathlive.css</code> and <code>mathlive.core.css</code> have been
+deprecated and removed from the distribution.</p>
+<p>The necessary CSS is now injected dynamically into the page. This simplifies
+the use of the library, but also reduces the amount of CSS in the page,
+potentially improving performance. That’s particularly the case when the
+virtual keyboard is not used, as the CSS stylesheet for the virtual keyboard
+is substantial, and it is now injected only when the keyboard is used.</p>
+<p>To transition, you should remove from your code any instance of:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;mathlive.core.css&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;mathlive.css&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/css&quot;</span> /&gt;</span>
+</code></pre>
+<p>(the path to your CSS file may be different).</p>
+<p>You may need to specify the location of the ‘fonts’ directory. By default, the
+‘fonts’ directory is expected to be next to the ‘mathlive.js’, ‘mathlive.mjs’
+file. If you need to copy the ‘fonts’ directory to a different location,
+specify it using the <code>Config.fontsDirectory</code> option. It should be either a
+relative path or a full URL pointing to the directory that contains the fonts.
+(Fix for <strong>#425</strong>)</p>
+<p>You no longer need to manually specify the stylesheets when using
+<code>renderMathInElement()</code> or <code>renderMathInDocument()</code> either. The necessary
+stylesheet will get injected in the document as needed. Note that this
+stylesheet for these functions is smaller than the stylesheet used when the
+editor is in use. These two functions also gain a property to specify the
+location of the ‘fonts’ directory, if necessary (by default, the ‘fonts’
+directory is expected to be next to the ‘mathlive.js’, ‘mathlive.mjs’ file.)</p>
+<p>In some rare cases, you may have used the CSS stylesheet without the Mathlive
+library, for example, after you may have saved the output of <code>latexToMarkup()</code>
+to a database and use it to render later in a page. In that case, you would
+need to use the CSS styelsheet <code>dist/mathlive-static.css</code>, which is suitable
+for this use case. Note that it does reference a ‘fonts’ folder that may need
+to be adjusted. By default, the <code>fonts</code> folder should be placed next to the
+stylesheet. If you need a different location when using the static stylesheet,
+you will need to modify it.</p>
+</li>
+<li>
+<p><strong>#425</strong> Added CSS variable <code>--ML_keyboard-zindex</code> to control the zindex of
+the virtual keyboard.</p>
+</li>
+<li>
+<p>Add support for <code>^^</code> and <code>^^^^</code> constructs in Latex. See TexBook p. 56:</p>
+<pre><code>There’s also a special convention in which ^^ is followed by two
+“lowercase hexadecimal digits,” 0–9 or a–f. With this convention, all 256 characters are
+obtainable in a uniform way, from ^^00 to ^^ff. Character 127 is ^^7f.
+</code></pre>
+<p>XeTeX extends this convention with <code>^^^^</code> for four-digit Unicode characters.</p>
+</li>
+<li>
+<p>Added support for more TeX primitives, including <code>\string</code>, <code>\csname</code>,
+<code>\endcsname</code>, <code>\obeyspaces</code></p>
+</li>
+<li>
+<p>Improved the handling of parameters (e.g. <code>#1</code>) to more accurately match the
+TeX behavior (previously parameters could only substitute for an entire
+argument, i.e. <code>{#1}</code>). They are now handled by replacing their value with
+their corresponding tokens.</p>
+</li>
+<li>
+<p>Added support for <code>\laplace</code> and <code>\Laplace</code> symbols</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p><strong>#469</strong> The keyboard layout on Linux was not detected correctly, resulting in
+some keys (such as arrows and backspace) not working correctly.</p>
+</li>
+<li>
+<p>Integers in a Latex stream would not always be parsed correctly. As per the
+TeXBook, an integer can be preceded by an arbitrary number of “+”, “-” or
+whitespace characters, so <code>\char -+ +- &quot;4A</code> is valid and equivalent to
+<code>\char&quot;4A</code></p>
+</li>
+<li>
+<p>Integers in a latex stream specified with a backtick (“alphabetic constant”)
+would not be parsed correctly. Now <code>\char`A</code> gives the expected result
+(<code>A</code>).</p>
+</li>
+<li>
+<p>Consecutive whitespace where not always coalesced.</p>
+</li>
+<li>
+<p>The bounding box of the initial selection (before the ‘first’ atom was
+inserted) was incorrect.</p>
+</li>
+<li>
+<p>The sizing commands (<code>\huge</code>, <code>\small</code>, <code>\tiny</code>, etc…) should not apply in
+‘math’ mode.</p>
+</li>
+</ul>
+<h2>0.52 (2020-05-23)</h2>
+<h3>New Feature</h3>
+<ul>
+<li>
+<p>Support for
+<a href="https://w3c.github.io/webappsec-trusted-types/dist/spec/">Trusted Types</a>.</p>
+<p>A new option in <code>Config</code>, <code>createHTML</code>, is called before injecting HTML into
+the page, providing an opportunity to sanitize the markup according to a
+policy set by the host</p>
+</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p>Move some of the Mathematica inspired command (e.g. <code>\differentialD</code>,
+<code>doubleStruckCapitalN</code>, etc…) to be macros instead of built-in commands.
+This will allow them to be properly expanded during copy/paste operations for
+improved interoperability</p>
+</li>
+<li>
+<p>When an invalid keybinding is encountered, the <code>onError</code> listener is now
+invoked with an erorr code of <code>invalid-keybinding</code></p>
+</li>
+<li>
+<p>Added support for German keyboard layout.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p>The Undo and Redo button in the virtual keyboard did not change their state
+appropriately given the state of the undo stack.</p>
+</li>
+<li>
+<p>‘overunder’: The superscript and subscript after an ‘overunder’ atom (e.g.
+<code>\overbrace</code>) did not display correctly (above or below the brace). The
+‘overunder’ atom would also not display correctly if the width of the atom was
+below a minimal threshold.</p>
+</li>
+</ul>
+<h2>0.51.0 (2020-05-19)</h2>
+<h3>New Features</h3>
+<ul>
+<li>
+<p><strong>#450</strong> Custom keybindings. A keybinding (also called keyboard shorcut)
+associate a keystroke combination on a physical keyboard with a command.
+Mathlive previously had some built-in keybindings, but now they can be
+extended or replaced.</p>
+<p>See <code>config.keybindings</code> and <code>Keybinding</code></p>
+</li>
+<li>
+<p>Added <code>setKeyboardLayout()</code> and <code>setKeyboardLayoutLocale()</code> functions to
+customize the current physical keyboard layout</p>
+</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p><strong>#461</strong> The array editing commands only worked in math mode. They now apply
+in text mode as well</p>
+</li>
+<li>
+<p><strong>#459</strong>: Add a placeholder for incomplete commands, for example entering
+<code>\frac</code> in command mode</p>
+</li>
+<li>
+<p>Added some missing commands: <del><code>deleteNextChar</code></del> <code>deleteForward</code>,
+<del><code>deletePreviousChar</code></del> <code>deleteBackward</code>, <code>deleteNextWord</code>,
+<code>deletePreviousWord</code>, <code>deleteToGroupStart</code>, <code>deleteToGroupEnd</code>,
+<code>deleteToMathFieldEnd</code>, <code>moveToSubscript</code>, <code>applyStyle</code>,
+<code>toggleVirtualKeyboard</code>, <code>hideVirtualKeyboard</code>, <code>showVirtualKeyboard</code></p>
+</li>
+<li>
+<p>In some cases, the top of the placeholder character could be cut off</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p>The Read Aloud feature would not work when a Neural Engine AWS voice was used
+(such as Joana or Matthew)</p>
+</li>
+<li>
+<p>In the Vue wrapper, the <code>onKeystroke</code> handler would error</p>
+</li>
+<li>
+<p>Styling (applying color, style) was disabled. This also affected mode change
+(i.e. alt+= to switch between text and math mode)</p>
+</li>
+<li>
+<p>After completing a command in command mode (i.e. pressing the return key), the
+mode did not switch not math mode and remained in command mode.</p>
+</li>
+</ul>
+<h2>0.50.8 (2020-05-13)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>The Symbols keyboard is now a top-level keyboard. Previously it was accessible
+only from the Roman keyboard</li>
+<li>Added some standard Latex commands: <code>\inf</code>, <code>\Pr</code>, <code>\liminf</code>, <code>\limsup</code></li>
+<li>Added inline shortcuts for some commands: <code>sinh</code>, <code>cosh</code>, <code>sec</code>, <code>csc</code>, <code>cot</code>,
+<code>arcsin</code>, <code>arccos</code>, <code>arctan</code></li>
+<li>When generating Latex output, only insert spaces when necessary (i.e. after
+commands that are followed by a letter). Conversely, <em>always</em> generate the
+space when necessary (<code>\rbrack a</code> would generate <code>\rbracka</code>)</li>
+<li>Minor rendering performance improvement</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p>The absolute value character “|” (and other small delimiters) would be
+displayed in the wrong font (and too small)</p>
+</li>
+<li>
+<p>The absolute value key from the virtual keyboard would insert ‘|#@|’</p>
+</li>
+<li>
+<p>The ‘sqrt’ key from the virtual keyboard or keyboard shortcut (option+V) would
+do nothing. The problem affected any inline shortcut or key that included a
+‘#0’ argument when there was no selection</p>
+</li>
+<li>
+<p>Fixed an issue with long inline shortcuts that could trigger text mode (e.g.
+‘arcsin’) and never apply the inline shortcut</p>
+</li>
+<li>
+<p>Do not trigger smart mode conversion with arrow keys</p>
+</li>
+<li>
+<p>Fixed an issue on iOS 12 and Firefox/Android where the Mathfield could not be
+focused (fix contributed by (https://github.com/beneater)</p>
+</li>
+</ul>
+<h2>0.50.7 (2020-05-11)</h2>
+<ul>
+<li><strong>Fix #448</strong>: Fix an issue where the “^” keyboard shortcut would not work</li>
+</ul>
+<h2>0.50.6 (2020-05-11)</h2>
+<ul>
+<li>Fix date stamping of declaration files</li>
+</ul>
+<h2>0.50.5 (2020-05-10)</h2>
+<ul>
+<li><strong>Fix #311</strong> Before making a build, check the correct version of node and npm
+are installed</li>
+<li>Make the build system work better on Windows</li>
+<li>Do not update /dist on each push</li>
+<li>When using a UMD module, do not export ‘default’</li>
+</ul>
+<h2>0.50.4 (2020-05-09)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>Fix #444</strong> The “x^2” key in the virtual keyboard did not work as expected.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>Updated the build system to automatically add the lastest entry from the
+CHANGELOG to the GitHub release note.</li>
+</ul>
+<h2>0.50.3 (2020-05-08)</h2>
+<h3>New Features</h3>
+<ul>
+<li>Added a <code>MathLive.version</code> string</li>
+</ul>
+<h2>0.50.2 (2020-05-07)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed an issue with rendering of MathML</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>Added additional contextual information to the parser error message. Detect
+more errors.</li>
+</ul>
+<h3>Breaking Change</h3>
+<ul>
+<li>Renamed <code>config.error</code> to <code>config.onError</code> for consistency with the other
+listeners.</li>
+</ul>
+<h3>New Feature</h3>
+<h2>0.50.1 (2020-05-06)</h2>
+<h3>New Feature</h3>
+<ul>
+<li>
+<p>A new option, <code>config.error</code> can be used to catch errors while parsing Latex.</p>
+<p>This is invoked both for the initial content of the mathfield, when the
+content of the mathfield is changed programmatically, and when the user pastes
+latex content in the field.</p>
+<p>An error code will indicate the problem encountered, but the parsing will
+attempt to recover, in keeping with the previous behavior.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed an issue where the alphabetic ‘sans’ keys on the virtual keyboard output
+blackboard.</li>
+<li>Fixed an issue where the <code>\mleft.</code> and <code>\mright.</code> commands would not be
+rendered correctly (or propertly converted to MathASCII).
+(https://github.com/benetech/MathShare/issues/1182)</li>
+</ul>
+<h2>0.50 (May 4, 2020)</h2>
+<h3>Highlights</h3>
+<ul>
+<li><strong>Maintenance</strong>: Migration to TypeScript</li>
+<li><strong>Maintenance</strong>: New math variant (bold, italic, etc…) subsytem matches
+LaTeX more closely</li>
+<li><strong>Maintenance</strong>: Reduced code size</li>
+<li><strong>New feature</strong>: Verbatim Latex</li>
+<li><strong>New feature</strong>: <code>Mathfield.getConfig()</code></li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li>
+<p><strong>“Verbatim Latex”</strong>: the Latex provided as input (for example with
+<code>insert()</code>) is preserved as long as it’s not edited. Previously, the Latex
+would be normalized on input, and the output would not match character for
+character, even though it produced equivalent Latex code. For example, extra
+spaces could be inserted, and the order of subscript and superscript was not
+preserved.</p>
+<p>Now, the input Latex is preserved until editing operations cause it to be
+modified. This also means that the arguments of macros are never modified
+(since the macros are not editable) and will be returned exactly as input
+(they were normalized before).</p>
+</li>
+<li>
+<p>New <strong><code>letterShapeStyle</code></strong> configuration setting to control which letters are
+automatically italicized, according to four popular styles:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><code>letterShapeStyle</code></th>
+<th>xyz</th>
+<th>ABC</th>
+<th>αβɣ</th>
+<th>ΓΔΘ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>iso</code></td>
+<td>it</td>
+<td>it</td>
+<td>it</td>
+<td>it</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>tex</code></td>
+<td>it</td>
+<td>it</td>
+<td>it</td>
+<td>up</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>french</code></td>
+<td>it</td>
+<td>up</td>
+<td>up</td>
+<td>up</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>upright</code></td>
+<td>up</td>
+<td>up</td>
+<td>up</td>
+<td>up</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(it)</strong> = italic<br>
+<strong>(up)</strong> = upright</p>
+<p>The default letter shape style is <code>auto</code>: if the system locale is “french”,
+the <code>french</code> style will be used, <code>tex</code> otherwise. The previous behavior was to
+always use <code>tex</code> style lettershape.</p>
+</li>
+<li>
+<p>New <code>Mathfield.getConfig()</code> method which gives access to the current
+configuration settings.</p>
+<p>It can be invoked in three different ways:</p>
+<ul>
+<li><code>mf.getConfig()</code>: return a <code>MathfieldConfig</code> object will the values for all
+the configuration options filled-in.</li>
+<li><code>mf.getConfig('letterShapeStyle')</code>: return the current value of the
+<code>letterShapeStyle</code> option</li>
+<li><code>mf.getConfig(['smartMode', 'smartFence'])</code>: return an object with the
+values of the <code>smartMode</code> and <code>smartFence</code> filled in.</li>
+</ul>
+<p>Note that <code>getConfig()</code> may return a different value immediately after
+<code>setConfig()</code> was invoked: <code>getConfig()</code> returns a “resolved” value, so for
+example:</p>
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">setConfig</span>({ <span class="hljs-attr">letterShapeStyle</span>: <span class="hljs-string">&#x27;auto&#x27;</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mf.<span class="hljs-title function_">getConfig</span>(<span class="hljs-string">&#x27;letterShapeStyle&#x27;</span>)); <span class="hljs-comment">// prints &#x27;tex&#x27;</span>
+</code></pre>
+</li>
+</ul>
+<ul>
+<li>
+<p>An example (<code>examples/test-cases</code>) with some test cases was added, including
+LaTeX output screenshots for comparison.</p>
+</li>
+<li>
+<p>Re-done the font selection sub-system. Internally, it’s now cleaner and easier
+to follow, and also closer to the LaTeX implementation. In particular, in math
+mode, the styling directives are exclusive, except for <code>\mathsymbol</code>, which
+matches the TeX behavior.</p>
+</li>
+<li>
+<p>When a character variant (for example using <code>\mathbb</code>) is not available in the
+font repertoire, convert to Unicode and fallback to the system font. This
+allows <code>\mathbb{1}</code> to correctly output 𝟙.</p>
+</li>
+<li>
+<p>Added support for <code>\ensuremath</code> command</p>
+</li>
+<li>
+<p>Added the <code>\imageof</code> ⊷ and <code>\originalof</code> ⊸ symbols</p>
+</li>
+</ul>
+<h3>Code Maintenance</h3>
+<h4>Codebase Migrated to Typescript</h4>
+<p>This does not impact the bundled library, which is still transpiled JavaScript
+from the TypeScript sources and which can be used either with a JavaScript or
+TypeScript based project.</p>
+<p>The migration did not result in changes to the public API which remains backward
+compatible with previous versions. However, new declaration files (<code>*.d.ts</code>) for
+TypeScript are available. They are more detailed (and accurate) than the
+previous ones which were generated from JSDoc comments.</p>
+<p>The migration was done by hand for the entire code base (35 kloc). Type
+information was provided for all the data structures and function signatures.</p>
+<p>While this does not affect the external users of MathLive (the API and
+functionality remains the same), this has resulted in several bugs being found
+by the compiler through static analysis. For example, the
+<code>onUndoStateWillChange()</code> handler was never invoked because of this statement:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (options &amp;&amp; options.<span class="hljs-property">onUndoStateWillChange</span> === <span class="hljs-string">&#x27;function&#x27;</span>) {
+  options.<span class="hljs-title function_">onUndoStateWillChange</span>();
+}
+</code></pre>
+<p>instead of:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (options &amp;&amp; <span class="hljs-keyword">typeof</span> options.<span class="hljs-property">onUndoStateWillChange</span> === <span class="hljs-string">&#x27;function&#x27;</span>) {
+  options.<span class="hljs-title function_">onUndoStateWillChange</span>();
+}
+</code></pre>
+<p>The TypeScript compiler correctly flagged this error.</p>
+<p>This migration will make the ongoing maintenance and development of the codebase
+much easier.</p>
+<h4>Codebase Refactoring</h4>
+<p>Concurrently to the migration to TypeScript, and thanks to the increased clarity
+and confidence brought in with static typing and code analysis tools, the code
+has been modularized and reorganized as follow. The codebase previously
+consisted of several large monolithic source files, some of which were in excess
+of 4,500 loc.</p>
+<p>They have been broken up as follow:</p>
+<ul>
+<li><code>core/atom.js</code> →
+<ul>
+<li><code>atom-array.ts</code></li>
+<li><code>atom-accent.ts</code></li>
+<li><code>atom-box.ts</code></li>
+<li><code>atom-enclose.ts</code></li>
+<li><code>atom-genfrac.ts</code></li>
+<li><code>atom-leftright.ts</code></li>
+<li><code>atom-line.ts</code></li>
+<li><code>atom-op.ts</code></li>
+<li><code>atom-overunder.ts</code></li>
+<li><code>atom-surd.ts</code></li>
+<li><code>atom-to-latex.ts</code></li>
+<li><code>atom-utils.ts</code></li>
+<li><code>atom.ts</code></li>
+</ul>
+</li>
+<li><code>core/definitions.js</code> →
+<ul>
+<li><code>definitions-accents.ts</code></li>
+<li><code>definitions-enclose.ts</code></li>
+<li><code>definitions-environments.ts</code></li>
+<li><code>definitions-extensible-symbols.ts</code></li>
+<li><code>definitions-functions.ts</code></li>
+<li><code>definitinos-styling.ts</code></li>
+<li><code>definitions-symbols.ts</code></li>
+<li><code>definitions-utils.ts</code></li>
+<li><code>definitions.ts</code></li>
+</ul>
+</li>
+<li><code>core/parser.js</code> →
+<ul>
+<li><code>parser.ts</code></li>
+<li><code>modes.ts</code></li>
+<li><code>modes-utils.ts</code></li>
+<li><code>modes-math.ts</code></li>
+<li><code>modes-text.ts</code></li>
+<li><code>modes-command.ts</code></li>
+</ul>
+</li>
+<li><code>editor-mathlist.js</code> →
+<ul>
+<li><code>model.ts</code></li>
+<li><code>model-utils.ts</code></li>
+<li><code>model-styling.ts</code></li>
+<li><code>model-smartfence.ts</code></li>
+<li><code>model-selection.ts</code></li>
+<li><code>model-listeners.ts</code></li>
+<li><code>model-insert.ts</code></li>
+<li><code>model-delete.ts</code></li>
+<li><code>model-commands.ts</code></li>
+<li><code>model-command-mode.ts</code></li>
+<li><code>model-array.ts</code></li>
+<li><code>model-array-utils.ts</code></li>
+</ul>
+</li>
+<li><code>editor-mathfield.js</code> →
+<ul>
+<li><code>a11y.ts</code></li>
+<li><code>autocomplete.ts</code></li>
+<li><code>commands.ts</code></li>
+<li><code>config.ts</code></li>
+<li><code>speech.ts</code></li>
+<li><code>speech-read-aloud.ts</code></li>
+<li><code>undo.ts</code></li>
+<li><code>mathfield.ts</code></li>
+<li><code>mathfield-virtual-keyboards.ts</code></li>
+<li><code>mathfield-utils.ts</code></li>
+<li><code>mathfield-styling.ts</code></li>
+<li><code>mathfield-smartmode.ts</code></li>
+<li><code>mathfield-render.ts</code></li>
+<li><code>mathfield-pointer-input.ts</code></li>
+<li><code>mathfield-keyboard-input.ts</code></li>
+<li><code>mathfield-commands.ts</code></li>
+<li><code>mathfield-clipboard.ts</code></li>
+<li><code>mathfield-buttons.ts</code></li>
+</ul>
+</li>
+</ul>
+<p>Again, this is an internal change that will have no impact for external users of
+the MathLive library, but it will be contribute to improving the maintainability
+and velocity of the project.</p>
+<h4>Other Code Maintenance</h4>
+<ul>
+<li>Updated font binaries</li>
+<li>Rewrote grapheme splitter in TypeScript. As a result, code size reduced by
+113Kb (!).</li>
+<li>Switched to <code>jest</code> as a test runner.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p><strong>Fix #285</strong>: The initial content of the mathfield was considered part of the
+undo stack, that is, typing command+Z before making any editing operations
+would make the initial content disappear.</p>
+</li>
+<li>
+<p><strong>Fix #236</strong>: An initially empty field had no visible caret until it had
+focused, then blurred, then focused again.</p>
+</li>
+<li>
+<p><strong>Fix #438</strong>: MathLive did not behave correctly when inside a shadow DOM</p>
+</li>
+<li>
+<p><strong>Fix #436</strong>: When <code>smartFence</code> was on, applying an inline shortcut before the
+closing parent of a paren group that had been inserted as a pure fence (not a
+<code>\left\right</code> group) the parens would get (incorrectly) promoted to a
+<code>\left\right</code> group, and the shortcut would be inserted outside of the paren.</p>
+</li>
+<li>
+<p><strong>Fix #435</strong>: Virtual keyboard after a JSON-based virtual keyboard would not
+display correctly.</p>
+</li>
+<li>
+<p><strong>Fix #417</strong>: The “International Backslash” (labeled <code>&gt;&lt;</code> on a german
+keyboard) would incorrectly trigger the command mode.</p>
+</li>
+<li>
+<p><strong>Fix #416</strong>: With <code>smartFence</code> on, braces around a fraction would disappear,
+e.g. typing “(1/2” would result in “1/2”</p>
+</li>
+<li>
+<p><strong>Fix #415</strong>: <code>toASCIIMath()</code> would fail when the mathfield was empty</p>
+</li>
+<li>
+<p><strong>Fix #393</strong>: some characters in a <code>\operatorname</code> command, including <code>-</code> and
+<code>*</code>, were not displayed correctly (they should display as if in text mode, not
+in math mode, and the correct glyphs are different between the two modes)</p>
+</li>
+<li>
+<p><strong>Fix #395</strong>: re-implemented how macros handle their arguments. They would
+previously parse their argument using the current parseMode. This is
+incorrect. The parseMode cannot be determined until the macro has been
+expanded and the arguments substituted. The parsing of the macros arguments is
+now deferred until after the macro has been expanded. Additionally, it wasn’t
+previously possible for arguments to macros to contain other arguments. This
+is now allowed.</p>
+</li>
+<li>
+<p><strong>Fix #395 (bis)</strong>: Properly output Latex for macros when using ‘latex’ and
+‘latex-expanded’ formats.</p>
+</li>
+<li>
+<p>Fixed numerous issues with LaTeX round-tripping. For example, <code>\mathfrak{C}</code>,
+<code>\boldsymbol{\sin\theta}</code>,</p>
+</li>
+<li>
+<p>If the <code>\text</code> command included a <code>&amp;</code>, the content following the <code>&amp;</code> would be
+ignored.</p>
+</li>
+<li>
+<p>The <code>align*</code> environment was not handled correctly and displayed an extra gap
+between columns.</p>
+</li>
+<li>
+<p>The math styling commands did not behave properly. For example:<br>
+<br>
+<code>\mathbf{\sin \alpha} + \mathit{\cos \beta} + \mathbf{\tan x} + \boldsymbol{\sin \gamma}</code></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>before</th>
+<th>after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alpha</td>
+<td>bold upright</td>
+<td>italic</td>
+</tr>
+<tr>
+<td>cos</td>
+<td>italic</td>
+<td>upright</td>
+</tr>
+<tr>
+<td>tan</td>
+<td>bold</td>
+<td>roman</td>
+</tr>
+<tr>
+<td>gamma</td>
+<td>bold upright</td>
+<td>bold italic</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<p>Related to the above, but worth noting separately, <code>\mathbf{\alpha}</code> should
+render as normal italic: the <code>\mathbf</code> command does not apply to lowercase
+greek letters. The command <em>does</em> apply to uppercase greek letters. This is an
+artifact of the TeX font encoding, but the behavior is preserved for
+compatibility with TeX.</p>
+</li>
+<li>
+<p>The <code>\textcolor</code> command did not apply to large symbols, such as <code>\sum</code></p>
+</li>
+<li>
+<p>Correctly output LaTeX for infix operators such as <code>\atopwithdelims</code></p>
+</li>
+<li>
+<p>Correctly output unicode characters in the astral plane, e.g.
+<code>\unicode{&quot;1F468}</code></p>
+</li>
+<li>
+<p>Fixed an issue were consecutive calls to set the content of the mathfield
+could result in some spurious characters inserted at the beginning of the
+field.</p>
+</li>
+</ul>
+<h3>Breaking Change</h3>
+<ul>
+<li>
+<p>The signature of the <code>latexToMarkup()</code> function has changed.<br>
+Instead of a style and format, the second argument is an option object. The style
+can be specified with a <code>mathstyle</code> property, the format with a <code>format</code> property.
+A new <code>letterShapeStyle</code> property can also be specified.</p>
+<ul>
+<li>Before: <code>MathLive.latexToMarkup(formula, 'displaystyle')</code></li>
+<li>After: <code>MathLive.latexToMarkup(formula, { mathstyle: 'displaystyle' });</code></li>
+</ul>
+</li>
+<li>
+<p>The ‘command’ virtual keyboard is no longer displayed by default. The layout
+for this virtual keyboard has been deprecated and will be removed in a future
+version. This is a partial fullfilment of #270.</p>
+</li>
+<li>
+<p>The <code>config.handleSpeak</code> and <code>config.handleReadAloud</code> hooks have been renamed
+<code>config.speakHook</code> and <code>config.readAloudHook</code> respectively</p>
+</li>
+</ul>
+<h3>Deprecated</h3>
+<ul>
+<li>The <code>overrideDefaultInlineShortcuts</code> is deprecated (still supported in this
+version, but will be removed in an upcoming one). Instead, to add to the
+default shortcuts, use:</li>
+</ul>
+<pre><code class="language-javascript">mf.<span class="hljs-title function_">setConfig</span>({
+  <span class="hljs-attr">inlineShortcuts</span>: {
+    ...mf.<span class="hljs-title function_">getConfig</span>(<span class="hljs-string">&#x27;inlineShortcuts&#x27;</span>).<span class="hljs-property">inlineShortcuts</span>,
+    ...newShortcuts,
+  },
+});
+</code></pre>
+<h2>0.35.0 (2020-03-24)</h2>
+<h3>New Features</h3>
+<ul>
+<li>
+<p><strong>Extensible (stretchy) symbols</strong>:</p>
+<p><strong>#126</strong> (<code>\overgroup</code>, <code>\overrightarrow</code>, <code>\overleftrightarrow</code>), <strong>#180</strong>
+(<code>\xrightarrow</code>, <code>\xrightleftharpoons</code>), <strong>#292</strong> (<code>\widehat</code>, <code>\overbrace</code>,
+<code>\underbrace</code>), <strong>#338</strong> (<code>\vec</code>, <code>\bar</code>).</p>
+<p>This work has been made possible thanks to the financial support of a generous
+sponsor.</p>
+<p>It is now possible for a symbol with operands above or below, or for a
+decoration above or below an expression, to stretch (extend) so that its width
+will match the width of the operands or expression.</p>
+<p>These extensible symbols and decorations are important for some domains such
+as geometry and chemistry.</p>
+<p>This release introduces th following new commands:</p>
+<ul>
+<li><code>\overrightarrow{base}</code></li>
+<li><code>\overleftarrow{base}</code></li>
+<li><code>\Overrightarrow{base}</code></li>
+<li><code>\overleftharpoon{base}</code></li>
+<li><code>\overrightharpoon{base}</code></li>
+<li><code>\overleftrightarrow{base}</code></li>
+<li><code>\overbrace{base}</code></li>
+<li><code>\overlinesegment{base}</code></li>
+<li><code>\overgroup{base}</code></li>
+<li><code>\underrightarrow{base}</code></li>
+<li><code>\underleftarrow{base}</code></li>
+<li><code>\underleftrightarrow{base}</code></li>
+<li><code>\underbrace{base}</code></li>
+<li><code>\underlinesegment{base}</code></li>
+<li><code>\undergroup{base}</code></li>
+<li><code>\xrightarrow[below]{above}</code></li>
+<li><code>\xleftarrow[below]{above}</code></li>
+<li><code>\xRightarrow[below]{above}</code></li>
+<li><code>\xLeftarrow[below]{above}</code></li>
+<li><code>\xleftharpoonup[below]{above}</code></li>
+<li><code>\xleftharpoondown[below]{above}</code></li>
+<li><code>\xrightharpoonup[below]{above}</code></li>
+<li><code>\xrightharpoondown[below]{above}</code></li>
+<li><code>\xlongequal[below]{above}</code></li>
+<li><code>\xtwoheadleftarrow[below]{above}</code></li>
+<li><code>\xtwoheadrightarrow[below]{above}</code></li>
+<li><code>\xleftrightarrow[below]{above}</code></li>
+<li><code>\xLeftrightarrow[below]{above}</code></li>
+<li><code>\xrightleftharpoons[below]{above}</code></li>
+<li><code>\xleftrightharpoons[below]{above}</code></li>
+<li><code>\xhookleftarrow[below]{above}</code></li>
+<li><code>\xhookrightarrow[below]{above}</code></li>
+<li><code>\xmapsto[below]{above}</code></li>
+<li><code>\xtofrom[below]{above}</code></li>
+<li><code>\xrightleftarrows[below]{above}</code></li>
+<li><code>\xrightequilibrium[below]{above}</code></li>
+<li><code>\xleftequilibrium[below]{above}</code></li>
+</ul>
+<p>In addition, the following commands can now be used to represent stretchy
+accents:</p>
+<ul>
+<li><code>\widehat{base}</code></li>
+<li><code>\widecheck{base}</code></li>
+<li><code>\widetilde{base}</code></li>
+<li><code>\utilde{base}</code></li>
+</ul>
+</li>
+<li>
+<p>Improved rendering and layout of <code>\enclose</code></p>
+</li>
+<li>
+<p>Improved layout of <code>overunder</code> atoms</p>
+</li>
+<li>
+<p>Improved layout of <code>accent</code> atoms</p>
+</li>
+<li>
+<p>Improved fidelity of styling commands (<code>\textup</code>, <code>\fontseries</code>, etc…). They
+are now closer to what LaTeX does, in all its wonderful weirdness (see
+https://texfaq.org/FAQ-2letterfontcmd). Added <code>\selectfont</code> command.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>
+<p><strong>#371</strong>: When clicking after the last element in the mathfield, always set
+the anchor to be the last element in the root, i.e. as if <code>moveToMathFieldEnd</code>
+had been performed. For example, if the content is “x^2”, clicking after the
+end of the field will put the caret after the last element (not after the “2”
+in the superscript)</p>
+</li>
+<li>
+<p><strong>#372</strong>: Using an argument in a macro will result in the argument to be
+substituted without a group being inserted. Previously, <code>#1</code> with <code>ax</code> as a
+value for the first argument would have resulted in <code>{ax}</code>. This was
+noticeable when using the <code>x^2</code> key in the virtual keyboard: if the equation
+was <code>ab</code>, pressing that key resulted in <code>{ab}^2</code>. It now results in <code>ab^2</code></p>
+</li>
+<li>
+<p>Fixed an issue rendering some commands such as <code>\boxed</code> and others when in
+static mode. An over-agressive optimization would coalesce spans with no
+content, even though they may include important styling info.</p>
+</li>
+<li>
+<p>Fixed the rendering of infix commands with arguments, e.g. <code>\atopwithdelims</code>
+and <code>overwithdelims</code>. The arguments of infix commands were incorrectly merged
+with the suffix.</p>
+</li>
+<li>
+<p>Fixed inter-atom spacing of <code>overunder</code> atoms (they should space as <code>mord</code>)</p>
+</li>
+</ul>
+<h3>Code Maintenance</h3>
+<ul>
+<li>
+<p>Re-factored the definitions of functions, symbols and environments which are
+now split in multiple files instead of being all contained in
+<code>core/definitions.js</code></p>
+</li>
+<li>
+<p>Re-factored and isolated the metadata about LaTex commands (frequency and
+category). This should reduce the amount of data carried by the core package.
+All the metadata is now in <code>definitions-metadata.js</code>. As a side effect, the
+examples displayed in the popover window might be less complete, but the
+removal of popover is on the roadmap.</p>
+</li>
+<li>
+<p>Removal of default export for some modules. Need to complete it for all the
+remaining modules.</p>
+</li>
+</ul>
+<h2>0.34.0 (2020-02-05)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fix #364: Some expressions containing placeholders, when inserted, would not
+have the placeholder selected. For example, when using the “differentialD” key
+in the virtual keyboard.</li>
+<li>Fix #349:
+<ul>
+<li>‘latex-expanded’ format no longer returns <code>\mleft</code> and <code>\mright</code>. This
+format is intended for inter-exchange with other TeX-compatible renderers
+and the <code>\mleft</code> and <code>\mright</code> commands are not widely deployed.</li>
+<li>The content exported to the clipboard is now surrounded by <code>$$</code> to more
+clearly indicate that the content is using TeX format.</li>
+<li>When pasting content that begins/ends with <code>$</code> or <code>$$</code>, assume LaTeX format</li>
+</ul>
+</li>
+<li>Fix keyboard shortcuts, e.g. “alt+(” or “alt+v”</li>
+<li>Fix #354: The argument of <code>\operatorname</code> is of type ‘math’, not ‘text’. This
+means that using the ‘\text’ command inside the argument is valid and that
+spaces should be ignored by default (but the <code>~</code> character can be used to
+insert a space in that context).</li>
+<li>Fix #282: Some keys from the virtual keyboards (‘e’, ‘i’) produce an incorrect
+input.</li>
+<li>Fix #227: An operator (<code>\sin</code>) following some text is incorrectly considered
+to be part of the text.</li>
+</ul>
+<h3>Features / Improvements</h3>
+<ul>
+<li>Documented <code>suppressChangeNotifications</code> options for <code>$insert()</code></li>
+<li>Document <code>config.smartMode</code> (#312)</li>
+<li>The ‘surd’ (root) and ‘leftright’ (fences) elements now change color when the
+caret is inside their body. This helps distinguish the case where the caret
+position may be ambiguous, for example when it is either after the last
+element of the body of a ‘surd’ or the first element after the ‘surd’.</li>
+<li>#339: Read-only mode. Set the mode to read-only with
+<code>mf.$setConfig({readOnly: true})</code>. When this mode is activated, the formula
+can be selected (so it can be copied), but it cannot be modified by the user.
+Progammatic modification is still possible.</li>
+</ul>
+<h2>0.33 (2019-12-19)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fix #313. Text mode content is not output in MathML, speech and MathJSON
+(contribution by @NSoiffer)</li>
+<li>Fix #275: Selection improvements (use centerpoint to calculate nearest atom)
+and make delimiters selection eligible.</li>
+</ul>
+<h2>0.32.3 (2019-10-29)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fix #286 <code>\mathbb{}</code>s are missing in the Latex output</li>
+</ul>
+<h2>0.32.2 (2019-09-24)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed an issue where some keys in the virtual keyboard would be unresponsive</li>
+</ul>
+<h2>0.30.1 (2019-07-30)</h2>
+<h3>Features / Improvements</h3>
+<ul>
+<li>Added Typescript type definition</li>
+</ul>
+<h2>0.30 (2019-07-18)</h2>
+<h3>Non-backward compatible changes</h3>
+<ul>
+<li>#157: Public APIs that don’t start with <code>$</code> have been removed. If your code
+used any of these APIs, add a <code>$</code> in front of their name. See #157 for the
+complete list.</li>
+</ul>
+<h3>Features / Improvements</h3>
+<ul>
+<li>#231: <code>smartMode</code> now supports Greek (the language). Also, Greek localization.</li>
+<li>Don’t display i-beam cursor over non-interactive content</li>
+<li>Use CSS class <code>.ML__smart-fence__close</code> to style closing smart fence</li>
+<li>Added speech support for text mode and units (contributed by @NSoiffer)</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed an issue where clicking past the end of the equation would select the
+numerator or denominator if the last element was a fraction, instead of place
+the cursor after the fraction (regression)</li>
+<li>Removed dependency on open-cli</li>
+<li>#220 Fixed an issue where tabbing out of a mathfield would break command mode
+and some functions</li>
+<li>#209, #214, #211 et. al. Improvements to SSML support and karaoke mode
+contributed by @NSoiffer</li>
+<li>#217 Fixed an issue with parentheses in numerator of fractions</li>
+<li>#212: Fix round-tripping of <code>\mathbb</code></li>
+<li>#194: When using the virtual keyboard, interpolate <code>#@</code></li>
+<li>Fixed an issue where “(” was incorrectly gobbled as argument to a fraction</li>
+<li>Fixed an issue where smartFence off was ignored</li>
+<li>#202: use numeric character references instead of named entities in MathML
+output</li>
+</ul>
+<h2>0.29.1 (2019-05-19)</h2>
+<h3>Bug fixes</h3>
+<ul>
+<li>#201: the popover button was not responsive</li>
+<li>#195: (partial fix) improve support for Edge (still requires Babelization)</li>
+<li>Fixed an issue while dragging to select across elements of different depths</li>
+<li>Fixed issue with smartMode for expressions including “x^2”, “xyz” and “\pi”</li>
+<li>Fixed an issue with styling, where the Latex output could sometimes include
+the non-existent <code>\mathup</code> command. The correct command is <code>\upshape</code></li>
+<li>Fixed issues with enclose layout</li>
+<li>Avoid triggering spurious notifications while inserting an inline shortcut</li>
+</ul>
+<h2>0.29 (2019-05-09)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>Scrollable mathfield. The mathfield now behaves like a text area: the content
+that does not fit withing the bounds of the mathfield will not overflow but
+will be scrollable. The scrolling can be done using the mouse wheel or
+trackpad gestures, or by dragging while selecting. The AP</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>When smartFence is on, and a new smart fence is inserted (by typing <code>(</code> for
+example), the closing ‘phantom’ fence would be displayed immediately after the
+opening fence. The closing fence will now be inserted after the end of the
+expression.</li>
+<li>The heuristics for determining implicit arguments, for example the implicit
+numerator when typing <code>/</code> have been improved. For example, typing <code>/</code> after
+<code>3 + 2sin x</code> will result in <code>3 + (2sin x)/(...)</code> instead of
+<code>3 + sin (x)/(...)</code>.</li>
+<li>When <code>config.removeExtraneousParentheses</code> is true (default), if a frac is
+inserted inside parentheses, the parens will be removed. So, if a <code>/</code> is typed
+after <code>1</code> in <code>(1)</code> it will become <code>1/(...)</code>.</li>
+<li>When smartMode is on, textual operators are eligible for conversion to text.
+Previously, if an inline shortcuts for <code>rad</code> was defined to
+<code>\operatorname{rad}</code> and ‘radius’ was typed, only <code>ius</code> would be turned to
+text.</li>
+<li>Smartmode is now applied when there is a selection. That is, if some text is
+selected and the <code>/</code> is pressed the selection will become the numerator.
+Previously the selection was deleted and replaced with an empty fraction</li>
+<li>Improved layout of surds, particularly when the surd is empty</li>
+<li>Made <code>\mathbb{}</code> et al. apply to the argument only, and not affect the style
+of following characters. Previously, if a <code>\mathbb{R}</code> was inserted, the
+following typed character would also be in Blackboard style.</li>
+<li>Improved build system on Windows. That is, it now works.</li>
+<li>Merge speak and readAloud APIs into one (contribution from Neil. Thanks Neil!)</li>
+<li>Switched to using <code>npm ci</code> for CI builds. Even for local builds, it is
+recommended to use <code>npm ci</code> to ensure the correct version of the dependencies
+are installed.</li>
+<li>In smartMode, the currency symbols are handled better. “One apple is
+$3.14”
+will result in the “$” being in math mode.</li>
+<li>Switching to/from command mode will not suppress smart mode.</li>
+</ul>
+<h3>Bug fixes</h3>
+<ul>
+<li>Fixed a crash when using smartFence with <code>sin(x^2/</code></li>
+<li>Fixed <code>alt+=</code> keyboard shortcut on Windows.</li>
+<li>Fixed some layout issues with <code>box</code> and <code>enclose</code></li>
+<li>Smart Fences will now work when invoked from the virtual keyboard.</li>
+<li>Fixed #177: custom localization strings are now handled correctly.</li>
+<li>Fixed some issues toggling style when selection is empty.</li>
+</ul>
+<h2>0.28 (2019-04-22)</h2>
+<p>This release contains some small bug fixes and improvements.</p>
+<ul>
+<li>Reduced Node version required (for dev builds) to Node LTS</li>
+<li>Fixed some issues with focus state of mathfields, particularly with multiple
+mathfields on a page</li>
+<li>Fixed an issue with some keys (such as /) on international keyboards (such as
+QWERTZ)</li>
+<li>Made <code>moveToOpposite</code> correctly select the opposite superscript/subscript</li>
+<li>Use the correct font for <code>\operatorname</code>, even for single character operators</li>
+<li>Send content change notifications when array cells are created</li>
+<li>Fixed a layout issue with upsized (<code>\huge</code>) content in fractions</li>
+<li>More accurate layout for <code>box</code> atoms (with <code>\bbox</code>, <code>\colorbox</code>, <code>\boxed</code> and
+<code>\fcolorbox</code>)</li>
+<li>Fixed an issue where units after an exponent were not recognized</li>
+<li>Fixed an issue displaying virtual keyboard on narrow Android phones</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li>Added support for applying size to the selection with
+<code>applyStyle({size:'size9'})</code> (default size is <code>size5</code>, smallest is <code>size1</code>,
+largest is <code>size10</code>).</li>
+<li>Added support for <code>npm run start</code> which will start a local web server for ease
+of debugging (some features, such as using JavaScript native modules, require
+a local server)</li>
+</ul>
+<h2>0.27 (2019-04-08)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>The syntax that MathJSON/MASTON can recognized has been significantly
+expanded. It also has been made more consistent, and in some cases it may be
+different than what was previously returned.</li>
+<li>Future breaking change: the selector <code>enterCommandMode</code> will be deprecated and
+replaced by the more general <code>switchMode('command')</code>. The selector
+<code>switchMode('command')</code> is available in this release, and <code>enterCommandMode</code>
+is supported as well but it will be removed in a future release and you should
+migrate to <code>switchMode()</code> as soon as possible.</li>
+</ul>
+<h3>Major New Features</h3>
+<h4>Text Mode (#153)</h4>
+<p>It was previously possible to enter text in an equation using the <code>\text{}</code>
+command and its family using the command mode. However, this feature was only
+suitable for advanced users, and had many limitations (text could not include
+spaces, for example).</p>
+<p>MathLive now fully support a dedicated text mode.</p>
+<p>To switch between math and text mode, use the <code>alt/option+=</code> keyboard shortcut,
+or programmatically using <code>mf.$perform(['apply-style', {mode: 'math'}])</code>. If
+there is a selection it will be converted to the specified mode (math is
+converted to ASCII Math). If there’s no selection, the next user input will be
+considered to be in the specified mode.</p>
+<p>The current mode can also be changed using
+<code>mf.$perform(['switch-mode', {mode: 'math'}])</code> without affecting the selection.</p>
+<p>To indicate the current mode, a (slightly) different cursor is used (it’s
+thinner in text mode). The text zones are also displayed on a light gray
+background when the field is focused.</p>
+<p>A notification is invoked when the mode changes: <code>config.onModeChange(mf, mode)</code>
+with mode either <code>&quot;text&quot;</code>, <code>&quot;math&quot;</code> or <code>&quot;command&quot;</code>.</p>
+<h4>Smart Mode</h4>
+<p>If <code>config.smartMode = true</code>, during text input the field will switch
+automatically between ‘math’ and ‘text’ mode depending on what is typed and the
+context of the formula. If necessary, what was previously typed will be ‘fixed’
+to account for the new info.</p>
+<p>For example, when typing “if x &gt;0”:</p>
+<ul>
+<li>“i” → math mode, imaginary unit</li>
+<li>“if” → text mode, english word “if”</li>
+<li>“if x” → all in text mode, maybe the next word is xylophone?</li>
+<li>“if x &gt;” → “if” stays in text mode, but now “x &gt;” is in math mode</li>
+<li>“if x &gt; 0” → “if” in text mode, “x &gt; 0” in math mode</li>
+</ul>
+<p>Smart Mode is off by default.</p>
+<p>Manually switching mode (by typing <code>alt/option+=</code>) will temporarily turn off
+smart mode.</p>
+<p><strong>Examples</strong></p>
+<ul>
+<li>slope = rise/run</li>
+<li>If x &gt; 0, then f(x) = sin(x)</li>
+<li>x^2 + sin (x) when x &gt; 0</li>
+<li>When x&lt;0, x^{2n+1}&lt;0</li>
+<li>Graph x^2 -x+3 =0 for 0&lt;=x&lt;=5</li>
+<li>Divide by x-3 and then add x^2-1 to both sides</li>
+<li>Given g(x) = 4x – 3, when does g(x)=0?</li>
+<li (x,y)|0&lt;="x&lt;=1" and="" 0&lt;="y&lt;=x">Let D be the set</li>
+<li>\int_{the unit square} f(x,y) dx dy</li>
+<li>For all n in NN</li>
+</ul>
+<h4>Styling</h4>
+<p>It is now possible to apply styling: font family, bold, italic, color and
+background color. This information is rendered correctly across math and text
+mode, and preserved in the LaTeX output.</p>
+<p>The key to control styling is the <code>$applyStyle(style)</code> method:</p>
+<p>If there is a selection, the style is applied to the selection.</p>
+<p>If the selection already has this style, it will be removed from it. If the
+selection has the style partially applied, i.e. only on some portions of the
+selection), it is removed from those sections, and applied to the entire
+selection.</p>
+<p>If there is no selection, the style will apply to the next character typed.</p>
+<ul>
+<li><strong>style</strong> an object with the following properties. All the properties are
+optional, but they can be combined.</li>
+<li><strong>style.mode</strong> - Either <code>'math'</code>, <code>'text'</code> or <code>'command'</code></li>
+<li><strong>style.color</strong> - The text/fill color, as a CSS RGB value or a string for some
+‘well-known’ colors, e.g. ‘red’, ‘#f00’, etc…</li>
+<li><strong>style.backgroundColor</strong> - The background color.</li>
+<li><strong>style.fontFamily</strong> - The font family used to render text. This value can the
+name of a locally available font, or a CSS font stack, e.g. “Avenir”,
+“Georgia, Times, serif”, etc… This can also be one of the following
+TeX-specific values: - <code>'cmr'</code>: Computer Modern Roman, serif - <code>'cmss'</code>:
+Computer Modern Sans-serif, latin characters only - <code>'cmtt'</code>: Typewriter,
+slab, latin characters only - <code>'cal'</code>: Calligraphic style, uppercase latin
+letters and digits only - <code>'frak'</code>: Fraktur, gothic, uppercase, lowercase and
+digits - <code>'bb'</code>: Blackboard bold, uppercase only - <code>'scr'</code>: Script style,
+uppercase only</li>
+<li><strong>style.fontSeries</strong> - The font ‘series’, i.e. weight and stretch (“series” is
+TeX terminology). The following values can be combined, for example: “ebc”:
+extra-bold, condensed. These attributes may not have visible effect if the
+font family does not support this style: - <code>'ul'</code> ultra-light weight
+<ul>
+<li><code>'el'</code>: extra-light - <code>'l'</code>: light - <code>'sl'</code>: semi-light - <code>'m'</code>: medium
+(default) - <code>'sb'</code>: semi-bold - <code>'b'</code>: bold - <code>'eb'</code>: extra-bold - <code>'ub'</code>:
+ultra-bold - <code>'uc'</code>: ultra-condensed - <code>'ec'</code>: extra-condensed - <code>'c'</code>:
+condensed - <code>'sc'</code>: semi-condensed - <code>'n'</code>: normal (default) - <code>'sx'</code>:
+semi-expanded - <code>'x'</code>: expanded - <code>'ex'</code>: extra-expanded - <code>'ux'</code>:
+ultra-expanded</li>
+</ul>
+</li>
+<li><strong>style.fontShape</strong> - The font ‘shape’ (again, TeX terminology), i.e. italic
+or condensed.
+<ul>
+<li><code>'it'</code>: italic</li>
+<li><code>'sl'</code>: slanted or oblique (often the same as italic)</li>
+<li><code>'sc'</code>: small caps</li>
+<li><code>'ol'</code>: outline</li>
+</ul>
+</li>
+</ul>
+<h4>Contextual Inline Shortcuts</h4>
+<p>Previously, some shortcuts would get triggered too frequently, for example when
+typing “find”, the “\in” shortcut would get triggered.</p>
+<p>Now, a shortcut can be defined with some pre-conditions. It is still possible to
+define a shortcut unconditionally, and thus if you are using custom inline
+shortcuts, they do not need to be updated:</p>
+<pre><code class="language-javascript">config.<span class="hljs-property">inlineShortcuts</span> = {
+  <span class="hljs-attr">in</span>: <span class="hljs-string">&#x27;\\in&#x27;</span>,
+};
+</code></pre>
+<p>However, a shortcut can now be specified with an object:</p>
+<pre><code class="language-javascript">config.<span class="hljs-property">inlineShortcuts</span> = {
+  <span class="hljs-attr">in</span>: {
+    <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;math&#x27;</span>,
+    <span class="hljs-attr">after</span>: <span class="hljs-string">&#x27;space+letter+digit+symbol+fence&#x27;</span>,
+    <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;\\in&#x27;</span>,
+  },
+};
+</code></pre>
+<p>The <code>value</code> key is required an indicate the shortcut substitution.</p>
+<p>The <code>mode</code> key, if present, indicate in which mode this shortcut should apply,
+either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut apply in
+both modes.</p>
+<p>The <code>'after'</code> key, if present, indicate in what context the shortcut should
+apply. One or more values can be specified, separated by a ‘+’ sign. If any of
+the values match, the shortcut will be applicable. Possible values are:</p>
+<ul>
+<li><code>'space'</code> A spacing command, such as <code>\quad</code></li>
+<li><code>'nothing'</code> The begining of a group</li>
+<li><code>'surd'</code> A square root or n-th root</li>
+<li><code>'frac'</code> A fraction</li>
+<li><code>'function'</code> A function such as <code>\sin</code> or <code>f</code></li>
+<li><code>'letter'</code> A letter, such as <code>x</code> or <code>n</code></li>
+<li><code>'digit'</code> <code>0</code> through <code>9</code></li>
+<li><code>'binop'</code> A binary operator, such as <code>+</code></li>
+<li><code>'relop'</code> A relational operator, such as <code>=</code></li>
+<li><code>'punct'</code> A punctuation mark, such as <code>,</code></li>
+<li><code>'array'</code> An array, such as a matrix or cases statement</li>
+<li><code>'openfence'</code> An opening fence, such as <code>(</code></li>
+<li><code>'closefence'</code> A closing fence such as <code>}</code></li>
+<li><code>'text'</code> Some plain text</li>
+</ul>
+<h4>Other Features</h4>
+<ul>
+<li>Arrays, matrices and cases can now be edited. To create a a matrix, after a
+<code>(</code> or a <code>[</code>, type some content then <code>[RETURN]</code>: a second row will be added to
+the matrix. Similarly, typing <code>[RETURN]</code> after a <code>{</code> will create a cases
+statements.
+<ul>
+<li>To insert a new row, type <code>[RETURN]</code></li>
+<li>To insert a new column, type <code>alt/option+,</code> (comma), the Excel shortcut for
+this operation.</li>
+</ul>
+</li>
+<li>Support for <code>\emph</code> (emphasis) command, which can be used to (semantically)
+highlight an element. This command works both in text and math mode (it only
+works in text mode in TeX). For example:</li>
+</ul>
+<pre><code class="language-tex"><span class="hljs-keyword">\text</span>{In the formula}<span class="hljs-keyword">\emph</span>{x}+1=0<span class="hljs-keyword">\text</span>{x is the <span class="hljs-keyword">\emph</span>{unknown}}
+</code></pre>
+<ul>
+<li>Support for <code>\cssId</code> and <code>\class</code> commands. These are non-standard TeX
+commands which are supported by MathJax.
+<ul>
+<li><code>\cssId{id}{content}</code> Attaches an id attribute with value <code>id</code> to the output
+associated with content when it is included in the HTML page. This allows
+your CSS to style the element, or your javascript to locate it on the page.</li>
+<li><code>\class{name}{content}</code> Attaches the CSS class <code>name</code> to the output
+associated with content when it is included in the HTML page. This allows
+your CSS to style the element.</li>
+</ul>
+</li>
+<li><code>config.removeExtraneousParentheses</code> (true by default) extra parentheses, for
+example around a numerator or denominator are removed automatically.
+Particularly useful when pasting content.</li>
+<li>Improvements to clipboard handling, pasting and copying. Now supports pasting
+of ASCIIMath and UnicodeMath (from MS Word) and LaTeX.</li>
+<li>Support for output of ASCIIMath using <code>mf.$text('ASCIIMath')</code> and
+<code>mf.$selectedText('ASCIIMath')</code></li>
+<li><code>config.smartSuperscript</code> If <code>true</code> (default), when a digit is entered in an
+empty superscript, the cursor leaps automatically out of the superscript. This
+makes entry of common polynomials easier and faster.</li>
+<li><code>config.scriptDepth</code> Controls how many levels of subscript/superscript can be
+entered. By restricting, this can help avoid unwanted entry of superscript and
+subscript. By default, there are no restrictions.</li>
+<li>#156: localization support, including French, Italian, Spanish, Polish and
+Russian.</li>
+<li>New visual appearance for selected elements.</li>
+</ul>
+<h3>Other Improvements</h3>
+<ul>
+<li>When in command mode (after pressing the ‘’ or ‘ESC’ key), pressing these
+keys will have the indicated effect:
+<ul>
+<li><code>[ESC]</code>: discards entry and return to math mode</li>
+<li><code>[TAB]</code>: accept suggestion and enter it</li>
+<li><code>[RETURN]</code>: enter characters typed so far, ignoring any suggestion.</li>
+</ul>
+</li>
+<li>#132: Support for smart fence with <code>{}</code>, and <code>\langle</code>.</li>
+<li>Pressing the spacebar next to a closing smartFence will close it. Useful for
+semi-open fences.</li>
+<li>Improved rendering performance by 8%</li>
+<li>Updated SRE support</li>
+<li>Improvements to undo/redo support. Fix #137, #139 and #140.</li>
+<li>Significant improvements to the Abstract Syntax Tree generation
+(MASTON/MathJSON), including #147</li>
+<li>Keyboard shortcuts that override inline shortcuts and Smart Fence:
+<code>option/alt+|</code>, <code>option/alt+\</code>. Also available are <code>option/alt+(</code> and
+<code>option/alt+)</code></li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>#155: A cases statement (or a matrix) can now be deleted. The rows and columns
+inside a cases statement (or a matrix) can also be deleted.</li>
+<li>#133: Clicking on a placeholder selects it.</li>
+<li>Fixed issue with positioning of Popover panel.</li>
+<li>Correctly render <code>\ulcorner</code>, <code>\urcorner</code>, <code>\llcorner</code> and <code>\rrcorner</code></li>
+<li>#141: Improved interaction of placeholders and smart fences</li>
+<li>#136: Close open smart fence with moveAfterParent only when at the closing of
+a smart fence</li>
+<li>#142: MathML output: supports sup/sub applied to a function</li>
+<li>Improved handling of shortcuts.</li>
+<li>#149: Fix handling of <code>\prime</code> and <code>\doubleprime</code></li>
+<li>#111: Fix issue where a subscript followed a superscript and were not properly
+combined.</li>
+<li>#118. Improved navigating out of inferior limits</li>
+<li>Improve visual blinking when selecting with the mouse to the left</li>
+</ul>
+<h2>0.26 (2019-02-04)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>Public method now start with <code>$</code>. This convention is also used, for example,
+by the Vue.js project. For now, aliases exist that begin with ‘_’ (the
+previous convention), however you are encourage to migrate as soon as
+possible. The function that are affected are: <code>_el()</code>, <code>_insert()</code>,
+<code>_keystroke()</code>, <code>_latex()</code>, <code>_perform()</code>, <code>_revertToOriginalContent()</code>,
+<code>_selectedText()</code>, <code>_selectionAtEnd()</code>, <code>_selectionAtStart()</code>,
+<code>_selectionDepth()</code>, <code>_selectionIsCollapsed()</code>, <code>_setConfig()</code>, <code>_text()</code>,
+<code>_typedText()</code> (this was initially implemented in 0.25)</li>
+</ul>
+<h3>Major New Features</h3>
+<ul>
+<li>Support for dark mode. Triggered automatically by the browser or by setting
+<code>theme=&quot;dark&quot;</code> on the <code>&lt;body&gt;</code> tag.</li>
+<li>New implementation for inline shortcuts. Now support complex inline shortcuts
+including <code>_</code>, <code>(</code> and other keys.</li>
+<li>Virtual Keyboards can now be described using a JSON data structure.
+Contribution from @rpdiss. Thanks!</li>
+<li>New <code>MathLive.toSpeakableText()</code> function</li>
+<li>New <code>config.onAnnounce</code> handler</li>
+</ul>
+<h3>Other Improvements</h3>
+<ul>
+<li>The <code>$perform()</code> function now accepts selector both in camelCase or
+kebab-case.</li>
+<li>Improved display of some keys in the keyboard caption panel</li>
+<li>New logo!</li>
+<li>Improved documentation, including adding pages for keyboard shortcuts,
+examples, macros, selectors and config options.</li>
+<li>Better support for IE11 via transpiling (thanks @synergycodes!)</li>
+</ul>
+<h3>Bug fixes</h3>
+<ul>
+<li>#103 - Fixed issues where the math path could become invalid. Also made the
+code more resilient to invalid paths.</li>
+<li>#128 - Properly cleanup event handlers on destruction</li>
+</ul>
+<h3>Codebase Health and Performance</h3>
+<ul>
+<li>Some minor optimizations and performance improvements, including lazy loading
+of sounds and some other resources.</li>
+<li>Moved some modules to classes.</li>
+</ul>
+<h2>0.25 (2018-12-29)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>A Vue.js wrapper and example is available in <code>examples/vue</code></li>
+</ul>
+<h3>Bug fixes</h3>
+<ul>
+<li>#104 - Numeric keypard “/” was ignored.</li>
+<li>#91 - Handling of ‘~’ as an operator and a shortcut.</li>
+</ul>
+<h2>0.24 (2018-12-16)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>Several handlers had some inconsistent signatures, or in some cases passed
+invalid values as their arguments. This has been fixed, but it required
+changing the signature of some handlers. For consistency, the first argument
+of the handlers now refers to the mathfield to which it applies.</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">makeMathField</span>(<span class="hljs-string">&#x27;input&#x27;</span>, {
+  <span class="hljs-attr">onContentDidChange</span>: <span class="hljs-function">(<span class="hljs-params">mf</span>) =&gt;</span> {
+    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;output&#x27;</span>).<span class="hljs-property">innerHTML</span> = mf.<span class="hljs-title function_">latex</span>();
+  },
+});
+</code></pre>
+<p>Keep in mind that arrow functions lexically bind their context, so <code>this</code>
+actually refers to the originating context (not to the mathfield).</p>
+<p>The affected handlers are:</p>
+<ul>
+<li><code>onFocus</code></li>
+<li><code>onBlur</code></li>
+<li><code>onKeystroke</code></li>
+<li><code>onMoveOutOf</code></li>
+<li><code>onTabOutOf</code></li>
+<li><code>onContentWillChange</code></li>
+<li><code>onContentDidChange</code></li>
+<li><code>onSelectionWillChange</code></li>
+<li><code>onSelectionDidChange</code></li>
+<li><code>onUndoStateWillChange</code></li>
+<li><code>onUndoStateDidChange</code></li>
+<li><code>onVirtualKeyboardToggle</code></li>
+<li><code>onReadAloudStatus</code></li>
+</ul>
+<p>It is recommended that you check if you use any of those handlers and validate
+their signatures.</p>
+<h3>Major New Features</h3>
+<ul>
+<li>Support for native JavaScript modules, contributed by Jason Boxman
+(https://github.com/jboxman). Thanks, Jason!</li>
+</ul>
+<p>The previous method, using a <code>&lt;script&gt;</code> tag, is still supported:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;../../dist/mathlive.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>but it is recommended to use native JavaScript modules:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-keyword">import</span> <span class="hljs-title class_">MathLive</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../../dist/mathlive.mjs&#x27;</span>;
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>(note the <code>.mjs</code> extension indicating this is a JavaScript module).</p>
+<p>A few caveats about using modules:</p>
+<ul>
+<li>JavaScript modules are automatically in strict mode</li>
+<li>To use JavaScript modules you need to be in your own module. With a <code>&lt;script&gt;</code>
+tag, this is indicated by adding the <code>type='module'</code> attribute. The code
+inside a module is not leaked to the global scope, the module has its own
+scope. As a result, functions defined inside the module (inside your
+<code>&lt;script&gt;</code> tag) will not be visible outside the module. You will need to
+either attach them to a global object (such as <code>window</code>) or in the case of
+even handlers, attach them to the relevant element, using <code>addEventListener</code>.</li>
+</ul>
+<p>See <code>examples/basic/index.esm.html</code> for a complete example.</p>
+<p>If you were previously loading the non-minified version, that is the raw
+sources, which can be useful to debug issues, you need to use modules to load
+them, while you may have used <code>requirejs</code> previously. The sources are now
+included in the distribution for this purpose.</p>
+<p>Instead of:</p>
+<pre><code class="language-javascript">    <span class="hljs-title function_">define</span>([<span class="hljs-string">&#x27;mathlive/src/mathlive&#x27;</span>], <span class="hljs-keyword">function</span>(<span class="hljs-params">MathLive</span>) {
+        <span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">makeMathField</span>(<span class="hljs-comment">/*...*/</span>);
+    }
+</code></pre>
+<p>use:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> <span class="hljs-title class_">MathLive</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../../dist/src/mathlive.js&#x27;</span>;
+<span class="hljs-title class_">MathLive</span>.<span class="hljs-title function_">makeMathField</span>(<span class="hljs-comment">/*...*/</span>);
+</code></pre>
+<ul>
+<li>Support for SRE (Speech Rule Engine) from Volker Sorge. Optional, and needs to
+be installed separately.</li>
+<li>Improved text to speech support, including karaoke mode (read aloud with
+synchronized highlighting)</li>
+<li>New configuration setting to control the spacing between elements,
+<code>horizontalSpacingScale</code>. Supplying a value &gt; 1.0 can improve readability for
+some users.</li>
+<li>Added notifications when undo state change, <code>onUndoStateWillChange</code> and
+<code>onUndoStateDidChange</code></li>
+<li>Added support for correctly inserting rows and columns in arrays.</li>
+</ul>
+<h3>Other Improvements</h3>
+<ul>
+<li>Fixes in MASTON</li>
+<li>Improved cross-browser accessibility support</li>
+<li>Fix MathML output for superscripts</li>
+<li>Fix issue #75 (autoconvert would fail in some cases)</li>
+<li>Fix issue #114. Incorrect selection when shift-select at the end.</li>
+<li>Fix issue #78. Cross-out positioning issue</li>
+</ul>
+<h2>0.22 (2018-04-11)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>Support for styling in the virtual keyboard UI: the text and highlight color
+can be adjusted to emphasize a portion of a formula</li>
+<li>Smart Fences. When a fence (“(”, “{”, etc…) is inserted, a matching closing
+fence is automatically inserted, displayed as a greyed out placeholder.<br>
+The Latex code inserted will vary depending on the context where the insertion
+is made, either standalone characters (<code>(</code>) or <code>\left...\right</code>. This feature
+is on by default and can be turned off with <code>config.smartFence</code>. <br>Option-9
+and Option-0, as well as <code>\(</code> and <code>\)</code> will override the setting and insert a
+plain old parenthesis.</li>
+<li><code>\mleft...\mright</code>. Similar to <code>\left...\right</code> (i.e. grow in height depending
+on its content) but with vertical spacing before and after similar to
+<code>\mathopen</code> and <code>\mathclose</code>. Used automatically by smart fences after a
+function such as <code>\sin</code> or <code>f</code>.</li>
+<li>Haptic and audio feedback for the virtual keyboard.<br>Haptic feedback is
+available on Android only. <br> Two new config options to control it.
+<code>config.keypressVibration</code>, which is on by default, control the haptic
+feedback. <code>config.keypressSound</code> control the audio feedback (off by default).
+Specify the URL to a sound file to be played when a key on the virtual
+keyboard is pressed, or an object with a <code>delete</code>, <code>return</code>, <code>spacebar</code> and
+<code>default</code> (required) keys to specify different sounds for those keys.</li>
+</ul>
+<h3>Other New Features</h3>
+<ul>
+<li>When a fraction is inserted, for example by pressing ‘/’, the items before the
+insertion point are considered as potential numerator. This now include
+parenthesized expressions and roots. In the case of parenthesized expressions,
+the parentheses are removed before being adoped for the numerator.</li>
+<li>MASTON: Use Unicode to represent math-variant letters (e.g. ℂ)</li>
+<li>Convert math-variant letters encoded in Unicode to Latex when pasting (e.g. ℂ
+becomes <code>\C</code>, 𝕰 becomes <code>\mathord{\mathbf{\mathfrak{E}}}</code></li>
+<li>MASTON: Commutativity support. a + b + c → add(a, b, c)</li>
+<li>MASTON: Right and left-associativity support (‘=’ and ‘=&gt;’ are right
+associative)</li>
+<li>Improvements to the delete behavior: when to the right of a <code>\left...\right</code>
+deletes remove the closing fence, not the whole expression. Same for root,
+fractions, and other groups. When at the beginning of a denominator, pressing
+delete will remove the fraction, but keep numerator and denominator, etc…</li>
+<li>When using the command virtual keyboard, switch to command mode as necessary.</li>
+<li>Added <code>MathAtom.skipBoundary</code>. When true, navigating into/out of the atom the
+last/first element will be skipped. For example, with <code>\textcolor{}</code> this
+implements a behavior similar to word processors.</li>
+</ul>
+<h3>Bug fixes</h3>
+<ul>
+<li>Fixed #63: improved displayed of <code>\enclose</code> over stacked atoms such as
+fractions and <code>\overset</code></li>
+<li>Fixed issue with selecting sparse arrays</li>
+<li>Make <code>\bigl</code> et al. properly selectable</li>
+</ul>
+<h3>Code Maintenance and Performance</h3>
+<ul>
+<li>Moved operator precedence and canonical names from Definitions to MASTON.</li>
+<li>Improved rendering performance by eliminating hotspots through profiling.</li>
+</ul>
+<h2>0.21 (2018-03-30)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>Basic support for Latex macros. Macros can be defined with
+<code>MathField.$setConfig({macros:'...')</code></li>
+<li>Display alternate keys when a key on the virtual keyboard is held down.</li>
+<li>Support for AZERTY, QWERTZ, Dvorak and Colemak virtual keyboards. Can be setup
+with <code>MathField.$setConfig({virtualKeyboardLayout:'...')</code>. Also, shift
+clicking on the keyboard icon toggles between layouts.</li>
+</ul>
+<h3>Other New Features</h3>
+<ul>
+<li>Toggle the virtual keyboard layer when the shift key is pressed</li>
+<li>New <code>onVirtualKeyboardToogle</code> handler will get called when the visibility of
+the virtual keyboard changes. Useful to scroll into view important content
+that might be obscured by the keyboard.</li>
+<li>Some common functions added as inline shortcuts: <code>limsup</code>, <code>liminf</code>, <code>argmin</code>,
+<code>argmax</code>, <code>bessel</code>, <code>mean</code>, <code>median</code>, <code>fft</code>.</li>
+<li>Added <code>\rd</code> command (synonym with <code>\differentialD</code> and used by Proof Wiki)</li>
+<li>Added a format option (<code>latex-expanded</code>) to <code>MathField.text()</code> and
+<code>MathField.selectedText()</code> to return Latex with macros expanded.</li>
+<li>Removed restrictions on charset in <code>text</code></li>
+<li>Support shift + arrows to extend the selection with the virtual keyboard</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>More accurate operator precedence. Follow the
+<a href="www.w3.org/TR/MathML3/appendixc.html">MathML</a> recommendation, except for
+arrows that are given a way too high priority in MathML.</li>
+<li>Correctly output to Latex the <code>\unicode</code> command</li>
+<li>When undoing, correctly restore the selection</li>
+<li>Improved behavior when inserting superscript and subscript on a selected item</li>
+<li>Fixed handling of unbalanced <code>\left</code>…<code>\right</code> sequences</li>
+<li>Correctly output the minus sign to Latex (as U+002D not as U+2212)</li>
+<li>Fixed some cases where the layout would shift by a couple of pixels as you
+navigated into the expression</li>
+</ul>
+<h3>Code Maintenance and Performance</h3>
+<ul>
+<li>Use <code>.test()</code> instead of <code>.match()</code> whenever possible</li>
+<li>Eliminated <code>.value</code> and <code>.children</code> in Math Atoms. It’s only <code>.body</code> now.</li>
+<li>Avoid unnecessary rendering while tracking the pointer</li>
+<li>Refactored the Popover code into <code>Popover.js</code></li>
+<li>Moved some content from <code>Definitions.js</code> and into <code>Popover.js</code></li>
+</ul>
+<h2>0.20 (2018-03-24)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>Virtual keyboards with multi-touch support</li>
+<li>BREAKING CHANGE: the command bar is no longer supported. Use virtual keyboards
+instead.</li>
+</ul>
+<h3>Other New Features</h3>
+<ul>
+<li>Added support for wide layouts to virtual keyboard. If space is available, up
+to four more columns of keys can be displayed.</li>
+<li>Added Copy button to virtual keyboard</li>
+<li>Allow ‘space’ in command mode</li>
+<li>MASTON: improved parsing of numbers</li>
+<li>Handle Unicode pseudo-superscript characters as exponents</li>
+</ul>
+<h2>0.19 (2018-03-19)</h2>
+<h3>Major New Features</h3>
+<ul>
+<li>MASTON: first implementation</li>
+<li>Support selecting cells in arrays</li>
+</ul>
+<h3>Other New Features</h3>
+<ul>
+<li>MASTON: handle complex numbers and modulo</li>
+<li>Added option for styling of keyboard glyph</li>
+<li>Improved output to Latex for arrays</li>
+<li>Additional trig and long functions (<code>\lb</code>, <code>\arsinh</code>, <code>\arcosh</code>, <code>\artanh</code>,
+<code>\arcsech</code>, <code>\arccsh</code>, <code>\arcsec</code>, <code>\arccsc</code>)</li>
+<li>MathML: more robust handling of complex <code>&lt;mo&gt;</code></li>
+<li>MathML: improved handling of fences</li>
+<li>Improved Latex output</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Correctly handle latex output for the <code>\char</code> command</li>
+<li>Correctly handle invalid Unicode code points in the <code>\char</code> command</li>
+<li>Correctly output MathML for extended Unicode characters and <code>\char</code> command</li>
+<li>Correctly handle selection in sparse arrays</li>
+<li>Correct spacing issue of selected items</li>
+<li>Fixed #17: correctly extend the selection when the anchor is at the end of the
+selection</li>
+<li>The caret would not blink in empty supsub</li>
+<li>The last character of the selection would not be copied on the clipboard</li>
+<li>MathML: don’t insert <code>&amp;invisibleTimes;</code> for factorial, but <em>do</em> insert it
+before a fence.</li>
+<li>Going up from a numerator longer than the denominator could hang.</li>
+<li>MathML and Latex output: better handling of <code>\Big</code> (etc…) delimiters</li>
+<li>MathML: do not render <code>\text</code> as <code>&lt;mi&gt;</code></li>
+<li>Latex output: handle the <code>\math...</code> (<code>\mathop</code>, <code>\mathbin</code>…) family of
+functions</li>
+<li>Properly parse custom operators</li>
+<li>Commands with multiple keyboard shortcuts would not display correctly in the
+Popover panel</li>
+</ul>
+<h3>Code Maintenance and Performance</h3>
+<ul>
+<li>Reduce the amount of markup generated, avoid generating markup for empty
+spans.</li>
+<li>Updated fonts from KaTeX</li>
+</ul>
+<h2>0.18 (2018-03-04)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed issue where <code>\underset</code> annotation was not selectable</li>
+</ul>
+<h3>Code Maintenance and Performance</h3>
+<ul>
+<li>Reverted back to WebPack 3</li>
+<li>Simplified CSS and streamlined markup for <code>vlist</code> spans.</li>
+</ul>
+<h2>0.0.17 (2018-02-27)</h2>
+<h3>New Features</h3>
+<ul>
+<li>Improved accessibility support (major contribution from Neil Soiffer)</li>
+<li>Support for MathML output and Latex to MathML conversion.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>#26 Fixed issue with Chrome 62 where fraction lines and other thin lines would
+intermittently not render.</li>
+<li>#20, #51. Ensure that a placeholder is always present for numerator,
+denominator.</li>
+<li>#21. Do not allow sub-elements of an enclose element to be selected.</li>
+<li>Font-size will now respect font-size specified by the parent element. As a
+result of this non-backward compatible change, the size of the equation may
+now be different than it was. To ensure that the size remains the same as
+before, specify a font-size property on the parent element with a value of
+16px.</li>
+<li>#29. Correctly handle $ and @ as inlineShortcuts</li>
+<li>Improved handling of undo.</li>
+<li>New implementation of \enclose notations.</li>
+</ul>
+<h2>0.0.16 (2017-09-13)</h2>
+<h3>Deprecated Features</h3>
+<ul>
+<li><code>MathField.write()</code> has been deprecated. Use <code>MathField.insert()</code> instead.</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li>Added <code>MathField.selectedText()</code> which returns the textual content of the
+selection.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Perform a snapshot with the undo manager when invoking <code>MathField.insert()</code>.</li>
+<li>Documentation improvements.</li>
+</ul>
+<h2>0.0.15 (2017-07-01)</h2>
+<h3>New Features</h3>
+<ul>
+<li>Properly exported public API, including <code>renderMathInDocument()</code> and
+<code>renderMathInElement()</code></li>
+<li>Added \enclose command, implementing the
+<a href="https://developer.mozilla.org/en-US/docs/Web/MathML/Element/menclose">MathML</a>
+equivalent.</li>
+<li>Added \cancel, \bcancel and \xcancel commands</li>
+<li>Added <code>preserveOriginalContent</code> option to <code>MathLive.renderMathIn...()</code></li>
+<li>Made <code>\backslash</code> work in text mode, for example when an argument of <code>\rlap{}</code></li>
+<li>Added <code>MathField.revertToOriginalContent()</code> when a math field is no longer
+needed for an element</li>
+<li>Added customization of the command bar. See <code>MathField.$setConfig()</code> and
+<code>config.commands</code></li>
+<li>Added <code>MathLive.revertToOriginalContent()</code> and <code>MathLive.getOriginalContent()</code></li>
+<li>Added optional namespacing of <code>data-</code> attributes</li>
+<li>Added <code>onContentWillChange</code> and <code>onContentDidChange</code> handlers in the math
+field config object.</li>
+<li>Added tutorials and improved documentation</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>Fixed #5: AZERTY keyboard input was misbehaving, particularly for the <code>^</code> key</li>
+<li>Dead keys (<code>´</code>, <code>^</code>, <code>¨</code>, <code>˜</code> and others on some keyboards) were not properly
+handled</li>
+<li>Complex emojis (emojis made of multiple codepoints, such as emojis with skin
+tone modifiers, or emojis with a ZERO WIDTH JOINER, such as the David Bowie
+emoji) would be incorrectly recognized as multiple symbols</li>
+<li>Fixed the <code>\color</code> command</li>
+<li>Properly roundtrip to LaTeX <code>\rlap</code>, <code>\color</code> and many other commands. Now,
+copying content using these commands in a math field will result in the
+correct LaTeX code to be generated.</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 05, 2022">
+                
+
+        
+
+
+        
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-05">April 05, 2022</time></p>
+        
+
+          <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+</div>
+
+<script type="module">
+  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
+  window.addEventListener('DOMContentLoaded', (event) => {
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+  });
+</script>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+    <ul class="social-icons">
+         
+         
+         
+        
+        <li>
+            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+            >
+        </li>
+         
+         
+        
+        <li>
+            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+            >
+        </li>
+         
+         
+        
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+             
+    <ul>
+         
+        
+        <li>
+            <a href="/about/" rel="nofollow noopener noreferrer">About Us</a
+            >
+        </li>
+         
+         
+    </ul>
+        
+
+</div>
+      </footer>
+    </div>
+
+    
+  <!-- <script defer src="/assets/js/main.min.js"></script> -->
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
