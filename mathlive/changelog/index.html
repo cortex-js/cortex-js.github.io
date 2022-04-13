@@ -668,14 +668,24 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
-<h2>[Unreleased]</h2>
+<h2>0.71.0 (2022-04-12)</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>Removed the <code>find</code> and <code>replace</code> methods. These methods were difficult to use,
+since they were based on LaTeX serialization and the mapping from atom to
+LaTeX is not always intuitive. To replace them it is recommended to extract
+the MathJSON representation of the value, and manipulate it using the CortexJS
+Compute Engine.</li>
+</ul>
+<h3>New Features</h3>
+<ul>
+<li><code>&quot;math-json&quot;</code> can be used as a format for <code>setValue()</code></li>
+</ul>
 <h3>Improvements</h3>
 <ul>
 <li><strong>#1415</strong> Atoms inside parentheses are now considered as implicit arguments,
 for example when inserting a fraction.</li>
 <li><strong>#1389</strong> Keyboard navigation inside tabular data (matrices, etc…)</li>
-<li><strong>#1387</strong> A matrix with an empty cell would result in error messages in the
-console in some cases</li>
 <li>Documentation: some of the data structures were not publicly exported and did
 not appear in the documentation (https://cortexjs.io/docs/mathlive/)</li>
 <li>When pasting content that included a double-backslash (e.g. as a row
@@ -685,6 +695,12 @@ escaped in JavaScript). However, this caused some legitimate LaTeX to not be
 interpreted correctly. The double-backslash are no longer “simplified”.</li>
 </ul>
 <h3>Bug Fixes</h3>
+<ul>
+<li>A style applied to a an atom using <code>applyStyle()</code> was not propagated to its
+children</li>
+<li><strong>#1387</strong> A matrix with an empty cell would result in error messages in the
+console in some cases</li>
+</ul>
 <h2>0.70.0 (2022-04-05)</h2>
 <h3>Features</h3>
 <ul>
