@@ -799,6 +799,7 @@ if it is confident enough of that guess.</p>
 <p>MathLive currently has a limited set of “known” keyboard layouts. If you happen
 to use a keyboard layout MathLive doesn’t know, it will guess the wrong keyboard
 layout. As a result some keyboard shortcuts may produce unexpected results.</p>
+<section id='inline-shortcuts'>
 <h2>Inline Shortcuts</h2>
 <p>An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
@@ -821,6 +822,7 @@ enhanced with new shortcuts.</p>
 const mf = document.getElementById('mf');
 mf.setOptions({
   inlineShortcuts: {
+    ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
     "infty": { mode: 'math', value: '\\infty' },
   }
 });</div><div slot="html">&lt;math-field id="mf"&gt;
@@ -832,6 +834,7 @@ mf.setOptions({
 key:</p>
 <pre><code class="language-javascript">mf.<span class="hljs-title function_">setOptions</span>({
   <span class="hljs-attr">inlineShortcuts</span>: {
+    ...mf.<span class="hljs-title function_">getOptions</span>(<span class="hljs-string">&#x27;inlineShortcuts&#x27;</span>),    <span class="hljs-comment">// Preserve default shortcuts</span>
     <span class="hljs-attr">in</span>: {
         <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;math&#x27;</span>,
         <span class="hljs-attr">after</span>: <span class="hljs-string">&#x27;space | letter | digit | symbol | fence&#x27;</span>,
@@ -857,6 +860,7 @@ key:</p>
 <li><code>'closefence'</code> A closing fence such as <code>}</code></li>
 <li><code>'text'</code> Some plain text</li>
 </ul>
+</section>
 <h3>Customizing the Inline Shortcut Sensitivity</h3>
 <p><strong>To change how quickly a set of keys must be typed to be considered a shortcut</strong>
 set the <code>inlineShortcutTimeout</code> option.</p>
@@ -874,6 +878,7 @@ supporting the “±” shortcut with the same sequence.</p>
 second character if this option is set to a value of 250 or so.</p>
 <p>Note that some operations, such as clicking to change the selection, or losing
 the focus on the mathfield, will automatically timeout the shortcuts.</p>
+<section id='ascii-math'>
 <h3>ASCIIMath Inline Shortcuts</h3>
 <p><a href="https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js">ASCIIMath</a> defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.</p>
@@ -964,6 +969,7 @@ setting.</p>
   }
 });
 </span></code></pre>
+</section>
 <div class='read-more'><a href="/mathlive/guides/speech/">
 Next: Control <strong>Speech</strong> output
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -976,14 +982,14 @@ Next: Control <strong>Speech</strong> output
         
 
 
-        <meta itemprop="datePublished" content="March 31, 2022">
+        <meta itemprop="datePublished" content="April 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-31">March 31, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-16">April 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

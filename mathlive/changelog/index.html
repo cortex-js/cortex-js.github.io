@@ -668,7 +668,7 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
-<h2>[Unreleased]</h2>
+<h2>0.72.0 (2022-04-18)</h2>
 <h3>Bug Fixes</h3>
 <ul>
 <li><strong>#1017</strong> Display tooltip over buttons of virtual keyboard button bar</li>
@@ -683,10 +683,19 @@ cursor or allow its content to be selected</li>
 a macro), allow the cursor to be positioned right after the atom.</li>
 <li>In some rare cases (if no keys but keybinding were entered in a mathfield),
 some keybindings would stop functioning</li>
+<li><strong>#1327</strong> Selecting the expression under a square root also selected the
+squared root.</li>
+<li>Extending the selection forward when including some atoms such as
+<code>\operatorname</code> jumped to the end of the expression.</li>
+<li><strong>#1422</strong> Turning off macros would still fallback to default macros.</li>
+<li><strong>#1037</strong> Correctly serialize <code>\mathord</code>, <code>\mathbin</code>, etc…</li>
+<li><strong>#1425</strong> Using the up/down keys to navigate could produce an error in some
+cases</li>
 </ul>
 <h3>Improvements</h3>
 <ul>
 <li>Use more standard <code>\mathbb{N}</code>, etc… for <code>NN</code> shortcut</li>
+<li>Improved display of command popover when editing raw LaTeX</li>
 </ul>
 <h2>0.71.0 (2022-04-12)</h2>
 <h3>Breaking Changes</h3>
@@ -3990,14 +3999,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="April 13, 2022">
+        <meta itemprop="datePublished" content="April 18, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-13">April 13, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-18">April 18, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
