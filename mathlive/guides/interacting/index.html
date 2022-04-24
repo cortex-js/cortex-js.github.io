@@ -922,12 +922,12 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </code></pre>
 <p><strong>To export the “raw” (not expanded) LaTeX)</strong>, use:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
-  <span class="hljs-string">`\\(<span class="hljs-subst">${mg.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
+  <span class="hljs-string">`\\(<span class="hljs-subst">${mf.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
 });
 </code></pre>
 <p>The exported format doesn’t have to be LaTeX. To export ASCIIMath instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
-  <span class="hljs-string">&quot;`&quot;</span> + mg.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>.
+  <span class="hljs-string">&quot;`&quot;</span> + mf.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>
 });
 </code></pre>
 <p class="notice--info">The standard delimiter for AsciiMath is the <kbd>`</kbd> (backtick) character .</p>
@@ -950,14 +950,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="March 31, 2022">
+        <meta itemprop="datePublished" content="April 24, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-31">March 31, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-24">April 24, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
