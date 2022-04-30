@@ -35,17 +35,17 @@
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -58,7 +58,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
   
     
       
@@ -889,17 +889,17 @@ Table of Content</label>
 <p><code>[“Integrate”, <em>expression</em>]</code></p>
 <p><code>[“Integrate”, <em>expression</em>, <em>symbol</em>]</code></p>
 <p>Indefinite integral</p>
-<p><code>[“Integrate”, [“Sin”, x], “x”]</code></p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, x], &quot;x&quot;]</code></p>
 <p>$$ \int \sin x ,\mathrm{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate</em>]</code></p>
 <p>Definite integral.</p>
-<p><code>[“Integrate”, [“Sin”, “x”], [“Element”, x, [“Interval”, 0, +Infinity]]]</code></p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
 <p>$$ \int_0^\infty \sin x ,\mathrm{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
 <p>Multiple integral.</p>
-<p><code>[“Integrate”, ['“Multiply”,  x [“Sin”, “y”]], [“Element”, x, [“Interval”, 0, 2]], [“Element”, y, [“Interval”, 0, 1]]]</code></p>
+<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  x [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, y, [&quot;Interval&quot;, 0, 1]]]</code></p>
 <p>$$ \int_0^1 \int_0^2 x\sin y ,\mathrm{d}x,\mathrm{d}y $$</p>
 </td></tr>
 <tr><td><code>D</code></td><td>
@@ -1030,14 +1030,14 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2022">
+        <meta itemprop="datePublished" content="April 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-24">April 24, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

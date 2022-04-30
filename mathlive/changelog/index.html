@@ -668,7 +668,7 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
-<h2>[Unreleased]</h2>
+<h2>0.72.2 (2022-04-30)</h2>
 <h3>Bug Fixes</h3>
 <ul>
 <li><strong>#1427</strong> An issue introduced in the previous release: the serialization to
@@ -676,6 +676,16 @@ LaTeX of some functions (e.g. <code>\log</code>) failed.</li>
 <li>Serialization to MathML of subscripts/superscripts was incorrect in some cases</li>
 <li>In Chrome, setting the <code>readonly</code> attribute on mathfield caused the content of
 the mathfield to be set to empty.</li>
+<li><strong>#1431</strong> AutoRender of static math expressions would not render correctly
+when using <code>&lt;script type='math/tex; mode=text'&gt;</code>. Auto-render could also fail
+catastrophically in some cases.</li>
+<li>Cortexjs.io <strong>#15</strong> When loading the fonts (and sounds), the origin of the
+library needs to be resolved to determine the relative location of those
+files. This was done with a http <code>GET</code> for each font file, which caused the
+entire library to be redownloaded multiple times. The base URL resolution is
+now only done once, and with a <code>HEAD</code> request to avoid the download. As a
+result, getting the MathLive library ready, especially when using a CDN and a
+slow network, is an order of magnitude faster.</li>
 </ul>
 <h2>0.72.0 (2022-04-18)</h2>
 <h3>Bug Fixes</h3>
@@ -3568,7 +3578,7 @@ Russian.</li>
 </ul>
 <h3>Other Improvements</h3>
 <ul>
-<li>When in command mode (after pressing the ‘’ or ‘ESC’ key), pressing these
+<li>When in command mode (after pressing the '' or ‘ESC’ key), pressing these
 keys will have the indicated effect:
 <ul>
 <li><code>[ESC]</code>: discards entry and return to math mode</li>
@@ -4008,14 +4018,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2022">
+        <meta itemprop="datePublished" content="April 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-24">April 24, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

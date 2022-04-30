@@ -35,17 +35,17 @@
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -65,7 +65,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
   
 
 
@@ -915,7 +915,7 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </table>
 </div>
 <p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn’t really a standard format for this, but testing of several LaTeX-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
-<p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code> format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the <code>\differentialD</code> command is used in the formula, it is exported as its corresponding definition, <code>\mathrm{d}</code>. .</p>
+<p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code> format. In this format, any macros in the formula are expanded to their definition. For example, the <code>\differentialD</code> command is exported as its corresponding definition, <code>\mathrm{d}</code>.</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
@@ -950,14 +950,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2022">
+        <meta itemprop="datePublished" content="April 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-24">April 24, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

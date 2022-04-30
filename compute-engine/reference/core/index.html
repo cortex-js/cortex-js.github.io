@@ -35,17 +35,17 @@
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -58,7 +58,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
   
     
       
@@ -914,15 +914,15 @@ Table of Content</label>
 <td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
 </tr>
 </tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Example</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
 <tbody>
-<tr>
-<td style="text-align:left">Example</td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left">:--------------------------</td>
-<td style="text-align:left">:------------------------------</td>
-</tr>
 <tr>
 <td style="text-align:left"><code>[&quot;Divide&quot;, 2, &quot;Missing&quot;]</code></td>
 <td style="text-align:left">\[\frac{2}{\unicode{&quot;2B1A}}\]</td>
@@ -937,22 +937,28 @@ Table of Content</label>
 <section id='core-functions'>
 <h2>Core Functions</h2>
 <table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-     <tr><td><code>About</code></td><td>
-<code>[“About”,
-<em>symbol</em>]</code>
+<tr><td><code>About</code></td><td>
+<code>[&quot;About&quot;, <em>symbol</em>]</code>
 <p>Evaluate to a dictionary containing information about a symbol such as its
-domain, its attributes, its value, etc… </td></tr> <tr><td><code>Domain</code></td><td></p>
+domain, its attributes, its value, etc… </td></tr></p>
+<tr><td><code>Domain</code></td><td>
 <p><code>[“Domain”, <em>expression</em>]</code></p>
-<p>Evaluate to the domain of <em>expression</em> </td></tr> <tr><td><code>Evaluate</code></td><td></p>
+<p>Evaluate to the domain of <em>expression</em> </td></tr></p>
+<tr><td><code>Evaluate</code></td><td>
 <p><code>[“Evaluate”, <em>expression</em>]</code></p>
 <p>Apply a sequence of definitions to an expression in order to reduce, simplify
 and calculate its value. Overrides <code>Hold</code> and hold attributes of a function.</p>
-</td></tr> <tr><td><code>Error</code></td><td>
-<code>[“Error”, <em>expression</em>,
-<em>string</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
+</td></tr>
+<tr><td><code>Error</code></td><td>
+<code>[&quot;Error&quot;, <em>expression</em>, <em>string</em>, <em>rest</em>]</code>
+<p><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
 <p>Tag an expression that could not be interpreted correctly. It may have a syntax
 error, a reference to an unknown symbol or function or some other problem.</p>
-</td></tr> <tr><td><code>Hold</code></td><td>
+<p>Note that an <code>Error</code> expression can be a sub-expression.</p>
+<p>The second argument is a string indicating the problem.</p>
+<p>The third argument, if present, is an expression describing what could not be parsed.</p>
+</td></tr>
+<tr><td><code>Hold</code></td><td>
 <code>[“Hold”,
 <em>expression</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
 <p>Tag an expression that should be kept in an unevaluated form </td></tr></p>
@@ -1195,14 +1201,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 24, 2022">
+        <meta itemprop="datePublished" content="April 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-24">April 24, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
