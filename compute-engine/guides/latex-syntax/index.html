@@ -26,6 +26,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
+
+<link rel="icon" href="data:," />
+
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
@@ -887,42 +890,52 @@ Table of Content</label>
 convert LaTeX strings to MathJSON expressions (<strong>parsing</strong>) and output MathJSON
 expressions as LaTeX string (<strong>serializing</strong>).</p>
 <p><strong>To parse a LaTeX string to MathJSON</strong>, call the <code>ce.parse()</code> function.</p>
-<p><strong>To serialize an expression to a LaTeX string</strong>, read the <code>expr.latex</code> property.</p>
+<p><strong>To serialize an expression to a LaTeX string</strong>, read the <code>expr.latex</code>
+property.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Power&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, [<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
 <span class="hljs-comment">// ➔  &quot;x^3 + 2&quot;</span>
 </code></pre>
 <p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
 <p>A MathLive mathfield works like a textarea in HTML, but for math. It provides
 its content as a LaTeX string or a MathJSON expression, ready to be used with
 the Compute Engine.</p>
-<div class='read-more'><a href="/mathlive/">
-Read more about <strong>MathLive</strong>
+<div class='read-more'><a href="/mathlive/"> Read more about <strong>MathLive</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>The behavior of <code>expr.parse()</code> and <code>expr.latex</code> can be customized by setting
 <code>ce.latexOptions</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 ce.<span class="hljs-property">latexOptions</span> = {
   <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
-  <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;,&quot;</span>
+  <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&#x27;{,}&#x27;</span>,
 };
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{1}{7}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;0,14\\ldots&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{1}{7}&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;0{,}14\\ldots&quot;</span>
 </code></pre>
+<h2>Customizing the Decimal Marker</h2>
+<p>The world is
+<a href="https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg">about evenly split</a>
+between using a dot or a comma as a decimal marker.</p>
+<p>By default, the ComputeEngine is configured to use a dot.</p>
+<p><strong>To use a comma as a decimal marker</strong>, set the <code>decimalMarker</code> option:</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">decimalMarker</span> = <span class="hljs-string">&#x27;{,}&#x27;</span>;
+</code></pre>
+<p>Note that in LaTeX, in order to get the correct spacing around the comma, it
+must be surrounded by curly brackets.</p>
 <h2>Advanced Usage</h2>
 <p>The LaTeX that can be parsed or serialized is defined by some dictionary
-entries. While the Compute Engine function and symbol definitions define
-the semantic of the MathJSON expressions, the LaTeX dictionary define the
-LaTeX syntax that can be parsed and serialized.</p>
-<p>The Compute Engine include some default dictionaries to parse a number
-of common math expressions.</p>
-<p><strong>To extend the LaTeX syntax</strong> pass a <code>latexDictionary</code> option the the
-Compute Engine constructor.</p>
+entries. While the Compute Engine function and symbol definitions define the
+semantic of the MathJSON expressions, the LaTeX dictionary define the LaTeX
+syntax that can be parsed and serialized.</p>
+<p>The Compute Engine include some default dictionaries to parse a number of common
+math expressions.</p>
+<p><strong>To extend the LaTeX syntax</strong> pass a <code>latexDictionary</code> option the the Compute
+Engine constructor.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
   <span class="hljs-attr">latexDictionary</span>: [
     {
@@ -951,14 +964,14 @@ Compute Engine constructor.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="May 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-16">May 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -998,43 +1011,42 @@ Compute Engine constructor.</p>
 
 <!-- end custom footer snippets -->
         <div class="page__footer-follow">
-    <ul class="social-icons">
-         
-         
-         
-        
-        <li>
-            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
-            >
-        </li>
-         
-         
-        
-        <li>
-            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
-            >
-        </li>
-         
-         
-        
+  <ul class="social-icons">
+     
+     
+     
+    
+    <li>
+      <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+      >
+    </li>
+     
+     
+    
+    <li>
+      <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+      >
+    </li>
+     
+     
+    
 
-    </ul>
+  </ul>
 </div>
 <div class="page__footer-pages">
-             
+   
     <ul>
-         
-        
-        <li>
-            <a href="/about/" rel="nofollow noopener noreferrer">About Us</a
-            >
-        </li>
-         
-         
+       
+      
+      <li>
+        <a href="/about/" rel="nofollow noopener noreferrer">About Us</a>
+      </li>
+       
+       
     </ul>
-        
+  
 
 </div>
       </footer>

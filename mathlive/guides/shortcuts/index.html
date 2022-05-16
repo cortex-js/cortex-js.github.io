@@ -26,6 +26,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
+
+<link rel="icon" href="data:," />
+
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
@@ -804,10 +807,11 @@ layout. As a result some keyboard shortcuts may produce unexpected results.</p>
 <p>An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
 trigger a command, but only to insert a LaTeX fragment.</p>
-<p>For example, typing the <code>p</code> key followed by the <code>i</code> key will result in the <em>π</em> (<code>\pi</code>) symbol being inserted.</p>
+<p>For example, typing the <code>p</code> key followed by the <code>i</code> key will result in the
+<code>\pi</code> \[ \pi \] command being inserted, and not the <code>pi</code> characters.</p>
 <p>If a substitution was undesirable, use <strong>undo</strong> to revert to the raw input.</p>
-<p>MathLive has some <a href="https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts">built-in inline shortcuts</a> defined, but they can be replaced or
-enhanced with new shortcuts.</p>
+<p>MathLive has some <a href="https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts">built-in inline shortcuts</a>
+defined, but they can be replaced or enhanced with additional shortcuts.</p>
 <code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
@@ -829,7 +833,9 @@ mf.setOptions({
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
-<p>The <code>mode</code> key, if present, indicate the mode in which this shortcut should apply, either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut apply in both modes.</p>
+<p>The <code>mode</code> key, if present, indicate the mode in which this shortcut should
+apply, either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut
+apply in both modes.</p>
 <p><strong>To constraint the context in which a shortcut should apply</strong>, use the <code>after</code>
 key:</p>
 <pre><code class="language-javascript">mf.<span class="hljs-title function_">setOptions</span>({
@@ -843,7 +849,10 @@ key:</p>
   }
 });
 </code></pre>
-<p>The <code>'after'</code> key indicate in what context the shortcut should apply. One or more values can be specified, separated by a ‘|’ sign. If any of the values match, the shortcut will be applicable. Possible values are:</p>
+<p>The <code>'after'</code> key indicate in what context the shortcut should apply. One or
+more values can be specified, separated by a ‘|’ sign. If any of the values
+match, the shortcut will be applicable.</p>
+<p>Possible values are:</p>
 <ul>
 <li><code>'space'</code> A spacing command, such as <code>\quad</code></li>
 <li><code>'nothing'</code> The begining of a group</li>
@@ -861,6 +870,27 @@ key:</p>
 <li><code>'text'</code> Some plain text</li>
 </ul>
 </section>
+<h2>Multicharacter Symbol</h2>
+<p>In some cases it may not be possible to define in advance all the possible
+combinations of keystrokes that should be interpreted as an inline shortcut.
+For example, it might be desirable to recognize multi-character symbols, e.g.
+\[ \mathrm{speed} = \frac{\mathrm{distance}}{\mathrm{time}}\]</p>
+<p>There are several ways to represent multicharacter symbols in LaTeX.
+Conventionally, the <code>\mathit{}</code> command is used to represent variables and the
+<code>\mathrm{}</code> for function names. You may prefer to use <code>\mathrm{}</code> in both cases.
+The command <code>\operatorname{}</code> may also be used for this purpose.</p>
+<p><strong>To recognize multicharacter symbols,</strong> provide a <code>onMultichar()</code> handler.
+If the handler recognize the input as a valid multichar symbol, it
+should return a command representing this symbol.</p>
+<pre><code class="language-ts">mf.<span class="hljs-title function_">setOptions</span>({
+  <span class="hljs-attr">onMulticharSymbol</span>: <span class="hljs-function">(<span class="hljs-params">_mf, s</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^[A-Z][a-z]+$/</span>.<span class="hljs-title function_">test</span>(s)) <span class="hljs-keyword">return</span> <span class="hljs-string">`\\mathrm{<span class="hljs-subst">${s}</span>}`</span>;
+    <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^[a-z][a-z]+$/</span>.<span class="hljs-title function_">test</span>(s)) <span class="hljs-keyword">return</span> <span class="hljs-string">`\\mathit{<span class="hljs-subst">${s}</span>}`</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>;
+  },
+});
+
+</code></pre>
 <h3>Customizing the Inline Shortcut Sensitivity</h3>
 <p><strong>To change how quickly a set of keys must be typed to be considered a shortcut</strong>
 set the <code>inlineShortcutTimeout</code> option.</p>
@@ -982,14 +1012,14 @@ Next: Control <strong>Speech</strong> output
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="May 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-03">May 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1029,43 +1059,42 @@ Next: Control <strong>Speech</strong> output
 
 <!-- end custom footer snippets -->
         <div class="page__footer-follow">
-    <ul class="social-icons">
-         
-         
-         
-        
-        <li>
-            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
-            >
-        </li>
-         
-         
-        
-        <li>
-            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
-            >
-        </li>
-         
-         
-        
+  <ul class="social-icons">
+     
+     
+     
+    
+    <li>
+      <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+      >
+    </li>
+     
+     
+    
+    <li>
+      <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+      >
+    </li>
+     
+     
+    
 
-    </ul>
+  </ul>
 </div>
 <div class="page__footer-pages">
-             
+   
     <ul>
-         
-        
-        <li>
-            <a href="/about/" rel="nofollow noopener noreferrer">About Us</a
-            >
-        </li>
-         
-         
+       
+      
+      <li>
+        <a href="/about/" rel="nofollow noopener noreferrer">About Us</a>
+      </li>
+       
+       
     </ul>
-        
+  
 
 </div>
       </footer>

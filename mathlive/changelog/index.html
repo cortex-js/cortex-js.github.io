@@ -26,6 +26,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
+
+<link rel="icon" href="data:," />
+
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
@@ -668,6 +671,85 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
+<h2>[Unreleased]</h2>
+<h3>Breaking Changes</h3>
+<ul>
+<li>
+<p>The following attributes of the <code>&lt;math-field&gt;</code> element that were previously
+“boolean attributes” are now “enumerated attributes”.</p>
+<p>A boolean attribute has a value of true if present and false if absent.</p>
+<p>An enumerated attribute has an explicit value.</p>
+<p>As a result of this change the default value of some attributes may have
+changed from <code>false</code> to <code>true</code>.</p>
+<ul>
+<li><code>keypress-vibration</code>: <code>&quot;on&quot;</code> | <code>&quot;off&quot;</code> | <code>&quot;&quot;</code> (default <code>&quot;on&quot;</code>)</li>
+<li><code>remove-extraneous-parentheses</code>: <code>&quot;on&quot;</code> | <code>&quot;off&quot;</code> | <code>&quot;&quot;</code> (default <code>&quot;on&quot;</code>)</li>
+<li><code>smart-fence</code>: <code>&quot;on&quot;</code> | <code>&quot;off&quot;</code> | <code>&quot;&quot;</code> (default<code>on</code>)</li>
+<li><code>smart-superscript</code>: <code>&quot;on&quot;</code> | <code>&quot;off&quot;</code> | <code>&quot;&quot;</code> (default <code>&quot;on&quot;</code>)</li>
+<li><code>smart-mode</code>: <code>&quot;on&quot;</code> | <code>&quot;off&quot;</code> | <code>&quot;&quot;</code> (default<code>off</code>)</li>
+</ul>
+</li>
+<li>
+<p>The commands <code>\mleft</code> and <code>\mright</code> are no longer generated automatically.
+Previously, when using <code>()</code> or <code>\left(...\right)</code>, a <code>\mleft(...\mright)</code>
+could be substituted when <code>smart-fence</code> was turned on. Now the
+<code>\left...\right</code> command automatically adjust its left spacing based on the
+symbol to its left. If the symbol to its left is a function, the spacing will
+be tighter.</p>
+</li>
+</ul>
+<h2>New Features</h2>
+<ul>
+<li>
+<p><strong>Comma <code>,</code> as decimal separator is now supported.</strong></p>
+<p>New <code>options.decimalSeparator</code> value can be set to <code>.</code> or <code>,</code> (<code>.</code> by default,
+which corresponds to the current behavior).</p>
+<p>When set to <code>,</code>, pressing the <code>,</code> key on the keyboard will insert a <code>{,}</code>
+LaTeX string, if in math mode and if before a digit.</p>
+<p>The virtual keyboard is also changed so that the <code>.</code> key is <code>,</code> instead and
+also contextually insert a <code>{,}</code> when appropriate.</p>
+<p>A new command <code>insertDecimalSeparator</code> has also been added, which inserts
+either <code>{,}</code> if in math mode, right after a digit, and when <code>decimalSeparator</code>
+is set to <code>&quot;,&quot;</code>. Otherwise, it inserts a “.”</p>
+</li>
+<li>
+<p><strong>Multi character symbols</strong></p>
+<p>The <code>onMulticharSymbol()</code> hook provides an opportunity to recognize multi
+character symbols and wrap them in an appropriate command.</p>
+<p>For example typing <code>speed</code> -&gt; <code>\mathrm{speed}</code></p>
+</li>
+<li>
+<p>Added support for the <code>\mathnormal{}</code> command, which displays text in italic
+and includes italic correction. As opposed to <code>\mathit{}</code> which displays text
+in italic, but without italic correction.</p>
+</li>
+<li>
+<p>Correctly handle double-clicking words styled in <code>\mathrm</code> or <code>\mathit</code></p>
+</li>
+<li>
+<p>The appearance of the placeholder symbol has changed to stand out more. Also,
+the LaTeX generated for the default placeholder is now simply
+<code>\placeholder{}</code>.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li>When extending the selection backward over a <code>captureSelection</code> group, do not
+extend more than necessary</li>
+<li><strong>#1354</strong> Correctly render <code>{,}</code>, which is used for French decimal point. Also
+correctly handle navigating with the keyboard, that is, handle it as a single
+character, not a group. Also correctly render it to MathML (as a <code>.</code>).</li>
+<li>The “contains highlight” and selection rectangles would not always account for
+the children of the expression, for example with <code>\sqrt{\frac12}</code>.</li>
+<li>The LaTeX output of subscript or superscripts was incorrect when no value for
+the superscript/subscript was provided. For example, typing <code>x</code>, <code>^</code>,
+<code>right arrow</code>, <code>2</code>, would incorrectly serialize <code>x^2</code>. It now serializes
+<code>x^{}2</code></li>
+<li>Improved parsing and layout of functions with arguments, i.e.
+<code>\sin\left(x\right)</code>. Previously, there would be an excessive amount of white
+space beween the <code>\sin</code> and <code>(</code>. The expression is now correctly interpreted
+as a function.</li>
+</ul>
 <h2>0.72.2 (2022-04-30)</h2>
 <h3>Bug Fixes</h3>
 <ul>
@@ -4018,14 +4100,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="May 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-16">May 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -4065,43 +4147,42 @@ correct LaTeX code to be generated.</li>
 
 <!-- end custom footer snippets -->
         <div class="page__footer-follow">
-    <ul class="social-icons">
-         
-         
-         
-        
-        <li>
-            <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
-            >
-        </li>
-         
-         
-        
-        <li>
-            <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
-                ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
-            >
-        </li>
-         
-         
-        
+  <ul class="social-icons">
+     
+     
+     
+    
+    <li>
+      <a href="https://github.com/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>GitHub</a
+      >
+    </li>
+     
+     
+    
+    <li>
+      <a href="https://gitter.im/cortex-js" rel="nofollow noopener noreferrer"
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+      >
+    </li>
+     
+     
+    
 
-    </ul>
+  </ul>
 </div>
 <div class="page__footer-pages">
-             
+   
     <ul>
-         
-        
-        <li>
-            <a href="/about/" rel="nofollow noopener noreferrer">About Us</a
-            >
-        </li>
-         
-         
+       
+      
+      <li>
+        <a href="/about/" rel="nofollow noopener noreferrer">About Us</a>
+      </li>
+       
+       
     </ul>
-        
+  
 
 </div>
       </footer>
