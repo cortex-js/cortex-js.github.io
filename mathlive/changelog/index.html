@@ -671,7 +671,30 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
-<h2>0.73.4 (2022-05-27)</h2>
+<h2>0.73.7 (2022-05-29)</h2>
+<h3>Improvements</h3>
+<ul>
+<li>Preferably use serialized atoms for clipboard copy/paste operations. This
+internal format captures more of the editing state than the LaTeX
+representation.</li>
+<li>Change the default textual output to clipboard to use <code>$$</code> as a format
+indicator.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1467</strong> Improvements to the Typescript public declarations</li>
+<li><strong>#1475</strong> Copying a formula containing a matrix could render the mathfield
+unresponsive</li>
+</ul>
+<h2>0.73.6 (2022-05-28)</h2>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1466</strong> In LaTeX mode, doing a Select All (cmd+A), then delete would put the
+mathfield in an inconsistent state</li>
+<li>While in LaTeX mode, doing a Select All (cmd+A) with a partial command
+followed by an auto-complete suggestion would render the mathfield
+unresponsive</li>
+</ul>
 <h2>0.73.4 (2022-05-27)</h2>
 <h3>Bug Fixes</h3>
 <ul>
@@ -3725,7 +3748,7 @@ Russian.</li>
 </ul>
 <h3>Other Improvements</h3>
 <ul>
-<li>When in command mode (after pressing the '' or ‘ESC’ key), pressing these
+<li>When in command mode (after pressing the ‘’ or ‘ESC’ key), pressing these
 keys will have the indicated effect:
 <ul>
 <li><code>[ESC]</code>: discards entry and return to math mode</li>
@@ -4165,14 +4188,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="May 27, 2022">
+        <meta itemprop="datePublished" content="May 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-27">May 27, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-29">May 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
