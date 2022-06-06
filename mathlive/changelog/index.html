@@ -671,6 +671,33 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
+<h2>[Unreleased]</h2>
+<h3>Improvements</h3>
+<ul>
+<li>
+<p>Improved API/workflow to control the behavior of the virtual keyboard when
+multiple mathfields are displayed in the page.</p>
+<p>In order to get a coordinated behavior between the mathfields, it is now only
+necessary to call <code>makeSharedVirtualKeyboard()</code>.</p>
+<p>The <code>use-shared-virtual-keyboard</code> attribute is now only necessary when using a
+mathfield in an iframe.</p>
+<p>If the <code>virtual-keyboard-mode</code> attribute of ma athfield is set to <code>auto</code> or
+<code>onfocus</code>, the virtual keyboard will activate and hide automatically. It is no
+longer necessary to set the mode to <code>off</code> and to listen for focus change event
+to show/hide the keyboard manually.</p>
+<p>If the virtual keyboard is visible and the focus changes between two
+mathfields, the virtual keyboard will stay visible (it will not hide with an
+animation, then get revealed again).</p>
+<p>If changing focus between two mathfields with identical keyboard
+configurations the keyboard will not blink (previously the keyboard would get
+destructed and reconstructed, even if its configuration was identical between
+two mathfields).</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1477</strong> Undo/redo did not generate an <code>input</code> event</li>
+</ul>
 <h2>0.73.7 (2022-05-29)</h2>
 <h3>Improvements</h3>
 <ul>
@@ -1285,7 +1312,7 @@ it to the string <code>&quot;null&quot;</code> did, though.</li>
 <li>An <code>input</code> event would incorrectly bubble out of the mathfield, even in
 read-only mode.</li>
 <li>When calling <code>getOption()</code>, or when examining a property on
-<code>MathFieldElement</code>, return the actual value, rather than an object literal
+<code>MathfieldElement</code>, return the actual value, rather than an object literal
 that contains the value.</li>
 <li>If the mathlive module was loaded before the <code>&lt;math-field&gt;</code> element was parsed
 in the document, the attributes of the mathfield would be ignored.</li>
@@ -3748,7 +3775,7 @@ Russian.</li>
 </ul>
 <h3>Other Improvements</h3>
 <ul>
-<li>When in command mode (after pressing the ‘’ or ‘ESC’ key), pressing these
+<li>When in command mode (after pressing the '' or ‘ESC’ key), pressing these
 keys will have the indicated effect:
 <ul>
 <li><code>[ESC]</code>: discards entry and return to math mode</li>
@@ -4188,14 +4215,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="May 29, 2022">
+        <meta itemprop="datePublished" content="June 05, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-05-29">May 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-05">June 05, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
