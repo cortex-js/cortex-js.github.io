@@ -900,7 +900,7 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 <tbody>
 <tr>
 <td style="text-align:left"><code>text/plain</code></td>
-<td style="text-align:left">LaTeX wrapped with a <code>\begin{equation*}</code> and <code>\end{equation*}</code>.</td>
+<td style="text-align:left">LaTeX wrapped with a <code>$$</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>application/x-latex</code></td>
@@ -910,14 +910,10 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 <td style="text-align:left"><code>application/json</code></td>
 <td style="text-align:left">A MathJSON representation of the formula.</td>
 </tr>
-<tr>
-<td style="text-align:left"><code>application/mathml+xml</code></td>
-<td style="text-align:left">A MathML representation of the formula.</td>
-</tr>
 </tbody>
 </table>
 </div>
-<p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn’t really a standard format for this, but testing of several LaTeX-capable editors has shown that <code>\begin{equation*}</code> was the most commonly recognized.</p>
+<p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in LaTeX format.</p>
 <p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code> format. In this format, any macros in the formula are expanded to their definition. For example, the <code>\differentialD</code> command is exported as its corresponding definition, <code>\mathrm{d}</code>.</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
@@ -953,14 +949,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="June 07, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-04-30">April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-07">June 07, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
