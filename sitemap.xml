@@ -240,6 +240,13 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/guides/assumptions/</loc>
+    <lastmod>2022-06-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/guides/canonical-form/</loc>
     <lastmod>2022-06-08</lastmod>
     <changefreq>monthly</changefreq>
@@ -303,6 +310,13 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/compute-engine/guides/simplify/</loc>
+    <lastmod>2022-06-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/compute-engine/guides/symbolic-computing/</loc>
     <lastmod>2022-06-08</lastmod>
     <changefreq>monthly</changefreq>
@@ -318,13 +332,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/calculus/</loc>
-    <lastmod>2022-06-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
     <lastmod>2022-06-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -359,21 +366,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
-    <lastmod>2022-06-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/assumptions/</loc>
-    <lastmod>2022-06-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/simplify/</loc>
+    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
     <lastmod>2022-06-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -388,6 +381,13 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/styling/</loc>
+    <lastmod>2022-06-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
     <lastmod>2022-06-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
