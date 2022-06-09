@@ -887,8 +887,8 @@ listen for the <code>change</code> event. Note that this event is not fired when
 editing mode, where <strong>Return</strong> or <strong>Enter</strong> is used to exit the mode.</p>
 <h2>Interacting with the Clipboard</h2>
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
-commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>C</kbd>).</p>
-<p>Multiple flavors are put on the clipboard, and the recipient of the <strong>Paste</strong> operation can pick whichever is most appropriate:</p>
+commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C</kbd>).</p>
+<p>Multiple flavors are put on the clipboard:</p>
 <div class='symbols-table'>
 <table>
 <thead>
@@ -913,15 +913,24 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 </tbody>
 </table>
 </div>
-<p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the recipient of the paste to recognize that this content is in LaTeX format.</p>
-<p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code> format. In this format, any macros in the formula are expanded to their definition. For example, the <code>\differentialD</code> command is exported as its corresponding definition, <code>\mathrm{d}</code>.</p>
+<p>The recipient of the <strong>Paste</strong> operation can pick whichever is most appropriate.
+If the recipient is a web app, the specific flavor can be accessed using
+the <code>event.clipboardData.getData()</code> API. If the recipient is a native app,
+the most popular browsers currently only make accessible the text flavor,
+with a LaTeX representation of the formula.</p>
+<p>The LaTeX in the <code>text/plain</code> flavor is “wrapped” to make it easier for the
+recipient of the paste to recognize that this content is in LaTeX format.</p>
+<p class="notice--info">For improved interoperability, the exported LaTeX uses the <code>latex-expanded</code>
+format. In this format, any macros in the formula are expanded to their
+definition. For example, the <code>\differentialD</code> command is exported as its
+corresponding definition, <code>\mathrm{d}</code>.</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
 </code></pre>
 <p><strong>To export the “raw” (not expanded) LaTeX)</strong>, use:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
-  <span class="hljs-string">`\\(<span class="hljs-subst">${mf.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>\\)`</span>
+  <span class="hljs-string">`$$<span class="hljs-subst">${mf.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>$$`</span>
 });
 </code></pre>
 <p>The exported format doesn’t have to be LaTeX. To export ASCIIMath instead:</p>
@@ -949,14 +958,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="June 07, 2022">
+        <meta itemprop="datePublished" content="June 08, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-07">June 07, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-08">June 08, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
