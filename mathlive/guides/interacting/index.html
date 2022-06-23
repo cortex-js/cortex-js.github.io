@@ -708,8 +708,8 @@ Table of Content</label>
 </script>
 <h1>Interacting with a Mathfield</h1>
 <h2>Reading the Content of a Mathfield</h2>
-<p>The content of a mathfield is available by reading the <code>value</code>
-property of the mathfield element, just like with a <code>&lt;textarea&gt;</code>.</p>
+<p>The content of a <code>&lt;mathfield&gt;</code> element is available by reading its <code>value</code>
+property, just like with a <code>&lt;textarea&gt;</code>.</p>
 <p><strong>To be notified as soon as the content of the mathfield is modified</strong> listen for
 an <code>'input'</code> event.</p>
 <p class="notice--info"><strong>Try</strong>: modify the <code>'input'</code> event below to a <code>'change'</code> event. Notice how the <code>'change'</code> event
@@ -751,6 +751,95 @@ mf.addEventListener('input',(ev) => {
     console.log(ev.target.getValue('math-json'));
 });</div>
 </code-playground>
+<h2>Listening for Changes to a Mathfield</h2>
+<p>The Mathfield implements the <a href="https://www.w3.org/TR/input-events-1/">Input Events</a>, <code>beforeinput</code> and <code>input</code>, which
+are also implemented by <code>&lt;textarea&gt;</code> and similar elements.</p>
+<p>The <code>beforeinput</code> and <code>input</code> events implement the <code>InputEvent</code> interface.</p>
+<p>These events are sent before (<code>beforeinput</code> event) and after (<code>input</code> event) a user attempts to edit the mathfield. This includes insertion and deletion of content, and formatting changes.</p>
+<p>The events include an <code>inputType</code> property that describe what caused the event to be dispatched.</p>
+<div class='symbols-table'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><code>inputType</code></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>insertText</code></td>
+<td style="text-align:left">Some content was added. It could be math content, plain text or raw latex. It could also be a row or column in matrix that was added.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>insertLineBreak</code></td>
+<td style="text-align:left">The <strong>Enter</strong> or <strong>Return</strong> key was pressed. Note that the actual content of the mathfield may not have changed.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>insertFromPaste</code></td>
+<td style="text-align:left">The content of the mathfield was changed because of a paste operation</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteWordBackward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteWordForward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteWordForward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteSoftLineBackward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteSoftLineForward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteHardLineBackward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteHardLineForward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteByCut</code></td>
+<td style="text-align:left">The content was changed because of a cut operation</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteContent</code></td>
+<td style="text-align:left">Some content was deleted, but no particular direction applied</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteContentBackward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deleteContentForward</code></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>historyUndo</code></td>
+<td style="text-align:left">The content was changed because of an undo command</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>historyRedo</code></td>
+<td style="text-align:left">The content was changed because of a redo command</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The event may also include a <code>data</code> property which is a
+string representing the content being modified.</p>
+<p>The <code>beforeinput</code> event is dispatched before any modifications to the mathfield have been done. The event
+is cancelable. Calling <code>preventDefault()</code> on the event will cause the modification to be prevented.</p>
+<p>If the <code>beforeinput</code> event is not canceled, the mathfield
+content is modified and a <code>input</code> event is dispatched.
+The <code>input</code> event is not cancelable.</p>
 <h2>Changing the Content of a Mathfield</h2>
 <p>You can change the value of the mathfield programatically. In the example
 below, the <strong>Latex</strong> input field is editable and is reflected in the mathfield
@@ -791,7 +880,8 @@ triggered and creating an infinite loop.</p>
 <p>The text color (“ink”) and background color (“paper”), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using <code>applyStyle()</code>.</p>
-<p class="notice--info">This style applies to the content of the formula and will be reflected in the LaTeX output. To change the appearance of the mathfield but not
+<p class="notice--info">This style applies to the content of the formula and will be reflected in the
+LaTeX output. To change the appearance of the mathfield but not
 the content of the formula, see <a href="mathlive/guides/customizing/">Customizing</a>.</p>
 <code-playground layout="stack">
     <style slot="style">
@@ -840,6 +930,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;                
 </div>
 </code-playground>
+<p><strong>To remove a style</strong>, set the value of the <code>fontFamily, </code>color<code>or</code>backgroundColor<code> property to</code>&quot;none&quot;<code>, or the value of the </code>fontShape<code>, </code>fontSeries<code>or</code>fontSize<code>property to</code>&quot;auto&quot;`.</p>
 <h2>Detecting a Click on a Mathfield</h2>
 <p>In most cases MathLive will respond to mouse and keyboard interactions with
 the mathfield. However, in some cases it might be useful to detect when a
@@ -960,14 +1051,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="June 08, 2022">
+        <meta itemprop="datePublished" content="June 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-08">June 08, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-23">June 23, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -671,6 +671,93 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>MathLive Changelog</h1>
+<h2>[Unreleased]</h2>
+<h3>Improvements</h3>
+<ul>
+<li>In the second argument of the <code>\colorbox</code> command, use <code>\ensuremath</code> when
+necessary to indicate that the content is math, rather than a mode shift
+command.</li>
+<li>When selecting all the children of a superscript or subscript, consider the
+superscript/subscript selected as well.</li>
+<li><strong>#1041</strong> When pasting textual content, if it can’t be otherwise determined,
+assume the content to be LaTeX</li>
+<li>Avoid excessive scrolling when bringing the mathfield into view.</li>
+</ul>
+<h3>Features</h3>
+<ul>
+<li>
+<p>Added new <code>latex-unstyled</code> output format. Use it with <code>getValue()</code> to get a
+LaTeX representation of the mathfield content, without any color or background
+color styling command.</p>
+</li>
+<li>
+<p><strong>#1335</strong> Added support for <em>Input Events Level 1</em>
+(https://www.w3.org/TR/input-events-1/), which includes the <code>beforeinput</code> and
+<code>input</code> events.</p>
+<p>While an <code>input</code> event was dispatched before, it did not conform to the
+<code>InputEvent</code> interface. The <code>input</code> event now includes an <code>inputType</code> property
+detailing what caused the event to be dispatched, and in some cases a <code>data</code>
+property.</p>
+<p>The <code>beforeinput</code> event is dispatched before the content of the mathfield is
+modified and is a cancelable event.</p>
+<p>A pair of <code>beforeinput</code> and <code>input</code> events are also dispatched when content is
+deleted, with an appropriate <code>inputType</code> value.</p>
+<p>An <code>input</code> event with a <code>inputType</code> property of <code>&quot;insertLineBreak&quot;</code> is
+displatched when the <strong>Return</strong> or <strong>Enter</strong> keys are pressed.</p>
+<p>This matches more closely the behavior of the <code>&lt;textarea&gt;</code> element.</p>
+</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1489</strong> In some cases, applying a background color, then entering some
+equations, could result in incorrect LaTeX output.</li>
+<li>Correct serialization for <code>\char&quot;0040 4</code> (or in general any command with an
+unbraced numeric argument followed by an ambiguous decimal or hexadecimal
+character)</li>
+<li>Avoid crashing when deleting a range that overlaps with all the atoms in the
+root</li>
+<li><strong>#1195</strong> MathML output could be incorrect in some situations involving LaTeX
+groups followed by a superscript and subscript.</li>
+</ul>
+<h2>0.75.0 (2022-06-21)</h2>
+<h3>Features</h3>
+<ul>
+<li><strong>#970</strong> It is now possible to vertically scroll the content of the mahtfield.</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li>If the layout of the page is such that a mathfield would appear behind a
+virtual keyboard because there isn’t enough space for the virtual keyboard and
+the mathfield, the height of the page is now adjusted so that both the
+mathfield and the virtual keyboard are visible (<strong>#1358</strong>)</li>
+<li>When the virtual keyboard is invoked, if a mathfield was positioned at the
+bottom of the page, it could get covered with the virtual keyboard and become
+inaccessible</li>
+<li>When a mathfield is set to a fixed height and it contains content that doesn’t
+fit vertically, a scollbar will appear.</li>
+<li>If the content of the mathfield was taller than could fit in the mathfield,
+typing would not bring the content of the mathfield into view. (<strong>#1310</strong>)</li>
+<li>When typing or using the virtual keyboard the mathfield would not always
+scroll into view to become visible (<strong>#1173</strong>)</li>
+<li>Propagate content change event on paste in text and LaTeX mode</li>
+<li>Added the <code>container</code> and <code>content</code> CSS part to customize the inside of the
+mathfield.</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>#1497</strong> On iOS, tapping the edge of the mathfield could bring the native
+virtual keyboard</li>
+<li><strong>#1456</strong> When multiple mathfields are present in a page, with
+<code>makeSharedVirtualKeyboard()</code>, calling <code>setOptions()</code> to change the virtual
+keyboard mode on those mathfields could cause the keyboards to not be shared.</li>
+<li><strong>#1501</strong> The keybindings to get into and out of text mode (<code>shift</code>+<code>quote</code>)
+work again</li>
+<li><strong>#1517</strong> Text content was not correctly serialized</li>
+<li><strong>#1503</strong> A spurious <code>=</code> character was produced in the serialization of <code>\ne</code>.
+The MathML and ASCIIMath serialization of <code>\ne</code> were incorrect.</li>
+<li><strong>#1513</strong> Using the virtual keyboard to apply underline or overline to the
+selection resulted in a placeholder being inserted instead.</li>
+</ul>
 <h2>0.74.0 (2022-06-06)</h2>
 <h3>Improvements</h3>
 <ul>
@@ -4215,14 +4302,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 08, 2022">
+        <meta itemprop="datePublished" content="June 23, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-08">June 08, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-23">June 23, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
