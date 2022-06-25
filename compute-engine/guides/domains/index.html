@@ -291,6 +291,26 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -886,16 +906,19 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Domains</h1>
-<p>A <strong>domain</strong> is a <strong>set</strong> used to represent the possible values of an expression.</p>
+<p>A <strong>domain</strong> is a <strong>set</strong> used to represent the possible values of an
+expression.</p>
 <p>A domain is represented by a <strong>domain expression</strong>, such as <code>Integer</code> <code>Boolean</code>
-or <code>[&quot;Range&quot;, -1, +1]</code>.</p>
-<p>Domains are similar to <em>types</em> in programming languages. They are used to
-select the correct function definition.</p>
+or <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code>. <code>Integer</code> and <code>Boolean</code> are
+domain literals, while <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code> is a
+parametric domain.</p>
+<p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
+they are used to select the correct function definition.</p>
 <p>For example a function <code>Add</code> could operate either on numbers or matrixes. The
-domain of the arguments indicates the appropriate function definition.</p>
-<p>Symbolic manipulation algorithms use domains to decide when certain
+domain of the arguments is used to select the appropriate function definition.</p>
+<p>Symbolic manipulation algorithms also use domains to decide when certain
 transformations are applicable.</p>
-<p>For example, \( \sqrt{x^2} = x\) only if  \(x \geq 0\)</p>
+<p>For example, \( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
 <div class='read-more'><a href="/compute-engine/reference/domains/"> Read more about the
 <strong>Domains</strong> included in the standard dictionary of the Compute
 Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -907,26 +930,66 @@ expression.</p>
 <section id='domain-lattice'>
 <h2>Domain Lattice</h2>
 <p><strong>Domains are defined in a hierarchy (a lattice).</strong> The upper bound of the
-domain lattice is the <code>Anything</code> domain and its lower bound is the <code>Nothing</code>
-domain.</p>
+domain lattice is the <code>Anything</code> domain (the top domain) and its lower bound is
+the <code>Void</code> domain (the bottom domain).</p>
 <ul>
+<li>The <strong><code>Anything</code></strong> domain contains all possible values and all possible
+domains. It is used when not much is known about the possible value of an
+expression. In some languages, this is called the <em>universal</em> type.</li>
+<li>The <strong><code>Void</code></strong> domain contains no value. It is rarely used, but it could for
+example indicate the return domain of a function that never returns.</li>
+</ul>
+<p>There are a few other important domains:</p>
+<ul>
+<li>The <strong><code>Domain</code></strong> domain contains all the domain literals and all the
+parametric domains.</li>
+<li>The <strong><code>Value</code></strong> domain contains all the objects which are not domains, such as
+<code>Number</code>, <code>String</code>, <code>Symbol</code>, <code>Tuple</code>, etc…</li>
 <li>The <strong><code>Nothing</code></strong> domain has exactly one value, the symbol <code>Nothing</code>. It is
-used when an expression could have no other meaningful value. In some languages,
-this is called the “unit” type.</li>
-<li>The <strong><code>Anything</code></strong> domain contains all possible values. It is used when not
-much is known about the possible value of an expression. In some languages, this
-is called the “universal” type.</li>
+used when an expression has no other meaningful value. In some languages, this
+is called the <em>unit</em> type and the <em>unit</em> value. For example a function that
+returns nothing would have a return domain of <code>Nothing</code> and would return the
+<code>Nothing</code> symbol.</li>
 </ul>
 <p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship, for
 example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains">
-<img src="/assets/domains.002.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
-<img src="/assets/domains.003.jpeg" alt="Function domains" title="The Function sub-domains">
-<img src="/assets/domains.004.jpeg" alt="Number domains" title="The Number sub-domains"></p>
+<img src="/assets/domains.002.jpeg" alt="Valud domains" title="The Value sub-domains">
+<img src="/assets/domains.003.jpeg" alt="Tensor domains" title="The Tensor sub-domains">
+<img src="/assets/domains.004.jpeg" alt="Function domains" title="The Function sub-domains">
+<img src="/assets/domains.005.jpeg" alt="Number domains" title="The Number sub-domains"></p>
 <p class="notice--info">The implementation of the CortexJS domains is based on
 <a href="https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties">Weibel, Trudy &amp; Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749. </a>.</p>
 </section>
-<section id='obtaining-the-domain-of-an-expression>
+<section id='parametric-domain'>
+<h2>Parametric Domains</h2>
+<p>Parametric domains are complex domains that are defined as a combination of
+other domains.</p>
+<p>For example <code>[&quot;Function&quot;, &quot;RealNumber&quot;, &quot;Integer&quot;]</code> is a parametric domain
+representing functions that have a single real number as input and that return
+an integer.</p>
+<p>Parametric domains are represented as special expressions: they are functions
+with one of the following heads:</p>
+<ul>
+<li><strong><code>Function</code></strong></li>
+<li><strong><code>List</code></strong></li>
+<li><strong><code>Record</code></strong></li>
+<li><strong><code>Tuple</code></strong></li>
+<li><strong><code>Range</code></strong></li>
+<li><strong><code>Interval</code></strong></li>
+<li><strong><code>Intersection</code></strong></li>
+<li><strong><code>Union</code></strong></li>
+<li><strong><code>Optional</code></strong></li>
+<li><strong><code>Some</code></strong></li>
+<li><strong><code>Head</code></strong></li>
+<li><strong><code>Symbol</code></strong></li>
+<li><strong><code>Literal</code></strong></li>
+<li><strong><code>Covariant</code></strong></li>
+<li><strong><code>Contravariant</code></strong></li>
+<li><strong><code>Invariant</code></strong></li>
+</ul>
+</section>
+<section id='obtaining-the-domain-of-an-expression'>
 <h2>Obtaining the Domain of an Expression</h2>
 <p><strong>To query the domain of an expression</strong>, read the <code>domain</code> property of the
 expression.</p>
@@ -1023,14 +1086,14 @@ ce.<span class="hljs-title function_">box</span>([
         
 
 
-        <meta itemprop="datePublished" content="June 23, 2022">
+        <meta itemprop="datePublished" content="June 24, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-23">June 23, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-24">June 24, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

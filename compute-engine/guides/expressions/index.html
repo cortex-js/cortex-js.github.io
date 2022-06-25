@@ -291,6 +291,26 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/expressions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/latex-syntax/" data-url=/compute-engine/guides/expressions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -896,8 +916,8 @@ Expressions</strong>.</p>
 <p>Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
 as VSCode Studio, to provide suitable hints in the editor, and to check that the
 correct functions and properties are used, particularly when using TypeScript.</p>
-<p>Boxed Expressions also improve performance by implementing caching and
-avoiding repetitive calculations.</p>
+<p>Boxed Expressions also improve performance by implementing caching and avoiding
+repetitive calculations.</p>
 <h2>Boxing</h2>
 <p><strong>To create a Boxed Expression from a MathJSON expression</strong>, use the <code>ce.box()</code>
 function.</p>
@@ -930,6 +950,14 @@ function.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;, &quot;y&quot;]</span>
 </code></pre>
+<p>If using MathLive, you can directly obtain an expression representing the
+content of a mathfield using the <code>expression</code> property:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;input&#x27;</span>);
+mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{10}{5}&#x27;</span>;
+<span class="hljs-keyword">const</span> expr = mf.<span class="hljs-property">expression</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.evaluate().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ 2</span>
+</code></pre>
 <h2>Unboxing</h2>
 <p><strong>To access the MathJSON expression of a boxed expression</strong>, use the <code>expr.json</code>
 property. Use this property to “look inside the box”.</p>
@@ -946,15 +974,15 @@ whether to use shorthand notation, and to exclude some functions.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = {
-  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Divide&#x27;</span>],  <span class="hljs-comment">// Don&#x27;t use `Divide` functions, </span>
-                        <span class="hljs-comment">// use `Multiply`/`Power` instead</span>
-  <span class="hljs-attr">shorthands</span>: [],     <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
+  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Divide&#x27;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
+  <span class="hljs-comment">// use `Multiply`/`Power` instead</span>
+  <span class="hljs-attr">shorthands</span>: [], <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
 };
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">canonical</span>.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;fn&quot;: [&quot;Add&quot;, [&quot;num&quot;: &quot;2&quot;], </span>
-<span class="hljs-comment">//      [&quot;fn&quot;: [&quot;Multiply&quot;, </span>
-<span class="hljs-comment">//        [&quot;sym&quot;: &quot;q&quot;], </span>
+<span class="hljs-comment">// ➔ [&quot;fn&quot;: [&quot;Add&quot;, [&quot;num&quot;: &quot;2&quot;],</span>
+<span class="hljs-comment">//      [&quot;fn&quot;: [&quot;Multiply&quot;,</span>
+<span class="hljs-comment">//        [&quot;sym&quot;: &quot;q&quot;],</span>
 <span class="hljs-comment">//        [&quot;fn&quot;: [&quot;Power&quot;, [&quot;sym&quot;: &quot;p&quot;], [&quot;num&quot;: &quot;-1&quot;]]]]</span>
 <span class="hljs-comment">//      ]</span>
 <span class="hljs-comment">//    ]]</span>
@@ -982,10 +1010,10 @@ ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#
 <h2>Pure Expressions</h2>
 <p>A pure expression is an expression whose value is fixed. Evaluating it produces
 no side effect (doesn’t change something outside its arguments to do something).</p>
-<p>The \( \sin() \) function is pure: if you invoke it with the same arguments, it
-will have the same value.</p>
-<p>On the other hand, \( \mathrm{random}() \) is not
-pure: by its nature it returns a different result on every call.</p>
+<p>The \( \sin() \) function is pure: if you invoke it with the same arguments,
+it will have the same value.</p>
+<p>On the other hand, \( \mathrm{random}() \) is not pure: by its nature it
+returns a different result on every call.</p>
 <p>Numbers, symbols and strings are pure. A function expression is pure if the
 function itself is pure, and all its arguments are pure as well.</p>
 <p><strong>To check if an expression is pure</strong>, use <code>expr.isPure</code>.</p>
@@ -994,7 +1022,8 @@ function itself is pure, and all its arguments are pure as well.</p>
 <h2>Literal Expressions</h2>
 <p>A literal expression is one that has a fixed value that was provided directly
 when the expression was defined. Numbers and strings are literal. Symbols and
-functions are not. They may have a value, but their value is calculated indirectly.</p>
+functions are not. They may have a value, but their value is calculated
+indirectly.</p>
 <p><strong>To check if an expression is a literal</strong>, use <code>expr.isLiteral</code>.</p>
 </section>
 <section id='canonical'>
@@ -1045,99 +1074,6 @@ dictionary, use the following boolean expressions:</p>
 <p>Note that symbols or functions can return <code>true</code> for <code>isNumber</code>, if their value
 is a number. Use <code>isLiteral</code> to distinguish literal numbers from other
 expressions that may have a numeric value.</p>
-<h2>Name Binding</h2>
-<p><strong>Name Binding is the process of associating the name of a function or symbol
-with a definition.</strong></p>
-<p>The definition of symbols and functions is set when an instance of a Compute
-Engine is created.</p>
-<p>Dictionaries that contain additional definitions can be provided when the Compute Engine is first created, or later at runtime.</p>
-<p>The definitions record contain information such as the domain or value of a
-symbol, or how to simplify or evaluate functions.</p>
-<h3>Symbol Binding</h3>
-<p>When a symbol is boxed, that is when <code>ce.box()</code> is called on an expression that
-contains the symbol, a definition matching the name of the symbol is searched in
-the dictionary of the current scope (<code>ce.context</code>). If none is found, the parent
-scope is searched recursively until one is found or the root scope is reached.</p>
-<p>If a definition is found, the symbol is associated with (bound to) the
-definition.</p>
-<h3>Auto-binding</h3>
-<p>If no definition is found for the symbol, a new one is created automatically.</p>
-<p>The new definition will have no value associated with it, so the symbol will be
-a <strong>free variable</strong>. It will have a domain of `ce.defaultDomain’.</p>
-<p>If <code>ce.defaultDomain</code> is <code>null</code>, no definition is created, and the symbol is not
-bound to any definition. This will severely limit the usefulness of the symbol.</p>
-<p>By default, <code>defaultDomain</code> is <code>ExtendedRealNumber</code> so any unknown variables is
-automatically assumed to be a real number.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;m&#x27;</span>); <span class="hljs-comment">// m for mystery</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
-<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
-symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">numericValue</span>?.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ 5</span>
-</code></pre>
-<h3>Symbol Binding: Bound Variables, Free Variables and Constants</h3>
-<p>When discussing <strong>binding</strong> and symbols, this can either relate to
-<a href="https://en.wikipedia.org/wiki/Name_binding"><strong>name binding</strong></a> (associating a
-definition with the name of a symbol) or
-<a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables"><strong>value binding</strong></a>
-(associating a value with the definition of a symbol).</p>
-<p>If the definition of a symbol has a value, the symbol is said to be a <strong>bound
-variable</strong> (value binding).</p>
-<p>This is in opposition to <strong>free variables</strong> which are symbols that have a
-definition, but no values, and <strong>constants</strong> which are symbols that have a value
-that cannot be altered.</p>
-<p>The property <code>expr.symbolDefinition</code> is not <code>undefined</code> if a symbol is a bound
-variable (name binding, it has a definition).</p>
-<p>The property <code>expr.symbolDefinition?.constant</code> is true if a symbol is a
-constant.</p>
-<p>Assigning a value to a free variable makes it a bound variable (name binding and
-value binding).</p>
-<p>The value of constants is determined at the time of name binding. The value of
-some symbols — <code>Pi</code>, for example — may be determined based on settings of the
-compute engine, for example the value of the <code>precision</code> property. So the same
-symbol could have different values depending on when the binding occurs.</p>
-<pre><code class="language-js">ce.<span class="hljs-property">precision</span> = <span class="hljs-number">4</span>;
-<span class="hljs-keyword">const</span> smallPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>); <span class="hljs-comment">// π with 4 digits</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(smallPi.<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ 3.1415</span>
-
-ce.<span class="hljs-property">prevision</span> = <span class="hljs-number">10</span>;
-<span class="hljs-keyword">const</span> bigPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>); <span class="hljs-comment">// π with 10 digits</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(bigPi.<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ 3.1415926535</span>
-
-ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100</span>; <span class="hljs-comment">// Future computations will be done with 100 digits</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;pi = &#x27;</span>, smallPi.<span class="hljs-property">numericValue</span>, <span class="hljs-string">&#x27;=&#x27;</span>, bigPi.<span class="hljs-property">numericValue</span>);
-<span class="hljs-comment">// ➔ pi  = 3.1415 = 3.1415926535</span>
-</code></pre>
-<h3>Declaring a Symbol</h3>
-<p>Declaring a symbol is providing some information about this symbol, such as its
-domain or whether it is positive, without providing a value for the symbol.</p>
-<p>If the symbol had not been used before, a new definition record for this symbol
-is created, and the symbol is bound to it.</p>
-<p><strong>To declare a symbol</strong> use <code>ce.assume()</code>.</p>
-<p>For example:</p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>);
-ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;n &gt; 0&#x27;</span>);
-
-<span class="hljs-keyword">const</span> <span class="hljs-built_in">symbol</span> = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;n&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(n.<span class="hljs-property">isPositive</span>);
-<span class="hljs-comment">// ➔ true</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(n.<span class="hljs-property">domain</span>);
-<span class="hljs-comment">// ➔ Integer</span>
-</code></pre>
-<h3>Function Binding</h3>
-<p>The definition associated with a function determines how it is put in canonical form,
-simplified and evaluated.</p>
-<p>When a function is boxed, for example when <code>ce.box()</code> is called on an expression
-that includes the name of the function, a function definition matching the
-function name is looked for in the current context, then in any parent scope.</p>
-<h3>Scoping</h3>
-<p>To locate the definition of a symbol or function, the dictionary associated with
-the current scope is used first.</p>
-<p>If no matching definition is found, the parent scope is searched, and so on
-until a definition is found.</p>
 <section id='incomplete-expressions'>
 <h2>Incomplete Expressions</h2>
 <p>When parsing a LaTeX expression, the Compute Engine uses the <strong>maximum effort</strong>
@@ -1165,15 +1101,15 @@ altogether, repace it with the <code>Nothing</code> symbol, then get the canonic
 the resulting expression.</p>
 </section>
 <h2>Errors</h2>
-<p>If an expression can only be partially parsed, a function with a <code>Error</code> head
-is returned.</p>
+<p>If an expression can only be partially parsed, a function with a <code>Error</code> head is
+returned.</p>
 <p>The <code>Error</code> function has the following arguments:</p>
 <ul>
-<li>A partial result,  i.e. the part that was successfully parsed. When an error
+<li>A partial result, i.e. the part that was successfully parsed. When an error
 expression is evaluated, its value is its first argument</li>
 <li>A error code, as a string</li>
-<li>An expression representing where the error occured,  for example a LaTeX
-string representing where the LaTeX parsing failed.</li>
+<li>An expression representing where the error occured, for example a LaTeX string
+representing where the LaTeX parsing failed.</li>
 </ul>
 <h2>Return Value Conventions</h2>
 <p>The Compute Engine API uses the following conventions for the return values of a
@@ -1188,6 +1124,9 @@ available later. You can think of this as an answer of “maybe”. For example,
 <li><strong><code>this</code></strong>: this function was not applicable, or there was nothing to do. For
 example, invoking <code>expr.simplify()</code> on a boxed string.</li>
 </ul>
+<div class='read-more'><a href="/compute-engine/guides/symbols/"> See also
+<strong>symbols</strong> to read about defining and changing the value of
+symbols<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -1197,14 +1136,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 23, 2022">
+        <meta itemprop="datePublished" content="June 24, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-23">June 23, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-24">June 24, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

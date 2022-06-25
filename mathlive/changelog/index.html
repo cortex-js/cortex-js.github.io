@@ -718,6 +718,12 @@ character)</li>
 root</li>
 <li><strong>#1195</strong> MathML output could be incorrect in some situations involving LaTeX
 groups followed by a superscript and subscript.</li>
+<li><strong>#1120</strong> If a MathField element had some hooks and listeners customized, then
+was removed from the DOM and reinserted later, the hooks and listerner
+functions would revert to their default implementation</li>
+<li><strong>#1302</strong> Long press on the backspace key of the virtual keyboard would output
+an error to the console. Long press on the backspace key is now a shortcut to
+clear the entire mathfield.</li>
 </ul>
 <h2>0.75.0 (2022-06-21)</h2>
 <h3>Features</h3>
@@ -4302,14 +4308,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 23, 2022">
+        <meta itemprop="datePublished" content="June 24, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-23">June 23, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-06-24">June 24, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
