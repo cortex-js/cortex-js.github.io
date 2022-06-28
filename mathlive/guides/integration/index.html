@@ -720,10 +720,10 @@ dynamically download the required fonts from the CDN as well.</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>$$\frac{\pi}{2}$$<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-    <span class="hljs-keyword">import</span> { renderMathInDocument } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>;
-
-    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, 
-      <span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">renderMathInDocument</span>()
+    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> 
+      <span class="hljs-title function_">import</span>(<span class="hljs-string">&#x27;//unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> 
+        mathlive.<span class="hljs-title function_">renderMathInDocument</span>()
+      )
     );
   </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
@@ -885,14 +885,14 @@ MathLive library is not necessary to render the formula.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 31, 2022">
+        <meta itemprop="datePublished" content="June 28, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2022-03-31">March 31, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-28'>June 28, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -906,7 +906,6 @@ MathLive library is not necessary to render the formula.</p>
 </div>
 
 <script type="module">
-  // import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
     import('//unpkg.com/mathlive?module').then((module) => {
       module.renderMathInDocument({ 
