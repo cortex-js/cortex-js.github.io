@@ -406,7 +406,7 @@ Table of Content</label>
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Static
+                  Display Static Math
                 </a></li>
             
           
@@ -844,17 +844,18 @@ font loading.</p>
 <p>While MathLive is primarily a math editor, the same  engine that renders
 an interactive math formula can also render “static” formulas in a web page,
 along the lines of what the MathJax or KaTeX libraries provide.</p>
-<p><strong>To render a non-editable formula</strong>, use <code>MathLive.renderMathInDocument()</code></p>
+<p><strong>To render a non-editable formula</strong>, use <code>renderMathInDocument()</code></p>
 <p>The <code>renderMathInDocument()</code> will parse the DOM and converts LaTeX or MathASCII
 strings it finds into corresponding HTML markup. The options argument of
 <code>renderMathInDocument()</code> can control the delimiters it considers, as well
 as which DOM elements to consider or skip. The necessary stylesheet and
 fonts will be injected in the current page.</p>
-<p><strong>To generate markup for a formula</strong>, use <code>MathLive.latexToMarkup()</code>. You may
+<p><strong>To generate markup for a formula</strong>, use <code>convertLatexToMarkup()</code>. You may
 save the output or return it from a server-side process.</p>
 <p>To correctly display this markup, use the <code>mathlive-static.css</code> stylesheet,
 which can be found in the <code>/dist/</code> directory. When using this method, the
-MathLive library is not necessary to render the formula.</p>
+MathLive library is not necessary to render the formula once the markup
+has been generated.</p>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">link</span> 
@@ -866,16 +867,19 @@ MathLive library is not necessary to render the formula.</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-    <span class="hljs-keyword">import</span> {convertLatexToMarkup} 
-    <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>;
-    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
-      <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = 
-        <span class="hljs-title function_">convertLatexToMarkup</span>(<span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>)
-    });
+    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> 
+      <span class="hljs-title function_">import</span>(<span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> {
+        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = 
+          mathlive.<span class="hljs-title function_">convertLatexToMarkup</span>(<span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>)
+      })
+    );
   </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 </code></pre>
+<div class='read-more'><a href="/mathlive/guides/static/">
+Learn more about the rendering <strong>static</strong> math content.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
