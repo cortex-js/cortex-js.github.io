@@ -1145,19 +1145,21 @@ elements in an expression or apply conditional rewriting rules to an expression.
 </div>
 
 <script type="module">
-  import { renderMathInDocument } from '//unpkg.com/mathlive?module';
+  // import { renderMathInDocument } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
+    import('//unpkg.com/mathlive?module').then((module) => {
+      module.renderMathInDocument({ 
+        renderAccessibleContent: false,
+        TeX: { 
+          delimiters: {
+            inline: [['\\(', '\\)']],
+            display: [ ['$$', '$$'], ['\\[', '\\]']],
+          },
+          processEnvironments : false 
         },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
+        asciiMath: null,
+      })
+    })
   });
 </script>
 
