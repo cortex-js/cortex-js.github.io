@@ -675,12 +675,12 @@ Table of Content</label>
 simplest way to use MathLive in your page is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield in a web page.</p>
 <h2>Creating Mathfield Elements Programmatically</h2>
-<p>In most cases you can simply use a <code>&lt;mathfield&gt;</code> tag:</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">mathfield</span>&gt;</span>e^{i\\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">mathfield</span>&gt;</span>
+<p>In most cases you can simply use a <code>&lt;math-field&gt;</code> tag:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
 <p>If you need to add a mathfield to your DOM dynamically, you can create
-new Mathfield DOM elements and add them to the DOM.</p>
-<p><strong>To create a Mathfield DOM element</strong>, use <code>new MathfieldElement()</code>.</p>
+new mathfield DOM elements and add them to the DOM.</p>
+<p><strong>To create a mathfield DOM element</strong>, use <code>new MathfieldElement()</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
 mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
 <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
