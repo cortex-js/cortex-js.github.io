@@ -906,11 +906,11 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
         
         <h1>Domains</h1>
-<p>A <strong>domain</strong> is a <strong>set</strong> of the possible values of an expression.</p>
+<p>A <strong>domain</strong> is the set of the possible values of an expression.</p>
 <p>A domain is represented by a <strong>domain expression</strong>, such as <code>Integer</code>, <code>Boolean</code>
 or <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code>. <code>Integer</code> and <code>Boolean</code> are
-domain literals, while <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code> is a
-parametric domain expression.</p>
+<strong>domain literals</strong>, while <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code> is a
+<strong>parametric domain expression</strong>.</p>
 <p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
 they are used to select the correct function definition.</p>
 <p>For example a function <code>Add</code> could operate either on numbers or matrixes. The
@@ -969,7 +969,7 @@ returns nothing would have a return domain of <code>Nothing</code> and would ret
 <p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship, for
 example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains"></p>
-<p><img src="/assets/domains.002.jpeg" alt="Valud domains" title="The Value sub-domains"></p>
+<p><img src="/assets/domains.002.jpeg" alt="Value domains" title="The Value sub-domains"></p>
 <p><img src="/assets/domains.003.jpeg" alt="Tensor domains" title="The Tensor sub-domains"></p>
 <p><img src="/assets/domains.004.jpeg" alt="Function domains" title="The Function sub-domains"></p>
 <p><img src="/assets/domains.005.jpeg" alt="Number domains" title="The Number sub-domains"></p>
@@ -983,14 +983,18 @@ example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <a href="https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)">compatibility</a>
 that can be determined:</p>
 <ul>
-<li><strong>Invariance</strong>: the two domains represent exactly the same set of values</li>
-<li><strong>Covariance</strong>: <strong>A</strong> is covariant with <strong>B</strong> if all the values in the domain
-<strong>A</strong> are also in the domain <strong>B</strong>. For example <code>Integer</code> is covariant with
-<code>Number</code></li>
-<li><strong>Contravariant</strong>: <strong>A</strong> is contravariant with <strong>B</strong> if all the values in the
-domain <strong>B</strong> are in the domain <strong>A</strong>. For example <code>Anything</code> is contravariant
-with every domain.</li>
+<li><strong>Invariance</strong>: two domains are invariant if they represent exactly the same
+set of values</li>
+<li><strong>Covariance</strong>: domain <strong>A</strong> is covariant with domain <strong>B</strong> if all the values
+in <strong>A</strong> are also in <strong>B</strong>. For example <code>Integer</code> is covariant with <code>Number</code></li>
+<li><strong>Contravariant</strong>: domain <strong>A</strong> is contravariant with domain <strong>B</strong> if all the
+values in <strong>B</strong> are in <strong>A</strong>. For example <code>Anything</code> is contravariant with
+every domain.</li>
 </ul>
+<p><strong>To evaluate the compatibility of two domains</strong> use <code>domain.isCompatible()</code></p>
+<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Integer&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;PositiveNumber&#x27;</span>);
+<span class="hljs-comment">// ➔ true</span>
+</code></pre>
 </section>
 <section id='parametric-domains'>
 <h2>Parametric Domains</h2>
@@ -1002,7 +1006,8 @@ with every domain.</li>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumber&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integer&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <p>Parametric domains are represented as special expressions: they are functions
-with one of the domain constructors below.</p>
+with one of the domain constructors below and their arguments are domain
+literals or other parametric domain expressions.</p>
 <p>By default, compatibility is determined by using invariance of the arguments of
 the parametric domain function.</p>
 <div class=symbols-table>
@@ -1056,7 +1061,7 @@ the parametric domain function.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>Literal</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left">This constructor defines a domain with a single value, the value of its argument. `                                                                                                                                                                                                                                                                                |</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Covariant</code></td>
@@ -1068,7 +1073,7 @@ the parametric domain function.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>Invariant</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left">This constructor indicate that two domains are compatible only if they are invariants with regard to each other.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Interval</code></td>

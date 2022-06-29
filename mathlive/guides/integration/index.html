@@ -675,12 +675,12 @@ Table of Content</label>
 simplest way to use MathLive in your page is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield in a web page.</p>
 <h2>Creating Mathfield Elements Programmatically</h2>
-<p>In most cases you can simply use a <code>&lt;math-field&gt;</code> tag:</p>
+<p><strong>To add an editable mathfield to a document</strong> use a <code>&lt;math-field&gt;</code> tag:</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
 <p>If you need to add a mathfield to your DOM dynamically, you can create
 new mathfield DOM elements and add them to the DOM.</p>
-<p><strong>To create a mathfield DOM element</strong>, use <code>new MathfieldElement()</code>.</p>
+<p><strong>To programatically create a mathfield element</strong>, use <code>new MathfieldElement()</code>.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
 mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
 <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
@@ -694,7 +694,7 @@ Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 <h2>Using MathLive with JavaScript Modules</h2>
 <p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions
 such as <code>renderMathInDocument()</code>.</p>
-<p><strong>To access those functions</strong>, import the MathLive module.</p>
+<p><strong>To access those functions</strong>, import them from the MathLive module.</p>
 <p>JavaScript modules offer several benefits (asynchronous, deterministics loading,
 no pollution of the global namespace, etc…). They are the recommended approach
 to use MathLive APIs in your project.</p>
@@ -732,7 +732,7 @@ dynamically download the required fonts from the CDN as well.</p>
 <p>If this option works for you, you can move on to the MathLive SDK reference
 to find out how to customize mathfields, receive change notifications, define
 keyboard shortcuts, use custom macros and more.</p>
-<p>The section below discuss aditional options to load MathLive for more complex
+<p>The section below discuss additional options to load MathLive for more complex
 configurations.</p>
 <h2>Using <code>&lt;script&gt;</code> tags</h2>
 <p>If you need to support browsers that don’t support JavaScript modules, you
@@ -796,7 +796,7 @@ library.</p>
 <p>If the global setup of your project requires a different organization,
 for example locating all the static assets in a <code>/assets/</code> directory and all the
 JavaScript code in a <code>/js/</code> directory, you can specify where those assets can
-be found using the <code>fontsDirectory</code> configutation option.</p>
+be found using the <code>fontsDirectory</code> configuration option.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MathfieldElement</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
 <span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
 mfe.<span class="hljs-title function_">setOptions</span>({
@@ -835,7 +835,7 @@ font loading.</p>
 <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>\tan(x) = \frac{\sin \tetha}{\cos \tetha}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>\tan(x) = \frac{\sin \theta}{\cos \theta}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;./vendor/mathlive.min.js&#x27;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
