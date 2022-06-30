@@ -2148,17 +2148,17 @@ It does make the handling of the interactive manipulation of the formula much
 easier, though.</p>
 </li>
 <li>
-<p><strong>Changes to the handling of sentinel atoms (type <code>'first'</code>)</strong></p>
+<p><strong>Changes to the handling of sentinel atoms (type <code>&quot;first&quot;</code>)</strong></p>
 <p>This is an internal change that does not affect the public API.</p>
-<p>Sentinel atoms are atoms of type <code>'first'</code> that are inserted as the first
+<p>Sentinel atoms are atoms of type <code>&quot;first&quot;</code> that are inserted as the first
 element in atom branches. Their purpose is to simplify the handling of “empty”
 lists, for example an empty numerator or superscript.</p>
 <p>Previously, these atoms where added when an editable atom tree was created,
 i.e. in the <code>editor</code> code branch, since they are not needed for pure
 rendering. However, this created situations where the tree had to be
-‘corrected’ by inserting missing <code>'first'</code>. This code was complex and resulted
+‘corrected’ by inserting missing <code>&quot;first&quot;</code>. This code was complex and resulted
 in some unexpected operations having the side effect of modifying the tree.</p>
-<p>The <code>'first'</code> atoms are now created during parsing and are present in editable
+<p>The <code>&quot;first&quot;</code> atoms are now created during parsing and are present in editable
 and non-editable atom trees.</p>
 </li>
 <li>
@@ -3744,39 +3744,39 @@ selection.</p>
 <ul>
 <li><strong>style</strong> an object with the following properties. All the properties are
 optional, but they can be combined.</li>
-<li><strong>style.mode</strong> - Either <code>'math'</code>, <code>'text'</code> or <code>'command'</code></li>
+<li><strong>style.mode</strong> - Either <code>&quot;math&quot;</code>, <code>&quot;text&quot;</code> or <code>&quot;command&quot;</code></li>
 <li><strong>style.color</strong> - The text/fill color, as a CSS RGB value or a string for some
 ‘well-known’ colors, e.g. ‘red’, ‘#f00’, etc…</li>
 <li><strong>style.backgroundColor</strong> - The background color.</li>
 <li><strong>style.fontFamily</strong> - The font family used to render text. This value can the
 name of a locally available font, or a CSS font stack, e.g. “Avenir”,
 “Georgia, Times, serif”, etc… This can also be one of the following
-TeX-specific values: - <code>'cmr'</code>: Computer Modern Roman, serif - <code>'cmss'</code>:
-Computer Modern Sans-serif, latin characters only - <code>'cmtt'</code>: Typewriter,
-slab, latin characters only - <code>'cal'</code>: Calligraphic style, uppercase latin
-letters and digits only - <code>'frak'</code>: Fraktur, gothic, uppercase, lowercase and
-digits - <code>'bb'</code>: Blackboard bold, uppercase only - <code>'scr'</code>: Script style,
+TeX-specific values: - <code>&quot;cmr&quot;</code>: Computer Modern Roman, serif - <code>&quot;cmss&quot;</code>:
+Computer Modern Sans-serif, latin characters only - <code>&quot;cmtt&quot;</code>: Typewriter,
+slab, latin characters only - <code>&quot;cal&quot;</code>: Calligraphic style, uppercase latin
+letters and digits only - <code>&quot;frak&quot;</code>: Fraktur, gothic, uppercase, lowercase and
+digits - <code>&quot;bb&quot;</code>: Blackboard bold, uppercase only - <code>&quot;scr&quot;</code>: Script style,
 uppercase only</li>
 <li><strong>style.fontSeries</strong> - The font ‘series’, i.e. weight and stretch (“series” is
 TeX terminology). The following values can be combined, for example: “ebc”:
 extra-bold, condensed. These attributes may not have visible effect if the
-font family does not support this style: - <code>'ul'</code> ultra-light weight
+font family does not support this style: - <code>&quot;ul&quot;</code> ultra-light weight
 <ul>
-<li><code>'el'</code>: extra-light - <code>'l'</code>: light - <code>'sl'</code>: semi-light - <code>'m'</code>: medium
-(default) - <code>'sb'</code>: semi-bold - <code>'b'</code>: bold - <code>'eb'</code>: extra-bold - <code>'ub'</code>:
-ultra-bold - <code>'uc'</code>: ultra-condensed - <code>'ec'</code>: extra-condensed - <code>'c'</code>:
-condensed - <code>'sc'</code>: semi-condensed - <code>'n'</code>: normal (default) - <code>'sx'</code>:
-semi-expanded - <code>'x'</code>: expanded - <code>'ex'</code>: extra-expanded - <code>'ux'</code>:
+<li><code>&quot;el&quot;</code>: extra-light - <code>&quot;l&quot;</code>: light - <code>&quot;sl&quot;</code>: semi-light - <code>&quot;m&quot;</code>: medium
+(default) - <code>&quot;sb&quot;</code>: semi-bold - <code>&quot;b&quot;</code>: bold - <code>&quot;eb&quot;</code>: extra-bold - <code>&quot;ub&quot;</code>:
+ultra-bold - <code>&quot;uc&quot;</code>: ultra-condensed - <code>&quot;ec&quot;</code>: extra-condensed - <code>&quot;c&quot;</code>:
+condensed - <code>&quot;sc&quot;</code>: semi-condensed - <code>&quot;n&quot;</code>: normal (default) - <code>&quot;sx&quot;</code>:
+semi-expanded - <code>&quot;x&quot;</code>: expanded - <code>&quot;ex&quot;</code>: extra-expanded - <code>&quot;ux&quot;</code>:
 ultra-expanded</li>
 </ul>
 </li>
 <li><strong>style.fontShape</strong> - The font ‘shape’ (again, TeX terminology), i.e. italic
 or condensed.
 <ul>
-<li><code>'it'</code>: italic</li>
-<li><code>'sl'</code>: slanted or oblique (often the same as italic)</li>
-<li><code>'sc'</code>: small caps</li>
-<li><code>'ol'</code>: outline</li>
+<li><code>&quot;it&quot;</code>: italic</li>
+<li><code>&quot;sl&quot;</code>: slanted or oblique (often the same as italic)</li>
+<li><code>&quot;sc&quot;</code>: small caps</li>
+<li><code>&quot;ol&quot;</code>: outline</li>
 </ul>
 </li>
 </ul>
@@ -3801,26 +3801,26 @@ shortcuts, they do not need to be updated:</p>
 </code></pre>
 <p>The <code>value</code> key is required an indicate the shortcut substitution.</p>
 <p>The <code>mode</code> key, if present, indicate in which mode this shortcut should apply,
-either <code>'math'</code> or <code>'text'</code>. If the key is not present the shortcut apply in
+either <code>&quot;math&quot;</code> or <code>&quot;text&quot;</code>. If the key is not present the shortcut apply in
 both modes.</p>
-<p>The <code>'after'</code> key, if present, indicate in what context the shortcut should
+<p>The <code>&quot;after&quot;</code> key, if present, indicate in what context the shortcut should
 apply. One or more values can be specified, separated by a ‘+’ sign. If any of
 the values match, the shortcut will be applicable. Possible values are:</p>
 <ul>
-<li><code>'space'</code> A spacing command, such as <code>\quad</code></li>
-<li><code>'nothing'</code> The begining of a group</li>
-<li><code>'surd'</code> A square root or n-th root</li>
-<li><code>'frac'</code> A fraction</li>
-<li><code>'function'</code> A function such as <code>\sin</code> or <code>f</code></li>
-<li><code>'letter'</code> A letter, such as <code>x</code> or <code>n</code></li>
-<li><code>'digit'</code> <code>0</code> through <code>9</code></li>
-<li><code>'binop'</code> A binary operator, such as <code>+</code></li>
-<li><code>'relop'</code> A relational operator, such as <code>=</code></li>
-<li><code>'punct'</code> A punctuation mark, such as <code>,</code></li>
-<li><code>'array'</code> An array, such as a matrix or cases statement</li>
-<li><code>'openfence'</code> An opening fence, such as <code>(</code></li>
-<li><code>'closefence'</code> A closing fence such as <code>}</code></li>
-<li><code>'text'</code> Some plain text</li>
+<li><code>&quot;space&quot;</code> A spacing command, such as <code>\quad</code></li>
+<li><code>&quot;nothing&quot;</code> The begining of a group</li>
+<li><code>&quot;surd&quot;</code> A square root or n-th root</li>
+<li><code>&quot;frac&quot;</code> A fraction</li>
+<li><code>&quot;function&quot;</code> A function such as <code>\sin</code> or <code>f</code></li>
+<li><code>&quot;letter&quot;</code> A letter, such as <code>x</code> or <code>n</code></li>
+<li><code>&quot;digit&quot;</code> <code>0</code> through <code>9</code></li>
+<li><code>&quot;binop&quot;</code> A binary operator, such as <code>+</code></li>
+<li><code>&quot;relop&quot;</code> A relational operator, such as <code>=</code></li>
+<li><code>&quot;punct&quot;</code> A punctuation mark, such as <code>,</code></li>
+<li><code>&quot;array&quot;</code> An array, such as a matrix or cases statement</li>
+<li><code>&quot;openfence&quot;</code> An opening fence, such as <code>(</code></li>
+<li><code>&quot;closefence&quot;</code> A closing fence such as <code>}</code></li>
+<li><code>&quot;text&quot;</code> Some plain text</li>
 </ul>
 <h4>Other Features</h4>
 <ul>
