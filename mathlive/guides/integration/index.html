@@ -676,7 +676,7 @@ simplest way to use MathLive in your page is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield in a web page.</p>
 <h2>Creating Mathfield Elements Programmatically</h2>
 <p><strong>To add an editable mathfield to a document</strong> use a <code>&lt;math-field&gt;</code> tag:</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
 <p>If you need to add a mathfield to your DOM dynamically, you can create
 new mathfield DOM elements and add them to the DOM.</p>
@@ -685,6 +685,7 @@ new mathfield DOM elements and add them to the DOM.</p>
 mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
 <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
 </code></pre>
+<p class="notice--info">In Javascript, the <code>\</code> in a string must be escaped and the escape character is also <code>\</code>. So, in Javascript strings LaTeX commands start with a <code>\\</code>.</p>
 <div class='read-more'><a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule)">
 See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -700,17 +701,13 @@ no pollution of the global namespace, etc…). They are the recommended approach
 to use MathLive APIs in your project.</p>
 <p><strong>To use MathLive as a JavaScript module</strong>:</p>
 <ol>
-<li>
-<p>Include a <code>&lt;script&gt;</code> tag, with a <code>type=&quot;module&quot;</code> attribute</p>
-</li>
-<li>
-<p>In the body of this <code>&lt;script&gt;</code> tag, use an <code>import</code> directive pointing to a
-CDN URL for MathLive, such as <code>https://unpkg.com/mathlive?module</code>.</p>
-<p>Note the <code>?module</code> suffix which indicate to the CDN we need the ESM version of MathLive.</p>
-</li>
-<li>
-<p>Invoke a MathLive API, such as <code>renderMathInDocument()</code>.</p>
-</li>
+<li>Include a <code>&lt;script&gt;</code> tag, with a <code>type=&quot;module&quot;</code> attribute</li>
+<li>In the body of this <code>&lt;script&gt;</code> tag, use an <code>import</code> directive pointing to a
+CDN URL for MathLive, such as <code>https://unpkg.com/mathlive?module</code>. If your target browser supports it, you can also use the <code>import()</code> function for a dynamic import.</li>
+</ol>
+<p class="notice--info"><strong>Note:</strong> The <code>?module</code> suffix indicates to the CDN we need the ESM (module) version of MathLive.</p>
+<ol start="3">
+<li>Invoke a MathLive API, such as <code>renderMathInDocument()</code>.</li>
 </ol>
 <p>With this setup, MathLive will dynamically insert one or more stylesheets in
 the page, as needed, for example when a mathfield is created. MathLive will
@@ -777,9 +774,6 @@ a CDN.</p>
 <p><strong>To add a local version of MathLive to your project</strong>, use the following command:</p>
 <pre><code class="language-bash">$ npm install --save mathlive
 </code></pre>
-<p>The version of MathLive installed in the <code>node_modules</code> directory essentially
-corresponds to the content of the <code>/dist/</code> directory in the MathLive project
-on GitHub.</p>
 <p>After you’ve completed this step, you can use MathLive as any other modules
 in your project:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MathfieldElement</span>} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mathlive&#x27;</span>;
@@ -889,14 +883,14 @@ Learn more about the rendering <strong>static</strong> math content.
         
 
 
-        <meta itemprop="datePublished" content="June 28, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-28'>June 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

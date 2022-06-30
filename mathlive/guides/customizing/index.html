@@ -713,12 +713,16 @@ Table of Content</label>
     };
 </script>
 <h1>Customizing a mathfield</h1>
-<p>The appearance and behavior of the mathfield is highly customizable. Here are a few common examples.</p>
+<p>The appearance and behavior of the mathfield is highly customizable. Here are a
+few common examples.</p>
 <h2>Styling</h2>
-<p>The mathfield can be styled using the <code>style</code> attribute on the <code>&lt;math-field&gt;</code>
-tag or by defining a CSS rule targeting the mathfield.</p>
-<p>This can be used to change the base font size or add a border.</p>
-<p>Change line 2-6 of the HTML in the playground below with <code>color: #dde; background: #256291;</code>.</p>
+<p><strong>To style the mathfield use the <code>style</code> attribute on the <code>&lt;math-field&gt;</code>
+tag or define a CSS rule targeting the mathfield.</strong></p>
+<p>This can be used to modify the appearance of the mathfield in many ways, for
+example changing the base font size or adding a border around it.</p>
+<p><strong>To display the mathfield as an inline element</strong>, rather than a block element,
+use <code>style=&quot;display: inline-block&quot;</code></p>
+<p>Change the style attribute in the playground below to <code>color: #dde; background: #256291;</code>.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
     <div slot="html">&lt;math-field style="
@@ -736,7 +740,7 @@ tag or by defining a CSS rule targeting the mathfield.</p>
 <!-- htmlmin:ignore -->
 <section id='focus-ring'>
 <h3>Focus Ring</h3>
-<p>To change the appearance of the focus ring, use the <code>:focus-within</code> pseudo-element.</p>
+<p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
     <div slot="html">&lt;style&gt;
@@ -753,31 +757,74 @@ tag or by defining a CSS rule targeting the mathfield.</p>
 </code-playground>
 <!-- htmlmin:ignore -->
 <p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
-with  a keyboard. However, you can change the appearance of the outline,
+with a keyboard. However, you can change the appearance of the outline,
 for example to indicate an error condition. If you remove the outline on the
 mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element. </p>
 </section>
-<section id='css-variable'>
+<section id='css-variables'>
 <h2>CSS Variables</h2>
-<p>Some CSS variables (custom properties) can be used to modify the appearance of
-the mathfield:</p>
-<ul>
-<li><code>--hue</code>: (0…360) default is 212 (light blue). The default colors below are derived
-from this variable</li>
-<li><code>--highlight</code>: color of the selected fragment of the expression, when the
-mathfield is active</li>
-<li><code>--highlight-inactive</code>: selection color when the mathfield is not focused</li>
-<li><code>--caret</code>: color of the caret (insertion point)</li>
-<li><code>--primary</code>: accent color for some UI elements, such as the virtual keyboard toggle</li>
-<li><code>--smart-fence-opacity</code>: opacity of a smart gence (default is 50%)</li>
-<li><code>--smart-fence-color</code>: color of a smart fence (default is current color)</li>
-<li><code>--text-font-family</code>: the font stack used in text mode</li>
-</ul>
-<p class="notice--info">Set these CSS variables on any selector inherited by the
-<code>math-field</code> tag, for example, <code>body</code>: although CSS styles are “invisible” to
-custom components, CSS variables are “passed through” and will affect the
-content of the <code>&lt;math-field&gt;</code> custom component.</p>
+<p><strong>To customize the appearance of the mathfield</strong>, use the following CSS
+variables (custom properties) in a ruleset that applies to the mathfield element.</p>
+<pre><code class="language-css">math-field {
+ <span class="hljs-attr">--hue</span>: <span class="hljs-number">10</span>       <span class="hljs-comment">/* Set the highlight color and caret to a reddish hue */</span>
+}
+</code></pre>
+<p>Alternatively you can set these CSS variables programatically:</p>
+<pre><code class="language-js">  <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--hue&quot;</span>, <span class="hljs-string">&quot;10&quot;</span>);
+</code></pre>
+<div class='symbols-table' style='--first-col-width:25ex'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">CSS Variable</th>
+<th style="text-align:left">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>--caret</code></td>
+<td style="text-align:left">Color of the caret/insertion point</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--contains-highlight</code></td>
+<td style="text-align:left">Backround property for items that contain the caret</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--highlight</code></td>
+<td style="text-align:left">Color of the selection</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--highlight-inactive</code></td>
+<td style="text-align:left">Color of the selection, when the mathfield is not focused</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--hue</code></td>
+<td style="text-align:left">Hue of the highlight color and the caret</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--primary</code></td>
+<td style="text-align:left">Primary accent color, used for example in the virtual keyboard</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--smart-fence-color</code></td>
+<td style="text-align:left">Color of a smart fence (default is current color)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--smart-fence-opacity</code></td>
+<td style="text-align:left">Opacity of a smart fence (default is 50%)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--text-font-family</code></td>
+<td style="text-align:left">The font stack used in text mode</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="notice--info">Set these CSS variables on any selector that applies to the
+<code>&lt;math-field&gt;</code> element you want to customize, for example, <code>body</code>.
+Although CSS styles are “invisible” to custom components, CSS variables are
+“passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
     <style slot="style">
@@ -790,14 +837,19 @@ content of the <code>&lt;math-field&gt;</code> custom component.</p>
       }
     </style>
     <div slot="html">&lt;math-field style="
-    --hue: 53 !important;
-    --caret: red !important;
+  --hue: 53;
+  --caret: red;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
+<br>
+<p>You can customize the appearance and zindex of the virtual keyboard panel
+with some CSS variables associated with a selector that applies to the
+virtual keyboard panel container.</p>
+<p>Read more about <a href="https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance">customizing the virtual keyboard appearance</a></p>
 </section>
 <section id='display-options'>
 <h2>Display Options</h2>
@@ -836,7 +888,7 @@ where 1 em is the base font size of the mathfield or static element.</p>
 <tr>
 <th style="text-align:right"><code>fontSize</code></th>
 <th style="text-align:left"></th>
-<th style="text-align:left">command</th>
+<th style="text-align:left">LaTeX command</th>
 </tr>
 </thead>
 <tbody>
@@ -930,11 +982,12 @@ for the mathfield, use the <code>min-width</code> CSS property.</p>
   <div slot="html">The answer is &lt;math-field 
   default-mode="inline-math"
   style="
-    padding-left: 5px; padding-right: 5px;
     display: inline-block;
-    mind-width: 100px;
+    vertical-align: middle;
     border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, .3); 
+    border: 1px solid rgba(0, 0, 0, .3);
+    padding-left: 5px; padding-right: 5px;
+    min-width: 100px;
   "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
   &lt;/math-field&gt;.
@@ -1034,8 +1087,11 @@ line 3 to <code>scriptDepth: 0</code>, then try to type “x^2” in the mathfie
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<p>See <a href="http://cortexjs.io/docs/mathlive/?q=EditingOptions">EditingOptions</a> for more
-details about these and other available options.</p>
+<br>
+<div class='read-more'><a href="/docs/mathlive/?q=EditingOptions">
+See <code>EditionOptions</code> for more
+details about these and other available options
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='space-bar'>
 <h2>Handling the Space Bar</h2>
@@ -1057,7 +1113,7 @@ relational, binary or unary operators, etc…</p>
 greek, spanish, farsi, french, italian, japanese, polish and russian.</p>
 <p>The language to use is detected automatically, but it can be overridden by
 using the <code>locale</code> option or the <code>locale</code> attribute.</p>
-<p class="notice--info">Note: we <code>await</code> for the <code>&lt;math-field&gt;</code> definition to be loaded before
+<p class="notice--info"><strong>Note:</strong> we <code>await</code> for the <code>&lt;math-field&gt;</code> definition to be loaded before
 invoking the <code>getOptions()</code> method, otherwise it would not be found.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
@@ -1086,7 +1142,8 @@ console.log(mf.getOptions().strings[locale]);
 <h2>Fonts</h2>
 <p>The content of the mathfield is displayed using a family of high-quality
 fonts based on the original Computer Modern font from TeX. The mathfield
-will not display correctly using another font. By default, the directory containing
+will not display correctly using another font.</p>
+<p>By default, the directory containing
 the fonts is located next to the file containing the mathlive library.
 If your bundler or asset management system require a different configuration
 you can specify where the fonts can be located using the <a href="http://cortexjs.io/docs/mathlive/?q=fontsDirectory"><code>fontsDirectory</code></a> option or the <code>fonts-directory</code> attribute.</p>
@@ -1106,13 +1163,13 @@ you can specify where the fonts can be located using the <a href="http://cortexj
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<p class="notice--warning">Note that changing the fonts directory for one mathfield will change the fonts
+<p class="notice--warning"><strong>Note:</strong> changing the fonts directory for one mathfield will change the fonts
 used by all the other mathfield elements in the page.</p>
 <div class='read-more'><a href="/mathlive/guides/integration/">
 Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/mathlive/guides/commands/">
-Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
+<strong>Next:</strong> <strong>Executing Commands</strong>: send editing commands to a mathfield
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -1123,14 +1180,14 @@ Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-04-30'>April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

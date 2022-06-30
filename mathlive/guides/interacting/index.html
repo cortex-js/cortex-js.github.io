@@ -711,8 +711,8 @@ Table of Content</label>
 <p><strong>To read the content of a <code>&lt;math-field&gt;</code> element</strong> use its <code>value</code>
 property, just like with a <code>&lt;textarea&gt;</code>.</p>
 <p><strong>To be notified as soon as the content of the mathfield is modified</strong> listen for
-an <code>'input'</code> event.</p>
-<p class="notice--info"><strong>Try</strong>: modify the <code>'input'</code> event below to a <code>'change'</code> event. Notice how the <code>'change'</code> event
+an <code>&quot;input&quot;</code> event.</p>
+<p class="notice--info"><strong>Try</strong>: modify the <code>&quot;input&quot;</code> event below to a <code>&quot;change&quot;</code> event. Notice how the <code>&quot;change&quot;</code> event
 is only sent if you press the <strong>Return</strong> or <strong>Enter</strong> key, or when the mathfield
 loses focus and the content has been modified.</p>
 <code-playground layout="stack">
@@ -739,7 +739,7 @@ no argument.</p>
 <p><strong>To control the format of the result</strong>, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
 For example to get the content as a MathJSON expression, use <code>getValue('math-json')</code>.</p>
 <p class="notice--info">The MathJSON format is a lightweight mathematical notation interchange format. <a href="/math-json/">Learn more about MathJSON</a>.</p>
-<p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>'math-json'</code> to <code>'spoken-text'</code>.</p>
+<p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>&quot;math-json&quot;</code> to <code>&quot;spoken-text&quot;</code>.</p>
 <code-playground layout="stack">
     <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
@@ -848,7 +848,7 @@ and a <code>input</code> event is dispatched. The <code>input</code> event is no
 below, the <strong>LaTeX</strong> input field is editable and is reflected in the mathfield
 (and vice-versa).</p>
 <p class="notice--info">Note that we use the <code>suppressChangeNotifications</code> option when
-changing the content of the mathfield, to prevent a <code>'input'</code> event from being
+changing the content of the mathfield, to prevent a <code>&quot;input&quot;</code> event from being
 triggered and creating an infinite loop.</p>
 <code-playground layout="stack">
   <div slot="javascript">import 'mathlive';
@@ -1048,10 +1048,10 @@ corresponding definition, <code>\mathrm{d}</code>.</p>
 <!-- ## Performing editing commands -->
 </section>
 <div class='read-more'><a href="/mathlive/guides/customizing/">
-Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
+<strong>Next:</strong> <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/mathlive/guides/lifecycle/">
-Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
+<strong>Next:</strong> Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -1062,14 +1062,14 @@ Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: 
         
 
 
-        <meta itemprop="datePublished" content="June 28, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-28'>June 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -773,7 +773,7 @@ text.</p>
 <p><strong>To use the SRE speech rules</strong>:</p>
 <ol>
 <li>Include the browser version of the SRE JavaScript file in your project. You can download it on <a href="https://github.com/zorkow/speech-rule-engine">GitHub</a></li>
-<li>Set the <code>textToSpeechRules</code> configuration key to <code>'sre'</code>.</li>
+<li>Set the <code>textToSpeechRules</code> configuration key to <code>&quot;sre&quot;</code>.</li>
 </ol>
 <p><strong>To configure SRE</strong>, set the <code>textToSpeechRulesOptions</code> configuration key. For example:</p>
 <pre><code class="language-javascript"><span class="hljs-attr">textToSpeechRulesOptions</span>: {
@@ -783,7 +783,7 @@ text.</p>
 </code></pre>
 <h3>Text-to-Speech Engine</h3>
 <h4>Using the Local TTS Engine</h4>
-<p><strong>To use the local (built-in, OS specific) TTS engine</strong>, set the <code>speechEngine</code> configuration key to <code>'local'</code>.</p>
+<p><strong>To use the local (built-in, OS specific) TTS engine</strong>, set the <code>speechEngine</code> configuration key to <code>&quot;local&quot;</code>.</p>
 <p>There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.</p>
 <h4>Using Amazon Polly TTS Engine</h4>
 <ol>
@@ -813,13 +813,13 @@ This may be as simple as adding this:</li>
 <h4>Speech Output Format</h4>
 <p><strong>To configure the format of the speech output engine</strong>, use the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
 <ul>
-<li><code>'ssml'</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
-<li><code>'mac'</code> to request an output using Mac OS speech markup, e.g. ‘[[slc 150]]’. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.</li>
-<li><code>''</code> (empty string) to request no markup.</li>
+<li><code>&quot;ssml&quot;</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
+<li><code>&quot;mac&quot;</code> to request an output using Mac OS speech markup, e.g. ‘[[slc 150]]’. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.</li>
+<li><code>&quot;&quot;</code> (empty string) to request no markup.</li>
 </ul>
 <p>The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.</p>
 <div class='read-more'><a href="/mathlive/guides/static/">
-Next: Display <strong>Static Math</strong> formulas
+<strong>Next:</strong> Display <strong>Static Math</strong> formulas
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -830,14 +830,14 @@ Next: Display <strong>Static Math</strong> formulas
         
 
 
-        <meta itemprop="datePublished" content="June 28, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-28'>June 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
