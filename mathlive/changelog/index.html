@@ -694,9 +694,8 @@ or when static math was rendered</li>
 <h3>Features</h3>
 <ul>
 <li>
-<p><strong>#1335</strong> Added support for [<em>Input Events Level 1</em>]
-(https://www.w3.org/TR/input-events-1/), which includes the <code>beforeinput</code> and
-<code>input</code> events</p>
+<p><strong>#1335</strong> Added support for the <code>beforeinput</code> and <code>input</code> events from [<em>Input
+Events Level 1</em>] (https://www.w3.org/TR/input-events-1/).</p>
 <p>While an <code>input</code> event was dispatched before, it did not conform to the
 <code>InputEvent</code> interface. The <code>input</code> event now includes an <code>inputType</code> property
 detailing what caused the event to be dispatched, and in some cases a <code>data</code>
@@ -736,7 +735,7 @@ clear the entire mathfield.</li>
 <h2>0.75.0 (2022-06-21)</h2>
 <h3>Features</h3>
 <ul>
-<li><strong>#970</strong> It is now possible to vertically scroll the content of the mahtfield.</li>
+<li><strong>#970</strong> It is now possible to vertically scroll the content of the mathfield.</li>
 </ul>
 <h3>Improvements</h3>
 <ul>
@@ -748,7 +747,7 @@ mathfield and the virtual keyboard are visible (<strong>#1358</strong>)</li>
 bottom of the page, it could get covered with the virtual keyboard and become
 inaccessible</li>
 <li>When a mathfield is set to a fixed height and it contains content that doesn’t
-fit vertically, a scollbar will appear.</li>
+fit vertically, a scrollbar will appear.</li>
 <li>If the content of the mathfield was taller than could fit in the mathfield,
 typing would not bring the content of the mathfield into view. (<strong>#1310</strong>)</li>
 <li>When typing or using the virtual keyboard the mathfield would not always
@@ -782,7 +781,7 @@ multiple mathfields are displayed in the page.</p>
 necessary to call <code>makeSharedVirtualKeyboard()</code>.</p>
 <p>The <code>use-shared-virtual-keyboard</code> attribute is now only necessary when using a
 mathfield in an iframe.</p>
-<p>If the <code>virtual-keyboard-mode</code> attribute of ma athfield is set to <code>auto</code> or
+<p>If the <code>virtual-keyboard-mode</code> attribute of mathfield is set to <code>auto</code> or
 <code>onfocus</code>, the virtual keyboard will activate and hide automatically. It is no
 longer necessary to set the mode to <code>off</code> and to listen for focus change event
 to show/hide the keyboard manually.</p>
@@ -957,7 +956,7 @@ the superscript/subscript was provided. For example, typing <code>x</code>, <cod
 <code>x^{}2</code></li>
 <li>Improved parsing and layout of functions with arguments, i.e.
 <code>\sin\left(x\right)</code>. Previously, there would be an excessive amount of white
-space beween the <code>\sin</code> and <code>(</code>. The expression is now correctly interpreted
+space between the <code>\sin</code> and <code>(</code>. The expression is now correctly interpreted
 as a function.</li>
 <li><strong>#1459</strong> When using a non-QWERTY physical keyboard layout, creating multiple
 mathfields could result in the keyboard layout being erroneously reset to
@@ -1062,7 +1061,7 @@ of LaTeX from MathJSON.</li>
 trigger some asserts</li>
 <li>Correctly handle deletion of the closing fence of a smartfence</li>
 <li><strong>#1412</strong> Correctly handle insertion of custom macros with <code>executeCommand</code></li>
-<li>On Windows/Linux with an AZERTY keyboard, the ² (supersript 2) is now handled
+<li>On Windows/Linux with an AZERTY keyboard, the ² (superscript 2) is now handled
 correctly</li>
 <li><strong>#1362</strong> and <strong>#726</strong> Correctly handle backspacing over a multi-character
 operator, e.g. <code>&lt;=</code>.</li>
@@ -1075,7 +1074,7 @@ operator, e.g. <code>&lt;=</code>.</li>
 between columns</li>
 <li>Added macros to the command popover</li>
 <li>Improved visual appearance when using dark mode. Also, added more CSS
-variables to customize the apperance of the mathfield.</li>
+variables to customize the appearance of the mathfield.</li>
 </ul>
 <h2>0.69.10 (2022-02-23)</h2>
 <h3>Bug Fixes</h3>
@@ -1143,7 +1142,7 @@ Therefore, sadly, this release rolls back emitting code including optional
 chaining, despite the fact it’s supported in every targeted browser, until the
 <code>vue</code> toolchain gets its act together. To be clear MathLive does not use or
 depend on <code>Vue</code>, but some users are integrating MathLive in projects that do
-use it, and this is sufficient to break MathLive. It appears that this isse
+use it, and this is sufficient to break MathLive. It appears that this issue
 affects also the React toolchain.</p>
 </li>
 <li>
@@ -1207,7 +1206,7 @@ location, or scroll with the page.</li>
 <h3>Breaking Changes</h3>
 <ul>
 <li>
-<p>This release requires TypeScript 4.3 or later (the API uses assymetric
+<p>This release requires TypeScript 4.3 or later (the API uses asymmetric
 getters/setters). If you are using VSCode, you may need to change the version
 of TypeScript used by the editor for language services (syntax checking). To
 do so, with a TypeScript file open, click the Typescript version in the bottom
@@ -1384,7 +1383,7 @@ project.</li>
 <li><strong>#948</strong> The Typescript declaration of <code>set plonkSound()</code> failed when compiled
 with <code>strictNullChecks</code>.</li>
 <li>When using a mathfield as a web component, the <code>speak</code> command would be
-inoperational.</li>
+inoperative.</li>
 <li>In Chrome/Blink, when a mathfield was in a <code>contentEditable</code> block, inserting
 a line before the component would make the component crash. Now the component
 is correctly disconnected, then reconnected and preserves its state across the
@@ -1563,7 +1562,7 @@ This situattion happened when using “tippyjs” and possibly other libraries.<
 was set to “undefined”.</li>
 <li>The DVIPS colors were case sensitive, they should be case sensitive. (i.e.
 <code>LimeGreen</code> is a valid color, <code>Limegreen</code> is not)</li>
-<li><strong>#945</strong> Preserve more aggresively verbatim LaTeX. Also, avoid serializing
+<li><strong>#945</strong> Preserve more aggressively verbatim LaTeX. Also, avoid serializing
 superfluous spaces in Spacing atoms.</li>
 <li><strong>#770</strong> Correctly handle attaching limits to <code>\int</code> command using the
 keyboard.</li>
@@ -1634,7 +1633,7 @@ apparent brightness and intensity:</p>
 <ul>
 <li>
 <p>The background of fractions, radicals and parentheses group (<code>\left</code>/<code>\right</code>
-commands) is now highlited when they contain the caret. This makes it easier
+commands) is now highlighted when they contain the caret. This makes it easier
 to distinguish some cases when the cursor is at the edge of the element and
 could be either inside or outside. The appearance of the highliting can be
 controlled with the <code>--contains-highlight</code> CSS variable. Set it to
@@ -1682,7 +1681,7 @@ asciiMath: null })`</p>
 <li>Substantial rewrite of the stacked layout algorithm (fractions, superscripts,
 etc…). The previous algorithm did not work correctly when mixing absolute
 sizing commands (<code>\Huge</code>) and relative ones (<code>\scriptstyle</code>) and had various
-issues and inconsistenceis with what TeX produced. The result is now close to
+issues and inconsistencies with what TeX produced. The result is now close to
 TeX.</li>
 </ul>
 <p><img src="assets/mathlive-0.64.jpg" alt=""></p>
@@ -1710,7 +1709,7 @@ were used, such as BoxAtom and more).</p>
 <li>
 <p>When pasting from the clipboard, recognize text bracketed with
 <code>\begin{math}</code>…<code>\end{math}</code> or <code>\begin{displaymath}</code>…<code>\end{displaymath}</code>
-as LaTeX (in additon to <code>$</code>, <code>$$</code>, <code>\[</code>…<code>\]</code> and <code>\(</code>…<code>\)</code> which were
+as LaTeX (in addition to <code>$</code>, <code>$$</code>, <code>\[</code>…<code>\]</code> and <code>\(</code>…<code>\)</code> which were
 recognized before). Also, recognize text that may contain a LaTeX expression
 surrounded by regular text (i.e. “if $x &gt; 0$”).</p>
 </li>
@@ -2129,10 +2128,10 @@ Consequently, new functionality can be exposed, such as the <code>find()</code> 
 which returns its results as an array of ranges. It is also possible now to
 query and change the current selection, and to apply styling to a portion of
 the expression other than the selection.</li>
-<li>The selection is represented as an <em>array</em> of ranges to support discontinous
-selections, which are useful to select for example all the cells in the
-column of a matrix column. This kind of selection was not previously
-possible.</li>
+<li>The selection is represented as an <em>array</em> of ranges to support
+discontinuous selections, which are useful to select for example all the
+cells in the column of a matrix column. This kind of selection was not
+previously possible.</li>
 <li>Incidentally this fixes a circular dependency, which was a smell test that
 there was a problem with the previous architecture.</li>
 </ul>
@@ -2141,7 +2140,7 @@ was based on the TeX implementation: when rendering a tree of atoms (which TeX
 calls <em>nodes</em>), the TeX layout algorithm never needs to find the parent of an
 atom. The MathLive rendering engine was implemented in the same way. However,
 for interactive editing, being able to locate the parent of an atom is
-frequetly necessary. The paths were a mechanism to maintain a separate data
+frequently necessary. The paths were a mechanism to maintain a separate data
 structure from the one needed by the rendering engine. However, they were a
 complex and clumsy mechanism. Now, a <code>parent</code> property has been introduced in
 instance of <code>Atom</code>, even though it is not necessary for the rendering phase.
@@ -2211,26 +2210,22 @@ and <code>&lt;textarea&gt;</code> elements.</p>
 <tr>
 <td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>Return</strong>/<strong>Enter</strong></td>
 <td style="text-align:left"><code>addRowAfter</code></td>
-<td></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> + <strong>Return</strong>/<strong>Enter</strong></td>
 <td style="text-align:left"><code>addRowBefore</code></td>
-<td></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>;</strong></td>
 <td style="text-align:left"><code>addRowAfter</code></td>
-<td></td>
-<td><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> +</td>
 </tr>
 <tr>
-<td style="text-align:left"><strong>;</strong></td>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> + <strong>;</strong></td>
 <td style="text-align:left"><code>addRowBefore</code></td>
-<td></td>
-<td><strong>ctrl</strong>/<strong>cmd</strong> + <strong>,</strong></td>
-<td><code>addColumnAfter</code></td>
-<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>,</strong></td>
+<td style="text-align:left"><code>addColumnAfter</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>ctrl</strong>/<strong>cmd</strong> + <strong>shift</strong> + <strong>,</strong></td>
@@ -2505,7 +2500,7 @@ incorrect <code>focus</code> event (for the <code>&lt;textarea&gt;</code> gainin
 <li><strong>#599</strong>: some characters, for example “ü”, would not be correctly parsed or
 displayed. Note that technically, those characters are ignored by TeX, but
 it’s a reasonable behavior nowadays to accept them as input.</li>
-<li><strong>#628</strong>: typing “e” repeatedly inside a matrix would corrupt the emited</li>
+<li><strong>#628</strong>: typing “e” repeatedly inside a matrix would corrupt the emitted</li>
 <li><strong>#637</strong>: in Chrome, thin lines, such as fraction bars or square root lines
 would not display at some zoom levels</li>
 <li>The locale was not properly taking into account when it was set manually</li>
@@ -2533,7 +2528,7 @@ release</li>
 <h3>New Features</h3>
 <ul>
 <li>
-<p><strong>WebPack issues workaround and font loading configuation</strong></p>
+<p><strong>WebPack issues workaround and font loading configuration</strong></p>
 <p>Follow up to <strong>#508</strong>. The fonts can now be loaded either statically or
 dynamically.</p>
 <ul>
@@ -2643,7 +2638,7 @@ root</p>
 <li>
 <p><strong>#508</strong> In order to better support some deployment configurations, added a
 ‘mathlive-fonts.css’ file to the distribution package.</p>
-<p>This is intended to be used by build/bundle environements that have an asset
+<p>This is intended to be used by build/bundle environments that have an asset
 pipeline that can move/rename assets, including the font-files</p>
 <p>Note that this method is <strong>not</strong> recommended. It will result in some cases
 where the layout is incorrect until the page is reloaded (especially for
@@ -2660,7 +2655,7 @@ formulas using large symbols such as integrals or large parentheses).</p>
 <li>Ensure that the ‘dt’ inline shortcut does not trigger when writing “width” (it
 should only apply in the math mode)</li>
 <li><strong>#492</strong> Typing “/” to insert as fraction when some items were selected would
-result in an eroneous output.</li>
+result in an erroneous output.</li>
 </ul>
 <h2>0.53.1 (2020-06-01)</h2>
 <h3>Bug Fixes</h3>
@@ -2701,7 +2696,7 @@ directory is expected to be next to the ‘mathlive.js’, ‘mathlive.mjs’ fi
 <p>In some rare cases, you may have used the CSS stylesheet without the Mathlive
 library, for example, after you may have saved the output of <code>latexToMarkup()</code>
 to a database and use it to render later in a page. In that case, you would
-need to use the CSS styelsheet <code>dist/mathlive-static.css</code>, which is suitable
+need to use the CSS stylesheet <code>dist/mathlive-static.css</code>, which is suitable
 for this use case. Note that it does reference a ‘fonts’ folder that may need
 to be adjusted. By default, the <code>fonts</code> folder should be placed next to the
 stylesheet. If you need a different location when using the static stylesheet,
@@ -2783,7 +2778,7 @@ improved interoperability</p>
 </li>
 <li>
 <p>When an invalid keybinding is encountered, the <code>onError</code> listener is now
-invoked with an erorr code of <code>invalid-keybinding</code></p>
+invoked with an error code of <code>invalid-keybinding</code></p>
 </li>
 <li>
 <p>Added support for German keyboard layout.</p>
@@ -2806,7 +2801,7 @@ below a minimal threshold.</p>
 <h3>New Features</h3>
 <ul>
 <li>
-<p><strong>#450</strong> Custom keybindings. A keybinding (also called keyboard shorcut)
+<p><strong>#450</strong> Custom keybindings. A keybinding (also called keyboard shortcut)
 associate a keystroke combination on a physical keyboard with a command.
 Mathlive previously had some built-in keybindings, but now they can be
 extended or replaced.</p>
@@ -2966,7 +2961,7 @@ rendered correctly (or propertly converted to MathASCII).
 <h3>Highlights</h3>
 <ul>
 <li><strong>Maintenance</strong>: Migration to TypeScript</li>
-<li><strong>Maintenance</strong>: New math variant (bold, italic, etc…) subsytem matches
+<li><strong>Maintenance</strong>: New math variant (bold, italic, etc…) subsystem matches
 LaTeX more closely</li>
 <li><strong>Maintenance</strong>: Reduced code size</li>
 <li><strong>New feature</strong>: Verbatim LaTeX</li>
@@ -4133,7 +4128,7 @@ clicking on the keyboard icon toggles between layouts.</li>
 <h3>Other New Features</h3>
 <ul>
 <li>Toggle the virtual keyboard layer when the shift key is pressed</li>
-<li>New <code>onVirtualKeyboardToogle</code> handler will get called when the visibility of
+<li>New <code>onVirtualKeyboardToggle</code> handler will get called when the visibility of
 the virtual keyboard changes. Useful to scroll into view important content
 that might be obscured by the keyboard.</li>
 <li>Some common functions added as inline shortcuts: <code>limsup</code>, <code>liminf</code>, <code>argmin</code>,
@@ -4316,14 +4311,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="June 29, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-29'>June 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

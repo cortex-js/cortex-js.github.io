@@ -703,7 +703,7 @@ Table of Content</label>
         
         <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
+        "mathlive": "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -728,39 +728,134 @@ keyboards, or create new ones.</p>
 <p>The default behavior of the virtual keyboard panel is to only be displayed on
 touch-enabled devices (mobile phones, tablets and laptops with a touch-screen) when a mathfield is focused.</p>
 <p><img src="/assets/images/mathfield/mobile-virtual-keyboard.png" alt="" class="max-w-md"></p>
-<p>This behavior can be changed with the <code>virtualKeyboardMode</code> option (or the
-equivalent <code>virtual-keyboard-mode</code> attribute):</p>
-<ul>
-<li><code>&quot;auto&quot;</code>:  on touch-enabled devices, show the virtual keyboard panel when
-the mathfield is focused, otherwise, don’t show it. This is the default behavior.</li>
-<li><code>&quot;manual&quot;</code>: a toggle button to control the virtual keyboard panel is displayed in the
-mathfield</li>
-<li><code>&quot;onfocus&quot;</code>: the virtual keyboard panel is displayed when the mathfield is focused</li>
-<li><code>&quot;off&quot;</code>: never show the virtual keyboard panel. The visibility of the virtual
-keyboard panel can still be controlled programatically by setting the
-<code>virtualKeyboardState</code> property of the Mathfield element to <code>visible</code> or <code>hidden</code>.</li>
-</ul>
+<p>This behavior can be changed with the <code>virtualKeyboardMode</code> option or the
+equivalent <code>virtual-keyboard-mode</code> attribute:</p>
+<div class='symbols-table'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><code>virtualKeyboardMode</code></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;auto&quot;</code></td>
+<td style="text-align:left">On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused, otherwise, don’t show it. This is the default behavior.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;manual&quot;</code></td>
+<td style="text-align:left">A virtualk keyboard toggle button is displayed in the mathfield. With this button the user controls when the keyboard is displayed.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;onfocus&quot;</code></td>
+<td style="text-align:left">The virtual keyboard panel is displayed when the mathfield is focused</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;off&quot;</code></td>
+<td style="text-align:left">Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically by setting the  <code>virtualKeyboardState</code> property of the mathfield element to <code>visible</code> or <code>hidden</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations.</p>
 </section>
-<section id='virtual-keyboard-panel-with-multiple-mathfields'>
-<h2>Virtual Keyboard Panel with Multiple Mathfields</h2>
-<p>If you have multiple mathfields on a page, you might want to coordinate their
-use of the virtual keyboard panel.</p>
-<p>By default, each mathfield has its own instance of a virtual keyboard panel, which will become visible or hide as a mathfield gains or loses focus. However, this can result in a virtual keyboard panel hiding briefly before showing again, when
-changing the focus from one mathfield to another.</p>
-<p>In some cases, you may need to have mathfields displayed in iframes, but
-would still want the virtual keyboard panel displayed as an element of the document, not attached to each iframe.</p>
-<p>For both of those situations, use a <strong>shared virtual keyboard</strong>.</p>
+<h2>Displaying the Virtual Keyboard in a Custom Container</h2>
+<p>By default when a virtual keyboard is created, it is attached at the end of the
+document’s <code>body</code> element.</p>
+<p>In some cases you may want to display the virtual keyboard in some other
+container.</p>
+<p>For example when using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">full screen elements</a> that contain a mathfield, you want to make sure the virtual
+keyboard panel is visible by attaching it to the full screen element.</p>
+<p><strong>To select which DOM element the virtual keyboard is created into</strong>, set the
+<code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
+<p class="notice--warning">The <code>position</code> attribute of this container element should be <code>relative</code> so that the virtual keyboard can correctly be placed relative to this element, and the container element should
+be at least 365px wide to ensure that the virtual keyboard can fit. </p>
+<h2>Customizing the Appearance of the Virtual Keyboard</h2>
+<p><strong>To customize the appearance of the virtual keyboard panel</strong> set the following CSS variables on a selector that applies to the container of the virtual
+keyboard panel, which is the <code>&lt;body&gt;</code> element by default:</p>
+<pre><code class="language-css"><span class="hljs-selector-tag">body</span> {
+  <span class="hljs-attr">--keyboard-zindex</span>: <span class="hljs-number">3000</span>;
+}
+</code></pre>
+<p>Alternatively, you can set these CSS variables programmatically:</p>
+<pre><code class="language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--keyboard-zindex&quot;</span>, <span class="hljs-string">&quot;3000&quot;</span>);
+</code></pre>
+<section id='zindex'>
+<h3>Customizing the Virtual Keyboard Stack Order</h3>
+<p><strong>To specify the stack order of the virtual keyboard panel relative to
+other DOM elements</strong> set the <code>--keyboard-zindex</code> CSS variable.</p>
+<p>The default <code>zindex</code> of the virtual keyboard panel is <code>105</code>.</p>
+</section>
+<section id='customizing-the-virtual-keyboard'>
+<h3>Customizing the Virtual Keyboard Colors</h3>
+<p><strong>To control the appearance of the virtual keyboard text and background colors</strong>, set the
+value of the following CSS variables to a CSS color:</p>
+<ul>
+<li><code>--keyboard-background</code></li>
+<li><code>--keyboard-text</code></li>
+<li><code>--keyboard-text-active</code></li>
+<li><code>--keyboard-background-border</code></li>
+</ul>
+</section>
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
+<h3>Customizing the Keycaps</h3>
+<p><strong>To control the appearance of keycaps</strong>, use the following CSS variables:</p>
+<ul>
+<li><code>--keycap-height</code></li>
+<li><code>--keycap-font-size</code></li>
+<li><code>--keycap-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-extra-small-font-size</code> (only if needed)</li>
+<li><code>--keycap-tt-font-size</code> (only if needed)</li>
+<li><code>--keycap-background</code>, a color</li>
+<li><code>--keycap-background-active</code>, a color</li>
+<li><code>--keycap-background-border</code>, a color</li>
+<li><code>--keycap-background-border-bottom</code>, a color</li>
+<li><code>--keycap-text</code>, a color</li>
+<li><code>--keycap-text-active</code>, a color</li>
+<li><code>--keycap-secondary-text</code>, a color</li>
+<li><code>--keycap-modifier-background</code>, a color</li>
+<li><code>--keycap-modifier-border</code>, a color</li>
+<li><code>--keycap-modifier-border-bottom</code>, a color</li>
+</ul>
+</section>
+<section id='shared-virtual-keyboard'>
+<h2>Sharing Virtual Keyboards Amongst Multiple Mathfields</h2>
+<p>When there are multiple mathfield elements in a page, they usually each have
+their own virtual keyboard.</p>
+<p>However, in some cases it might be desirable to have the virtual keyboard
+instance “detached” from the mathfield, and potentially shared by multiple
+mathfield elements.</p>
+<p>That’s the case for example when mathfield elements are displayed in an
+<em>iframe</em>. Since an <em>iframe</em> is essentially a mini embedded document, the
+default virtual keyboard will not display correctly when use in an <em>iframe</em>,
+as it will be attached to the <em>iframe</em> instead of being attached to the
+main document.</p>
+<p>This can be solved by using a “shared” virtual keyboard.</p>
 <p>A shared virtual keyboard is a single instance of the virtual keyboard panel per
 document, which is shared by all mathfield instances, regardless of whether
-they are in the main document or in an iframe.</p>
-<p><strong>To use a shared virtual keyboard</strong> call the <code>makeSharedVirtualKeyboard()</code>
-function from a script executing in the main document.</p>
-<p>If you are using iframes, add the <code>use-shared-virtual-keyboard</code> attribute to
-each mathfield in an iframe.</p>
+they are in the main document or in an <em>iframe</em>.</p>
+<p>Even when not using <em>iframes</em>, having a shared virtual keyboard will result in
+a better user experience when changing focus from mathfield to mathfield.
+With a shared virtual keyboard, the keyboard will remain visible while changing
+focus. Otherwise the virtual keyboard associated with one mathfield will hide, then
+the virtual keyboard keyboard associated with the newly focused mathfield
+will be displayed, resulting in a distracting animation.</p>
+<p><strong>To use a shared virtual keyboard</strong>, call the <code>makeSharedVirtualKeyboard()</code>
+function in the context of the main document.</p>
+<p>You should make that call as early as possible, before changing the options
+of any mathfield or adding mathfields to the DOM.</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
+  <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
+});
+</code></pre>
+<p>In the <em>iframe</em> sub-documents, use the <code>use-shared-virtual-keyboard</code> attribute on
+the <code>math-field</code> elements.</p>
 <p>You can set the <code>virtual-keyboard-mode</code> attribute of each mathfield to control
 when the shared virtual keyboard will be visible.</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
 </section>
 <section id='controlling-which-keyboards-are-displayed'>
 <h2>Controlling Which Keyboards Are Displayed</h2>
@@ -1019,6 +1114,34 @@ keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortc
 }
 </code></pre>
 </section>
+<section id='changing-the-alphabetical-keyboard-layout'>
+<h2>Changing the Alphabetical Keyboard Layout</h2>
+<p>By default, the layout of the alphabetic virtual keyboard is determined based
+on the locale (QWERTY for english speaking countries, AZERTY for french speaking
+countries, etc…).</p>
+<p><strong>To select a different alphabetic keyboard layout</strong>, such as DVORAK or COLEMAK,
+use the <code>virtualKeyboardLayout</code> configuration property.</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+document.getElementById('mf').setOptions({
+  virtualKeyboardMode: "manual",
+  virtualKeyboardLayout: 'dvorak'
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
+</section>
 <section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
 <h2>Customizing the Appearance of the Virtual Keyboard Toggle</h2>
 <p><strong>To apply a CSS rule to the virtual keyboard toggle</strong>, use
@@ -1053,103 +1176,6 @@ math-field::part(virtual-keyboard-toggle) {
 </div>
 </code-playground>
 </section>
-<section id='changing-the-alphabetical-keyboard-layout'>
-<h2>Changing the Alphabetical Keyboard Layout</h2>
-<p>By default, the layout of the alphabetic virtual keyboard is determined based
-on the locale (QWERTY for english speaking countries, AZERTY for french speaking
-countries, etc…).</p>
-<p><strong>To select a different alphabetic keyboard layout</strong>, such as DVORAK or COLEMAK,
-use the <code>virtualKeyboardLayout</code> configuration property.</p>
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">import 'mathlive';
-document.getElementById('mf').setOptions({
-  virtualKeyboardMode: "manual",
-  virtualKeyboardLayout: 'dvorak'
-});
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-</section>
-<h2>Displaying the Virtual Keyboard in a Custom Container</h2>
-<p>By default when a virtual keyboard is created, it is attached at the end of the
-document’s <code>body</code> element.</p>
-<p>In some cases you may want to display the virtual keyboard in some other
-container.</p>
-<p><strong>To select which DOM element the virtual keyboard is created into</strong>, set the
-<code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
-<p>The <code>position</code> attribute of this container element should be <code>relative</code> so that the virtual keyboard can correctly be placed relative to this element.</p>
-<p>For example when using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">full screen elements</a> that contain a mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.</p>
-<h2>Customizing the Appearance of the Virtual Keyboard</h2>
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-<h3>Customizing the Virtual Keyboard</h3>
-<p><strong>To control the appearance of the virtual keyboard background</strong>, set the
-value of the following CSS variables to a CSS color:</p>
-<ul>
-<li><code>--keyboard-background</code></li>
-<li><code>--keyboard-text</code></li>
-<li><code>--keyboard-text-active</code></li>
-<li><code>--keyboard-background-border</code></li>
-</ul>
-</section>
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-<h3>Customizing the keycaps</h3>
-<p><strong>To control the appearance of keycaps</strong>, use the following CSS variables.</p>
-<ul>
-<li><code>--keycap-height</code></li>
-<li><code>--keycap-font-size</code></li>
-<li><code>--keycap-small-font-size</code> (only if needed)</li>
-<li><code>--keycap-extra-small-font-size</code> (only if needed)</li>
-<li><code>--keycap-tt-font-size</code> (only if needed)</li>
-<li><code>--keycap-background</code>, a color</li>
-<li><code>--keycap-background-active</code>, a color</li>
-<li><code>--keycap-background-border</code>, a color</li>
-<li><code>--keycap-background-border-bottom</code>, a color</li>
-<li><code>--keycap-text</code>, a color</li>
-<li><code>--keycap-text-active</code>, a color</li>
-<li><code>--keycap-secondary-text</code>, a color</li>
-<li><code>--keycap-modifier-background</code>, a color</li>
-<li><code>--keycap-modifier-border</code>, a color</li>
-<li><code>--keycap-modifier-border-bottom</code>, a color</li>
-</ul>
-<p class="notice--info">Set these CSS variables on any selector inherited by the
-<code>math-field</code> tag, for example, <code>body</code>: although CSS styles are “invisible” to custom components, CSS variables
-are “passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
-</section>
-<section id='sharing-virtual-keyboards-amongst-multiple-instances'>
-<h2>Sharing Virtual Keyboards Amongst Multiple Instances</h2>
-<p>When there are multiple mathfield elements in a page, they usually each have
-their own virtual keyboard.</p>
-<p>However, in some cases it might be desirable to have the virtual keyboard
-instance “detached” from the mathfield, and potentially shared by multiple
-mathfield elements.</p>
-<p>That’s the case for example when mathfield elements are displayed in an
-<em>iframe</em>. Since an <em>iframe</em> is essentially a mini embedded document, the
-default virtual keyboard will not display correctly when use in an <em>iframe</em>,
-as it will be attached to the <em>iframe</em> instead of being attached to the
-main document.</p>
-<p>This can be solved by using a “shared” virtual keyboard.</p>
-<p><strong>To use a shared virtual keyboard</strong>, call the <code>makeSharedVirtualKeyboard()</code>
-function in the context of the main document.</p>
-<pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
-  <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
-});
-</code></pre>
-<p>In the <em>iframe</em> sub-documents, use the <code>use-shared-virtual-keyboard</code> attribute on
-the <code>math-field</code> elements.</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
-</code></pre>
-</section>
 <div class='read-more'><a href="/mathlive/guides/lifecycle/">
 Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1165,14 +1191,14 @@ Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
         
 
 
-        <meta itemprop="datePublished" content="June 05, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-05'>June 05, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

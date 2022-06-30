@@ -1052,8 +1052,17 @@ ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#
 <p>The definition associated with a function determines how it is put in canonical
 form, simplified and evaluated.</p>
 <p>When a function is boxed, for example when <code>ce.box()</code> is called on an expression
-that includes the name of the function, a function definition matching the
-function name is looked for in the current context, then in any parent scope.</p>
+that includes the name of the function, a dictionary entry for the function is
+looked up in the current context, then recursively in the parent scope.</p>
+<p>When a matching entry is found, the definitions associated with it are
+bound with the boxed function. Note that unlike a symbol, a function may
+have multiple definitions in a given scope. In this way, function can support
+<a href="https://en.wikipedia.org/wiki/Ad_hoc_polymorphism">ad-hoc polymorphism</a>, that
+is have multiple implementations depending on the values or domains of their
+arguments.</p>
+<p>When an expression containing a function is put in canonical form,
+simplified or evaluated, the appropriate definition is selected based on
+the domain and value of its arguments.</p>
 
         
       </section>
@@ -1063,14 +1072,14 @@ function name is looked for in the current context, then in any parent scope.</p
         
 
 
-        <meta itemprop="datePublished" content="June 29, 2022">
+        <meta itemprop="datePublished" content="June 30, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-29'>June 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
