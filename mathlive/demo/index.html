@@ -706,8 +706,11 @@ Table of Content</label>
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
+  window.addEventListener('DOMContentLoaded', (event) => 
+      import('//unpkg.com/mathlive?module').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
+  ));
 </script>
-<h1>MathLive Example</h1>
+<h1>Demo</h1>
 <p>Experiment with the options available to setup and customize a
 mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.</p>
 <!-- htmlmin:ignore -->
@@ -741,9 +744,7 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
     <div slot="javascript">import 'mathlive';
 const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
-latexField.addEventListener('input', () => 
-  mf.setValue(latexField.value)
-);
+latexField.addEventListener('input', () => mf.setValue(latexField.value));
 function updateLatex() {
   document.querySelector('#latex').value = mf.value;
 }
@@ -765,14 +766,14 @@ updateLatex();</div>
         
 
 
-        <meta itemprop="datePublished" content="April 30, 2022">
+        <meta itemprop="datePublished" content="July 01, 2022">
                 
 
-        
+        <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-04-30'>April 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-01'>July 01, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
