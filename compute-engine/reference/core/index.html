@@ -908,6 +908,8 @@ Table of Content</label>
         <h1>Core</h1>
 <section id='constants'>
 <h2>Constants</h2>
+<p>The constants below are <strong>inert</strong>. They are used as tokens and have no
+value other than themselves.</p>
 <table>
 <thead>
 <tr>
@@ -918,31 +920,31 @@ Table of Content</label>
 <tbody>
 <tr>
 <td style="text-align:left"><code>All</code></td>
-<td style="text-align:left">All the possible values apply</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span> All the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Missing</code></td>
-<td style="text-align:left">A <strong>required</strong> expression is not present</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>A <strong>required</strong> expression is not present</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>None</code></td>
-<td style="text-align:left">None of the possible values apply</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>None of the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Nothing</code></td>
-<td style="text-align:left">An <strong>optional</strong> expression is not present</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>An <strong>optional</strong> expression is not present</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Undefined</code></td>
-<td style="text-align:left">The result is not defined. For example, the <code>domain()</code> of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>The result is not defined. For example, the domain of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
 </tr>
 </tbody>
 </table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Example</th>
-<th style="text-align:left"></th>
+<th style="text-align:left">MathJSON</th>
+<th style="text-align:left">LaTeX</th>
 </tr>
 </thead>
 <tbody>
@@ -957,24 +959,211 @@ Table of Content</label>
 </tbody>
 </table>
 </section>
+<section id='control-structures'>
+<h2>Control Structures</h2>
+<p>Control Structures, along with Loops, define how a sequence of expressions
+is evaluated.</p>
+<p>A <code>[&quot;Block&quot;]</code> expression defines a sequential control structure and <code>[&quot;If&quot;]</code>
+expression defines a conditional control structure.</p>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Block</code></td><td>
+<p><code>[“Block”, <em>expr1</em>, …<em>expr2</em>]</code><br>
+<code>[“Block”, <em>dictionary</em>, <em>expr1</em>, …<em>expr2</em>]</code></p>
+<p>When a <code>[&quot;Block&quot;]</code> expression is evaluated, the following steps are followed:</p>
+<ol>
+<li>Create a new scope</li>
+<li>Set the value of the symbols in <em>dictionary</em> in this scope</li>
+<li>Evaluate each <em>expr</em> sequentially</li>
+</ol>
+<p>The <em>dictionary</em> argument can be a <code>[&quot;Dictionary&quot;]</code> expression, a
+<code>[&quot;KeyValuePair&quot;]</code> expression, a <code>[&quot;Pair&quot;]</code> expression or a <code>[&quot;Tuple&quot;]</code> expression.</p>
+<p>The value of the <code>Block</code> expression is the value of the last expression, or the
+value of the first <code>[&quot;Break&quot;]</code> expression.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 10</span>
+</code></pre>
+</td></tr>
+<tr><td><code>If</code></td><td>
+<p><code>[“If”, <em>condition</em>, <em>expr-1</em>, <em>expr-2</em>]</code><br>
+<code>[“If”, <em>condition</em>, <em>expr-1</em>]</code></p>
+<p>If the value of <em>condition</em> is the symbol <code>True</code>, the value of the <code>If</code>
+expression is <em>expr-1</em>. Otherwise, it is <em>expr-2</em> or <code>Nothing</code> if <em>expr-2</em>
+is not provided.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 10</span>
+</code></pre>
+</td></tr>
+</tbody></table>
+</section>
+<section id='loops'>
+<h2>Loops</h2>
+<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration functions that share a
+similar form.</p>
+<p>Their first argument, <em>body</em> is an expression that gets evaluated repeatedly.
+In the case of <code>Sum</code>, each value of <em>body</em>  is summed, and the
+value of the loop function is the sum. Similarly for <code>Product</code>. For <code>Loop</code>, the
+value of the loop function is the last value of <em>body</em> or the value of a <code>[&quot;Break&quot;]</code> expression.</p>
+<p>The other arguments indicate how the iteration should be performed:</p>
+<ul>
+<li>if no other argument is specified, the <em>body</em> expression is evaluated until
+its value is a <code>[&quot;Break&quot;]</code> expression.</li>
+<li><em>max-iterations</em>: indicates how many times the <em>body</em> expression will be evaluated</li>
+<li><em>var</em>, <em>list-of-value</em>: the symbol <em>var</em> is assigned in turn the values in
+<em>list-of-values</em></li>
+<li><em>var</em>, <em>range</em>: the symbol <em>var</em> is assigned the values from the minimum to
+the maximum in the range, with a step of 1.</li>
+<li><em>var</em>, <em>max</em>: the symbol <em>var</em> is assigned a value of 1, then incremented
+by 1 until it reaches at least <em>max</em></li>
+<li><em>var</em>, <em>min</em>, <em>max</em>: the symbol <em>var</em> is assigned a value of <em>min</em>, then
+incremented by 1 until it reaches at least <em>max</em></li>
+<li><em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>: the symbol <em>var</em> is assigned a value of <em>min</em>, then
+incremented by <em>step</em> until it reaches at least <em>max</em></li>
+</ul>
+<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions create a new scope. If <em>var</em> is
+specified, it is defined in this new scope.</p>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>FixedPoint</code></td><td>
+<p><code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>]</code><br>
+<code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>, <em>max-iterations</em>]</code></p>
+<p>Apply <em>body</em> to <em>initial-value</em>, then apply <em>body</em> to the result until
+the result no longer changes.</p>
+<p>To determine if a fixed point has been reached and the loop should terminate,
+the previous and current values are compared with <code>Same</code>.</p>
+<p>Use <code>[&quot;Break&quot;]</code> to exit the loop immediately.</p>
+</td></tr>
+<tr><td><code>Loop</code></td><td>
+<p><code>[“Loop”, <em>body</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>max-iterations</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
+<code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+<p>Repeatedly evaluate <em>body</em> until either <em>max-iterations</em> is reached (or
+<code>ce.iterationLimit</code> if <em>max-iteration</em> is not specified), or the value of <em>body</em> is
+a <code>[&quot;Break&quot;]</code> expression.</p>
+</td></tr>
+<tr><td><code>Product</code></td><td>
+<p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+<p>Evaluate <em>body</em> and make a product of the result.</p>
+</td></tr>
+<tr><td><code>Sum</code></td><td>
+<p><code>[“Sum”, <em>body</em>, <em>max</em>]</code><br>
+<code>[“Sum”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
+<code>[“Sum”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
+<code>[“Sum”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
+<code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
+<code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+<p>Evaluate <em>body</em> and make a sum of the result.</p>
+</td></tr>
+</tbody></table>
+<p><strong>To control the flow of a loop function</strong>, use <code>[&quot;Break&quot;]</code> and <code>[&quot;Continue&quot;]</code>.</p>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Break</code></td><td>
+<p><code>[“Break”]</code><br>
+<code>[“Break”, <em>expr</em>]</code><br></p>
+<p>When in a loop, exit the loop immediately. The final value of the loop
+expression is <em>expr</em> or <code>Nothing</code> if not provided.</p>
+<p><code>[&quot;Break&quot;]</code> expressions can also be used in a <code>[&quot;Block&quot;]</code> expression.</p>
+</td></tr>
+<tr><td><code>Continue</code></td><td>
+<p><code>[“Continue”]</code><br>
+<code>[“Continue”, <em>expr</em>]</code><br></p>
+<p>When in a loop, skip to the next iteration of the loop. The value of the
+iteration is <em>expr</em> or <code>Nothing</code> if not provided.</p>
+</td></tr>
+</tbody></table>
+</section>
+<section id='variables'>
+<h2>Variables</h2>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Let</code></td><td>
+<p><code>[“Let”, <em>symbol</em>, <em>domain</em>]</code><br>
+<code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
+<code>[“Let”, <em>symbol</em>, <em>value</em>, <em>domain</em>]</code></p>
+<p>Define a new symbol in the current scope, and set its value or domain.</p>
+<p>If the symbol already had a definition in the current scope, replace it.</p>
+</td></tr>
+<tr><td><code>Set</code></td><td>
+<p><code>[“Set”, <em>symbol</em>, <em>value</em>]</code></p>
+<p>Set the value of <em>symbol</em> to <em>value</em>.</p>
+<p>If <em>symbol</em> does not exist in the current context, consider parent scopes until
+a definition for the symbol is found.</p>
+<p>If no definition for the symbol is found add one in the current scope.</p>
+</td></tr>
+</tbody></table>
+</section>
+<section id='functions'>
+<h2>Functions</h2>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Function</code></td><td>
+<p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
+<code>[“Function”, <em>variable</em>, <em>body</em>]</code></p>
+<p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
+also called <strong>anonymous function</strong>.</p>
+<p>The first argument is a symbol or a list of symbols which are the bound
+variables (parameters) of the Lambda-function.</p>
+<p>The others arguments are expressions which are evaluated sequentially, or until
+a <code>[&quot;Return&quot;]</code> expression is encountered.</p>
+<p>The <code>[&quot;Function&quot;]</code> expression creates a new scope.</p>
+<p><strong>To apply some arguments to a function expression</strong>, use <code>[&quot;Apply&quot;]</code>.</p>
+</td></tr>
+<tr><td><code>Apply</code></td><td>
+<p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
+<p><a href="https://en.wikipedia.org/wiki/Apply">Apply</a> a list of arguments to a lambda expression or function.</p>
+<p>The following wildcards in <em>body</em> are replaced as indicated</p>
+<ul>
+<li><code>_</code> or <code>_1</code> : the first argument</li>
+<li><code>_2</code> : the second argument</li>
+<li><code>_3</code> : the third argument, etc…</li>
+<li><code>_</code>: the sequence of arguments, so <code>[&quot;Length&quot;, &quot;&amp;#95;&quot;]</code> is the number of arguments</li>
+</ul>
+<p>If <em>body</em> is a <code>[&quot;Function&quot;]</code> expression, the named arguments of <code>[&quot;Function&quot;]</code>
+are replaced by the wildcards.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 9</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 9</span>
+</code></pre>
+<p>You can assign a Lambda expression to a symbol for later use:</p>
+<pre><code class="language-cortex">cube = Lambda(_ * _ * _)
+cube(5)
+// ➔ 125
+</code></pre>
+</td></tr>
+<tr><td><code>Return</code></td><td>
+<p><code>[“Return”, <em>expression</em>]</code></p>
+<p>If in an <code>[&quot;Function&quot;]</code> expression, interupts the evaluation of the function.
+The value of the <code>[&quot;Function&quot;]</code> expression is <em>expression</em></p>
+</td></tr>
+</tbody></table>
+</section>
 <section id='core-functions'>
 <h2>Core Functions</h2>
 <table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>About</code></td><td>
-<code>[&quot;About&quot;, <em>symbol</em>]</code>
+<p><code>[&quot;About&quot;, <em>symbol</em>]</code></p>
 <p>Evaluate to a dictionary containing information about a symbol such as its
-domain, its attributes, its value, etc… </td></tr></p>
+domain, its attributes, its value, etc…</p>
+</td></tr>
 <tr><td><code>Domain</code></td><td>
 <p><code>[“Domain”, <em>expression</em>]</code></p>
-<p>Evaluate to the domain of <em>expression</em> </td></tr></p>
+<p>Evaluate to the domain of <em>expression</em></p>
+</td></tr>
 <tr><td><code>Evaluate</code></td><td>
 <p><code>[“Evaluate”, <em>expression</em>]</code></p>
 <p>Apply a sequence of definitions to an expression in order to reduce, simplify
 and calculate its value. Overrides <code>Hold</code> and hold attributes of a function.</p>
 </td></tr>
 <tr><td><code>Error</code></td><td>
-<code>[&quot;Error&quot;, <em>expression</em>, <em>string</em>, <em>rest</em>]</code>
-<p><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p><span class='tags float-right'><span class='tag inert'>inert</span></span>
+<code>[“Error”, <em>expression</em>, <em>string</em>, <em>rest</em>]</code></p>
 <p>Tag an expression that could not be interpreted correctly. It may have a syntax
 error, a reference to an unknown symbol or function or some other problem.</p>
 <p>Note that an <code>Error</code> expression can be a sub-expression.</p>
@@ -982,98 +1171,70 @@ error, a reference to an unknown symbol or function or some other problem.</p>
 <p>The third argument, if present, is an expression describing what could not be parsed.</p>
 </td></tr>
 <tr><td><code>Hold</code></td><td>
-<code>[“Hold”,
-<em>expression</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
-<p>Tag an expression that should be kept in an unevaluated form </td></tr></p>
+<p><code>[“Hold”,
+<em>expression</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+<p>Tag an expression that should be kept in an unevaluated form</p>
+</td></tr>
 <tr><td><code>Html</code></td><td>
-<code>[“Html”, <em>expr</em>]</code>
+<p><code>[“Html”, <em>expr</em>]</code></p>
 <p>Evaluate to a string which is the HTML markup corresponding to the expression.
 If the head of <em>expr</em> is <code>LatexString</code>, <code>Latex</code> or <code>LatexTokens</code>, renders the
-LaTeX to HTML markup </td></tr> <tr><td><code>Identity</code></td><td>
-<code>[“Identity”,
+LaTeX to HTML markup</p>
+</td></tr> <tr><td><code>Identity</code></td><td>
+<p><code>[“Identity”,
 <em>expression</em>]</code></p>
-<p>Evaluate to its argument </td></tr> <tr><td><code>InverseFunction</code></td><td></p>
+<p>Evaluate to its argument</p>
+</td></tr> <tr><td><code>InverseFunction</code></td><td>
 <p><code>[“InverseFunction”, <em>expression</em>]</code></p>
 <p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code></p>
-</td></tr> <tr><td><code>Latex</code></td><td>
-<code>[“Latex”, <em>expr</em>]</code>
+</td></tr>
+<tr><td><code>Latex</code></td><td>
+<p><code>[“Latex”, <em>expr</em>]</code></p>
 <p>Evaluate to a <code>LatexString</code> which is the expression serialized to LaTeX</p>
-</td></tr> <tr><td><code>LatexString</code></td><td>
-<code>[“LatexString”,
-<em>string</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
-<p>Tag a string as a LaTeX string </td></tr> <tr><td><code>LatexTokens</code></td><td></p>
+</td></tr>
+<tr><td><code>LatexString</code></td><td>
+<p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“LatexString”, <em>string</em>]</code></p>
+<p>Tag a string as a LaTeX string</p>
+</td></tr>
+<tr><td><code>LatexTokens</code></td><td>
 <p><code>[“LatexTokens”, …<em>token</em>[]]</code></p>
 <p>Evaluate to a <code>LatexString</code> made of the concatenation of the token arguments</p>
-</td></tr> <tr><td><code>Parse</code></td><td>
-<code>[“Parse”, <em>expr</em>]</code>
+</td></tr>
+<tr><td><code>Parse</code></td><td>
+<p><code>[“Parse”, <em>expr</em>]</code></p>
 <p>If <em>expr</em> is a <code>LatexString</code> or <code>LatexTokens</code>, evaluate to a MathJSON expression
-corresponding to the LaTeX string. </td></tr> <tr><td><code>String</code></td><td></p>
-<p><code>[“String”, …<em>expr</em>[]]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+corresponding to the LaTeX string.</p>
+</td></tr>
+<tr><td><code>String</code></td><td>
+<p><code>[“String”, …<em>expr</em>]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
 <p>Evaluate to a string made from the concatenation of the arguments converted to
-string </td></tr> <tr><td><code>Symbol</code></td><td>
-<code>[“Symbol”,
-…<em>expr</em>[]]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+string</p>
+</td></tr>
+<tr><td><code>Symbol</code></td><td>
+<p><code>[“Symbol”, …<em>expr</em>]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
 <p>Evaluate to a new symbol made of a concatenation of the arguments.</p>
-<p>For example `[“Symbol”, “x”, 2] -&gt; “x2” </td></tr> </tbody></table></p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Example</th>
-<th style="text-align:left"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code></td>
-<td style="text-align:left">\[ \sin^{-1} \]</td>
-</tr>
-</tbody>
-</table>
-<section id='core-functions'>
+<p>For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></p>
+</td></tr>
+</tbody></table>
+</section>
+<section id='styling-functions'>
 <h2>Styling Functions</h2>
 <p>The functions in this section represent a visual difference that is not usually
 material to the interpretation of an expression such as text color and size or
 other typographic variations.</p>
 <table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-     <tr><td><code>Style</code></td><td>
-<code>[“Style”, <em>expr</em>,
-<em>css</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
+<tr><td><code>Style</code></td><td>
+<p><code>[“Style”, <em>expr</em>, <em>css</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
 <p>Apply CSS styles to an expression</p>
 </td></tr> <tr><td><code>Delimiter</code></td><td>
-<code>[“Delimiter”,
-<em>expr</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span>
+<p><code>[“Delimiter”,
+<em>expr</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
 <p><code>[“Delimiter”, <em>expr</em>, <em>sep</em>]</code></p>
 <p><code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>close</em>]</code></p>
 <p><code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>sep</em>, <em>close</em>]</code></p>
 <p>Display <em>expr</em> wrapped in a delimiter.</p>
 </td></tr> </tbody></table>
-<h3><code>Lambda</code></h3>
-<p><code>[“Lambda”, <em>variables:List</em>, <em>expression</em>]</code></p>
-<p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
-also called <strong>anonymous function</strong>.</p>
-<p>The first argument is a symbol or a list of symbols which are the bound
-variables (parameters) of the Lambda-function.</p>
-<p>The second argument is an expression expressed as a function of the bound
-variables of the Lambda-function.</p>
-<p><strong>To apply a Lambda-function to some arguments</strong>, use:</p>
-<pre><code class="language-cortex">Lambda([x], x * x)(3)
-// ➔ 9
-</code></pre>
-<p>You can avoid naming the parameters by using the following shorthands:</p>
-<ul>
-<li><code>_</code> or <code>_1</code> : the first argument</li>
-<li><code>_2</code> : the second argument</li>
-<li><code>_3</code> : the third argument, etc…</li>
-<li><code>__</code>: the sequence of arguments, so <code>Length(__)</code> is the number of arguments</li>
-</ul>
-<pre><code class="language-cortex">Lambda(_ * _)(4)
-// ➔ 16
-</code></pre>
-<p>You can assign a Lambda expression to a symbol for later use:</p>
-<pre><code class="language-cortex">cube = Lambda(_ * _ * _)
-cube(5)
-// ➔ 125
-</code></pre>
+</section>
 <h3><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h3>
 <p><code>[“Latex”, <em>expr</em> ]</code></p>
 <ul>
@@ -1224,14 +1385,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 01, 2022">
+        <meta itemprop="datePublished" content="July 02, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-01'>July 01, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-02'>July 02, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
