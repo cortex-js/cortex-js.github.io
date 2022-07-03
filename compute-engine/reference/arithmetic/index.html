@@ -951,7 +951,7 @@ Table of Content</label>
 </table>
 </div>
 <div class='read-more'><a href="/compute-engine/reference/trigonometry/"> See also
-<strong>Trigonometry</strong> for ( \pi ) and related
+<strong>Trigonometry</strong> for <code>Pi</code> and related
 constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2>Relational Operators</h2>
 <div class=symbols-table>
@@ -997,28 +997,6 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 </tbody>
 </table>
 </div>
-<h2>Rational</h2>
-<p><code>Rational(</code><em><code>n:Number</code></em><code>)</code></p>
-<p><code>Rational(</code><em><code>numerator:Integer</code></em><code>, </code><em><code>denominator:Integer </code></em><code>)</code></p>
-<p>If two arguments, the first argument is the numerator, the second is the
-denominator. If a single argument, will evaluate to a rational approximating the
-value of the argument.</p>
-<h2><code>BaseForm</code></h2>
-<p><code>BaseForm(_n:Integer_, _base_=10)</code></p>
-<p>Format an <em>integer</em> in a specific <em>base</em>, such as hexadecimal or binary.</p>
-<p>The sign of <em>integer</em> is ignored.</p>
-<ul>
-<li><em>value</em> should be an integer.</li>
-<li><em>base</em> should be an integer from 2 to 36.</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;BaseForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">16</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ (\text(2a))_{16}</span>
-</code></pre>
-<pre><code class="language-cortex">Latex(BaseForm(42, 16))
-// ➔ (\text(2a))_{16}
-String(BaseForm(42, 16))
-// ➔ &quot;'0x2a'&quot;
-</code></pre>
 <h2>Functions</h2>
 <div class=symbols-table>
 <table>
@@ -1153,6 +1131,56 @@ String(BaseForm(42, 16))
 </tbody>
 </table>
 </div>
+<h3>Other Functions</h3>
+<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>BaseForm</code></td><td>
+<p><code>[“BaseForm”, <em>value:Integer</em>]</code><br>
+<code>[“BaseForm”, <em>value:Integer</em>, <em>base</em>]</code></p>
+<p>Format an <em>integer</em> in a specific <em>base</em>, such as hexadecimal or binary.</p>
+<p>If no <em>base</em> is specified, use base-10.</p>
+<p>The sign of <em>integer</em> is ignored.</p>
+<ul>
+<li><em>value</em> should be an integer.</li>
+<li><em>base</em> should be an integer from 2 to 36.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;BaseForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">16</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ (\text(2a))<em 16="">{16}</span>
+</code></pre>
+<pre><code class="language-cortex">Latex(BaseForm(42, 16))
+// ➔ (\text(2a))</em>
+String(BaseForm(42, 16))
+// ➔ &quot;‘0x2a’&quot;
+</code></pre>
+</td></tr>
+<tr><td><code>Clamp</code></td><td>
+<p><code>[“Clamp”, <em>value</em>]</code><br>
+<code>[“Clamp”, <em>value</em>, <em>lower</em>, <em>upper</em>]</code><br></p>
+<p>This function evaluates to <em>value</em> if <em>value</em> is greater than <em>lower</em> and less
+than <em>upper</em>. Otherwise it evaluates to <em>lower</em> if <em>value</em> is less than
+<em>lower</em>, otherwise to <em>upper</em>.</p>
+<p>If <em>lower</em> and <em>upper</em> are not provided, they take the default values of -1 and +1.</p>
+</td></tr>
+<tr><td><code>Min</code></td><td>
+<p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
+<code>[“Min”, <em>list-of-values</em>]</code></p>
+<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the smallest of the arguments. Otherwise, simplify the expression by removing values that are
+greater or equal to the smallest real number.</p>
+</td></tr>
+<tr><td><code>Max</code></td><td>
+<p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
+<code>[“Max”, <em>list-of-values</em>]</code></p>
+<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest of the arguments. Otherwise, simplify the expression by removing values that are
+smaller or equal to the largest real number.</p>
+</td></tr>
+<tr><td><code>Rational</code></td><td>
+<p><code>[“Rational”, <em>n:Number</em>]</code><br>
+<code>[“Rational”, <em>numerator:Integer</em>, <em>denominator:Integer</em>]</code></p>
+<p>If two arguments, the first argument is the numerator, the second is the
+denominator.</p>
+<p>If a single argument, will evaluate to a rational approximating the
+value of the argument.</p>
+</td></tr>
+</tbody></table> 
 
         
       </section>
