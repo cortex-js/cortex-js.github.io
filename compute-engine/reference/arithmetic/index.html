@@ -1068,17 +1068,22 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 <td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q168698">Exponential function</a> <span class='tags float-right'><span class='tag numeric'>numeric</span></span></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Log</code></td>
+<td style="text-align:left"><code>Ln</code></td>
 <td style="text-align:left">\(\ln(x)\)</td>
 <td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q11197">Logarithm function</a>, the inverse of <code>Exp</code> <span class='tags float-right'><span class='tag numeric'>numeric</span></span></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Log2</code></td>
+<td style="text-align:left"><code>Log</code></td>
+<td style="text-align:left">\(\ln(x)\)</td>
+<td style="text-align:left"><code>[&quot;Log&quot;, _v_, _b_]</code> logarithm of base <em>b</em>, default 10 <span class='tags float-right'><span class='tag numeric'>numeric</span></span></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Lb</code></td>
 <td style="text-align:left">\(\ln_2(x)\)</td>
 <td style="text-align:left"><a href="https://www.wikidata.org/wiki/Q581168">Binary logarithm function</a>, the base-2 logarithm <span class='tags float-right'><span class='tag numeric'>numeric</span></span></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Log10</code></td>
+<td style="text-align:left"><code>Lg</code></td>
 <td style="text-align:left">\(\ln_{10}(x)\)</td>
 <td style="text-align:left"><a href="Q966582">Common logarithm</a>, the base-10 logarithm <span class='tags float-right'><span class='tag numeric'>numeric</span></span></td>
 </tr>
@@ -1159,18 +1164,34 @@ String(BaseForm(42, 16))
 than <em>upper</em>. Otherwise it evaluates to <em>lower</em> if <em>value</em> is less than
 <em>lower</em>, otherwise to <em>upper</em>.</p>
 <p>If <em>lower</em> and <em>upper</em> are not provided, they take the default values of -1 and +1.</p>
-</td></tr>
-<tr><td><code>Min</code></td><td>
-<p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
-<code>[“Min”, <em>list-of-values</em>]</code></p>
-<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the smallest of the arguments. Otherwise, simplify the expression by removing values that are
-greater or equal to the smallest real number.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 5</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4.2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 0</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">100</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 11</span>
+</code></pre>
 </td></tr>
 <tr><td><code>Max</code></td><td>
 <p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Max”, <em>list-of-values</em>]</code></p>
-<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest of the arguments. Otherwise, simplify the expression by removing values that are
-smaller or equal to the largest real number.</p>
+<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest
+of the arguments. Otherwise, simplify the expression by removing values that are
+smaller than or equal to the largest real number.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Max&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 5</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Max&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7.1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;NaN&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Max&quot;, 7.1, &quot;NaN&quot;, &quot;x&quot;]</span>
+</code></pre>
+</td></tr>
+<tr><td><code>Min</code></td><td>
+<p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
+<code>[“Min”, <em>list-of-values</em>]</code></p>
+<p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the
+smallest of the arguments. Otherwise, simplify the expression by removing
+values that are greater than or equal to the smallest real number.</p>
 </td></tr>
 <tr><td><code>Rational</code></td><td>
 <p><code>[“Rational”, <em>n:Number</em>]</code><br>
