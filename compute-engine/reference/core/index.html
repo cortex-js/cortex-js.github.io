@@ -963,12 +963,15 @@ value other than themselves.</p>
 <h2>Control Structures</h2>
 <p>Control Structures, along with Loops, define how a sequence of expressions
 is evaluated.</p>
-<p>A <code>[&quot;Block&quot;]</code> expression defines a sequential control structure and <code>[&quot;If&quot;]</code>
-expression defines a conditional control structure.</p>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<ul>
+<li>A <code>[&quot;Block&quot;]</code> expression defines a <strong>sequential</strong> control structure</li>
+<li>An <code>[&quot;If&quot;]</code> expression defines a <strong>conditional</strong> control structure.</li>
+<li>A <code>[&quot;Loop&quot;]</code>, <code>[&quot;FixedPoint&quot;]</code>, <code>[&quot;Sum&quot;]</code>, <code>[&quot;Product&quot;]</code> expression defines an <strong>iterative</strong> control structure.</li>
+</ul>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Block</code></td><td>
-<p><code>[“Block”, <em>expr1</em>, …<em>expr2</em>]</code><br>
-<code>[“Block”, <em>dictionary</em>, <em>expr1</em>, …<em>expr2</em>]</code></p>
+<p><code>[“Block”, <em>expr-1</em>, …<em>expr-n</em>]</code><br>
+<code>[“Block”, <em>dictionary</em>, <em>expr1</em>, …<em>expr-n</em>]</code></p>
 <p>When a <code>[&quot;Block&quot;]</code> expression is evaluated, the following steps are followed:</p>
 <ol>
 <li>Create a new scope</li>
@@ -977,7 +980,7 @@ expression defines a conditional control structure.</p>
 </ol>
 <p>The <em>dictionary</em> argument can be a <code>[&quot;Dictionary&quot;]</code> expression, a
 <code>[&quot;KeyValuePair&quot;]</code> expression, a <code>[&quot;Pair&quot;]</code> expression or a <code>[&quot;Tuple&quot;]</code> expression.</p>
-<p>The value of the <code>Block</code> expression is the value of the last expression, or the
+<p>The value of the <code>[&quot;Block&quot;]</code> expression is the value of the last expression, or the
 value of the first <code>[&quot;Break&quot;]</code> expression.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
@@ -986,9 +989,11 @@ value of the first <code>[&quot;Break&quot;]</code> expression.</p>
 <tr><td><code>If</code></td><td>
 <p><code>[“If”, <em>condition</em>, <em>expr-1</em>, <em>expr-2</em>]</code><br>
 <code>[“If”, <em>condition</em>, <em>expr-1</em>]</code></p>
-<p>If the value of <em>condition</em> is the symbol <code>True</code>, the value of the <code>If</code>
-expression is <em>expr-1</em>. Otherwise, it is <em>expr-2</em> or <code>Nothing</code> if <em>expr-2</em>
-is not provided.</p>
+<ul>
+<li>If the value of <code><em>condition</em></code> is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
+expression is <code><em>expr-1</em></code>.</li>
+<li>Otherwise, it is <code><em>expr-2</em></code> or <code>Nothing</code> if <code><em>expr-2</em></code>  is not provided.</li>
+</ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
@@ -1000,33 +1005,34 @@ is not provided.</p>
 <h2>Loops</h2>
 <p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration functions that share a
 similar form.</p>
-<p>Their first argument, <em>body</em> is an expression that gets evaluated repeatedly.
-In the case of <code>Sum</code>, each value of <em>body</em>  is summed, and the
-value of the loop function is the sum. Similarly for <code>Product</code>. For <code>Loop</code>, the
-value of the loop function is the last value of <em>body</em> or the value of a <code>[&quot;Break&quot;]</code> expression.</p>
+<p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.</p>
+<p>In the case of <code>Sum</code>, each value of <code>body</code>  is summed, and the
+value of the loop function is the sum. Similarly for <code>Product</code>.</p>
+<p>For <code>[&quot;Loop&quot;]</code> expressions, the value of the loop expression is the last value
+of <code>body</code> or the value of a <code>[&quot;Break&quot;]</code> expression.</p>
 <p>The other arguments indicate how the iteration should be performed:</p>
 <ul>
-<li>if no other argument is specified, the <em>body</em> expression is evaluated until
+<li>if no other argument is specified, the <code>body</code> expression is evaluated until
 its value is a <code>[&quot;Break&quot;]</code> expression.</li>
-<li><em>max-iterations</em>: indicates how many times the <em>body</em> expression will be evaluated</li>
-<li><em>var</em>, <em>list-of-value</em>: the symbol <em>var</em> is assigned in turn the values in
-<em>list-of-values</em></li>
-<li><em>var</em>, <em>range</em>: the symbol <em>var</em> is assigned the values from the minimum to
-the maximum in the range, with a step of 1.</li>
-<li><em>var</em>, <em>max</em>: the symbol <em>var</em> is assigned a value of 1, then incremented
-by 1 until it reaches at least <em>max</em></li>
-<li><em>var</em>, <em>min</em>, <em>max</em>: the symbol <em>var</em> is assigned a value of <em>min</em>, then
-incremented by 1 until it reaches at least <em>max</em></li>
-<li><em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>: the symbol <em>var</em> is assigned a value of <em>min</em>, then
-incremented by <em>step</em> until it reaches at least <em>max</em></li>
+<li><code>max-iterations</code>: indicates how many times the <em>body</em> expression will be evaluated</li>
+<li><code>var</code>, <code>list-of-values</code>: the symbol <code>var</code> is assigned, in turn, the values in
+<code>_list-of-values_</code></li>
+<li><code>var</code>, <code>range</code>: the symbol <code>var</code> is assigned the values from the lower
+bound to the upper bound of the range, with a step of 1.</li>
+<li><code>var</code>, <code>max</code>: the symbol <code>var</code> is assigned a value of 1, then incremented
+by 1 until it reaches at least <code>max</code></li>
+<li><code>var</code>, <code>min</code>, <code>max</code>: the symbol <code>var</code> is assigned a value of <code>min</code>, then
+incremented by 1 until it reaches at least <code>max</code></li>
+<li><code>var</code>, <code>min</code>, <code>max</code>, <code>step</code>: the symbol <code>var</code> is assigned a value
+of <code>min</code>, then incremented by <code>step</code> until it reaches at least <code>max</code></li>
 </ul>
-<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions create a new scope. If <em>var</em> is
-specified, it is defined in this new scope.</p>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<p>The <code>FixedPoint</code>, <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions create a new scope. If
+<code>var</code> is specified, it is defined in this new scope.</p>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>FixedPoint</code></td><td>
 <p><code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>]</code><br>
 <code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>, <em>max-iterations</em>]</code></p>
-<p>Apply <em>body</em> to <em>initial-value</em>, then apply <em>body</em> to the result until
+<p>Apply <code><em>body</em></code> to <code><em>initial-value</em></code>, then apply <code><em>body</em></code> to the result until
 the result no longer changes.</p>
 <p>To determine if a fixed point has been reached and the loop should terminate,
 the previous and current values are compared with <code>Same</code>.</p>
@@ -1040,9 +1046,9 @@ the previous and current values are compared with <code>Same</code>.</p>
 <code>[“Loop”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
 <code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
 <code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
-<p>Repeatedly evaluate <em>body</em> until either <em>max-iterations</em> is reached (or
-<code>ce.iterationLimit</code> if <em>max-iteration</em> is not specified), or the value of <em>body</em> is
-a <code>[&quot;Break&quot;]</code> expression.</p>
+<p>Repeatedly evaluate <code><em>body</em></code> until either <code><em>max-iterations</em></code> is reached (or
+<code>ce.iterationLimit</code> if <code><em>max-iteration</em></code> is not specified), or the value of
+<code><em>body</em></code> is a <code>[&quot;Break&quot;]</code> expression.</p>
 </td></tr>
 <tr><td><code>Product</code></td><td>
 <p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
@@ -1051,7 +1057,7 @@ a <code>[&quot;Break&quot;]</code> expression.</p>
 <code>[“Product”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
 <code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
 <code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
-<p>Evaluate <em>body</em> and make a product of the result.</p>
+<p>Evaluate <code><em>body</em></code> and make a product of the result.</p>
 </td></tr>
 <tr><td><code>Sum</code></td><td>
 <p><code>[“Sum”, <em>body</em>, <em>max</em>]</code><br>
@@ -1060,40 +1066,42 @@ a <code>[&quot;Break&quot;]</code> expression.</p>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
-<p>Evaluate <em>body</em> and make a sum of the result.</p>
+<p>Evaluate <code><em>body</em></code> and make a sum of the result.</p>
 </td></tr>
 </tbody></table>
 <p><strong>To control the flow of a loop function</strong>, use <code>[&quot;Break&quot;]</code> and <code>[&quot;Continue&quot;]</code>.</p>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Break</code></td><td>
 <p><code>[“Break”]</code><br>
 <code>[“Break”, <em>expr</em>]</code><br></p>
 <p>When in a loop, exit the loop immediately. The final value of the loop
-expression is <em>expr</em> or <code>Nothing</code> if not provided.</p>
+expression is <code><em>expr</em></code> or <code>Nothing</code> if not provided.</p>
 <p><code>[&quot;Break&quot;]</code> expressions can also be used in a <code>[&quot;Block&quot;]</code> expression.</p>
 </td></tr>
 <tr><td><code>Continue</code></td><td>
 <p><code>[“Continue”]</code><br>
 <code>[“Continue”, <em>expr</em>]</code><br></p>
 <p>When in a loop, skip to the next iteration of the loop. The value of the
-iteration is <em>expr</em> or <code>Nothing</code> if not provided.</p>
+iteration is <code><em>expr</em></code> or <code>Nothing</code> if not provided.</p>
 </td></tr>
 </tbody></table>
 </section>
 <section id='variables'>
 <h2>Variables</h2>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Let</code></td><td>
-<p><code>[“Let”, <em>symbol</em>, <em>domain</em>]</code><br>
-<code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
+<p><code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
 <code>[“Let”, <em>symbol</em>, <em>value</em>, <em>domain</em>]</code></p>
-<p>Define a new symbol in the current scope, and set its value or domain.</p>
+<p>Define a new symbol in the current scope, and set its value and domain.
+If <code>domain</code> is not provided, the domain is inferred based on the value.</p>
 <p>If the symbol already had a definition in the current scope, replace it.</p>
 </td></tr>
-<tr><td><code>Set</code></td><td>
-<p><code>[“Set”, <em>symbol</em>, <em>value</em>]</code></p>
-<p>Set the value of <em>symbol</em> to <em>value</em>.</p>
-<p>If <em>symbol</em> does not exist in the current context, consider parent scopes until
+<tr><td><code>Value</code></td><td>
+<p><code>[“Value”, <em>symbol</em>]</code></p>
+<p>Evaluate to the value of <code><em>symbol</em></code>.</p>
+<p><code>[“Value”, <em>symbol</em>, <em>value</em>]</code></p>
+<p>Set the value of <code><em>symbol</em></code> to <code><em>value</em></code>.</p>
+<p>If <code><em>symbol</em></code> does not exist in the current context, consider parent scopes until
 a definition for the symbol is found.</p>
 <p>If no definition for the symbol is found add one in the current scope.</p>
 </td></tr>
@@ -1101,7 +1109,7 @@ a definition for the symbol is found.</p>
 </section>
 <section id='functions'>
 <h2>Functions</h2>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Function</code></td><td>
 <p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
 <code>[“Function”, <em>variable</em>, <em>body</em>]</code></p>
@@ -1146,7 +1154,7 @@ The value of the <code>[&quot;Function&quot;]</code> expression is <em>expressio
 </section>
 <section id='core-functions'>
 <h2>Core Functions</h2>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>About</code></td><td>
 <p><code>[&quot;About&quot;, <em>symbol</em>]</code></p>
 <p>Evaluate to a dictionary containing information about a symbol such as its
@@ -1216,24 +1224,6 @@ string</p>
 <p>For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></p>
 </td></tr>
 </tbody></table>
-</section>
-<section id='styling-functions'>
-<h2>Styling Functions</h2>
-<p>The functions in this section represent a visual difference that is not usually
-material to the interpretation of an expression such as text color and size or
-other typographic variations.</p>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>Style</code></td><td>
-<p><code>[“Style”, <em>expr</em>, <em>css</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
-<p>Apply CSS styles to an expression</p>
-</td></tr> <tr><td><code>Delimiter</code></td><td>
-<p><code>[“Delimiter”,
-<em>expr</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
-<p><code>[“Delimiter”, <em>expr</em>, <em>sep</em>]</code></p>
-<p><code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>close</em>]</code></p>
-<p><code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>sep</em>, <em>close</em>]</code></p>
-<p>Display <em>expr</em> wrapped in a delimiter.</p>
-</td></tr> </tbody></table>
 </section>
 <h3><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h3>
 <p><code>[“Latex”, <em>expr</em> ]</code></p>
@@ -1320,6 +1310,7 @@ tokens.</p>
 </tr>
 </tbody>
 </table>
+<section id='supsub'>
 <h3>Superscripts and Subscripts</h3>
 <p>These functions are all inert functions, that is they evaluate to themselves.</p>
 <div class=symbols-table>
@@ -1385,14 +1376,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 02, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-02'>July 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

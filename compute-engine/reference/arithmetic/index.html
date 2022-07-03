@@ -967,32 +967,32 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 <tr>
 <td style="text-align:left"><code>Equal</code></td>
 <td style="text-align:left">\( x = y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span><br>Mathematical relationship asserting that two quantities have the same value</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span><br>Mathematical relationship asserting that two quantities have the same value</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Greater</code></td>
 <td style="text-align:left">\( x \gt y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>GreaterEqual</code></td>
 <td style="text-align:left">\( x \geq y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Less</code></td>
 <td style="text-align:left">\( x \lt y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>LessEqual</code></td>
 <td style="text-align:left">\( x \leq y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>NotEqual</code></td>
 <td style="text-align:left">\( x \ne y \)</td>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag predicate'>predicate</span></span></td>
 </tr>
 </tbody>
 </table>
@@ -1137,7 +1137,7 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 </table>
 </div>
 <h3>Other Functions</h3>
-<table><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>BaseForm</code></td><td>
 <p><code>[“BaseForm”, <em>value:Integer</em>]</code><br>
 <code>[“BaseForm”, <em>value:Integer</em>, <em>base</em>]</code></p>
@@ -1159,11 +1159,13 @@ String(BaseForm(42, 16))
 </td></tr>
 <tr><td><code>Clamp</code></td><td>
 <p><code>[“Clamp”, <em>value</em>]</code><br>
-<code>[“Clamp”, <em>value</em>, <em>lower</em>, <em>upper</em>]</code><br></p>
-<p>This function evaluates to <em>value</em> if <em>value</em> is greater than <em>lower</em> and less
-than <em>upper</em>. Otherwise it evaluates to <em>lower</em> if <em>value</em> is less than
-<em>lower</em>, otherwise to <em>upper</em>.</p>
-<p>If <em>lower</em> and <em>upper</em> are not provided, they take the default values of -1 and +1.</p>
+<code>[“Clamp”, <em>value</em>, <em>lower</em>, <em>upper</em>]</code></p>
+<ul>
+<li>If <code><em>value</em></code> is less than <code><em>lower</em></code>, evaluate to <code><em>lower</em></code></li>
+<li>If <code><em>value</em></code> is greater than <code><em>upper</em></code>, evaluate to <code><em>upper</em></code></li>
+<li>Otherwise, evaluate to <code><em>value</em></code></li>
+</ul>
+<p>If <code><em>lower</em></code> and <code><em>upper</em></code> are not provided, they take the default values of -1 and +1.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 5</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4.2</span><span class="hljs-punctuation">]</span>
@@ -1178,7 +1180,8 @@ than <em>upper</em>. Otherwise it evaluates to <em>lower</em> if <em>value</em> 
 <p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Max”, <em>list-of-values</em>]</code></p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest
-of the arguments. Otherwise, simplify the expression by removing values that are
+of the arguments.</p>
+<p>Otherwise, simplify the expression by removing values that are
 smaller than or equal to the largest real number.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Max&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 5</span>
@@ -1190,16 +1193,16 @@ smaller than or equal to the largest real number.</p>
 <p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Min”, <em>list-of-values</em>]</code></p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the
-smallest of the arguments. Otherwise, simplify the expression by removing
+smallest of the arguments.</p>
+<p>Otherwise, simplify the expression by removing
 values that are greater than or equal to the smallest real number.</p>
 </td></tr>
 <tr><td><code>Rational</code></td><td>
-<p><code>[“Rational”, <em>n:Number</em>]</code><br>
-<code>[“Rational”, <em>numerator:Integer</em>, <em>denominator:Integer</em>]</code></p>
-<p>If two arguments, the first argument is the numerator, the second is the
-denominator.</p>
-<p>If a single argument, will evaluate to a rational approximating the
-value of the argument.</p>
+<p><code>[“Rational”, <em>n:Number</em>]</code><br></p>
+<p>Evaluate to a rational approximating the value of the <code><em>n</em></code>.</p>
+<br>
+<p><code>[“Rational”, <em>numerator:Integer</em>, <em>denominator:Integer</em>]</code></p>
+<p>Represent a rational number equal to <code><em>numerator</em></code> over <code><em>denominator</em></code>.</p>
 </td></tr>
 </tbody></table> 
 
@@ -1211,14 +1214,14 @@ value of the argument.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 02, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-02'>July 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
