@@ -691,16 +691,29 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Commands</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#editing">Editing</a></li><li><a href="#edit-menu">Edit Menu</a></li><li><a href="#user-interface">User Interface</a></li><li><a href="#scrolling">Scrolling</a></li><li><a href="#navigating">Navigating</a></li><li><a href="#extending-the-selection">Extending the Selection</a></li><li><a href="#arrays">Arrays</a></li><li><a href="#speech">Speech</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1>Commands</h1>
 <p>User initiated commands that control the mathfield can be dispatched using
 <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)"><code>executeCommand()</code></a>.</p>
 <p>Commands are
@@ -714,7 +727,7 @@ selector and the commands arguments can be passed to
 </code></pre>
 <p>The command above will insert an open and close parenthesis around the selection (the <code>#0</code>
 sequence is replaced with the current selection).</p>
-<h2>Editing</h2>
+<h2 id="editing" tabindex="-1">Editing</h2>
 <ul>
 <li><code>insert</code>. This selector takes two arguments. The first one is required and is
 the content to be inserted, as a string. The second one is an optional set of
@@ -737,7 +750,7 @@ selected).</li>
 <li><code>deleteToMathFieldEnd</code></li>
 <li><code>transpose</code></li>
 </ul>
-<h2>Edit Menu</h2>
+<h2 id="edit-menu" tabindex="-1">Edit Menu</h2>
 <ul>
 <li><code>undo</code></li>
 <li><code>redo</code></li>
@@ -745,7 +758,7 @@ selected).</li>
 <li><code>copyToClipboard</code></li>
 <li><code>pasteFromClipboard</code></li>
 </ul>
-<h2>User Interface</h2>
+<h2 id="user-interface" tabindex="-1">User Interface</h2>
 <ul>
 <li><code>switchMode</code></li>
 <li><code>complete</code> exit command mode and insert result</li>
@@ -755,13 +768,13 @@ display the next/previous suggestion</li>
 displays the keys being typed, including the shortcuts. Great for demos!</li>
 <li><code>toggleVirtualKeyboard</code> show/hide the virtual keyboard</li>
 </ul>
-<h2>Scrolling</h2>
+<h2 id="scrolling" tabindex="-1">Scrolling</h2>
 <ul>
 <li><code>scrollToStart</code></li>
 <li><code>scrollToEnd</code></li>
 <li><code>scrollIntoView</code></li>
 </ul>
-<h2>Navigating</h2>
+<h2 id="navigating" tabindex="-1">Navigating</h2>
 <ul>
 <li><code>moveToNextChar</code>, <code>moveToPreviousChar</code></li>
 <li><code>moveToNextPlaceholder</code>, <code>moveToPreviousPlaceholder</code></li>
@@ -773,7 +786,7 @@ displays the keys being typed, including the shortcuts. Great for demos!</li>
 <li><code>moveToOpposite</code></li>
 <li><code>moveBeforeParent</code>, <code>moveAfterParent</code></li>
 </ul>
-<h2>Extending the Selection</h2>
+<h2 id="extending-the-selection" tabindex="-1">Extending the Selection</h2>
 <ul>
 <li><code>selectGroup</code></li>
 <li><code>selectAll</code></li>
@@ -784,12 +797,12 @@ displays the keys being typed, including the shortcuts. Great for demos!</li>
 <li><code>extendToGroupStart</code>, <code>extendToGroupEnd</code></li>
 <li><code>extendToMathFieldStart</code>, <code>extendToMathFieldEnd</code></li>
 </ul>
-<h2>Arrays</h2>
+<h2 id="arrays" tabindex="-1">Arrays</h2>
 <ul>
 <li><code>addRowAfter</code>, <code>addRowBefore</code></li>
 <li><code>addColumnAfter</code>, <code>addColumnBefore</code></li>
 </ul>
-<h2>Speech</h2>
+<h2 id="speech" tabindex="-1">Speech</h2>
 <ul>
 <li>
 <p><code>speak</code> This selector takes two optional arguments. The first argument is a string that
@@ -820,14 +833,14 @@ AWS speech synthesizer.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

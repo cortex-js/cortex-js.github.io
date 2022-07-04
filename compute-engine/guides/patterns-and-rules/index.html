@@ -902,14 +902,27 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Patterns and Rules</h1>
-<p>Recognizing patterns and applying rules is a powerful symbolic computing tool to
+
+<h1>Patterns and Rules</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#wildcards">Wildcards</a></li><li><a href="#patterns">Patterns</a></li><li><a href="#matching-an-expression-to-a-pattern">Matching an Expression to a Pattern</a></li><li><a href="#substitution">Substitution</a></li><li><a href="#comparing">Comparing</a></li><li><a href="#applying-rewrite-rules">Applying Rewrite Rules</a></li><li><a href="#count">Count</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p>Recognizing patterns and applying rules is a powerful symbolic computing tool to
 identify and manipulate the structure of expressions.</p>
 <section id='wildcards'>
-<h2>Wildcards</h2>
+<h2 id="wildcards" tabindex="-1">Wildcards</h2>
 <p>Wildcard symbols are placeholders in an expression. They start with a <code>_</code>.</p>
 <p>The <code>&quot;_&quot;</code> wildcard matches anything that is in the corresponding position in an
 expression.</p>
@@ -923,7 +936,7 @@ must match. In contrast, an un-named wildcard (a universal wildcard such as
 <code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple times to match different values.</p>
 </section>
 <section id='patterns'>
-<h2>Patterns</h2>
+<h2 id="patterns" tabindex="-1">Patterns</h2>
 <p>A pattern is an expression which can include one or more placeholders in the
 form of wildcard symbols.</p>
 <p>Patterns are similar to Regular Expressions in traditional programming languages
@@ -941,7 +954,7 @@ pattern <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code>: no substitution exist
 into the pattern by replacing the wildcards.</p>
 </section>
 <section id='matching-an-expression-to-a-pattern'>
-<h2>Matching an Expression to a Pattern</h2>
+<h2 id="matching-an-expression-to-a-pattern" tabindex="-1">Matching an Expression to a Pattern</h2>
 <p><strong>To check if an expression matches a pattern</strong>, use the
 <code>ce.match(&lt;expression&gt;, &lt;pattern&gt;)</code> function.</p>
 <p>If there is a match, <code>ce.match()</code> returns a <code>Substitution</code> object literal with
@@ -985,7 +998,7 @@ functions.</p>
 </code></pre>
 </section>
 <section id='substitution'>
-<h2>Substitution</h2>
+<h2 id="substitution" tabindex="-1">Substitution</h2>
 <p>The return value of the <code>match()</code> function is a <code>Substitution</code> object: a mapping
 from wildcard names to expressions.</p>
 <p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression
@@ -1001,7 +1014,7 @@ it was derived from, use the <code>substitute()</code> function.</p>
 </code></pre>
 </section>
 <section id='comparing'>
-<h2>Comparing</h2>
+<h2 id="comparing" tabindex="-1">Comparing</h2>
 <p><strong>To check if an expression matches a pattern</strong>, use the <code>pattern.match()</code>
 function.</p>
 <p>The function returns <code>null</code> if the two expressions do not match. It returns an
@@ -1030,7 +1043,7 @@ the expressions simply match or not, check if the return value is <code>null</co
 </code></pre>
 </section>
 <section id='applying-rewrite-rules'>
-<h2>Applying Rewrite Rules</h2>
+<h2 id="applying-rewrite-rules" tabindex="-1">Applying Rewrite Rules</h2>
 <p>A rewrite rule is a triplet of:</p>
 <ul>
 <li>a left-hand-side pattern, <code>lhs</code></li>
@@ -1064,7 +1077,7 @@ until no rules are applicable.</p>
 You can define your own rules and apply them using <code>expr.replace()</code>.</p>
 </section>
 <section id='count'>
-<h2><code>Count</code></h2>
+<h2 id="count" tabindex="-1"><code>Count</code></h2>
 </section>
 
         

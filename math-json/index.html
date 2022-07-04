@@ -902,10 +902,11 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'>
+
+          <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'>
 <p>The MathJSON format is a lightweight data interchange format for mathematical
 notation.</p>
 <div class=symbols-table>
@@ -956,7 +957,7 @@ those needs MathJSON is flexible, extensible and customizable. Extensible
 dictionaries can be used to define new syntax and new semantic.</p>
 <p>MathJSON is not intended to be suitable as a visual representation of arbitrary
 mathematical notations, and as such is not a replacement for LaTeX or MathML.</p>
-<h2>Structure of a MathJSON Expression</h2>
+<h2 id="structure-of-a-mathjson-expression" tabindex="-1">Structure of a MathJSON Expression</h2>
 <p>A MathJSON expression is a combination of <strong>numbers</strong>, <strong>symbols</strong>, <strong>strings</strong>,
 <strong>functions</strong> and <strong>dictionaries</strong>.</p>
 <p><strong>Number</strong></p>
@@ -993,13 +994,13 @@ or as a shorthand notation using a JSON number, string or array.</p>
 object literal with a <code>&quot;dict&quot;</code> key.</p>
 <p>The shorthand notation is more concise and easier to read, but cannot include
 metadata properties.</p>
-<h2>Numbers</h2>
+<h2 id="numbers" tabindex="-1">Numbers</h2>
 <p>A MathJSON <strong>number</strong> is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;num&quot;</code> key</li>
 <li>a JSON number</li>
 </ul>
-<h3>Numbers as Object Literals</h3>
+<h3 id="numbers-as-object-literals" tabindex="-1">Numbers as Object Literals</h3>
 <p><strong>Numbers</strong> can be represented as an object literal with a <code>&quot;num&quot;</code> key. The
 value of the key is a <strong>string</strong> representation of the number.</p>
 <pre><code class="language-typescript">{
@@ -1072,7 +1073,7 @@ repeating digits.</p>
 </tbody>
 </table>
 </div>
-<h3>JSON numbers</h3>
+<h3 id="json-numbers" tabindex="-1">JSON numbers</h3>
 <p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
 representation of numbers, a JSON number can be used.</p>
 <p>Specifically:</p>
@@ -1096,7 +1097,7 @@ float (<strong>IEEE 754-2008</strong>, 52-bit, about 15 digits of precision).</l
 <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-Infinity&quot;</span> <span class="hljs-punctuation">}</span>
 
 </code></pre>
-<h2>Strings</h2>
+<h2 id="strings" tabindex="-1">Strings</h2>
 <p>A MathJSON <strong>string</strong> is either</p>
 <ul>
 <li>an object literal with a <code>&quot;str&quot;</code> key</li>
@@ -1163,7 +1164,7 @@ the following characters must be escaped as indicated:</p>
 UTF-16LE, UTF-16BE, etc…</p>
 <pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
 </code></pre>
-<h2>Symbols</h2>
+<h2 id="symbols" tabindex="-1">Symbols</h2>
 <p>A MathJSON <strong>symbol</strong> is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;sym&quot;</code> key</li>
@@ -1330,7 +1331,7 @@ must be stored internally and compared using the NFC.</p>
 </ul>
 <p>The following naming convention for wildcards, variables, constants and
 functions are recommendations.</p>
-<h3>Wildcards</h3>
+<h3 id="wildcards" tabindex="-1">Wildcards</h3>
 <p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) should be used to
 denote wildcards and other placeholders:</p>
 <div class=symbols-table>
@@ -1361,7 +1362,7 @@ denote wildcards and other placeholders:</p>
 </tbody>
 </table>
 </div>
-<h3>Variables</h3>
+<h3 id="variables" tabindex="-1">Variables</h3>
 <ul>
 <li>
 <p>The first character of a variable should be a lowercase or uppercase letter
@@ -1383,13 +1384,13 @@ that might otherwise arise with some Unicode symbols.</p>
 <p>Use <code>newDeterminant</code> rather than <code>newDet</code> or <code>nDet</code></p>
 </li>
 </ul>
-<h3>Constants</h3>
+<h3 id="constants" tabindex="-1">Constants</h3>
 <ul>
 <li>The first character of a constant should be an uppercase letter <code>A</code>-<code>Z</code></li>
 <li>Subsequent characters should be a letter, digit <code>0</code>-<code>9</code> or underscore <code>_</code>.</li>
 <li>If a constant is made up of several words, use camelCase, e.g. <code>SpeedOfLight</code></li>
 </ul>
-<h3>Rendering Conventions</h3>
+<h3 id="rendering-conventions" tabindex="-1">Rendering Conventions</h3>
 <p>The following recommendations may be followed by clients displaying MathJSON
 symbols. They do not affect computation or manipulation of expressions following
 these conventions.</p>
@@ -1453,13 +1454,13 @@ subscript</li>
 </tbody>
 </table>
 </div>
-<h2>Functions</h2>
+<h2 id="functions" tabindex="-1">Functions</h2>
 <p>A MathJSON function is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;fn&quot;</code> key.</li>
 <li>a JSON array</li>
 </ul>
-<h3>Functions as Object Literal</h3>
+<h3 id="functions-as-object-literal" tabindex="-1">Functions as Object Literal</h3>
 <p>The default representation of <strong>functions</strong> is as an object literal with a
 <code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head and
 its arguments.</p>
@@ -1479,7 +1480,7 @@ well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong
 </code></pre>
 <p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code> and the argument is
 <code>&quot;x&quot;</code>.</p>
-<h3>JSON array</h3>
+<h3 id="json-array" tabindex="-1">JSON array</h3>
 <p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
 <p>For example these two expressions are equivalent:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
@@ -1488,7 +1489,7 @@ well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong
 </code></pre>
 <p>Note that an array representing a function must have at least one element, the
 head of the function. Therefore <code>[]</code> is not a valid expression.</p>
-<h2>Dictionary</h2>
+<h2 id="dictionary" tabindex="-1">Dictionary</h2>
 <p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
 languages it is called a map or associative array.</p>
 <p>The keys are strings and the values are MathJSON expressions.</p>
@@ -1502,7 +1503,7 @@ value of the key is a JSON object literal holding the content of the dictionary.
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
-<h2>Metadata</h2>
+<h2 id="metadata" tabindex="-1">Metadata</h2>
 <p>MathJSON object literals can be annotated with supplemental information.</p>
 <p>A <strong>number</strong> represented as a JSON number, a <strong>symbol</strong> represented as a JSON
 string, or a <strong>function</strong> represented as a JSON array must be transformed into

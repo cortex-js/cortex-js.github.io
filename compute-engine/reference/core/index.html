@@ -902,12 +902,25 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Core</h1>
-<section id='constants'>
-<h2>Constants</h2>
+
+<h1>Core</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#control-structures">Control Structures</a></li><li><a href="#loops">Loops</a></li><li><a href="#variables">Variables</a></li><li><a href="#functions">Functions</a></li><li><a href="#core-functions">Core Functions</a></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <section id='constants'>
+<h2 id="constants" tabindex="-1">Constants</h2>
 <p>The constants below are <strong>inert</strong>. They are used as tokens and have no
 value other than themselves.</p>
 <table>
@@ -960,7 +973,7 @@ value other than themselves.</p>
 </table>
 </section>
 <section id='control-structures'>
-<h2>Control Structures</h2>
+<h2 id="control-structures" tabindex="-1">Control Structures</h2>
 <p>Control Structures, along with Loops, define how a sequence of expressions
 is evaluated.</p>
 <ul>
@@ -994,7 +1007,7 @@ value of the first <code>[&quot;Break&quot;]</code> expression.</p>
 expression is <code><em>expr-1</em></code>.</li>
 <li>Otherwise, it is <code><em>expr-2</em></code> or <code>Nothing</code> if <code><em>expr-2</em></code>  is not provided.</li>
 </ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Value&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
 </code></pre>
@@ -1002,7 +1015,7 @@ expression is <code><em>expr-1</em></code>.</li>
 </tbody></table>
 </section>
 <section id='loops'>
-<h2>Loops</h2>
+<h2 id="loops" tabindex="-1">Loops</h2>
 <p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration functions that share a
 similar form.</p>
 <p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.</p>
@@ -1087,7 +1100,7 @@ iteration is <code><em>expr</em></code> or <code>Nothing</code> if not provided.
 </tbody></table>
 </section>
 <section id='variables'>
-<h2>Variables</h2>
+<h2 id="variables" tabindex="-1">Variables</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Let</code></td><td>
 <p><code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
@@ -1108,7 +1121,7 @@ a definition for the symbol is found.</p>
 </tbody></table>
 </section>
 <section id='functions'>
-<h2>Functions</h2>
+<h2 id="functions" tabindex="-1">Functions</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Function</code></td><td>
 <p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
@@ -1153,7 +1166,7 @@ The value of the <code>[&quot;Function&quot;]</code> expression is <em>expressio
 </tbody></table>
 </section>
 <section id='core-functions'>
-<h2>Core Functions</h2>
+<h2 id="core-functions" tabindex="-1">Core Functions</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>About</code></td><td>
 <p><code>[&quot;About&quot;, <em>symbol</em>]</code></p>
@@ -1225,7 +1238,7 @@ string</p>
 </td></tr>
 </tbody></table>
 </section>
-<h3><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h3>
+<h2 id="parse%2C-latex%2C-latextokens-and-latexstring" tabindex="-1"><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h2>
 <p><code>[“Latex”, <em>expr</em> ]</code></p>
 <ul>
 <li><code><em>expr</em></code>: a MathJSON expression</li>
@@ -1290,8 +1303,8 @@ string</p>
 <p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
 <p>This function can be returned when the parser fails to parse a sequence of LaTeX
 tokens.</p>
-<h3><code>Piecewise</code></h3>
-<h3><code>Prime</code></h3>
+<h2 id="piecewise" tabindex="-1"><code>Piecewise</code></h2>
+<h2 id="prime" tabindex="-1"><code>Prime</code></h2>
 <table>
 <thead>
 <tr>
@@ -1311,7 +1324,7 @@ tokens.</p>
 </tbody>
 </table>
 <section id='supsub'>
-<h3>Superscripts and Subscripts</h3>
+<h2 id="superscripts-and-subscripts" tabindex="-1">Superscripts and Subscripts</h2>
 <p>These functions are all inert functions, that is they evaluate to themselves.</p>
 <div class=symbols-table>
 <table>

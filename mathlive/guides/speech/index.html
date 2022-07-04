@@ -691,17 +691,30 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Speech</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#using-speech-output-in-mathlive">Using Speech Output in MathLive</a></li><li><a href="#configuring-speech-options">Configuring Speech Options</a><ol><li><a href="#speech-rules">Speech Rules</a></li><li><a href="#text-to-speech-engine">Text-to-Speech Engine</a></li><li><a href="#speech-output-format">Speech Output Format</a></li></ol></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1>Speech</h1>
-<h2>Using Speech Output in MathLive</h2>
+<h2 id="using-speech-output-in-mathlive" tabindex="-1">Using Speech Output in MathLive</h2>
 <p><strong>To speak the formula or a portion of it</strong>, use these keyboard shortcuts:</p>
 <ul>
 <li><strong>alt/⌥ + ctrl + ⇡</strong>: speak the entire formula</li>
@@ -755,7 +768,7 @@ formula use:</p>
 the <code>spoken-text</code> format:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;spoken-text&#x27;</span>);
 </code></pre>
-<h2>Configuring Speech Options</h2>
+<h2 id="configuring-speech-options" tabindex="-1">Configuring Speech Options</h2>
 <p>There are two aspects that can be configured independently:</p>
 <ol>
 <li>
@@ -765,7 +778,7 @@ the <code>spoken-text</code> format:</p>
 <p>Text-to-Speech engine: the software used to transform the readable text produced by the speech rules into sound. By default, the TTS engine provide by the operating system will be used, but MathLive can be configured to use the Amazon Cloud TTS engine as well.</p>
 </li>
 </ol>
-<h3>Speech Rules</h3>
+<h3 id="speech-rules" tabindex="-1">Speech Rules</h3>
 <p>A set of <strong>speech rules</strong> define how a math formula is transformed to speakable
 text.</p>
 <p><strong>To use the MathLive built-in speech rules</strong>, set <code>textToSpeechRules</code> to <code>mathlive</code>.</p>
@@ -781,11 +794,11 @@ text.</p>
     <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
 },
 </code></pre>
-<h3>Text-to-Speech Engine</h3>
-<h4>Using the Local TTS Engine</h4>
+<h3 id="text-to-speech-engine" tabindex="-1">Text-to-Speech Engine</h3>
+<h4 id="using-the-local-tts-engine" tabindex="-1">Using the Local TTS Engine</h4>
 <p><strong>To use the local (built-in, OS specific) TTS engine</strong>, set the <code>speechEngine</code> configuration key to <code>&quot;local&quot;</code>.</p>
 <p>There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.</p>
-<h4>Using Amazon Polly TTS Engine</h4>
+<h4 id="using-amazon-polly-tts-engine" tabindex="-1">Using Amazon Polly TTS Engine</h4>
 <ol>
 <li>Include the AWS SDK for JavaScript in your app. See <a href="https://aws.amazon.com/sdk-for-browser/">here for details</a>.
 This may be as simple as adding this:</li>
@@ -810,7 +823,7 @@ This may be as simple as adding this:</li>
 </li>
 </ol>
 <p>Carefully consider how to handle the access and secret access keys. With the setup above they are somewhat restricted to a domain, however, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.</p>
-<h4>Speech Output Format</h4>
+<h3 id="speech-output-format" tabindex="-1">Speech Output Format</h3>
 <p><strong>To configure the format of the speech output engine</strong>, use the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
 <ul>
 <li><code>&quot;ssml&quot;</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
@@ -830,14 +843,14 @@ This may be as simple as adding this:</li>
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

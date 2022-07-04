@@ -902,11 +902,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Calculus</h1>
-<h3>Functions</h3>
+
+<h1>Calculus</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#functions">Functions</a></li><li><a href="#leibniz-notation">Leibniz Notation</a></li><li><a href="#lagrange-notation">Lagrange Notation</a></li><li><a href="#euler-modified-notation">Euler Modified Notation</a></li><li><a href="#newton-notation-(%40todo)">Newton Notation (@todo)</a><ol><li><a href="#integral">Integral</a></li></ol></li><li><a href="#indefinite-integral">Indefinite Integral</a></li><li><a href="#definite-integral">Definite Integral</a></li><li><a href="#domain-integral">Domain Integral</a><ol><li><a href="#contour-integral">Contour Integral</a></li></ol></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <h3 id="functions" tabindex="-1">Functions</h3>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Integrate</code></td><td>
 <p><code>[“Integrate”, <em>expression</em>]</code></p>
@@ -933,7 +946,7 @@ Table of Content</label>
 <p>Evaluate to the multiple derivative ( \frac{\partialD^n f}{\partialD x^n} ) (Leibniz notation) or ( f^{(n)}(x) ) (Lagrange notation)</p>
 </td></tr>
 </tbody></table>
-<h3>Lagrange Notation</h3>
+<h3 id="lagrange-notation" tabindex="-1">Lagrange Notation</h3>
 <table>
 <thead>
 <tr>
@@ -977,7 +990,7 @@ Table of Content</label>
 </tbody>
 </table>
 <p>@todo: <code>f^{(4)}</code></p>
-<h2>Leibniz Notation</h2>
+<h2 id="leibniz-notation" tabindex="-1">Leibniz Notation</h2>
 <table>
 <thead>
 <tr>
@@ -995,7 +1008,7 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
-<h2>Euler Modified Notation</h2>
+<h2 id="euler-modified-notation" tabindex="-1">Euler Modified Notation</h2>
 <p>This notation is used by Mathematica. The Euler notation uses <code>D</code> instead of
 <code>\partial</code></p>
 <table>
@@ -1016,23 +1029,23 @@ Table of Content</label>
 </tr>
 </tbody>
 </table>
-<h2>Newton Notation (@todo)</h2>
+<h2 id="newton-notation-(%40todo)" tabindex="-1">Newton Notation (@todo)</h2>
 <p><code>\dot{v}</code> -&gt; first derivative relative to time t <code>\ddot{v}</code> -&gt; second derivative
 relative to time t</p>
-<h3>Integral</h3>
-<h2>Indefinite Integral</h2>
+<h3 id="integral" tabindex="-1">Integral</h3>
+<h2 id="indefinite-integral" tabindex="-1">Indefinite Integral</h2>
 <p><code>\int f dx</code> -&gt; [“Integrate”, f, x,] <code>\int\int f dxdy</code> -&gt; [“Integrate”, f, x, y]</p>
 <p>Note: <code>[&quot;Integrate&quot;, [&quot;Integrate&quot;, f , x], y]</code> is equivalent to
 <code>[&quot;Integrate&quot;, f , x, y]</code></p>
-<h2>Definite Integral</h2>
+<h2 id="definite-integral" tabindex="-1">Definite Integral</h2>
 <p><code>\int_{a}^{b} f dx</code> -&gt; [“Integrate”, f, [x, a, b]]
 <code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, f, [x, a, b], [y, c, d]]</p>
 <p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, f, -1], [x, a, b]]</p>
 <p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, f, [x, a, b]]</p>
 <p>If <code>[a, b]</code> are numeric, numeric methods are used to approximate the integral.</p>
-<h2>Domain Integral</h2>
+<h2 id="domain-integral" tabindex="-1">Domain Integral</h2>
 <p><code>\int_{x\in D}</code> -&gt; [“Integrate”, f, [“In”, x, D]]</p>
-<h3>Contour Integral</h3>
+<h3 id="contour-integral" tabindex="-1">Contour Integral</h3>
 <p><code>\oint f dx</code> -&gt; <code>[&quot;ContourIntegral&quot;, f, x,]</code></p>
 <p><code>\varointclockwise f dx</code> -&gt; <code>[&quot;ClockwiseContourIntegral&quot;, f, x]</code></p>
 <p><code>\ointctrclockwise f dx</code> -&gt; <code>[&quot;CounterclockwiseContourIntegral&quot;, f, x,]</code></p>

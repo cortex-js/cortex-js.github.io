@@ -667,14 +667,27 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Add MathLive to Your Project</h1>
-<p>As discussed in <a href="/mathlive/guides/getting-started/">Getting Started</a> the
+
+<h1>Add MathLive to Your Project</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; tags</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with an Asset Pipeline</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p>As discussed in <a href="/mathlive/guides/getting-started/">Getting Started</a> the
 simplest way to use MathLive in your page is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield in a web page.</p>
-<h2>Creating Mathfield Elements Programmatically</h2>
+<h2 id="creating-mathfield-elements-programmatically" tabindex="-1">Creating Mathfield Elements Programmatically</h2>
 <p><strong>To add an editable mathfield to a document</strong> use a <code>&lt;math-field&gt;</code> tag:</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
@@ -692,7 +705,7 @@ See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more deta
 <div class='read-more'><a href="/mathlive/guides/lifecycle/">
 Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Using MathLive with JavaScript Modules</h2>
+<h2 id="using-mathlive-with-javascript-modules" tabindex="-1">Using MathLive with JavaScript Modules</h2>
 <p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions
 such as <code>renderMathInDocument()</code>.</p>
 <p><strong>To access those functions</strong>, import them from the MathLive module.</p>
@@ -731,7 +744,7 @@ to find out how to customize mathfields, receive change notifications, define
 keyboard shortcuts, use custom macros and more.</p>
 <p>The section below discuss additional options to load MathLive for more complex
 configurations.</p>
-<h2>Using <code>&lt;script&gt;</code> tags</h2>
+<h2 id="using-%3Cscript%3E-tags" tabindex="-1">Using <code>&lt;script&gt;</code> tags</h2>
 <p>If you need to support browsers that don’t support JavaScript modules, you
 can use a <code>&lt;script&gt;</code> tag to load the MathLive library.</p>
 <p>A few things to note:</p>
@@ -883,14 +896,14 @@ Learn more about the rendering <strong>static</strong> math content.
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

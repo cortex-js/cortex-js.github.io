@@ -902,11 +902,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Numerical Evaluation</h1>
-<p><strong>To obtain a numeric approximation of the value of an expression</strong>, call the
+
+<h1>Numerical Evaluation</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#numeric-modes">Numeric Modes</a></li><li><a href="#decimal-numeric-mode">Decimal Numeric Mode</a></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p><strong>To obtain a numeric approximation of the value of an expression</strong>, call the
 <code>expr.N()</code> function.</p>
 <p>If <code>expr.N()</code> cannot provide a numeric evaluation, a symbolic representation of
 the partially evaluated expression is returned.</p>
@@ -929,11 +942,11 @@ of the expression can be obtained with <code>expr.numericValue</code>.</p>
 </code></pre>
 <div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
 <strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Numeric Modes</h2>
+<h2 id="numeric-modes" tabindex="-1">Numeric Modes</h2>
 <p>Four numeric modes may be used to perform numeric evaluations with the Compute
 Engine: <code>machine</code> <code>decimal</code> <code>complex</code> and <code>auto</code>. The default mode is <code>auto</code>.</p>
 <section id='machine-numeric-mode'>
-<h3>Machine Numeric Mode</h3>
+<h3 id="machine-numeric-mode" tabindex="-1">Machine Numeric Mode</h3>
 <p>Calculations in the <code>machine</code> numeric mode use a
 <a href="https://en.wikipedia.org/wiki/IEEE_754">64-bit binary floating point format</a>.</p>
 <p>This format is implemented in hardware and well suited to do fast computations.
@@ -962,7 +975,7 @@ Read <strong>“What Every Computer Scientist Should Know About Floating-Point
 Arithmetic”</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='decimal-numeric-mode'>
-<h3>Decimal Numeric Mode</h3>
+<h3 id="decimal-numeric-mode" tabindex="-1">Decimal Numeric Mode</h3>
 <p>In the <code>decimal</code> numeric mode, numbers are represented in Decimal format, using
 base-10 and a variable amount of memory depending on the number of significant
 digits (<strong>precision</strong>) desired.</p>
@@ -1010,7 +1023,7 @@ mode is implemented using the <strong>decimal.js</strong> library.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='complex-numeric-mode'>
-<h3>Complex Numeric Mode</h3>
+<h3 id="complex-numeric-mode" tabindex="-1">Complex Numeric Mode</h3>
 <p>The <code>complex</code> numeric mode can represent complex numbers as a pair of real and
 imaginary components. The real and imaginary components are stored as 64-bit
 floating point numbers and have thus the same limitations as the <code>machine</code>
@@ -1026,13 +1039,13 @@ This is a convenient shorthand for
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='auto-numeric-mode'>
-<h3><code>Auto</code> Numeric Mode</h3>
+<h3 id="auto-numeric-mode" tabindex="-1"><code>Auto</code> Numeric Mode</h3>
 <p>When using the <code>auto</code> numeric mode, calculations are performed using machine
 numbers if the precision is 15 or less. If the precision is more than 15,
 Decimal numbers are used.</p>
 <p>Computations with a result in the Complex domain will return a Complex number.</p>
 </section>
-<h2>Simplifying Before Evaluating</h2>
+<h2 id="simplifying-before-evaluating" tabindex="-1">Simplifying Before Evaluating</h2>
 <p><strong>When using <code>expr.N()</code>, no rewriting of the expression is done before it is
 evaluated.</strong></p>
 <p>Because of the limitations of machine numbers, this may produce surprising
@@ -1051,7 +1064,7 @@ made.</p>
 </code></pre>
 <p>In some cases, it may be advantageous to invoke <code>expr.simplify()</code> before using
 <code>expr.N()</code>.</p>
-<h2>Tolerance</h2>
+<h2 id="tolerance" tabindex="-1">Tolerance</h2>
 <p>Two numbers that are sufficiently close to each other are considered equal.</p>
 <p><strong>To control how close two numbers have to be before they are considered
 equal</strong>, set the <code>tolerance</code> property of a <code>ComputeEngine</code> instance.</p>
@@ -1060,7 +1073,7 @@ equal</strong>, set the <code>tolerance</code> property of a <code>ComputeEngine
 replace a number of a small magnitude with the exact integer 0.</p>
 <p>It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.</p>
-<h2>Numeric Functions</h2>
+<h2 id="numeric-functions" tabindex="-1">Numeric Functions</h2>
 <p>The dictionaries below can provide numeric evaluations for their numeric
 functions:</p>
 <div class=symbols-table>

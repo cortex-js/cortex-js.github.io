@@ -698,16 +698,29 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Virtual Keyboards</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#controlling-when-the-virtual-keyboard-panel-is-displayed">Controlling when the Virtual Keyboard Panel is Displayed</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-keycaps">Customizing the Keycaps</a></li></ol></li><li><a href="#sharing-virtual-keyboards-amongst-multiple-mathfields">Sharing Virtual Keyboards Amongst Multiple Mathfields</a></li><li><a href="#controlling-which-keyboards-are-displayed">Controlling Which Keyboards Are Displayed</a></li><li><a href="#defining-custom-virtual-keyboards">Defining Custom Virtual Keyboards</a><ol><li><a href="#defining-a-layer">Defining a Layer</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#keycap-examples">Keycap Examples</a></li><li><a href="#defining-a-keyboard">Defining a Keyboard</a></li><li><a href="#adding-the-layers-and-keyboards">Adding the Layers and Keyboards</a></li></ol></li><li><a href="#changing-the-alphabetical-keyboard-layout">Changing the Alphabetical Keyboard Layout</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard-toggle">Customizing the Appearance of the Virtual Keyboard Toggle</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         "mathlive": "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1>Virtual Keyboards</h1>
 <p>Typing math formulas require access to many special symbols. While <a href="/mathlive/guides/shortcuts">keyboard
 shortcuts and inline shortcuts</a> can help, mobile
 devices require another solution.</p>
@@ -723,8 +736,7 @@ The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, 
 <p>These keyboards  include the most common math symbols and they can be
 customized to fit your specific needs. For example you can remove some
 keyboards, or create new ones.</p>
-<section id='controlling-when-the-virtual-keyboard-panel-is-displayed'>
-<h2>Controlling when the Virtual Keyboard Panel is Displayed</h2>
+<h2 id="controlling-when-the-virtual-keyboard-panel-is-displayed" tabindex="-1">Controlling when the Virtual Keyboard Panel is Displayed</h2>
 <p>The default behavior of the virtual keyboard panel is to only be displayed on
 touch-enabled devices (mobile phones, tablets and laptops with a touch-screen) when a mathfield is focused.</p>
 <p><img src="/assets/images/mathfield/mobile-virtual-keyboard.png" alt="" class="max-w-md"></p>
@@ -760,8 +772,7 @@ equivalent <code>virtual-keyboard-mode</code> attribute:</p>
 </div>
 <p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations.</p>
-</section>
-<h2>Displaying the Virtual Keyboard in a Custom Container</h2>
+<h2 id="displaying-the-virtual-keyboard-in-a-custom-container" tabindex="-1">Displaying the Virtual Keyboard in a Custom Container</h2>
 <p>By default when a virtual keyboard is created, it is attached at the end of the
 document’s <code>body</code> element.</p>
 <p>In some cases you may want to display the virtual keyboard in some other
@@ -772,8 +783,7 @@ keyboard panel is visible by attaching it to the full screen element.</p>
 <code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
 <p class="notice--warning">The <code>position</code> attribute of this container element should be <code>relative</code> so that the virtual keyboard can correctly be placed relative to this element, and the container element should
 be at least 365px wide to ensure that the virtual keyboard can fit. </p>
-<section id='custom-appearance'>
-<h2>Customizing the Appearance of the Virtual Keyboard</h2>
+<h2 id="customizing-the-appearance-of-the-virtual-keyboard" tabindex="-1">Customizing the Appearance of the Virtual Keyboard</h2>
 <p><strong>To customize the appearance of the virtual keyboard panel</strong> set the following CSS variables on a selector that applies to the container of the virtual
 keyboard panel, which is the <code>&lt;body&gt;</code> element by default:</p>
 <pre><code class="language-css"><span class="hljs-selector-tag">body</span> {
@@ -783,14 +793,11 @@ keyboard panel, which is the <code>&lt;body&gt;</code> element by default:</p>
 <p>Alternatively, you can set these CSS variables programmatically:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--keyboard-zindex&quot;</span>, <span class="hljs-string">&quot;3000&quot;</span>);
 </code></pre>
-<section id='zindex'>
-<h3>Customizing the Virtual Keyboard Stack Order</h3>
+<h3 id="customizing-the-virtual-keyboard-stack-order" tabindex="-1">Customizing the Virtual Keyboard Stack Order</h3>
 <p><strong>To specify the stack order of the virtual keyboard panel relative to
 other DOM elements</strong> set the <code>--keyboard-zindex</code> CSS variable.</p>
 <p>The default <code>zindex</code> of the virtual keyboard panel is <code>105</code>.</p>
-</section>
-<section id='customizing-the-virtual-keyboard'>
-<h3>Customizing the Virtual Keyboard Colors</h3>
+<h3 id="customizing-the-virtual-keyboard-colors" tabindex="-1">Customizing the Virtual Keyboard Colors</h3>
 <p><strong>To control the appearance of the virtual keyboard text and background colors</strong>, set the
 value of the following CSS variables to a CSS color:</p>
 <ul>
@@ -799,9 +806,7 @@ value of the following CSS variables to a CSS color:</p>
 <li><code>--keyboard-text-active</code></li>
 <li><code>--keyboard-background-border</code></li>
 </ul>
-</section>
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-<h3>Customizing the Keycaps</h3>
+<h3 id="customizing-the-keycaps" tabindex="-1">Customizing the Keycaps</h3>
 <p><strong>To control the appearance of keycaps</strong>, use the following CSS variables:</p>
 <ul>
 <li><code>--keycap-height</code></li>
@@ -820,10 +825,7 @@ value of the following CSS variables to a CSS color:</p>
 <li><code>--keycap-modifier-border</code>, a color</li>
 <li><code>--keycap-modifier-border-bottom</code>, a color</li>
 </ul>
-</section>
-</section>
-<section id='shared-virtual-keyboard'>
-<h2>Sharing Virtual Keyboards Amongst Multiple Mathfields</h2>
+<h2 id="sharing-virtual-keyboards-amongst-multiple-mathfields" tabindex="-1">Sharing Virtual Keyboards Amongst Multiple Mathfields</h2>
 <p>When there are multiple mathfield elements in a page, they usually each have
 their own virtual keyboard.</p>
 <p>However, in some cases it might be desirable to have the virtual keyboard
@@ -858,9 +860,7 @@ the <code>math-field</code> elements.</p>
 when the shared virtual keyboard will be visible.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
-</section>
-<section id='controlling-which-keyboards-are-displayed'>
-<h2>Controlling Which Keyboards Are Displayed</h2>
+<h2 id="controlling-which-keyboards-are-displayed" tabindex="-1">Controlling Which Keyboards Are Displayed</h2>
 <p>The virtual keyboard panel displays multiple keyboards which can be
 toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
 and <code>greek</code>.</p>
@@ -885,16 +885,14 @@ document.getElementById("mf").setOptions({
   virtualKeyboards: "numeric symbols"
 });</div>
 </code-playground>
-</section>
-<section id='defining-custom-virtual-keyboards'>
-<h2>Defining Custom Virtual Keyboards</h2>
+<h2 id="defining-custom-virtual-keyboards" tabindex="-1">Defining Custom Virtual Keyboards</h2>
 <p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
 set of keys that can be toggled using another key. For example, the <code>roman</code>
 keyboard has a regular layer and a layer for symbols. Most keyboards have a
 single layer.</p>
 <p><strong>To define a custom virtual keyboard layout</strong>, use an object literal as described
 below.</p>
-<h3>Defining a Layer</h3>
+<h3 id="defining-a-layer" tabindex="-1">Defining a Layer</h3>
 <p>First, let’s define a layer, which we’ll call <code>&quot;high-school-layer&quot;</code>.</p>
 <p>A layer is an array of rows, a row is an array of keycaps.</p>
 <p>Each keycap can have the following properties:</p>
@@ -942,7 +940,7 @@ determine the action to perform: <code>command</code>, <code>insert</code>, <cod
 layer.</p>
 <p>The appearance of the layer can be further customized by providing a CSS class
 name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
-<h3>Keycap Variants</h3>
+<h3 id="keycap-variants" tabindex="-1">Keycap Variants</h3>
 <p>The default keyboard include <strong>variants</strong> for many of its keycaps. These
 variants are accessed with a long press on the keycap. The variants are
 typically related, but less frequently used version of the main keycap.</p>
@@ -959,7 +957,7 @@ label and insert it when the key is pressed.</p>
   ]
 ]
 </code></pre>
-<h3>Keycap Examples</h3>
+<h3 id="keycap-examples" tabindex="-1">Keycap Examples</h3>
 <p>Each keycap must define its label and what happens when the keycap is pressed.
 There are many different ways of doing this using the properties above.</p>
 <p>The simplest case is when pressing a key insert some LaTeX and its label
@@ -1081,7 +1079,7 @@ property:</p>
       }
     };
 </code></pre>
-<h3>Defining a Keyboard</h3>
+<h3 id="defining-a-keyboard" tabindex="-1">Defining a Keyboard</h3>
 <p>Now, let’s define a new keyboard called <code>&quot;high-school-keyboard&quot;</code>.</p>
 <p>The keyboard has a <code>label</code> which is displayed in the keyboard selector area
 of the virtual keyboard. When hovering on this label, a <code>tooltip</code> can be
@@ -1099,7 +1097,7 @@ array of their names.</p>
       }
     };
 </code></pre>
-<h3>Adding the Layers and Keyboards</h3>
+<h3 id="adding-the-layers-and-keyboards" tabindex="-1">Adding the Layers and Keyboards</h3>
 <p>Now, we just have to call <code>setOptions()</code> with our custom layer and custom
 keyboard.</p>
 <p>The <code>virtualKeyboards</code> option indicate which keyboards we want to be available.
@@ -1115,9 +1113,7 @@ keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortc
   });
 }
 </code></pre>
-</section>
-<section id='changing-the-alphabetical-keyboard-layout'>
-<h2>Changing the Alphabetical Keyboard Layout</h2>
+<h2 id="changing-the-alphabetical-keyboard-layout" tabindex="-1">Changing the Alphabetical Keyboard Layout</h2>
 <p>By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
 countries, etc…).</p>
@@ -1143,9 +1139,7 @@ document.getElementById('mf').setOptions({
 &lt;/math-field&gt;
 </div>
 </code-playground>
-</section>
-<section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
-<h2>Customizing the Appearance of the Virtual Keyboard Toggle</h2>
+<h2 id="customizing-the-appearance-of-the-virtual-keyboard-toggle" tabindex="-1">Customizing the Appearance of the Virtual Keyboard Toggle</h2>
 <p><strong>To apply a CSS rule to the virtual keyboard toggle</strong>, use
 the <code>math-field::part(virtual-keyboard-toggle)</code> CSS selector.</p>
 <p><strong>To change the icon of the virtual keyboard toggle</strong>, use the
@@ -1177,7 +1171,6 @@ math-field::part(virtual-keyboard-toggle) {
 &lt;/math-field&gt;
 </div>
 </code-playground>
-</section>
 <div class='read-more'><a href="/mathlive/guides/lifecycle/">
 <strong>Advanced topic:</strong> Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1193,14 +1186,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

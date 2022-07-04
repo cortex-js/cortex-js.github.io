@@ -286,10 +286,11 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Cortex</h1>
+
+          <h1 id="cortex" tabindex="-1">Cortex</h1>
 <p>Cortex is a programming language for scientific computing built on the Cortex
 Compute Engine.</p>
 <p notice--warning="">The Cortex language is a work in progress. The information below reflects the
@@ -309,12 +310,12 @@ x = 2^11 - 1
 Cortex</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/cortex/implementation/"> Read more about the
 <strong>implementation of Cortex</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Pragmas</h2>
+<h2 id="pragmas" tabindex="-1">Pragmas</h2>
 <p>Pragmas, or compiler directives, are annotations in the source code that provide
 instructions to the parser/compiler about how to interpret the source code.
 These instructions are executed during the parsing/compilation phase, not during
 the execution phase.</p>
-<h3>Environment Variables</h3>
+<h3 id="environment-variables" tabindex="-1">Environment Variables</h3>
 <p>Environment variables are defined in the execution environment of the compiler
 process when executed from a <code>node</code> process. In Unix, they are set using a
 shell-specific syntax (<code>export VARIABLE=value</code> in bash shells, for example).</p>
@@ -331,7 +332,7 @@ place in a browser process.</p>
 <li><code>HOME</code>: path to the user home directory</li>
 <li><code>TEMP</code>: path to a temporary file directory</li>
 </ul>
-<h3>Navigator Properties</h3>
+<h3 id="navigator-properties" tabindex="-1">Navigator Properties</h3>
 <p>The navigator properties are available when the compilation/parsing is taking
 place in a browser process.</p>
 <p><strong>To access the properties of the <code>navigator</code> JavaScript global object</strong>, use
@@ -339,7 +340,7 @@ the <code>#navigator()</code> pragma function. It returns ‘Nothing’ if the p
 available.</p>
 <pre><code class="language-cortex">#navigator(&quot;userAgent&quot;)
 </code></pre>
-<h3>Compile-Time Diagnostic Statement</h3>
+<h3 id="compile-time-diagnostic-statement" tabindex="-1">Compile-Time Diagnostic Statement</h3>
 <p>A compile-time diagnostic statement causes the compiler to emit an error or a
 warning during compilation.</p>
 <p><strong>To output a message to the console and immediately interrupt the
@@ -350,7 +351,7 @@ parsing/compilation</strong>, use the <code>#error()</code> pragma function.</p>
 use the <code>#warning()</code> pragma function.</p>
 <pre><code class="language-cortex">#warning(&quot;TODO: Implement function&quot;)
 </code></pre>
-<h3>Line Control Statements</h3>
+<h3 id="line-control-statements" tabindex="-1">Line Control Statements</h3>
 <p>The name and URL of the source file being parsed/compiled can be accessed using
 the <code>#sourceFile</code> and <code>#sourceUrl</code> pragmas. The current line is indicated by
 <code>#line</code> and column by <code>#column</code>.</p>
@@ -365,7 +366,7 @@ function.</p>
 </code></pre>
 <p><strong>To reset the source location to the actual source and line</strong>, use
 <code>#sourceLocation()</code>.</p>
-<h3>Other Pragmas</h3>
+<h3 id="other-pragmas" tabindex="-1">Other Pragmas</h3>
 <p>The following pragmas are replaced with the indicated value:</p>
 <ul>
 <li><code>#line</code>: the current source line number, which is either the actual source
@@ -377,7 +378,7 @@ line 1.</li>
 <li><code>#date</code>: the current date in the <code>YYYY-MM-DD</code> format.</li>
 <li><code>#time</code>: the current time in the <code>HH:MM:SS</code> format.</li>
 </ul>
-<h2>Comments</h2>
+<h2 id="comments" tabindex="-1">Comments</h2>
 <p><strong>Line Comments</strong> start with <code>//</code>. Everything after a <code>//</code> is ignored until the
 end of the line.</p>
 <p><strong>Block (multi-line) Comments</strong> start with <code>/*</code> and end with <code>*/</code>. Block
@@ -388,15 +389,15 @@ markdown</strong>, use <code>///</code> for single line comments and <code>/** *
 prefixed with <code>#!</code>. Its content indicate the command line interpreter to use:</p>
 <pre><code>#!/usr/bin/cortex
 </code></pre>
-<h2>Strings</h2>
-<h3>Single Line String</h3>
+<h2 id="strings" tabindex="-1">Strings</h2>
+<h3 id="single-line-string" tabindex="-1">Single Line String</h3>
 <p>A single-line string is delimited by a <code>&quot;</code> character (<strong>U+0022 QUOTATION
 MARK</strong>).</p>
 <p>A single-line string cannot include an unescaped <code>&quot;</code> (<strong>U+0022 QUOTATION
 MARK</strong>), an unescaped backslash <code>\</code> (<strong>U+005C REVERSE SOLIDUS</strong>), or an
 unescaped <strong>new line character</strong> (<strong>U+00A LINE FEED</strong>, <strong>U+00D CARRIAGE
 RETURN</strong>, <strong>U+2028 LINE SEPARATOR</strong> or <strong>U+2029 PARAGRAPH SEPARATOR</strong>).</p>
-<h3>Escape Sequence</h3>
+<h3 id="escape-sequence" tabindex="-1">Escape Sequence</h3>
 <p>Inside a string, backslash <code>\</code> (<strong>U+005C REVERSE SOLIDUS</strong>) is the escape
 character:</p>
 <ul>
@@ -412,7 +413,7 @@ form, the <code>\u</code> must be followed by exactly 4 hex-digits.</li>
 <li><code>\u{61}</code> is the Unicode character <strong>U+0061 LATIN SMALL LETTER A</strong>. In this
 form, a string of 0 to 8 hex-digits must be included between <code>\u{</code> and `}.</li>
 </ul>
-<h3>Multi-line String Literals</h3>
+<h3 id="multi-line-string-literals" tabindex="-1">Multi-line String Literals</h3>
 <p>A multiline string is delimited by <code>&quot;&quot;&quot;</code> (three quotation marks).</p>
 <pre><code class="language-cortex">cortex = &quot;&quot;&quot;
       ,ad8888ba,
@@ -461,7 +462,7 @@ hello3 = &quot;&quot;&quot;
 </code></pre>
 <p>If there is some whitespace before the final <code>&quot;&quot;&quot;</code>, this whitespace will be
 excluded from all the lines before it.</p>
-<h3>Interpolated Strings</h3>
+<h3 id="interpolated-strings" tabindex="-1">Interpolated Strings</h3>
 <p>A single-line string or a multiline string can include interpolated expressions
 that are indicated by an expression in parentheses after a backslash (<strong>U+005C
 REVERSE SOLIDUS</strong>). The interpolated expression can contain a string literal,
@@ -473,7 +474,7 @@ PARAGRAPH SEPARATOR</strong>)</p>
 &quot;1 2 \(3)&quot;
 &quot;1 2 \(1 + 2)&quot;
 </code></pre>
-<h3>Extended String Literal</h3>
+<h3 id="extended-string-literal" tabindex="-1">Extended String Literal</h3>
 <p>A string literal which contains no escape sequences is delimited by one or more
 ‘#’ and a quotation mark.</p>
 <pre><code>#&quot;There is no escaping now&quot;#
@@ -483,7 +484,7 @@ PARAGRAPH SEPARATOR</strong>)</p>
 <p>These string as useful for string containing characters such as quotation mark
 or backslash that would otherwise need to be escaped, leading to the
 <a href="https://en.wikipedia.org/wiki/Leaning_toothpick_syndrome">Leaning Tootpick Syndrome</a>.</p>
-<h2>Symbols</h2>
+<h2 id="symbols" tabindex="-1">Symbols</h2>
 <p><strong>Symbols</strong> are strings of Unicode characters, except for the prohibited
 characters described below.</p>
 <p>Before they are used, symbols are normalized to the
@@ -498,7 +499,7 @@ Unicode character <strong>U+00C5 LATIN CAPITAL LETTER A WITH RING ABOVE</strong>
 `A\u030a`
 `\u0041\u030a`
 </code></pre>
-<h3>Prohibited Symbol Characters</h3>
+<h3 id="prohibited-symbol-characters" tabindex="-1">Prohibited Symbol Characters</h3>
 <p>The name of a symbol cannot contain any of the following characters:</p>
 <ul>
 <li><strong>U+0000</strong> to <strong>U+0020</strong></li>
@@ -531,7 +532,7 @@ Unicode character <strong>U+00C5 LATIN CAPITAL LETTER A WITH RING ABOVE</strong>
 <li><strong>U+007D RIGHT CURLY BRACKET</strong> : <strong><code>}</code></strong></li>
 <li><strong>U+007E TILDE</strong> : <strong><code>~</code></strong></li>
 </ul>
-<h3>Verbatim Form</h3>
+<h3 id="verbatim-form" tabindex="-1">Verbatim Form</h3>
 <p>The Verbatim Form must be used if:</p>
 <ul>
 <li>
@@ -584,7 +585,7 @@ CARRIAGE RETURN</strong>, <strong>U+2028 LINE SEPARATOR</strong>, <strong>U+2029
 `\u{2135}0`  // same as `ℵ0` (Alef symbol)
 `\u21350`  // same as `ℵ0` (Alef symbol)
 </code></pre>
-<h2>Numbers</h2>
+<h2 id="numbers" tabindex="-1">Numbers</h2>
 <p>Numbers can be written as:</p>
 <ul>
 <li>A decimal number, with no prefix</li>
@@ -615,7 +616,7 @@ to help with readability. Neither type of formatting affects the underlying
 value of the literal.</p>
 <pre><code class="language-cortex">+03.14_15_92_65
 </code></pre>
-<h2>Operators</h2>
+<h2 id="operators" tabindex="-1">Operators</h2>
 <p>Most operators are infix operators: they have two operands, a left-hand side
 (lhs) operand and a right-hand side operand (rhs).</p>
 <p>An infix operator can either have whitespace before and after the operator or
@@ -627,20 +628,20 @@ operators are followed immediately by their operand: they cannot be separated by
 whitespace.</p>
 <p class="notice--info">The whitespace rules are necessary to support unambiguous parsing of expressions
 spanning multiple lines without requiring a separator between expressions</p>
-<h3>Arithmetic Operations</h3>
+<h3 id="arithmetic-operations" tabindex="-1">Arithmetic Operations</h3>
 <ul>
 <li><code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
 <li><code>&lt;</code>, <code>&lt;=</code>, <code>=</code>, <code>&gt;=</code>, '<code>&gt;</code>, ‘!=’</li>
 <li><code>==</code>, ‘!==’</li>
 </ul>
-<h3>Logic Operations</h3>
+<h3 id="logic-operations" tabindex="-1">Logic Operations</h3>
 <ul>
 <li><code>and</code>, <code>or</code>, <code>not</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code></li>
 </ul>
-<h2>Functions</h2>
-<h2>Collections</h2>
-<h3>Tuples</h3>
-<h3>Dictionaries</h3>
+<h2 id="functions" tabindex="-1">Functions</h2>
+<h2 id="collections" tabindex="-1">Collections</h2>
+<h3 id="tuples" tabindex="-1">Tuples</h3>
+<h3 id="dictionaries" tabindex="-1">Dictionaries</h3>
 <p>A dictionary is a collection of set of key/value pairs separated with a comma
 (<code>,</code>) and surrounded by curly brackets.</p>
 <p>Elements in a dictionary are not ordered and the keys are unique. They are
@@ -653,7 +654,7 @@ if the quotation mark is omitted the character escape sequences are not applied.
 {&quot;one&quot; -&gt; 1, &quot;two&quot; -&gt; 2}
 </code></pre>
 <p>The empty dictionary is <code>{-&gt;}</code>.</p>
-<h3>Lists</h3>
+<h3 id="lists" tabindex="-1">Lists</h3>
 <p>A list is a collection of expressions separated with a comma <code>,</code> and surrounded
 by square brackets: <code>[</code> and <code>]</code></p>
 <p>Elements in a list are ordered and don’t have to be unique. They are iterable
@@ -662,12 +663,12 @@ and indexable with a numeric value (their order in the list, start with 0).</p>
 [3, 3 + 5, 3 + + 7, 3 + 5 + 7 + 11]
 </code></pre>
 <p>The empty list is <code>[]</code>.</p>
-<h3>Sets</h3>
+<h3 id="sets" tabindex="-1">Sets</h3>
 <p>A set is a collection of expressions surrounded by curly brackets: <code>{</code> and <code>}</code>.</p>
 <p>Elements in a set are not ordered and must be unique. They are iterable but they
 are not indexable.</p>
 <p>The empty set is <code>{}</code>.</p>
-<h2>Flow Control</h2>
+<h2 id="flow-control" tabindex="-1">Flow Control</h2>
 
         
       </section>

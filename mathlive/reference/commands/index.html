@@ -667,10 +667,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <style>
+
+<h1>Supported TeX/LaTeX Commands</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#text-mode%2C-math-mode-and-math-style">Text Mode, Math Mode and Math Style</a><ol><li><a href="#math-mode">Math Mode</a></li><li><a href="#text-mode">Text Mode</a></li></ol></li><li><a href="#fractions-and-binomials">Fractions and Binomials</a></li><li><a href="#binary-operators">Binary Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#trigonometry">Trigonometry</a></li><li><a href="#bounds">Bounds</a></li><li><a href="#projections">Projections</a></li><li><a href="#modulo">Modulo</a></li><li><a href="#custom-functions">Custom Functions</a></li></ol></li><li><a href="#unicode">Unicode</a></li><li><a href="#large-operators">Large Operators</a></li><li><a href="#logic">Logic</a><ol><li><a href="#quantifiers">Quantifiers</a></li><li><a href="#unary%2Fbinary-operators">Unary/Binary Operators</a></li><li><a href="#relational-operators">Relational Operators</a></li></ol></li><li><a href="#arrows">Arrows</a><ol><li><a href="#negated-arrows">Negated Arrows</a></li><li><a href="#extensible-arrows">Extensible Arrows</a></li></ol></li><li><a href="#accents">Accents</a><ol><li><a href="#extensible-accents">Extensible Accents</a></li></ol></li><li><a href="#relational-operators-1">Relational Operators</a><ol><li><a href="#negated-relational-operators">Negated Relational Operators</a></li></ol></li><li><a href="#sets">Sets</a><ol><li><a href="#unary%2Fbinary-set-operators">Unary/Binary Set Operators</a></li><li><a href="#relational-set-operators">Relational Set Operators</a></li></ol></li><li><a href="#greek">Greek</a></li><li><a href="#hebrew">Hebrew</a></li><li><a href="#letterlike-symbols">Letterlike Symbols</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#punctuation">Punctuation</a><ol><li><a href="#dots">Dots</a></li></ol></li><li><a href="#shapes">Shapes</a></li><li><a href="#layout">Layout</a></li><li><a href="#spacing">Spacing</a></li><li><a href="#decorations">Decorations</a><ol><li><a href="#notations">Notations</a></li><li><a href="#colors">Colors</a></li></ol></li><li><a href="#font-styling">Font Styling</a><ol><li><a href="#bold">Bold</a></li><li><a href="#italic">Italic</a></li><li><a href="#font-family">Font Family</a></li><li><a href="#mathjax-html-extension">MathJax HTML Extension</a></li><li><a href="#others">Others</a></li></ol></li><li><a href="#sizing">Sizing</a></li><li><a href="#various">Various</a></li><li><a href="#mediawiki-(texvc.sty-package)">MediaWiki (texvc.sty package)</a></li><li><a href="#physics">Physics</a><ol><li><a href="#braket-notation">Braket Notation</a></li></ol></li><li><a href="#chemistry-(mhchem-package)">Chemistry (mhchem package)</a><ol><li><a href="#chemical-formulae">Chemical Formulae</a></li><li><a href="#charges">Charges</a></li><li><a href="#stoichiometric-numbers">Stoichiometric numbers</a></li><li><a href="#isotopes">Isotopes</a></li><li><a href="#complex-examples">Complex Examples</a></li></ol></li><li><a href="#macros">Macros</a></li><li><a href="#environments-%2F-matrixes">Environments / Matrixes</a><ol><li><a href="#matrixes">Matrixes</a></li><li><a href="#other-environments">Other Environments</a></li></ol></li><li><a href="#tex-registers">TeX Registers</a></li><li><a href="#tex-primitives">TeX Primitives</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <style>
   ul.command-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -811,13 +825,12 @@ Table of Content</label>
     white-space: break-spaces;
   }
 </style>
-<h1>Supported TeX/LaTeX Commands</h1>
 <p>MathLive supports over 800 LaTeX commands.</p>
 <div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">
 If you know the shape of a symbol use <strong>Detexify</strong> to find the name of the corresponding LaTeX command.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2>Text Mode, Math Mode and Math Style</h2>
-<h3>Math Mode</h3>
+<h2 id="text-mode%2C-math-mode-and-math-style" tabindex="-1">Text Mode, Math Mode and Math Style</h2>
+<h3 id="math-mode" tabindex="-1">Math Mode</h3>
 <p>When in <strong>Math Mode</strong>, the content is laid out using typesetting rules specific
 to math. For example, variables are displayed in italics, an appropriate amount
 of space is inserted around some letters such as “f” to improve their legibility
@@ -860,7 +873,7 @@ displayed in a smaller font.</p>
 </tbody>
 </table>
 </div>
-<h3>Text Mode</h3>
+<h3 id="text-mode" tabindex="-1">Text Mode</h3>
 <p><strong>To include some textual comments</strong>, use the <code>\text{}</code> command to switch
 to <strong>Text Mode</strong>.</p>
 <div class='no-line two-col'>
@@ -910,7 +923,7 @@ account for the current math style.</p>
 </div>
 <p>When in Text Mode, use <code>$...$</code> to switch back to Math Mode, Text Style (inline math) or <code>\\[...\\]</code> to switch
 to Math Mode, Display Style.</p>
-<h2>Fractions and Binomials</h2>
+<h2 id="fractions-and-binomials" tabindex="-1">Fractions and Binomials</h2>
 <ul class="command-list">
 <li><span class='math'>$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\frac{}{}</code></li>
 <li><span class='math'>$$\dfrac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</span> <code>\dfrac{}{}</code></li>
@@ -944,7 +957,7 @@ when creating modern LaTeX content.
 <li><span class='math'>$${\unicode{&quot;2B1A} \atopwithdelims\lbrace\rbrace \unicode{&quot;2B1A}} $$</span> <code>\atopwithdelims\lbrace\rbrace</code></li>
 </ul>
 </section>
-<h2>Binary Operators</h2>
+<h2 id="binary-operators" tabindex="-1">Binary Operators</h2>
 <p>Some binary operators can also be used as a unary operator: <code>+</code>, <code>-</code>, etc…
 Their spacing is adjusted accordingly. For example in $$-1-2$$
 there is less space between <code>-</code> and <code>1</code> than there is between <code>-</code> and <code>2</code>.</p>
@@ -998,7 +1011,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\ast $$</span>   <code>\ast</code></li>
 <li><span class='math'>$$\star $$</span>   <code>\star</code></li>
 </ul>
-<h2>Functions</h2>
+<h2 id="functions" tabindex="-1">Functions</h2>
 <ul class="command-list">
 <li><span class='math'>$$\deg $$</span> <code>\deg</code></li>
 <li><span class='math'>$$\det $$</span> <code>\det</code></li>
@@ -1007,7 +1020,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\ln $$</span> <code>\ln</code></li>
 <li><span class='math'>$$\log $$</span> <code>\log</code></li>
 </ul>
-<h3>Trigonometry</h3>
+<h3 id="trigonometry" tabindex="-1">Trigonometry</h3>
 <ul class="command-list">
 <li><span class='math'>$$\arccos $$</span> <code>\arccos</code></li>
 <li><span class='math'>$$\arcsin $$</span> <code>\arcsin</code></li>
@@ -1035,7 +1048,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\tg $$</span> <code>\tg</code></li>
 <li><span class='math'>$$\th $$</span> <code>\th</code></li>
 </ul>
-<h3>Bounds</h3>
+<h3 id="bounds" tabindex="-1">Bounds</h3>
 <ul class="command-list">
 <li><span class='math'>$$\max $$</span> <code>\max</code></li>
 <li><span class='math'>$$\min $$</span> <code>\min</code></li>
@@ -1046,23 +1059,23 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 <li><span class='math'>$$\limsup $$</span> <code>\limsup</code></li>
 <li><span class='math'>$$\dim $$</span> <code>\dim</code></li>
 </ul>
-<h3>Projections</h3>
+<h3 id="projections" tabindex="-1">Projections</h3>
 <ul class="command-list">
 <li><span class='math'>$$\Pr $$</span> <code>\Pr</code></li>
 <li><span class='math'>$$\hom $$</span> <code>\hom</code></li>
 <li><span class='math'>$$\arg $$</span> <code>\arg</code></li>
 </ul>
-<h3>Modulo</h3>
+<h3 id="modulo" tabindex="-1">Modulo</h3>
 <ul>
 <li><span class='math'>$$n \pmod{3} $$</span> <code>n \pmod{3}</code></li>
 <li><span class='math'>$$n \mod{3} $$</span> <code>n \mod{3}</code></li>
 <li><span class='math'>$$n \bmod 3 $$</span> <code>n \bmod 3</code></li>
 </ul>
-<h3>Custom Functions</h3>
+<h3 id="custom-functions" tabindex="-1">Custom Functions</h3>
 <ul>
 <li><span class='math'>$$\operatorname{argth}(\theta) $$</span> <code>\operatorname{argth}(\theta)</code></li>
 </ul>
-<h2>Unicode</h2>
+<h2 id="unicode" tabindex="-1">Unicode</h2>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1088,7 +1101,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 </table>
 </div>
 <p class="notice--info">The codepoint of the Unicode character ⨗ <strong>U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK</strong> is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter <code>J</code> is 004A<sub>16</sub> in hexadecimal. Learn more about <a href="https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode">Mathematical Operators and Symbols in Unicode on Wikipedia</a>.</p>
-<h2>Large Operators</h2>
+<h2 id="large-operators" tabindex="-1">Large Operators</h2>
 <p>Large operators display their limits above and below or adjacent to the operator,
 depending on the math style (<strong>Display Style</strong> or <strong>Text Style</strong>) and on the
 operator.</p>
@@ -1170,14 +1183,14 @@ above and below by default, while the <code>\int</code> command display its limi
 <li><span class='math'>$$\wr $$</span> <code>\wr</code></li>
 <li><span class='math'>$$\amalg $$</span> <code>\amalg</code></li>
 </ul>
-<h2>Logic</h2>
-<h3>Quantifiers</h3>
+<h2 id="logic" tabindex="-1">Logic</h2>
+<h3 id="quantifiers" tabindex="-1">Quantifiers</h3>
 <ul class="command-list">
 <li><span class='math'>$$\forall $$</span>   <code>\forall</code></li>
 <li><span class='math'>$$\exists $$</span>   <code>\exists</code></li>
 <li><span class='math'>$$\nexists $$</span>   <code>\nexists</code></li>
 </ul>
-<h3>Unary/Binary Operators</h3>
+<h3 id="unary%2Fbinary-operators" tabindex="-1">Unary/Binary Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\land $$</span>   <code>\land</code></li>
 <li><span class='math'>$$\wedge $$</span>   <code>\wedge</code></li>
@@ -1191,7 +1204,7 @@ above and below by default, while the <code>\int</code> command display its limi
 <li><span class='math'>$$\lnot $$</span>   <code>\lnot</code></li>
 <li><span class='math'>$$\neg $$</span>   <code>\neg</code></li>
 </ul>
-<h3>Relational Operators</h3>
+<h3 id="relational-operators" tabindex="-1">Relational Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\to $$</span>   <code>\to</code></li>
 <li><span class='math'>$$\gets $$</span>   <code>\gets</code></li>
@@ -1207,7 +1220,7 @@ above and below by default, while the <code>\int</code> command display its limi
 <li><span class='math'>$$\vdash $$</span>   <code>\vdash</code></li>
 <li><span class='math'>$$\dashv $$</span>   <code>\dashv</code></li>
 </ul>
-<h2>Arrows</h2>
+<h2 id="arrows" tabindex="-1">Arrows</h2>
 <section class='full-width no-header center thin-line three-col math-80px'>
 <table>
 <thead>
@@ -1341,7 +1354,7 @@ above and below by default, while the <code>\int</code> command display its limi
 </tbody>
 </table>
 </section>
-<h3>Negated Arrows</h3>
+<h3 id="negated-arrows" tabindex="-1">Negated Arrows</h3>
 <section class='full-width no-header center thin-line three-col math-80px'>
 <table>
 <thead>
@@ -1365,7 +1378,7 @@ above and below by default, while the <code>\int</code> command display its limi
 </tbody>
 </table>
 </section>
-<h3>Extensible Arrows</h3>
+<h3 id="extensible-arrows" tabindex="-1">Extensible Arrows</h3>
 <p>The width of the arrow commands above is fixed. The width of the commands
 below is determined by the length of the content above and below
 the arrows, which is specified as an argument (and optional argument):</p>
@@ -1446,7 +1459,7 @@ the arrows, which is specified as an argument (and optional argument):</p>
 </tbody>
 </table>
 </section>
-<h2>Accents</h2>
+<h2 id="accents" tabindex="-1">Accents</h2>
 <p>Regular accents have a fixed width and do not stretch. For example, compare:</p>
 <ul>
 <li><span class='math'>$$\vec{ABC}$$</span> <code>\vec{ABC}</code></li>
@@ -1479,7 +1492,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\c{c} $$</span> <code>\c{c}</code></li>
 <li><span class='math'>$$\~{n} $$</span>   <code>\~{n}</code></li>
 </ul>
-<h3>Extensible Accents</h3>
+<h3 id="extensible-accents" tabindex="-1">Extensible Accents</h3>
 <ul class="command-list">
 <li><span class='math'>$$\overline{ABC} $$</span> <code>\overline{}</code></li>
 <li><span class='math'>$$\overgroup{ABC} $$</span> <code>\overgroup{}</code></li>
@@ -1511,7 +1524,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\underparen{ABC} $$</span> <code>\underparen{}</code></li>
 <li><span class='math'>$$\utilde{ABC} $$</span> <code>\utilde{}</code></li>
 </ul>
-<h2>Relational Operators</h2>
+<h2 id="relational-operators-1" tabindex="-1">Relational Operators</h2>
 <p>To display a vertical “stack” of two symbols as a relational operator, use the
 <code>\stackrel</code> command: <span class='math'>$$a\stackrel{?}{=}b $$</span> <code>a\stackrel{?}{=}b</code>.</p>
 <ul class="command-list">
@@ -1608,7 +1621,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\parallel $$</span>   <code>\parallel</code></li>
 <li><span class='math'>$$\simeq $$</span>   <code>\simeq</code></li>
 </ul>
-<h3>Negated Relational Operators</h3>
+<h3 id="negated-relational-operators" tabindex="-1">Negated Relational Operators</h3>
 <p>To negate other relational operators, use the <code>\not</code> command, e.g.
 <span class='math'>\( \not\equiv \)</span> <code>\not\equiv</code>.</p>
 <ul class="command-list">
@@ -1657,7 +1670,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\unlhd $$</span>   <code>\unlhd</code></li>
 <li><span class='math'>$$\unrhd $$</span>   <code>\unrhd</code></li>
 </ul>
-<h2>Sets</h2>
+<h2 id="sets" tabindex="-1">Sets</h2>
 <ul class="command-list">
 <li><span class='math'>$$\emptyset $$</span>   <code>\emptyset</code></li>
 <li><span class='math'>$$\varnothing $$</span>   <code>\varnothing</code></li>
@@ -1673,7 +1686,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\doubleStruckCapitalZ $$</span> <code>\doubleStruckCapitalZ</code> (macro)</li>
 <li><span class='math'>$$\doubleStruckCapitalP $$</span> <code>\doubleStruckCapitalP</code> (macro)</li>
 </ul>
-<h3>Unary/Binary Set Operators</h3>
+<h3 id="unary%2Fbinary-set-operators" tabindex="-1">Unary/Binary Set Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\cap $$</span>   <code>\cap</code></li>
 <li><span class='math'>$$\cup $$</span>   <code>\cup</code></li>
@@ -1681,7 +1694,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\smallsetminus $$</span>   <code>\smallsetminus</code></li>
 <li><span class='math'>$$\complement $$</span>   <code>\complement</code></li>
 </ul>
-<h3>Relational Set Operators</h3>
+<h3 id="relational-set-operators" tabindex="-1">Relational Set Operators</h3>
 <ul class="command-list">
 <li><span class='math'>$$\nsupseteqq $$</span>   <code>\nsupseteqq</code></li>
 <li><span class='math'>$$\supsetneq $$</span>   <code>\supsetneq</code></li>
@@ -1715,7 +1728,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\nsubseteq $$</span>   <code>\nsubseteq</code></li>
 <li><span class='math'>$$\nsupseteq $$</span>   <code>\nsupseteq</code></li>
 </ul>
-<h2>Greek</h2>
+<h2 id="greek" tabindex="-1">Greek</h2>
 <ul class="command-list">
 <li><span class='math'>$$\alpha $$</span>   <code>\alpha</code></li>
 <li><span class='math'>$$\beta $$</span>   <code>\beta</code></li>
@@ -1788,14 +1801,14 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\Omega $$</span>   <code>\Omega</code></li>
 <li><span class='math'>$$\varOmega $$</span>   <code>\varOmega</code></li>
 </ul>
-<h2>Hebrew</h2>
+<h2 id="hebrew" tabindex="-1">Hebrew</h2>
 <ul class="command-list">
 <li><span class='math'>$$\aleph $$</span>   <code>\aleph</code></li>
 <li><span class='math'>$$\beth $$</span>   <code>\beth</code></li>
 <li><span class='math'>$$\gimel $$</span>   <code>\gimel</code></li>
 <li><span class='math'>$$\daleth $$</span>   <code>\daleth</code></li>
 </ul>
-<h2>Letterlike Symbols</h2>
+<h2 id="letterlike-symbols" tabindex="-1">Letterlike Symbols</h2>
 <ul class="command-list">
 <li><span class='math'>$$@ $$</span>   <code>@</code></li>
 <li><span class='math'>$$\mid $$</span>   <code>\mid</code></li>
@@ -1825,7 +1838,7 @@ if there is an equivalent Unicode character available.
 <li><span class='math'>$$\Re $$</span> <code>\Re</code></li>
 <li><span class='math'>$$\Im $$</span> <code>\Im</code></li>
 </ul>
-<h2>Delimiters</h2>
+<h2 id="delimiters" tabindex="-1">Delimiters</h2>
 <p>A delimiter, also called a <strong>fence</strong>, is a symbol used to group some symbols, for example parentheses, brackets, braces, etc…</p>
 <p>To grow delimiters based on their content, use <code>\left...\right</code>.</p>
 <div class='no-line two-col'>
@@ -1897,7 +1910,7 @@ following commands.</p>
 <li><span class='math'>$$\rmoustache $$</span>   <code>\rmoustache</code></li>
 <li><span class='math'>$$\mvert $$</span>   <code>\mvert</code></li>
 </ul>
-<h2>Punctuation</h2>
+<h2 id="punctuation" tabindex="-1">Punctuation</h2>
 <ul class="command-list">
 <li><span class='math'>$$. $$</span>   <code>.</code></li>
 <li><span class='math'>$$? $$</span>   <code>?</code></li>
@@ -1909,7 +1922,7 @@ following commands.</p>
 <li><span class='math'>$$; $$</span>   <code>;</code></li>
 <li><span class='math'>$$&quot; $$</span>   <code>&quot;</code></li>
 </ul>
-<h3>Dots</h3>
+<h3 id="dots" tabindex="-1">Dots</h3>
 <ul class="command-list">
 <li><span class='math'>$$\cdotp $$</span>   <code>\cdotp</code></li>
 <li><span class='math'>$$\ldotp $$</span>   <code>\ldotp</code></li>
@@ -1919,7 +1932,7 @@ following commands.</p>
 <li><span class='math'>$$\ldots $$</span>   <code>\ldots</code></li>
 <li><span class='math'>$$\mathellipsis $$</span>   <code>\mathellipsis</code></li>
 </ul>
-<h2>Shapes</h2>
+<h2 id="shapes" tabindex="-1">Shapes</h2>
 <ul class="command-list">
 <li><span class='math'>$$\diamond $$</span>   <code>\diamond</code></li>
 <li><span class='math'>$$\Diamond $$</span>   <code>\Diamond</code></li>
@@ -1981,7 +1994,7 @@ following commands.</p>
 <li><span class='math'>$$\ddagger $$</span>   <code>\ddagger</code></li>
 <li><span class='math'>$$\maltese $$</span>   <code>\maltese</code></li>
 </ul>
-<h2>Layout</h2>
+<h2 id="layout" tabindex="-1">Layout</h2>
 <p>These commands change the amount of space around a symbol: <code>\mathop{}</code>
 treats its argument as if it was a large operator, <code>\mathrel{}</code> a
 relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{}</code> and <code>\mathclose{}</code> an opening and closing delimiter, respectively, <code>\mathpunct{}</code> a punctuation, <code>\mathinner{}</code> a fraction, and <code>\mathord{}</code> an ordinary symbol</p>
@@ -2007,7 +2020,7 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <li><span class='math'>$$o\mathllap{/} $$</span> <code>\mathllap{}</code></li>
 <li><span class='math'>$$\mathrlap{/}0 $$</span> <code>\mathrlap{}</code></li>
 </ul>
-<h2>Spacing</h2>
+<h2 id="spacing" tabindex="-1">Spacing</h2>
 <ul class="command-list">
 <li><span class='math'>$$\unicode{&quot;203A}\hspace{1em}\unicode{&quot;2039} $$</span> <code>\hspace{}</code></li>
 <li><span class='math'>$$\unicode{&quot;203A}\hspace*{1em}\unicode{&quot;2039} $$</span> <code>\hspace*{}</code></li>
@@ -2020,7 +2033,7 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 <li><span class='math'>$$\unicode{&quot;203A}\quad\unicode{&quot;2039} $$</span> <code>\quad</code></li>
 <li><span class='math'>$$\unicode{&quot;203A}\qquad\unicode{&quot;2039} $$</span> <code>\qquad</code></li>
 </ul>
-<h2>Decorations</h2>
+<h2 id="decorations" tabindex="-1">Decorations</h2>
 <section class='no-header thin-line center'>
 <table>
 <thead>
@@ -2066,8 +2079,8 @@ relational operator, <code>\mathbin{}</code> a binary operator, <code>\mathopen{
 </tbody>
 </table>
 </section>
-<h3>Notations</h3>
-<h4><code>\enclose</code></h4>
+<h3 id="notations" tabindex="-1">Notations</h3>
+<h4 id="%5Cenclose" tabindex="-1"><code>\enclose</code></h4>
 <p>The <code>\enclose</code> command is very flexible. It accepts three arguments, two of
 which are required:</p>
 <pre><code class="language-tex">    <span class="hljs-keyword">\enclose</span>{&lt;notation&gt;}[&lt;style&gt;]{&lt;body&gt;}
@@ -2181,7 +2194,7 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 <li><span class='math'>$$\enclose{circle}[mathbackground=“#fbc0bd”]{\frac1x}$$</span> <code>\enclose{circle}[mathbackground=&quot;#fbc0bd&quot;]{\frac1x}</code></li>
 <li><span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> <code>\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}</code></li>
 </ul>
-<h4><code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code></h4>
+<h4 id="%5Ccancel%2C-%5Cbcancel-and-%5Cxcancel" tabindex="-1"><code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code></h4>
 <div class='thin-line two-col'>
 <table>
 <thead>
@@ -2208,7 +2221,7 @@ follows the shorthand syntax of the CSS <code>border</code> property, for exampl
 </div>
 <p class="notice--info">The <code>\cancel</code>, <code>\bcancel</code> and <code>\xcancel</code> commands are part of the
 <a href="https://www.ctan.org/pkg/cancel">“cancel”</a> LaTeX package.</p>
-<h3>Colors</h3>
+<h3 id="colors" tabindex="-1">Colors</h3>
 <p>To change the foreground color, use the <code>\textcolor{}{}</code> command.</p>
 <p>To change the background, use the <code>\colorbox{}{}</code> command.</p>
 <p>The first argument of these commands is a color specified as:</p>
@@ -2239,12 +2252,12 @@ DVIPS colors: <code>White</code>, <code>Black</code>,
 <code>Gray</code>, <code>Red</code>, <code>Orange</code>, <code>Yellow</code>, <code>LimeGreen</code>, <code>Green</code>, <code>TealBlue</code>, <code>Blue</code>,
 <code>Violet</code>, <code>Purple</code>
 and <code>Magenta</code>. Those names are case-sensitive.</p>
-<h2>Font Styling</h2>
+<h2 id="font-styling" tabindex="-1">Font Styling</h2>
 <ul class="command-list">
 <li><span class='math'>$$\text{\selectfont} $$</span> <code>\selectfont</code></li>
 </ul>
 <hr>
-<h3>Bold</h3>
+<h3 id="bold" tabindex="-1">Bold</h3>
 <ul class="command-list command-list">
 <li><span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> <code>\fontseries{}</code></li>
 <li><span class='math'>$$\boldsymbol{Don Knuth} $$</span> <code>\boldsymbol{}</code></li>
@@ -2257,7 +2270,7 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$$\mathbf{Don Knuth} $$</span> <code>\mathbf{}</code></li>
 <li><span class='math'>$$\mathbfit $$</span> <code>\mathbfit{}</code></li>
 </ul>
-<h3>Italic</h3>
+<h3 id="italic" tabindex="-1">Italic</h3>
 <ul class="command-list command-list">
 <li><span class='math'>$$\text{\upshape Don Knuth} $$</span> <code>\upshape</code></li>
 <li><span class='math'>$$\text{\slshape Don Knuth} $$</span> <code>\slshape</code></li>
@@ -2266,21 +2279,21 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$$\textit{Don Knuth} $$</span> <code>\textit{}</code></li>
 <li><span class='math'>$$\mathit{Don Knuth} $$</span> <code>\mathit{}</code></li>
 </ul>
-<h3>Font Family</h3>
-<h4>Typewriter / Monospace</h4>
+<h3 id="font-family" tabindex="-1">Font Family</h3>
+<h4 id="typewriter-%2F-monospace" tabindex="-1">Typewriter / Monospace</h4>
 <ul class="command-list">
 <li><span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> <code>\fontfamily{}</code></li>
 <li><span class='math'>$$\texttt{Don Knuth} $$</span> <code>\texttt{}</code></li>
 <li><span class='math'>$$\mathtt{Don Knuth} $$</span> <code>\mathtt{}</code></li>
 <li><span class='math'>$${\ttfamily Don Knuth} $$</span> <code>\ttfamily</code></li>
 </ul>
-<h4>Sans-Serif</h4>
+<h4 id="sans-serif" tabindex="-1">Sans-Serif</h4>
 <ul class="command-list">
 <li><span class='math'>$$\textsf{Don Knuth} $$</span> <code>\textsf{}</code></li>
 <li><span class='math'>$$\mathsf{Don Knuth} $$</span> <code>\mathsf{}</code></li>
 <li><span class='math'>$${\sffamily Don Knuth} $$</span> <code>\sffamily</code></li>
 </ul>
-<h4>Math Variants</h4>
+<h4 id="math-variants" tabindex="-1">Math Variants</h4>
 <ul class="command-list command-list">
 <li><span class='math'>$$\mathfrak{ABCdef} $$</span>
 <code>\mathfrak{ABCdef}</code> – Fraktur</li>
@@ -2293,7 +2306,7 @@ and <code>Magenta</code>. Those names are case-sensitive.</p>
 <li><span class='math'>$${\rmfamily Don Knuth} $$</span> <code>\rmfamily</code></li>
 <li><span class='math'>$${\frak Don Knuth} $$</span> <code>{\frak}</code></li>
 </ul>
-<h3>MathJax HTML Extension</h3>
+<h3 id="mathjax-html-extension" tabindex="-1">MathJax HTML Extension</h3>
 <p>MathLive support some commands from the <a href="http://docs.mathjax.org/en/latest/input/tex/extensions/html.html">MathJax HTML extension</a>.</p>
 <div class="side-by-side">
   <div class='math frame'>$$\class{custom-class}{x+1} $$</div>
@@ -2332,7 +2345,7 @@ the <code>MathFieldElement</code>.</p>
 <pre><code class="language-tex">  <span class="hljs-keyword">\htmlData</span>{foo=green,bar=blue}{ <span class="hljs-keyword">\text</span>{Don Knuth} }
 </code></pre>
 </div>
-<h3>Others</h3>
+<h3 id="others" tabindex="-1">Others</h3>
 <ul class="command-list">
 <li><span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> <code>\fontshape{}</code> Small Caps</li>
 <li><span class='math'>$$\text{\scshape Don Knuth} $$</span> <code>\scshape</code></li>
@@ -2370,7 +2383,7 @@ but their use is generally discouraged when creating new LaTeX content</p>
 </table>
 </section>
 </section>
-<h2>Sizing</h2>
+<h2 id="sizing" tabindex="-1">Sizing</h2>
 <p>In LaTeX using the sizing commands below may not always achieve the expected result. In MathLive, the sizing commands are applied consistently to text and math mode.</p>
 <p>These size are relative to the <code>font-size</code> property of the mathfield.</p>
 <section class="no-header center">
@@ -2458,7 +2471,7 @@ delimiters based on the content.</p>
 </tbody>
 </table>
 </section>
-<h2>Various</h2>
+<h2 id="various" tabindex="-1">Various</h2>
 <ul class="command-list command-list">
 <li>
 <p><span class='math'>$$/ $$</span>   <code>/</code></p>
@@ -2572,7 +2585,7 @@ delimiters based on the content.</p>
 <p><span class='math'>$$\phantom $$</span> <code>\phantom{}</code></p>
 </li>
 </ul>
-<h2>MediaWiki (<code>texvc.sty</code> package)</h2>
+<h2 id="mediawiki-(texvc.sty-package)" tabindex="-1">MediaWiki (<code>texvc.sty</code> package)</h2>
 <p>MathLive supports the commands used by <a href="https://en.wikipedia.org/wiki/Help:Displaying_a_formula">MediaWiki</a> pages, except for the deprecated ones.</p>
 <ul class="command-list">
 <li><span class='math'>$$ \darr $$</span> <code>\darr</code></li>
@@ -2639,8 +2652,8 @@ delimiters based on the content.</p>
 <li><span class='math'>$$ \weierp $$</span> <code>\weierp</code></li>
 <li><span class='math'>$$ \Zeta $$</span> <code>\Zeta</code></li>
 </ul>
-<h2>Physics</h2>
-<h3>Braket Notation</h3>
+<h2 id="physics" tabindex="-1">Physics</h2>
+<h3 id="braket-notation" tabindex="-1">Braket Notation</h3>
 <p>MathLive supports the <a href="https://ctan.org/pkg/braket"><code>braket</code> package</a></p>
 <ul class="command-list">
 <li><span class='math'>$$\bra{\Psi} $$</span> <code>\bra{\Psi}</code> (macro)</li>
@@ -2650,14 +2663,14 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\Ket{ab} $$</span> <code>\Ket{}</code> (macro)</li>
 <li><span class='math'>$$\Braket{ab} $$</span> <code>\Braket{}</code> (macro)</li>
 </ul>
-<h2>Chemistry (<code>mhchem</code> package)</h2>
+<h2 id="chemistry-(mhchem-package)" tabindex="-1">Chemistry (<code>mhchem</code> package)</h2>
 <p>MathLive  supports the <a href="https://mhchem.github.io/MathJax-mhchem/"><code>mhchem</code> package</a>.</p>
-<h3>Chemical Formulae</h3>
+<h3 id="chemical-formulae" tabindex="-1">Chemical Formulae</h3>
 <ul class="command-list">
 <li><span class='math'>$$\ce{H2O} $$</span> <code>\ce{H2O}</code></li>
 <li><span class='math'>$$\ce{Sb2O3} $$</span> <code>\ce{Sb2O3}</code></li>
 </ul>
-<h3>Charges</h3>
+<h3 id="charges" tabindex="-1">Charges</h3>
 <ul class="command-list">
 <li><span class='math'>$$\ce{[AgCl2]-} $$</span> <code>\ce{[AgCl2]-}</code></li>
 <li><span class='math'>$$\ce{Y^99+} $$</span> <code>\ce{Y^99+}</code></li>
@@ -2665,7 +2678,7 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\ce{H+} $$</span> <code>\ce{H+}</code></li>
 <li><span class='math'>$$\ce{CrO4^2-} $$</span> <code>\ce{CrO4^2-}</code></li>
 </ul>
-<h3>Stoichiometric numbers</h3>
+<h3 id="stoichiometric-numbers" tabindex="-1">Stoichiometric numbers</h3>
 <ul class="command-list">
 <li><span class='math'>$$\ce{2 H2O} $$</span> <code>\ce{2 H2O}</code></li>
 <li><span class='math'>$$\ce{2H2O} $$</span> <code>\ce{2H2O}</code></li>
@@ -2674,7 +2687,7 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\ce{(1/2) H2O} $$</span> <code>\ce{(1/2) H2O}</code></li>
 <li><span class='math'>$$\ce{$n$ H2O} $$</span> <code>\ce{$n$ H2O}</code></li>
 </ul>
-<h3>Isotopes</h3>
+<h3 id="isotopes" tabindex="-1">Isotopes</h3>
 <ul class="command-list">
 <li><span class='math'>$$\ce{^{227}_{90}Th+} $$</span> <code>\ce{^{227}_{90}Th+}</code></li>
 <li><span class='math'>$$\ce{^227_90Th+} $$</span> <code>\ce{^227_90Th+}</code></li>
@@ -2683,7 +2696,7 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\ce{H{}^3HO} $$</span> <code>\ce{H{}^3HO}</code></li>
 <li><span class='math'>$$\ce{H^3HO} $$</span> <code>\ce{H^3HO}</code></li>
 </ul>
-<h3>Complex Examples</h3>
+<h3 id="complex-examples" tabindex="-1">Complex Examples</h3>
 <ul>
 <li><span class='math'>$$\ce{CO2 + C -&gt; 2 CO} $$</span> <br>  <code>\ce{CO2 + C -&gt; 2 CO}</code></li>
 <li><span class='math'>$$\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-} $$</span> <br>   <code>\ce{Hg^2+ -&gt;[I-] HgI2 -&gt;[I-] [Hg^{II}I4]^2-}</code></li>
@@ -2695,7 +2708,7 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$} $$</span> <br>  <code>\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}</code></li>
 <li><span class='math'>$$\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$} $$</span> <br>   <code>\ce{Hg^2+ -&gt;[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  -&gt;[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}</code></li>
 </ul>
-<h2>Macros</h2>
+<h2 id="macros" tabindex="-1">Macros</h2>
 <ul class="command-list">
 <li><span class='math'>$$\iff $$</span> <code>\iff</code></li>
 <li><span class='math'>$$\set{ab} $$</span> <code>\set{}</code></li>
@@ -2715,13 +2728,13 @@ delimiters based on the content.</p>
 <li><span class='math'>$$\differentialD $$</span> <code>\differentialD</code></li>
 <li><span class='math'>$$\capitalDifferentialD $$</span> <code>\capitalDifferentialD</code></li>
 </ul>
-<h2>Environments / Matrixes</h2>
+<h2 id="environments-%2F-matrixes" tabindex="-1">Environments / Matrixes</h2>
 <p>Environements are used to typeset a set of related items, for examples cells
 in a matrix, or multi-line equations.</p>
 <p>Each row in a tabular environment is separated by a <code>\\</code> command.</p>
 <p>Each column is separated by a <code>&amp;</code>.</p>
-<h3>Matrixes</h3>
-<h4><code>array</code></h4>
+<h3 id="matrixes" tabindex="-1">Matrixes</h3>
+<h4 id="array" tabindex="-1"><code>array</code></h4>
 <p>A simple table with no delimiters.</p>
 <div class='side-by-side'>
 <div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
@@ -2766,7 +2779,7 @@ column format:</p>
 <span class="hljs-keyword">\end</span>{array}
 </code></pre>
 </div>
-<h4><code>matrix</code></h4>
+<h4 id="matrix" tabindex="-1"><code>matrix</code></h4>
 <p>The <code>matrix</code> environment is very similar to <code>array</code>, but it does not have an
 argument to specify the format of the columns.</p>
 <div class='side-by-side'>
@@ -2787,7 +2800,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
 </div>
-<h4><code>pmatrix</code></h4>
+<h4 id="pmatrix" tabindex="-1"><code>pmatrix</code></h4>
 <p>A matrix with <strong>parentheses</strong> as delimiters.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
@@ -2797,7 +2810,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{pmatrix}
 </code></pre>
 </div>
-<h4><code>bmatrix</code></h4>
+<h4 id="bmatrix" tabindex="-1"><code>bmatrix</code></h4>
 <p>A matrix with <strong>square brackets</strong> as delimiters.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
@@ -2807,7 +2820,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{bmatrix}
 </code></pre>
 </div>
-<h4><code>Bmatrix</code></h4>
+<h4 id="bmatrix-1" tabindex="-1"><code>Bmatrix</code></h4>
 <p>A matrix with <strong>braces</strong> (curly brackets) as delimiters.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
@@ -2817,7 +2830,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{Bmatrix}
 </code></pre>
 </div>
-<h4><code>vmatrix</code></h4>
+<h4 id="vmatrix" tabindex="-1"><code>vmatrix</code></h4>
 <p>A matrix with <strong>single bars</strong> as delimiters.</p>
 <div class='side-by-side'>
  <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
@@ -2827,7 +2840,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{vmatrix}
 </code></pre>
 </div>
-<h4><code>Vmatrix</code></h4>
+<h4 id="vmatrix-1" tabindex="-1"><code>Vmatrix</code></h4>
 <p>A matrix with <strong>double bars</strong> as delimiters.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
@@ -2837,7 +2850,7 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{Vmatrix}
 </code></pre>
 </div>
-<h4><code>matrix*</code></h4>
+<h4 id="matrix*" tabindex="-1"><code>matrix*</code></h4>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{matrix*}
@@ -2846,14 +2859,14 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 <span class="hljs-keyword">\end</span>{matrix*}
 </code></pre>
 </div>
-<h4><code>smallmatrix</code></h4>
+<h4 id="smallmatrix" tabindex="-1"><code>smallmatrix</code></h4>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
 </code></pre>
 </div>
-<h3>Other Environments</h3>
-<h4><code>cases</code>, <code>dcases</code> and <code>rcases</code></h4>
+<h3 id="other-environments" tabindex="-1">Other Environments</h3>
+<h4 id="cases%2C-dcases-and-rcases" tabindex="-1"><code>cases</code>, <code>dcases</code> and <code>rcases</code></h4>
 <p>Use these environments to write piecewise functions:</p>
 <div class='side-by-side'>
 <div class='math frame'>$$f(n) = \begin{cases}
@@ -2895,7 +2908,7 @@ $$</div>
 
 </code></pre>
 </div>
-<h4><code>gather</code></h4>
+<h4 id="gather" tabindex="-1"><code>gather</code></h4>
 <p>Consecutive equations without alignment</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{gather}
@@ -2910,7 +2923,7 @@ $$</div>
   <span class="hljs-keyword">\end</span>{gather}
 </code></pre>
 </div>
-<h4><code>multline</code></h4>
+<h4 id="multline" tabindex="-1"><code>multline</code></h4>
 <p>The first line is left aligned, the last line is right aligned.</p>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{multline}
@@ -2925,7 +2938,7 @@ $$</div>
   <span class="hljs-keyword">\end</span>{multline}
 </code></pre>
 </div>
-<h4><code>align</code></h4>
+<h4 id="align" tabindex="-1"><code>align</code></h4>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{align}
 f(x) & = (a+b)^2 \\
@@ -2937,7 +2950,7 @@ f(x) & = (a+b)^2 \\
 <span class="hljs-keyword">\end</span>{align}
 </code></pre>
 </div>
-<h4>Others</h4>
+<h4 id="others-1" tabindex="-1">Others</h4>
 <div class='side-by-side'>
   <div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
 <pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{math}
@@ -3003,7 +3016,7 @@ can be used as building blocks for more elaborate structures:</p>
 <pre><code class="language-tex">  <span class="hljs-keyword">\​</span>begin{aligned}...<span class="hljs-keyword">\end</span>{aligned}
 </code></pre>
 </div>
-<h2>TeX Registers</h2>
+<h2 id="tex-registers" tabindex="-1">TeX Registers</h2>
 <p>The math typesetting is influenced by some “constants” that are stored
 in “registers”. Those registers can be set globally on a mathfield using
 the <code>registers</code> option.</p>
@@ -3063,7 +3076,7 @@ the <code>registers</code> option.</p>
 </tbody>
 </table>
 </div>
-<h2>TeX Primitives</h2>
+<h2 id="tex-primitives" tabindex="-1">TeX Primitives</h2>
 <p>The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.</p>
 <div class=symbols-table>
@@ -3128,14 +3141,14 @@ document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / C
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

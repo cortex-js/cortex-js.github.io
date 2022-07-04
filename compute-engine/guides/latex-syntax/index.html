@@ -902,11 +902,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Parsing and Serializing LaTeX</h1>
-<p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
+
+<h1>Parsing and Serializing LaTeX</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#advanced-usage">Advanced Usage</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p>The CortexJS Compute Engine manipulates MathJSON expressions. It can also
 convert LaTeX strings to MathJSON expressions (<strong>parsing</strong>) and output MathJSON
 expressions as LaTeX string (<strong>serializing</strong>).</p>
 <p><strong>To parse a LaTeX string to MathJSON</strong>, call the <code>ce.parse()</code> function.</p>
@@ -937,7 +950,7 @@ ce.<span class="hljs-property">latexOptions</span> = {
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{1}{7}&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;0{,}14\\ldots&quot;</span>
 </code></pre>
-<h2>Customizing the Decimal Marker</h2>
+<h2 id="customizing-the-decimal-marker" tabindex="-1">Customizing the Decimal Marker</h2>
 <p>The world is
 <a href="https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg">about evenly split</a>
 between using a dot or a comma as a decimal marker.</p>
@@ -947,7 +960,7 @@ between using a dot or a comma as a decimal marker.</p>
 </code></pre>
 <p>Note that in LaTeX, in order to get the correct spacing around the comma, it
 must be surrounded by curly brackets.</p>
-<h2>Advanced Usage</h2>
+<h2 id="advanced-usage" tabindex="-1">Advanced Usage</h2>
 <p>The LaTeX that can be parsed or serialized is defined by some dictionary
 entries. While the Compute Engine function and symbol definitions define the
 semantic of the MathJSON expressions, the LaTeX dictionary define the LaTeX

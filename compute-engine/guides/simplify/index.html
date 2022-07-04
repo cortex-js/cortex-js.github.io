@@ -902,11 +902,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Simplify</h1>
-<p>A complicated mathematical expression can often be transformed into a form that
+
+<h1>Simplify</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#defining-%E2%80%9Csimpler%E2%80%9D">Defining “Simpler”</a></li><li><a href="#numeric-simplifications">Numeric Simplifications</a></li><li><a href="#using-assumptions">Using Assumptions</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p>A complicated mathematical expression can often be transformed into a form that
 is easier to understand.</p>
 <p>The <code>expr.simplify()</code> function tries expanding, factoring and applying many
 other transformations to find a simple a simpler form of a symbolic expression.</p>
@@ -918,7 +931,7 @@ of the function definition. In addition, any argument wrapped with a <code>Hold<
 function will be held, that is, not simplified. Conversely, a held argument
 wrapped with a <code>ReleaseHold</code> function will not be held, and it will be
 simplified.</p>
-<h2>Defining “Simpler”</h2>
+<h2 id="defining-%E2%80%9Csimpler%E2%80%9D" tabindex="-1">Defining “Simpler”</h2>
 <p>An expression may be represented by several equivalent forms.</p>
 <p>For example \( (x + 4)(x-5) \) and \(x^2 -x -20\) represent the same
 expression.</p>
@@ -943,14 +956,14 @@ of operations in the expression, and giving an increasing cost to:</p>
 <p><strong>To influence how the complexity of an expression is measured</strong>, set the
 <code>costFunction</code> property of the compute engine to a function assigning a cost to
 an expression.</p>
-<h2>Numeric Simplifications</h2>
+<h2 id="numeric-simplifications" tabindex="-1">Numeric Simplifications</h2>
 <p>The <code>expr.simplify()</code> function will apply some numeric simplifications, such as
 combining small integer and rational values, simplifying division by 1, addition
 or subtraction of 0, etc…</p>
 <p>It avoids making any simplification that could result in a loss of precision.</p>
 <p>For example, \( 10^{300} + 1\) cannot be simplified without losing the least
 significant digit, so <code>expr.simplify()</code> will return the expression unmodified.</p>
-<h2>Using Assumptions</h2>
+<h2 id="using-assumptions" tabindex="-1">Using Assumptions</h2>
 <p>Assumptions are additional information available about some symbols, for example
 \( x &gt; 0 \) or \(n \in \N\).</p>
 <p>Some transformations are only applicable if some assumptions can be verified.</p>

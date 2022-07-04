@@ -703,19 +703,33 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Customizing - MathLive Guide</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#localization">Localization</a></li><li><a href="#fonts">Fonts</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1>Customizing a mathfield</h1>
+<h1 id="customizing-a-mathfield" tabindex="-1">Customizing a mathfield</h1>
 <p>The appearance and behavior of the mathfield is highly customizable. Here are a
 few common examples.</p>
-<h2>Styling</h2>
+<h2 id="styling" tabindex="-1">Styling</h2>
 <p><strong>To style the mathfield use the <code>style</code> attribute on the <code>&lt;math-field&gt;</code>
 tag or define a CSS rule targeting the mathfield.</strong></p>
 <p>This can be used to modify the appearance of the mathfield in many ways, for
@@ -739,7 +753,7 @@ use <code>style=&quot;display: inline-block&quot;</code></p>
 </code-playground>
 <!-- htmlmin:ignore -->
 <section id='focus-ring'>
-<h3>Focus Ring</h3>
+<h3 id="focus-ring" tabindex="-1">Focus Ring</h3>
 <p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
@@ -763,7 +777,7 @@ mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element. </p>
 </section>
 <section id='css-variables'>
-<h2>CSS Variables</h2>
+<h2 id="css-variables" tabindex="-1">CSS Variables</h2>
 <p><strong>To customize the appearance of the mathfield</strong>, use the following CSS
 variables (custom properties) in a ruleset that applies to the mathfield element.</p>
 <pre><code class="language-css">math-field {
@@ -852,10 +866,10 @@ virtual keyboard panel container.</p>
 <p>Read more about <a href="https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance">customizing the virtual keyboard appearance</a></p>
 </section>
 <section id='display-options'>
-<h2>Display Options</h2>
+<h2 id="display-options" tabindex="-1">Display Options</h2>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
-<h3>Color</h3>
+<h3 id="color" tabindex="-1">Color</h3>
 <p><strong>To change the foreground (“ink”) and background (“paper”) colors of a formula
 programmatically</strong>, use the <code>applyStyle()</code> function.</p>
 <p><strong>To change the foreground color</strong>, use the <code>\textcolor{}{}</code> command.
@@ -878,7 +892,7 @@ different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.</p>
 <p class="notice--info"><strong>To customize how the color names are interpreted</strong> provide a <code>colorMap</code>
 or <code>backgroundColorMap</code> function.</p>
-<h3>Size</h3>
+<h3 id="size" tabindex="-1">Size</h3>
 <p><strong>To change the base font size</strong>, set the <code>font-size</code> CSS property to the desired
 value on the <code>mathfield</code> or static element.</p>
 <p>Within a formula, the size can be specified from a font scale with 10 values,
@@ -947,7 +961,7 @@ where 1 em is the base font size of the mathfield or static element.</p>
 <p class="notice--warning">In TeX, the sizing commands behave inconsistently when applied to math.
 Other implementations of TeX may also interpret the sizing commands
 differently.</p>
-<h3>Math Layout</h3>
+<h3 id="math-layout" tabindex="-1">Math Layout</h3>
 <p><strong>To control some aspects of the math typesetting</strong>, change the mathstyle with
 the commands <code>\displaystyle</code>, <code>\textstyle</code>, <code>\scriptstyle</code>, <code>\scriptscriptstyle</code>.</p>
 <p><img src="/assets/images/mathfield/mathstyles.png" alt=""></p>
@@ -994,7 +1008,7 @@ for the mathfield, use the <code>min-width</code> CSS property.</p>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<h3>Letter Shape Style</h3>
+<h3 id="letter-shape-style" tabindex="-1">Letter Shape Style</h3>
 <p><strong>To control which letters are automatically italicized</strong>, use the <code>letterShapeStyle</code> configuration option.</p>
 <div class='symbols-table'>
 <table>
@@ -1049,7 +1063,7 @@ letters and lowercase greek letters, but not uppercase greek letters.</p>
 the <code>french</code> style is used, <code>tex</code> otherwise.</p>
 </section>
 <section id='editing-options'>
-<h2>Editing Options</h2>
+<h2 id="editing-options" tabindex="-1">Editing Options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
 the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
 as we’ve see above with the <code>fontsDirectory</code> option.</p>
@@ -1094,7 +1108,7 @@ details about these and other available options
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <section id='space-bar'>
-<h2>Handling the Space Bar</h2>
+<h2 id="handling-the-space-bar" tabindex="-1">Handling the Space Bar</h2>
 <p>In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
 relational, binary or unary operators, etc…</p>
@@ -1108,7 +1122,7 @@ relational, binary or unary operators, etc…</p>
 </code></pre>
 </section>
 <section id='localization'>
-<h2>Localization</h2>
+<h2 id="localization" tabindex="-1">Localization</h2>
 <p>The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.</p>
 <p>The language to use is detected automatically, but it can be overridden by
@@ -1139,7 +1153,7 @@ console.log(mf.getOptions().strings[locale]);
 </code-playground>
 <!-- htmlmin:ignore -->
 </section>
-<h2>Fonts</h2>
+<h2 id="fonts" tabindex="-1">Fonts</h2>
 <p>The content of the mathfield is displayed using a family of high-quality
 fonts based on the original Computer Modern font from TeX. The mathfield
 will not display correctly using another font.</p>
@@ -1180,14 +1194,14 @@ Learn more about configuring the MathLive library to your environment, including
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

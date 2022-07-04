@@ -902,11 +902,24 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Domains</h1>
-<p>A <strong>domain</strong> is the set of the possible values of an expression.</p>
+
+<h1>Domains</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#obtaining-the-domain-of-an-expression">Obtaining the Domain of an Expression</a></li><li><a href="#domain-lattice">Domain Lattice</a></li><li><a href="#domain-compatibility">Domain Compatibility</a></li><li><a href="#parametric-domains">Parametric Domains</a></li><li><a href="#simplifying-domains">Simplifying Domains</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <p>A <strong>domain</strong> is the set of the possible values of an expression.</p>
 <p>A domain is represented by a <strong>domain expression</strong>, such as <code>Integer</code>, <code>Boolean</code>
 or <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code>. <code>Integer</code> and <code>Boolean</code> are
 <strong>domain literals</strong>, while <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code> is a
@@ -922,7 +935,7 @@ transformations are applicable.</p>
 <strong>Domain Literals</strong> included in the standard dictionary of the
 Compute Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <section id='obtaining-the-domain-of-an-expression'>
-<h2>Obtaining the Domain of an Expression</h2>
+<h2 id="obtaining-the-domain-of-an-expression" tabindex="-1">Obtaining the Domain of an Expression</h2>
 <p><strong>To query the domain of an expression</strong>, read the <code>domain</code> property of the
 expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
@@ -942,7 +955,7 @@ ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x2
 </code></pre>
 </section>
 <section id='domain-lattice'>
-<h2>Domain Lattice</h2>
+<h2 id="domain-lattice" tabindex="-1">Domain Lattice</h2>
 <p><strong>Domains are defined in a hierarchy (a lattice).</strong> The upper bound of the
 domain lattice is the <code>Anything</code> domain (the top domain) and its lower bound is
 the <code>Void</code> domain (the bottom domain).</p>
@@ -977,7 +990,7 @@ example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
 <a href="https://www.researchgate.net/publication/.221564157_An_Algebra_of_Properties">Weibel, Trudy &amp; Gonnet, Gaston. (1991). An Algebra of Properties… 352-359. 10.1145/120694.120749. </a>.</p>
 </section>
 <section id='domain-compatibility'>
-<h2>Domain Compatibility</h2>
+<h2 id="domain-compatibility" tabindex="-1">Domain Compatibility</h2>
 <p>Two domains can be evaluated for their <strong>compatibility</strong>.</p>
 <p>There are three kinds of
 <a href="https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)">compatibility</a>
@@ -997,7 +1010,7 @@ every domain.</li>
 </code></pre>
 </section>
 <section id='parametric-domains'>
-<h2>Parametric Domains</h2>
+<h2 id="parametric-domains" tabindex="-1">Parametric Domains</h2>
 <p>A new domain can be defined using a parametric domain expression.</p>
 <pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Literal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Literal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
@@ -1092,7 +1105,7 @@ the parametric domain function.</p>
 </div>
 </section>
 <section id='simplifying-domains'>
-<h2>Simplifying Domains</h2>
+<h2 id="simplifying-domains" tabindex="-1">Simplifying Domains</h2>
 <p><strong>To simplify a domain expression</strong>, call <code>domain.simplify()</code>.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">0</span>]]).<span class="hljs-title function_">simplify</span>();
 <span class="hljs-comment">// ➔ [&quot;Range&quot;, 1, &quot;+Infinity]]</span>

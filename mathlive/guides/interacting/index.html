@@ -698,16 +698,29 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Interacting with a Mathfield</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive?module",
     };
 </script>
-<h1>Interacting with a Mathfield</h1>
-<h2>Reading the Content of a Mathfield</h2>
+<h2 id="reading-the-content-of-a-mathfield" tabindex="-1">Reading the Content of a Mathfield</h2>
 <p><strong>To read the content of a <code>&lt;math-field&gt;</code> element</strong> use its <code>value</code>
 property, just like with a <code>&lt;textarea&gt;</code>.</p>
 <p><strong>To be notified as soon as the content of the mathfield is modified</strong> listen for
@@ -751,7 +764,7 @@ mf.addEventListener('input',(ev) => {
     console.log(ev.target.getValue('math-json'));
 });</div>
 </code-playground>
-<h2>Listening for Changes to a Mathfield</h2>
+<h2 id="listening-for-changes-to-a-mathfield" tabindex="-1">Listening for Changes to a Mathfield</h2>
 <p>The mathfield element dispatches the <code>beforeinput</code> and <code>input</code> <a href="https://www.w3.org/TR/input-events-1/">Input Events</a>, which
 are also implemented by <code>&lt;textarea&gt;</code> and similar elements.</p>
 <p>The <code>beforeinput</code> and <code>input</code> events implement the <code>InputEvent</code> interface.</p>
@@ -843,7 +856,7 @@ have been done. This event is cancelable. Calling <code>preventDefault()</code> 
 event will cause the modification to be prevented.</p>
 <p>If the <code>beforeinput</code> event is not canceled, the mathfield content is modified
 and a <code>input</code> event is dispatched. The <code>input</code> event is not cancelable.</p>
-<h2>Changing the Content of a Mathfield</h2>
+<h2 id="changing-the-content-of-a-mathfield" tabindex="-1">Changing the Content of a Mathfield</h2>
 <p>You can change the value of the mathfield programatically. In the example
 below, the <strong>LaTeX</strong> input field is editable and is reflected in the mathfield
 (and vice-versa).</p>
@@ -879,7 +892,7 @@ triggered and creating an infinite loop.</p>
   autocorrect="off" spellcheck="false"></textarea></textarea>
   </div>
 </code-playground>
-<h2>Applying Style to a Mathfield</h2>
+<h2 id="applying-style-to-a-mathfield" tabindex="-1">Applying Style to a Mathfield</h2>
 <p>The text color (“ink”) and background color (“paper”), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using <code>applyStyle()</code>.</p>
@@ -937,7 +950,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 property to <code>&quot;none&quot;</code>, or the value of the <code>fontShape</code>, <code>fontSeries</code> or <code>fontSize</code>
 property to <code>&quot;auto&quot;</code>.</p>
 <p class="notice--info">You can ignore styles applied to a formula by using <code>mf.getValue('latex-unstyled')</code></p>
-<h2>Detecting a Click on a Mathfield</h2>
+<h2 id="detecting-a-click-on-a-mathfield" tabindex="-1">Detecting a Click on a Mathfield</h2>
 <p>In most cases MathLive will respond to mouse and keyboard interactions with
 the mathfield. However, in some cases it might be useful to detect when a
 mathfield is clicked on. For example, you could display one or more read-only
@@ -978,7 +991,7 @@ may not be able to reliably trigger this event.</p>
 <p>Instead, to detect when a mathfield is being clicked on, listen for a <code>focus</code>
 event or a <code>pointerdown</code> event. The <code>focus</code> event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.</p>
-<h2>Detecting When the User has Finished Editing a Mathfield</h2>
+<h2 id="detecting-when-the-user-has-finished-editing-a-mathfield" tabindex="-1">Detecting When the User has Finished Editing a Mathfield</h2>
 <p><strong>To detect when the user presses the <strong>Return</strong> or <strong>Enter</strong> key in a mathfield</strong>,
 listen for the <code>change</code> event.</p>
 <p>Note that this event is not fired when in LaTeX editing mode, where <strong>Return</strong>
@@ -988,7 +1001,7 @@ use the keyboard. This behavior matches the <code>&lt;textarea&gt;</code> elemen
 <p><strong>To listen specifically for a press of the <strong>Return</strong> or <strong>Enter</strong> key on the
 keyboard</strong> listen for an <code>input</code> event with an <code>inputType</code> property of <code>&quot;insertLineBreak&quot;</code>.</p>
 <section id='clipboard'>
-<h2>Interacting with the Clipboard</h2>
+<h2 id="interacting-with-the-clipboard" tabindex="-1">Interacting with the Clipboard</h2>
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
 commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C</kbd>).</p>
 <p>Multiple flavors are put on the clipboard:</p>
@@ -1062,14 +1075,14 @@ corresponding definition, <code>\mathrm{d}</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

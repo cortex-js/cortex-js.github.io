@@ -698,22 +698,35 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <script>
+
+<h1>Key Bindings and Inline Shortcuts</h1>
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+    
+          <div class="toc__menu" >
+        <ol><li><a href="#key-bindings">Key Bindings</a><ol><li><a href="#international-keyboards">International Keyboards</a></li></ol></li><li><a href="#inline-shortcuts">Inline Shortcuts</a></li><li><a href="#multicharacter-symbol">Multicharacter Symbol</a></li><li><a href="#customizing-the-inline-shortcut-sensitivity">Customizing the Inline Shortcut Sensitivity</a></li><li><a href="#asciimath-inline-shortcuts">ASCIIMath Inline Shortcuts</a></li></ol>
+      </div>
+                        
+        </nav>
+
+
+          <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1>Key Bindings and Inline Shortcuts</h1>
 <p>Input using a physical keyboard can be sped using two methods:</p>
 <ul>
-<li>key bindings</li>
-<li>inline shortcuts</li>
+<li><strong>key bindings</strong></li>
+<li><strong>inline shortcuts</strong></li>
 </ul>
-<h2>Key bindings</h2>
+<h2 id="key-bindings" tabindex="-1">Key Bindings</h2>
 <p>A key binding is a combination of keys pressed simultaneously that
 triggers a command.</p>
 <p>For example, pressing <kbd>Alt/Options</kbd> and the <kbd>V</kbd> key at the same time will insert
@@ -760,7 +773,7 @@ mf.setOptions({
 </ul>
 <p>Return <code>false</code> to stop handling of the event, otherwise the default command
 (if any) associated with this keystroke will be processed.</p>
-<h3>International Keyboards</h3>
+<h3 id="international-keyboards" tabindex="-1">International Keyboards</h3>
 <p>Correctly handling keyboard shortcuts while accounting for international
 keyboard layout is surprisingly difficult. MathLive uses some heuristics that
 may occasionally result in a surprising result.</p>
@@ -803,7 +816,7 @@ if it is confident enough of that guess.</p>
 to use a keyboard layout MathLive doesn’t know, it will guess the wrong keyboard
 layout. As a result some keyboard shortcuts may produce unexpected results.</p>
 <section id='inline-shortcuts'>
-<h2>Inline Shortcuts</h2>
+<h2 id="inline-shortcuts" tabindex="-1">Inline Shortcuts</h2>
 <p>An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
 trigger a command, but only to insert a LaTeX fragment.</p>
@@ -870,7 +883,7 @@ match, the shortcut will be applicable.</p>
 <li><code>&quot;text&quot;</code> Some plain text</li>
 </ul>
 </section>
-<h2>Multicharacter Symbol</h2>
+<h2 id="multicharacter-symbol" tabindex="-1">Multicharacter Symbol</h2>
 <p>In some cases it may not be possible to define in advance all the possible
 combinations of keystrokes that should be interpreted as an inline shortcut.
 For example, it might be desirable to recognize multi-character symbols, e.g.
@@ -891,7 +904,7 @@ should return a command representing this symbol.</p>
 });
 
 </code></pre>
-<h3>Customizing the Inline Shortcut Sensitivity</h3>
+<h2 id="customizing-the-inline-shortcut-sensitivity" tabindex="-1">Customizing the Inline Shortcut Sensitivity</h2>
 <p><strong>To change how quickly a set of keys must be typed to be considered a shortcut</strong>
 set the <code>inlineShortcutTimeout</code> option.</p>
 <p>It represents the maximum amount of time, in milliseconds, between consecutive characters for them to be
@@ -909,7 +922,7 @@ second character if this option is set to a value of 250 or so.</p>
 <p>Note that some operations, such as clicking to change the selection, or losing
 the focus on the mathfield, will automatically timeout the shortcuts.</p>
 <section id='ascii-math'>
-<h3>ASCIIMath Inline Shortcuts</h3>
+<h2 id="asciimath-inline-shortcuts" tabindex="-1">ASCIIMath Inline Shortcuts</h2>
 <p><a href="https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js">ASCIIMath</a> defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.</p>
 <p>The most common ASCIIMath shortcuts are part of the default inline shortcuts.</p>
@@ -1012,14 +1025,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="June 30, 2022">
+        <meta itemprop="datePublished" content="July 03, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-06-30'>June 30, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

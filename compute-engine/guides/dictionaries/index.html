@@ -902,11 +902,12 @@ Table of Content</label>
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        
-        <h1>Dictionaries</h1>
-<h2>Syntax and Symbol Dictionaries</h2>
+
+          <h1 id="dictionaries" tabindex="-1">Dictionaries</h1>
+<h2 id="syntax-and-symbol-dictionaries" tabindex="-1">Syntax and Symbol Dictionaries</h2>
 <p>The <a href ="/math-json/">MathJSON format</a> is independent of any source or
 target language (LaTeX, MathASCII, etc…) or of any specific interpretation of
 the symbols used in a MathJSON expression (<code>&quot;Pi&quot;</code>, <code>&quot;Sin&quot;</code>, etc…).</p>
@@ -930,7 +931,7 @@ interpret it.</p>
 <li>“<em>The <code>Add</code> function is associative, commutative, pure, idempotent and can be
 applied to arbitrary number of Real or Complex numbers</em>”.</li>
 </ul>
-<h2>Domains</h2>
+<h2 id="domains" tabindex="-1">Domains</h2>
 <p>A domain is similar to a type in a traditional programming language.</p>
 <p>The domain of a symbol provides some contextual information about this symbol,
 for example: <em>“x is a positive integer”</em>.</p>
@@ -938,7 +939,7 @@ for example: <em>“x is a positive integer”</em>.</p>
 or the domain of the “result” of the function.</p>
 <p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
 functions its codomain.</p>
-<h2>Functions</h2>
+<h2 id="functions" tabindex="-1">Functions</h2>
 <p>A MathJSON function such as <code>Add</code>, <code>Sin</code> or <code>Equal</code> can be used for a variety of
 purposes. It can be helpful to classify them in some broad categories:</p>
 <div class=symbols-table>
@@ -973,7 +974,7 @@ purposes. It can be helpful to classify them in some broad categories:</p>
 </tbody>
 </table>
 </div>
-<h2>Customizing the Dictionaries</h2>
+<h2 id="customizing-the-dictionaries" tabindex="-1">Customizing the Dictionaries</h2>
 <p><strong>To define a custom syntax</strong>, provide custom syntax and custom symbol
 dictionaries when creating a <code>ComputeEngine</code> instance.</p>
 <p>If no custom dictionaries are provided, the default ones are used. They are
