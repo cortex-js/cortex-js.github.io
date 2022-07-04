@@ -957,12 +957,12 @@ is an array of <code>VirtualKeyboardKeycap</code>. As a shortcut, a string can a
 used, which is equivalent to a <code>VirtualKeyboardKeycap</code> with a <code>latex</code> property
 equal to the string, that is, it will display the latex string as the keycap
 label and insert it when the key is pressed.</p>
-<pre><code class="language-js"><span class="hljs-attr">rows</span>: [
-  [
-    { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-attr">variants</span>: [<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;\\Alpha&quot;</span>] }
+<pre><code class="language-json">rows<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;a&quot;</span><span class="hljs-punctuation">,</span> variants<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;A&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\alpha&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\Alpha&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
     ...
-  ]
-]
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
 </code></pre>
 <h3 id="keycap-examples" tabindex="-1">Keycap Examples</h3>
 <p>Each keycap must define its label and what happens when the keycap is pressed.
@@ -973,29 +973,35 @@ used to specify both the label and what happens when the key is pressed.</p>
 <p>They <code>keycap</code> class indicates that the appearance of the key should be
 of a regular keycap, as opposed to a modified key (<code>modifier</code>) or an action
 key (<code>action</code>).</p>
-<pre><code class="language-js">  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\beta&quot;</span> },
-  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\mu_0&quot;</span> },
-  { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> },
+<pre><code class="language-json">  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\beta&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\mu_0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
 </code></pre>
 <p><strong>To display the key label as some HTML markup instead</strong>, use the <code>label</code>
 property:</p>
-<pre><code class="language-js">  { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> },
-  { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, 
-    <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>, 
-    <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span> 
-  },
+<pre><code class="language-json">  <span class="hljs-punctuation">{</span> label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span><span class="hljs-punctuation">,</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span> class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tex&quot;</span><span class="hljs-punctuation">,</span> 
+    latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span><span class="hljs-punctuation">,</span> 
+    latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span> 
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
 </code></pre>
 <p>The keycap label is displayed using the system font when the <code>label</code> property
 is used. To display it using the TeX fonts instead, set the value of the <code>class</code>
 property to <code>tex</code>.</p>
-<p><strong>To perform a command other than inserting a LaTeX string</strong>, use the <code>command</code>
+<p><strong>To perform a command other than inserting a LaTeX string</strong> use the <code>command</code>
 property:</p>
-<pre><code class="language-js">  {
-    <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
-    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
-    <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>]
-  },
+<pre><code class="language-json">  <span class="hljs-punctuation">{</span>
+    class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;action&quot;</span><span class="hljs-punctuation">,</span>
+    label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-commit&#x27; /&gt;&lt;/svg&gt;&quot;</span><span class="hljs-punctuation">,</span>
+    command<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;performWithFeedback&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;commit&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
 </code></pre>
+<p>The <code>commit</code> command is triggered when the user presses the <strong>Return</strong> or
+<strong>Enter</strong> key on the physical keyboard and will cause a <code>change</code> event to
+be dispatched.</p>
+<div class='read-more'><a href="/mathlive/guides/commands/">
+Find out more about the available commands
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span> = {
       <span class="hljs-string">&quot;high-school-layer&quot;</span>: {
         <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
@@ -1193,14 +1199,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -723,20 +723,22 @@ Table of Content</label>
 </script>
 <p>User initiated commands that control the mathfield can be dispatched using
 <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)"><code>executeCommand()</code></a>.</p>
-<p>Commands are
-identified by a string called the <strong>selector</strong>.</p>
+<p>Commands are identified by a string called the <strong>selector</strong>.</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;deleteBackward&#x27;</span>);
 </code></pre>
-<p>Most commands take no parameters. When a command does have a parameter, a tuple with the
-selector and the commands arguments can be passed to
+<p>Most commands take no parameters. When a command does have a parameter, a tuple
+with the selector and the commands arguments can be passed to
 <code>executeCommand()</code>. For example:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">executeCommand</span>([<span class="hljs-string">&#x27;insert&#x27;</span>, <span class="hljs-string">&#x27;(#0)&#x27;</span>]);
 </code></pre>
 <p>The command above will insert an open and close parenthesis around the selection (the <code>#0</code>
 sequence is replaced with the current selection).</p>
+<p>Commands can also be associated with virtual keyboard keycaps.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;action&quot;</span><span class="hljs-punctuation">,</span> label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Next&quot;</span><span class="hljs-punctuation">,</span> command<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;performWithFeedback&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;commit&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+</code></pre>
 <h2 id="editing" tabindex="-1">Editing</h2>
 <ul>
-<li><code>insert</code>. This selector takes two arguments. The first one is required and is
+<li><code>insert</code> This selector takes two arguments. The first one is required and is
 the content to be inserted, as a string. The second one is an optional set of
 key value pairs:
 <ul>
@@ -750,10 +752,10 @@ has been inserted) or <code>&quot;item&quot;</code> (the item that was inserted 
 selected).</li>
 </ul>
 </li>
-<li><code>delete</code> synonym for <code>deleteNextChar</code></li>
-<li><code>deleteBackward</code>, <code>deleteForward</code></li>
-<li><code>deleteNextWord</code>, <code>deletePreviousWord</code></li>
-<li><code>deleteToGroupStart</code>, <code>deleteToGroupEnd</code></li>
+<li><code>delete</code> Synonym for <code>deleteNextChar</code></li>
+<li><code>deleteBackward</code> <code>deleteForward</code></li>
+<li><code>deleteNextWord</code> <code>deletePreviousWord</code></li>
+<li><code>deleteToGroupStart</code> <code>deleteToGroupEnd</code></li>
 <li><code>deleteToMathFieldEnd</code></li>
 <li><code>transpose</code></li>
 </ul>
@@ -767,13 +769,15 @@ selected).</li>
 </ul>
 <h2 id="user-interface" tabindex="-1">User Interface</h2>
 <ul>
+<li><code>commit</code> The user has completed input. Triggered when pressing the <strong>Return</strong>
+or <strong>Enter</strong> key.</li>
 <li><code>switchMode</code></li>
-<li><code>complete</code> exit command mode and insert result</li>
+<li><code>complete</code> Exit command mode and insert result</li>
 <li><code>nextSuggestion</code> and <code>previousSuggestion</code> when the popover panel is selected,
 display the next/previous suggestion</li>
-<li><code>toggleKeystrokeCaption</code> show/hide the keystroke caption panel. This panel
+<li><code>toggleKeystrokeCaption</code> Show/hide the keystroke caption panel. This panel
 displays the keys being typed, including the shortcuts. Great for demos!</li>
-<li><code>toggleVirtualKeyboard</code> show/hide the virtual keyboard</li>
+<li><code>toggleVirtualKeyboard</code> Show/hide the virtual keyboard</li>
 </ul>
 <h2 id="scrolling" tabindex="-1">Scrolling</h2>
 <ul>
@@ -783,31 +787,31 @@ displays the keys being typed, including the shortcuts. Great for demos!</li>
 </ul>
 <h2 id="navigating" tabindex="-1">Navigating</h2>
 <ul>
-<li><code>moveToNextChar</code>, <code>moveToPreviousChar</code></li>
-<li><code>moveToNextPlaceholder</code>, <code>moveToPreviousPlaceholder</code></li>
-<li><code>moveToNextWord</code>, <code>moveToPreviousWord</code></li>
-<li><code>moveToGroupStart</code>, <code>moveToGroupEnd</code></li>
-<li><code>moveToMathFieldStart</code>, <code>moveToMathFieldEnd</code></li>
-<li><code>moveUp</code>, <code>moveDown</code></li>
-<li><code>moveToSuperscript</code>, <code>moveToSubscript</code></li>
+<li><code>moveToNextChar</code> <code>moveToPreviousChar</code></li>
+<li><code>moveToNextPlaceholder</code> <code>moveToPreviousPlaceholder</code></li>
+<li><code>moveToNextWord</code> <code>moveToPreviousWord</code></li>
+<li><code>moveToGroupStart</code> <code>moveToGroupEnd</code></li>
+<li><code>moveToMathFieldStart</code> <code>moveToMathFieldEnd</code></li>
+<li><code>moveUp</code> <code>moveDown</code></li>
+<li><code>moveToSuperscript</code> <code>moveToSubscript</code></li>
 <li><code>moveToOpposite</code></li>
-<li><code>moveBeforeParent</code>, <code>moveAfterParent</code></li>
+<li><code>moveBeforeParent</code> <code>moveAfterParent</code></li>
 </ul>
 <h2 id="extending-the-selection" tabindex="-1">Extending the Selection</h2>
 <ul>
 <li><code>selectGroup</code></li>
 <li><code>selectAll</code></li>
-<li><code>extendToNextChar</code>, <code>extendToPreviousChar</code></li>
-<li><code>extendToNextWord</code>, <code>extendToPreviousWord</code></li>
-<li><code>extendUp</code>, <code>extendDown</code></li>
-<li><code>extendToNextBoundary</code>, <code>extendToPreviousBoundary</code></li>
-<li><code>extendToGroupStart</code>, <code>extendToGroupEnd</code></li>
-<li><code>extendToMathFieldStart</code>, <code>extendToMathFieldEnd</code></li>
+<li><code>extendToNextChar</code> <code>extendToPreviousChar</code></li>
+<li><code>extendToNextWord</code> <code>extendToPreviousWord</code></li>
+<li><code>extendUp</code> <code>extendDown</code></li>
+<li><code>extendToNextBoundary</code> <code>extendToPreviousBoundary</code></li>
+<li><code>extendToGroupStart</code> <code>extendToGroupEnd</code></li>
+<li><code>extendToMathFieldStart</code> <code>extendToMathFieldEnd</code></li>
 </ul>
 <h2 id="arrays" tabindex="-1">Arrays</h2>
 <ul>
-<li><code>addRowAfter</code>, <code>addRowBefore</code></li>
-<li><code>addColumnAfter</code>, <code>addColumnBefore</code></li>
+<li><code>addRowAfter</code> <code>addRowBefore</code></li>
+<li><code>addColumnAfter</code> <code>addColumnBefore</code></li>
 </ul>
 <h2 id="speech" tabindex="-1">Speech</h2>
 <ul>
@@ -840,14 +844,14 @@ AWS speech synthesizer.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
