@@ -1204,7 +1204,7 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 <h3 id="other-functions" tabindex="-1">Other Functions</h3>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>BaseForm</code></td><td>
-<p><code>[“BaseForm”, <em>value:Integer</em>]</code><br>
+    <p><code>[“BaseForm”, <em>value:Integer</em>]</code><br>
 <code>[“BaseForm”, <em>value:Integer</em>, <em>base</em>]</code></p>
 <p>Format an <em>integer</em> in a specific <em>base</em>, such as hexadecimal or binary.</p>
 <p>If no <em>base</em> is specified, use base-10.</p>
@@ -1214,23 +1214,23 @@ constants<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 <li><em>base</em> should be an integer from 2 to 36.</li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;BaseForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">16</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ (\text(2a))<em 16="">{16}</span>
+<span class="hljs-comment">// ➔ (\text(2a))_{16}</span>
 </code></pre>
 <pre><code class="language-cortex">Latex(BaseForm(42, 16))
-// ➔ (\text(2a))</em>
+// ➔ (\text(2a))_{16}
 String(BaseForm(42, 16))
-// ➔ &quot;‘0x2a’&quot;
+// ➔ &quot;'0x2a'&quot;
 </code></pre>
 </td></tr>
 <tr><td><code>Clamp</code></td><td>
-<p><code>[“Clamp”, <em>value</em>]</code><br>
+    <p><code>[“Clamp”, <em>value</em>]</code><br>
 <code>[“Clamp”, <em>value</em>, <em>lower</em>, <em>upper</em>]</code></p>
 <ul>
-<li>If <code><em>value</em></code> is less than <code><em>lower</em></code>, evaluate to <code><em>lower</em></code></li>
-<li>If <code><em>value</em></code> is greater than <code><em>upper</em></code>, evaluate to <code><em>upper</em></code></li>
-<li>Otherwise, evaluate to <code><em>value</em></code></li>
+<li>If <code>_value_</code> is less than <code>_lower_</code>, evaluate to <code>_lower_</code></li>
+<li>If <code>_value_</code> is greater than <code>_upper_</code>, evaluate to <code>_upper_</code></li>
+<li>Otherwise, evaluate to <code>_value_</code></li>
 </ul>
-<p>If <code><em>lower</em></code> and <code><em>upper</em></code> are not provided, they take the default values of -1 and +1.</p>
+<p>If <code>_lower_</code> and <code>_upper_</code> are not provided, they take the default values of -1 and +1.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 5</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4.2</span><span class="hljs-punctuation">]</span>
@@ -1240,9 +1240,9 @@ String(BaseForm(42, 16))
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">100</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 11</span>
 </code></pre>
-</td></tr>
+</td></tr> 
 <tr><td><code>Max</code></td><td>
-<p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
+    <p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Max”, <em>list-of-values</em>]</code></p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest
 of the arguments.</p>
@@ -1253,22 +1253,22 @@ smaller than or equal to the largest real number.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Max&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7.1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;NaN&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;Max&quot;, 7.1, &quot;NaN&quot;, &quot;x&quot;]</span>
 </code></pre>
-</td></tr>
+</td></tr> 
 <tr><td><code>Min</code></td><td>
-<p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
+    <p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Min”, <em>list-of-values</em>]</code></p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the
 smallest of the arguments.</p>
 <p>Otherwise, simplify the expression by removing
 values that are greater than or equal to the smallest real number.</p>
-</td></tr>
+</td></tr> 
 <tr><td><code>Rational</code></td><td>
-<p><code>[“Rational”, <em>n:Number</em>]</code><br></p>
-<p>Evaluate to a rational approximating the value of the <code><em>n</em></code>.</p>
+    <p><code>[“Rational”, <em>n:Number</em>]</code><br></p>
+<p>Evaluate to a rational approximating the value of the <code>_n_</code>.</p>
 <br>
 <p><code>[“Rational”, <em>numerator:Integer</em>, <em>denominator:Integer</em>]</code></p>
-<p>Represent a rational number equal to <code><em>numerator</em></code> over <code><em>denominator</em></code>.</p>
-</td></tr>
+<p>Represent a rational number equal to <code>_numerator_</code> over <code>_denominator_</code>.</p>
+</td></tr> 
 </tbody></table> 
 
         

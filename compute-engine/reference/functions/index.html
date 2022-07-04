@@ -956,7 +956,7 @@ Table of Content</label>
           <h2 id="functions" tabindex="-1">Functions</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Function</code></td><td>
-<p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
+    <p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
 <code>[“Function”, <em>variable</em>, <em>body</em>]</code></p>
 <p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
 also called <strong>anonymous function</strong>.</p>
@@ -966,20 +966,20 @@ variables (parameters) of the Lambda-function.</p>
 a <code>[&quot;Return&quot;]</code> expression is encountered.</p>
 <p>The <code>[&quot;Function&quot;]</code> expression creates a new scope.</p>
 <p><strong>To apply some arguments to a function expression</strong>, use <code>[&quot;Apply&quot;]</code>.</p>
-</td></tr>
+</td></tr> 
 <tr><td><code>Apply</code></td><td>
-<p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
+    <p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
 <p><a href="https://en.wikipedia.org/wiki/Apply">Apply</a> a list of arguments to a lambda expression or function.</p>
 <p>The following wildcards in <em>body</em> are replaced as indicated</p>
 <ul>
-<li><code>_</code> or <code>_1</code> : the first argument</li>
-<li><code>_2</code> : the second argument</li>
-<li><code>_3</code> : the third argument, etc…</li>
-<li><code>_</code>: the sequence of arguments, so <code>[&quot;Length&quot;, &quot;&amp;#95;&quot;]</code> is the number of arguments</li>
+<li><code>\_</code> or <code>\_1</code> : the first argument</li>
+<li><code>\_2</code> : the second argument</li>
+<li><code>\_3</code> : the third argument, etc…</li>
+<li><code>\_</code>: the sequence of arguments, so <code>[&quot;Length&quot;, &quot;&amp;#95;&quot;]</code> is the number of arguments</li>
 </ul>
 <p>If <em>body</em> is a <code>[&quot;Function&quot;]</code> expression, the named arguments of <code>[&quot;Function&quot;]</code>
 are replaced by the wildcards.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 9</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 9</span>
@@ -989,12 +989,12 @@ are replaced by the wildcards.</p>
 cube(5)
 // ➔ 125
 </code></pre>
-</td></tr>
+</td></tr> 
 <tr><td><code>Return</code></td><td>
-<p><code>[“Return”, <em>expression</em>]</code></p>
+    <p><code>[“Return”, <em>expression</em>]</code></p>
 <p>If in an <code>[&quot;Function&quot;]</code> expression, interupts the evaluation of the function.
 The value of the <code>[&quot;Function&quot;]</code> expression is <em>expression</em></p>
-</td></tr>
+</td></tr> 
 </tbody></table>
 
         

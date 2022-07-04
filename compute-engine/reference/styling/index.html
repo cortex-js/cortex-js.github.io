@@ -959,25 +959,29 @@ material to the interpretation of an expression such as text color and size or
 other typographic variations.</p>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Delimiter</code></td><td>
-<p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Delimiter”, <em>expr</em>]</code><br>
+    <p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Delimiter”, <em>expr</em>]</code><br>
 <code>[“Delimiter”, <em>expr</em>, <em>sep</em>]</code><br>
 <code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>close</em>]</code><br>
 <code>[“Delimiter”, <em>expr</em>, <em>open</em>, <em>sep</em>, <em>close</em>]</code></p>
-<p>Display <em>expr</em> wrapped in a delimiter.</p>
+<p>May be used to group arithmetic expressions.</p>
+<p>When serializing to LaTeX, render <em>expr</em> wrapped in a delimiter.</p>
+<p>If <em>expr</em> is a <code>[&quot;List&quot;]</code> expression, serialize each element of the list, separated by <em>sep</em>.</p>
+<p>If no <em>sep</em> is provided, use a comma <code>,</code> as a separator.</p>
+<p>If no <em>open</em> and <em>close</em> strings are provided, use parentheses <code>(</code> and <code>)</code>.</p>
+<p>The <code>Delimiter</code> function is <strong>inert</strong> and the value of a <code>[&quot;Delimiter&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
 </td></tr>
 <tr><td><code>Spacing</code></td><td>
-<p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Spacing”, <em>width</em>]</code></p>
-<ul>
-<li><code><em>width</em></code> dimension of the spacing, in 1/18 em</li>
-</ul>
+    <p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Spacing”, <em>width</em>]</code></p>
+<p>When serializing to LaTeX,  <code>_width_</code> is the dimension of the spacing, in 1/18 em.</p>
+<p>The <code>Spacing</code> function is <strong>inert</strong> and the value of a <code>[&quot;Spacing&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
 </td></tr>
 <tr><td><code>Style</code></td><td>
-<p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Style”, <em>expr</em>, <em>dictionary</em>]</code><br></p>
+    <p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“Style”, <em>expr</em>, <em>dictionary</em>]</code><br></p>
 <ul>
-<li><code><em>expr</em></code> an expression</li>
-<li><code><em>dictionary</em></code> a dictionary with one or more of the following keys:
+<li><code>_expr_</code> an expression</li>
+<li><code>_dictionary_</code> a dictionary with one or more of the following keys:
 <ul>
-<li><em><code>&quot;display&quot;</code></em>:
+<li><code>_&quot;display&quot;_</code>:
 <ul>
 <li><code>&quot;inline&quot;</code> for <code>\textstyle</code></li>
 <li><code>&quot;block&quot;</code> for <code>\displaystyle</code></li>
@@ -985,11 +989,12 @@ other typographic variations.</p>
 <li><code>&quot;scriptscript&quot;</code> for <code>\scriptscriptstyle</code></li>
 </ul>
 </li>
-<li><code><em>&quot;size&quot;</em></code>: <code>1</code>…<code>10</code>. Size <code>5</code> is normal, size <code>1</code> is smallest</li>
-<li><code><em>&quot;color&quot;</em></code></li>
+<li><code>_&quot;size&quot;_</code>: <code>1</code>…<code>10</code>. Size <code>5</code> is normal, size <code>1</code> is smallest</li>
+<li><code>_&quot;color&quot;_</code></li>
 </ul>
 </li>
 </ul>
+<p>The <code>Style</code> function is <strong>inert</strong> and the value of a <code>[&quot;Style&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
 </td></tr>
 </tbody></table>
 </section>

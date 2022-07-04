@@ -925,7 +925,7 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
 
           <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
-<p>The <strong>CortexJS Compute Engine</strong> is a JavaScript/TypeScript library for symbolic
+<p class="xl">The <strong>CortexJS Compute Engine</strong> is a JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
@@ -952,19 +952,8 @@ students, scientists and engineers.</p>
 Try the <strong>interactive demo</strong> now
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="getting-started" tabindex="-1">Getting Started</h2>
-<p>The Compute Engine library is available in two flavors:</p>
-<ul>
-<li>A <strong>JavaScript module</strong> (ESM): <code>compute-engine.min.esm.js</code></li>
-<li>A <strong>UMD library</strong>, for CJS or AMD imports: <code>compute-engine.min.js</code></li>
-</ul>
-<p>If you are using a modern environment, use the ESM version. The ESM version
-does make use of modern JavaScript features such as optional chaining and more.</p>
-<p>If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. For example, WebPack 4 does
-not support the optional chaining operator, so use the UMD version in this case,
-which will make use of polyfills as necessary.</p>
-<p>A non-minified module, <code>compute-engine.esm.js</code>, is also available, which may
-be useful for debugging.</p>
+<p>The easiest way to get started it to load the Compute Engine JavaScript module
+from a CDN.</p>
 <h3 id="using-javascript-modules" tabindex="-1">Using JavaScript Modules</h3>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> 
@@ -976,7 +965,12 @@ be useful for debugging.</p>
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 </code></pre>
-<h2 id="using-vintage-javascript" tabindex="-1">Using Vintage JavaScript</h2>
+<p>The ESM (module) version is also available as <code>dist/compute-engine.min.esm.js</code></p>
+<h3 id="using-vintage-javascript" tabindex="-1">Using Vintage JavaScript</h3>
+<p>If you are using a vintage environment, or if your toolchain does not support
+modern JavaScript features, use the UMD version. For example, WebPack 4 does
+not support the optional chaining operator, so use the UMD version in this case,
+which will make use of polyfills as necessary.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/@cortex-js/compute-engine&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
   <span class="hljs-variable language_">window</span>.<span class="hljs-property">onload</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
@@ -986,9 +980,13 @@ be useful for debugging.</p>
   }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
+<p>The UMD version is also available as <code>dist/compute-engine.min.js</code></p>
+<h3 id="other-versions" tabindex="-1">Other Versions</h3>
+<p>A non-minified module, <code>compute-engine.esm.js</code>, is also available, which may
+be useful for debugging.</p>
 <h2 id="dictionaries" tabindex="-1">Dictionaries</h2>
 <p>Expressions reference symbols and functions that are defined in dictionaries.</p>
-<p>By default, new instances of the Compute Engine include a robust set of
+<p>By default, new <code>ComputeEngine</code> instances include a robust set of
 functions and symbols, grouped in several dictionaries.</p>
 <div class=symbols-table>
 <table>
@@ -1013,11 +1011,19 @@ functions and symbols, grouped in several dictionaries.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/control-structures/">Control Structures</a></td>
-<td style="text-align:left"><code>If</code> <code>Loop</code> <code>Sum</code> <code>Block</code> …</td>
+<td style="text-align:left"><code>If</code> <code>Block</code> <code>Loop</code> <code>Sum</code>  …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/core/">Core</a></td>
-<td style="text-align:left"><code>Missing</code> <code>Block</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+<td style="text-align:left"><code>Missing</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/domains/">Domains</a></td>
+<td style="text-align:left"><code>Anything</code> <code>Nothing</code> <code>Number</code> <code>Integer</code> …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/functions/">Functions</a></td>
+<td style="text-align:left"><code>Function</code> <code>Apply</code> <code>Return</code>  …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/logic/">Logic</a></td>
@@ -1032,14 +1038,18 @@ functions and symbols, grouped in several dictionaries.</p>
 <td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
 </tr>
 <tr>
+<td style="text-align:left"><a href="/compute-engine/reference/styling/">Styling</a></td>
+<td style="text-align:left"><code>Delimiter</code> <code>Style</code>…</td>
+</tr>
+<tr>
 <td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
 <td style="text-align:left"><code>Pi</code> <code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>To customize the dictionaries that define the math functions and symbols</strong>,
-use the constructor of the Compute Engine instance to define the dictionaries
+<p><strong>To customize the dictionaries that define the functions and symbols</strong>,
+use the <code>ComputeEngine</code> constructor to define the dictionaries
 to use.</p>
 <p>In addition to the built-in dictionaries, you can define your own.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
@@ -1063,14 +1073,14 @@ Read more about <strong>Dictionaries</strong>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

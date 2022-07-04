@@ -956,55 +956,11 @@ Table of Content</label>
 <h1>Collections</h1>
 
 
-          <nav class="toc">
-          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
-    
-          <div class="toc__menu" >
-        <ol><li><a href="#sequence">Sequence</a></li><li><a href="#set">Set</a></li><li><a href="#list">List</a></li><li><a href="#delimiter">Delimiter</a></li></ol>
-      </div>
-                        
-        </nav>
-
-
-          <h2 id="sequence" tabindex="-1"><code>Sequence</code></h2>
-<p>The most primitive collection: a series of expressions.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">LaTeX</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Sequence&quot;, 1, 2]</code></td>
-<td style="text-align:left">\( 1 2 \)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Sequence&quot;, [&quot;Add&quot;, &quot;x&quot;, 1], &quot;y&quot;]</code></td>
-<td style="text-align:left">\( x + 1 y \)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="set" tabindex="-1"><code>Set</code></h2>
-<p>An unordered collection of unique elements.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">LaTeX</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Set&quot;, &quot;x&quot;, &quot;y&quot;]</code></td>
-<td style="text-align:left">\( \lbrack x, y\rbrack \)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="list" tabindex="-1"><code>List</code></h2>
-<p>An ordered collection of elements.</p>
-<p>Use to represent a data structure, as opposed to <code>Parentheses</code> or <code>Sequence</code>.</p>
+          <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>List</code></td><td>
+    <p><code>[“List”, <em>expr-1</em>, …<em>expr-2</em>]</code></p>
+<p>An <strong>ordered</strong> collection of elements.</p>
+<p>Use to represent a data structure, unlike <code>Delimiter</code> which is just a visual styling.</p>
 <table>
 <thead>
 <tr>
@@ -1015,18 +971,18 @@ Table of Content</label>
 <tbody>
 <tr>
 <td style="text-align:left"><code>[&quot;List&quot;, &quot;x&quot;, &quot;y&quot;, &quot;7&quot;, &quot;11&quot;]</code></td>
-<td style="text-align:left">\([x, y, 7, 11]\)</td>
+<td style="text-align:left">\( \lbrack x, y, 7, 11\rbrack \)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>[&quot;List&quot;, &quot;x&quot;, &quot;Nothing&quot;, &quot;y&quot;]</code></td>
-<td style="text-align:left">\([x,y]\)</td>
+<td style="text-align:left">\( \lbrack x,y\rbrack \)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="delimiter" tabindex="-1"><code>Delimiter</code></h2>
-<p>One or more expressions in a sequence, enclosed with some delimiters and
-separated by a separator</p>
-<p>Use to represent function arguments and to group arithmetic expressions.</p>
+</td></tr>
+<tr><td><code>Set</code></td><td>
+    <p><code>[“Set”, <em>expr-1</em>, …<em>expr-2</em>]</code></p>
+<p>An <strong>unordered</strong> collection of unique elements.</p>
 <table>
 <thead>
 <tr>
@@ -1036,19 +992,13 @@ separated by a separator</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>[&quot;Parentheses&quot;, [&quot;Sequence&quot;, &quot;x&quot;, &quot;y&quot;, &quot;7&quot;, &quot;11&quot;]</code></td>
-<td style="text-align:left"><code>(x, y, 7, 11)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Delimiter&quot;]</code></td>
-<td style="text-align:left"><code>()</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Delimiter&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code></td>
-<td style="text-align:left"><code>(a, b, c)</code></td>
+<td style="text-align:left"><code>[&quot;Set&quot;, &quot;x&quot;, &quot;y&quot;]</code></td>
+<td style="text-align:left">\( \lbrace x, y\rbrace \)</td>
 </tr>
 </tbody>
 </table>
+</td></tr>
+</tbody></table>
 
         
       </section>
