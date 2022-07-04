@@ -683,6 +683,26 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/reference/functions/" data-url=/compute-engine/reference/control-structures/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Functions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/reference/logic/" data-url=/compute-engine/reference/control-structures/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -951,27 +971,39 @@ is evaluated.</p>
 <tr><td><code>Block</code></td><td>
 <p><code>[“Block”, <em>expr-1</em>, …<em>expr-n</em>]</code><br>
 <code>[“Block”, <em>dictionary</em>, <em>expr1</em>, …<em>expr-n</em>]</code></p>
-<p>When a <code>[&quot;Block&quot;]</code> expression is evaluated, the following steps are followed:</p>
+<p>The evaluation of a <code>[&quot;Block&quot;]</code> expression follows these steps:</p>
 <ol>
-<li>Create a new scope</li>
-<li>Set the value of the symbols in <em>dictionary</em> in this scope</li>
-<li>Evaluate each <em>expr</em> sequentially</li>
-</ol>
+<li>
+<p>Create a new scope</p>
+</li>
+<li>
+<p>Set the value of the symbols in <code><em>dictionary</em></code> in this scope.</p>
 <p>The <em>dictionary</em> argument can be a <code>[&quot;Dictionary&quot;]</code> expression, a
 <code>[&quot;KeyValuePair&quot;]</code> expression, a <code>[&quot;Pair&quot;]</code> expression or a <code>[&quot;Tuple&quot;]</code> expression.</p>
-<p>The value of the <code>[&quot;Block&quot;]</code> expression is the value of the last expression, or the
-value of the first <code>[&quot;Break&quot;]</code> expression.</p>
+</li>
+<li>
+<p>Evaluate each <em>expr</em> sequentially.</p>
+<p>If the value of an expression is a <code>[&quot;Return&quot;]</code> expression, a <code>[&quot;Break&quot;]</code>
+expression or a <code>[&quot;Continue&quot;]</code> expression, no more expressions are
+evaluated and the value of the <code>[&quot;Block&quot;]</code> is this expression.</p>
+<p>Otherwise, the value of the <code>[&quot;Block&quot;]</code> expression is the value of the last
+expression</p>
+</li>
+</ol>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
 </code></pre>
 </td></tr>
 <tr><td><code>If</code></td><td>
-<p><code>[“If”, <em>condition</em>, <em>expr-1</em>, <em>expr-2</em>]</code><br>
-<code>[“If”, <em>condition</em>, <em>expr-1</em>]</code></p>
+<p><code>[“If”, <em>condition</em>, <em>expr-1</em>]</code></p>
 <ul>
 <li>If the value of <code><em>condition</em></code> is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
-expression is <code><em>expr-1</em></code>.</li>
-<li>Otherwise, it is <code><em>expr-2</em></code> or <code>Nothing</code> if <code><em>expr-2</em></code>  is not provided.</li>
+expression is <code><em>expr-1</em></code>, otherwise <code>Nothing</code>.</li>
+</ul>
+<p><code>[“If”, <em>condition</em>, <em>expr-1</em>, <em>expr-2</em>]</code></p>
+<ul>
+<li>If the value of <code><em>condition</em></code> is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
+expression is <code><em>expr-1</em></code>, otherwise <code><em>expr-2</em></code>.</li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Value&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
@@ -1013,7 +1045,8 @@ of <code>min</code>, then incremented by <code>step</code> until it reaches at l
 the result no longer changes.</p>
 <p>To determine if a fixed point has been reached and the loop should terminate,
 the previous and current values are compared with <code>Same</code>.</p>
-<p>Use <code>[&quot;Break&quot;]</code> to exit the loop immediately.</p>
+<p>Use <code>[&quot;Break&quot;]</code> to exit the loop immediately or <code>[&quot;Continue&quot;]</code> to skip to
+the next iteration.</p>
 </td></tr>
 <tr><td><code>Loop</code></td><td>
 <p><code>[“Loop”, <em>body</em>]</code><br>
@@ -1025,7 +1058,8 @@ the previous and current values are compared with <code>Same</code>.</p>
 <code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
 <p>Repeatedly evaluate <code><em>body</em></code> until either <code><em>max-iterations</em></code> is reached (or
 <code>ce.iterationLimit</code> if <code><em>max-iteration</em></code> is not specified), or the value of
-<code><em>body</em></code> is a <code>[&quot;Break&quot;]</code> expression.</p>
+<code><em>body</em></code> is a <code>[&quot;Break&quot;]</code> expression, a <code>[&quot;Continue&quot;]</code> expression or a
+<code>[&quot;Return&quot;]</code> expression.</p>
 </td></tr>
 <tr><td><code>Product</code></td><td>
 <p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
@@ -1047,20 +1081,23 @@ the previous and current values are compared with <code>Same</code>.</p>
 </td></tr>
 </tbody></table>
 <h2 id="break-and-continue" tabindex="-1">Break and Continue</h2>
-<p><strong>To control the flow of a loop function</strong>, use <code>[&quot;Break&quot;]</code> and <code>[&quot;Continue&quot;]</code>.</p>
+<p><strong>To control the flow of a loop expression</strong>, use <code>[&quot;Break&quot;]</code> and <code>[&quot;Continue&quot;]</code>.</p>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>Break</code></td><td>
 <p><code>[“Break”]</code><br>
 <code>[“Break”, <em>expr</em>]</code><br></p>
-<p>When in a loop, exit the loop immediately. The final value of the loop
-expression is <code><em>expr</em></code> or <code>Nothing</code> if not provided.</p>
-<p><code>[&quot;Break&quot;]</code> expressions can also be used in a <code>[&quot;Block&quot;]</code> expression.</p>
+<p>When in a block, exit the block immediately. The value of the <code>[&quot;Block&quot;]</code>
+expression is the <code>[&quot;Break&quot;]</code> expression.</p>
+<p>When  in a loop exit the loop immediately. The final value of the loop is
+<code><em>expr</em></code> or <code>Nothing</code> if not provided.</p>
 </td></tr>
 <tr><td><code>Continue</code></td><td>
 <p><code>[“Continue”]</code><br>
 <code>[“Continue”, <em>expr</em>]</code><br></p>
 <p>When in a loop, skip to the next iteration of the loop. The value of the
 iteration is <code><em>expr</em></code> or <code>Nothing</code> if not provided.</p>
+<p>When in a block, exit the block immediately, and return the <code>[&quot;Continue&quot;]</code>
+expression as the value of the block.</p>
 </td></tr>
 </tbody></table>
 
@@ -1072,14 +1109,14 @@ iteration is <code><em>expr</em></code> or <code>Nothing</code> if not provided.
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

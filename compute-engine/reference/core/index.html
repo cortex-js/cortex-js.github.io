@@ -683,6 +683,26 @@ Table of Content</label>
               
 
               <li>              
+                <a href="/compute-engine/reference/functions/" data-url=/compute-engine/reference/core/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Functions
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/reference/logic/" data-url=/compute-engine/reference/core/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -933,7 +953,7 @@ Table of Content</label>
           <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
     
           <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#variables">Variables</a></li><li><a href="#functions">Functions</a></li><li><a href="#core-functions">Core Functions</a></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#variables">Variables</a></li><li><a href="#core-functions">Core Functions</a></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
                         
         </nav>
@@ -1010,51 +1030,6 @@ If <code>domain</code> is not provided, the domain is inferred based on the valu
 <p>If <code><em>symbol</em></code> does not exist in the current context, consider parent scopes until
 a definition for the symbol is found.</p>
 <p>If no definition for the symbol is found add one in the current scope.</p>
-</td></tr>
-</tbody></table>
-</section>
-<section id='functions'>
-<h2 id="functions" tabindex="-1">Functions</h2>
-<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>Function</code></td><td>
-<p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
-<code>[“Function”, <em>variable</em>, <em>body</em>]</code></p>
-<p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
-also called <strong>anonymous function</strong>.</p>
-<p>The first argument is a symbol or a list of symbols which are the bound
-variables (parameters) of the Lambda-function.</p>
-<p>The others arguments are expressions which are evaluated sequentially, or until
-a <code>[&quot;Return&quot;]</code> expression is encountered.</p>
-<p>The <code>[&quot;Function&quot;]</code> expression creates a new scope.</p>
-<p><strong>To apply some arguments to a function expression</strong>, use <code>[&quot;Apply&quot;]</code>.</p>
-</td></tr>
-<tr><td><code>Apply</code></td><td>
-<p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
-<p><a href="https://en.wikipedia.org/wiki/Apply">Apply</a> a list of arguments to a lambda expression or function.</p>
-<p>The following wildcards in <em>body</em> are replaced as indicated</p>
-<ul>
-<li><code>_</code> or <code>_1</code> : the first argument</li>
-<li><code>_2</code> : the second argument</li>
-<li><code>_3</code> : the third argument, etc…</li>
-<li><code>_</code>: the sequence of arguments, so <code>[&quot;Length&quot;, &quot;&amp;#95;&quot;]</code> is the number of arguments</li>
-</ul>
-<p>If <em>body</em> is a <code>[&quot;Function&quot;]</code> expression, the named arguments of <code>[&quot;Function&quot;]</code>
-are replaced by the wildcards.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 9</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 9</span>
-</code></pre>
-<p>You can assign a Lambda expression to a symbol for later use:</p>
-<pre><code class="language-cortex">cube = Lambda(_ * _ * _)
-cube(5)
-// ➔ 125
-</code></pre>
-</td></tr>
-<tr><td><code>Return</code></td><td>
-<p><code>[“Return”, <em>expression</em>]</code></p>
-<p>If in an <code>[&quot;Function&quot;]</code> expression, interupts the evaluation of the function.
-The value of the <code>[&quot;Function&quot;]</code> expression is <em>expression</em></p>
 </td></tr>
 </tbody></table>
 </section>
@@ -1282,14 +1257,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
