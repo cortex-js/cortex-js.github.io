@@ -707,14 +707,14 @@ Table of Content</label>
     
       <section class="page__content" itemprop="text">
 
-<h1>Customizing - MathLive Guide</h1>
+<h1>Customizing a Mathfield</h1>
 
 
           <nav class="toc">
           <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
     
           <div class="toc__menu" >
-        <ol><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#localization">Localization</a></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#localization">Localization</a></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
                         
         </nav>
@@ -726,7 +726,6 @@ Table of Content</label>
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-<h1 id="customizing-a-mathfield" tabindex="-1">Customizing a mathfield</h1>
 <p>The appearance and behavior of the mathfield is highly customizable. Here are a
 few common examples.</p>
 <h2 id="styling" tabindex="-1">Styling</h2>
@@ -752,31 +751,6 @@ use <code>style=&quot;display: inline-block&quot;</code></p>
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<section id='focus-ring'>
-<h3 id="focus-ring" tabindex="-1">Focus Ring</h3>
-<p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
-<!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
-  math-field:focus-within {
-    outline: 4px solid #d7170b;
-    border-radius: 4px;
-    background: rgba(251,	187,	182, .1);
-  }
-&lt;/style&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-<!-- htmlmin:ignore -->
-<p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
-with a keyboard. However, you can change the appearance of the outline,
-for example to indicate an error condition. If you remove the outline on the
-mathfield, make sure to replace it with another indicator, for example
-by displaying an outline on an enclosing element. </p>
-</section>
-<section id='css-variables'>
 <h2 id="css-variables" tabindex="-1">CSS Variables</h2>
 <p><strong>To customize the appearance of the mathfield</strong>, use the following CSS
 variables (custom properties) in a ruleset that applies to the mathfield element.</p>
@@ -864,8 +838,28 @@ Although CSS styles are “invisible” to custom components, CSS variables are
 with some CSS variables associated with a selector that applies to the
 virtual keyboard panel container.</p>
 <p>Read more about <a href="https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance">customizing the virtual keyboard appearance</a></p>
-</section>
-<section id='display-options'>
+<h2 id="focus-ring" tabindex="-1">Focus Ring</h2>
+<p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" >
+    <div slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+<p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
+with a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element. </p>
 <h2 id="display-options" tabindex="-1">Display Options</h2>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
@@ -1061,7 +1055,6 @@ letters and lowercase greek letters, but not uppercase greek letters.</p>
 <p>The French typographical convention is to only italicize lowercase roman letters.</p>
 <p>The default letter shape style is <code>auto</code>: if the system locale is “french”,
 the <code>french</code> style is used, <code>tex</code> otherwise.</p>
-</section>
 <section id='editing-options'>
 <h2 id="editing-options" tabindex="-1">Editing Options</h2>
 <p>Some configuration options can be specified when creating a mathfield as
@@ -1194,14 +1187,14 @@ Learn more about configuring the MathLive library to your environment, including
         
 
 
-        <meta itemprop="datePublished" content="July 03, 2022">
+        <meta itemprop="datePublished" content="July 04, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-03'>July 03, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
