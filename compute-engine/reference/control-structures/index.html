@@ -1022,25 +1022,21 @@ expression is <code>_expr-1_</code>, otherwise <code>_expr-2_</code>.</li>
 <p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration functions that share a
 similar form.</p>
 <p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.</p>
-<p>In the case of <code>Sum</code>, each value of <code>body</code>  is summed, and the
-value of the loop function is the sum. Similarly for <code>Product</code>.</p>
-<p>For <code>[&quot;Loop&quot;]</code> expressions, the value of the loop expression is the last value
-of <code>body</code> or the value of a <code>[&quot;Break&quot;]</code> expression.</p>
-<p>The other arguments indicate how the iteration should be performed:</p>
+<p>Their second argument, <code>iterator</code> can take the following shapes:</p>
 <ul>
-<li>if no other argument is specified, the <code>body</code> expression is evaluated until
-its value is a <code>[&quot;Break&quot;]</code> expression.</li>
-<li><code>max-iterations</code>: indicates how many times the <em>body</em> expression will be evaluated</li>
-<li><code>var</code>, <code>list-of-values</code>: the symbol <code>var</code> is assigned, in turn, the values in
-<code>_list-of-values_</code></li>
-<li><code>var</code>, <code>range</code>: the symbol <code>var</code> is assigned the values from the lower
-bound to the upper bound of the range, with a step of 1.</li>
-<li><code>var</code>, <code>max</code>: the symbol <code>var</code> is assigned a value of 1, then incremented
-by 1 until it reaches at least <code>max</code></li>
-<li><code>var</code>, <code>min</code>, <code>max</code>: the symbol <code>var</code> is assigned a value of <code>min</code>, then
-incremented by 1 until it reaches at least <code>max</code></li>
-<li><code>var</code>, <code>min</code>, <code>max</code>, <code>step</code>: the symbol <code>var</code> is assigned a value
-of <code>min</code>, then incremented by <code>step</code> until it reaches at least <code>max</code></li>
+<li><code>[&quot;Tuple&quot;, _var_, _list-of-values_]</code>: the symbol <code>var</code> is assigned, in turn,
+the values in <code>_list-of-values_</code>,  where <code>_list-of-values_</code> is an expression
+evaluating to a <code>[&quot;List&quot;]</code> expression or to a <code>[&quot;Tuple]</code> expression.</li>
+<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _upper_]]</code>: the symbol <code>var</code> is assigned
+the value 1, then incremented by 1 until it reached at least <em>upper</em>.</li>
+<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _lower_, _upper_]]</code> or
+<code>[&quot;Tuple&quot;, _var_, _lower_, _upper_]</code>: the symbol <code>var</code> is assigned
+the values from the lower bound to the upper bound of the range, with a step of 1.</li>
+<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _lower_, _upper_], _step]</code> or
+<code>[&quot;Tuple&quot;, _var_, _lower_, _upper_, _step]</code>: the symbol <code>var</code> is assigned
+the value <em>lower</em> then incremented by <em>step</em> until it reaches at least <em>upper</em>.</li>
+<li><code>[&quot;Tuple&quot;, _var_, _upper_]</code>: the symbol <code>var</code> is assigned a value of 1, then
+incremented by 1 until it reaches at least <code>upper</code></li>
 </ul>
 <p>The <code>FixedPoint</code>, <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions create a new scope. If
 <code>var</code> is specified, it is defined in this new scope.</p>
@@ -1058,27 +1054,37 @@ the next iteration.</p>
 <tr><td><code>Loop</code></td><td>
     <p><code>[“Loop”, <em>body</em>]</code><br>
 <code>[“Loop”, <em>body</em>, <em>max-iterations</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+<code>[“Loop”, <em>body</em>, <em>iterator</em>]</code><br></p>
 <p>Repeatedly evaluate <code>_body_</code> until either <code>_max-iterations_</code> is reached (or
 <code>ce.iterationLimit</code> if <code>_max-iteration_</code> is not specified), or the value of
 <code>_body_</code> is a <code>[&quot;Break&quot;]</code> expression, a <code>[&quot;Continue&quot;]</code> expression or a
 <code>[&quot;Return&quot;]</code> expression.</p>
+<p>See above for the definition of <em>iterator</em>.</p>
 </td></tr> 
 <tr><td><code>Product</code></td><td>
-    <p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+    <p><code>[“Product”, <em>list-of-values</em>]</code></p>
+<p>Evaluate to a product of all the elements in <code>_list-of-values_</code>. If all the
+elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 385</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
+<p></code></pre></p>
+<p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
+<code>[“Product”, <em>body</em>, <em>iterator</em>]</code><br></p>
 <p>Evaluate <code>_body_</code> and make a product of the result.</p>
+<p>See above for the definition of <em>iterator</em>.</p>
 </td></tr> 
 <tr><td><code>Sum</code></td><td>
-    <p><code>[“Sum”, <em>body</em>, <em>max</em>]</code><br>
+    <p><code>[“Sum”, <em>list-of-values</em>]</code></p>
+<p>Evaluate to a sum of all the elements in <code>_list-of-values_</code>. If all the
+elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 23</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;List&quot;, 16, &quot;x&quot;]</span>
+<p></code></pre></p>
+<p><code>[“Sum”, <em>body</em>, <em>iterator</em>]</code><br>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
 <code>[“Sum”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
@@ -1116,14 +1122,14 @@ expression as the value of the block.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 04, 2022">
+        <meta itemprop="datePublished" content="July 05, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-04'>July 04, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-05'>July 05, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
