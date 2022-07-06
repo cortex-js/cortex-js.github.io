@@ -1232,10 +1232,10 @@ UTF-16LE, UTF-16BE, etc…</p>
 <li>an object literal with a <code>&quot;sym&quot;</code> key</li>
 <li>a JSON string</li>
 </ul>
-<p><strong>Symbols</strong> are identifiers that represent the name of constants, variables and
-functions.</p>
+<p><strong>Symbols</strong> are identifiers that represent the name of variables, wildcards,
+constants and functions.</p>
 <p>Symbols are strings of valid Unicode characters, including Greek, Cyrillic,
-Hebrew, Arabic, mathematical symbols, ideographic and CJK symbols and emojis,
+Hebrew, Arabic, ideographic and CJK symbols, mathematical symbols and emojis,
 except:</p>
 <div class=symbols-table>
 <table>
@@ -1386,14 +1386,43 @@ must be stored internally and compared using the NFC.</p>
 <p>These four strings represent the same symbol:</p>
 <ul>
 <li><code>&quot;Å&quot;</code></li>
-<li><code>&quot;A\u030a&quot;</code></li>
-<li><code>&quot;\u00c5&quot;</code> <strong>LATIN CAPITAL LETTER A WITH RING ABOVE</strong> <code>Å</code> and</li>
+<li><code>&quot;A\u030a&quot;</code> <code>A‌</code> + <strong>COMBINING RING ABOVE</strong></li>
+<li><code>&quot;\u00c5&quot;</code> <strong>LATIN CAPITAL LETTER A WITH RING ABOVE</strong> <code>Å</code></li>
 <li><code>&quot;\u0041\u030a&quot;</code> <strong>LATIN CAPITAL LETTER A</strong> + <strong>COMBINING RING ABOVE</strong> <code>A‌</code> +
 <code> ̊</code></li>
 </ul>
 <p>The following naming convention for wildcards, variables, constants and
-functions are recommendations.</p>
-<h3 id="wildcards" tabindex="-1">Wildcards</h3>
+function names are recommendations.</p>
+<h3 id="variables-naming-convention" tabindex="-1">Variables Naming Convention</h3>
+<ul>
+<li>
+<p>Avoid mixing latin characters and non-latin characters.</p>
+<p>For example, use <code>&quot;半径&quot;</code>, <code>&quot;🍕&quot;</code> or <code>&quot;🐕🐄&quot;</code>, but avoid <code>&quot;🍕slice&quot;</code></p>
+<p>Carefully consider when to use non-latin characters.</p>
+<p>For example:</p>
+<ul>
+<li>prefer using <code>&quot;gamma&quot;</code> rather than <code>&quot;ɣ&quot;</code> (<strong>LATIN SMALL LETTER GAMMA</strong>) or <code>&quot;γ&quot;</code> (<strong>GREEK SMALL LETTER GAMMA</strong>)</li>
+<li>prefer using <code>&quot;Total&quot;</code> rather than <code>&quot;∑&quot;</code> <strong>U+2211 N-ARY SUMMATION</strong>, which can be visually confused with <code>&quot;Σ&quot;</code> <strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong>.</li>
+</ul>
+</li>
+<li>
+<p>If using latin characters, the first character of a variable should be a
+lowercase or uppercase letter: <code>a</code>-<code>z</code> or <code>A</code>-<code>Z</code></p>
+</li>
+<li>
+<p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
+<p>Using a more limited set of common characters avoids visual ambiguity issues
+that might otherwise arise with some Unicode symbols.</p>
+</li>
+<li>
+<p>If a variable is made of several words, use camelCase, i.e. <code>&quot;newDeterminant&quot;</code></p>
+</li>
+<li>
+<p>Prefer clarity over brevity and avoid obscure abbreviations.</p>
+<p>Use <code>&quot;newDeterminant&quot;</code> rather than <code>&quot;newDet&quot;</code> or <code>&quot;nDet&quot;</code></p>
+</li>
+</ul>
+<h3 id="wildcards-naming-convention" tabindex="-1">Wildcards Naming Convention</h3>
 <p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) should be used to
 denote wildcards and other placeholders.</p>
 <p>For example, they can be used to denote the positional arguments in an
@@ -1409,55 +1438,41 @@ and captured expression in patterns.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>_</code></td>
+<td style="text-align:left"><code>&quot;_&quot;</code></td>
 <td style="text-align:left">Wildcard for a single expression</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>_1</code></td>
+<td style="text-align:left"><code>&quot;_1&quot;</code></td>
 <td style="text-align:left">Wildcard for a positional argument</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>_ _</code></td>
+<td style="text-align:left"><code>“_ _”</code></td>
 <td style="text-align:left">Wildcard for a sequence of 1 or more expression</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>___</code></td>
+<td style="text-align:left"><code>&quot;___&quot;</code></td>
 <td style="text-align:left">Wildcard for a sequence of 0 or more expression</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>_a</code></td>
+<td style="text-align:left"><code>&quot;_a&quot;</code></td>
 <td style="text-align:left">Capturing an expression as a wildcard named <code>a</code></td>
 </tr>
 </tbody>
 </table>
 </div>
-<h3 id="variables" tabindex="-1">Variables</h3>
+<h3 id="constants-naming-convention" tabindex="-1">Constants Naming Convention</h3>
 <ul>
-<li>
-<p>The first character of a variable should be a lowercase or uppercase letter
-(<code>a</code>-<code>z</code> or <code>A</code>-<code>Z</code>)</p>
-</li>
-<li>
-<p>Subsequent characters should be a letter, digit (<code>0</code>-<code>9</code>) or underscore (<code>_</code>).</p>
-<p>For example, it is recommended to use <code>gamma</code> rather than <code>ɣ</code> and <code>Total</code>
-rather than <strong>U+2211 N-ARY SUMMATION</strong> <code>∑</code>, which can be confused with
-<strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong> <code>Σ</code>.</p>
-<p>Using a more limited set of common characters avoids visual ambiguity issues
-that might otherwise arise with some Unicode symbols.</p>
-</li>
-<li>
-<p>If a variable is made of several words, use camelCase, i.e. <code>newDeterminant</code></p>
-</li>
-<li>
-<p>Prefer clarity over brevity and avoid obscure abbreviations.</p>
-<p>Use <code>newDeterminant</code> rather than <code>newDet</code> or <code>nDet</code></p>
-</li>
-</ul>
-<h3 id="constants" tabindex="-1">Constants</h3>
-<ul>
-<li>The first character of a constant should be an uppercase letter <code>A</code>-<code>Z</code></li>
+<li>Avoid mixing latin characters and non-latin characters.</li>
+<li>If using latin characters, the first character of a constant should be an uppercase letter <code>A</code>-<code>Z</code></li>
 <li>Subsequent characters should be a letter, digit <code>0</code>-<code>9</code> or underscore <code>_</code>.</li>
-<li>If a constant is made up of several words, use camelCase, e.g. <code>SpeedOfLight</code></li>
+<li>If a constant is made up of several words, use camelCase, e.g. <code>&quot;SpeedOfLight&quot;</code></li>
+</ul>
+<h3 id="function-names-naming-convention" tabindex="-1">Function Names Naming Convention</h3>
+<ul>
+<li>Avoid mixing latin characters and non-latin characters.</li>
+<li>The names of the function in the standard dictionary start with an uppercase letter <code>A</code>-<code>Z</code>, for example <code>&quot;Sin&quot;</code>, <code>&quot;Fold&quot;</code>.</li>
+<li>Subsequent characters should be a letter, digit <code>0</code>-<code>9</code> or underscore <code>_</code>.</li>
+<li>If a function name is made up of several words, use camelCase, e.g. <code>&quot;InverseFunction&quot;</code></li>
 </ul>
 <h3 id="rendering-conventions" tabindex="-1">Rendering Conventions</h3>
 <p>The following recommendations may be followed by clients displaying MathJSON
@@ -1501,19 +1516,19 @@ subscript</li>
 <td>\( \alpha \)</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>m56</code></td>
-<td style="text-align:left"><code>m_{56}</code></td>
-<td>\( m_{56} \)</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>alpha0</code></td>
 <td style="text-align:left"><code>\alpha_0</code></td>
 <td>\( \alpha_0 \)</td>
 </tr>
 <tr>
+<td style="text-align:left"><code>m56</code></td>
+<td style="text-align:left"><code>m_{56}</code></td>
+<td>\( m_{56} \)</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>m56_max</code></td>
 <td style="text-align:left"><code>m_{56_{\mathit{max}}</code></td>
-<td>\( m*{56*{\mathit{max}}} \)</td>
+<td>\( m_{56_{\mathit{max}}} \)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>c_max</code></td>
@@ -1530,23 +1545,36 @@ subscript</li>
 <li>a JSON array</li>
 </ul>
 <h3 id="functions-as-object-literal" tabindex="-1">Functions as Object Literal</h3>
-<p>The default representation of <strong>functions</strong> is as an object literal with a
-<code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head and
-its arguments.</p>
-<pre><code class="language-typescript">{
-    <span class="hljs-string">&quot;fn&quot;</span>: [<span class="hljs-title class_">Expression</span>, ...<span class="hljs-title class_">Expression</span>[]]
+<p>The default representation of <strong>function</strong> expressions is an object literal
+with a <code>&quot;fn&quot;</code> key. The value of the key is an array representing the function
+head and its arguments.</p>
+<pre><code class="language-js">{
+  <span class="hljs-string">&quot;fn&quot;</span>: [<span class="hljs-title class_">Expression</span>, ...<span class="hljs-title class_">Expression</span>[]]
 }
 </code></pre>
-<p>The <strong>head</strong> of the function is the first element in the array. Its presence is
-required. It indicates the “function name” or “what” the function is about.</p>
+<p>The <strong>head</strong> of the function expression is the first element in the array.
+Its presence is required. It indicates the <strong>name of the function</strong> or “what” the function is about.</p>
 <p>The head is frequently a string, but it can be another expression.</p>
-<p>If it is a string, it should follow the conventions for constants in the
-section above on Symbols.</p>
+<ul>
+<li>
+<p>If it is a string, it should follow the conventions for function names.</p>
+<pre><code class="language-json"><span class="hljs-comment">// Apply the function &quot;Sin&quot; to the argument &quot;x&quot;</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// Apply &quot;Cos&quot; to a function expression</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</li>
+<li>
 <p>If it is an expression, it may include the wildcard <code>_</code> or <code>_1</code> to represent
-the first argument, <code>_2</code>, etc… to represent the second and other arguments.
+the first argument, <code>_2</code> to represent the second, etc…
 The wildcard <code>__</code> represents the sequence of all the arguments.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</li>
+</ul>
 <p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
 well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong> of the function.</p>
+<p class="notice--warning"><strong>CAUTION</strong> the arguments of a function are expressions. To represent an argument which is a list, use a <code>[&quot;List&quot;]</code> expression, do not use an array.</p>
 <p>The expression corresponding to \(\sin^{-1}(x)\) is:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
@@ -1559,7 +1587,7 @@ well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong
 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Note that an array representing a function must have at least one element, the
+<p class="notice--info">An array representing a function must have at least one element, the
 head of the function. Therefore <code>[]</code> is not a valid expression.</p>
 <h2 id="dictionary" tabindex="-1">Dictionary</h2>
 <p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
