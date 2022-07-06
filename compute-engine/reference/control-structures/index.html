@@ -966,12 +966,12 @@ Table of Content</label>
         </nav>
 
 
-          <p>Control Structures define how a sequence of expressions
-is evaluated.</p>
+          <p>Control Structures define how a sequence of expressions is evaluated.</p>
 <ul>
 <li>A <code>[&quot;Block&quot;]</code> expression defines a <strong>sequential</strong> control structure</li>
 <li>An <code>[&quot;If&quot;]</code> expression defines a <strong>conditional</strong> control structure.</li>
-<li>A <code>[&quot;Loop&quot;]</code>, <code>[&quot;FixedPoint&quot;]</code>, <code>[&quot;Sum&quot;]</code> or <code>[&quot;Product&quot;]</code> expression defines an <strong>iterative</strong> control structure.</li>
+<li>A <code>[&quot;FixedPoint&quot;]</code>, <code>[&quot;Loop&quot;]</code>, <code>[&quot;Sum&quot;]</code> or <code>[&quot;Product&quot;]</code> expression
+defines an <strong>iterative</strong> control structure.</li>
 </ul>
 <h2 id="block-and-if" tabindex="-1">Block and If</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
@@ -1019,37 +1019,39 @@ expression is <code>_expr-1_</code>, otherwise <code>_expr-2_</code>.</li>
 </td></tr> 
 </tbody></table>
 <h2 id="loops" tabindex="-1">Loops</h2>
-<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration functions that share a
-similar form.</p>
-<p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.</p>
+<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration control structures that
+share a similar form.</p>
+<p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.
+The <code>body</code> expression is evaluated with an implicit argument <code>_</code> whose value is
+the current iteration element.</p>
 <p>Their second argument, <code>iterator</code> can take the following shapes:</p>
 <ul>
-<li><code>[&quot;Tuple&quot;, _var_, _list-of-values_]</code>: the symbol <code>var</code> is assigned, in turn,
-the values in <code>_list-of-values_</code>,  where <code>_list-of-values_</code> is an expression
-evaluating to a <code>[&quot;List&quot;]</code> expression or to a <code>[&quot;Tuple]</code> expression.</li>
-<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _upper_]]</code>: the symbol <code>var</code> is assigned
-the value 1, then incremented by 1 until it reached at least <em>upper</em>.</li>
-<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _lower_, _upper_]]</code> or
-<code>[&quot;Tuple&quot;, _var_, _lower_, _upper_]</code>: the symbol <code>var</code> is assigned
+<li><code>[&quot;List&quot;, _expr-1_, ..._expr-n]</code>: the <code>_</code> implicit argument takes in turn each
+element</li>
+<li><code>[&quot;Range&quot;, _upper_]</code>: the <code>_</code> implicit argument is assigned
+the value 1, then incremented by 1 until it reaches at least <em>upper</em>.</li>
+<li><code>[&quot;Range&quot;, _lower_, _upper_]</code>: the <code>_</code> implicit argument is assigned
 the values from the lower bound to the upper bound of the range, with a step of 1.</li>
-<li><code>[&quot;Tuple&quot;, _var_, [&quot;Range&quot;, _lower_, _upper_], _step]</code> or
-<code>[&quot;Tuple&quot;, _var_, _lower_, _upper_, _step]</code>: the symbol <code>var</code> is assigned
+<li><code>[&quot;Range&quot;, _lower_, _upper_, _step_]</code>: the <code>_</code> implicit argument is assigned
 the value <em>lower</em> then incremented by <em>step</em> until it reaches at least <em>upper</em>.</li>
-<li><code>[&quot;Tuple&quot;, _var_, _upper_]</code>: the symbol <code>var</code> is assigned a value of 1, then
-incremented by 1 until it reaches at least <code>upper</code></li>
 </ul>
-<p>The <code>FixedPoint</code>, <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions create a new scope. If
-<code>var</code> is specified, it is defined in this new scope.</p>
+<p>To use a named argument, use a <code>[&quot;Function&quot;]</code> expression for the <code>body</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 2 3 4 5</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 2 3 4 5</span>
+</code></pre>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>FixedPoint</code></td><td>
     <p><code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>]</code><br>
 <code>[“FixedPoint”, <em>body</em>, <em>initial-value</em>, <em>max-iterations</em>]</code></p>
+<p>Assumes <code>_body_</code> is an expression using an implicit argument <code>_</code>.</p>
 <p>Apply <code>_body_</code> to <code>_initial-value_</code>, then apply <code>_body_</code> to the result until
 the result no longer changes.</p>
 <p>To determine if a fixed point has been reached and the loop should terminate,
 the previous and current values are compared with <code>Same</code>.</p>
-<p>Use <code>[&quot;Break&quot;]</code> to exit the loop immediately or <code>[&quot;Continue&quot;]</code> to skip to
-the next iteration.</p>
+<p>Inside <code>_body_</code>, use <code>[&quot;Break&quot;]</code> to exit the loop immediately or <code>[&quot;Continue&quot;]</code>
+to skip to the next iteration.</p>
 </td></tr> 
 <tr><td><code>Loop</code></td><td>
     <p><code>[“Loop”, <em>body</em>]</code><br>
@@ -1062,34 +1064,28 @@ the next iteration.</p>
 <p>See above for the definition of <em>iterator</em>.</p>
 </td></tr> 
 <tr><td><code>Product</code></td><td>
-    <p><code>[“Product”, <em>list-of-values</em>]</code></p>
-<p>Evaluate to a product of all the elements in <code>_list-of-values_</code>. If all the
+    <p><code>[“Product”, <em>iterator</em>]</code></p>
+<p>Evaluate to a product of all the elements in <code>_iterator_</code>. If all the
 elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 385</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
 <p></code></pre></p>
-<p><code>[“Product”, <em>body</em>, <em>max-iterations</em>]</code><br>
-<code>[“Product”, <em>body</em>, <em>iterator</em>]</code><br></p>
+<p><code>[“Product”, <em>body</em>, <em>iterator</em>]</code></p>
 <p>Evaluate <code>_body_</code> and make a product of the result.</p>
 <p>See above for the definition of <em>iterator</em>.</p>
 </td></tr> 
 <tr><td><code>Sum</code></td><td>
-    <p><code>[“Sum”, <em>list-of-values</em>]</code></p>
-<p>Evaluate to a sum of all the elements in <code>_list-of-values_</code>. If all the
+    <p><code>[“Sum”, <em>iterator</em>]</code></p>
+<p>Evaluate to a sum of all the elements in <code>_iterator_</code>. If all the
 elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 23</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 16, &quot;x&quot;]</span>
 <p></code></pre></p>
-<p><code>[“Sum”, <em>body</em>, <em>iterator</em>]</code><br>
-<code>[“Sum”, <em>body</em>, <em>var</em>, <em>list-of-values</em>]</code><br>
-<code>[“Sum”, <em>body</em>, <em>var</em>, <em>range</em>]</code><br>
-<code>[“Sum”, <em>body</em>, <em>var</em>, <em>max</em>]</code><br>
-<code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>]</code><br>
-<code>[“Sum”, <em>body</em>, <em>var</em>, <em>min</em>, <em>max</em>, <em>step</em>]</code><br></p>
+<p><code>[“Sum”, <em>body</em>, <em>iterator</em>]</code></p>
 <p>Evaluate <code>_body_</code> and make a sum of the result.</p>
 </td></tr> 
 </tbody></table>
@@ -1122,14 +1118,14 @@ expression as the value of the block.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 05, 2022">
+        <meta itemprop="datePublished" content="July 06, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-05'>July 05, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-06'>July 06, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
