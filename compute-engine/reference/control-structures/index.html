@@ -1019,8 +1019,8 @@ expression is <code>_expr-1_</code>, otherwise <code>_expr-2_</code>.</li>
 </td></tr> 
 </tbody></table>
 <h2 id="loops" tabindex="-1">Loops</h2>
-<p>The <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration control structures that
-share a similar form.</p>
+<p>The <code>Fold</code>, <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration control
+structures that share a similar form.</p>
 <p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.
 The <code>body</code> expression is evaluated with an implicit argument <code>_</code> whose value is
 the current iteration element.</p>
@@ -1036,10 +1036,10 @@ the values from the lower bound to the upper bound of the range, with a step of 
 the value <em>lower</em> then incremented by <em>step</em> until it reaches at least <em>upper</em>.</li>
 </ul>
 <p>To use a named argument, use a <code>[&quot;Function&quot;]</code> expression for the <code>body</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 1 2 3 4 5</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 1 2 3 4 5</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
 </code></pre>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>FixedPoint</code></td><td>
@@ -1053,40 +1053,57 @@ the previous and current values are compared with <code>Same</code>.</p>
 <p>Inside <code>_body_</code>, use <code>[&quot;Break&quot;]</code> to exit the loop immediately or <code>[&quot;Continue&quot;]</code>
 to skip to the next iteration.</p>
 </td></tr> 
+<tr><td><code>Fold</code></td><td>
+    <p><code>[“Fold”, <em>body</em>, <em>iterator</em>]</code><br>
+<code>[“Fold”, <em>body</em>, <em>initial-value</em>, <em>iterator</em>]</code></p>
+<p>Evaluate to <code>[_body_, [_body_, _initial-value_, _elem-1_], _elem-2]]...</code> where
+<em>elem-1</em> and <em>elem-2</em> are the first two elements from the iterator.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 385</span>
+</code></pre>
+<p>See above for the definition of <em>iterator</em>.</p>
+</td></tr> 
 <tr><td><code>Loop</code></td><td>
     <p><code>[“Loop”, <em>body</em>]</code><br>
-<code>[“Loop”, <em>body</em>, <em>max-iterations</em>]</code><br>
 <code>[“Loop”, <em>body</em>, <em>iterator</em>]</code><br></p>
-<p>Repeatedly evaluate <code>_body_</code> until either <code>_max-iterations_</code> is reached (or
-<code>ce.iterationLimit</code> if <code>_max-iteration_</code> is not specified), or the value of
-<code>_body_</code> is a <code>[&quot;Break&quot;]</code> expression, a <code>[&quot;Continue&quot;]</code> expression or a
-<code>[&quot;Return&quot;]</code> expression.</p>
+<p>Repeatedly evaluate <code>_body_</code> until the last element of the iterator is reached.</p>
 <p>See above for the definition of <em>iterator</em>.</p>
+<p>To exit the loop early, <em>body</em> should evaluate to a <code>[&quot;Break&quot;]</code> expression,
+a <code>[&quot;Continue&quot;]</code> expression or a <code>[&quot;Return&quot;]</code> expression.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
+</code></pre>
 </td></tr> 
 <tr><td><code>Product</code></td><td>
     <p><code>[“Product”, <em>iterator</em>]</code></p>
 <p>Evaluate to a product of all the elements in <code>_iterator_</code>. If all the
 elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
+<p>Equivalent to <code>[&quot;Fold&quot;, &quot;Multiply&quot;, _iterator_]</code>.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 385</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
-<p></code></pre></p>
+</code></pre>
 <p><code>[“Product”, <em>body</em>, <em>iterator</em>]</code></p>
 <p>Evaluate <code>_body_</code> and make a product of the result.</p>
+<p>Equivalent to <code>[&quot;Fold&quot;, [&quot;Multiply&quot;, _1, [_body_, _2]], _iterator_]</code>.</p>
 <p>See above for the definition of <em>iterator</em>.</p>
 </td></tr> 
 <tr><td><code>Sum</code></td><td>
     <p><code>[“Sum”, <em>iterator</em>]</code></p>
 <p>Evaluate to a sum of all the elements in <code>_iterator_</code>. If all the
 elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
+<p>Equivalent to <code>[&quot;Fold&quot;, &quot;Add&quot;, _iterator_]</code>.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 23</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 16, &quot;x&quot;]</span>
-<p></code></pre></p>
+</code></pre>
 <p><code>[“Sum”, <em>body</em>, <em>iterator</em>]</code></p>
 <p>Evaluate <code>_body_</code> and make a sum of the result.</p>
+<p>Equivalent to <code>[&quot;Fold&quot;, [&quot;Add&quot;, _1, [_body_, _2]], _iterator_]</code>.</p>
 </td></tr> 
 </tbody></table>
 <h2 id="break-and-continue" tabindex="-1">Break and Continue</h2>
