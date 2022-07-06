@@ -953,10 +953,25 @@ Table of Content</label>
     
       <section class="page__content" itemprop="text">
 
-          <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'>
-<p>The MathJSON format is a lightweight data interchange format for mathematical
-notation.</p>
-<div class=symbols-table>
+  
+    <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'> <p class=xl>The MathJSON format is a lightweight data interchange format for mathematical notation.</p>
+  
+
+
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+
+          
+            <div class="toc__menu" >
+        <ol><li><a href="#structure-of-a-mathjson-expression">Structure of a MathJSON Expression</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#strings">Strings</a></li><li><a href="#symbols">Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#dictionary">Dictionary</a></li><li><a href="#metadata">Metadata</a></li></ol>
+      </div>
+          
+                                  
+        </nav>
+
+
+          <div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -1120,7 +1135,7 @@ repeating digits.</p>
 </tbody>
 </table>
 </div>
-<h3 id="json-numbers" tabindex="-1">JSON numbers</h3>
+<h3 id="json-numbers" tabindex="-1">JSON Numbers</h3>
 <p>When a <strong>number</strong> has no extra metadata and is compatible with the JSON
 representation of numbers, a JSON number can be used.</p>
 <p>Specifically:</p>
@@ -1245,7 +1260,7 @@ except:</p>
 <tr>
 <td style="text-align:left"><strong>U+0060</strong></td>
 <td style="text-align:left"><strong>GRAVE ACCENT</strong><br>backtick</td>
-<td style="text-align:left"><code>`</code> |</td>
+<td style="text-align:left"><code>`</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>U+FFFE</strong></td>
@@ -1380,7 +1395,10 @@ must be stored internally and compared using the NFC.</p>
 functions are recommendations.</p>
 <h3 id="wildcards" tabindex="-1">Wildcards</h3>
 <p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) should be used to
-denote wildcards and other placeholders:</p>
+denote wildcards and other placeholders.</p>
+<p>For example, they can be used to denote the positional arguments in an
+expression with some arguments. They can also be used to denote placeholders
+and captured expression in patterns.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1392,19 +1410,23 @@ denote wildcards and other placeholders:</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>_</code></td>
-<td style="text-align:left">Wildcard for a single symbol</td>
+<td style="text-align:left">Wildcard for a single expression</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>__</code></td>
-<td style="text-align:left">Wildcard for a sequence of 1 or more symbols</td>
+<td style="text-align:left"><code>_1</code></td>
+<td style="text-align:left">Wildcard for a positional argument</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>_ _</code></td>
+<td style="text-align:left">Wildcard for a sequence of 1 or more expression</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>___</code></td>
-<td style="text-align:left">Wildcard for a sequence of 0 or more symbols</td>
+<td style="text-align:left">Wildcard for a sequence of 0 or more expression</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>_a</code></td>
-<td style="text-align:left">Capturing wildcard named <code>a</code></td>
+<td style="text-align:left">Capturing an expression as a wildcard named <code>a</code></td>
 </tr>
 </tbody>
 </table>
@@ -1517,9 +1539,12 @@ its arguments.</p>
 </code></pre>
 <p>The <strong>head</strong> of the function is the first element in the array. Its presence is
 required. It indicates the “function name” or “what” the function is about.</p>
-<p>The head is frequently a string, but it can be another expression. If it is a
-string, it should follow the conventions for constants in the section above on
-Symbols.</p>
+<p>The head is frequently a string, but it can be another expression.</p>
+<p>If it is a string, it should follow the conventions for constants in the
+section above on Symbols.</p>
+<p>If it is an expression, it may include the wildcard <code>_</code> or <code>_1</code> to represent
+the first argument, <code>_2</code>, etc… to represent the second and other arguments.
+The wildcard <code>__</code> represents the sequence of all the arguments.</p>
 <p>Following the head are zero or more <strong>arguments</strong>, which are expressions as
 well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong> of the function.</p>
 <p>The expression corresponding to \(\sin^{-1}(x)\) is:</p>
@@ -1527,7 +1552,7 @@ well. The arguments, or <strong>operands</strong>, form the <strong>tail</strong
 </code></pre>
 <p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code> and the argument is
 <code>&quot;x&quot;</code>.</p>
-<h3 id="json-array" tabindex="-1">JSON array</h3>
+<h3 id="json-array" tabindex="-1">JSON Array</h3>
 <p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
 <p>For example these two expressions are equivalent:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
