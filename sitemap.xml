@@ -79,13 +79,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/guides/macros/</loc>
-    <lastmod>2022-06-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/demo/</loc>
     <lastmod>2022-07-01</lastmod>
     <changefreq>monthly</changefreq>
@@ -142,13 +135,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
-    <lastmod>2022-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/mathlive/guides/interacting/</loc>
     <lastmod>2022-07-04</lastmod>
     <changefreq>monthly</changefreq>
@@ -156,21 +142,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/mathlive/guides/customizing/</loc>
-    <lastmod>2022-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/mathlive/demo/</loc>
-    <lastmod>2022-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/mathlive/guides/virtual-keyboards/</loc>
     <lastmod>2022-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -186,6 +158,34 @@
   <url>
     <loc>https://cortexjs.io/compute-engine/</loc>
     <lastmod>2022-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/customizing/</loc>
+    <lastmod>2022-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/macros/</loc>
+    <lastmod>2022-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/guides/virtual-keyboards/</loc>
+    <lastmod>2022-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/mathlive/reference/commands/</loc>
+    <lastmod>2022-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -219,14 +219,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/implementation/</loc>
+    <loc>https://cortexjs.io/cortex/</loc>
     <lastmod>2022-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/</loc>
+    <loc>https://cortexjs.io/cortex/implementation/</loc>
     <lastmod>2022-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -240,14 +240,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/canonical-form/</loc>
+    <loc>https://cortexjs.io/compute-engine/guides/assumptions/</loc>
     <lastmod>2022-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/assumptions/</loc>
+    <loc>https://cortexjs.io/compute-engine/guides/canonical-form/</loc>
     <lastmod>2022-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
