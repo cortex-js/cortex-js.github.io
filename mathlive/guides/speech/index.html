@@ -693,6 +693,12 @@ Table of Content</label>
 </nav>
     
   </div>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.querySelector('.sidebar');
+sidebar.scrollTo(0, document.querySelector('.nav__items .active').offsetTop - sidebar.clientHeight + 100)
+    });
+  </script>
 
 
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
