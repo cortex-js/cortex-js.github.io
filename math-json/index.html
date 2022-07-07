@@ -9,9 +9,9 @@
 <title>
     CortexJS
 </title>
-<meta name="description" content="" />
+<meta name="description" content="The MathJSON format is a lightweight data interchange format for mathematical notation" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
-<script>
+<script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -34,47 +34,18 @@
 </script>
 
 
-  
-    
-      
-    
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js" crossorigin='anonymous'></script>
-  
-    
-      
-    
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
-  
-    
-      
-    
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js" crossorigin='anonymous'></script>
-  
-
 
 
 
 
 <link rel="stylesheet" href="/assets/css/main.css">
 
-  
-    
-      
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
-  
-    
-      
-    
-    <link rel="stylesheet" href="/assets/js/ui.css">
-  
-
 
 
 
 
     <link rel="preconnect" href="https://kit.fontawesome.com">
-<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+<script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -954,24 +925,26 @@ Table of Content</label>
       <section class="page__content" itemprop="text">
 
   
-    <img src='/assets/MathJSON-1.jpg' class='full-width' style='border-radius:8px 8px 0 0; border:1px solid #203346; margin-bottom: 2em'> <p class=xl>The MathJSON format is a lightweight data interchange format for mathematical notation.</p>
+    <picture class=full-width style='aspect-ratio:1.775;clip-path: inset(0 0 0 0 round 8px 8px 0 0); margin-bottom: 2em'> <source srcset=/assets/MathJSON@1x.webp type=image/webp> <source srcset=/assets/MathJSON@1x.jpg type=image/jpeg>  <img src=/assets/MathJSON@1x.jpg alt='MathJSON'> </picture> <p class=xl>The MathJSON format is a lightweight data interchange format for mathematical notation.
+  
+
+  
+
+    <nav class="toc">
+      <header><h2 class="nav__title"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" style="height:16px; width:12px"><path fill="currentColor" d="M256 0v128h128L256 0zM224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM272 416h-160C103.2 416 96 408.8 96 400C96 391.2 103.2 384 112 384h160c8.836 0 16 7.162 16 16C288 408.8 280.8 416 272 416zM272 352h-160C103.2 352 96 344.8 96 336C96 327.2 103.2 320 112 320h160c8.836 0 16 7.162 16 16C288 344.8 280.8 352 272 352zM288 272C288 280.8 280.8 288 272 288h-160C103.2 288 96 280.8 96 272C96 263.2 103.2 256 112 256h160C280.8 256 288 263.2 288 272z"/></svg>On This Page</h2></header>
+
+      
+        <div class="toc__menu" >
+        <ol><li><a href="#structure-of-a-mathjson-expression">Structure of a MathJSON Expression</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#strings">Strings</a></li><li><a href="#symbols">Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#dictionary">Dictionary</a></li><li><a href="#metadata">Metadata</a></li></ol>
+      </div>
+      
+                              
+    </nav>
   
 
 
 
-          <nav class="toc">
-          <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
-
-          
-            <div class="toc__menu" >
-        <ol><li><a href="#structure-of-a-mathjson-expression">Structure of a MathJSON Expression</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#strings">Strings</a></li><li><a href="#symbols">Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#dictionary">Dictionary</a></li><li><a href="#metadata">Metadata</a></li></ol>
-      </div>
-          
-                                  
-        </nav>
-
-
-          <div class=symbols-table>
+<div class=symbols-table>
 <table>
 <thead>
 <tr>
@@ -1403,7 +1376,7 @@ function names are recommendations.</p>
 <p>For example:</p>
 <ul>
 <li>prefer using <code>&quot;gamma&quot;</code> rather than <code>&quot;ɣ&quot;</code> (<strong>LATIN SMALL LETTER GAMMA</strong>) or <code>&quot;γ&quot;</code> (<strong>GREEK SMALL LETTER GAMMA</strong>)</li>
-<li>prefer using <code>&quot;Total&quot;</code> rather than <code>&quot;∑&quot;</code> <strong>U+2211 N-ARY SUMMATION</strong>, which can be visually confused with <code>&quot;Σ&quot;</code> <strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong>.</li>
+<li>prefer using <code>&quot;Sum&quot;</code> rather than <code>&quot;∑&quot;</code> <strong>U+2211 N-ARY SUMMATION</strong>, which can be visually confused with <code>&quot;Σ&quot;</code> <strong>U+03A3 GREEK CAPITAL LETTER SIGMA</strong>.</li>
 </ul>
 </li>
 <li>
@@ -1424,10 +1397,10 @@ that might otherwise arise with some Unicode symbols.</p>
 </li>
 </ul>
 <h3 id="wildcards-naming-convention" tabindex="-1">Wildcards Naming Convention</h3>
-<p>Symbols that begin with <strong>U+005F LOW LINE</strong> <code>_</code> (underscore) should be used to
+<p>Symbols that begin with <code>_</code> <strong>U+005F LOW LINE</strong>  (underscore) should be used to
 denote wildcards and other placeholders.</p>
-<p>For example, they can be used to denote the positional arguments in an
-expression with some arguments. They can also be used to denote placeholders
+<p>For example, they can be used to denote the positional arguments in a function
+expression. They can also be used to denote placeholders
 and captured expression in patterns.</p>
 <div class=symbols-table>
 <table>
@@ -1440,7 +1413,7 @@ and captured expression in patterns.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>&quot;_&quot;</code></td>
-<td style="text-align:left">Wildcard for a single expression</td>
+<td style="text-align:left">Wildcard for a single expression or for the first positional argument</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&quot;_1&quot;</code></td>
@@ -1684,14 +1657,14 @@ annotated.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 06, 2022">
+        <meta itemprop="datePublished" content="July 07, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-06'>July 06, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-07'>July 07, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1706,8 +1679,8 @@ annotated.</p>
 
 <script type="module">
   window.addEventListener('DOMContentLoaded', (event) => {
-    import('//unpkg.com/mathlive?module').then((module) => {
-      module.renderMathInDocument({ 
+    import('https://unpkg.com/mathlive?module').then((mathlive) => {
+      mathlive.renderMathInDocument({ 
         renderAccessibleContent: false,
         TeX: { 
           delimiters: {

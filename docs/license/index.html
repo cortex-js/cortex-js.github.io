@@ -11,7 +11,7 @@
 </title>
 <meta name="description" content="" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
-<script>
+<script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -45,7 +45,7 @@
 
 
     <link rel="preconnect" href="https://kit.fontawesome.com">
-<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+<script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -321,9 +321,10 @@ Table of Content</label>
     
       <section class="page__content" itemprop="text">
 
+  
 
 
-          <h1 id="license" tabindex="-1">License</h1>
+<h1 id="license" tabindex="-1">License</h1>
 <p>The components of CortexJS, including MathLive, the Cortex Compute Engine and the Cortex language are licensed under the MIT license below.</p>
 <hr>
 <p><strong>Copyright 2019-2022, Arno Gourdol and the CortexJS maintainers</strong></p>
@@ -361,8 +362,8 @@ Table of Content</label>
 
 <script type="module">
   window.addEventListener('DOMContentLoaded', (event) => {
-    import('//unpkg.com/mathlive?module').then((module) => {
-      module.renderMathInDocument({ 
+    import('https://unpkg.com/mathlive?module').then((mathlive) => {
+      mathlive.renderMathInDocument({ 
         renderAccessibleContent: false,
         TeX: { 
           delimiters: {

@@ -11,7 +11,7 @@
 </title>
 <meta name="description" content="" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
-<script>
+<script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -45,7 +45,7 @@
 
 
     <link rel="preconnect" href="https://kit.fontawesome.com">
-<script src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
+<script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -321,9 +321,10 @@ Table of Content</label>
     
       <section class="page__content" itemprop="text">
 
+  
 
 
-          <h1 id="reporting-issues" tabindex="-1">Reporting Issues</h1>
+<h1 id="reporting-issues" tabindex="-1">Reporting Issues</h1>
 <h2 id="contributing-ideas-and-feature-requests" tabindex="-1">Contributing Ideas and Feature Requests</h2>
 <p>Use the <a href="https://github.com/arnog/mathlive/issues">issue tracker</a> to submit
 requests for new features. First, have a look at what might already be there,
@@ -392,8 +393,8 @@ the browser, the OS, or the laws of physics.</li>
 
 <script type="module">
   window.addEventListener('DOMContentLoaded', (event) => {
-    import('//unpkg.com/mathlive?module').then((module) => {
-      module.renderMathInDocument({ 
+    import('https://unpkg.com/mathlive?module').then((mathlive) => {
+      mathlive.renderMathInDocument({ 
         renderAccessibleContent: false,
         TeX: { 
           delimiters: {
