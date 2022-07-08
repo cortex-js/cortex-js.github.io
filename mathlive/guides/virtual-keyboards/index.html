@@ -1014,6 +1014,24 @@ be dispatched.</p>
 <div class='read-more'><a href="/mathlive/guides/commands/">
 Learn more about the available commands
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To use a SVG glyph on the keycaps</strong>, use some SVG markup in the <code>label</code>
+property and set the <code>class</code> attribute to <code>svg-glyph</code></p>
+<p>To reference the built-in SVG glyphs, use the <code>&lt;use&gt;</code> SVG command:</p>
+<ul>
+<li><code>svg-commit</code></li>
+<li><code>svg-tab</code></li>
+<li><code>svg-arrow-left</code></li>
+<li><code>svg-arrow-right</code></li>
+<li><code>svg-angle-double-left</code></li>
+<li><code>svg-angle-double-right</code></li>
+<li><code>svg-shift</code></li>
+<li><code>svg-command</code></li>
+<li><code>svg-delete-backward</code></li>
+<li><code>svg-copy</code></li>
+<li><code>svg-undo</code></li>
+<li><code>svg-redo</code></li>
+<li><code>svg-trash</code></li>
+</ul>
 <pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span> = {
       <span class="hljs-string">&quot;high-school-layer&quot;</span>: {
         <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
@@ -1211,14 +1229,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="July 06, 2022">
+        <meta itemprop="datePublished" content="July 08, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-06'>July 06, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-08'>July 08, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
