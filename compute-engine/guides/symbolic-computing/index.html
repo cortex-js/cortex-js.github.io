@@ -1101,11 +1101,11 @@ replacing part of it, and applying conditional rewrite rules.</p>
 <p class="notice--info">Functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a <code>ComputeEngine</code> instance
 which is denoted by a <code>ce.</code> prefix.<br>Functions that apply to a boxed
 expression, such as <code>expr.simplify()</code> are denoted with a <code>expr.</code> prefix.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@cortex-js/compute-engine?module&#x27;</span>;
-<span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2 + 2x^2 + x + 5&#x27;</span>).<span class="hljs-title function_">simplify</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;5x^2 + x + 5&quot;</span>
-</code></pre>
+<code-playground layout="stack" show-line-numbers>
+<div slot="javascript">import { ComputeEngine } from 'compute-engine';
+const ce = new ComputeEngine();
+console.log(ce.parse('3x^2 + 2x^2 + x + 5').simplify().latex);</div>
+</code-playground>
 <h2 id="comparing-expressions" tabindex="-1">Comparing Expressions</h2>
 <p>There are two useful ways to compare symbolic expressions:</p>
 <ul>
@@ -1194,8 +1194,8 @@ assumptions may result in a different answer.</p>
 <p>The argument of the <code>subs()</code> function is an object literal. Each key value
 pairs represent the name of a symbol and the value (as an expression) to be
 substituted with.</p>
-<code-playground layout="stack">
-    <div slot="javascript">import { ComputeEngine } from 'compute-engine';
+<code-playground layout="stack" show-line-numbers>
+<div slot="javascript">import { ComputeEngine } from 'compute-engine';
 const ce = new ComputeEngine();
 let expr = ce.parse('\\sqrt{\\frac{1}{x+1}}');
 console.log(expr.json);
@@ -1205,8 +1205,7 @@ expr = expr.subs({x: ce.box(3)});
 console.log(expr.json);
 //
 console.log("Numerical Evaluation");
-console.log(expr.N().latex);
-</div>
+console.log(expr.N().latex);</div>
 </code-playground>
 <h2 id="other-symbolic-manipulation" tabindex="-1">Other Symbolic Manipulation</h2>
 <p>An expression can be created from MathJSON or LaTeX, simplified, or evaluated.
