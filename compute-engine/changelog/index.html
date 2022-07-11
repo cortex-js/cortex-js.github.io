@@ -938,6 +938,19 @@ sidebar.scrollTo(0, document.querySelector('.nav__items .active').offsetTop - si
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 </ul>
+<h3 id="features" tabindex="-1">Features</h3>
+<ul>
+<li>Implemented new domain computation system</li>
+<li>Added support for multiple signatures per function (ad-hoc polymorphism)</li>
+<li>Added <code>FixedPoint</code>, <code>Loop</code>, <code>Product</code>, <code>Sum</code>, <code>Break</code>, <code>Continue</code>, <code>Block</code>,
+<code>If</code>, <code>Let</code>, <code>Set</code>, <code>Function</code>, <code>Apply</code>, <code>Return</code></li>
+<li>Added <code>Min</code>, <code>Max</code>, <code>Clamp</code></li>
+<li>Added parsing of log functions, <code>\lb</code>, <code>\ln</code>, <code>\ln_{10}</code>, <code>\ln_2</code>, etc…</li>
+</ul>
+<p>Read more at
+<a href="https://cortexjs.io/compute-engine/reference/core/">Core Reference</a> and
+[Arithmetic Reference]
+(https://cortexjs.io/compute-engine/reference/arithmetic/)</p>
 <h3 id="bug-fixed" tabindex="-1">Bug Fixed</h3>
 <ul>
 <li><strong>#43</strong> If the input of <code>ce.parse()</code> is an empty string, return an empty
@@ -952,7 +965,7 @@ round-tripping</li>
 <ul>
 <li>Parse more cases of tabular environments</li>
 <li>Handle simplify and evaluate of inert functions by default</li>
-<li>Avoid unnecessary wrapping of functins when serializing LaTeX</li>
+<li>Avoid unnecessary wrapping of functions when serializing LaTeX</li>
 <li>Parse arguments of LaTeX commands (e.g. <code>\vec{}</code>)</li>
 <li><strong>#42</strong> Export static <code>ComputeEngine.getLatexDictionary</code></li>
 <li>Parse multi-character constants and variables, e.g. <code>\mathit{speed}</code> and
@@ -997,7 +1010,7 @@ the removal of top level functions.</p>
 MathJSON <code>Expression</code>. It provides some member functions that can be used to
 manipulate the expression, for example <code>expr.simplify()</code> or <code>expr.evaluate()</code>.</p>
 <p>The boxed expresson itself is immutable. For example, calling <code>expr.simplify()</code>
-will return a new, simplfied, expression, without modifying <code>expr</code>.</p>
+will return a new, simplified, expression, without modifying <code>expr</code>.</p>
 <p>To create a “boxed” expression from a “raw” MathJSON expression, use <code>ce.box()</code>.
 To create a boxed expression from a LaTeX string, use <code>ce.parse()</code>.</p>
 <p>To access the “raw” MathJSON expression, use the <code>expr.json</code> property. To
@@ -1091,7 +1104,7 @@ such as <code>Equal</code>:</p>
 <td style="text-align:left"><code>expr = ce.box([&quot;Add&quot;, 1, 2])</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>expr = ce.evaluatate(expr)</code></td>
+<td style="text-align:left"><code>expr = ce.evaluate(expr)</code></td>
 <td style="text-align:left"><code>expr = expr.evaluate()</code></td>
 </tr>
 <tr>
@@ -1143,14 +1156,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="July 10, 2022">
+        <meta itemprop="datePublished" content="July 11, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-10'>July 10, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-11'>July 11, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
