@@ -737,7 +737,7 @@ of the mathfield, as a LaTeX expression.</p>
 <p><strong>In the code playground below, change line 3 of the HTML to another LaTeX expression.</strong><br>For example <code>f(x) = \frac{x}{2}</code>.</p>
 <p class="notice--info"><strong>Note:</strong> The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
 <br>Press <strong>Reset</strong> to bring back the playground to its original state.</p>
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -752,9 +752,12 @@ of the mathfield, as a LaTeX expression.</p>
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
-<p class="notice--warning"><strong>Caution</strong> The HTML quirks mode is not supported. This means that the host page
+ <div class="notice--warning" markdown="1">
+<h4 id="caution" tabindex="-1">Caution</h4>
+<p>The HTML quirks mode is not supported. This means that the host page
 must use the strict mode, indicated by a <code>&lt;!DOCTYPE html&gt;</code> directive at the top
 of the page. Without it, the layout of the equations inside the mathfield may be incorrect.</p>
+</div>
 <div class='read-more'><a href="/mathlive/guides/interacting/">
 <strong>Next:</strong> <strong>Interacting with a Mathfield</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -770,14 +773,14 @@ Learn more about other options to <strong>add MathLive to your project</strong>
         
 
 
-        <meta itemprop="datePublished" content="July 10, 2022">
+        <meta itemprop="datePublished" content="July 15, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-10'>July 10, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-15'>July 15, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
