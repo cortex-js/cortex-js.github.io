@@ -566,8 +566,17 @@ TEMPLATE.innerHTML = `
     opacity: 1;
     color: var(--base-07, #fff);
   }
-  .CodeMirror .marked pre.CodeMirror-line {
-    background: var(--editor-marked-line, var(--blue-700, #0c6abe)) !important;
+
+  .CodeMirror .marked pre.CodeMirror-line::before {
+    content: "";
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;  
+    opacity: .5; 
+    z-index: -1;
+    background: var(--editor-marked-line, var(--cyan-700, #0c6abe)) !important;
   }
 </style>
 <slot name="style"></slot><slot name="preamble"></slot>
