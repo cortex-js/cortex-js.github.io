@@ -681,8 +681,17 @@ class CodePlaygroundElement extends HTMLElement {
                 .querySelector(':host > div')
                 .classList.toggle('stack-layout', newValue === 'stack');
         }
-        else if (name === 'mark-line') {
-            mark(this.shadowRoot, newValue);
+        else if (name === 'mark-line' || name === 'mark-javascript-line') {
+            mark(this.shadowRoot, 'javascript', newValue);
+        }
+        else if (name === 'mark-css-line') {
+            mark(this.shadowRoot, 'css', newValue);
+        }
+        else if (name === 'mark-json-line') {
+            mark(this.shadowRoot, 'json', newValue);
+        }
+        else if (name === 'mark-html-line') {
+            mark(this.shadowRoot, 'html', newValue);
         }
         else if (name === 'show-line-numbers') {
             this.shadowRoot
@@ -812,10 +821,7 @@ class CodePlaygroundElement extends HTMLElement {
                 });
                 editor.setValue(sanitizeInput(x.value));
                 editor.setSize('100%', '100%');
-                if (lang === 'javascript') {
-                    if (this.markLine)
-                        mark(shadowRoot, this.markLine);
-                }
+                mark(shadowRoot, x.dataset.language, this.getAttribute(`mark-${x.dataset.language}-line`));
                 editor.on('change', () => this.editorContentChanged());
             });
         }
@@ -987,10 +993,7 @@ class CodePlaygroundElement extends HTMLElement {
             if (text) {
                 const editor = this.shadowRoot.querySelector(`textarea[data-language="${slot.name}"] + .CodeMirror`);
                 editor['CodeMirror'].setValue(sanitizeInput(text));
-                if (slot.name === 'javascript') {
-                    if (this.markLine)
-                        mark(this.shadowRoot, this.markLine);
-                }
+                mark(this.shadowRoot, slot.name, this.getAttribute(`mark-${slot.name}-line`));
             }
         });
     }
@@ -1097,6 +1100,8 @@ class CodePlaygroundElement extends HTMLElement {
         });
         // Important: keep the ${script} on a separate line. The content could
         // be "// a comment" which would result in the script failing to parse
+        //
+        // Note: the function is marked `async` so that await can be used in its body
         return (imports
             .map((x) => {
             if (this.moduleMap[x[2]])
@@ -1107,7 +1112,7 @@ class CodePlaygroundElement extends HTMLElement {
             `const playground${jsID} = document.getElementById("${this.id}").shadowRoot;` +
             `const console${jsID} = playground${jsID}.host.pseudoConsole();` +
             `const output${jsID} = playground${jsID}.querySelector("div.result > div.output");` +
-            'try{(function() {\n' +
+            'try{(async function() {\n' +
             script +
             `\n}());} catch(err) { console${jsID}.catch(err) }`);
     }
@@ -1488,18 +1493,19 @@ function sanitizeInput(s) {
         .join('\n');
     return s;
 }
-function mark(root, arg) {
+function mark(root, language, arg) {
     var _a;
-    const jsEditor = (_a = root.querySelector('textarea[data-language="javascript"] + .CodeMirror')) === null || _a === void 0 ? void 0 : _a['CodeMirror'];
-    if (!jsEditor)
+    if (arg === undefined)
         return;
-    // jsEditor.doc.getAllMarks().forEach((marker) => marker.clear());
-    for (let i = jsEditor.doc.firstLine; i <= jsEditor.doc.lastLine; i++)
-        jsEditor.doc.removeLineClass(i, 'wrap', 'marked');
+    const editor = (_a = root.querySelector(`textarea[data-language="${language}"] + .CodeMirror`)) === null || _a === void 0 ? void 0 : _a['CodeMirror'];
+    if (!editor)
+        return;
+    for (let i = editor.doc.firstLine; i <= editor.doc.lastLine; i++)
+        editor.doc.removeLineClass(i, 'wrap', 'marked');
     if (typeof arg === 'string' && /\d+-\d+/.test(arg)) {
         const [, from, to] = arg.match(/(\d+)-(\d+)/);
         for (let i = parseInt(from); i <= parseInt(to); i++)
-            jsEditor.doc.addLineClass(i - 1, 'wrap', 'marked');
+            editor.doc.addLineClass(i - 1, 'wrap', 'marked');
         return;
     }
     let value = arg;
@@ -1511,11 +1517,11 @@ function mark(root, arg) {
     if (value === '' || value === 'none')
         return;
     if (typeof value === 'number') {
-        jsEditor.doc.addLineClass(value - 1, 'wrap', 'marked');
+        editor.doc.addLineClass(value - 1, 'wrap', 'marked');
     }
     else if (Array.isArray(value)) {
         for (const line of value)
-            jsEditor.doc.addLineClass(line - 1, 'wrap', 'marked');
+            editor.doc.addLineClass(line - 1, 'wrap', 'marked');
     }
 }
 // Register the tag for the element, only if it isn't already registered
