@@ -674,12 +674,9 @@ class CodePlaygroundElement extends HTMLElement {
             this.activateTab(newValue);
         }
         else if (name === 'layout') {
-            this.shadowRoot
-                .querySelector(':host > div')
-                .classList.toggle('tab-layout', newValue !== 'stack');
-            this.shadowRoot
-                .querySelector(':host > div')
-                .classList.toggle('stack-layout', newValue === 'stack');
+            const div = this.shadowRoot.querySelector(':host > div');
+            div.classList.toggle('tab-layout', newValue !== 'stack');
+            div.classList.toggle('stack-layout', newValue === 'stack');
         }
         else if (name === 'mark-line' || name === 'mark-javascript-line') {
             mark(this.shadowRoot, 'javascript', newValue);
@@ -737,18 +734,19 @@ class CodePlaygroundElement extends HTMLElement {
         const self = this;
         const activateTab = function (ev) {
             const tab = ev.target;
-            if (tab.tagName === 'LABEL') {
+            if (tab.tagName.toLowerCase() === 'label')
                 self.activateTab(tab.parentNode.dataset.name);
-            }
         };
         // 1. Remove the event handlers
-        shadowRoot.querySelectorAll('.tab').forEach((x) => {
-            x.removeEventListener('click', activateTab);
-        });
+        shadowRoot
+            .querySelectorAll('.tab')
+            .forEach((x) => x.removeEventListener('click', activateTab));
         // 2. Collect the content of each tab
-        const slots = shadowRoot.querySelectorAll('.original-content slot');
+        const slots = [
+            ...shadowRoot.querySelectorAll('.original-content slot'),
+        ];
         let content = '';
-        slots.forEach((slot) => {
+        for (const slot of slots) {
             let text = slot
                 .assignedNodes()
                 .map((node) => node.innerHTML)
@@ -756,12 +754,12 @@ class CodePlaygroundElement extends HTMLElement {
             if (text) {
                 // Remove empty comments. This 'trick' is used to work around
                 // an issue where Eleventy ignores empty lines in HTML blocks,
-                // so an empty comment is insert, but it now needs to be removed
+                // so an empty comment is inserted, but it now needs to be removed
                 // so that the empty line is properly picked up by CodeMirror. Sigh.
                 text = text.replace(/<!-- -->/g, '');
                 const tabId = randomId();
                 const language = slot.name;
-                content += `<div class='tab' id="${tabId}" data-name="${language}">
+                content += `<div class='tab' data-name="${language}">
         <input type="radio" id="${tabId}" name="${this.id}">
         <label for="${tabId}">${language}</label>
         <div part="editor" class="content ${language.toLowerCase()}">
@@ -769,7 +767,7 @@ class CodePlaygroundElement extends HTMLElement {
         </div>
     </div>`;
             }
-        });
+        }
         shadowRoot.querySelector('.tabs').innerHTML = content;
         // 3. Listen to tab activation
         const tabs = shadowRoot.querySelectorAll('.tab');
@@ -777,9 +775,9 @@ class CodePlaygroundElement extends HTMLElement {
             tabs.forEach((x) => (x.querySelector('.tab > label').style.display = 'none'));
         }
         else {
-            shadowRoot.querySelectorAll('.tab label').forEach((x) => {
-                x.addEventListener('click', activateTab);
-            });
+            shadowRoot
+                .querySelectorAll('.tab label')
+                .forEach((x) => x.addEventListener('click', activateTab));
         }
         const firstTab = tabs[0];
         const lastTab = tabs[tabs.length - 1];
@@ -826,7 +824,9 @@ class CodePlaygroundElement extends HTMLElement {
             });
         }
         // 5. Activate the previously active tab, or the first one
-        this.activateTab(this.activeTab || tabs[0].dataset.name);
+        this.activateTab(this.activeTab || tabs[0].dataset.name, {
+            refresh: false,
+        });
         // 6. Run the playground
         this.runPlayground();
         // Refresh the codemirror layouts
@@ -835,24 +835,26 @@ class CodePlaygroundElement extends HTMLElement {
             .querySelectorAll('textarea + .CodeMirror')
             .forEach((x) => { var _a; return (_a = x === null || x === void 0 ? void 0 : x['CodeMirror']) === null || _a === void 0 ? void 0 : _a.refresh(); }), 128);
     }
-    activateTab(name) {
+    activateTab(name, options) {
         var _a;
-        const activeTab = (_a = this.shadowRoot.querySelector(`[data-name=${name}]`)) !== null && _a !== void 0 ? _a : this.shadowRoot.querySelectorAll('.tab')[0];
+        const activeTab = (_a = this.shadowRoot.querySelector(`[data-name=${name}]`)) !== null && _a !== void 0 ? _a : this.shadowRoot.querySelector('.tab');
         if (!activeTab)
             return;
         activeTab.querySelector('input[type="radio"]').checked =
             true;
-        this.shadowRoot
-            .querySelector('.tabs')
-            .style.setProperty('--tab-indicator-offset', activeTab.offsetLeft -
+        const offset = activeTab.offsetLeft -
             this.shadowRoot.querySelector('.tab:first-of-type')
-                .offsetLeft +
-            'px');
-        requestAnimationFrame(() => {
-            var _a, _b;
-            return (_b = (_a = activeTab
-                .querySelector('textarea + .CodeMirror')) === null || _a === void 0 ? void 0 : _a['CodeMirror']) === null || _b === void 0 ? void 0 : _b.refresh();
-        });
+                .offsetLeft;
+        if (offset !== 0)
+            this.shadowRoot
+                .querySelector('.tabs')
+                .style.setProperty('--tab-indicator-offset', offset + 'px');
+        if ((options === null || options === void 0 ? void 0 : options.refresh) === true)
+            requestAnimationFrame(() => {
+                var _a, _b;
+                return (_b = (_a = activeTab
+                    .querySelector('textarea + .CodeMirror')) === null || _a === void 0 ? void 0 : _a['CodeMirror']) === null || _b === void 0 ? void 0 : _b.refresh();
+            });
     }
     runPlayground() {
         var _a, _b, _c, _d;
