@@ -1478,7 +1478,8 @@ crossorigin
   ));
 </script>
 <h1 id="mathlive-demo" tabindex="-1">MathLive Demo</h1>
-<p>In the demo below, a mathfield and a LaTeX textfield reflect their content.</p>
+<p>In the demo below, a mathfield and a LaTeX textfield reflect their content. The
+MathJSON representation of the expression is also dispalyed in the console.</p>
 <p>The HTML and JavaScript playgrounds below are interactive.</p>
 <p>Modify the code to experiment with the options available.</p>
 <div class='read-more'><a href="/compute-engine/demo/">
@@ -1521,7 +1522,7 @@ latexField.addEventListener('input', () => mf.setValue(latexField.value));
 function onMathfieldInput() {
     // Output MathJSON representation of the expression
     console.clear();
-    console.log(mf.expression.json);  
+    console.log('MathJSON expression', mf.expression.json);  
     // Update raw LaTeX value
     latexField.value = mf.value;
 }

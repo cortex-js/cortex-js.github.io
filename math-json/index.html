@@ -9,7 +9,7 @@
 <title>
     CortexJS
 </title>
-<meta name="description" content="The MathJSON format is a lightweight data interchange format for mathematical notation" />
+<meta name="description" content="MathJSON is a lightweight data interchange format for mathematical notation" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -1459,7 +1459,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <picture class=full-width style='aspect-ratio:1.775;clip-path: inset(0 0 0 0 round 8px 8px 0 0); margin-bottom: 2em'> <source srcset=/assets/MathJSON@1x.webp type=image/webp> <source srcset=/assets/MathJSON@1x.jpg type=image/jpeg>  <img src=/assets/MathJSON@1x.jpg alt='MathJSON'> </picture> <p class=xl>The MathJSON format is a lightweight data interchange format for mathematical notation.
+    <picture class=full-width style='aspect-ratio:1.775;clip-path: inset(0 0 0 0 round 8px 8px 0 0); margin-bottom: 2em'> <source srcset=/assets/MathJSON@1x.webp type=image/webp> <source srcset=/assets/MathJSON@1x.jpg type=image/jpeg>  <img src=/assets/MathJSON@1x.jpg alt='MathJSON'> </picture> <p class=xl>MathJSON is a lightweight data interchange format for mathematical notation.
   
 
   
@@ -1478,6 +1478,38 @@ crossorigin
 
 
 
+<style>
+  .math-json {
+    background: var(--console-background);
+    color: var(--base-0a);
+    padding: 4px;
+  }
+  .mathfield {
+    border: var(--ui-border);
+    padding: 5px;
+    margin: 10px 0 10px 0;
+    border-radius: 5px;
+  }
+  .output {
+    font-family: var(--monospace-font-family);
+    color: var(--base-0a); /* #f0c674; */
+
+    background: var(--console-background);
+
+    padding: 5px;
+    margin: 10px 0 10px 0;
+    border-radius: 5px;
+    border: var(--ui-border);
+
+    min-height: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+</style>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1489,19 +1521,78 @@ crossorigin
 <tbody>
 <tr>
 <td style="text-align:left">\[\frac{n}{1+n}\]</td>
-<td style="text-align:left"><code>[&quot;Divide&quot;, &quot;n&quot;, [&quot;Add&quot;, 1, &quot;n&quot;]]</code></td>
-</tr>
-<tr>
-<td style="text-align:left">\[e^{\imaginaryI \pi }+1=0\]</td>
-<td style="text-align:left"><code>[&quot;Equal&quot;, [&quot;Add&quot;, [&quot;Exp&quot;, [&quot;Multiply&quot;, &quot;Pi&quot;, &quot;ImaginaryUnit&quot;], 1]], 0]</code></td>
+<td style="text-align:left"><code class="math-json">[&quot;Divide&quot;, &quot;n&quot;, [&quot;Add&quot;, 1, &quot;n&quot;]]</code></td>
 </tr>
 <tr>
 <td style="text-align:left">\[\sin^{-1}^\prime(x)\]</td>
-<td style="text-align:left"><code>[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
+<td style="text-align:left"><code class="math-json">[[&quot;Derivative&quot;, 1, [&quot;InverseFunction&quot;, &quot;Sin&quot;]], &quot;x&quot;]</code></td>
 </tr>
 </tbody>
 </table>
 </div>
+<p><math-field id="mf" class="mathfield" virtual-keyboard-mode="manual">e^{i\pi}+1=0</math-field></p>
+<div id="mathfield-json" class="output"></div>
+<script type="module">
+    // import 'https://unpkg.com/mathlive?module';
+    const mf = document.getElementById('mf');
+
+    window.customElements.whenDefined("math-field").then(() => {
+      document.getElementById('mathfield-json').innerHTML = exprToString(mf.expression.json);
+      mf.addEventListener('input', (ev) => {
+        document.getElementById('mathfield-json').innerHTML = exprToString(mf.expression.json);
+      });
+    });
+
+    const MAX_LINE_LENGTH = 64;
+    function exprToStringRecursive(expr, start) {
+      let indent = ' '.repeat(start);
+      if (Array.isArray(expr)) {
+        const elements = expr.map(x => exprToStringRecursive(x, start + 2));
+        let result = `[${elements.join(', ')}]`;
+        if (start + result.length < MAX_LINE_LENGTH) return result;
+        return `[\n${indent}  ${elements.join(`,\n${indent}  `)}\n${indent}]`;
+      }
+      if (expr === null) return 'null';
+      if (typeof expr === 'object') {
+        const elements = {};
+        Object.keys(expr).forEach(x => 
+           elements[x] = exprToStringRecursive(expr[x], start + 2)
+        );
+        let result = `\n${indent}{${Object.keys(expr).map(key => {return `${key}: ${elements[key]}`}).join('; ')}}`;
+        if (start + result.length < MAX_LINE_LENGTH) return result;
+        return  `\n${indent}{\n` + Object.keys(expr).map(key => 
+            { return `${indent}  ${key}: ${elements[key]}` }
+          ).join(`;\n${indent}`) + '\n' + indent + '}';
+      }
+      return JSON.stringify(expr, null, 2);
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/[&<>"'`=/\u200b]/g, function (s) {
+        return (
+          {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '/': '&#x2F;',
+            '`': '&#x60;',
+            '=': '&#x3D;',
+            '\u200b': '&amp;#zws;',
+          }[s] || s
+        );
+      });
+    }
+
+    function exprToString(expr) {
+      return escapeHtml(exprToStringRecursive(expr, 0));
+    }
+</script>
+<br>
+<div class='read-more'><a href="/compute-engine/demo/">
+Try a demo of the <strong>Compute Engine</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>MathJSON is built on the <a href="https://www.json.org/">JSON format</a>. Its focus is on
 interoperability between software programs to facilitate the exchange of
 mathematical data and the building of scientific software through the
