@@ -1477,9 +1477,13 @@ crossorigin
       import('//unpkg.com/mathlive?module').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
   ));
 </script>
-<h1 id="demo" tabindex="-1">Demo</h1>
-<p>Experiment with the options available to setup and customize a
-mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.</p>
+<h1 id="mathlive-demo" tabindex="-1">MathLive Demo</h1>
+<p>In the demo below, a mathfield and a LaTeX textfield reflect their content.</p>
+<p>The HTML and JavaScript playgrounds below are interactive.</p>
+<p>Modify the code to experiment with the options available.</p>
+<div class='read-more'><a href="/compute-engine/demo/">
+Try a demo of the <strong>Compute Engine</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
     <style slot="style">
@@ -1511,12 +1515,19 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
     <div slot="javascript">import 'mathlive';
 const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
+//
 latexField.addEventListener('input', () => mf.setValue(latexField.value));
-function updateLatex() {
-  document.querySelector('#latex').value = mf.value;
+//
+function onMathfieldInput() {
+    // Output MathJSON representation of the expression
+    console.clear();
+    console.log(mf.expression.json);  
+    // Update raw LaTeX value
+    latexField.value = mf.value;
 }
-mf.addEventListener('input', updateLatex);
-updateLatex();</div>
+//
+mf.addEventListener('input', onMathfieldInput);
+onMathfieldInput();</div>
     <div slot="html">
 &lt;math-field id="formula" virtual-keyboard-mode="manual"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -1533,17 +1544,17 @@ updateLatex();</div>
         
 
 
-        <meta itemprop="datePublished" content="July 17, 2022">
+        <meta itemprop="datePublished" content="July 21, 2022">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-17'>July 17, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
         
 
-          <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>See a typo? Question? Feedback?</strong> File an issue at <a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+          <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
       </footer>
 
 
