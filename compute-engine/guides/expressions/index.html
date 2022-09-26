@@ -1709,10 +1709,10 @@ property. Use this property to “look inside the box”.</p>
 </code></pre>
 <p><strong>To customize the format of the MathJSON expression</strong> use the
 <code>ce.jsonSerializationOptions</code> property )</p>
-<p>Use this option to control which metadata, if any, should be included,
-whether to use shorthand notation, and to exclude some functions. See
-<a href="/docs/compute-engine/?q=JsonSerializationOptions">JsonSerializationOptions</a>
-for more info about what can be customized.</p>
+<p>Use this option to control which metadata, if any, should be included, whether
+to use shorthand notation, and to exclude some functions. See
+<a href="/docs/compute-engine/?q=JsonSerializationOptions">JsonSerializationOptions</a> for
+more info about what can be customized.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + \\frac{q}{p}&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">canonical</span>.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
@@ -1734,8 +1734,8 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
 <h2 id="literal-expressions" tabindex="-1">Literal Expressions</h2>
 <p>A literal expression is one that has a fixed value that was provided directly
 when the expression was defined.</p>
-<p>Numbers and strings are literals. Symbols and functions are not. They may have
-a value, but their value is calculated indirectly.</p>
+<p>Numbers and strings are literals. Symbols and functions are not. They may have a
+value, but their value is calculated indirectly.</p>
 <p><strong>To check if an expression is a literal</strong>, use <code>expr.isLiteral</code>.</p>
 <h2 id="immutability" tabindex="-1">Immutability</h2>
 <p><strong>Boxed expressions are immutable</strong>. Once a Boxed Expression has been created it
@@ -1770,7 +1770,8 @@ function itself is pure, and all its arguments are pure as well.</p>
 <h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
 <p>The canonical form of an expression is a “standard” way of writing an
 expression.</p>
-<p><strong>To check if an expression is already in canonical form</strong>, use <code>expr.isCanonical</code>.</p>
+<p><strong>To check if an expression is already in canonical form</strong>, use
+<code>expr.isCanonical</code>.</p>
 <p><strong>To obtain the canonical representation of an expression</strong>, use
 <code>expr.canonical</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
@@ -1819,16 +1820,16 @@ have no value if it represents a free variable.</p>
 <section id=errors>
 <h2 id="errors" tabindex="-1">Errors</h2>
 <p>Sometimes, things go wrong.</p>
-<p>When something goes wrong an <code>[&quot;Error&quot;]</code> expression is returned.</p>
+<p>When something goes wrong the Compute Engine uses an <code>[&quot;Error&quot;]</code> expression.</p>
 <p>The <strong>first argument</strong> of an <code>[&quot;Error&quot;]</code> expression provides details about the
 nature of the problem. This can be either a string or an <code>[&quot;ErrorCode&quot;]</code>
 expression if there are additional arguments to the error.</p>
 <p>For example if the problem is that an argument of a function expression is not
 of the expected domain, an expression such as
-<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'expected-argument-domain'&quot;, [&quot;Domain&quot;, &quot;Number&quot;]]]</code>
+<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'mismatched-argument-domain'&quot;, [&quot;Domain&quot;, &quot;Number&quot;]]]</code>
 could be returned to indicate that a value of domain <code>&quot;Number&quot;</code> was expected.</p>
-<p>The <strong>second argument</strong> of an <code>[&quot;Error&quot;]</code> expression indicate the context of
-the error. This can be a <code>[&quot;Latex&quot;]</code> expression when the problem occurred while
+<p>The <strong>second argument</strong> of an <code>[&quot;Error&quot;]</code> expression indicate the context of the
+error. This can be a <code>[&quot;Latex&quot;]</code> expression when the problem occurred while
 parsing a LaTeX string, or another expression if the problem was detected later.</p>
 <h3 id="parsing-errors" tabindex="-1">Parsing Errors</h3>
 <p>When parsing a LaTeX expression, the Compute Engine uses the <strong>maximum effort</strong>
@@ -1837,24 +1838,24 @@ of the input as possible is reflected in the MathJSON result.</p>
 <p>If required operands are missing (the denominator of a fraction, for example), a
 <code>[&quot;Error&quot;, &quot;'missing'&quot;]</code> error expression is inserted where the missing operand
 should have been.</p>
-<p>Problems that occur while parsing a LaTeX string will usually indicate a
-LaTeX syntax error or typo: missing <code>}</code>, mistyped command name, etc…</p>
+<p>Problems that occur while parsing a LaTeX string will usually indicate a LaTeX
+syntax error or typo: missing <code>}</code>, mistyped command name, etc…</p>
 <h3 id="semantic-errors" tabindex="-1">Semantic Errors</h3>
-<p>Some errors are not caught until an expression is bound, that is until
-an attempt is made to associate its symbol and function identifiers to
-definitions. This could include missing or mismatched arguments.</p>
+<p>Some errors are not caught until an expression is bound, that is until an
+attempt is made to associate its symbol or function identifiers to a definition.
+This could include errors such as missing or mismatched arguments.</p>
 <p>Some errors that could be considered LaTeX syntax errors may not surface until
 binding occurs.</p>
 <p>For example <code>\frac{1}{2=x}</code> (instead of <code>\frac{1}{2}=x</code>) will be parsed as
-<code>[&quot;Divide&quot;, 1, [&quot;Equal&quot;, 2, x]]</code>. The fact that the second argument of the <code>&quot;Divide&quot;</code>
-function is a boolean and not a number will not be detected until the definition
-for <code>&quot;Divide&quot;</code> has been located.</p>
+<code>[&quot;Divide&quot;, 1, [&quot;Equal&quot;, 2, x]]</code>. The fact that the second argument of the
+<code>&quot;Divide&quot;</code> function is a boolean and not a number will not be detected until the
+definition for <code>&quot;Divide&quot;</code> has been located.</p>
 <p>Name binding is done lazily, not upon boxing. To force the binding to occur,
 request the canonical version of the expression.</p>
-<p><strong>To check if an expression includes an <code>[&quot;Error&quot;]</code> subexpression</strong> check
-the <code>expr.isValid</code> property.</p>
-<p><strong>To get the list of all the <code>[&quot;Error&quot;]</code> subexpression</strong> use the
-<code>expr.errors</code> property.</p>
+<p><strong>To check if an expression includes an <code>[&quot;Error&quot;]</code> subexpression</strong> check the
+<code>expr.isValid</code> property.</p>
+<p><strong>To get the list of all the <code>[&quot;Error&quot;]</code> subexpression</strong> use the <code>expr.errors</code>
+property.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1885,8 +1886,24 @@ the <code>expr.isValid</code> property.</p>
 <td style="text-align:left">the character does not apply to the current parsing context</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>expected-argument-domain</code></td>
+<td style="text-align:left"><code>mismatched-argument-domain</code></td>
 <td style="text-align:left">the argument provided does not match the expected domain</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>unexpected-argument</code></td>
+<td style="text-align:left">too many arguments provided</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>expected-argument</code></td>
+<td style="text-align:left">not enough arguments provided</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>invalid-symbol-name</code></td>
+<td style="text-align:left">the name of the symbol cannot be used (see <a href="/math-json/#symbols">MathJSON Symbols</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>invalid-domain</code></td>
+<td style="text-align:left">the domain is not a valid domain literal or domain expression</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>expected-closing-delimiter</code></td>
@@ -1910,7 +1927,7 @@ the <code>expr.isValid</code> property.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>unexpected-operator</code></td>
-<td style="text-align:left">the operator does not apply to the current parsing context. Could be a infix or postfix operator without a rhs.</td>
+<td style="text-align:left">the operator does not apply to the current parsing context. Could be an infix or postfix operator without a rhs.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>unexpected-digit</code></td>
@@ -1931,20 +1948,54 @@ the <code>expr.isValid</code> property.</p>
 </tbody>
 </table>
 </div>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{1}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 1, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]</span>
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\oops&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Error&quot;, [&quot;ErrorCode&quot;,&quot;&#x27;unexpected-command&#x27;&quot;,&quot;&#x27;\\oops&#x27;&quot;], [&quot;Latex&quot;,&quot;&#x27;\\oops&#x27;&quot;]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔  [&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\oops{bar}+2&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔  [&quot;Add&quot;,</span>
+<span class="hljs-comment">//        [&quot;Error&quot;,</span>
+<span class="hljs-comment">//          [&quot;ErrorCode&quot;,&quot;&#x27;unexpected-command&#x27;&quot;,&quot;&#x27;\\oops&#x27;&quot;],</span>
+<span class="hljs-comment">//          [&quot;Latex&quot;,&quot;&#x27;\\oops{bar}&#x27;&quot;]</span>
+<span class="hljs-comment">//        ],</span>
+<span class="hljs-comment">//        2</span>
+<span class="hljs-comment">//    ]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\begin{oops}\\end{oops}&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Error&quot;,[&quot;ErrorCode&quot;,&quot;&#x27;unknown-environment&#x27;&quot;,&quot;&#x27;oops&#x27;&quot;],[&quot;Latex&quot;,&quot;&#x27;\\\\begin{oops}\\\\end{oops}&#x27;&quot;]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔  [&quot;Error&quot;, [&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]], &quot;&#x27;syntax-error&#x27;&quot;, [&quot;Latex&quot;, &quot;&#x27;{&#x27;&quot;]]</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+\\sqrt&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1 ,[&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\times 2&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Error&quot;, &quot;&#x27;unexpected-operator&#x27;&quot;]</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+\\frac{2}&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, [&quot;Divide&quot;, 2, [&quot;Error&quot;,&quot;&#x27;missing&#x27;&quot;]]]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+(2=2)+2&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, [&quot;Delimiter&quot;, [&quot;Equal&quot;, 2, 2]]]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+(2=2)+3&#x27;</span>).<span class="hljs-property">canonical</span>.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;,</span>
+<span class="hljs-comment">//      1,</span>
+<span class="hljs-comment">//      [&quot;Error&quot;,</span>
+<span class="hljs-comment">//          [&quot;ErrorCode&quot;, &quot;&#x27;mismatched-argument-domain&#x27;&quot;, [&quot;Domain&quot;, &quot;Number&quot;]],</span>
+<span class="hljs-comment">//          [&quot;Delimiter&quot;,[&quot;Equal&quot;, 2, 2]]</span>
+<span class="hljs-comment">//      ],</span>
+<span class="hljs-comment">//      3</span>
+<span class="hljs-comment">//    ]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\times 3&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Sequence&quot;, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;&#x27;unexpected-operator&#x27;&quot;, &quot;&#x27;\\times&#x27;&quot;], [&quot;Latex&quot;,&quot;&#x27;\\times&#x27;&quot;]], 3]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x__+1&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, [&quot;Subscript&quot;, &quot;x&quot;, [&quot;Error&quot;,&quot;&#x27;syntax-error&#x27;&quot;, [&quot;Latex&quot;,&quot;&#x27;_&#x27;&quot;]]], 1]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x_{a&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Subscript&quot;, &quot;x&quot;, [&quot;Error&quot;, &quot;&#x27;expected-closing-delimiter&#x27;&quot;, [&quot;Latex&quot;,&quot;&#x27;{a&#x27;&quot;]]]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1()&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Multiply&quot;,1,[&quot;Error&quot;,&quot;&#x27;expected-expression&#x27;&quot;,[&quot;Latex&quot;,&quot;&#x27;()&#x27;&quot;]]]</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;x@2&#x27;</span>).<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Sequence&quot;, &quot;x&quot;, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;&#x27;unexpected-token&#x27;&quot;, &quot;&#x27;@&#x27;&quot;], [&quot;Latex&quot;, &quot;&#x27;@2&#x27;&quot;]]]</span>
 </code></pre>
 </section>
 <h2 id="return-value-conventions" tabindex="-1">Return Value Conventions</h2>
@@ -1960,8 +2011,6 @@ available later. You can think of this as an answer of “maybe”. For example,
 <li><strong><code>this</code></strong>: this function was not applicable, or there was nothing to do. For
 example, invoking <code>expr.simplify()</code> on a boxed string.</li>
 </ul>
-<div class='read-more'><a href="/compute-engine/guides/symbols/"> Read more about defining and
-changing the value of <strong>symbols</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>

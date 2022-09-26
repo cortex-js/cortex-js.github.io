@@ -1658,15 +1658,14 @@ to be used with the Compute Engine.</p>
 <div class='read-more'><a href="/mathlive/"> Read more about the MathLive <strong>mathfield
 element</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To parse a LaTeX string</strong>, call the <code>ce.parse()</code> function.</p>
-<p>The Compute Engine will apply maximum effort to parse the input string as
-LaTeX, even if it includes errors. If errors are encountered, the
-resulting expression will have its <code>expr.isValid</code> property set to <code>false</code>.
-An <code>[&quot;Error&quot;]</code> expression will be produced where a problem was encountered.
-To get the list of all the errors in an expression, use <code>expr.errors</code> which
-will return an array of <code>[&quot;Error&quot;]</code> expressions.</p>
-<div class='read-more'><a href="/compute-engine/guides/expressions/#errors">
-Read more about the <strong>errors</strong> that can be returned.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>The Compute Engine will apply maximum effort to parse the input string as LaTeX,
+even if it includes errors. If errors are encountered, the resulting expression
+will have its <code>expr.isValid</code> property set to <code>false</code>. An <code>[&quot;Error&quot;]</code> expression
+will be produced where a problem was encountered. To get the list of all the
+errors in an expression, use <code>expr.errors</code> which will return an array of
+<code>[&quot;Error&quot;]</code> expressions.</p>
+<div class='read-more'><a href="/compute-engine/guides/expressions/#errors"> Read more about the
+<strong>errors</strong> that can be returned. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To serialize an expression to a LaTeX string</strong>, read the <code>expr.latex</code>
 property.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
@@ -1682,16 +1681,23 @@ property.</p>
 <p>Example of customization:</p>
 <ul>
 <li>whether to use an invisible multiply operator between expressions</li>
-<li>whether the input LaTeX should be preserved as metadata in the output expression</li>
+<li>whether the input LaTeX should be preserved as metadata in the output
+expression</li>
 <li>how to handle encountering unknown symbols while parsing</li>
 <li>whether to use a dot or a comma as a decimal marker</li>
 <li>how to display imaginary numbers and infinity</li>
 <li>whether to format numbers using engineering or scientific format</li>
 <li>what precision to use when formatting numbers</li>
-<li>how to serialize an explicit or implicit multiplication (using <code>\times</code>, <code>\cdot</code>, etc…)</li>
-<li>how to serialize functions, fractions, groups, logical operators, intervals, roots and powers.</li>
+<li>how to serialize an explicit or implicit multiplication (using <code>\times</code>,
+<code>\cdot</code>, etc…)</li>
+<li>how to serialize functions, fractions, groups, logical operators, intervals,
+roots and powers.</li>
 </ul>
-<p>The type of <code>ce.latexOptions</code> is <kbd><a href="/docs/compute-engine/?q=NumberFormattingOptions">NumberFormattingOptions</a> &amp; <a href="/docs/compute-engine/?q=ParseLatexOptions">ParseLatexOptions</a> &amp; <a href="/docs/compute-engine/?q=SerializeLatexOptions">SerializeLatexOptions</a></kbd>. Refer to these interfaces for more details.</p>
+<p>The type of <code>ce.latexOptions</code> is
+<kbd><a href="/docs/compute-engine/?q=NumberFormattingOptions">NumberFormattingOptions</a>
+&amp; <a href="/docs/compute-engine/?q=ParseLatexOptions">ParseLatexOptions</a> &amp;
+<a href="/docs/compute-engine/?q=SerializeLatexOptions">SerializeLatexOptions</a></kbd>.
+Refer to these interfaces for more details.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 ce.<span class="hljs-property">latexOptions</span> = {
   <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
@@ -1716,7 +1722,8 @@ must be surrounded by curly brackets.</p>
 target language (LaTeX, MathASCII, etc…) or of any specific interpretation of
 the symbols used in a MathJSON expression (<code>&quot;Pi&quot;</code>, <code>&quot;Sin&quot;</code>, etc…).</p>
 <p>A <strong>LaTeX dictionary</strong> defines how a MathJSON expression can be expressed as a
-LaTeX string (<strong>serialization</strong>) or constructed from a LaTeX string (<strong>parsing</strong>).</p>
+LaTeX string (<strong>serialization</strong>) or constructed from a LaTeX string
+(<strong>parsing</strong>).</p>
 <p>It includes definitions such as:</p>
 <ul>
 <li>“<em>The <code>Power</code> function is represented as “<code>x^{n}</code>”</em>”</li>
@@ -1734,7 +1741,6 @@ Engine constructor.</p>
     ...<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getLatexDictionary</span>().<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;PlusMinus),
     {
       trigger: [&#x27;</span>\\smoll<span class="hljs-string">&#x27;],
-      requiredLatexArg: 2,
       parse: (parser: Parser): Expression =&gt; {
         return [
           &#x27;</span><span class="hljs-title class_">Divide</span><span class="hljs-string">&#x27;,

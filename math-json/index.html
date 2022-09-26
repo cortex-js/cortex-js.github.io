@@ -1916,15 +1916,15 @@ representation of numbers, a JSON number literal can be used.</p>
 
 <span class="hljs-number">-234.534e-46</span>
 
-<span class="hljs-comment">// The numbers below cannot be represented as JSON number literals</span>
-<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-234.534e-46&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-comment">// The numbers below cannot be represented as JSON number literals:</span>
 
-<span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span>
-    <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105&quot;</span>
-<span class="hljs-punctuation">}</span>
+<span class="hljs-comment">// Exponent out of bounds</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;5.78e309&quot;</span> <span class="hljs-punctuation">}</span>
 
+<span class="hljs-comment">// Too many digits</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.14159265358979323846264338327950288419716&quot;</span> <span class="hljs-punctuation">}</span>
 
+<span class="hljs-comment">// Non-finite number</span>
 <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;-Infinity&quot;</span> <span class="hljs-punctuation">}</span>
 
 </code></pre>
@@ -2327,10 +2327,20 @@ and its arguments.</p>
   <span class="hljs-string">&quot;fn&quot;</span>: [<span class="hljs-title class_">Expression</span>, ...<span class="hljs-title class_">Expression</span>[]]
 }
 </code></pre>
+<h3 id="functions-as-json-arrays" tabindex="-1">Functions as JSON Arrays</h3>
+<p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
+<p>For example these two expressions are equivalent:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="notice--info">An array representing a function must have at least one element, the head of the
+function. Therefore <code>[]</code> is not a valid expression.</p>
+<h3 id="function-head" tabindex="-1">Function Head</h3>
 <p>The <strong>head</strong> of the function expression is the first element in the array. Its
 presence is required. It indicates the <strong>name of the function</strong> or “what” the
 function is about.</p>
-<p>The head is frequently a string, but it can be another expression.</p>
+<p>The head is usually a string, but it can be another expression.</p>
 <ul>
 <li>
 <p>If it is a string, it should follow the conventions for function names.</p>
@@ -2342,8 +2352,8 @@ function is about.</p>
 </li>
 <li>
 <p>If it is an expression, it may include the wildcard <code>_</code> or <code>_1</code> to represent
-the first argument, <code>_2</code> to represent the second, etc… The wildcard <code>__</code>
-represents the sequence of all the arguments.</p>
+the first argument, <code>_2</code> to represent the second argument, etc… The wildcard
+<code>__</code> represents the sequence of all the arguments.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
 </code></pre>
 </li>
@@ -2357,15 +2367,6 @@ argument which is a list, use a <code>[&quot;List&quot;]</code> expression, do n
 </code></pre>
 <p>The head of this expression is <code>[&quot;InverseFunction&quot;, &quot;Sin&quot;]</code> and the argument is
 <code>&quot;x&quot;</code>.</p>
-<h3 id="functions-as-json-arrays" tabindex="-1">Functions as JSON Arrays</h3>
-<p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
-<p>For example these two expressions are equivalent:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;fn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
-
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cos&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<p class="notice--info">An array representing a function must have at least one element, the head of the
-function. Therefore <code>[]</code> is not a valid expression.</p>
 <h2 id="dictionary" tabindex="-1">Dictionary</h2>
 <p>A <strong>dictionary</strong> is a collection of key-value pairs. In some progamming
 languages it is called a map or associative array.</p>
