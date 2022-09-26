@@ -38,17 +38,17 @@
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -68,7 +68,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.css">
   
 
 
@@ -935,11 +935,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/mathlive/guides/interacting/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/mathlive/guides/interacting/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1219,6 +1219,176 @@ crossorigin
                   
                   Introduction
                 </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/goals/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/mathlive/guides/interacting/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
             
           
             
@@ -1681,41 +1851,34 @@ the mathfield. However, in some cases it might be useful to detect when a
 mathfield is clicked on. For example, you could display one or more read-only
 mathfields in a list and prompt the user to pick one by clicking on it.</p>
 <p>In general, to be notified of an event, use <code>mf.addEventListener()</code>. This
-includes some generic events, as well as some that are specific to mathfields.
-Events that target a DOM element inside the mathfield (inside the shadow DOM)
+includes some generic events, as well as some that are specific to mathfields.</p>
+<p>Events that target a DOM element inside the mathfield (inside the shadow DOM)
 will bubble and be retargeted to appear as if they had targeted the
 mathfield (that is, the <code>evt.target</code> will be the mathfield itself).</p>
 <p>This include the following standard events:</p>
 <ul>
 <li><code>change</code>: <strong>Return</strong> or <strong>Enter</strong> key was pressed</li>
 <li><code>blur</code>, <code>focus</code>, <code>focusin</code>, <code>focusout</code></li>
+<li><code>click</code></li>
 <li><code>mousedown</code>, <code>mouseup</code>, <code>mousemove</code>, <code>mouseout, </code>mouseover`</li>
+<li><code>beforeinput</code>, <code>input</code></li>
+<li><code>keydown</code>, <code>keypress</code>, <code>keyup</code></li>
 <li><code>wheel</code></li>
-<li><code>beforeinput</code>, <code>input</code>, <code>keydown</code>, <code>keyup</code></li>
 <li>all the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events">pointer events</a> such as <code>pointerdown</code>, <code>pointerup</code>, etc… and all the touch events</li>
 </ul>
 <p>As well as these mathfield specific events:</p>
 <ul>
 <li><code>mount</code>: the mathfield has been connected to the DOM</li>
 <li><code>unmount</code>: the mathfield is no longer connected to the DOM</li>
-<li><code>math-error</code>: syntax and other errors</li>
-<li><code>keystroke</code>: general keyboard interactions</li>
 <li><code>focus-out</code>: tab key interactions</li>
 <li><code>move-out</code>: arrow key interactions</li>
 <li><code>mode-change</code>: change to <code>math</code>, <code>text</code> or <code>latex</code> mode</li>
+<li><code>placeholder-change</code>: an editable placeholder inside a read-only mathfield
+has been modified</li>
 <li><code>read-aloud-status-change</code></li>
 <li><code>selection-change</code></li>
 <li><code>undo-state-change</code></li>
 </ul>
-<p>The <code>click</code> event may be dispatched in some cases. However, this event should
-be avoided. It is a synthetic event, meaning it’s generated by the browser
-based on some heuristic that tries to detect a <code>pointerdown</code> followed by a
-<code>pointerup</code> on the same DOM element. However, interacting with a mathfield may
-change its DOM elements (to display the selection for example) and the browser
-may not be able to reliably trigger this event.</p>
-<p>Instead, to detect when a mathfield is being clicked on, listen for a <code>focus</code>
-event or a <code>pointerdown</code> event. The <code>focus</code> event has the benefit of working
-with both mouse and keyboard, which makes this solution more accessible.</p>
 <section id='clipboard'>
 <h2 id="interacting-with-the-clipboard" tabindex="-1">Interacting with the Clipboard</h2>
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
@@ -1850,14 +2013,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 12, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-12'>September 12, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

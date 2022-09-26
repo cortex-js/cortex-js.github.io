@@ -928,11 +928,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/compute-engine/guides/canonical-form/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/compute-engine/guides/canonical-form/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1226,6 +1226,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/compute-engine/guides/canonical-form/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1459,7 +1629,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <h1>Canonical Forms</h1>
+    <h1>Canonical Form</h1>
   
 
   
@@ -1497,22 +1667,22 @@ object:</p>
 </tbody>
 </table>
 </div>
-<p>By applying some conventions — for example sorting operands of
-commutative functions or flattening associative functions —
-we define a <strong>canonical</strong> representation.</p>
+<p>By applying some conventions — for example sorting operands of commutative
+functions or flattening associative functions — we define a <strong>canonical</strong>
+representation.</p>
 <p>A canonical representation is somewhat arbitrary, but using it consistently make
 some operations easier, for example, comparing two expressions for equality.</p>
 <p>The canonical form used by the Compute Engine follows common (but certainly not
 universal) conventions in writing mathematical expressions, and expresses them
-in a way that optimize their computation. It is not necessarily “the simplest” way
-to represent an expression.</p>
+in a way that optimize their computation. It is not necessarily “the simplest”
+way to represent an expression.</p>
 <p>The canonical form of an expression is always the same when used with a given
 Compute Engine instance. However, do not rely on the canonical form as future
 versions of the Compute Engine could provide a different result.</p>
-<p>The <code>ce.box()</code> and <code>ce.parse()</code> function return a non-canonical expression.
-This may be desirable for example to compare a “raw” user input.</p>
-<p>The output of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are
-canonical expressions.</p>
+<p>The <code>ce.box()</code> and <code>ce.parse()</code> function return a non-canonical expression. This
+may be desirable for example to compare a “raw” user input.</p>
+<p>The output of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are canonical
+expressions.</p>
 <p><strong>To obtain the canonical representation of an expression</strong>, use the
 <code>expr.canonical</code> property.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>]).<span class="hljs-property">canonical</span>);
@@ -1525,17 +1695,17 @@ to an expression. In that sense, it is similar to simplifying an expression with
 <code>expr.simplify()</code>, but it is more conservative in the transformations it
 applies, and it will not take into account any assumptions about symbols.</p>
 <p>The default canonical representation applies a series of transformation to put
-sums, products, numbers, roots, etc… in canonical form. Below is a list
-of some of the transformations applied to obtain the canonical form:</p>
+sums, products, numbers, roots, etc… in canonical form. Below is a list of
+some of the transformations applied to obtain the canonical form:</p>
 <ul>
 <li>Idempotency: \( f(f(x)) \to f(x) \)</li>
 <li>Involution: \( f(f(x)) \to x \)</li>
-<li>Associativity: \( f(a, f(b), c) \to f(a, b, c) \)</li>
+<li>Associativity: \( f(a, f(b, c)) \to f(a, b, c) \)</li>
 <li>Commutativity: sorted arguments</li>
 <li>Some operations may be substituted with others, for example substraction
 replaced by addition. \(1 + 2 - 3 \longrightarrow Add(1, 2, -3)\)</li>
-<li>For <code>Add</code>, literal 0 is removed, small integers and small rationals are
-added together.</li>
+<li>For <code>Add</code>, literal 0 is removed, small integers and small rationals are added
+together.</li>
 <li>For <code>Multiply</code>, literal 1 is removed, small integers and small rations are
 multiplied together.</li>
 <li>For <code>Divide</code>, replaced by <code>Multiply</code> / <code>Power</code></li>
@@ -1567,14 +1737,14 @@ multiplied together.</li>
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-26'>September 26, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

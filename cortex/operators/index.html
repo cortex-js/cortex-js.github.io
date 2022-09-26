@@ -904,11 +904,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/cortex/operators/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/cortex/operators/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1202,6 +1202,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/cortex/operators/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/cortex/operators/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/cortex/operators/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1437,10 +1607,33 @@ crossorigin
   
 
 
+<h1 id="operators" tabindex="-1">Operators</h1>
+<p>Most operators are infix operators: they have two operands, a left-hand side
+(lhs) operand and a right-hand side operand (rhs).</p>
+<p>An infix operator can either have whitespace before and after the operator or
+have no whitespace neither before nor after the operator.</p>
+<p>Infix operators have a precedence that indicate how strongly they bind to their
+operand and a left or right associativity.</p>
+<p>A few operators are prefix operators: they only have a right-hand side. Prefix
+operators are followed immediately by their operand: they cannot be separated by
+whitespace.</p>
+<p class="notice--info">The whitespace rules are necessary to support unambiguous parsing of expressions
+spanning multiple lines without requiring a separator between expressions</p>
 <h2 id="precedence" tabindex="-1">Precedence</h2>
 <p>The operator at the root of the parse tree has the lowest precedence.</p>
+<h2 id="arithmetic-operations" tabindex="-1">Arithmetic Operations</h2>
+<ul>
+<li><code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
+</ul>
+<h2 id="logic-operations" tabindex="-1">Logic Operations</h2>
+<ul>
+<li><code>and</code>, <code>or</code>, <code>not</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code></li>
+</ul>
 <h2 id="relational-operators" tabindex="-1">Relational Operators</h2>
-<h2 id="comparison-operators" tabindex="-1">Comparison Operators</h2>
+<ul>
+<li><code>&lt;</code>, <code>&lt;=</code>, <code>=</code>, <code>&gt;=</code>, '<code>&gt;</code>, ‘!=’</li>
+<li><code>==</code>, ‘!==’</li>
+</ul>
 
         
       </section>
@@ -1450,14 +1643,14 @@ crossorigin
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-26'>September 26, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -928,11 +928,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/compute-engine/guides/domains/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1226,6 +1226,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1469,7 +1639,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#obtaining-the-domain-of-an-expression">Obtaining the Domain of an Expression</a></li><li><a href="#domain-lattice">Domain Lattice</a></li><li><a href="#domain-compatibility">Domain Compatibility</a></li><li><a href="#parametric-domains">Parametric Domains</a></li><li><a href="#simplifying-domains">Simplifying Domains</a></li></ol>
+        <ol><li><a href="#obtaining-the-domain-of-an-expression">Obtaining the Domain of an Expression</a></li><li><a href="#domain-lattice">Domain Lattice</a></li><li><a href="#domain-compatibility">Domain Compatibility</a></li><li><a href="#constructing-new-domains">Constructing New Domains</a></li></ol>
       </div>
       
                               
@@ -1479,23 +1649,36 @@ crossorigin
 
 
 <p class="xl">A <strong>domain</strong> is the set of the possible values of an expression.</p>
-<p>A domain is represented by a <strong>domain expression</strong>, such as <code>Integer</code>, <code>Boolean</code>
-or <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code>. <code>Integer</code> and <code>Boolean</code> are
-<strong>domain literals</strong>, while <code>[&quot;Range&quot;, [&quot;Literal&quot;, -1], [&quot;Literal&quot;, +1]]</code> is a
-<strong>parametric domain expression</strong>.</p>
+<p>A domain is represented by a <strong>domain expression</strong>. For example:</p>
+<ul>
+<li><code>&quot;Integer&quot;</code></li>
+<li><code>&quot;Boolean&quot;</code></li>
+<li><code>[&quot;Range&quot;, -1, +1]</code>.</li>
+</ul>
+<p>A domain expression is either a <strong>domain literal</strong> represented by a symbol such
+as <code>&quot;Integer&quot;</code> and <code>&quot;Boolean&quot;</code> or a <strong>constructed domain</strong> represented by a
+function. Of course, it wouldn’t make sense for it to be any function, so the
+head of that function is among a limited set of <strong>domain constructor</strong>. This
+effectively defines a specialized language to represent domains. In some cases
+the same function name can be used in a domain expression and a value
+expression, but they will be interpreted differently. For example, the
+expression <code>[&quot;List&quot;, 5, 7, 11]</code> is a value representing a list of three
+integers. On the other hand, the domain expression <code>[&quot;List&quot;, &quot;Integer&quot;]</code>
+represent the domain of all the lists that have integers as their element.</p>
 <p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
 they are used to select the correct function definition.</p>
 <p>For example a function <code>Add</code> could operate either on numbers or matrixes. The
-domain of the arguments is used to select the appropriate function definition.</p>
+domain of the arguments would be used to select the appropriate function
+definition.</p>
 <p>Symbolic manipulation algorithms also use domains to decide when certain
 transformations are applicable.</p>
 <p>For example, \( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
 <div class='read-more'><a href="/compute-engine/reference/domains/"> Read more about the
-<strong>Domain Literals</strong> included in the standard dictionary of the
-Compute Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<strong>Domain Literals</strong> included in the standard library of the Compute
+Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <section id='obtaining-the-domain-of-an-expression'>
 <h2 id="obtaining-the-domain-of-an-expression" tabindex="-1">Obtaining the Domain of an Expression</h2>
-<p><strong>To query the domain of an expression</strong>, read the <code>domain</code> property of the
+<p><strong>To query the domain of an expression</strong> read the <code>domain</code> property of the
 expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
@@ -1524,14 +1707,15 @@ domains. It is used when not much is known about the possible value of an
 expression. In some languages, this is called the <em>universal</em> type.</li>
 <li>The <strong><code>Void</code></strong> domain contains no value. It is the subdomain of all domains.
 Also called the zero or empty domain. It is rarely used, but it could indicate
-the return domain of a function that never returns.</li>
+the return domain of a function that never returns. Not to be confused with
+<code>Nothing</code>, which is used when a function returns nothing.</li>
 </ul>
 <p>There are a few other important domains:</p>
 <ul>
-<li>The <strong><code>Domain</code></strong> domain contains all the domain literals and all the
-parametric domains.</li>
-<li>The <strong><code>Value</code></strong> domain contains all the objects which are not domains, such as
-<code>Number</code>, <code>String</code>, <code>Symbol</code>, <code>Tuple</code>, etc…</li>
+<li>The <strong><code>Domain</code></strong> domain contains all the domain expressions.</li>
+<li>The <strong><code>Value</code></strong> domain contains all the expressions which are not domains,<br>
+for example the number <code>42</code>, the symbol <code>alpha</code>, the expression
+<code>[&quot;Add&quot;, &quot;x&quot;, 1]</code>.</li>
 <li>The <strong><code>Nothing</code></strong> domain has exactly one value, the symbol <code>Nothing</code>. It is
 used when an expression has no other meaningful value. In some languages, this
 is called the <em>unit</em> type and the <em>unit</em> value. For example a function that
@@ -1564,24 +1748,24 @@ values in <strong>B</strong> are in <strong>A</strong>. For example <code>Anythi
 every domain.</li>
 </ul>
 <p><strong>To evaluate the compatibility of two domains</strong> use <code>domain.isCompatible()</code></p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Integer&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;PositiveNumber&#x27;</span>);
+<p>By default, <code>domain.isCompatible()</code> will check for covariant compatibility.</p>
+<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;PositiveNumber&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;Integer&#x27;</span>);
+<span class="hljs-comment">// ➔ true</span>
+
+ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Number&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;contravariant&#x27;</span>);
 <span class="hljs-comment">// ➔ true</span>
 </code></pre>
 </section>
-<section id='parametric-domains'>
-<h2 id="parametric-domains" tabindex="-1">Parametric Domains</h2>
-<p>A new domain can be defined using a parametric domain expression.</p>
+<h2 id="constructing-new-domains" tabindex="-1">Constructing New Domains</h2>
+<p>A domain constructor is a function with one of the heads below.</p>
+<p><strong>To define a new domain</strong> use a domain constructor.</p>
 <pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Literal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Literal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>num<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
 
 <span class="hljs-comment">// Functions with a single real number argument and that return an integer</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumber&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integer&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Parametric domains are represented as special expressions: they are functions
-with one of the domain constructors below and their arguments are domain
-literals or other parametric domain expressions.</p>
-<p>By default, compatibility is determined by using invariance of the arguments of
-the parametric domain function.</p>
+<p>When a domain expression is boxed, it is automatically put in canonical form.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -1593,11 +1777,11 @@ the parametric domain function.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>Function</code></td>
-<td style="text-align:left"><code>[&quot;Function&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance, excluding`Nothing, for the arguments and contravariance for the co-domain. |</td>
+<td style="text-align:left"><code>[&quot;Function&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance for the arguments and contravariance for the co-domain.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>List</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;List&quot;, &lt;element-domain&gt;]</code> <br></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Record</code></td>
@@ -1605,23 +1789,23 @@ the parametric domain function.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>Tuple</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Tuple&quot;, &lt;element-1-domain&gt;]</code>, <code>[&quot;Tuple&quot;, &lt;element-1-domain&gt;] ... &lt;element-n-domain&gt;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Intersection</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Intersection&quot;, &lt;domain-1&gt;, &lt;domain-2&gt;]</code> <br> All the values that are a member of <code>&lt;domain-1&gt;</code> and <code>&lt;domain-2&gt;</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Union</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Union&quot;, &lt;domain-1&gt;, &lt;domain-2&gt;]</code> <br>All the values that are a member of <code>&lt;domain-1&gt;</code> or <code>&lt;domain-2&gt;</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Optional</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>Maybe</code></td>
+<td style="text-align:left"><code>[&quot;Maybe&quot;, &lt;domain&gt;]</code><br> A value of <code>&lt;domain&gt;</code> or <code>Nothing</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Some</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>Sequence</code></td>
+<td style="text-align:left"><code>[&quot;Sequence&quot;, &lt;domain&gt;]</code> <br>As a function argument one or more values of <code>&lt;domain&gt;</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Head</code></td>
@@ -1633,7 +1817,7 @@ the parametric domain function.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>Literal</code></td>
-<td style="text-align:left">This constructor defines a domain with a single value, the value of its argument. `                                                                                                                                                                                                                                                                                |</td>
+<td style="text-align:left">This constructor defines a domain with a single value, the value of its argument. `                                                                                                                                                                                                                                                            |</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Covariant</code></td>
@@ -1645,11 +1829,11 @@ the parametric domain function.</p>
 </tr>
 <tr>
 <td style="text-align:left"><code>Invariant</code></td>
-<td style="text-align:left">This constructor indicate that two domains are compatible only if they are invariants with regard to each other.</td>
+<td style="text-align:left"><code>[&quot;Invariant&quot;, &lt;domain&gt;]</code><br> This constructor indicate that a domain is compatible with this domain only if they are invariants with regard to each other.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Interval</code></td>
-<td style="text-align:left"><code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of real numbers between <code>&lt;min&gt;</code> and <code>&lt;max&gt;</code>.<br> Use <code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> to indicate a open-left interval.</td>
+<td style="text-align:left"><code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of real numbers between <code>&lt;min&gt;</code> and <code>&lt;max&gt;</code>.<br> Use <code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> to indicate an open-left interval.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Range</code></td>
@@ -1662,21 +1846,6 @@ the parametric domain function.</p>
 </tbody>
 </table>
 </div>
-</section>
-<section id='simplifying-domains'>
-<h2 id="simplifying-domains" tabindex="-1">Simplifying Domains</h2>
-<p><strong>To simplify a domain expression</strong>, call <code>domain.simplify()</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;SetMinus&#x27;</span>, <span class="hljs-string">&#x27;Integer&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">0</span>]]).<span class="hljs-title function_">simplify</span>();
-<span class="hljs-comment">// ➔ [&quot;Range&quot;, 1, &quot;+Infinity]]</span>
-
-ce.<span class="hljs-title function_">box</span>([
-  <span class="hljs-string">&#x27;Union&#x27;</span>,
-  [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;+Infinity&#x27;</span>],
-  [<span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;-Infinity&#x27;</span>, <span class="hljs-number">5</span>],
-]).<span class="hljs-title function_">simplify</span>();
-<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
-</code></pre>
-</section>
 
         
       </section>
@@ -1686,14 +1855,14 @@ ce.<span class="hljs-title function_">box</span>([
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-26'>September 26, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

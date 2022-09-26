@@ -904,11 +904,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/compute-engine/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/compute-engine/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1202,6 +1202,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/compute-engine/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/compute-engine/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1459,7 +1629,8 @@ students, scientists and engineers.</p>
 <ul>
 <li><a href="/compute-engine/guides/latex-syntax/"><strong>parse</strong> and <strong>serialize</strong></a> expressions from and to LaTeX</li>
 <li><a href="/compute-engine/guides/simplify/"><strong>simplify</strong></a> expressions</li>
-<li><a href="/compute-engine/guides/evaluate/"><strong>evaluate symbolically</strong></a> and <a href="/compute-engine/guides/numeric-evaluation/"><strong>evaluate numerically</strong></a> expressions</li>
+<li><a href="/compute-engine/guides/evaluate/"><strong>evaluate symbolically</strong></a> expressions</li>
+<li><a href="/compute-engine/guides/numeric-evaluation/"><strong>evaluate numerically</strong></a> expressions</li>
 </ul>
 <div class='read-more'><a href="/compute-engine/demo/">
 Try the <strong>interactive demo</strong> now
@@ -1495,17 +1666,17 @@ which will make use of polyfills as necessary.</p>
 </code></pre>
 <p>The UMD version is also available as <code>dist/compute-engine.min.js</code></p>
 <h3 id="other-versions" tabindex="-1">Other Versions</h3>
-<p>A non-minified module, <code>compute-engine.esm.js</code>, is also available, which may
-be useful for debugging.</p>
-<h2 id="dictionaries" tabindex="-1">Dictionaries</h2>
-<p>Expressions reference symbols and functions that are defined in dictionaries.</p>
+<p>A non-minified module which may  be useful for debugging is available as
+<code>dist/compute-engine.esm.js</code>.</p>
+<h2 id="standard-library" tabindex="-1">Standard Library</h2>
+<p>Expressions reference symbols and functions that are defined in libraries.</p>
 <p>By default, new <code>ComputeEngine</code> instances include a robust set of
-functions and symbols, grouped in several dictionaries.</p>
+functions and symbols, the standard library, grouped in several categories.</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Dictionary</th>
+<th style="text-align:left">Category</th>
 <th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
@@ -1528,7 +1699,7 @@ functions and symbols, grouped in several dictionaries.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/core/">Core</a></td>
-<td style="text-align:left"><code>Missing</code> <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+<td style="text-align:left"><code>InverseFunction</code> <code>LatexTokens</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/domains/">Domains</a></td>
@@ -1561,21 +1732,23 @@ functions and symbols, grouped in several dictionaries.</p>
 </tbody>
 </table>
 </div>
-<p><strong>To customize the dictionaries that define the functions and symbols</strong>,
-use the <code>ComputeEngine</code> constructor to define the dictionaries
-to use.</p>
-<p>In addition to the built-in dictionaries, you can define your own.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>(<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getDictionary</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>));
+<p>In addition to definitions from the standard library, you can define your
+own symbols and functions.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
+  <span class="hljs-attr">symbolTables</span>: <span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getSymbolTable</span>(<span class="hljs-string">&#x27;arithmetic&#x27;</span>)
+});
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">json</span>);
 </code></pre>
-<p>Each entry in a dictionary define the properties of that function or
-symbols, as well as how to put expression in canonical form, simplify,
-and evaluate expressions using that function.</p>
-<p>There are separate dictionaries that define the LaTeX syntax, that is
-how to parse and serialize LaTeX to MathJSON. You can also customize these
-dictionaries.</p>
-<div class='read-more'><a href="/compute-engine/guides/dictionaries/">
-Read more about <strong>Dictionaries</strong>
+<p>Each entry in a symbol table defines the properties of that function or
+symbol, as well as how to put expressions using that function in canonical form
+and how to simplify and evaluate it.</p>
+<div class='read-more'><a href="/compute-engine/guides/standard-library/">
+Read more about <strong>Standard Library</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>You can also customize the LaTeX syntax, that is how to parse and serialize
+LaTeX to MathJSON.</p>
+<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">
+Read more about the <strong>LaTeX Syntax</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -1586,14 +1759,14 @@ Read more about <strong>Dictionaries</strong>
         
 
 
-        <meta itemprop="datePublished" content="July 17, 2022">
+        <meta itemprop="datePublished" content="September 19, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-17'>July 17, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-19'>September 19, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

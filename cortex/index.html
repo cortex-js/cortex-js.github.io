@@ -928,11 +928,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/cortex/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/cortex/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1226,6 +1226,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/cortex/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/cortex/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1481,334 +1651,18 @@ x = 2^11 - 1
 Cortex</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/cortex/implementation/"> Read more about the
 <strong>implementation of Cortex</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2 id="pragmas" tabindex="-1">Pragmas</h2>
-<p>Pragmas, or compiler directives, are annotations in the source code that provide
-instructions to the parser/compiler about how to interpret the source code.
-These instructions are executed during the parsing/compilation phase, not during
-the execution phase.</p>
-<h3 id="environment-variables" tabindex="-1">Environment Variables</h3>
-<p>Environment variables are defined in the execution environment of the compiler
-process when executed from a <code>node</code> process. In Unix, they are set using a
-shell-specific syntax (<code>export VARIABLE=value</code> in bash shells, for example).</p>
-<p>Environment variables are not available when the compilation/parsing is taking
-place in a browser process.</p>
-<p><strong>To access an environment variable</strong>, use the <code>#env()</code> pragma.</p>
-<pre><code class="language-cortex">#env(&quot;DEBUG&quot;)
-</code></pre>
-<p>Some common environment variables include:</p>
-<ul>
-<li><code>NO_COLOR</code>: if set, color output to the terminal should be avoided</li>
-<li><code>TERM</code>: describe the capabilities of the output terminal, e.g.
-<code>xterm-256color</code></li>
-<li><code>HOME</code>: path to the user home directory</li>
-<li><code>TEMP</code>: path to a temporary file directory</li>
-</ul>
-<h3 id="navigator-properties" tabindex="-1">Navigator Properties</h3>
-<p>The navigator properties are available when the compilation/parsing is taking
-place in a browser process.</p>
-<p><strong>To access the properties of the <code>navigator</code> JavaScript global object</strong>, use
-the <code>#navigator()</code> pragma function. It returns ‘Nothing’ if the property is not
-available.</p>
-<pre><code class="language-cortex">#navigator(&quot;userAgent&quot;)
-</code></pre>
-<h3 id="compile-time-diagnostic-statement" tabindex="-1">Compile-Time Diagnostic Statement</h3>
-<p>A compile-time diagnostic statement causes the compiler to emit an error or a
-warning during compilation.</p>
-<p><strong>To output a message to the console and immediately interrupt the
-parsing/compilation</strong>, use the <code>#error()</code> pragma function.</p>
-<pre><code class="language-cortex">#error(&quot;File cannot be compiled&quot;)
-</code></pre>
-<p><strong>To output a message to the console</strong>, but continue the parsing/compilation,
-use the <code>#warning()</code> pragma function.</p>
-<pre><code class="language-cortex">#warning(&quot;TODO: Implement function&quot;)
-</code></pre>
-<h3 id="line-control-statements" tabindex="-1">Line Control Statements</h3>
-<p>The name and URL of the source file being parsed/compiled can be accessed using
-the <code>#sourceFile</code> and <code>#sourceUrl</code> pragmas. The current line is indicated by
-<code>#line</code> and column by <code>#column</code>.</p>
-<p>When generating and pre-processing code, it might be useful to indicate the
-original source code and location, rather than the current one. To change the
-source URL and line of the current file, use the <code>#sourceLocation()</code> pragma
-function.</p>
-<pre><code class="language-cortex">#sourceLocation(145, &quot;file://localhost/~user/dev/source.ctx&quot;)
-</code></pre>
-<p><strong>To number the following line to 146</strong>, use:</p>
-<pre><code class="language-cortex">#sourceLocation(145)
-</code></pre>
-<p><strong>To reset the source location to the actual source and line</strong>, use
-<code>#sourceLocation()</code>.</p>
-<h3 id="other-pragmas" tabindex="-1">Other Pragmas</h3>
-<p>The following pragmas are replaced with the indicated value:</p>
-<ul>
-<li><code>#line</code>: the current source line number, which is either the actual source
-line number, or as calculated based on <code>#sourceLocation()</code>. The first line is
-line 1.</li>
-<li><code>#column</code>: the current column number. The first column is column 1.</li>
-<li><code>#url</code>: the URL of the current source file.</li>
-<li><code>#filename</code>: the filename of the current source file.</li>
-<li><code>#date</code>: the current date in the <code>YYYY-MM-DD</code> format.</li>
-<li><code>#time</code>: the current time in the <code>HH:MM:SS</code> format.</li>
-</ul>
-<h2 id="comments" tabindex="-1">Comments</h2>
-<p><strong>Line Comments</strong> start with <code>//</code>. Everything after a <code>//</code> is ignored until the
-end of the line.</p>
-<p><strong>Block (multi-line) Comments</strong> start with <code>/*</code> and end with <code>*/</code>. Block
-comments can be nested.</p>
-<p><strong>To indicate that a comment is part of the documentation and is formatted using
-markdown</strong>, use <code>///</code> for single line comments and <code>/** */</code> for block comments.</p>
-<p><strong>Hashbang Comment</strong> can be included as the first line of a Cortex source file
-prefixed with <code>#!</code>. Its content indicate the command line interpreter to use:</p>
-<pre><code>#!/usr/bin/cortex
-</code></pre>
-<h2 id="strings" tabindex="-1">Strings</h2>
-<h3 id="single-line-string" tabindex="-1">Single Line String</h3>
-<p>A single-line string is delimited by a <code>&quot;</code> character (<strong>U+0022 QUOTATION
-MARK</strong>).</p>
-<p>A single-line string cannot include an unescaped <code>&quot;</code> (<strong>U+0022 QUOTATION
-MARK</strong>), an unescaped backslash <code>\</code> (<strong>U+005C REVERSE SOLIDUS</strong>), or an
-unescaped <strong>new line character</strong> (<strong>U+00A LINE FEED</strong>, <strong>U+00D CARRIAGE
-RETURN</strong>, <strong>U+2028 LINE SEPARATOR</strong> or <strong>U+2029 PARAGRAPH SEPARATOR</strong>).</p>
-<h3 id="escape-sequence" tabindex="-1">Escape Sequence</h3>
-<p>Inside a string, backslash <code>\</code> (<strong>U+005C REVERSE SOLIDUS</strong>) is the escape
-character:</p>
-<ul>
-<li><code>\0</code> is the NULL character (<strong>U+0000</strong>)</li>
-<li><code>\\</code> is a backslash character</li>
-<li><code>\'</code> is a single quote character</li>
-<li><code>\&quot;</code> is a quotation mark</li>
-<li><code>\t</code> is a tab character</li>
-<li><code>\n</code> is a line feed character</li>
-<li><code>\r</code> is a carriage return character</li>
-<li><code>\u0061</code> is the Unicode character <strong>U+0061 LATIN SMALL LETTER A</strong>. In this
-form, the <code>\u</code> must be followed by exactly 4 hex-digits.</li>
-<li><code>\u{61}</code> is the Unicode character <strong>U+0061 LATIN SMALL LETTER A</strong>. In this
-form, a string of 0 to 8 hex-digits must be included between <code>\u{</code> and `}.</li>
-</ul>
-<h3 id="multi-line-string-literals" tabindex="-1">Multi-line String Literals</h3>
-<p>A multiline string is delimited by <code>&quot;&quot;&quot;</code> (three quotation marks).</p>
-<pre><code class="language-cortex">cortex = &quot;&quot;&quot;
-      ,ad8888ba,
-    d8&quot;'    `&quot;8b                             ,d
-    d8'                                       88
-    88              ,adPPYba,   8b,dPPYba,  MM88MMM   ,adPPYba,  8b,     ,d8
-    88             a8&quot;     &quot;8a  88P'   &quot;Y8    88     a8P_____88   `Y8, ,8P'
-    Y8,            8b       d8  88            88     8PP&quot;&quot;&quot;&quot;&quot;&quot;&quot;     )888(
-    Y8a.    .a8P  &quot;8a,   ,a8&quot;  88            88,    &quot;8b,   ,aa   ,d8&quot; &quot;8b,
-      `&quot;Y8888Y&quot;'    `&quot;YbbdP&quot;'   88            &quot;Y888   `&quot;Ybbd8&quot;'  8P'     `Y8
-    &quot;&quot;&quot;
-</code></pre>
-<p>A multiline string can contain <code>&quot;</code> or new line characters. It can’t contain an
-unescaped sequence of <code>&quot;&quot;&quot;</code>.</p>
-<p>Anything after the <code>&quot;&quot;&quot;</code> that begins the multiline string literal and before the
-end of the line is ignored. The line break after the <code>&quot;&quot;&quot;</code> isn’t part of the
-string.</p>
-<p>The line break before the <code>&quot;&quot;&quot;</code> that ends the literal is also not part of the
-string. To make a multiline string literal that begins or ends with a line feed,
-write a blank line as its first or last line.</p>
-<p>A multiline string literal can be indented using any combination of spaces and
-tabs; this indentation isn’t included in the string. The <code>&quot;&quot;&quot;</code> that ends the
-literal determines the indentation: Every nonblank line in the literal must
-begin with exactly the same indentation that appears before the closing <code>&quot;&quot;&quot;</code>;
-there’s no conversion between tabs and spaces. You can include additional spaces
-and tabs after that indentation; those spaces and tabs appear in the string.</p>
-<p>Line breaks in a multiline string literal are normalized to use the line feed
-character. Even if your source file has a mix of carriage returns and line
-feeds, all of the line breaks in the string will be the same.</p>
-<p>If a line of a multiline string ends with a <code>\</code> character, the next line is
-considered a continuation and the string will include neither the <code>\</code> nor the
-new line characters. Any whitespace between the backslash and the line break is
-also omitted.This can come in handy when using a very long string.</p>
-<pre><code class="language-cortex">hello = &quot;Hello \
-World&quot;  // Same as &quot;Hello World&quot;
-</code></pre>
-<pre><code class="language-cortex">hello2 = &quot;&quot;&quot;
-Hello
-World
-&quot;&quot;&quot; // Same as &quot;Hello\nWorld&quot;
-
-hello3 = &quot;&quot;&quot;
-    Hello
-    World
-    &quot;&quot;&quot; // Same as &quot;Hello\nWorld&quot;
-</code></pre>
-<p>If there is some whitespace before the final <code>&quot;&quot;&quot;</code>, this whitespace will be
-excluded from all the lines before it.</p>
-<h3 id="interpolated-strings" tabindex="-1">Interpolated Strings</h3>
-<p>A single-line string or a multiline string can include interpolated expressions
-that are indicated by an expression in parentheses after a backslash (<strong>U+005C
-REVERSE SOLIDUS</strong>). The interpolated expression can contain a string literal,
-but can’t contain an unescaped backslash, or a <strong>new line character</strong> (<strong>U+000A
-LINE FEED</strong>, <strong>U+000D CARRIAGE RETURN</strong>, <strong>U+2028 LINE SEPARATOR</strong>, <strong>U+2029
-PARAGRAPH SEPARATOR</strong>)</p>
-<pre><code class="language-cortex">&quot;1 2 3&quot;
-&quot;1 2 \(&quot;3&quot;)&quot;
-&quot;1 2 \(3)&quot;
-&quot;1 2 \(1 + 2)&quot;
-</code></pre>
-<h3 id="extended-string-literal" tabindex="-1">Extended String Literal</h3>
-<p>A string literal which contains no escape sequences is delimited by one or more
-‘#’ and a quotation mark.</p>
-<pre><code>#&quot;There is no escaping now&quot;#
-#&quot;Using &quot;quotation marks&quot; and \ without escaping&quot;#
-##&quot;As many # as one needs&quot;##
-</code></pre>
-<p>These string as useful for string containing characters such as quotation mark
-or backslash that would otherwise need to be escaped, leading to the
-<a href="https://en.wikipedia.org/wiki/Leaning_toothpick_syndrome">Leaning Tootpick Syndrome</a>.</p>
-<h2 id="symbols" tabindex="-1">Symbols</h2>
-<p><strong>Symbols</strong> are strings of Unicode characters, except for the prohibited
-characters described below.</p>
-<p>Before they are used, symbols are normalized to the
-<a href="http://www.macchiato.com/unicode/nfc-faq">Unicode Normalization Form Canonical Composition (NFC)</a>.
-They are stored internally and compared using the NFC.</p>
-<p>These 6 expressions represent the same symbol: once the escape sequences are
-resolved and after applying the Unicode NFC, the symbol name is the single
-Unicode character <strong>U+00C5 LATIN CAPITAL LETTER A WITH RING ABOVE</strong>.</p>
-<pre><code class="language-cortex">`Å`
-`\u00c5`
-`\u212b`
-`A\u030a`
-`\u0041\u030a`
-</code></pre>
-<h3 id="prohibited-symbol-characters" tabindex="-1">Prohibited Symbol Characters</h3>
-<p>The name of a symbol cannot contain any of the following characters:</p>
-<ul>
-<li><strong>U+0000</strong> to <strong>U+0020</strong></li>
-<li><strong>U+0022 QUOTATION MARK</strong>: <strong><code>&quot;</code></strong></li>
-<li><strong>U+0060 GRAVE ACCENT</strong> backtick : <strong><code>`</code></strong></li>
-<li><strong>U+2028 LINE SEPARATOR</strong></li>
-<li><strong>U+2029 PARAGRAPH SEPARATOR</strong></li>
-<li><strong>U+FEFF BYTE ORDER MARK</strong></li>
-<li><strong>U+FFFE</strong> Invalid Byte Order Mark</li>
-</ul>
-<p>In addition, the first character of a symbol cannot be:</p>
-<ul>
-<li><strong>U+0021 EXCLAMATION MARK</strong> : <strong><code>!</code></strong></li>
-<li><strong>U+0023 NUMBER SIGN</strong> : <strong><code>#</code></strong></li>
-<li><strong>U+0024 DOLLAR SIGN</strong> : <strong><code>$</code></strong></li>
-<li><strong>U+0025 PERCENT</strong> : <strong><code>%</code></strong></li>
-<li><strong>U+0026 AMPERSAND</strong> : <strong><code>&amp;</code></strong></li>
-<li><strong>U+0027 APOSTROPHE</strong> : <strong><code>'</code></strong></li>
-<li><strong>U+0028 LEFT PARENTHESIS</strong> : <strong><code>(</code></strong></li>
-<li><strong>U+0029 RIGHT PARENTHESIS</strong> : <strong><code>)</code></strong></li>
-<li><strong>U+002E FULL STOP</strong> : <strong><code>'</code></strong></li>
-<li><strong>U+003A COLON</strong> : <strong><code>:</code></strong></li>
-<li><strong>U+003C LESS THAN SIGN</strong> : <strong><code>:</code></strong></li>
-<li><strong>U+003F QUESTION MARK</strong> : <strong><code>?</code></strong></li>
-<li><strong>U+0040 COMMERCIAL AT</strong> : <strong><code>@</code></strong></li>
-<li><strong>U+005B LEFT SQUARE BRACKET</strong> : <strong><code>[</code></strong></li>
-<li><strong>U+005D RIGHT SQUARE BRACKET</strong> : <strong><code>]</code></strong></li>
-<li><strong>U+005E CIRCUMFLEX ACCENT</strong> : <strong><code>^</code></strong></li>
-<li><strong>U+007B LEFT CURLY BRACKET</strong> : <strong><code>{</code></strong></li>
-<li><strong>U+007D RIGHT CURLY BRACKET</strong> : <strong><code>}</code></strong></li>
-<li><strong>U+007E TILDE</strong> : <strong><code>~</code></strong></li>
-</ul>
-<h3 id="verbatim-form" tabindex="-1">Verbatim Form</h3>
-<p>The Verbatim Form must be used if:</p>
-<ul>
-<li>
-<p>the first character of the symbol name is a decimal digit: <strong>U+0030</strong> to
-<strong>U+0039</strong> (0-9) or <strong>U+FF10</strong> to <strong>U+FF19</strong> (<strong>FULLWIDTH DIGIT ZERO</strong> to
-<strong>FULLWIDTH DIGIT NINE</strong>)</p>
-</li>
-<li>
-<p>the symbol name includes a character with the <strong>White_Space</strong> or the
-<strong>Pattern_Syntax</strong> Unicode property</p>
-<p>Characters with the <strong>White_Space</strong> property include:</p>
-<ul>
-<li><strong>U+0020 SPACE</strong></li>
-<li><strong>U+0009 HORIZONTAL TABULATION</strong></li>
-<li><strong>U+000D CARRIAGE RETURN</strong></li>
-<li><strong>U+000A LINE FEED</strong></li>
-</ul>
-<p>Characters with the <strong>Pattern_Syntax</strong> property include:
-<code>!&quot;#$%&amp;'()*+,-./:;&gt;=&lt;?@[\\]^|{}~</code>.</p>
-<p>See the
-<a href="https://www.unicode.org/Public/UCD/latest/ucd/PropList.txt">Unicode Character Database</a>
-for a complete list of the characters with the <strong>White_Space</strong> or
-<strong>Pattern_Syntax</strong> property.</p>
-</li>
-<li>
-<p>the symbol name is a reserved word</p>
-<p><strong>Reserved words</strong> are: <code>abstract</code>, <code>at</code>, <code>and</code>, <code>as</code>, <code>assert</code>, <code>await</code>,
-<code>begin</code>, <code>break</code>, <code>case</code>, <code>catch</code>,<code>class</code>, <code>const</code>, <code>continue</code>,<code>debugger</code>,
-<code>default</code>, <code>delete</code>, <code>dynamic</code>, <code>do</code>, <code>each</code>, <code>else</code>, <code>end</code>, <code>export</code>,
-<code>extern</code>, <code>finally</code>, <code>for</code>, <code>from</code>, <code>function</code>, <code>get</code>, <code>global</code>, <code>goto</code>, <code>if</code>,
-<code>in</code>, <code>inline</code>, <code>interface</code>, <code>internal</code>, <code>import</code>, <code>label</code>, <code>lazy</code>, <code>local</code>,
-<code>loop</code>, <code>match</code>, <code>module</code>, <code>namespace</code>, <code>native</code>, <code>new</code>, <code>not</code>, <code>of</code>, <code>on</code>,
-<code>optional</code>, <code>or</code>, <code>package</code>, <code>private</code>, <code>protected</code>, <code>protocol</code>, <code>public</code>,
-<code>repeat</code>, <code>return</code>, <code>self</code>, <code>set</code>, <code>static</code>, <code>super</code>, <code>switch</code>, <code>this</code>,
-<code>throw</code>, <code>to</code>, <code>try</code>, <code>until</code>, <code>using</code>, <code>var</code>, <code>warn</code>, <code>when</code>, <code>where</code>,
-<code>while</code>, <code>with</code>, <code>xor</code>, <code>yield</code>.</p>
-</li>
-</ul>
-<p><strong>To write a symbol with the <em>Verbatim Form</em></strong> , put a backtick <strong><code>`</code></strong>
-(<strong>U+0060 GRAVE ACCENT</strong>) before and after its name.</p>
-<p>The string between the two backticks can be a reserved word or it can include
-characters with the <strong>Pattern_Syntax</strong> property or the <strong>White_Space</strong> property,
-except for prohibited symbol characters.</p>
-<p>The string between the two ticks can include the same escape character sequences
-as in a string.</p>
-<p>The following characters must be escaped: <strong>U+000A LINE FEED</strong>, <strong>U+000D
-CARRIAGE RETURN</strong>, <strong>U+2028 LINE SEPARATOR</strong>, <strong>U+2029 PARAGRAPH SEPARATOR</strong>.</p>
-<pre><code class="language-cortex">`Hello World`
-`new`
-`\u{2135}0`  // same as `ℵ0` (Alef symbol)
-`\u21350`  // same as `ℵ0` (Alef symbol)
-</code></pre>
-<h2 id="numbers" tabindex="-1">Numbers</h2>
-<p>Numbers can be written as:</p>
-<ul>
-<li>A decimal number, with no prefix</li>
-<li>A binary number, with a <code>0b</code> prefix</li>
-<li>A hexadecimal number, with a <code>0x</code> prefix</li>
-</ul>
-<p><strong>Decimal digits</strong> include <strong>U+0030</strong> to <strong>U+0039</strong> (0-9) and <strong>U+FF10</strong> to
-<strong>U+FF19</strong> (<strong>FULLWIDTH DIGIT ZERO</strong> to <strong>FULLWIDTH DIGIT NINE</strong>).</p>
-<p>Hexadecimal digits include decimal digits and <strong>a</strong> to <strong>f</strong> and <strong>A</strong> to <strong>F</strong>.</p>
-<p>Decimal floating point numbers can include an exponent indicated by an uppercase
-or lowercase letter <code>e</code>. This exponent is a power of 10. The value of the
-exponent is a decimal integer.</p>
-<p>Hexadecimal floats <strong>must</strong> have an exponent, indicated by an uppercase or
-lowercase <code>p</code>. This exponent is a power of 2. The value of the exponent is a
-decimal integer.</p>
-<ul>
-<li><code>1.25e2</code> means $$1.25 \times 10^2$$, or $$125.0$$.</li>
-<li><code>1.25e-2</code> means $$1.25 \times 10^{-2}$$, or $$0.0125$$.</li>
-<li><code>0xFp2</code> means $$15 \times 2^2$$, or $$60.0$$.</li>
-<li><code>0xFp-2</code> means $$15 \times 2^{-2}$$, or $$3.75$$.</li>
-</ul>
-<p class="notice--info">The hexadecimal float format is documented in
-<a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf">the C99 standard</a>
-(p.57-58).</p>
-<p>Numeric literals can contain extra formatting to make them easier to read. Both
-integers and floats can be padded with extra zeros and can contain underscores
-to help with readability. Neither type of formatting affects the underlying
-value of the literal.</p>
-<pre><code class="language-cortex">+03.14_15_92_65
-</code></pre>
-<h2 id="operators" tabindex="-1">Operators</h2>
-<p>Most operators are infix operators: they have two operands, a left-hand side
-(lhs) operand and a right-hand side operand (rhs).</p>
-<p>An infix operator can either have whitespace before and after the operator or
-have no whitespace neither before nor after the operator.</p>
-<p>Infix operators have a precedence that indicate how strongly they bind to their
-operand and a left or right associativity.</p>
-<p>A few operators are prefix operators: they only have a right-hand side. Prefix
-operators are followed immediately by their operand: they cannot be separated by
-whitespace.</p>
-<p class="notice--info">The whitespace rules are necessary to support unambiguous parsing of expressions
-spanning multiple lines without requiring a separator between expressions</p>
-<h3 id="arithmetic-operations" tabindex="-1">Arithmetic Operations</h3>
-<ul>
-<li><code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
-<li><code>&lt;</code>, <code>&lt;=</code>, <code>=</code>, <code>&gt;=</code>, '<code>&gt;</code>, ‘!=’</li>
-<li><code>==</code>, ‘!==’</li>
-</ul>
-<h3 id="logic-operations" tabindex="-1">Logic Operations</h3>
-<ul>
-<li><code>and</code>, <code>or</code>, <code>not</code>, <code>=&gt;</code>, <code>&lt;=&gt;</code></li>
-</ul>
+<div class='read-more'><a href="/mathlive/cortex/comments/">
+<strong>Pragmas</strong>: compiler directives embedded in the code
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/cortex/comments/">
+<strong>Comments</strong>: line and block comments
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/cortex/comments/">
+<strong>Literals</strong>: strings, numbers, symbols
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/cortex/comments/">
+<strong>Operators</strong>: arithmetic, logic, relational
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="functions" tabindex="-1">Functions</h2>
 <h2 id="collections" tabindex="-1">Collections</h2>
 <h3 id="tuples" tabindex="-1">Tuples</h3>
@@ -1849,14 +1703,14 @@ are not indexable.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-26'>September 26, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

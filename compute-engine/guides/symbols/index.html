@@ -940,11 +940,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/dictionaries/" data-url=/compute-engine/guides/symbols/ class="">
+                <a href="/compute-engine/guides/standard-library/" data-url=/compute-engine/guides/symbols/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
                   
-                  Dictionaries
+                  Standard Library
                 </a></li>
             
           
@@ -1238,6 +1238,176 @@ crossorigin
               
 
               <li>              
+                <a href="/cortex/goals/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Goals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/principles/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#intro"></use></svg>
+                  
+                  Principles
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/source-code/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Source Code
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/comments/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Comments
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/literals/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Literals
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/naming/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Naming
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/operators/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Operators
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/cortex/pragmas/" data-url=/compute-engine/guides/symbols/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Pragmas
+                </a></li>
+            
+          
+            
+            
+              <li class="separator"></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/cortex/syntax/" data-url=/compute-engine/guides/symbols/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
@@ -1471,7 +1641,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <p class="xl">A <b>symbol</b> is a named mathematical object. It  belongs to a domain and it may hold a value. A symbol without a value  represents a mathematical unknown in an expression.</p>
+    <h1>Symbols</h1><p class="xl">A <b>symbol</b> is a named mathematical object. It belongs to a domain and it may hold a value. A symbol without a value represents a mathematical unknown in an expression.</p>
   
 
   
@@ -1481,7 +1651,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#scopes">Scopes</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li><li><a href="#name-binding">Name Binding</a><ol><li><a href="#symbol-binding">Symbol Binding</a></li><li><a href="#symbol-auto-binding">Symbol Auto-binding</a></li><li><a href="#bound-variables%2C-free-variables-and-constants">Bound Variables, Free Variables and Constants</a></li><li><a href="#declaring-a-symbol">Declaring a Symbol</a></li><li><a href="#function-binding">Function Binding</a></li></ol></li></ol>
+        <ol><li><a href="#bound-variables%2C-free-variables-and-constants">Bound Variables, Free Variables and Constants</a></li><li><a href="#declaring-a-symbol">Declaring a Symbol</a></li><li><a href="#symbol-auto-binding">Symbol Auto-binding</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li></ol>
       </div>
       
                               
@@ -1499,102 +1669,40 @@ moduleMap = {
 </script>
 <p><strong>To change the value or domain of a symbol</strong>, use the <code>value</code> and <code>domain</code>
 properties of the symbol.</p>
+<p>A symbol does not have be declared before it can be used. A previously unknown
+symbol has a domain of <code>ce.defaultDomain</code> and no value.</p>
 <code-playground layout="stack" show-line-numbers>
 <div slot="javascript">
 const n = ce.box('n');
 n.domain = 'Integer';
 n.value = 5;
-console.log("n: ", n.value.json, n.domain.toString());</div></code-playground>
-<p>A symbol can be used before being declared.  A previously unknown symbol has
-a domain of <code>ce.defaultDomain</code> and no value.</p>
-<p>Symbols exist within a <strong>scope</strong>.</p>
-<h2 id="scopes" tabindex="-1">Scopes</h2>
-<p>The Compute Engine supports
-<a href="https://en.wikipedia.org/wiki/Scope_(computer_science)">lexical scoping</a>.</p>
-<p>The <strong>context</strong> of the Compute Engine is a stack of scopes that define the
-current symbol and function definitions.</p>
-<p>To locate the definition of a symbol or function, the dictionary associated with
-the current (top-most) scope is used first.</p>
-<p>If no matching definition is found, the parent scope is searched, and so on
-until a definition is found.</p>
-<p><strong>To add a new scope to the context</strong> use <code>ce.pushScope()</code>.</p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">pushScope</span>({
-  <span class="hljs-attr">dictionary</span>: {
-    <span class="hljs-attr">symbols</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">500</span> }],
-  },
-});
-</code></pre>
-<p>The <code>dictionary</code> property of a scope contains bindings for symbols and
-functions.</p>
-<p><strong>To exit a scope</strong> use <code>ce.popScope()</code>. This will invalidate any definition
-associated with the scope, and restore definitions from previous scopes that may
-have been shadowed by the current scope.</p>
-<h2 id="forgetting-a-symbol" tabindex="-1">Forgetting a Symbol</h2>
-<p><strong>To <em>reset</em> what is known about a symbol</strong> use the <code>ce.forget()</code> function.</p>
-<p>The <code>ce.forget()</code> function will remove any domain/value associated with a
-symbol, and any <a href="/compute-engine/guides/assumptions">assumption</a> about the symbol.</p>
-<p>To forget about a specific symbol, pass the name of the symbol as an argument
-to <code>ce.forget()</code>.</p>
-<p>To forget about all the symbols in the current scope, use <code>ce.forget()</code> without
-any arguments.</p>
-<p>Note that only symbols in the current scope are forgotten. If a definition
-for the symbol existed in a previous scope, that definition will now
-be in effect.</p>
-<h2 id="name-binding" tabindex="-1">Name Binding</h2>
-<p><strong><a href="https://en.wikipedia.org/wiki/Name_binding">Name Binding</a> is the process of
-associating the name of a function or symbol with a definition.</strong></p>
-<p>The definition of symbols and functions is initially set when an instance of a
-Compute Engine is created. Dictionaries that map names to definitions can be
-provided  when the Compute Engine is created. Additional dictionaries can be
-provided later using the <code>ce.pushScope()</code> function.</p>
-<p>The definitions record contain information such as the domain or value of a
-symbol, or how to simplify or evaluate functions.</p>
-<h3 id="symbol-binding" tabindex="-1">Symbol Binding</h3>
-<p>When a symbol is boxed, that is when <code>ce.box()</code> is called on an expression that
-contains the symbol, a definition matching the name of the symbol is searched in
-the symbol dictionary of the current scope (<code>ce.context</code>). If none is found, the
-parent scope is searched recursively until one is found or the root scope is
-reached.</p>
-<p>If a definition is found, the symbol is associated with (bound to) the
-definition.</p>
-<h3 id="symbol-auto-binding" tabindex="-1">Symbol Auto-binding</h3>
-<p>If <code>ce.defaultDomain</code> is <code>null</code>, and no definition exist for the symbol, the
-symbol is unbound. This will limit the usefulness of the symbol, although
-the symbol can still be used to represent unknowns.</p>
-<p>If <code>ce.defaultDomain</code> is not<code>null</code> and no definition is found for the symbol,
-a new one is created automatically.</p>
-<p>The new definition has a domain of `ce.defaultDomain’ and no value associated
-with it, so the symbol will be a <strong>free variable</strong>.</p>
-<p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
-automatically assumed to be a real number.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;m&#x27;</span>); <span class="hljs-comment">// m for mystery</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
-<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
-symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">numericValue</span>?.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ 5</span>
-</code></pre>
-<h3 id="bound-variables%2C-free-variables-and-constants" tabindex="-1">Bound Variables, Free Variables and Constants</h3>
-<p><strong>Symbol binding</strong> can either refer to
-<a href="https://en.wikipedia.org/wiki/Name_binding"><strong>name binding</strong></a> (associating a
-definition with the name of a symbol) or
-<a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables"><strong>value binding</strong></a>
-(associating a value with the definition of a symbol).</p>
+console.log("n:", n.domain.json, "=", n.value);</div></code-playground>
+<p>Symbols are defined within a <strong>scope</strong>.</p>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
+<strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="bound-variables%2C-free-variables-and-constants" tabindex="-1">Bound Variables, Free Variables and Constants</h2>
 <p>If the definition of a symbol has a value, the symbol is said to be a <strong>bound
 variable</strong> (value binding).</p>
-<p>This is in opposition to <strong>free variables</strong> which are symbols that have a
-definition, but no value, and <strong>constants</strong> which are symbols that have a value
+<p>This is in opposition to <strong>free variables</strong> which are symbols that have no
+value, and <strong>constants</strong> which are symbols that have a value
 that cannot be altered.</p>
-<p>The property <code>expr.symbolDefinition</code> is not <code>undefined</code> if a symbol is a bound
-variable (name binding, it has a definition).</p>
-<p>The property <code>expr.symbolDefinition?.constant</code> is <code>true</code> if a symbol is a
-constant.</p>
-<p>Assigning a value to a free variable makes it a bound variable (name binding and
-value binding).</p>
-<p>The value of constants is determined at the time of name binding. The value of
+<p>The property <code>expr.isFree</code> is <code>true</code> if a symbol is a free variable.</p>
+<p>Assigning a value to a free variable makes it a bound variable.</p>
+<p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
+<p><strong>To get a list of all the free variables in an expression</strong> use <code>expr.symbols.filter(x =&gt; x.isFree)</code>.</p>
+<p>The property <code>expr.isConstant</code> is <code>true</code> if a symbol is a constant.</p>
+<p class="notice-warning">The value of constants is determined at the time of name binding. The value of
 some symbols — <code>Pi</code>, for example — may be determined based on settings of the
 compute engine, for example the value of the <code>precision</code> property. So the same
 symbol could have different values depending on when the binding occurs.</p>
+<p>The property <code>expr.symbolDefinition</code> is not <code>undefined</code> if a symbol has a
+definition (name binding).</p>
+<p class="notice--info"><a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables"><strong>Value binding</strong></a>
+(associating a value with the definition of a symbol) should not be confused
+with <a href="https://en.wikipedia.org/wiki/Name_binding"><strong>name binding</strong></a> (associating a
+definition with the name of a symbol).</p>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/#binding"> Read more about
+<strong>name binding</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <pre><code class="language-js">ce.<span class="hljs-property">precision</span> = <span class="hljs-number">4</span>;
 <span class="hljs-keyword">const</span> smallPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>); <span class="hljs-comment">// π with 4 digits</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(smallPi.<span class="hljs-property">latex</span>);
@@ -1610,9 +1718,10 @@ ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100<
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;pi = &#x27;</span>, smallPi.<span class="hljs-property">numericValue</span>, <span class="hljs-string">&#x27;=&#x27;</span>, bigPi.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ pi  = 3.1415 = 3.1415926535</span>
 </code></pre>
-<h3 id="declaring-a-symbol" tabindex="-1">Declaring a Symbol</h3>
-<p>Declaring a symbol is providing some information about this symbol, such as its
-domain or whether it is positive.</p>
+<h2 id="declaring-a-symbol" tabindex="-1">Declaring a Symbol</h2>
+<p>Declaring a symbol is explicitly associating a definition with it. The
+definition includes some  information, such as its domain or whether it is
+positive.</p>
 <p>If the symbol has not been used before, a new definition record for this symbol
 is created, and the symbol is bound to it.</p>
 <p><strong>To declare a symbol</strong> use <code>ce.assume()</code>.</p>
@@ -1638,24 +1747,36 @@ ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(n).<span class="hljs-property">latex</span>;
 <span class="hljs-comment">// ➔ 5</span>
-
 </code></pre>
-<p>Note that <code>ce.assume('n', 5)</code> is equivalent to <code>ce.box('n').value = 5</code>.</p>
-<h3 id="function-binding" tabindex="-1">Function Binding</h3>
-<p>The definition associated with a function determines how it is put in canonical
-form, simplified and evaluated.</p>
-<p>When a function is boxed, for example when <code>ce.box()</code> is called on an expression
-that includes the name of the function, a dictionary entry for the function is
-looked up in the current context, then recursively in the parent scope.</p>
-<p>When a matching entry is found, the definitions associated with it are
-bound with the boxed function. Note that unlike a symbol, a function may
-have multiple definitions in a given scope. In this way, function can support
-<a href="https://en.wikipedia.org/wiki/Ad_hoc_polymorphism">ad-hoc polymorphism</a>, that
-is have multiple implementations depending on the values or domains of their
-arguments.</p>
-<p>When an expression containing a function is put in canonical form,
-simplified or evaluated, the appropriate definition is selected based on
-the domain and value of its arguments.</p>
+<p class="--notice-info">Note that <code>ce.assume('n', 5)</code> is equivalent to <code>ce.box('n').value = 5</code>.</p>
+<h2 id="symbol-auto-binding" tabindex="-1">Symbol Auto-binding</h2>
+<p>If <code>ce.defaultDomain</code> is not<code>null</code> and no definition exist for the symbol, a
+new one is created automatically.</p>
+<p>The new definition has a domain of <code>ce.defaultDomain</code> and no value associated
+with it, so the symbol will be a <strong>free variable</strong>.</p>
+<p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
+automatically assumed to be a real number.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;m&#x27;</span>); <span class="hljs-comment">// m for mystery</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
+<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
+symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">numericValue</span>?.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ 5</span>
+</code></pre>
+<p>If <code>ce.defaultDomain</code> is <code>null</code>, and no definition exist for the symbol, the
+symbol is <strong>unbound</strong> (no name binding). This will limit the usefulness of the
+symbol and the symbol will evaluate to an <code>[&quot;Error&quot;]</code> expression.</p>
+<h2 id="forgetting-a-symbol" tabindex="-1">Forgetting a Symbol</h2>
+<p><strong>To <em>reset</em> what is known about a symbol</strong> use the <code>ce.forget()</code> function.</p>
+<p>The <code>ce.forget()</code> function will remove the definition associated with a
+symbol, including its domain and value, and any <a href="/compute-engine/guides/assumptions">assumption</a>
+about the symbol.</p>
+<p>To forget about a specific symbol, pass the name of the symbol as an argument to
+<code>ce.forget()</code>.</p>
+<p>To forget about all the symbols in the current scope, use <code>ce.forget()</code> without
+any arguments.</p>
+<p class="notice--info">Note that only symbols in the current scope are forgotten. If a definition for
+the symbol existed in a previous scope, that definition will now be in effect.</p>
 
         
       </section>
@@ -1665,14 +1786,14 @@ the domain and value of its arguments.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2022">
+        <meta itemprop="datePublished" content="September 26, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-21'>July 21, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-26'>September 26, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
