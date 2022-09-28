@@ -1646,7 +1646,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
+        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#fill-in-the-blank">Fill in the Blank</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
       </div>
       
                               
@@ -1845,6 +1845,25 @@ or <strong>Enter</strong> is used to exit the mode.</p>
 use the keyboard. This behavior matches the <code>&lt;textarea&gt;</code> element.</p>
 <p><strong>To listen specifically for a press of the <strong>Return</strong> or <strong>Enter</strong> key on the
 keyboard</strong> listen for an <code>input</code> event with an <code>inputType</code> property of <code>&quot;insertLineBreak&quot;</code>.</p>
+<h2 id="fill-in-the-blank" tabindex="-1">Fill in the Blank</h2>
+<p>To have one or more portions of a mathfield editable, while the rest is
+read-only, use a <code>readonly</code> mathfield, and the <code>\placeholder[]{}</code> command.</p>
+<p>This can used to prompt an answer to a quiz with a partially provided
+formula and with some portions that the student has to provide.</p>
+<p>The optional argument of the <code>\placeholder</code> command, i.e. the one provided
+in <code>[]</code> is a string identifier made of letters and digits. The main argument
+of the <code>\placeholder</code> comman, i.e. the one in <code>{}</code> is the default value of the
+field. You can leave it blank.</p>
+<p>When using the <code>\placeholder[]{}</code> command in a readonly mathfield, some
+additional mathfields are created automatically, one for each <code>\placeholder</code>
+command. To access these mathfields, use the <code>mf.placeholders</code> property.</p>
+<code-playground layout="stack">
+  <div slot="javascript">
+const blank1 = document.getElementById('mf').placeholders['blank1'];
+blank1.addEventListener('input', (ev) => console.log(blank1.value));
+  </div>
+  <div slot="html">&lt;math-field id="mf" readonly style="font-size:3em"&gt;f(x)= \placeholder[blank1]{x}&lt;/math-field&gt;</div>
+</code-playground>
 <h2 id="detecting-a-click-on-a-mathfield" tabindex="-1">Detecting a Click on a Mathfield</h2>
 <p>In most cases MathLive will respond to mouse and keyboard interactions with
 the mathfield. However, in some cases it might be useful to detect when a
@@ -2013,14 +2032,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 12, 2022">
+        <meta itemprop="datePublished" content="September 28, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-12'>September 12, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-28'>September 28, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
