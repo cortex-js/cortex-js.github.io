@@ -1618,6 +1618,9 @@ determined by position/index. Contributed by @manstie. Thank you!</li>
 <li>Expose the <code>placeholders</code> property on <code>MathfieldElement</code> to get access to the
 “fill-in-the-blank” mathfields, i.e.
 <code>&lt;math-field readonly&gt;f(x)=\placeholder[var1]{x}&lt;/math-field&gt;</code></li>
+<li>Don’t apply smart superscript on big operators (e.g. <code>\sum</code>). Smart
+superscript moves immediately out of the superscript if the input is a single
+digit. Works well for, e.g. <code>x^2</code> but is less desirable with <code>\sum</code>.</li>
 </ul>
 <h2 id="0.80.0-(2022-09-27)" tabindex="-1">0.80.0 (2022-09-27)</h2>
 <h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
@@ -5498,14 +5501,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 28, 2022">
+        <meta itemprop="datePublished" content="September 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-28'>September 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -1682,7 +1682,7 @@ which cannot be evaluate or processed.</p>
 <p>For example, the boxed expression for <code>ce.box([&quot;Divide&quot;, 2, 'True'])</code> cannot be
 evaluated because a number cannot be divided by a boolean. More accurately,
 evaluating this boxed expression will result in an <code>[&quot;Error&quot;]</code> expression:
-<code>[&quot;Divide&quot;, 2, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'mismatched-argument-domain'&quot;, [&quot;Domain&quot;, &quot;Number&quot;]], &quot;True&quot;]]</code>.</p>
+<code>[&quot;Divide&quot;, 2, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Boolean&quot;]], &quot;True&quot;]]</code>.</p>
 <p><strong>To check if an expression can be evaluated</strong> check that
 <code>expr.canonical.isValid</code> is <code>true</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/expressions/#errors"> Read more about the
@@ -1737,14 +1737,14 @@ f(f(a, b), c) \to f(a, b, c) \]</p>
         
 
 
-        <meta itemprop="datePublished" content="September 28, 2022">
+        <meta itemprop="datePublished" content="September 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-28'>September 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

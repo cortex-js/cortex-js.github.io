@@ -1826,8 +1826,8 @@ nature of the problem. This can be either a string or an <code>[&quot;ErrorCode&
 expression if there are additional arguments to the error.</p>
 <p>For example if the problem is that an argument of a function expression is not
 of the expected domain, an expression such as
-<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'mismatched-argument-domain'&quot;, [&quot;Domain&quot;, &quot;Number&quot;]]]</code>
-could be returned to indicate that a value of domain <code>&quot;Number&quot;</code> was expected.</p>
+<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Anything&quot;]]</code> could
+be returned to indicate that a value of domain <code>&quot;Number&quot;</code> was expected.</p>
 <p>The <strong>second argument</strong> of an <code>[&quot;Error&quot;]</code> expression indicate the context of the
 error. This can be a <code>[&quot;Latex&quot;]</code> expression when the problem occurred while
 parsing a LaTeX string, or another expression if the problem was detected later.</p>
@@ -1886,7 +1886,7 @@ property.</p>
 <td style="text-align:left">the character does not apply to the current parsing context</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>mismatched-argument-domain</code></td>
+<td style="text-align:left"><code>incompatible-domain</code></td>
 <td style="text-align:left">the argument provided does not match the expected domain</td>
 </tr>
 <tr>
@@ -1976,8 +1976,8 @@ property.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;,</span>
 <span class="hljs-comment">//      1,</span>
 <span class="hljs-comment">//      [&quot;Error&quot;,</span>
-<span class="hljs-comment">//          [&quot;ErrorCode&quot;, &quot;&#x27;mismatched-argument-domain&#x27;&quot;, [&quot;Domain&quot;, &quot;Number&quot;]],</span>
-<span class="hljs-comment">//          [&quot;Delimiter&quot;,[&quot;Equal&quot;, 2, 2]]</span>
+<span class="hljs-comment">//          [&quot;ErrorCode&quot;, &quot;&#x27;incompatible-domain&#x27;&quot;, &quot;Number&quot;, &quot;Boolean&quot;],</span>
+<span class="hljs-comment">//          [&quot;Delimiter&quot;, [&quot;Equal&quot;, 2, 2]]</span>
 <span class="hljs-comment">//      ],</span>
 <span class="hljs-comment">//      3</span>
 <span class="hljs-comment">//    ]</span>
@@ -2020,14 +2020,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 28, 2022">
+        <meta itemprop="datePublished" content="September 29, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-28'>September 28, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
