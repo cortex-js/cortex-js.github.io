@@ -1651,15 +1651,15 @@ crossorigin
 <p class="xl">The CortexJS Compute Engine produces and manipulates
 <a href="https://en.wikipedia.org/wiki/Expression_(mathematics)">symbolic expressions</a>
 such as numbers, constants, variables and functions.</p>
-<p>Expressions are represented using the <a href="/math-json/">MathJSON format</a>.</p>
-<p>In the CortexJS Compute Engine, MathJSON expressions are wrapped in a JavaScript
-object, a processed called <strong>boxing</strong>, and the resulting expressions are <strong>Boxed
-Expressions</strong>.</p>
+<p>In the CortexJS Compute Engine, expressions are represented using the
+<a href="/math-json/">MathJSON format</a>.</p>
+<p>They are wrapped in a JavaScript object, a processe called <strong>boxing</strong>, and the
+resulting expressions are <strong>Boxed Expressions</strong>.</p>
+<p>Boxed Expressions improve performance by implementing caching to avoid
+repetitive calculations.</p>
 <p>Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
 as VSCode Studio, to provide suitable hints in the editor, and to check that the
 correct functions and properties are used, particularly when using TypeScript.</p>
-<p>Boxed Expressions also improve performance by implementing caching and avoiding
-repetitive calculations.</p>
 <h2 id="boxing" tabindex="-1">Boxing</h2>
 <p><strong>To create a Boxed Expression from a MathJSON expression</strong>, use the <code>ce.box()</code>
 function.</p>
@@ -1693,7 +1693,7 @@ function.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;, &quot;y&quot;]</span>
 </code></pre>
 <p><strong>To get a Boxed Expression representing the content of a MathLive mathfield</strong>
-usethe <code>mf.expression</code> property:</p>
+use the <code>mf.expression</code> property:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;input&#x27;</span>);
 mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{10}{5}&#x27;</span>;
 <span class="hljs-keyword">const</span> expr = mf.<span class="hljs-property">expression</span>;
@@ -1702,19 +1702,19 @@ mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\
 </code></pre>
 <h2 id="unboxing" tabindex="-1">Unboxing</h2>
 <p><strong>To access the MathJSON expression of a boxed expression</strong>, use the <code>expr.json</code>
-property. Use this property to “look inside the box”.</p>
+property. Use this property to “unbox” the expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&#x27;Add&#x27;, 3, &#x27;x&#x27;]</span>
 </code></pre>
 <p><strong>To customize the format of the MathJSON expression</strong> use the
-<code>ce.jsonSerializationOptions</code> property )</p>
+<code>ce.jsonSerializationOptions</code> property.</p>
 <p>Use this option to control which metadata, if any, should be included, whether
 to use shorthand notation, and to exclude some functions. See
 <a href="/docs/compute-engine/?q=JsonSerializationOptions">JsonSerializationOptions</a> for
-more info about what can be customized.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + \\frac{q}{p}&#x27;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">canonical</span>.<span class="hljs-property">json</span>);
+more info about the formatting options.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + \\frac{q}{p}&#x27;</span>).<span class="hljs-property">canonical</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = {
@@ -1723,7 +1723,7 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
   <span class="hljs-attr">shorthands</span>: [], <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
 };
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">canonical</span>.<span class="hljs-property">json</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;fn&quot;: [&quot;Add&quot;, [&quot;num&quot;: &quot;2&quot;],</span>
 <span class="hljs-comment">//      [&quot;fn&quot;: [&quot;Multiply&quot;,</span>
 <span class="hljs-comment">//        [&quot;sym&quot;: &quot;q&quot;],</span>
@@ -1732,8 +1732,8 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
 <span class="hljs-comment">//    ]]</span>
 </code></pre>
 <h2 id="literal-expressions" tabindex="-1">Literal Expressions</h2>
-<p>A literal expression is one that has a fixed value that was provided directly
-when the expression was defined.</p>
+<p>A literal expression has a fixed value that was provided directly when the
+expression was defined.</p>
 <p>Numbers and strings are literals. Symbols and functions are not. They may have a
 value, but their value is calculated indirectly.</p>
 <p><strong>To check if an expression is a literal</strong>, use <code>expr.isLiteral</code>.</p>
@@ -1761,7 +1761,7 @@ ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#
 no side effect.</p>
 <p>The \( \sin() \) function is pure: it evaluates to the same value when the
 same arguments are applied to it.</p>
-<p>On the other hand, the \( \mathrm{random}() \) function is not pure: by its
+<p>On the other hand, the \( \mathrm{Random}() \) function is not pure: by its
 nature it evaluates to a different value on every evaluation.</p>
 <p>Numbers, symbols and strings are pure. A function expression is pure if the
 function itself is pure, and all its arguments are pure as well.</p>
@@ -1776,6 +1776,16 @@ expression.</p>
 <code>expr.canonical</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
 <strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>A non-canonical expression may include errors as a result of parsing from LaTeX,
+if there were syntax errors in the LaTeX input.</p>
+<p>The arguments of a function in canonical form are validated to make sure they
+match expectations.</p>
+<p>A canonical expression may include additional errors, for example
+<code>[&quot;Divide&quot;, 2, 5, 6]</code> (three arguments instead of two), <code>[&quot;Add&quot;, 2, &quot;True&quot;]</code>
+(mismatched argument domain, expected a number but got a boolean).</p>
+<p><strong>To check if an expression contains errors</strong> use <code>expr.canonical.isValid</code>.</p>
+<p>This check will include not only possible syntax errors, but also semantic
+errors (incorrect number or domain of arguments, etc…).</p>
 </section>
 <h2 id="checking-the-kind-of-expression" tabindex="-1">Checking the Kind of Expression</h2>
 <p>To identify if an expression is a number, symbol, function, string or
@@ -2020,14 +2030,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2022">
+        <meta itemprop="datePublished" content="October 02, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -1611,6 +1611,21 @@ crossorigin
 <h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
 <ul>
+<li>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
+the esoteric <code>[Symbol.toPrimitive]()</code> method. These are used by JavaScript
+when interacting with other primitive types. A major change is that
+<code>expr.toJSON()</code> now returns an <code>Expression</code> as an object literal, and not a
+string serialized the <code>Expression</code>.</li>
+</ul>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<ul>
+<li>Numerical evaluation of expressions containing complex numbers when in
+<code>decimal</code> or <code>auto</code> mode produced incorrect results. Example: <code>e^{i\\pi}</code></li>
+</ul>
+<h2 id="0.7.0" tabindex="-1">0.7.0</h2>
+<p><strong>Release Date:</strong> 2022-09-30</p>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
 dropped. The first argument is now an error code, either as a string or an
@@ -1627,6 +1642,7 @@ programming languages)</li>
 <li>Added <code>FixedPoint</code>, <code>Loop</code>, <code>Product</code>, <code>Sum</code>, <code>Break</code>, <code>Continue</code>, <code>Block</code>,
 <code>If</code>, <code>Let</code>, <code>Set</code>, <code>Function</code>, <code>Apply</code>, <code>Return</code></li>
 <li>Added <code>Min</code>, <code>Max</code>, <code>Clamp</code></li>
+<li>Parsing of <code>\sum</code>, <code>\prod</code>, <code>\int</code>.</li>
 <li>Added parsing of log functions, <code>\lb</code>, <code>\ln</code>, <code>\ln_{10}</code>, <code>\ln_2</code>, etc…</li>
 <li>Added
 <code>expr.</code>subexpressions<code>, </code>expr.getSubexpressions()<code>, </code>expr.errors<code>, </code>expr.symbols<code>, </code>expr.isValid`.</li>
@@ -1644,7 +1660,7 @@ range of a 64-bit float.</li>
 <a href="https://cortexjs.io/compute-engine/reference/core/">Core Reference</a> and
 [Arithmetic Reference]
 (https://cortexjs.io/compute-engine/reference/arithmetic/)</p>
-<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#43</strong> If the input of <code>ce.parse()</code> is an empty string, return an empty
 string for <code>expr.latex</code> or <code>expr.json.latex</code>: that is, ensure verbatim LaTeX
@@ -1849,14 +1865,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2022">
+        <meta itemprop="datePublished" content="October 02, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

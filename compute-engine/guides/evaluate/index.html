@@ -1635,19 +1635,13 @@ crossorigin
 <p><strong>To apply a sequence of definitions to an expression in order to simplify it,
 calculate its value or get a numerical approximation of its value</strong>, call the
 <code>expr.simplify()</code>, <code>expr.evaluate()</code> or <code>expr.N()</code> function.</p>
-<p>Each identifier (name of symbol or function) is <strong>bound</strong> to a definition within
-a <strong>scope</strong>.</p>
-<p>When a Boxed Expression is created with <code>ce.box()</code> or <code>ce.parse()</code>, its
-identifiers are not bound immediately. The name binding occurs lazily the first
-time it is required. This could be when a function such as <code>expr.evaluate()</code> is
-invoked, or when a property such as <code>expr.domain</code> is accessed.</p>
 <h2 id="scopes" tabindex="-1">Scopes</h2>
 <p>The Compute Engine supports
 <a href="https://en.wikipedia.org/wiki/Scope_(computer_science)">lexical scoping</a>.</p>
-<p>The <strong>context</strong> of the Compute Engine is a stack of scopes that provide the
-current symbol and function definitions.</p>
-<p>To locate the definition of a symbol or function, the symbol table associated
-with the current (top-most) scope is used first.</p>
+<p>A scope provides definitions of symbols and functions. Scopes are arranged in a
+stack, with the current (top-most) scope available with <code>ce.context</code>.</p>
+<p>To locate the definition of an identifier, the symbol table associated with the
+current (top-most) scope is used first.</p>
 <p>If no matching definition is found, the parent scope is searched, and so on
 until a definition is found.</p>
 <p><strong>To add a new scope to the context</strong> use <code>ce.pushScope()</code>.</p>
@@ -1667,12 +1661,9 @@ that may have been shadowed by the current scope.</p>
 associating an identifier (the name of a function or symbol) with a
 definition.</strong></p>
 <p>Name Binding should not be confused with <strong>value binding</strong> with is the process
-of associating a <strong>value</strong> to a symbol.</p>
+of associating a <strong>value</strong> to an identifier.</p>
 <div class='read-more'><a href="/compute-engine/guides/symbols/#scopes">Read more about
 <strong>symbols</strong> and value binding.<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p>The symbol tables are initially set when an instance of a Compute Engine is
-created. Additional symbol tables can be provided later using the
-<code>ce.pushScope()</code> function.</p>
 <p>For symbols, the definition records contain information such as the domain of
 the symbol and its value. For functions, the definition record include the
 signature of the function (the domain of the argument it expects), and how to
@@ -1685,9 +1676,19 @@ evaluating this boxed expression will result in an <code>[&quot;Error&quot;]</co
 <code>[&quot;Divide&quot;, 2, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Boolean&quot;]], &quot;True&quot;]]</code>.</p>
 <p><strong>To check if an expression can be evaluated</strong> check that
 <code>expr.canonical.isValid</code> is <code>true</code>.</p>
+<p><strong>To get a list of the errors in an expression</strong> use the <code>expr.errors</code> property.</p>
 <div class='read-more'><a href="/compute-engine/guides/expressions/#errors"> Read more about the
 <strong>errors</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="evaluation-loop" tabindex="-1">Evaluation Loop</h2>
+<p notice--info="">This is an advanced topic. You don’t need to know the details of how the
+evaluation loop work, unless you’re interested in extending the standard library
+and providing your own function definitions.</p>
+<p>Each identifier (name of symbol or function) is <strong>bound</strong> to a definition within
+a <strong>scope</strong>.</p>
+<p>When a Boxed Expression is created with <code>ce.box()</code> or <code>ce.parse()</code>, its
+identifiers are not bound immediately. The name binding occurs lazily the first
+time it is required, for example when a function such as <code>expr.evaluate()</code> is
+invoked, or when a property such as <code>expr.domain</code> is accessed.</p>
 <p>When a function is evaluated, the following steps are followed:</p>
 <ol>
 <li>
@@ -1737,14 +1738,14 @@ f(f(a, b), c) \to f(a, b, c) \]</p>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2022">
+        <meta itemprop="datePublished" content="October 02, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-29'>September 29, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
