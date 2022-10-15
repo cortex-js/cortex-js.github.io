@@ -678,11 +678,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/canonical-form/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/canonical-form/ class="active">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -718,6 +718,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/canonical-form/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/canonical-form/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -738,11 +778,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/canonical-form/ class="active">
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/canonical-form/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -763,26 +803,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/canonical-form/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -823,26 +843,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/canonical-form/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1679,8 +1679,17 @@ way to represent an expression.</p>
 <p>The canonical form of an expression is always the same when used with a given
 Compute Engine instance. However, do not rely on the canonical form as future
 versions of the Compute Engine could provide a different result.</p>
-<p>The <code>ce.box()</code> and <code>ce.parse()</code> function return a non-canonical expression. This
-may be desirable for example to compare a “raw” user input.</p>
+<p>The <code>ce.box()</code> and <code>ce.parse()</code> function return a canonical expression by
+default. If instead you want a non-canonical version, set the <code>canonical</code> option
+to <code>false</code>. The non-canonical version will be closer to the literal LaTeX
+input from a user for example, which may be desirable to compare a “raw” user
+input with an expected answer.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>)
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
+
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, -5]</span>
+</code></pre>
 <p>The output of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are canonical
 expressions.</p>
 <p><strong>To obtain the canonical representation of an expression</strong>, use the
@@ -1737,14 +1746,14 @@ multiplied together.</li>
         
 
 
-        <meta itemprop="datePublished" content="October 02, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

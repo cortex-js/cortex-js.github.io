@@ -654,11 +654,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/changelog/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/changelog/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -694,6 +694,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/changelog/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -714,11 +754,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/changelog/ class="">
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/changelog/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -739,26 +779,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/changelog/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -799,26 +819,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/changelog/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1608,14 +1608,24 @@ crossorigin
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.8.0" tabindex="-1">0.8.0</h2>
+<p><strong>Release Date:</strong> 2022-10-02</p>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
 <ul>
-<li>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
+<li>
+<p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
 the esoteric <code>[Symbol.toPrimitive]()</code> method. These are used by JavaScript
 when interacting with other primitive types. A major change is that
 <code>expr.toJSON()</code> now returns an <code>Expression</code> as an object literal, and not a
-string serialized the <code>Expression</code>.</li>
+string serialization of the <code>Expression</code>.</p>
+</li>
+<li>
+<p>Changed from “decimal” to “bignum”. “Decimal” is a confusing name, since it is
+used to represent both integers and floating point numbers. Its key
+characteristic is that it is an arbitrary precision number, aka “bignum”. This
+affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead of
+<code>decimal', </code>expr.decimalValue<code>-&gt;</code>expr.bignumValue<code>, </code>decimalValue()<code>-&gt; </code>bignumValue()`</p>
+</li>
 </ul>
 <h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
 <ul>
@@ -1742,9 +1752,8 @@ and will collapse some integer constants. However, in some cases it may be
 necessary to invoke <code>expr.simplify()</code> in order to get the same results as
 <code>ce.format(expr)</code>.</p>
 <h3 id="rational-and-division" tabindex="-1">Rational and Division</h3>
-<p>In addition to machine floating points, arbitrarily long decimal numbers and
-complex number, the Compute Engine now also recognize and process rational
-numbers.</p>
+<p>In addition to machine floating points, arbitrary precision numbers and complex
+numbers, the Compute Engine now also recognize and process rational numbers.</p>
 <p>This is mostly an implementation detail, although you may see
 <code>[&quot;Rational&quot;, 3, 4]</code>, for example, in the value of a <code>expr.json</code> property.</p>
 <p>If you do not want rational numbers represented in the value of the <code>.json</code>
@@ -1865,14 +1874,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 02, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

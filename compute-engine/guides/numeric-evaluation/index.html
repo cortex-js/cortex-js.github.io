@@ -678,11 +678,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -718,6 +718,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -738,11 +778,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -763,26 +803,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -823,26 +843,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/numeric-evaluation/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1629,7 +1629,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <h1>Numerical Evaluation</h1>
+    <h1>Numerical Evaluation</h1><p class="xl">To obtain a numeric approximation of the value of an expression, call the <kbd>expr.N()</kbd> function.</p>
   
 
   
@@ -1639,7 +1639,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#numeric-modes">Numeric Modes</a></li><li><a href="#decimal-numeric-mode">Decimal Numeric Mode</a></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
+        <ol><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
       </div>
       
                               
@@ -1648,16 +1648,14 @@ crossorigin
 
 
 
-<p><strong>To obtain a numeric approximation of the value of an expression</strong>, call the
-<code>expr.N()</code> function.</p>
 <p>If <code>expr.N()</code> cannot provide a numeric evaluation, a symbolic representation of
 the partially evaluated expression is returned.</p>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 5 + x&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 5 + x&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;8 + x&quot;</span>
 </code></pre>
 <p>If the expression is <a href="/compute-engine/guides/expressions#pure/">pure</a>, the value
 of the expression can be obtained with <code>expr.numericValue</code>.</p>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;345.2360679774998&quot;</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
@@ -1673,8 +1671,74 @@ of the expression can be obtained with <code>expr.numericValue</code>.</p>
 <strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="numeric-modes" tabindex="-1">Numeric Modes</h2>
 <p>Four numeric modes may be used to perform numeric evaluations with the Compute
-Engine: <code>machine</code> <code>decimal</code> <code>complex</code> and <code>auto</code>. The default mode is <code>auto</code>.</p>
-<section id='machine-numeric-mode'>
+Engine: <code>&quot;machine&quot;</code> <code>&quot;bignum&quot;</code> <code>&quot;complex&quot;</code> and <code>&quot;auto&quot;</code>. The default mode is
+<code>&quot;auto&quot;</code>.</p>
+<p>Numbers are represented internally in one of the following format:</p>
+<ul>
+<li><code>number</code>: a 64-bit float</li>
+<li><code>complex</code>: a pair of 64-bit float for the real and imaginary part</li>
+<li><code>bignum</code>: an arbitrary precision floating point number</li>
+<li><code>rational</code>: a pair of 64-bit float for the numerator and denominator</li>
+<li><code>big rational</code>: a pair of arbitrary precision floating point numbers for the
+numerator and denominator</li>
+</ul>
+<p>Depending on the current numeric mode, this is what happens to calculations
+involving the specified number types:</p>
+<ul>
+<li><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg> indicate that no transformation is done</li>
+<li><code>upgraded</code> indicate that a transformation is done without loss of precision</li>
+<li><code>downgraded</code> indicate that a transformation is done with may result in a loss
+of precision, a rounding towards 0 if underflow occurs, or a rounding
+towards \( \pm\infty \) if overflow occurs.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th><code>auto</code></th>
+<th><code>machine</code></th>
+<th><code>bignum</code></th>
+<th><code>complex</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>number</code></td>
+<td>upgraded to <code>bignum</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>upgraded to <code>bignum</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>complex</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td><code>NaN</code></td>
+<td><code>NaN</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>bignum</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>downgraded to <code>number</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>downgraded to <code>number</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>rational</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>upgraded to <code>big rational</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>big rational</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>downgraded to <code>rational</code></td>
+<td><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg></td>
+<td>downgraded to <code>rational</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="machine-numeric-mode" tabindex="-1">Machine Numeric Mode</h3>
 <p>Calculations in the <code>machine</code> numeric mode use a
 <a href="https://en.wikipedia.org/wiki/IEEE_754">64-bit binary floating point format</a>.</p>
@@ -1702,33 +1766,29 @@ errors when manipulating them.</p>
 <div class='read-more'><a href="https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">
 Read <strong>“What Every Computer Scientist Should Know About Floating-Point
 Arithmetic”</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-</section>
-<section id='decimal-numeric-mode'>
-<h3 id="decimal-numeric-mode" tabindex="-1">Decimal Numeric Mode</h3>
-<p>In the <code>decimal</code> numeric mode, numbers are represented in Decimal format, using
-base-10 and a variable amount of memory depending on the number of significant
-digits (<strong>precision</strong>) desired.</p>
-<p>Numbers in the Decimal format have a minimum value of \( \pm
-10^{-9000000000000000} \) and a maximum value of \( \pm9.99999\ldot\times
-10^{+9000000000000000} \).</p>
-<p><strong>To change the numeric mode to the <code>decimal</code> mode</strong>, use
-<code>engine.numericMode = &quot;decimal&quot;</code>.</p>
-<pre><code class="language-ts">ce.<span class="hljs-property">numericMode</span> = <span class="hljs-string">&#x27;decimal&#x27;</span>;
+<h3 id="bignum-numeric-mode" tabindex="-1">Bignum Numeric Mode</h3>
+<p>In the <code>bignum</code> numeric mode, numbers are represented as a string of base-10
+digits and an exponent.</p>
+<p>Bignum numbers have a minimum value of \( \pm 10^{-9\,000\,000\,000\,000\,000} \) and a
+maximum value of \( \pm9.99999\ldots \times  10^{+9\,000\,000\,000\,000\,000} \).</p>
+<p><strong>To change the numeric mode to the <code>bignum</code> mode</strong>, use
+<code>engine.numericMode = &quot;bignum&quot;</code>.</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">numericMode</span> = <span class="hljs-string">&#x27;bignum&#x27;</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;0.3&quot;</span>
 </code></pre>
-<p>When using the <code>decimal</code> mode, the precision of computation (number of
+<p>When using the <code>bignum</code> mode, the precision of computation (number of
 significant digits used) can be changed. By default, the precision is 100.</p>
 <p>Trigonometric operations are accurate for precision up to 1,000.</p>
-<p><strong>To change the precision of calculations in <code>decimal</code> mode</strong>, set the
+<p><strong>To change the precision of calculations in <code>bignum</code> mode</strong>, set the
 <code>engine.precision</code> property.</p>
-<p>The <code>precision</code> property affects how the computations are performed. To change
-how numbers are displayed when serialized to LaTeX, use
+<p>The <code>precision</code> property affects how the computations are performed, but not how
+they are serialized. To change how numbers are serialized to LaTeX, use
 <code>engine.latexOptions = { precision: 6 }</code> to set it to 6 significant digits, for
 example.</p>
 <p>The LaTeX precision is adjusted automatically when the <code>precision</code> is changed so
 that the display precision is never greater than the computation precision.</p>
-<p>When using the <code>decimal</code> mode, the return value of <code>expr.N().json</code> may be a
+<p>When using the <code>bignum</code> mode, the return value of <code>expr.N().json</code> may be a
 MathJSON number that looks like this:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3.141592653589793238462643383279502884197169399375105820974944592307
@@ -1747,11 +1807,9 @@ MathJSON number that looks like this:</p>
   876611195909216420199&quot;</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
-<div class='read-more'><a href="https://mikemcl.github.io/decimal.js/"> Support for the <code>decimal</code>
+<div class='read-more'><a href="https://mikemcl.github.io/decimal.js/"> Support for the <code>bignum</code>
 mode is implemented using the <strong>decimal.js</strong> library.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-</section>
-<section id='complex-numeric-mode'>
 <h3 id="complex-numeric-mode" tabindex="-1">Complex Numeric Mode</h3>
 <p>The <code>complex</code> numeric mode can represent complex numbers as a pair of real and
 imaginary components. The real and imaginary components are stored as 64-bit
@@ -1766,14 +1824,10 @@ This is a convenient shorthand for
 <div class='read-more'><a href="https://github.com/infusion/Complex.js"> Support for the
 <code>complex</code> mode is implemented using the <strong>Complex.js</strong> library.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-</section>
-<section id='auto-numeric-mode'>
 <h3 id="auto-numeric-mode" tabindex="-1"><code>Auto</code> Numeric Mode</h3>
-<p>When using the <code>auto</code> numeric mode, calculations are performed using machine
-numbers if the precision is 15 or less. If the precision is more than 15,
-Decimal numbers are used.</p>
-<p>Computations with a result in the Complex domain will return a Complex number.</p>
-</section>
+<p>When using the <code>auto</code> numeric mode, calculations are performed using bignum
+numbers.</p>
+<p>Computations which result in a complex number will return a complex number.</p>
 <h2 id="simplifying-before-evaluating" tabindex="-1">Simplifying Before Evaluating</h2>
 <p><strong>When using <code>expr.N()</code>, no rewriting of the expression is done before it is
 evaluated.</strong></p>
@@ -1838,14 +1892,14 @@ functions:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 02, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

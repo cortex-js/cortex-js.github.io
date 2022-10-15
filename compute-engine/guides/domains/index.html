@@ -678,11 +678,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/domains/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -718,6 +718,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/domains/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/domains/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -738,11 +778,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/domains/ class="">
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/domains/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -763,26 +803,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/domains/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -823,26 +843,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/domains/ class="active">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1629,7 +1629,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <h1>Domains</h1>
+    <h1>Domains</h1><p class="xl">The <b>domain</b> of an expression is the set  of the possible values of that expression.</p>
   
 
   
@@ -1648,23 +1648,23 @@ crossorigin
 
 
 
-<p class="xl">A <strong>domain</strong> is the set of the possible values of an expression.</p>
 <p>A domain is represented by a <strong>domain expression</strong>. For example:</p>
 <ul>
 <li><code>&quot;Integer&quot;</code></li>
 <li><code>&quot;Boolean&quot;</code></li>
 <li><code>[&quot;Range&quot;, -1, +1]</code>.</li>
 </ul>
-<p>A domain expression is either a <strong>domain literal</strong> represented by a symbol such
-as <code>&quot;Integer&quot;</code> and <code>&quot;Boolean&quot;</code> or a <strong>constructed domain</strong> represented by a
-function. Of course, it wouldn’t make sense for it to be any function, so the
-head of that function is among a limited set of <strong>domain constructor</strong>. This
-effectively defines a specialized language to represent domains. In some cases
-the same function name can be used in a domain expression and a value
-expression, but they will be interpreted differently. For example, the
-expression <code>[&quot;List&quot;, 5, 7, 11]</code> is a value representing a list of three
-integers. On the other hand, the domain expression <code>[&quot;List&quot;, &quot;Integer&quot;]</code>
-represent the domain of all the lists that have integers as their element.</p>
+<p>A domain expression is either a <strong>domain literal</strong> represented by an identifier
+such as <code>&quot;Integer&quot;</code> and <code>&quot;Boolean&quot;</code> or a <strong>constructed domain</strong> represented by
+a function expression.</p>
+<p>Of course, it wouldn’t make sense for it to be any function, so the
+name of that function must be among a limited set of <strong>domain constructor</strong>.</p>
+<p>This effectively defines a specialized language to represent domains. In some
+cases the same function name can be used in a domain expression and a value
+expression, but they will be interpreted differently.</p>
+<p>For example, the expression <code>[&quot;List&quot;, 5, 7, 11]</code> is a value representing a list
+of three integers. On the other hand, the domain expression <code>[&quot;List&quot;, &quot;Integer&quot;]</code>
+represents the domain of all the lists that have integers as their element.</p>
 <p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
 they are used to select the correct function definition.</p>
 <p>For example a function <code>Add</code> could operate either on numbers or matrixes. The
@@ -1757,7 +1757,7 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#
 </code></pre>
 </section>
 <h2 id="constructing-new-domains" tabindex="-1">Constructing New Domains</h2>
-<p>A domain constructor is a function with one of the heads below.</p>
+<p>A domain constructor is a function expression with one of the identifiers below.</p>
 <p><strong>To define a new domain</strong> use a domain constructor.</p>
 <pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>num<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
@@ -1855,14 +1855,14 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#
         
 
 
-        <meta itemprop="datePublished" content="October 02, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

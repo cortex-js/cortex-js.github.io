@@ -685,11 +685,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -725,6 +725,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -745,11 +785,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                <a href="/compute-engine/guides/evaluate/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -770,26 +810,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/mathlive/guides/virtual-keyboards/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -830,26 +850,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/mathlive/guides/virtual-keyboards/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1716,8 +1716,8 @@ can specify different virtual keyboard panel configurations.</p>
 <h2 id="preventing-input-from-the-physical-keyboard" tabindex="-1">Preventing Input from the Physical Keyboard</h2>
 <p><strong>To require the virtual keyboard to be used for input and ignore
 keys pressed on the physical keyboard</strong> listen and <code>preventDefault()</code> on <code>&quot;keydown&quot;</code>
-events</p>
-<pre><code class="language-ts">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;keydown&#x27;</span>,<span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span>  evt.<span class="hljs-title function_">preventDefault</span>());
+events during the capture phase.</p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;keydown&quot;</span>, <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span>  evt.<span class="hljs-title function_">preventDefault</span>(), {<span class="hljs-attr">capture</span>: <span class="hljs-literal">true</span>});
 </code></pre>
 <h2 id="displaying-the-virtual-keyboard-in-a-custom-container" tabindex="-1">Displaying the Virtual Keyboard in a Custom Container</h2>
 <p>By default when a virtual keyboard is created, it is attached at the end of the
@@ -2157,14 +2157,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="September 10, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-10'>September 10, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

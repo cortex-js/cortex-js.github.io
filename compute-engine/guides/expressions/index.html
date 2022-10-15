@@ -678,11 +678,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/expressions/ class="">
+                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/expressions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Symbols
+                  Canonical Form
                 </a></li>
             
           
@@ -718,6 +718,46 @@ crossorigin
               
 
               <li>              
+                <a href="/compute-engine/guides/symbols/" data-url=/compute-engine/guides/expressions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Symbols
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/expressions/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Domains
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/compute-engine/guides/symbolic-computing/" data-url=/compute-engine/guides/expressions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
@@ -738,11 +778,11 @@ crossorigin
               
 
               <li>              
-                <a href="/compute-engine/guides/canonical-form/" data-url=/compute-engine/guides/expressions/ class="">
+                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/expressions/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Canonical Form
+                  Evaluation
                 </a></li>
             
           
@@ -763,26 +803,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Simplify
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/evaluate/" data-url=/compute-engine/guides/expressions/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Evaluation
                 </a></li>
             
           
@@ -823,26 +843,6 @@ crossorigin
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
                   Assumptions
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/compute-engine/guides/domains/" data-url=/compute-engine/guides/expressions/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
-                  
-                  Domains
                 </a></li>
             
           
@@ -1639,7 +1639,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#literal-expressions">Literal Expressions</a></li><li><a href="#immutability">Immutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
+        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#literal-expressions">Literal Expressions</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
       </div>
       
                               
@@ -1653,7 +1653,7 @@ crossorigin
 such as numbers, constants, variables and functions.</p>
 <p>In the CortexJS Compute Engine, expressions are represented using the
 <a href="/math-json/">MathJSON format</a>.</p>
-<p>They are wrapped in a JavaScript object, a processe called <strong>boxing</strong>, and the
+<p>They are wrapped in a JavaScript object, a process called <strong>boxing</strong>, and the
 resulting expressions are <strong>Boxed Expressions</strong>.</p>
 <p>Boxed Expressions improve performance by implementing caching to avoid
 repetitive calculations.</p>
@@ -1663,8 +1663,7 @@ correct functions and properties are used, particularly when using TypeScript.</
 <h2 id="boxing" tabindex="-1">Boxing</h2>
 <p><strong>To create a Boxed Expression from a MathJSON expression</strong>, use the <code>ce.box()</code>
 function.</p>
-<p>The result is an instance of a subclass of <code>BoxedExpression</code>, such as
-<code>BoxedNumber</code> <code>BoxedFunction</code> etc…</p>
+<p>The result is an instance of a <code>BoxedExpression</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">let</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-number">1.729e3</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">machineNumber</span>);
 <span class="hljs-comment">// ➔ 1729</span>
@@ -1737,11 +1736,42 @@ expression was defined.</p>
 <p>Numbers and strings are literals. Symbols and functions are not. They may have a
 value, but their value is calculated indirectly.</p>
 <p><strong>To check if an expression is a literal</strong>, use <code>expr.isLiteral</code>.</p>
-<h2 id="immutability" tabindex="-1">Immutability</h2>
-<p><strong>Boxed expressions are immutable</strong>. Once a Boxed Expression has been created it
-will always represent the same mathematical object.</p>
+<section id='canonical'>
+<h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
+<p>The canonical form of an expression is a “standard” way of writing an
+expression.</p>
+<p><strong>To check if an expression is already in canonical form</strong>, use
+<code>expr.isCanonical</code>.</p>
+<p><strong>To obtain the canonical representation of an expression</strong>, use
+<code>expr.canonical</code>.</p>
+<div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
+<strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>By default, <code>ce.box()</code> and <code>ce.parse()</code> produce a <a href="#canonical-expressions">canonical expression</a>.</p>
+<p><strong>To get a “raw” (non-canonical) expression instead</strong>, use <code>ce.box(expr, {canonical: false})</code>
+or <code>ce.parse(latex, {canonical: false})</code>.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>)
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
+
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, -5]</span>
+</code></pre>
+<p>A non-canonical expression may include errors as a result of parsing from LaTeX,
+if the LaTeX input contained LaTeX syntax errors.</p>
+<p>The arguments of a function in canonical form are validated to make sure they
+match expectations.</p>
+<p>A canonical expression may include additional errors, for example
+<code>[&quot;Divide&quot;, 2, 5, 6]</code> (three arguments instead of two), <code>[&quot;Add&quot;, 2, &quot;True&quot;]</code>
+(mismatched argument domain, expected a number but got a boolean).</p>
+<p><strong>To check if an expression contains errors</strong> use <code>expr.isValid</code>.</p>
+<p>When doing this check on a canonical expression it take into consideration not
+only possible syntax errors, but also semantic errors (incorrect number or
+domain of arguments, etc…).</p>
+</section>
+<h2 id="mutability" tabindex="-1">Mutability</h2>
+<p>Unless otherwise specified, expressions are immutable.</p>
 <p>The functions that manipulate Boxed Expressions, such as <code>expr.simplify()</code>,
-return a new Boxed Expression, without modifying <code>expr</code>.</p>
+<code>expr.evaluate()</code>, <code>expr.N()</code> return a new Boxed Expression, without modifying
+<code>expr</code>.</p>
 <p>However, the properties of the expression may change, since some of them may
 depend on contextual information which can change over time.</p>
 <p>For example, <code>expr.isPositive</code> may return <code>undefined</code> if nothing is known about
@@ -1766,27 +1796,6 @@ nature it evaluates to a different value on every evaluation.</p>
 <p>Numbers, symbols and strings are pure. A function expression is pure if the
 function itself is pure, and all its arguments are pure as well.</p>
 <p><strong>To check if an expression is pure</strong>, use <code>expr.isPure</code>.</p>
-<section id='canonical'>
-<h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
-<p>The canonical form of an expression is a “standard” way of writing an
-expression.</p>
-<p><strong>To check if an expression is already in canonical form</strong>, use
-<code>expr.isCanonical</code>.</p>
-<p><strong>To obtain the canonical representation of an expression</strong>, use
-<code>expr.canonical</code>.</p>
-<div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
-<strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p>A non-canonical expression may include errors as a result of parsing from LaTeX,
-if there were syntax errors in the LaTeX input.</p>
-<p>The arguments of a function in canonical form are validated to make sure they
-match expectations.</p>
-<p>A canonical expression may include additional errors, for example
-<code>[&quot;Divide&quot;, 2, 5, 6]</code> (three arguments instead of two), <code>[&quot;Add&quot;, 2, &quot;True&quot;]</code>
-(mismatched argument domain, expected a number but got a boolean).</p>
-<p><strong>To check if an expression contains errors</strong> use <code>expr.canonical.isValid</code>.</p>
-<p>This check will include not only possible syntax errors, but also semantic
-errors (incorrect number or domain of arguments, etc…).</p>
-</section>
 <h2 id="checking-the-kind-of-expression" tabindex="-1">Checking the Kind of Expression</h2>
 <p>To identify if an expression is a number, symbol, function, string or
 dictionary, use the following boolean expressions:</p>
@@ -2030,14 +2039,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="October 02, 2022">
+        <meta itemprop="datePublished" content="October 14, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-02'>October 02, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
