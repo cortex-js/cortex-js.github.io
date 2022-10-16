@@ -2003,11 +2003,18 @@ UTF-16LE, UTF-16BE, etc…</p>
 <p><strong>Symbols</strong> are identifiers that represent the name of variables,
 constants and wildcards.</p>
 <h2 id="functions" tabindex="-1">Functions</h2>
-<p>A MathJSON function is either:</p>
+<p>A MathJSON function expression is either:</p>
 <ul>
 <li>an object literal with a <code>&quot;fn&quot;</code> key.</li>
 <li>a JSON array</li>
 </ul>
+<p>Function expressions in the context of MathJSON can be used to represent
+mathematical functions but are more generally used to represent
+the application of a function to some arguments.</p>
+<p>The function expression <code>[&quot;Add&quot;, 2, 3]</code> applies the function
+named <code>Add</code> to the arguments <code>2</code> and <code>3</code>.</p>
+<p>The function <code>&quot;f&quot;</code> can be used as a symbol, or in a function expression:
+<code>[&quot;f&quot;, &quot;x&quot;]</code>.</p>
 <h3 id="functions-as-object-literal" tabindex="-1">Functions as Object Literal</h3>
 <p>The default representation of <strong>function</strong> expressions is an object literal with
 a <code>&quot;fn&quot;</code> key. The value of the key is an array representing the function head
@@ -2016,11 +2023,6 @@ and its arguments.</p>
   <span class="hljs-string">&quot;fn&quot;</span>: [<span class="hljs-title class_">Expression</span>, ...<span class="hljs-title class_">Expression</span>[]]
 }
 </code></pre>
-<p>Note that function expressions in the context of MathJSON are used not only to
-represent mathematical functions but are more generally used to represent
-the application of a function to some arguments.</p>
-<p>For example the function expression <code>[&quot;Add&quot;, 2, 3]</code> applies the function
-named <code>Add</code> to the arguments <code>2</code> and <code>3</code>.</p>
 <h3 id="functions-as-json-arrays" tabindex="-1">Functions as JSON Arrays</h3>
 <p>If a <strong>function</strong> has no extra metadata it can be represented as a JSON array.</p>
 <p>For example these two expressions are equivalent:</p>
