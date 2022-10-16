@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#variables">Variables</a></li><li><a href="#core-functions">Core Functions</a></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#assignment%2C-declaration-and-assumptions">Assignment, Declaration and Assumptions</a></li><li><a href="#core-functions">Core Functions</a></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
       
                               
@@ -1664,16 +1664,12 @@ value other than themselves.</p>
 <td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span> All the possible values apply</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Missing</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>A <strong>required</strong> expression is not present</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>None</code></td>
 <td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>None of the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Nothing</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>An <strong>optional</strong> expression is not present</td>
+<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>An <strong>optional</strong> expression is not present. Used in sparse list to indicate  skipped elements.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Undefined</code></td>
@@ -1690,37 +1686,47 @@ value other than themselves.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>[&quot;Divide&quot;, 2, &quot;Missing&quot;]</code></td>
-<td style="text-align:left">\[\frac{2}{\unicode{&quot;2B1A}}\]</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>[&quot;List&quot;, 2, &quot;Nothing&quot;, 3]</code></td>
 <td style="text-align:left">\[\lbrack 2, ,3 \rbrack\]</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id='variables'>
-<h2 id="variables" tabindex="-1">Variables</h2>
+<h2 id="assignment%2C-declaration-and-assumptions" tabindex="-1">Assignment, Declaration and Assumptions</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>Assume</code></td><td>
+    <p><code>[“Assume”, <em>symbol</em>, <em>value</em>]</code><br></p>
+<p><code>[“Assume”, <em>symbol</em>, <em>domain</em>]</code><br></p>
+<p><code>[“Assume”, <em>predicate</em>]</code></p>
+<p>The predicate is an expression that evaluates to <code>True</code> or `False. The symbols
+or functions in the predicate expression may be free (i.e. not have a definition).</p>
+</td></tr> 
 <tr><td><code>Let</code></td><td>
     <p><code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
 <code>[“Let”, <em>symbol</em>, <em>value</em>, <em>domain</em>]</code></p>
 <p>Define a new symbol in the current scope, and set its value and domain.
-If <code>domain</code> is not provided, the domain is inferred based on the value.</p>
-<p>If the symbol already had a definition in the current scope, replace it.</p>
+If <em><kbd>domain</kbd></em> is not provided, the domain is inferred based on the value.</p>
+<p>If the symbol already has a definition in the current scope, evaluate to
+an error, otherwise evaluate to <em><kbd>value</kbd></em>. To change the value of
+an existing symbol, use a <code>[&quot;Set&quot;]</code> expression.</p>
+<p><code>[“Let”, <em>function-expression</em>, <em>value</em>]</code></p>
+<p>Define a new function in the current scope. The name of the function and its
+arguments are provided by the function expression. The value is an expression
+using the arguments from <em><kbd>function-expression</kbd></em>.</p>
+<pre><code>// Define f(x) := x + 1
+[&quot;Let&quot;, [&quot;f&quot;, &quot;x&quot;], [&quot;Add&quot;, &quot;x&quot;, 1]]
+</code></pre>
 </td></tr> 
-<tr><td><code>Value</code></td><td>
-    <p><code>[“Value”, <em>symbol</em>]</code></p>
-<p>Evaluate to the value of <code>_symbol_</code>.</p>
-<p><code>[“Value”, <em>symbol</em>, <em>value</em>]</code></p>
-<p>Set the value of <code>_symbol_</code> to <code>_value_</code>.</p>
-<p>If <code>_symbol_</code> does not exist in the current context, consider parent scopes until
-a definition for the symbol is found.</p>
-<p>If no definition for the symbol is found add one in the current scope.</p>
+<tr><td><code>Set</code></td><td>
+    <p><code>[“Set”, <em>symbol</em>, <em>value</em>]</code></p>
+<p>Set the value of <em><kbd>symbol</kbd></em> to <em><kbd>value</kbd></em>.</p>
+<p>If <em><kbd>symbol</kbd></em> does not exist in the current context, consider parent
+scopes until a definition for the symbol is found.</p>
+<p>If there is no definition for the symbol, evaluate to an error, otherwise
+evaluate to <em><kbd>value</kbd></em>.  To define a new symbol, use a <code>[&quot;Let&quot;]</code>
+expression.</p>
 </td></tr> 
 </tbody></table>
-</section>
 <section id='core-functions'>
 <h2 id="core-functions" tabindex="-1">Core Functions</h2>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
@@ -1945,14 +1951,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 15, 2022">
+        <meta itemprop="datePublished" content="October 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-15'>October 15, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-16'>October 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

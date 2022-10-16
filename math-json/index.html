@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#structure-of-a-mathjson-expression">Structure of a MathJSON Expression</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#strings">Strings</a></li><li><a href="#symbols">Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#identifiers">Identifiers</a></li><li><a href="#dictionary">Dictionary</a></li><li><a href="#metadata">Metadata</a></li></ol>
+        <ol><li><a href="#structure-of-a-mathjson-expression">Structure of a MathJSON Expression</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#strings">Strings</a></li><li><a href="#symbols">Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#identifiers">Identifiers</a></li><li><a href="#dictionary">Dictionary</a></li><li><a href="#metadata">Metadata</a></li><li><a href="#standard-library">Standard Library</a></li></ol>
       </div>
       
                               
@@ -2461,6 +2461,76 @@ array must be transformed into the equivalent object literal to be annotated.</p
   <span class="hljs-attr">&quot;wikidata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Q168&quot;</span><span class="hljs-punctuation">,</span>
 <span class="hljs-punctuation">}</span>
 </code></pre>
+<h2 id="standard-library" tabindex="-1">Standard Library</h2>
+<p>This document defines the structure of MathJSON expression. The Standard
+Library defines a recommended <strong>vocabulary</strong> to use in MathJSON expressions.</p>
+<p>Before considering inventing your own vocabulary, check if the standard
+library already provides relevant definitions.</p>
+<p>The Standard Library includes definitions for:</p>
+<div class=symbols-table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Dictionary</th>
+<th style="text-align:left">Symbols/Functions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/arithmetic/">Arithmetic</a></td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Power</code> <code>Exp</code> <code>Log</code> <code>ExponentialE</code> <code>ImaginaryUnit</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/calculus/">Calculus</a></td>
+<td style="text-align:left"><code>Derive</code> <code>Integrate</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/collections/">Collections</a></td>
+<td style="text-align:left"><code>Sequence</code> <code>List</code> <code>Dictionary</code> <code>Set</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/control-structures/">Control Structures</a></td>
+<td style="text-align:left"><code>If</code> <code>Block</code> <code>Loop</code> <code>Sum</code>  …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/core/">Core</a></td>
+<td style="text-align:left"><code>Let</code>, <code>Set</code>, <code>InverseFunction</code> <code>LatexTokens</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/domains/">Domains</a></td>
+<td style="text-align:left"><code>Anything</code> <code>Nothing</code> <code>Number</code> <code>Integer</code> …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/functions/">Functions</a></td>
+<td style="text-align:left"><code>Function</code> <code>Apply</code> <code>Return</code>  …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/logic/">Logic</a></td>
+<td style="text-align:left"><code>And</code> <code>Or</code> <code>Not</code> <code>True</code> <code>False</code> <code>Maybe</code> …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/sets/">Sets</a></td>
+<td style="text-align:left"><code>Union</code> <code>Intersection</code> <code>EmptySet</code> …</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
+<td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/styling/">Styling</a></td>
+<td style="text-align:left"><code>Delimiter</code> <code>Style</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
+<td style="text-align:left"><code>Pi</code> <code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If you need to define a new function, avoid using a name already defined
+in the Standard Library.</p>
+<div class='read-more'><a href="/compute-engine/guides/standard-library/"> Read more about the
+<strong>MathJSON Standard Library</strong>.<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
       </section>
@@ -2470,14 +2540,14 @@ array must be transformed into the equivalent object literal to be annotated.</p
         
 
 
-        <meta itemprop="datePublished" content="October 15, 2022">
+        <meta itemprop="datePublished" content="October 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-15'>October 15, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-16'>October 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
