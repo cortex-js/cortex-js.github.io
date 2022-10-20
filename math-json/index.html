@@ -1817,8 +1817,8 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <p><strong>Numbers</strong>, <strong>symbols</strong>, <strong>strings</strong> and <strong>functions</strong> can be expressed either
-as an object literal with a <code>&quot;num&quot;</code> <code>&quot;str&quot;</code> <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key, respectively,
-or as a shorthand notation using a JSON number, string or array.</p>
+as object literals with a <code>&quot;num&quot;</code> <code>&quot;str&quot;</code> <code>&quot;sym&quot;</code> or <code>&quot;fn&quot;</code> key, respectively,
+or using a shorthand notation as a a JSON number, string or array.</p>
 <p><strong>Dictionaries</strong> do not have a shorthand notation and are always expressed as an
 object literal with a <code>&quot;dict&quot;</code> key.</p>
 <p>The shorthand notation is more concise and easier to read, but cannot include
@@ -2313,15 +2313,15 @@ letter <code>A</code>-<code>Z</code>, for example <code>&quot;Sin&quot;</code>, 
 </ul>
 <h3 id="rendering-conventions" tabindex="-1">Rendering Conventions</h3>
 <p>The following recommendations may be followed by clients displaying MathJSON
-symbols. They do not affect computation or manipulation of expressions following
+identifiers. They do not affect computation or manipulation of expressions following
 these conventions.</p>
 <ul>
-<li>Multi-letter variables, that is symbols with more than one character, may be
+<li>Multi-letter variables, that is identifiers with more than one character, may be
 rendered in LaTeX with a <code>\mathit{}</code> or <code>\mathrm{}</code> command.</li>
-<li>Symbol names containing a <code>_</code> may be split in a suffix (part before the <code>_</code>)
+<li>Identifiers containing a <code>_</code> may be split in a suffix (part before the <code>_</code>)
 and a prefix (part after the <code>_</code>) and the prefix may be displayed as a
-subscript of the suffix. A symbol fragment is either the entire symbol, or a
-suffix or a prefix of a symbol.</li>
+subscript of the suffix. An identifier fragment is either the entire
+identifier, or a suffix or a prefix of an identifier.</li>
 <li>The following common names, when they appear as a fragment, may be replaced
 with a corresponding LaTeX command: <code>alpha</code>, <code>beta</code>, <code>gamma</code>, <code>Gamma</code>,
 <code>delta</code>, <code>Delta</code>, <code>epsilon</code>, <code>zeta</code>, <code>eta</code>, <code>theta</code>, <code>Theta</code>, <code>iota</code>, <code>kappa</code>,
@@ -2329,14 +2329,14 @@ with a corresponding LaTeX command: <code>alpha</code>, <code>beta</code>, <code
 <code>Sigma</code>, <code>tau</code>, <code>upsilon</code>, <code>phi</code>, <code>Phi</code>, <code>varphi</code>, <code>chi</code>, <code>psi</code>, <code>Psi</code>,
 <code>omega</code>, <code>Omega</code>, <code>aleph</code>, <code>ast</code>, <code>blacksquare</code>, <code>bot</code>, <code>bullet</code>, <code>circ</code>,
 <code>diamond</code>, <code>times</code>, <code>top</code>, <code>square</code>, <code>star</code>.</li>
-<li>Symbol fragments ending in digits may be displayed with a corresponding
+<li>Identifier fragments ending in digits may be displayed with a corresponding
 subscript</li>
 </ul>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Symbol</th>
+<th style="text-align:left">Identifier</th>
 <th style="text-align:left">LaTeX</th>
 <th></th>
 </tr>
@@ -2415,7 +2415,7 @@ array must be transformed into the equivalent object literal to be annotated.</p
 <tbody>
 <tr>
 <td style="text-align:left"><code>wikidata</code></td>
-<td style="text-align:left">A short string indicating an entry in a wikibase.<br>This information can be used to disambiguate the meaning of a symbol</td>
+<td style="text-align:left">A short string indicating an entry in a wikibase.<br>This information can be used to disambiguate the meaning of an identifier</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>comment</code></td>
@@ -2540,14 +2540,14 @@ in the Standard Library.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2022">
+        <meta itemprop="datePublished" content="October 19, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-16'>October 16, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-19'>October 19, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

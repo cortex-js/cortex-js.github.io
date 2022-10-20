@@ -1700,6 +1700,13 @@ value other than themselves.</p>
 <p><code>[“Assume”, <em>predicate</em>]</code></p>
 <p>The predicate is an expression that evaluates to <code>True</code> or `False. The symbols
 or functions in the predicate expression may be free (i.e. not have a definition).</p>
+<p>The predicate can take the form of an equality, an inequality or a membership
+expression:</p>
+<ul>
+<li><code>[&quot;Assume&quot;, [&quot;Equal&quot;, &quot;x&quot;, 3]]</code></li>
+<li><code>[&quot;Assume&quot;, [&quot;Greater&quot;, &quot;x&quot;, 0]]</code></li>
+<li><code>[&quot;Assume&quot;, [&quot;Element&quot;, &quot;x&quot;, &quot;Integer&quot;]]</code></li>
+</ul>
 </td></tr> 
 <tr><td><code>Let</code></td><td>
     <p><code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
@@ -1715,6 +1722,14 @@ arguments are provided by the function expression. The value is an expression
 using the arguments from <em><kbd>function-expression</kbd></em>.</p>
 <pre><code>// Define f(x) := x + 1
 [&quot;Let&quot;, [&quot;f&quot;, &quot;x&quot;], [&quot;Add&quot;, &quot;x&quot;, 1]]
+</code></pre>
+<p>The arguments of the function expression should be either</p>
+<ul>
+<li>symbols</li>
+<li>pairs of symbol and domain.</li>
+</ul>
+<pre><code>// Define f(n) := 2n, where n is an integer
+[&quot;Let&quot;, [&quot;f&quot;, [&quot;Tuple&quot;, &quot;n&quot;, &quot;Integer]], [&quot;Multiply&quot;, &quot;n&quot;, 2]]
 </code></pre>
 </td></tr> 
 <tr><td><code>Set</code></td><td>
@@ -1951,14 +1966,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2022">
+        <meta itemprop="datePublished" content="October 19, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-16'>October 16, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-19'>October 19, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
