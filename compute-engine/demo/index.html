@@ -1781,6 +1781,14 @@ crossorigin
     margin-bottom: 1em;
   }
 
+  #canonical-form .latex {
+    display: none;
+  }
+
+  #canonical-form .latex.is-visible {
+    display: inherit;
+  }
+
   button.toggle {
     display: flex;
     align-items: center;
@@ -1973,7 +1981,6 @@ crossorigin
     </div>
     <div class="toggle-field">
       <div id="mathfield-latex" class="output"></div>
-      <div id="mathfield-math-json" class="output mathjson"></div>
     </div>
   </div>
 
@@ -2042,10 +2049,10 @@ crossorigin
         <div class="latex"></div>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
-      <div class="output mathjson toggle-field"></div>
     </div>
 
     <div class="output-section" id="canonical-form">
+      <math-field class="latex" read-only></math-field>
       <div class="output mathjson"></div>
     </div>
 
@@ -2277,6 +2284,9 @@ crossorigin
       updateExpr(null, 'evaluate');
       updateExpr(null, 'evaluate-numerically');
 
+      // document.getElementById('output-latex').innerText = '';
+
+
 
       let expr;
       try {
@@ -2304,6 +2314,11 @@ crossorigin
         const canonicalExpr = expr.canonical;
 
         updateExpr(canonicalExpr, 'canonical-form');
+
+        if (canonicalExpr.isValid) 
+          document.querySelector('#canonical-form .latex').classList.remove('is-visible')
+        else 
+          document.querySelector('#canonical-form .latex').classList.add('is-visible')
       } catch (e) {
         console.error("canonical(%c " + latex + '%c) ' +
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
@@ -2485,14 +2500,14 @@ crossorigin
         
 
 
-        <meta itemprop="datePublished" content="November 15, 2022">
+        <meta itemprop="datePublished" content="November 16, 2022">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Compute Engine version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-15'>November 15, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-16'>November 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

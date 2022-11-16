@@ -1670,32 +1670,52 @@ object:</p>
 functions or flattening associative functions — we define a <strong>canonical</strong>
 representation.</p>
 <p>A canonical representation is somewhat arbitrary, but using it consistently make
-some operations easier, for example, comparing two expressions for equality.</p>
+some operations easier, for example, comparing two expressions for structural
+equality.</p>
 <p>The canonical form used by the Compute Engine follows common (but certainly not
 universal) conventions in writing mathematical expressions, and expresses them
-in a way that optimize their computation. It is not necessarily “the simplest”
+in a way that optimize their computation. It is not always “the simplest”
 way to represent an expression.</p>
 <p>The canonical form of an expression is always the same when used with a given
 Compute Engine instance. However, do not rely on the canonical form as future
 versions of the Compute Engine could provide a different result.</p>
 <p>The <code>ce.box()</code> and <code>ce.parse()</code> function return a canonical expression by
-default. If instead you want a non-canonical version, set the <code>canonical</code> option
-to <code>false</code>. The non-canonical version will be closer to the literal LaTeX
+default.</p>
+<p><strong>To get a non-canonical version of an experssion</strong> set the <code>canonical</code> option
+of <code>ce.parse()</code> or <code>ce.box()</code> to <code>false</code>.</p>
+<p>The non-canonical version will be closer to the literal LaTeX
 input from a user for example, which may be desirable to compare a “raw” user
 input with an expected answer.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>)
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
+<span class="hljs-comment">// The canonical version moves the sign to the numerator</span>
 
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> })
 <span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, -5]</span>
+<span class="hljs-comment">// The non-canonical version does not change the arguments, so this is </span>
+<span class="hljs-comment">// interpreted as a regular fraction (&quot;Divide&quot;), not a rational.</span>
+</code></pre>
+<p>You can further customize how an expression is interpreted by using
+<a href="/docs/guide-expressions#unboxing"><code>ce.jsonSerializationOptions</code></a>.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{5}&quot;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> })
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, 3, 5]</span>
+<span class="hljs-comment">// This is a rational without modifying the arguments, so a `[&quot;Rational&quot;]` </span>
+<span class="hljs-comment">// expression is returned</span>
+
+ce.<span class="hljs-property">jsonSerializationOptions</span> = { <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Rational&#x27;</span>] };
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{5}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, 5]</span>
+<span class="hljs-comment">// We&#x27;ve excluded `[&quot;Rational&quot;]` expressions, so it is interepreted as a </span>
+<span class="hljs-comment">// division instead.</span>
 </code></pre>
 <p>The output of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are canonical
 expressions.</p>
-<p><strong>To obtain the canonical representation of an expression</strong>, use the
+<p><strong>To obtain the canonical representation of an non-canonical expression</strong>, use the
 <code>expr.canonical</code> property.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>]).<span class="hljs-property">canonical</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 5, &quot;x&quot;]</span>
 </code></pre>
+<p><strong>To check if an expression is canonical</strong> use <code>expr.isCanonical</code>.</p>
 <p>If the expression is already canonical, <code>expr.canonical</code> immediately return
 <code>expr</code>.</p>
 <p>Calculating the canonical form of an expression is applying some rewriting rules
@@ -1745,14 +1765,14 @@ multiplied together.</li>
         
 
 
-        <meta itemprop="datePublished" content="November 15, 2022">
+        <meta itemprop="datePublished" content="November 16, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-15'>November 15, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-16'>November 16, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
