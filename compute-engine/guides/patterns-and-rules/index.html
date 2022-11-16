@@ -1776,27 +1776,32 @@ the expressions simply match or not, check if the return value is <code>null</co
 <ul>
 <li>a left-hand-side pattern, <code>lhs</code></li>
 <li>a right-hand-side pattern, <code>rhs</code></li>
-<li>an optional <code>condition</code></li>
 </ul>
-<p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> and the
-<code>condition</code> applies to the resulting substitution, the result of the rule is the
-substitution applied to the <code>rhs</code>.</p>
+<p>When a rule is applied to an expression <code>expr</code>, if <code>expr</code> matches <code>lhs</code> the
+result of the rule is the substitution applied to the <code>rhs</code>.</p>
 <p><strong>To apply a set of rules to an expression</strong>, call the <code>expr.replace()</code>
 function.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = [
-  [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
-  [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
-];
+<pre><code class="language-ts"><span class="hljs-keyword">const</span> squareRule = ce.<span class="hljs-title function_">rules</span>([
+  [
+    [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
+    [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
+  ],
+]);
 
-ce.<span class="hljs-title function_">box</span>([squareRule], [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]).<span class="hljs-title function_">replace</span>();
+ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>]).<span class="hljs-title function_">replace</span>(squareRule);
 <span class="hljs-comment">// ➔ [&#x27;Square&#x27;, 4]</span>
 
-<span class="hljs-keyword">const</span> sqrtRule = [
-  [<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>]],
-  <span class="hljs-string">&#x27;_x&#x27;</span>,
-  <span class="hljs-function">(<span class="hljs-params">ce, sub</span>) =&gt;</span> ce.<span class="hljs-title function_">isPositive</span>(sub.<span class="hljs-property">_x</span>),
-];
-ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Sqrt&#x27;</span>, [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-number">17</span>]]).<span class="hljs-title function_">replace</span>([sqrtRule]);
+
+ce
+  .<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-number">4</span>, <span class="hljs-number">4</span>])
+  .<span class="hljs-title function_">replace</span>(
+    ce.<span class="hljs-title function_">rules</span>([
+      [
+        [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
+        [<span class="hljs-string">&#x27;Square&#x27;</span>, <span class="hljs-string">&#x27;_x&#x27;</span>],
+      ],
+    ])
+  );
 <span class="hljs-comment">// ➔ 17</span>
 </code></pre>
 <p>The <code>expr.replace()</code> function continues applying all the rules in the ruleset
@@ -1816,14 +1821,14 @@ You can define your own rules and apply them using <code>expr.replace()</code>.<
         
 
 
-        <meta itemprop="datePublished" content="October 22, 2022">
+        <meta itemprop="datePublished" content="November 15, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-22'>October 22, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-15'>November 15, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

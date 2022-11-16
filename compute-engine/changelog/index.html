@@ -1607,9 +1607,150 @@ crossorigin
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.9.0" tabindex="-1">0.9.0</h2>
+<p><strong>Release Date:</strong> 2022-11-15</p>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<ul>
+<li>The head of a number expression is always <code>Number</code>. Use <code>expr.domain</code> to be
+get more specific info about what kind of number this is.</li>
+<li>By default, <code>ce.box()</code> and <code>ce.parse()</code> return a canonical expression. A flag
+can be used if a non-canonical expression is desired.</li>
+<li>The API surface of <code>BoxedExpression</code> has been reduced. The properties
+<code>machineValue</code>, <code>bignumValue</code>, <code>asFloat</code>, <code>asSmallInteger</code>, <code>asRational</code>
+etc… have been replaced with a single <code>numericValue</code> property.</li>
+<li><code>parseUnknownSymbol</code> is now <code>parseUnknownIdentifier</code></li>
+</ul>
+<h3 id="improvements" tabindex="-1">Improvements</h3>
+<ul>
+<li>
+<p>Support angles in degrees with <code>30\deg</code>, <code>30\degree</code>, <code>30^\circ</code> and
+<code>\ang{30}</code>.</p>
+</li>
+<li>
+<p>More accurate error expressions, for example if there is a missing closing
+delimiter an <code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'expected-closing-delimiter'&quot;, &quot;')'&quot;]]</code>
+is produced.</p>
+</li>
+<li>
+<p><code>[&quot;Expand&quot;]</code> handles more cases</p>
+</li>
+<li>
+<p>The trig functions can now have a regular exponent, i.e.<code>\cos^2(x)</code> in
+addition to <code>-1</code> for inverse, and a combination of <code>\prime</code>, <code>\doubleprime</code>
+and <code>'</code> for derivatives.</p>
+</li>
+<li>
+<p><code>ce.assume()</code> handle more expressions and can be used to define new symbols by
+domain or value.</p>
+</li>
+<li>
+<p>Better error message when parsing, e.g. <code>\sqrt(2)</code> (instead of <code>\sqrt{2}</code>)</p>
+</li>
+<li>
+<p>Better simplification for square root expressions:</p>
+<ul>
+<li><code>\sqrt{25x^2}</code> -&gt; <code>5x</code></li>
+</ul>
+</li>
+<li>
+<p>Improved evaluation of <code>[&quot;Power&quot;]</code> expressions, including for negative
+arguments and non-integer exponents and complex arguments and exponents.</p>
+</li>
+<li>
+<p>Added <code>Arccot</code>, <code>Arcoth</code>, <code>Arcsch</code>, <code>Arcscc</code>, <code>Arsech</code> and <code>Arccsc</code></p>
+</li>
+<li>
+<p><code>expr.solve()</code> returns result for polynomials of order up to 2.</p>
+</li>
+<li>
+<p>The <code>pattern.match()</code> function now work correctly for commutative functions,
+i.e. <code>ce.pattern(['Add', '_a', 'x']).match(ce.parse('x+y')) -&gt; {&quot;_a&quot;: &quot;y&quot;}</code></p>
+</li>
+<li>
+<p>Added <code>ce.let()</code> and <code>ce.set()</code> to declare and assign values to identifiers.</p>
+</li>
+<li>
+<p>Preserve exact calculations involving rationals or square root of rationals.</p>
+<ul>
+<li><code>\sqrt{\frac{49}{25}}</code> -&gt; <code>\frac{7}{5}</code></li>
+</ul>
+</li>
+<li>
+<p>Addition and multiplication provide more consistent results for <code>evaluate()</code>
+and <code>N()</code>. Evaluate returns an exact result when possible.</p>
+<ul>
+<li>EXACT
+<ul>
+<li>2 + 5 -&gt; 7</li>
+<li>2 + 5/7 -&gt; 19/7</li>
+<li>2 + √2 -&gt; 2 + √2</li>
+<li>2 + √(5/7) -&gt; 2 + √(5/7)</li>
+<li>5/7 + 9/11 -&gt; 118/77</li>
+<li>5/7 + √2 -&gt; 5/7 + √2</li>
+<li>10/14 + √(18/9) -&gt; 5/7 + √2</li>
+<li>√2 + √5 -&gt; √2 + √5</li>
+<li>√2 + √2 -&gt; 2√2</li>
+<li>sin(2) -&gt; sin(2)</li>
+<li>sin(π/3) -&gt; √3/2</li>
+</ul>
+</li>
+<li>APPROXIMATE
+<ul>
+<li>2 + 2.1 -&gt; 4.1</li>
+<li>2 + √2.1 -&gt; 3.44914</li>
+<li>5/7 + √2.1 -&gt; 2.16342</li>
+<li>sin(2) + √2.1 -&gt; 2.35844</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>More consistent behavior of the <code>auto</code> numeric mode: calculations are done
+with <code>bignum</code> and <code>complex</code> in most cases.</p>
+</li>
+<li>
+<p><code>JsonSerializationOptions</code> has a new option to specify the numeric precision
+in the MathJSON serialization.</p>
+</li>
+<li>
+<p>Shorthand numbers can now be strings if they do not fit in a float-64:</p>
+</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-comment">// Before</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1234567890123456789&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;num&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2345678901234567889&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
+
+<span class="hljs-comment">// Now</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;1234567890123456789&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;2345678901234567889&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<ul>
+<li><code>\sum</code> is now correctly parsed and evaluated. This includes creating a local
+scope with the index and expression value of the sum.</li>
+</ul>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<ul>
+<li>The parsing and evaluation of log functions could produce unexpected results</li>
+<li>The <code>\gamma</code> command now correctly maps to <code>[&quot;Gamma&quot;]</code></li>
+<li>Fixed numeric evaluation of the <code>[&quot;Gamma&quot;]</code> function when using bignum</li>
+<li><strong>#57</strong> Substituting <code>0</code> (i.e. with <code>expr.subs({})</code>) did not work.</li>
+<li><strong>#60</strong> Correctly parse multi-char symbols with underscore, i.e.
+<code>\mathrm{V_a}</code></li>
+<li>Parsing a number with repeating decimals and an exponent would drop the
+exponent.</li>
+<li>Correct calculation of complex square roots
+<ul>
+<li><code>\sqrt{-49}</code> -&gt; <code>7i</code></li>
+</ul>
+</li>
+<li>Calculations were not always performed as bignum in <code>&quot;auto&quot;</code> numeric mode if
+the precision was less than 15. Now, if the numeric mode is <code>&quot;auto&quot;</code>,
+calculations are done as bignum or complex numbers.</li>
+<li>If an identifier contained multiple strings of digits, it would not be
+rendered to LaTeX correctly, e.g. <code>V20_20</code>.</li>
+<li>Correctly return <code>isReal</code> for real numbers</li>
+</ul>
 <h2 id="0.8.0" tabindex="-1">0.8.0</h2>
 <p><strong>Release Date:</strong> 2022-10-02</p>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
@@ -1626,14 +1767,14 @@ affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead o
 <code>decimal', </code>expr.decimalValue<code>-&gt;</code>expr.bignumValue<code>, </code>decimalValue()<code>-&gt; </code>bignumValue()`</p>
 </li>
 </ul>
-<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li>Numerical evaluation of expressions containing complex numbers when in
 <code>decimal</code> or <code>auto</code> mode produced incorrect results. Example: <code>e^{i\\pi}</code></li>
 </ul>
 <h2 id="0.7.0" tabindex="-1">0.7.0</h2>
 <p><strong>Release Date:</strong> 2022-09-30</p>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
@@ -1669,7 +1810,7 @@ range of a 64-bit float.</li>
 <a href="https://cortexjs.io/compute-engine/reference/core/">Core Reference</a> and
 [Arithmetic Reference]
 (https://cortexjs.io/compute-engine/reference/arithmetic/)</p>
-<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#43</strong> If the input of <code>ce.parse()</code> is an empty string, return an empty
 string for <code>expr.latex</code> or <code>expr.json.latex</code>: that is, ensure verbatim LaTeX
@@ -1679,7 +1820,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.6.0" tabindex="-1">0.6.0</h2>
 <p><strong>Release Date:</strong> 2022-04-18</p>
-<h3 id="improvements" tabindex="-1">Improvements</h3>
+<h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
 <li>Parse more cases of tabular environments</li>
 <li>Handle simplify and evaluate of inert functions by default</li>
@@ -1692,7 +1833,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.5.0" tabindex="-1">0.5.0</h2>
 <p><strong>Release Date:</strong> 2022-04-05</p>
-<h3 id="improvements-1" tabindex="-1">Improvements</h3>
+<h3 id="improvements-2" tabindex="-1">Improvements</h3>
 <ul>
 <li>Correctly parse tabular content (for example in
 <code>\begin{pmatrix}...\end{pmatrix}</code></li>
@@ -1706,7 +1847,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.4.4" tabindex="-1">0.4.4</h2>
 <p><strong>Release Date</strong>: 2022-03-27</p>
-<h3 id="improvements-2" tabindex="-1">Improvements</h3>
+<h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added option to specify custom LaTeX dictionaries in <code>ComputeEngine</code>
 constructor</li>
@@ -1860,7 +2001,7 @@ such as <code>Equal</code>:</p>
 </table>
 <h2 id="0.3.0" tabindex="-1">0.3.0</h2>
 <p><strong>Release Date</strong>: 2021-06-18</p>
-<h3 id="improvements-3" tabindex="-1">Improvements</h3>
+<h3 id="improvements-4" tabindex="-1">Improvements</h3>
 <ul>
 <li>In LaTeX, parse <code>\operatorname{foo}</code> as the MathJSON symbol <code>&quot;foo&quot;</code>.</li>
 </ul>
@@ -1873,14 +2014,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 22, 2022">
+        <meta itemprop="datePublished" content="November 15, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-22'>October 22, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-15'>November 15, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
