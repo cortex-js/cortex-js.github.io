@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#literal-expressions">Literal Expressions</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
+        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
       </div>
       
                               
@@ -1729,12 +1729,6 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
 <span class="hljs-comment">//      ]</span>
 <span class="hljs-comment">//    ]]</span>
 </code></pre>
-<h2 id="literal-expressions" tabindex="-1">Literal Expressions</h2>
-<p>A literal expression has a fixed value that was provided directly when the
-expression was defined.</p>
-<p>Numbers and strings are literals. Symbols and functions are not. They may have a
-value, but their value is calculated indirectly.</p>
-<p><strong>To check if an expression is a literal</strong>, use <code>expr.isLiteral</code>.</p>
 <section id='canonical'>
 <h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
 <p>The canonical form of an expression is a conventional way of writing an
@@ -1812,7 +1806,7 @@ dictionary, use the following boolean expressions:</p>
 <tbody>
 <tr>
 <td style="text-align:left"><strong>Number</strong></td>
-<td style="text-align:left"><code>expr.isLiteral &amp;&amp; expr.isNumber</code></td>
+<td style="text-align:left"><code>expr.numericValue !== null</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Symbol</strong></td>
@@ -1820,7 +1814,7 @@ dictionary, use the following boolean expressions:</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Function</strong></td>
-<td style="text-align:left"><code>expr.tail !== null</code></td>
+<td style="text-align:left"><code>expr.ops !== null</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>String</strong></td>
@@ -1833,9 +1827,6 @@ dictionary, use the following boolean expressions:</p>
 </tbody>
 </table>
 </div>
-<p>Note that symbols or functions can return <code>true</code> for <code>isNumber</code>, if their value
-is a number. Use <code>isLiteral</code> to distinguish literal numbers from other
-expressions that may have a numeric value.</p>
 <p>A symbol may have a value if it represents a bound variable, but it may also
 have no value if it represents a free variable.</p>
 <section id=errors>
@@ -2041,14 +2032,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="November 16, 2022">
+        <meta itemprop="datePublished" content="November 18, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-16'>November 16, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-18'>November 18, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
