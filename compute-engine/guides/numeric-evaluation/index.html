@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
+        <ol><li><a href="#repeated-evaluation">Repeated Evaluation</a></li><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
       </div>
       
                               
@@ -1647,37 +1647,76 @@ crossorigin
 
 
 
-<p>An evaluation with <code>expr.evaluate()</code> preserves <strong>exact</strong> numbers. Exact
-numbers are:</p>
+<p>An evaluation with <code>expr.evaluate()</code> preserves <strong>exact values</strong>. Exact
+values are:</p>
 <ul>
-<li>constants such as <code>ExponentialE</code> and <code>Pi</code></li>
 <li>integers and rationals</li>
 <li>square roots of integers and rationals</li>
+<li>constants such as <code>ExponentialE</code> and <code>Pi</code></li>
 </ul>
 <p>If one of the arguments is not an exact value the expression is evaluated
 as a numeric approximation.</p>
-<p>To provide a numeric approximation, use <code>expr.N()</code>. If <code>expr.N()</code> cannot
+<p><strong>To obtain a numeric approximation, use <code>expr.N()</code></strong>. If <code>expr.N()</code> cannot
 provide a numeric evaluation, a symbolic representation of the partially
 evaluated expression is returned.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + 5 + x&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;8 + x&quot;</span>
-</code></pre>
-<p>If the expression is <a href="/compute-engine/guides/expressions#pure/">pure</a>, the value
-of the expression can be obtained with <code>expr.numericValue</code>.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;345.2360679774998&quot;</span>
+<p>The value of <code>N()</code> is a boxed expression. The <code>numericValue</code> property is
+either a machine number, a <code>Decimal</code> object or a <code>Complex</code> object,
+depending on the <code>numericMode</code> of the compute engine, or <code>null</code> if the
+result is not a number.</p>
+<p><strong>To access a JavaScript machine number approximation of the result</strong> use
+<code>valueOf()</code>. If <code>numericValue</code> is a machine number or a <code>Decimal</code> object,
+<code>valueOf()</code> will return a machine number approximation. Otherwise it returns
+a string serialization of the MathJSON representation of the expression.</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-title function_">valueOf</span>());
+<span class="hljs-comment">// ➔ 345.2360679774998</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;345.2360679774998&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">numericValue</span>);
+<span class="hljs-comment">// ➔ [Decimal]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;\sqrt{x} + 343&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">numericValue</span>.<span class="hljs-title function_">toNumber</span>());
+<span class="hljs-comment">// ➔ 345.2360679774998</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-property">numericValue</span>?.<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ undefined</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;345.236\,067\,977\,499\,8,&quot;</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{x} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-title function_">valueOf</span>());
+<span class="hljs-comment">// ➔ &quot;[&quot;Add&quot;,343,[&quot;Sqrt&quot;,&quot;x&quot;]]&quot;</span>
+
 </code></pre>
 <div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
 <strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="repeated-evaluation" tabindex="-1">Repeated Evaluation</h2>
+<p><strong>To repeatedly evaluate an expression</strong> use <code>ce.set()</code> to change the value
+of variables. <code>ce.set()</code> changes the value associated with one or more
+variables in the current scope.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+c&quot;</span>);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
+  ce.<span class="hljs-title function_">set</span>({x : x});
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.N().valueOf()}</span>`</span>);
+}
+</code></pre>
+<p>You can also use <code>expr.subs()</code>, but this will create a brand new expression
+on each iteration, and will be much slower.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+c&quot;</span>);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({x: x}).N().valueOf()}</span>`</span>);
+}
+</code></pre>
+<p><strong>To reset a variable to be unbound to a value</strong> use <code>ce.set()</code></p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">set</span>({<span class="hljs-attr">x</span>: <span class="hljs-literal">null</span>});
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;3x^2+4x+c&quot;</span>
+</code></pre>
+<p>You can change the value of a variable by setting its <code>value</code> property:</p>
+<pre><code class="language-ts">
+ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
+
+ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-literal">undefined</span>;
+
+</code></pre>
 <h2 id="numeric-modes" tabindex="-1">Numeric Modes</h2>
 <p>Four numeric modes may be used to perform numeric evaluations with the Compute
 Engine: <code>&quot;machine&quot;</code> <code>&quot;bignum&quot;</code> <code>&quot;complex&quot;</code> and <code>&quot;auto&quot;</code>. The default mode is
@@ -1838,13 +1877,14 @@ This is a convenient shorthand for
 <h3 id="auto-numeric-mode" tabindex="-1"><code>Auto</code> Numeric Mode</h3>
 <p>When using the <code>auto</code> numeric mode, calculations are performed using bignum
 numbers.</p>
-<p>Computations which result in a complex number will return a complex number.</p>
+<p>Computations which result in a complex number will return a complex number as
+a <code>Complex</code> object.</p>
 <h2 id="simplifying-before-evaluating" tabindex="-1">Simplifying Before Evaluating</h2>
 <p><strong>When using <code>expr.N()</code>, no rewriting of the expression is done before it is
 evaluated.</strong></p>
 <p>Because of the limitations of machine numbers, this may produce surprising
 results.</p>
-<p>For example:</p>
+<p>For example, when <code>numericMode = &quot;machine&quot;</code>:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> x = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;0.1 + 0.2&#x27;</span>).<span class="hljs-title function_">N</span>();
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Subtract&#x27;</span>, x, x]).<span class="hljs-title function_">N</span>());
 <span class="hljs-comment">// ➔ 2.7755575615628914e-17</span>
@@ -1903,14 +1943,14 @@ functions:</p>
         
 
 
-        <meta itemprop="datePublished" content="November 18, 2022">
+        <meta itemprop="datePublished" content="November 19, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-18'>November 18, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-19'>November 19, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
