@@ -1628,7 +1628,7 @@ crossorigin
       <section class="page__content" itemprop="text">
 
   
-    <h1>Parsing and Serializing LaTeX</h1><p class="xl">The CortexJS Compute Engine  manipulates MathJSON expressions. It can also convert LaTeX strings to  MathJSON expressions (<b>parsing</b>) and output MathJSON expressions as  LaTeX string (<b>serializing</b>)</p>
+    <h1>Parsing and Serializing LaTeX</h1><p class="xl">The CortexJS Compute Engine manipulates MathJSON expressions. It can also convert LaTeX strings to MathJSON expressions (<b>parsing</b>) and output MathJSON expressions as LaTeX string (<b>serializing</b>)</p>
   
 
   
@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a></li></ol>
+        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a></li></ol>
       </div>
       
                               
@@ -1651,19 +1651,21 @@ crossorigin
 <code>ComputeEngine</code> instance which is denoted by a <code>ce.</code> prefix.<br>Functions that
 apply to a boxed expression, such as <code>expr.simplify()</code> are denoted with a
 <code>expr.</code> prefix.</p>
-<p><strong>To parse a LaTeX string as a MathJSON expression</strong>, call the <code>ce.parse()</code> function.</p>
+<p><strong>To parse a LaTeX string as a MathJSON expression</strong>, call the <code>ce.parse()</code>
+function.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
 </code></pre>
-<p>By default, <code>ce.parse()</code> return a <a href="/compute-engine/guides/canonical-form/">canonical expression</a>.
-To get a non-canonical expression instead, use the <code>{canonical: false}</code> option:
-The non-canonical form is closer to the literal LaTeX input.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{7}{-4}&quot;</span>)
+<p>By default, <code>ce.parse()</code> return a
+<a href="/compute-engine/guides/canonical-form/">canonical expression</a>. To get a
+non-canonical expression instead, use the <code>{canonical: false}</code> option: The
+non-canonical form is closer to the literal LaTeX input.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{7}{-4}&#x27;</span>);
 <span class="hljs-comment">// ➔  [&quot;Rational&quot;, -7, 4]</span>
 
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{7}{-4}&quot;</span>, {<span class="hljs-attr">canonical</span>:<span class="hljs-literal">false</span>})
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{7}{-4}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// ➔  [&quot;Divide&quot;, 7, -4]</span>
 </code></pre>
 <hr>
@@ -1675,11 +1677,11 @@ to be used with the Compute Engine.</p>
 element</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="the-compute-engine-natural-parser" tabindex="-1">The Compute Engine Natural Parser</h2>
 <p>Unlike a programming language, mathematical notation is surprisingly ambiguous
-and full of idiosyncrasies. Mathematicians frequently invent new notations,
-or have their own preferences to represent even common concepts.</p>
-<p>The Compute Engine Natural Parser interprets expressions using the notation
-you are already familiar with. Write as you would on a blackboard, and
-get back a semantic representation as an expression ready to be processed.</p>
+and full of idiosyncrasies. Mathematicians frequently invent new notations, or
+have their own preferences to represent even common concepts.</p>
+<p>The Compute Engine Natural Parser interprets expressions using the notation you
+are already familiar with. Write as you would on a blackboard, and get back a
+semantic representation as an expression ready to be processed.</p>
 <table>
 <thead>
 <tr>
@@ -1694,7 +1696,7 @@ get back a semantic representation as an expression ready to be processed.</p>
 </tr>
 <tr>
 <td style="text-align:left"><big>$$ \int \frac{dx}{x} $$ </big><code>\int \frac{dx}{x}</code></td>
-<td style="text-align:left"><code>[&quot;Integrate&quot;, [&quot;Divide&quot;, 1,  &quot;x&quot;], &quot;x&quot;]</code></td>
+<td style="text-align:left"><code>[&quot;Integrate&quot;, [&quot;Divide&quot;, 1, &quot;x&quot;], &quot;x&quot;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><big>$$ 123.4(567) $$ </big><code>123.4(567)</code></td>
@@ -1705,21 +1707,21 @@ get back a semantic representation as an expression ready to be processed.</p>
 <td style="text-align:left"><code>123.4(567)</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><big>$$ |a+|b|+c| $$ </big><code>|a+|b|+c|</code></td>
+<td style="text-align:left"><big>$$ |a+|b|+c| $$ </big><code>                          | a+                                                                      | b   | +c  |</code></td>
 <td style="text-align:left"><code>[&quot;Abs&quot;, [&quot;Add&quot;, &quot;a&quot;, [&quot;Abs&quot;, &quot;b&quot;], &quot;c&quot;]]</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><big>$$ ||a||+|b| $$ </big><code>||a||+|b|</code></td>
+<td style="text-align:left"><big>$$ ||a||+|b| $$ </big><code>                        |                                                                         | a   |     | +   | b                                          |</code></td>
 <td style="text-align:left"><code>[&quot;Add&quot;, [&quot;Norm&quot;, &quot;a&quot;], [&quot;Abs&quot;, &quot;b&quot;]]</code></td>
 </tr>
 </tbody>
 </table>
-<p>The Compute Engine Natural Parser will apply maximum effort to parse the input string as LaTeX,
-even if it includes errors. If errors are encountered, the resulting expression
-will have its <code>expr.isValid</code> property set to <code>false</code>. An <code>[&quot;Error&quot;]</code> expression
-will be produced where a problem was encountered. To get the list of all the
-errors in an expression, use <code>expr.errors</code> which will return an array of
-<code>[&quot;Error&quot;]</code> expressions.</p>
+<p>The Compute Engine Natural Parser will apply maximum effort to parse the input
+string as LaTeX, even if it includes errors. If errors are encountered, the
+resulting expression will have its <code>expr.isValid</code> property set to <code>false</code>. An
+<code>[&quot;Error&quot;]</code> expression will be produced where a problem was encountered. To get
+the list of all the errors in an expression, use <code>expr.errors</code> which will return
+an array of <code>[&quot;Error&quot;]</code> expressions.</p>
 <div class='read-more'><a href="/compute-engine/guides/expressions/#errors"> Read more about the
 <strong>errors</strong> that can be returned. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="serializing-to-latex" tabindex="-1">Serializing to LaTeX</h2>
@@ -1772,6 +1774,66 @@ between using a dot or a comma as a decimal marker.</p>
 </code></pre>
 <p>Note that in LaTeX, in order to get the correct spacing around the comma, it
 must be surrounded by curly brackets.</p>
+<h3 id="customizing-the-number-formatting" tabindex="-1">Customizing the Number Formatting</h3>
+<p>There are several options that can be used to customize the formating of numbers
+when using <code>expr.latex</code>. Note that the format of numbers in JSON serialization
+is standardized and cannot be customized.</p>
+<p>The options are members of <code>ce.latexOptions</code>.</p>
+<ul>
+<li><code>notation</code>
+<ul>
+<li><code>&quot;auto&quot;</code>: (<strong>default</strong>) the whole part may take any value</li>
+<li><code>&quot;scientific&quot;</code>: the whole part is a number between 1 and 9, there is an
+exponent, unless it is 0.</li>
+<li><code>&quot;engineering&quot;</code>: the whole part is a number between 1 and 999, the exponent
+is a multiple of 3.</li>
+</ul>
+</li>
+<li><code>avoidExponentsInRange</code>
+<ul>
+<li>if <code>null</code>, exponents are always used</li>
+<li>otherwise, it is a tuple of two values representing a range of exponents. If
+the exponent for the number is within this range, a decimal notation is
+used. Otherwise, the number is displayed with an exponent. The default is
+<code>[-6, 20]</code></li>
+</ul>
+</li>
+<li><code>exponentProduct</code>: a LaTeX string inserted before an exponent, if necessary.
+Default is <code>&quot;\cdot&quot;</code>. Another popular value is <code>&quot;\times&quot;</code>.</li>
+<li><code>beginExponentMarker</code> and <code>endExponentMarker</code>: LaTeX strings used as template
+to format an exponent. Default values are <code>&quot;10^{&quot;</code> and <code>&quot;}&quot;</code> respectively.
+Other values could include <code>&quot;\mathrm{E}{&quot;</code> and <code>&quot;}&quot;</code>.</li>
+<li><code>truncationMarker</code>: a LaTeX string used to indicate that a number has more
+precision than what is displayed. Default is <code>&quot;\ldots&quot;</code></li>
+<li><code>beginRepeatingDigits</code> and <code>endRepeatingDigits</code>: LaTeX strings used a template
+to format repeating digits, as in <code>1.333333333...</code>. Default is <code>&quot;\overline{&quot;</code>
+and <code>&quot;}&quot;</code>. Other popular values are <code>&quot;(&quot;</code> and <code>&quot;)&quot;</code>.</li>
+<li><code>imaginaryUnit</code>: the LaTeX string used to represent the imaginary unit symbol.
+Default is <code>&quot;\imaginaryI&quot;</code>. Other popular values are <code>&quot;\mathrm{i}&quot;</code>.</li>
+<li><code>positiveInfinity</code> and <code>negativeInfinity</code> the LaTeX strings used to represent
+positive and negative infinity, respectively. Defaults are <code>&quot;\infty&quot;</code> and
+<code>&quot;-\infty&quot;</code>.</li>
+<li><code>notANumber</code>: the LaTeX string to represent the number NaN. Default value is
+<code>&quot;\operatorname{NaN}&quot;</code>.</li>
+<li><code>groupSeparator</code>: the LaTeX string used to separate group of digits, for
+example thousands. Default is <code>&quot;\,&quot;</code>. To turn off group separators, set to
+<code>&quot;&quot;</code></li>
+</ul>
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;700&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;700&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;123456.789&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;123\,456.789&quot;</span>
+
+<span class="hljs-comment">// Always use the scientific notation</span>
+ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">notation</span> = <span class="hljs-string">&#x27;scientific&#x27;</span>;
+ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">avoidExponentsInRange</span> = <span class="hljs-literal">null</span>;
+ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">exponentProduct</span> = <span class="hljs-string">&#x27;\\times&#x27;</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;700&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;7\times10^{2}&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;123456.789&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-comment">// ➔ &quot;1.234\,567\,89\times10^{5}&quot;</span>
+</code></pre>
 <h2 id="customizing-the-latex-dictionary" tabindex="-1">Customizing the LaTeX Dictionary</h2>
 <p>The <a href ="/math-json/">MathJSON format</a> is independent of any source or
 target language (LaTeX, MathASCII, etc…) or of any specific interpretation of
@@ -1793,7 +1855,7 @@ Engine constructor.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
   <span class="hljs-attr">latexDictionary</span>: [
     <span class="hljs-comment">// Remove the `PlusMinus` entry from the default dictionary...</span>
-    ...<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getLatexDictionary</span>().<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;PlusMinus&#x27;</span>),
+    ...<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getLatexDictionary</span>().<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> x.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;PlusMinus&#x27;</span>),
     <span class="hljs-comment">// ... and add one for the `\smoll` command</span>
     {
       <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\smoll&#x27;</span>],
@@ -1801,7 +1863,7 @@ Engine constructor.</p>
         <span class="hljs-keyword">return</span> [
           <span class="hljs-string">&#x27;Divide&#x27;</span>,
           parser.<span class="hljs-title function_">matchRequiredLatexArgument</span>() ?? [<span class="hljs-string">&#x27;Error&#x27;</span>, <span class="hljs-string">&quot;&#x27;missing&#x27;&quot;</span>],
-          parser.<span class="hljs-title function_">matchRequiredLatexArgument</span>() ?? [<span class="hljs-string">&#x27;Error&#x27;</span>, <span class="hljs-string">&quot;&#x27;missing&#x27;&quot;</span>]
+          parser.<span class="hljs-title function_">matchRequiredLatexArgument</span>() ?? [<span class="hljs-string">&#x27;Error&#x27;</span>, <span class="hljs-string">&quot;&#x27;missing&#x27;&quot;</span>],
         ];
       },
     },
@@ -1820,14 +1882,14 @@ Engine constructor.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 19, 2022">
+        <meta itemprop="datePublished" content="November 27, 2022">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-19'>November 19, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-27'>November 27, 2022</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
