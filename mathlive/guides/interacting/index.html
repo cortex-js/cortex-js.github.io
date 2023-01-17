@@ -1645,7 +1645,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#fill-in-the-blank">Fill in the Blank</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
+        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#fill-in-the-blank">Fill in the Blank</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-navigation-out-of-a-mathfield">Detecting Navigation out of a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
       </div>
       
                               
@@ -1897,6 +1897,35 @@ has been modified</li>
 <li><code>selection-change</code></li>
 <li><code>undo-state-change</code></li>
 </ul>
+<h2 id="detecting-navigation-out-of-a-mathfield" tabindex="-1">Detecting Navigation out of a Mathfield</h2>
+<p>A user may navigate outside of a mathfield by pressing the arrow keys, or the tab, home and end keys.</p>
+<p>By default, the mathfield reacts as a standard textarea field: moving to the next focusable element when the tab (or shift-tab) key is pressed, and
+doing nothing when reaching the start or end of the mathfield when navigation with the arrow keys.</p>
+<p>In some cases, you may want to implement a different behavior. For example if a mathfield is embedded inside an editable paragraph, you may want the arrow keys to exit the mathfield when reaching the end/start. Or you may want the tab key to simply move the caret to the end/start of the mathfield.</p>
+<p><strong>To change the behavior of a mathfield when navigation out of a mathfield</strong> listen
+for the <code>focus-out</code> and <code>move-out</code> events.</p>
+<p>The <code>detail</code> property of those events indicate the direction of navigation.
+To cancel the default behavior, use <code>ev.preventDefault()</code>.</p>
+<pre><code class="language-js">
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;move-out&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+ev.<span class="hljs-title function_">preventDefault</span>();
+  <span class="hljs-comment">// Remove focus from mathfield</span>
+  mf.<span class="hljs-title function_">blur</span>();
+  <span class="hljs-comment">// Focus some other element, use ev.detail.direction to detect if </span>
+  <span class="hljs-comment">// navigating backward, forward, upward or downward</span>
+  <span class="hljs-comment">// ...</span>
+});
+
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;focus-out&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  ev.<span class="hljs-title function_">preventDefault</span>();
+  <span class="hljs-comment">// Move the cursor to the start/end of the mathfield on tab</span>
+  <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">detail</span>.<span class="hljs-property">direction</span> === <span class="hljs-string">&#x27;forward&#x27;</span>)
+    mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;moveToMathfieldEnd&#x27;</span>);
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">detail</span>.<span class="hljs-property">direction</span> === <span class="hljs-string">&#x27;backward&#x27;</span>)
+    mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;moveToMathfieldStart&#x27;</span>);
+});
+
+</code></pre>
 <section id='clipboard'>
 <h2 id="interacting-with-the-clipboard" tabindex="-1">Interacting with the Clipboard</h2>
 <p>Users can export the content of the mathfield by using standard <strong>Copy</strong>/<strong>Cut</strong>
@@ -2031,14 +2060,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="December 09, 2022">
+        <meta itemprop="datePublished" content="January 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-12-09'>December 09, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-17'>January 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
