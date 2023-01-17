@@ -1643,10 +1643,14 @@ crossorigin
     };
 </script>
 <h1 id="macros" tabindex="-1">Macros</h1>
-<p class="xl">MathLive has over <a href="/mathlive/reference/commands/">800 LaTeX commands</a> predefined. Some are primitives but others
-are macros, that is commands defined with a LaTeX expression.</p>
-<p><strong>To view the default macros</strong>, inspect the <code>macros</code> option:</p>
-<code-playground layout="stack" >
+<p class="xl">MathLive has over <a href="/mathlive/reference/commands/">800 LaTeX commands</a>
+predefined. Some are primitives but others are macros, that is commands defined
+with a LaTeX expression. You can extend MathLive with your own macros.</p>
+<h2 id="adding%2Fremoving-macros" tabindex="-1">Adding/Removing Macros</h2>
+<p><strong>To add a macro</strong> use <code>setOptions({macros: {...getOptions('macros'), ...}})</code>.</p>
+<p>If you do not include the <code>...getOptions('macros')</code> call, all the standard
+macros will be turned off.</p>
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -1658,12 +1662,19 @@ are macros, that is commands defined with a LaTeX expression.</p>
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-console.log(mf.getOptions('macros'));
+mf.setOptions({
+    macros: {
+        ...mf.getOptions('macros'),
+        minutes: '\\,{}^\\prime\\;',
+        seconds: '\\,\\doubleprime\\;',
+    }
+});
 </div>
-    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
 </code-playground>
-<p><strong>To add or remove macros</strong> use <code>setOptions({macros: ...})</code>.</p>
+<hr>
+<p>The macro definition can contain up to eight arguments, represented by <code>#1</code> to <code>#9</code>.</p>
 <code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
@@ -1686,8 +1697,83 @@ mf.setOptions({
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
 </code-playground>
+<hr>
+<p>By default, a macro command behaves as a group whose subcomponents cannot be
+modified. This behavior can be controlled using the <code>captureSelection</code> flag
+in the expanded definition of a macro.</p>
+<p><strong>To define a macro whose content is selectable and editable</strong> set
+<code>captureSelection</code> to <code>true</code>.</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.getElementById('mf');
+mf.setOptions({
+    macros: {
+        ...mf.getOptions('macros'),
+        smallfrac: {
+          args: 2,
+          def: '{}^{#1}\\!\\!/\\!{}_{#2}',
+          captureSelection: false,
+        },
+    }
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
+</div>
+</code-playground>
+<hr>
+<p><strong>To remove a macro</strong> set its definition to undefined:</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.getElementById('mf');
+mf.setOptions({
+    macros: {
+        ...mf.getOptions('macros'),
+        diamonds: undefined
+    }
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
+</div>
+</code-playground>
+<h2 id="inspecting-available-macros" tabindex="-1">Inspecting Available Macros</h2>
+<p><strong>To view the available macros</strong>, inspect the <code>macros</code> option:</p>
+<code-playground layout="stack" >
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.getElementById('mf');
+console.log(mf.getOptions('macros'));
+</div>
+    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
+</div>
+</code-playground>
+<h2 id="disabling-macros" tabindex="-1">Disabling Macros</h2>
 <p><strong>To turn off all macros</strong>, use  <code>setOptions({macros: {}})</code>.</p>
-<p>The macro definition can contain up to eight arguments, represented by <code>#1</code> to <code>#9</code>.</p>
 <div class='read-more'><a href="/mathlive/guides/shortcuts/">
 <strong>Next:</strong> Manage <strong>Key bindings and Inline Shortcuts</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1700,14 +1786,14 @@ mf.setOptions({
         
 
 
-        <meta itemprop="datePublished" content="November 26, 2022">
+        <meta itemprop="datePublished" content="January 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-26'>November 26, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-17'>January 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

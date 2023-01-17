@@ -1607,18 +1607,40 @@ crossorigin
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.86.0-(2022-12-02)" tabindex="-1">0.86.0 (2022-12-02)</h2>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<ul>
+<li>The Compute Engine has been split from MathLive to reduce the package size and
+improve the TTI (Time To Interactive) metric. The Compute Engine now needs to
+be loaded separately:</li>
+</ul>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://unpkg.com/@cortex-js/compute-engine@latest/dist/compute-engine.min.esm.js&#x27;</span>;
+</code></pre>
+<p>or</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;https://unpkg.com/@cortex-js/compute-engine@latest/dist/compute-engine.min.esm.js&#x27;</span>;
+</code></pre>
+<p>to create custom Compute Engine instances, which can then be associated with a
+mathfield using <code>mf.setOptions({computeEngine: ce})</code> or <code>mf.computeEngine = ce</code>.</p>
+<p>If the Compute Engine library is not loaded, some functionality of the mathfield
+will not be available: <code>mf.expression</code> will always return <code>null</code> and cannot be
+used to change the content of the mathfield, and <code>math-json</code> is not available as
+a format on the clipboard,</p>
 <h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>The vertical placement of the superscript after a <code>\left...\right</code> command was
 incorrect.</li>
 <li>Extensible arrows with superscript or subscript would not serialize the
 superscript/subscript.</li>
+<li>The fraction line and surd line would not be visible when printing with the
+“Don’t show image background” option in the print dialog.</li>
+<li>The <code>&quot;placeholder-change&quot;</code> event was not dispatched.</li>
 </ul>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
 <li>Tweaked the layout of the symbols virtual keyboard to make regular arrows the
 default, rather than extensible arrows.</li>
+<li>Fill-in-the-blank (placeholder) nested mathfields now line up with the
+baseline. They also inherit the font-size of their parent container.</li>
 </ul>
 <h2 id="0.85.1-(2022-11-18)" tabindex="-1">0.85.1 (2022-11-18)</h2>
 <ul>
@@ -1803,7 +1825,7 @@ coordinate, use <code>mf.offsetFromPoint()</code>.</li>
 <li><strong>#1643</strong> Support for the <code>\kern</code>, <code>\mkern</code> and <code>\mspace</code> command.</li>
 </ul>
 <h2 id="0.79.0-(2022-09-06)" tabindex="-1">0.79.0 (2022-09-06)</h2>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>onMulticharSymbol</code> handler has been renamed to <code>onInlineShortcut</code></li>
 <li>The deprecated <code>modelHooks</code> have been removed. Use the corresponding events
@@ -1884,7 +1906,7 @@ special mapping, e.g. “°”.</p>
 </li>
 </ul>
 <h2 id="0.78.0-(2022-08-11)" tabindex="-1">0.78.0 (2022-08-11)</h2>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p><strong>The way errors are reported has changed.</strong></p>
@@ -2165,7 +2187,7 @@ panel is up</li>
 <li>Typing a <code>,</code> (comma) would be rendered as a <code>.</code> (dot)</li>
 </ul>
 <h2 id="0.73.0-(2022-05-23)" tabindex="-1">0.73.0 (2022-05-23)</h2>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>The following attributes of the <code>&lt;math-field&gt;</code> element that were previously
@@ -2333,7 +2355,7 @@ cases</li>
 <li>Improved display of command popover when editing raw LaTeX</li>
 </ul>
 <h2 id="0.71.0-(2022-04-12)" tabindex="-1">0.71.0 (2022-04-12)</h2>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Removed the <code>find</code> and <code>replace</code> methods. These methods were difficult to use,
 since they were based on LaTeX serialization and the mapping from atom to
@@ -2522,7 +2544,7 @@ location, or scroll with the page.</li>
 <li>Attempt to fix installation of the npm package on some Windows configurations</li>
 </ul>
 <h2 id="0.69.0-(2021-06-09)" tabindex="-1">0.69.0 (2021-06-09)</h2>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>This release requires TypeScript 4.3 or later (the API uses asymmetric
@@ -2652,7 +2674,7 @@ correctly even in non-git environments.</li>
 <li><strong>#968</strong> navigating with arrow keys cannot navigate past a macro</li>
 </ul>
 <h2 id="0.68.0-(2021-05-31)" tabindex="-1">0.68.0 (2021-05-31)</h2>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <p><strong>#500</strong> MathJSON support. The legacy MASTON/JSON format has been removed.<br>
 The MathJSON format is now integrated into MathLive 🚀 🎆 🥳</p>
 <p>To get the MathJSON representation of a formula, use <code>mf.getValue('math-json')</code>.</p>
@@ -2750,7 +2772,7 @@ font size 1 (tiny).</li>
 <li>Macro packages were incorrectly parsed</li>
 </ul>
 <h2 id="0.66.0-(2021-05-20)" tabindex="-1">0.66.0 (2021-05-20)</h2>
-<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>horizontalSpacingScale</code> option is deprecated. It will be removed in an
 upcoming version and replaced by the standard TeX registers <code>\thinmuskip</code>,
@@ -2891,7 +2913,7 @@ yet, even if the output format is not specified.</li>
 arguments contained some spaces, e.g.<code>rgb ( 255 , 255 , 255 )</code>.</li>
 </ul>
 <h2 id="0.65.0-(2021-05-14)" tabindex="-1">0.65.0 (2021-05-14)</h2>
-<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>substituteTextArea</code> option has been removed. This option was in fact not
 working so removing it will presumably have no impact.</li>
@@ -2922,7 +2944,7 @@ fraction of a pixel when moving the caret.</li>
 <li>In LaTeX mode with nested expressions, the edited LaTeX was incorrect.</li>
 </ul>
 <h2 id="0.64.0-(2021-05-09)" tabindex="-1">0.64.0 (2021-05-09)</h2>
-<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>The <code>FontSize</code> type is now an integer between 1 and 10. It previously was
@@ -3156,7 +3178,7 @@ dropping some styling.</li>
 rendered when calling <code>renderMathInElement()</code> or <code>renderMathInDocument()</code>.</li>
 </ul>
 <h2 id="0.61.0-(2021-04-22)" tabindex="-1">0.61.0 (2021-04-22)</h2>
-<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Some format options have been renamed:</p>
@@ -4991,7 +5013,7 @@ of debugging (some features, such as using JavaScript native modules, require
 a local server)</li>
 </ul>
 <h2 id="0.27-(2019-04-08)" tabindex="-1">0.27 (2019-04-08)</h2>
-<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The syntax that MathJSON/MASTON can recognized has been significantly
 expanded. It also has been made more consistent, and in some cases it may be
@@ -5230,7 +5252,7 @@ combined.</li>
 <li>Improve visual blinking when selecting with the mouse to the left</li>
 </ul>
 <h2 id="0.26-(2019-02-04)" tabindex="-1">0.26 (2019-02-04)</h2>
-<h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-12" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Public method now start with <code>$</code>. This convention is also used, for example,
 by the Vue.js project. For now, aliases exist that begin with ‘_’ (the
@@ -5285,7 +5307,7 @@ of sounds and some other resources.</li>
 <li>#91 - Handling of ‘~’ as an operator and a shortcut.</li>
 </ul>
 <h2 id="0.24-(2018-12-16)" tabindex="-1">0.24 (2018-12-16)</h2>
-<h3 id="breaking-changes-12" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-13" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Several handlers had some inconsistent signatures, or in some cases passed
 invalid values as their arguments. This has been fixed, but it required
@@ -5631,14 +5653,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="November 27, 2022">
+        <meta itemprop="datePublished" content="January 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-11-27'>November 27, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-17'>January 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
