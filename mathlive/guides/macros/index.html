@@ -1753,6 +1753,47 @@ mf.setOptions({
     <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
 </div>
 </code-playground>
+<h2 id="adding-a-matching-shortcut" tabindex="-1">Adding a Matching Shortcut</h2>
+<p>By defining a new macro, a new LaTeX command is added to the dictionary
+of commands that can be used in a LaTeX expression. They can be inserted
+in a mathfield by typing <kbd>ESC</kbd> or <kbd>/</kbd> to enter the LaTeX editing mode, followed by the name of the macro.</p>
+<p>Custom macros are also included in the value of the mathfield
+expressed as a LaTeX string (<code>mf.value</code>).</p>
+<p>However, it may also be convenient to associate the macro with an inline
+shortcut. Inline shortcuts can be typed without having to enter the LaTeX
+editing mode.</p>
+<p><strong>To define an associated inline shortcut</strong>, use the <code>inlineShortcuts</code> option.</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.getElementById('mf');
+mf.setOptions({
+    macros: {
+        ...mf.getOptions('macros'),
+        minutes: '\\,{}^\\prime\\;',
+        seconds: '\\,\\doubleprime\\;',
+    },
+    inlineShortcuts: {
+        ...mf.getOptions('inlineShortcuts'),
+        minutes: '\\minutes',
+        seconds: '\\seconds',
+    }
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
+</div>
+</code-playground>
+<div class='read-more'><a href="/mathlive/guides/shortcuts/">
+<strong>Next:</strong> Manage <strong>Key bindings and Inline Shortcuts</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="inspecting-available-macros" tabindex="-1">Inspecting Available Macros</h2>
 <p><strong>To view the available macros</strong>, inspect the <code>macros</code> option:</p>
 <code-playground layout="stack" >
