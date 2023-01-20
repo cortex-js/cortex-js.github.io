@@ -1655,9 +1655,11 @@ crossorigin
 
 
 <script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-    };
+  moduleMap = {
+    mathlive: "//unpkg.com/mathlive?module",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
+  };
 </script>
 <h2 id="changing-the-content-of-a-mathfield" tabindex="-1">Changing the Content of a Mathfield</h2>
 <p><strong>To change the value of a <code>&lt;math-field&gt;</code> element programatically</strong> set its <code>value</code>
@@ -1699,9 +1701,10 @@ triggered and creating an infinite loop.</p>
 <h2 id="reading-the-content-of-a-mathfield" tabindex="-1">Reading the Content of a Mathfield</h2>
 <p><strong>To read the content of a <code>&lt;math-field&gt;</code> element</strong> use its <code>value</code> property,
 just like with a <code>&lt;textarea&gt;</code>.</p>
-<p class="notice--info">The <code>expression.json</code> property of a mathfield contains a MathJSON representation
+<p>The <code>expression.json</code> property of a mathfield contains a MathJSON representation
 of its content. The <a href="/math-json">MathJSON</a> format is a lightweight
 mathematical notation interchange format.</p>
+<p class="notice--info">To use MathJSON, import the compute-engine library, e.g. <code>import &quot;https://unpkg.com/@cortex-js/compute-engine?module&quot;</code></p>
 <p><strong>To be notified when the content of the mathfield is modified</strong> listen for
 an <code>&quot;input&quot;</code> event.</p>
 <p class="notice--info"><strong>Try</strong>: modify the <code>&quot;input&quot;</code> event below to a <code>&quot;change&quot;</code> event. Notice how the <code>&quot;change&quot;</code> event
@@ -1726,6 +1729,7 @@ loses focus and the content has been modified.</p>
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
+<hr>
 <p>Reading the <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
 no argument.</p>
 <p><strong>To control the format of the result</strong>, pass options to <a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)"><code>getValue()</code></a>.
@@ -1736,7 +1740,8 @@ For example to get the content as a MathJSON expression, use <code>getValue('mat
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
-    <div slot="javascript">const mf = document.getElementById('formula');
+    <div slot="javascript">import 'compute-engine';
+    const mf = document.getElementById('formula');
 mf.addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.getValue('math-json'));
@@ -2060,14 +2065,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="January 17, 2023">
+        <meta itemprop="datePublished" content="January 20, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-17'>January 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-20'>January 20, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
