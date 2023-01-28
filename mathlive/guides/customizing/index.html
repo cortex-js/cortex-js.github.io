@@ -1650,7 +1650,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
       
                               
@@ -2080,10 +2080,28 @@ relational, binary or unary operators, etc…</p>
 <p>By default, pressing the spacebar when in math mode does not insert anything.</p>
 <p><strong>To insert a LaTeX command when the spacebar is pressed</strong>, set the value of the
 <code>mathModeSpace</code> option to that command:</p>
-<pre><code class="language-js">md.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">mathModeSpace</span>: <span class="hljs-string">&#x27;\\:&#x27;</span>});
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">mathModeSpace</span>: <span class="hljs-string">&#x27;\\:&#x27;</span>});
 
 </code></pre>
 </section>
+<h2 id="turning-off-the-latex-mode" tabindex="-1">Turning off the LaTeX mode</h2>
+<p>Pressing the <code>\</code> (backslash) or <code>ESC</code> key switches to the LaTeX mode where it
+is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
+a powerful way to enter or edit LaTeX in an expression. However, users
+unfamiliar with LaTeX may be confused if they accidentally press those keys.</p>
+<p><strong>To prevent the LaTeX mode from being enabled</strong> intercept the trigger keys
+and handle them as desired.</p>
+<pre><code class="language-ts">mf.<span class="hljs-title function_">addEventListener</span>(
+  <span class="hljs-string">&#x27;keydown&#x27;</span>,
+  <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;\\&#x27;</span>) {
+      ev.<span class="hljs-title function_">preventDefault</span>();
+      mf.<span class="hljs-title function_">executeCommand</span>([<span class="hljs-string">&#x27;insert&#x27;</span>, <span class="hljs-string">&#x27;\\backslash&#x27;</span>]);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;Escape&#x27;</span>) ev.<span class="hljs-title function_">preventDefault</span>();
+  },
+  { <span class="hljs-attr">capture</span>: <span class="hljs-literal">true</span> }
+);
+</code></pre>
 <section id='localization'>
 <h2 id="localization" tabindex="-1">Localization</h2>
 <p>The user interface of the mathfield is provided in english, arabic, german,
@@ -2219,14 +2237,14 @@ Learn more about configuring the MathLive library to your environment, including
         
 
 
-        <meta itemprop="datePublished" content="January 20, 2023">
+        <meta itemprop="datePublished" content="January 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-20'>January 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-28'>January 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
