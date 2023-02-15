@@ -1695,6 +1695,14 @@ mf.addEventListener('keydown', (ev) => {
 </code-playground>
 <p>Call <code>ev.preventDefault()</code> to stop handling of the event, otherwise the default
 command (if any) associated with this keystroke will be processed.</p>
+<p>When using <code>insert()</code>, the LaTeX fragment argument of the function can include
+one of the following special placeholder tokens:</p>
+<ul>
+<li><code>#@</code>: replaced with the selection, if there is one. If there is no selection,
+replaced with an implicit argument to the left of the caret. For example, for
+<code>12+34</code>, if the caret is at the end, <code>#@</code> would be replaced with <code>34</code>.</li>
+<li><code>#?</code>: replaced with a <code>\placeholder{}</code> expression</li>
+</ul>
 <h3 id="international-keyboards" tabindex="-1">International Keyboards</h3>
 <p>Correctly handling keyboard shortcuts while accounting for international
 keyboard layout is surprisingly difficult. MathLive uses some heuristics that
@@ -1968,14 +1976,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 10, 2022">
+        <meta itemprop="datePublished" content="February 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-09-10'>September 10, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-14'>February 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -1645,7 +1645,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#controlling-when-the-virtual-keyboard-panel-is-displayed">Controlling when the Virtual Keyboard Panel is Displayed</a></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-keycaps">Customizing the Keycaps</a></li></ol></li><li><a href="#sharing-virtual-keyboards-amongst-multiple-mathfields">Sharing Virtual Keyboards Amongst Multiple Mathfields</a></li><li><a href="#controlling-which-keyboards-are-displayed">Controlling Which Keyboards Are Displayed</a></li><li><a href="#defining-custom-virtual-keyboards">Defining Custom Virtual Keyboards</a><ol><li><a href="#defining-a-layer">Defining a Layer</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#keycap-examples">Keycap Examples</a></li><li><a href="#defining-a-keyboard">Defining a Keyboard</a></li><li><a href="#adding-the-layers-and-keyboards">Adding the Layers and Keyboards</a></li></ol></li><li><a href="#changing-the-alphabetical-keyboard-layout">Changing the Alphabetical Keyboard Layout</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard-toggle">Customizing the Appearance of the Virtual Keyboard Toggle</a></li></ol>
+        <ol><li><a href="#controlling-when-the-virtual-keyboard-panel-is-displayed">Controlling when the Virtual Keyboard Panel is Displayed</a></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-keycaps">Customizing the Keycaps</a></li></ol></li><li><a href="#sharing-virtual-keyboards-amongst-multiple-mathfields">Sharing Virtual Keyboards Amongst Multiple Mathfields</a></li><li><a href="#controlling-which-keyboards-are-displayed">Controlling Which Keyboards Are Displayed</a></li><li><a href="#defining-custom-virtual-keyboards">Defining Custom Virtual Keyboards</a><ol><li><a href="#defining-a-layer">Defining a Layer</a></li><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#keycap-examples">Keycap Examples</a></li><li><a href="#defining-a-keyboard">Defining a Keyboard</a></li><li><a href="#adding-the-layers-and-keyboards">Adding the Layers and Keyboards</a></li></ol></li><li><a href="#changing-the-alphabetical-keyboard-layout">Changing the Alphabetical Keyboard Layout</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard-toggle">Customizing the Appearance of the Virtual Keyboard Toggle</a></li></ol>
       </div>
       
                               
@@ -1661,8 +1661,8 @@ crossorigin
     };
 </script>
 <p class="xl">Typing math formulas require access to many special symbols. While <a href="/mathlive/guides/shortcuts">keyboard
-shortcuts and inline shortcuts</a> can help, mobile
-devices require another solution.</p>
+shortcuts and inline shortcuts</a> can help when a
+physical keyboard is available, touch-enabled devices require another solution.</p>
 <p>A <strong>virtual keyboard</strong> is a keyboard displayed on screen that can be customized
 with specialized symbols for math input.</p>
 <p><img src="/assets/images/mathfield/virtual-keyboard.png" alt=""></p>
@@ -1727,10 +1727,13 @@ container.</p>
 keyboard panel is visible by attaching it to the full screen element.</p>
 <p><strong>To select which DOM element the virtual keyboard is created into</strong>, set the
 <code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
-<p class="notice--warning">The <code>position</code> attribute of this container element should be <code>relative</code> so that the virtual keyboard can correctly be placed relative to this element, and the container element should
-be at least 365px wide to ensure that the virtual keyboard can fit. </p>
+<p class="notice--warning">The <code>position</code> attribute of this container element should be <code>relative</code> so that
+the virtual keyboard can correctly be placed relative to this element, and the
+container element should be at least 365px wide to ensure that the virtual
+keyboard can fit. </p>
 <h2 id="customizing-the-appearance-of-the-virtual-keyboard" tabindex="-1">Customizing the Appearance of the Virtual Keyboard</h2>
-<p><strong>To customize the appearance of the virtual keyboard panel</strong> set the following CSS variables on a selector that applies to the container of the virtual
+<p><strong>To customize the appearance of the virtual keyboard panel</strong> set the following
+CSS variables on a selector that applies to the container of the virtual
 keyboard panel, which is the <code>&lt;body&gt;</code> element by default:</p>
 <pre><code class="language-css"><span class="hljs-selector-tag">body</span> {
   <span class="hljs-attr">--keyboard-zindex</span>: <span class="hljs-number">3000</span>;
@@ -1864,7 +1867,7 @@ the <code>latex</code> value is used. If no <code>key</code>, <code>command</cod
 provided, the label (stripped of any HTML markup) is what will be inserted
 when the keycap is pressed.</li>
 <li><code>latex</code>: a LaTeX fragment used as a label and as the content to insert when
-the keycap is pressed.</li>
+the keycap is pressed. The LaTeX fragment can contain <a href="#placeholder-tokens">Placeholder Tokens</a>.</li>
 <li><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</li>
 <li><code>aside</code>: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.</li>
@@ -1886,6 +1889,15 @@ determine the action to perform: <code>command</code>, <code>insert</code>, <cod
 layer.</p>
 <p>The appearance of the layer can be further customized by providing a CSS class
 name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
+<h3 id="placeholder-tokens" tabindex="-1">Placeholder Tokens</h3>
+<p>The LaTeX fragment that defines what gets inserted when a virtual keyboard key
+is pressed can contain one of the following special placeholder tokens:</p>
+<ul>
+<li><code>#@</code>: replaced with the selection, if there is one. If there is no selection,
+replaced with an implicit argument to the left of the caret. For example, for
+<code>12+34</code>, if the caret is at the end, <code>#@</code> would be replaced with <code>34</code>.</li>
+<li><code>#?</code>: replaced with a <code>\placeholder{}</code> expression</li>
+</ul>
 <h3 id="keycap-variants" tabindex="-1">Keycap Variants</h3>
 <p>The default keyboard include <strong>variants</strong> for many of its keycaps. These
 variants are accessed with a long press on the keycap. The variants are
@@ -2156,14 +2168,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="October 14, 2022">
+        <meta itemprop="datePublished" content="February 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-10-14'>October 14, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-14'>February 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

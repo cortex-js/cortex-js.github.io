@@ -1653,7 +1653,7 @@ call <a href="/docs/mathlive/?q=renderMathInDocument"><code>renderMathInDocument
 end of your document, or in a <code>DOMContentLoaded</code> event handler.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">defer</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> 
-    <span class="hljs-title function_">import</span>(<span class="hljs-string">&#x27;//unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> 
+    <span class="hljs-keyword">import</span>(<span class="hljs-string">&#x27;//unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> 
       mathlive.<span class="hljs-title function_">renderMathInDocument</span>()
     )
   );

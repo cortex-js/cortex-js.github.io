@@ -1638,7 +1638,7 @@ crossorigin
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a></li></ol>
+        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li></ol></li><li><a href="#customizing-the-serialization-style">Customizing the Serialization Style</a><ol><li><a href="#function-application">Function Application</a></li><li><a href="#group">Group</a></li><li><a href="#root">Root</a></li><li><a href="#fraction">Fraction</a></li><li><a href="#logic">Logic</a></li><li><a href="#power">Power</a></li><li><a href="#numeric-sets">Numeric Sets</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a></li></ol>
       </div>
       
                               
@@ -1834,6 +1834,250 @@ ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">e
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;123456.789&#x27;</span>).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;1.234\,567\,89\times10^{5}&quot;</span>
 </code></pre>
+<h2 id="customizing-the-serialization-style" tabindex="-1">Customizing the Serialization Style</h2>
+<p>Some category of expressions can be serialized in different ways based on
+conventions or personal preference. For example, a group can be indicate by
+simple parentheses, or by a <code>\left...\right</code> command. A fraction can be
+indicated by a <code>\frac{}{}</code> command or by a <code>{}{}^{-1}</code>.</p>
+<p>The compute engine includes some built-in defaults, but they can be customized
+as desired. For example to always represent fractions with a <code>\frac{}{}</code>
+command:</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">latexSyntax</span>.<span class="hljs-property">options</span>.<span class="hljs-property">fractionStyle</span> = <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&#x27;quotient&#x27;</span>;
+</code></pre>
+<p class="notice--info">If using a mathfield, the compute engine associated with the mathfield is
+available as <code>mf.computeEngine</code>.</p>
+<p>The style option handler has two arguments:</p>
+<ul>
+<li>the expression fragment being styled</li>
+<li>the depth/level of the expression in the overall expression</li>
+</ul>
+<p>For example, to serialize rational numbers and division deeper than level 2 as
+an inline solidus:</p>
+<pre><code class="language-ts">ce.<span class="hljs-property">latexSyntax</span>.<span class="hljs-property">options</span>.<span class="hljs-property">fractionStyle</span> = <span class="hljs-function">(<span class="hljs-params">expr, level</span>) =&gt;</span>
+  <span class="hljs-title function_">head</span>(expr) === <span class="hljs-string">&#x27;Rational&#x27;</span> || level &gt; <span class="hljs-number">2</span> ? <span class="hljs-string">&#x27;inline-solidus&#x27;</span> : <span class="hljs-string">&#x27;quotient&#x27;</span>;
+</code></pre>
+<h3 id="function-application" tabindex="-1">Function Application</h3>
+<p><code>[&quot;Sin&quot;, &quot;x&quot;]</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;paren&quot;</code></td>
+<td style="text-align:left"><code>\sin(x)</code></td>
+<td style="text-align:left">$$\sin(x)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;leftright&quot;</code></td>
+<td style="text-align:left"><code>\sin\left(x\right)</code></td>
+<td style="text-align:left">$$\sin\left(x\right)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;big&quot;</code></td>
+<td style="text-align:left"><code>\sin\bigl(x\bigr)</code></td>
+<td style="text-align:left">$$\sin\bigl(x\bigr)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;none&quot;</code></td>
+<td style="text-align:left"><code>\sin x</code></td>
+<td style="text-align:left">$$\sin x$$</td>
+</tr>
+</tbody>
+</table>
+<h3 id="group" tabindex="-1">Group</h3>
+<p><code>[&quot;Multiply&quot;, &quot;x&quot;, [&quot;Add&quot;, &quot;a&quot;, &quot;b&quot;]]</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;paren&quot;</code></td>
+<td style="text-align:left"><code>x(a+b)</code></td>
+<td style="text-align:left">$$x(a+b)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;leftright&quot;</code></td>
+<td style="text-align:left"><code>x\left(a+b\right)</code></td>
+<td style="text-align:left">$$x\left(a+b\right)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;big&quot;</code></td>
+<td style="text-align:left"><code>x\bigl(a+b\bigr)</code></td>
+<td style="text-align:left">$$x\bigl(a+b\bigr)$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;none&quot;</code></td>
+<td style="text-align:left"><code>x a+b</code></td>
+<td style="text-align:left">$$ x a+b$$</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root" tabindex="-1">Root</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;radical&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;quotient&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;solidus&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fraction" tabindex="-1">Fraction</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;quotient&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;inline-solidus&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;nice-solidus&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;reciprocal&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;factor&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="logic" tabindex="-1">Logic</h3>
+<p><code>[&quot;And&quot;, &quot;p&quot;, &quot;q&quot;]</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;word&quot;</code></td>
+<td style="text-align:left"><code>a \text{ and } b</code></td>
+<td style="text-align:left">$$a \text{ and } b$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;boolean&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;uppercase-word&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;punctuation&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="power" tabindex="-1">Power</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;root&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;solidus&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;quotient&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="numeric-sets" tabindex="-1">Numeric Sets</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;compact&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;regular&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;interval&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;set-builder&quot;</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
 <h2 id="customizing-the-latex-dictionary" tabindex="-1">Customizing the LaTeX Dictionary</h2>
 <p>The <a href ="/math-json/">MathJSON format</a> is independent of any source or
 target language (LaTeX, MathASCII, etc…) or of any specific interpretation of
@@ -1882,14 +2126,14 @@ Engine constructor.</p>
         
 
 
-        <meta itemprop="datePublished" content="January 28, 2023">
+        <meta itemprop="datePublished" content="February 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-01-28'>January 28, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-14'>February 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
