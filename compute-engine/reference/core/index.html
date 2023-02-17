@@ -38,17 +38,17 @@
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin='anonymous'></script>
   
 
 
@@ -61,7 +61,7 @@
     
       
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
   
 
 
@@ -75,31 +75,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 
-<!-- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,400;0,600;0,700;1,400;1,600;1,700&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet"> -->
-
-
-<!-- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet"> -->
-
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;1,200;1,400;1,600;1,700&display=swap&subset=latin" rel="stylesheet">
 
-
-<!-- <link
-rel="preload"
-as="font"
-type="font/woff2"
-href="https://unpkg.com/mathlive@0.77.0/dist/fonts/KaTeX_Main-Regular.woff2"
-crossorigin
-/> -->
-
-
-<!-- <script>
-  // ((window.gitter = {}).chat = {}).options = {
-  //   room: 'cortex-js/community',
-  //   activationElement: '.my-special-button',
-  //   targetElement: '.my-special-target-element'
-  // };
-</script> -->
-<!-- <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script> -->
 
   </head>
 
@@ -1966,14 +1943,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="February 15, 2023">
+        <meta itemprop="datePublished" content="February 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-15'>February 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1986,22 +1963,27 @@ tokens.</p>
   </article>
 </div>
 
+
 <script type="module">
-  window.addEventListener('DOMContentLoaded', (event) => {
-    import('https://unpkg.com/mathlive?module').then((mathlive) => {
-      mathlive.renderMathInDocument({ 
-        renderAccessibleContent: false,
-        TeX: { 
-          delimiters: {
-            inline: [['\\(', '\\)']],
-            display: [ ['$$', '$$'], ['\\[', '\\]']],
-          },
-          processEnvironments : false 
+function whenReady(fn) {
+  if (document.readyState !== 'loading')  fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+
+whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
+    mathlive.renderMathInDocument({
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
-        asciiMath: null,
-      })
+        processEnvironments : false 
+      },
+      asciiMath: null,
     })
-  });
+  )
+)
 </script>
 </div>
 
