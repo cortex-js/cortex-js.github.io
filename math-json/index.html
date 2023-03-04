@@ -131,11 +131,11 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" title="Chat on Gitter"><svg class='icon1quarterem' role='img'><title>Gitter</title><use xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+                <a href="/gitter/" ><svg class='icon1quarterem' role='img'><title>Gitter Forum</title><use xlink:href='/assets/icons.svg#gitter'></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg></a>
+                <a href="https://github.com/cortex-js" ><svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg></a>
               </li></ul>
         
       </nav>
@@ -1454,7 +1454,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#gitter"></use></svg>
                   
-                  Questions and Feedback on Gitter
+                  Discuss in Gitter Forum
                 </a></li>
             
           
@@ -1680,6 +1680,7 @@
 <div id="mathfield-json" class="output"></div>
 <script type="module">
     // import 'https://unpkg.com/mathlive?module';
+    import 'https://unpkg.com/@cortex-js/compute-engine@latest/dist/compute-engine.min.esm.js';
     const mf = document.getElementById('mf');
 
     window.customElements.whenDefined("math-field").then(() => {
@@ -2562,6 +2563,28 @@ Standard Library.</p>
   </article>
 </div>
 
+
+<script type="module">
+function whenReady(fn) {
+  if (document.readyState !== 'loading')  fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+
+whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
+    mathlive.renderMathInDocument({
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    })
+  )
+)
+</script>
 </div>
 
     
@@ -2586,7 +2609,7 @@ Standard Library.</p>
     
     <li>
       <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter Forum</a
       >
     </li>
      

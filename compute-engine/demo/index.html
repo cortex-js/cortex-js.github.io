@@ -107,11 +107,11 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" title="Chat on Gitter"><svg class='icon1quarterem' role='img'><title>Gitter</title><use xlink:href='/assets/icons.svg#gitter'></use></svg></a>
+                <a href="/gitter/" ><svg class='icon1quarterem' role='img'><title>Gitter Forum</title><use xlink:href='/assets/icons.svg#gitter'></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="https://github.com/cortex-js" title="Get source code on GitHub"><svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg></a>
+                <a href="https://github.com/cortex-js" ><svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg></a>
               </li></ul>
         
       </nav>
@@ -1430,7 +1430,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#gitter"></use></svg>
                   
-                  Questions and Feedback on Gitter
+                  Discuss in Gitter Forum
                 </a></li>
             
           
@@ -2467,14 +2467,14 @@
         
 
 
-        <meta itemprop="datePublished" content="December 09, 2022">
+        <meta itemprop="datePublished" content="March 04, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Compute Engine version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-12-09'>December 09, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-04'>March 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2487,6 +2487,28 @@
   </article>
 </div>
 
+
+<script type="module">
+function whenReady(fn) {
+  if (document.readyState !== 'loading')  fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+
+whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
+    mathlive.renderMathInDocument({
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    })
+  )
+)
+</script>
 </div>
 
     
@@ -2511,7 +2533,7 @@
     
     <li>
       <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter</a
+          ><svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>Gitter Forum</a
       >
     </li>
      
