@@ -301,11 +301,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/guides/lifecycle/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/guides/lifecycle/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/guides/lifecycle/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -445,7 +485,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1615,7 +1655,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#before-initialization">Before Initialization</a></li><li><a href="#initialization">Initialization</a></li><li><a href="#constructed">Constructed</a></li><li><a href="#attached%2Fmounted">Attached/Mounted</a></li><li><a href="#detached%2Funmounted">Detached/Unmounted</a></li></ol>
+        <ol><li><a href="#%E2%91%A0-before-initialization">① Before Initialization</a></li><li><a href="#%E2%91%A1-initialization">② Initialization</a></li><li><a href="#%E2%91%A2-constructed">③ Constructed</a></li><li><a href="#%E2%91%A3-attached%2Fmounted">④ Attached/Mounted</a></li><li><a href="#%E2%91%A4-detached%2Funmounted">⑤ Detached/Unmounted</a></li></ol>
       </div>
       
                               
@@ -1636,8 +1676,9 @@ remember these guidelines:</p>
 <ul>
 <li>Once a component is attached to the DOM, attributes (key/value pairs
 attached to the <code>&lt;math-field&gt;</code> tag and properties (key/value pairs attached
-to a <code>MathfieldElement</code> object) are kept in sync, or <em>reflected</em>. You can also
-call the methods of <code>MathfieldElement</code> without limitations.</li>
+to a <code>MathfieldElement</code> object) are kept in sync, or <em>reflected</em>, except for
+the <code>value</code> attribute which only reflect the inital value, not the current one.
+You can also call the functions of <code>MathfieldElement</code> without limitations.</li>
 <li>To be notified when the component is attached to the DOM, listen for a <code>mount</code>
 event on the element.</li>
 <li>Before the component is attached to the DOM or even before the <code>MathfieldElement</code>
@@ -1647,17 +1688,23 @@ and the properties matching an attribute (<code>readOnly</code> for <code>read-o
 and related attributes are safe to set, but the values you read back may be
 different once the component is mounted.</li>
 </ul>
-<h2 id="before-initialization" tabindex="-1">Before Initialization</h2>
+<h2 id="%E2%91%A0-before-initialization" tabindex="-1">① Before Initialization</h2>
 <p>When the page is loaded, before any code is loaded or executed, elements with a
 <code>&lt;math-field&gt;</code> tag will be laid out and rendered by the browser as if they were
-a <code>&lt;div&gt;</code>. To prevent this from happening, you can use the <code>not(:defined)</code> CSS
+a <code>&lt;div&gt;</code>.</p>
+<p>To prevent this from happening, you can use the <code>not(:defined)</code> CSS
 selector and set the <code>display</code> CSS property to <code>none</code>. This will prevent
 some potentially undesirable flash of content when the page is loaded.</p>
 <pre><code class="language-css">math-field<span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-pseudo">:defined</span>) {
   <span class="hljs-attribute">display</span>: none;
 }
 </code></pre>
-<h2 id="initialization" tabindex="-1">Initialization</h2>
+<p>You can take some additional steps to ensure an optimal loading experience
+with minimal layout shifts.</p>
+<div class='read-more'><a href="/mathlive/guides/integration/#optimizing-load-performance">
+Read more about <strong>Optimizing Load Performance</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="%E2%91%A1-initialization" tabindex="-1">② Initialization</h2>
 <p>The element has been created from markup, but the code registering
 the <code>&lt;math-field&gt;</code> tag with the <code>MathfieldElement</code> class has not been executed
 yet. This could happen if the scripts are loaded in an unexpected order or
@@ -1669,56 +1716,56 @@ if there is a temporary networking issue.</p>
 </ul>
 <pre><code class="language-javascript"><span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\sin x&#x27;</span>;
 </code></pre>
-<p>However, some of those properties behave in limited way. For example, the <code>options</code>
-property usually return the default value for the options. However, at this stage,
-it will only return the values you have set.</p>
+<p>However, some of those properties behave in a limited way.</p>
 <ul>
 <li>you can change/add/remove attributes on the element. At this stage, the
 attributes and the properties are independent, so if you set for example the
-<code>virtual-keyboard-mode</code> attribute, it will not be reflected in
-`options.virtualKeyboardMode.</li>
+<code>math-virtual-keyboard-policy</code> attribute, it will not be reflected in
+<code>mf.mathVirtualKeyboardPolicy</code>.</li>
 <li>the only methods on the element that can be invoked are those of <code>HTMLElement</code>
 since the element has not been upgraded yet.</li>
 </ul>
-<p><strong>To be notified when the registration takes place</strong>, use the <code>whenDefined()</code> method.</p>
+<p><strong>To be notified when the registration takes place</strong>, use <code>customElements.whenDefined()</code>.</p>
+<p>You may want to wait for this to access and modify some global properties
+of <code>MathfieldElement</code></p>
 <pre><code class="language-javascript">customElements.<span class="hljs-title function_">whenDefined</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;&lt;math-field&gt; is defined&#x27;</span>);
+  <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">fontsDirectory</span> = <span class="hljs-string">&quot;assets/fonts/&quot;</span>;  
 });
 </code></pre>
 <p>If all goes well, the element will be constructed next.</p>
-<h2 id="constructed" tabindex="-1">Constructed</h2>
+<h2 id="%E2%91%A2-constructed" tabindex="-1">③ Constructed</h2>
 <p>This stage occurs either after the previous one (i.e. an element created
 from markup) or when an element is created programmatically with <code>new MathfieldElement()</code>.</p>
 <p>The <code>HTMLElement</code> object exist, but it is not yet attached to the DOM. You can
-interact with the object, but its operations are limited.</p>
+interact with the element, but its operations are still limited.</p>
 <p>At this stage:</p>
 <ul>
 <li>you can read and change the properties as before. However, doing so will
-be reflected on attributes as well. That is calling <code>mf.virtualKeyboardMode = &quot;manual&quot;</code> or
-<code>mf.setOptions({ virtualKeyboardMode: &quot;manual&quot; })</code>
-will result in <code>mf.getAttribute('virtual-keyboard-mode')</code> to return <code>&quot;manual&quot;</code>.</li>
+be reflected on attributes as well. That is calling <code>mf.mathVirtualKeyboardPolicy = &quot;manual&quot;</code>
+will result in <code>mf.getAttribute('math-virtual-keyboard-policy')</code> to return <code>&quot;manual&quot;</code>.</li>
 <li>you can read and change the attributes as before, however they will now
-be reflected on properties as well, that is calling <code>mf.setAttribute('virtual-keyboard-mode', 'manual')</code>
-will result in <code>mf.virtualKeyboardMode</code> and <code>mf.getOptions('virtualKeyboardMode')</code>
-to return <code>&quot;manual&quot;</code>.</li>
+be reflected on properties as well, that is calling <code>mf.setAttribute('math-virtual-keyboard-policy', 'manual')</code>
+will result in the value of <code>mf.mathVirtualKeyboardPolicy</code> to be <code>&quot;manual&quot;</code>.</li>
 <li>you can change/add/remove attributes on the element</li>
 <li>you can invoke all methods specific to <code>MathfieldElement</code>, however some may
 have some limitations. For example <code>setValue()</code> will ignore any options provided
-including formats other than LaTeX, <code>executeCommand()</code> will do nothing, etc…
-These commands required the element to be attached to the DOM to function properly.</li>
+including formats other than LaTeX, <code>executeCommand()</code> will do anything, etc…
+These commands require the element to be attached to the DOM to function properly.
+But no worries, that’s what happens next.</li>
 </ul>
-<h2 id="attached%2Fmounted" tabindex="-1">Attached/Mounted</h2>
-<p>This stage occurs next. The transition to this stage happens
-automatically for elements created from markup after the <code>MathfieldElement</code>
-class has been registered to handle the <code>&lt;math-field&gt;</code> tag. If the element
-was created programatically, this stage is reached when the element is explicitly
-attached to the DOM, for example using <code>appendChild()</code>.</p>
+<h2 id="%E2%91%A3-attached%2Fmounted" tabindex="-1">④ Attached/Mounted</h2>
+<p>This stage normally occurs after the element has been constructed.</p>
+<p>The transition to this stage happens automatically for elements created from
+markup after the <code>MathfieldElement</code> class has been registered to handle the
+<code>&lt;math-field&gt;</code> tag.</p>
+<p>If the element was created programatically, this stage is reached when the
+element is explicitly attached to the DOM, for example using <code>appendChild()</code>.</p>
 <p>At this stage:</p>
 <ul>
 <li>you can read and change properties and attributes and they will reflect
 each other (changing an attribute will update the corresponding property and
 vice versa).</li>
-<li>you can invoke all properties of <code>MathfieldElement</code> without limitations</li>
+<li>you can invoke all functions of <code>MathfieldElement</code> without limitations</li>
 </ul>
 <p><strong>To be notified when this stage is reached</strong>, listen for the <code>mount</code> event on
 the element:</p>
@@ -1726,10 +1773,10 @@ the element:</p>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is mounted&#x27;</span>);
   <span class="hljs-comment">// You can now read default options value for example, or </span>
   <span class="hljs-comment">// call `setValue()` with format options other than LaTeX.</span>
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-title function_">getOptions</span>(<span class="hljs-string">&#x27;macros&#x27;</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-property">macros</span>);
 });
 </code></pre>
-<h2 id="detached%2Funmounted" tabindex="-1">Detached/Unmounted</h2>
+<h2 id="%E2%91%A4-detached%2Funmounted" tabindex="-1">⑤ Detached/Unmounted</h2>
 <p>This stage can be reached if the element is explicitly removed from the DOM,
 for example with <code>ChildNode.remove()</code>.</p>
 <p>This stage is not reached when the page is closed: in that case the element
@@ -1742,7 +1789,7 @@ or to be re-attached.</p>
 the element:</p>
 <pre><code class="language-javascript">md.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;unmount&#x27;</span>)(<span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;mf is about to be unmounted&#x27;</span>);
-  <span class="hljs-comment">// Last change to interact with the mathfield</span>
+  <span class="hljs-comment">// Last chance to interact with the mathfield</span>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ev.<span class="hljs-property">target</span>.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;ascii-math&#x27;</span>));
 });
 </code></pre>
@@ -1758,14 +1805,14 @@ the element:</p>
         
 
 
-        <meta itemprop="datePublished" content="February 17, 2023">
+        <meta itemprop="datePublished" content="March 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

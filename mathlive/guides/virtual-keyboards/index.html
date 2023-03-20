@@ -308,11 +308,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/guides/virtual-keyboards/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/guides/virtual-keyboards/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -452,7 +492,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1612,7 +1652,7 @@
       <section class="page__content" itemprop="text">
 
   
-    <h1>Virtual Keyboards</h1>
+    <h1>Virtual Keyboard</h1>
   
 
   
@@ -1622,7 +1662,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#controlling-when-the-virtual-keyboard-panel-is-displayed">Controlling when the Virtual Keyboard Panel is Displayed</a></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-keycaps">Customizing the Keycaps</a></li></ol></li><li><a href="#sharing-virtual-keyboards-amongst-multiple-mathfields">Sharing Virtual Keyboards Amongst Multiple Mathfields</a></li><li><a href="#controlling-which-keyboards-are-displayed">Controlling Which Keyboards Are Displayed</a></li><li><a href="#defining-custom-virtual-keyboards">Defining Custom Virtual Keyboards</a><ol><li><a href="#defining-a-layer">Defining a Layer</a></li><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#keycap-examples">Keycap Examples</a></li><li><a href="#defining-a-keyboard">Defining a Keyboard</a></li><li><a href="#adding-the-layers-and-keyboards">Adding the Layers and Keyboards</a></li></ol></li><li><a href="#changing-the-alphabetical-keyboard-layout">Changing the Alphabetical Keyboard Layout</a></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard-toggle">Customizing the Appearance of the Virtual Keyboard Toggle</a></li></ol>
+        <ol><li><a href="#controlling-when-the-virtual-keyboard-is-displayed">Controlling when the Virtual Keyboard is Displayed</a></li><li><a href="#controlling-the-virtual-toggle-visibility">Controlling the Virtual Toggle Visibility</a></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-layouts">Customizing the Layouts</a></li><li><a href="#defining-custom-layouts">Defining Custom Layouts</a><ol><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#advanced-keycaps">Advanced Keycaps</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#layout-defined-with-markup">Layout Defined with Markup</a></li><li><a href="#layer-styling">Layer Styling</a></li><li><a href="#multiple-layers">Multiple Layers</a></li></ol></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-keycaps">Customizing the Keycaps</a></li></ol></li><li><a href="#customizing-the-alphabetical-layout">Customizing the Alphabetical Layout</a></li></ol>
       </div>
       
                               
@@ -1639,74 +1679,328 @@
 </script>
 <p class="xl">Typing math formulas require access to many special symbols. While <a href="/mathlive/guides/shortcuts">keyboard
 shortcuts and inline shortcuts</a> can help when a
-physical keyboard is available, touch-enabled devices require another solution.</p>
-<p>A <strong>virtual keyboard</strong> is a keyboard displayed on screen that can be customized
-with specialized symbols for math input.</p>
+physical keyboard is available, touch-enabled devices without a physical
+keyboard attached require another solution.</p>
+<p>A <strong>virtual keyboard</strong> is a keyboard displayed on screen that contains
+specialized symbols for math input.</p>
 <p><img src="/assets/images/mathfield/virtual-keyboard.png" alt=""></p>
-<p><strong>To display variants related to a key</strong>, press and hold it. Not all keys have
-variants, though.</p>
-<p><img src="/assets/images/mathfield/alt-keys.png" alt="" class="max-w-md"></p>
-<p><img src="/assets/images/mathfield/more-alt-keys.png" alt="" class="max-w-md"></p>
-<p>The mathfield virtual keyboard panel can display multiple keyboards.
-The default keyboards are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>,
-<strong>roman letters</strong> and <strong>greek letters</strong>.</p>
-<p>These keyboards  include the most common math symbols and they can be
-customized to fit your specific needs. For example you can remove some
-keyboards, or create new ones.</p>
-<h2 id="controlling-when-the-virtual-keyboard-panel-is-displayed" tabindex="-1">Controlling when the Virtual Keyboard Panel is Displayed</h2>
-<p>The default behavior of the virtual keyboard panel is to only be displayed on
-touch-enabled devices (mobile phones, tablets and laptops with a touch-screen) when a mathfield is focused.</p>
-<p><img src="/assets/images/mathfield/mobile-virtual-keyboard.png" alt="" class="max-w-md"></p>
-<p>This behavior can be changed with the <code>virtualKeyboardMode</code> option or the
-equivalent <code>virtual-keyboard-mode</code> attribute:</p>
+<p>A keyboard may have multiple <strong>layouts</strong> which you can select with the
+layout selector.</p>
+<p>The virtual keyboard can display multiple layouts.
+The default layouts are <strong>numeric</strong>, <strong>functions</strong>, <strong>symbols</strong>,
+<strong>alphabetic</strong> and <strong>greek letters</strong>.</p>
+<p>These layouts  include the most common math symbols. You can
+customize them to fit your specific needs. For example you can remove some
+layouts, or create new ones.</p>
+<p><strong>To display variants related to a key</strong>, press and hold it. Most keys have
+variants, but a few don’t.</p>
+<p><img src="/assets/images/mathfield/alt-keys.png" alt=""></p>
+<h2 id="controlling-when-the-virtual-keyboard-is-displayed" tabindex="-1">Controlling when the Virtual Keyboard is Displayed</h2>
+<p>The default behavior is to display the virtual keyboard when a mathfield is
+focused on a touch-enabled devices (mobile phones, tablets and laptops with
+a touch-screen).</p>
+<p><img src="/assets/images/mathfield/mobile-virtual-keyboard.png" alt=""></p>
+<p>This behavior can be changed with the <code>mf.mathVirtualKeyboardPolicy</code> property
+or the equivalent <code>math-virtual-keyboard-policy</code> attribute.</p>
 <div class='symbols-table'>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"><code>virtualKeyboardMode</code></th>
+<th style="text-align:left"><code>mathVirtualKeyboardPolicy</code></th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><code>&quot;auto&quot;</code></td>
-<td style="text-align:left">On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused, otherwise, don’t show it. This is the default behavior.</td>
+<td style="text-align:left">On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused. This is the default behavior.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>&quot;manual&quot;</code></td>
-<td style="text-align:left">A virtualk keyboard toggle button is displayed in the mathfield. With this button the user controls when the keyboard is displayed.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;onfocus&quot;</code></td>
-<td style="text-align:left">The virtual keyboard panel is displayed when the mathfield is focused</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;off&quot;</code></td>
-<td style="text-align:left">Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically by setting the  <code>virtualKeyboardState</code> property of the mathfield element to <code>visible</code> or <code>hidden</code></td>
+<td style="text-align:left">Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically with <code>mathVirtualKeyboard.show()</code> and <code>mathVirtualKeyboard.hide()</code></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="notice--info">There is only one virtual keyboard panel displayed at a time, but each mathfield
-can specify different virtual keyboard panel configurations.</p>
+<p>The virtual keyboard toggle is displayed by default when the when the mathfield
+can be modified, that is when it’s not read-only or disabled.</p>
+<h2 id="controlling-the-virtual-toggle-visibility" tabindex="-1">Controlling the Virtual Toggle Visibility</h2>
+<p><strong>To control the visibility of the virtual keyboard toggle</strong>, use CSS.</p>
+<p>For example to hide the toggle unless on a touch-enabled device, use:</p>
+<pre><code class="language-css"><span class="hljs-keyword">@media</span> <span class="hljs-keyword">not</span> (<span class="hljs-attribute">pointer</span>: coarse) {
+  math-field<span class="hljs-selector-pseudo">::part</span>(virtual-keyboard-toggle) {
+    <span class="hljs-attribute">display</span>: none;
+  }
+}
+</code></pre>
 <h2 id="preventing-input-from-the-physical-keyboard" tabindex="-1">Preventing Input from the Physical Keyboard</h2>
 <p><strong>To require the virtual keyboard to be used for input and ignore
 keys pressed on the physical keyboard</strong> listen and <code>preventDefault()</code> on <code>&quot;keydown&quot;</code>
-events during the capture phase.</p>
+events during the capture phase, and show the virtual keyboard when the mathfield
+is focused.</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;keydown&quot;</span>, <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span>  evt.<span class="hljs-title function_">preventDefault</span>(), {<span class="hljs-attr">capture</span>: <span class="hljs-literal">true</span>});
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;focus&quot;</span>, <span class="hljs-function">() =&gt;</span>  mathVirtualKeyboard.<span class="hljs-title function_">show</span>());
 </code></pre>
 <h2 id="displaying-the-virtual-keyboard-in-a-custom-container" tabindex="-1">Displaying the Virtual Keyboard in a Custom Container</h2>
-<p>By default when a virtual keyboard is created, it is attached at the end of the
-document’s <code>body</code> element.</p>
+<p>By default the virtual keyboard is inserted at the end of the document’s <code>body</code>
+element.</p>
 <p>In some cases you may want to display the virtual keyboard in some other
 container.</p>
 <p>For example when using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">full screen elements</a> that contain a mathfield, you want to make sure the virtual
 keyboard panel is visible by attaching it to the full screen element.</p>
-<p><strong>To select which DOM element the virtual keyboard is created into</strong>, set the
-<code>virtualKeyboardContainer</code> option to the desired DOM element.</p>
-<p class="notice--warning">The container element should be at least 365px wide to ensure that the virtual
-keyboard can fit. The height of the container element will be adjusted so
-that the virtual keyboard can fit.</p>
+<p><strong>To select which DOM element the virtual keyboard is attached to</strong>, set the
+<code>mathVirtualKeyboard.container</code> property to the desired DOM element.</p>
+<p class="notice--warning">The container element should be at least 320px wide to ensure that the
+default layouts can fit. The height of the container element will be
+adjusted so that the virtual keyboard can fit.</p>
+<h2 id="customizing-the-layouts" tabindex="-1">Customizing the Layouts</h2>
+<p>The virtual keyboard panel displays multiple layouts which can be
+toggled using the layout switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>alphabetic</code>
+and <code>greek</code>.</p>
+<p><strong>To choose which layouts are listed in the layout switcher</strong>, use the
+<code>mathVirtualKeyboard.layouts</code> property.</p>
+<p>For example, to only show the numeric and symbols layouts, use:</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
+<div slot="javascript">mathVirtualKeyboard.layouts = ["numeric", "symbols"];</div>
+</code-playground>
+<hr>
+<p>To revert to the default layouts, use:</p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = <span class="hljs-string">&#x27;default&#x27;</span>;
+</code></pre>
+<h2 id="defining-custom-layouts" tabindex="-1">Defining Custom Layouts</h2>
+<p>In addition to the built-in layouts, you can define your own layouts.</p>
+<p><strong>To use a custom layout</strong> set <code>mathVirtualKeyboard.layouts</code> to an object
+literal with a <code>rows</code> property, an array of keycaps.</p>
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
+<div slot="javascript">mathVirtualKeyboard.layouts = {
+  rows: [
+    [
+      "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+      "(", ")", "\\sqrt{#0}", "#@^{#?}",
+    ],
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+  ]
+};</div>
+</code-playground>
+<p><img src="/assets/images/mathfield/custom-layout.png" alt=""></p>
+<p>Each keycap is a LaTeX string which is used both as the label of the keycap,
+and as the content inserted when the keycap is pressed.</p>
+<p>You can also mix default layouts with your own. For example, to add the
+alphabetic layout after your own:</p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;minimal&quot;</span>,
+    <span class="hljs-attr">toolip</span>: <span class="hljs-string">&quot;Only the essential&quot;</span>,
+    <span class="hljs-attr">rows</span>: [
+      [
+        <span class="hljs-string">&quot;+&quot;</span>, <span class="hljs-string">&quot;-&quot;</span>, <span class="hljs-string">&quot;\\times&quot;</span>, <span class="hljs-string">&quot;\\frac{#@}{#?}&quot;</span>, <span class="hljs-string">&quot;=&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>,
+        <span class="hljs-string">&quot;(&quot;</span>, <span class="hljs-string">&quot;)&quot;</span>, <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>, <span class="hljs-string">&quot;#@^{#?}&quot;</span>,
+      ],
+      [<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>],
+    ]
+  }, 
+  <span class="hljs-string">&quot;alphabetic&quot;</span>
+];
+</code></pre>
+<p>If you include more than one layout, it’s a good idea to provide a label
+and tooltip so they get propertly displayed in the layout switcher.</p>
+<h3 id="placeholder-tokens" tabindex="-1">Placeholder Tokens</h3>
+<p>You’ll notice from the example above that the LaTeX fragments defining the
+keycap can contain the following special placeholder tokens:</p>
+<div class='symbols-table'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Token</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>#@</code></td>
+<td style="text-align:left">Replaced with the selection, if there is one. If there is no selection, replaced with an implicit argument to the left of the caret. For example, for <code>12+34</code>, if the caret is at the end, <code>#@</code> would be replaced with <code>34</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>#0</code></td>
+<td style="text-align:left">replaced with the selection if there is one, a <code>\placeholder{}</code> command otherwise</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>#?</code></td>
+<td style="text-align:left">replaced with a <code>\placeholder{}</code> command</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="advanced-keycaps" tabindex="-1">Advanced Keycaps</h3>
+<p>Instead of defining keycaps with a string, you can use an object literal
+with the following properties:</p>
+<ul>
+<li><code>label</code>: the label of the keycap, displayed using the system font. This
+can include some HTML markup, for example <code>&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</code></li>
+<li><code>latex</code>: if no label is provided, the value of this property is used as
+the label of the keycap. This property is also used to insert content in
+the mathfield when the keycap is pressed.</li>
+<li><code>class</code>: a set of CSS classes to style this keycap. The classes can be custom
+defined (see below about the <code>styles</code> layer property), or be one or more of the
+standard ones:
+<ul>
+<li><code>tex</code>: use the TeX font for its label.
+Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
+define the label.</li>
+<li><code>small</code>: display the label in a smaller size</li>
+<li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
+<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
+<li><code>separator w5</code>: a half-width blank used as a separator. Other widths
+include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
+for the space bar).</li>
+<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
+</ul>
+</li>
+<li><code>command</code>: the command to perform when the keycap is pressed. For example:
+<code>[&quot;performWithFeedback&quot;, &quot;commit&quot;]</code></li>
+<li><code>aside</code>: an optional small label displayed below the keycap. This label
+may not be displayed if the space available is too small.</li>
+<li><code>altKeys</code>: a set of variants to display when the keycap is long-pressed.</li>
+<li><code>shifted</code>: the HTML markup to display as the label of the keycap when the
+shift key is pressed</li>
+<li><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
+the shift key.</li>
+</ul>
+<div class='read-more'><a href="/mathlive/guides/commands/">
+Learn more about the available commands
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To use a SVG glyph in the keycap label</strong>, use some SVG markup in the <code>label</code>
+property and set the <code>class</code> attribute to <code>svg-glyph</code></p>
+<p>To reference the built-in SVG glyphs, use the <code>&lt;use&gt;</code> SVG command:</p>
+<ul>
+<li><code>svg-commit</code></li>
+<li><code>svg-tab</code></li>
+<li><code>svg-arrow-left</code></li>
+<li><code>svg-arrow-right</code></li>
+<li><code>svg-angle-double-left</code></li>
+<li><code>svg-angle-double-right</code></li>
+<li><code>svg-shift</code></li>
+<li><code>svg-command</code></li>
+<li><code>svg-delete-backward</code></li>
+<li><code>svg-copy</code></li>
+<li><code>svg-undo</code></li>
+<li><code>svg-redo</code></li>
+<li><code>svg-trash</code></li>
+</ul>
+<p>For example:</p>
+<pre><code class="language-json">  <span class="hljs-punctuation">{</span>
+    class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;action&quot;</span><span class="hljs-punctuation">,</span>
+    label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-commit&#x27; /&gt;&lt;/svg&gt;&quot;</span><span class="hljs-punctuation">,</span>
+    command<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;performWithFeedback&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;commit&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+</code></pre>
+<h3 id="keycap-variants" tabindex="-1">Keycap Variants</h3>
+<p>The default layouts include <strong>variants</strong> for many of their keycaps. These
+variants are accessed with a long press on the keycap. The variants are
+typically related, but less frequently used version of the main keycap.</p>
+<p>You can define variants for a custom layout by specifying a <code>variants</code>
+property with the definition of a keycap. The value of the <code>variants</code> property
+is an array of <code>VirtualKeyboardKeycap</code>. As a shortcut, a string can also be
+used, which is equivalent to a <code>VirtualKeyboardKeycap</code> with a <code>latex</code> property
+equal to the string, that is, it will display the latex string as the keycap
+label and insert it when the key is pressed.</p>
+<pre><code class="language-json">rows<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;a&quot;</span><span class="hljs-punctuation">,</span> variants<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;A&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\alpha&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\Alpha&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
+    ...
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<h3 id="layout-defined-with-markup" tabindex="-1">Layout Defined with Markup</h3>
+<p>Defining a layout using rows of keycaps is a convenient and compact
+way of creating your own layout.</p>
+<p>However, if you need more control in the appearance of your layout, you
+can define a layout with some HTML markup.</p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;minimal&quot;</span>,
+    <span class="hljs-attr">toolip</span>: <span class="hljs-string">&quot;Only the essential&quot;</span>,
+    <span class="hljs-attr">markup</span>: <span class="hljs-string">&quot;&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;&quot;</span>
+  }, 
+  <span class="hljs-string">&quot;alphabetic&quot;</span>
+];
+
+</code></pre>
+<h3 id="layer-styling" tabindex="-1">Layer Styling</h3>
+<p>If you want to apply custom CSS classes to some keycaps, you can provide
+a definition for them using the <code>styles</code> property:</p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;minimal&quot;</span>,
+    <span class="hljs-attr">toolip</span>: <span class="hljs-string">&quot;Only the essential&quot;</span>,
+    <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;.digit { background: blue; color: white }&quot;</span>,
+    <span class="hljs-attr">rows</span>: [
+      [
+        <span class="hljs-string">&quot;+&quot;</span>, <span class="hljs-string">&quot;-&quot;</span>, <span class="hljs-string">&quot;\\times&quot;</span>, <span class="hljs-string">&quot;\\frac{#@}{#?}&quot;</span>, <span class="hljs-string">&quot;=&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>,
+        <span class="hljs-string">&quot;(&quot;</span>, <span class="hljs-string">&quot;)&quot;</span>, <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>, <span class="hljs-string">&quot;#@^{#?}&quot;</span>,
+      ],
+      [
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;1&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;2&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;3&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;4&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;5&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;6&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;7&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;9&quot;</span>},
+        {<span class="hljs-attr">class</span>: <span class="hljs-string">&quot;digit&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;0&quot;</span>},
+      ],
+    ]
+  }, 
+  <span class="hljs-string">&quot;alphabetic&quot;</span>
+];
+
+</code></pre>
+<h3 id="multiple-layers" tabindex="-1">Multiple Layers</h3>
+<p>Most keyboard layouts are made of a single layer. However, if your layout
+includes multiple layers, for example a layer accessible with a shifted key,
+use the <code>layers</code> property to provide an array of layers.</p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = {
+  <span class="hljs-attr">layers</span>: [
+    {
+      <span class="hljs-attr">rows</span>: [
+        [
+          <span class="hljs-string">&quot;+&quot;</span>, <span class="hljs-string">&quot;-&quot;</span>, <span class="hljs-string">&quot;\\times&quot;</span>, <span class="hljs-string">&quot;\\frac{#@}{#?}&quot;</span>, <span class="hljs-string">&quot;=&quot;</span>, <span class="hljs-string">&quot;.&quot;</span>,
+          <span class="hljs-string">&quot;(&quot;</span>, <span class="hljs-string">&quot;)&quot;</span>, <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>, <span class="hljs-string">&quot;#@^{#?}&quot;</span>,
+        ],
+      ]
+    },
+    {
+      <span class="hljs-attr">rows</span>: [
+        [<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>],
+      ]
+    }
+
+  ],
+};
+
+</code></pre>
 <h2 id="customizing-the-appearance-of-the-virtual-keyboard" tabindex="-1">Customizing the Appearance of the Virtual Keyboard</h2>
 <p><strong>To customize the appearance of the virtual keyboard panel</strong> set the following
 CSS variables on a selector that applies to the container of the virtual
@@ -1715,7 +2009,7 @@ keyboard panel, which is the <code>&lt;body&gt;</code> element by default:</p>
   <span class="hljs-attr">--keyboard-zindex</span>: <span class="hljs-number">3000</span>;
 }
 </code></pre>
-<p>Alternatively, you can set these CSS variables programmatically:</p>
+<p>You can also set these CSS variables programmatically:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--keyboard-zindex&quot;</span>, <span class="hljs-string">&quot;3000&quot;</span>);
 </code></pre>
 <h3 id="customizing-the-virtual-keyboard-stack-order" tabindex="-1">Customizing the Virtual Keyboard Stack Order</h3>
@@ -1750,382 +2044,26 @@ value of the following CSS variables to a CSS color:</p>
 <li><code>--keycap-modifier-border</code>, a color</li>
 <li><code>--keycap-modifier-border-bottom</code>, a color</li>
 </ul>
-<h2 id="sharing-virtual-keyboards-amongst-multiple-mathfields" tabindex="-1">Sharing Virtual Keyboards Amongst Multiple Mathfields</h2>
-<p>When there are multiple mathfield elements in a page, they usually each have
-their own virtual keyboard.</p>
-<p>However, in some cases it might be desirable to have the virtual keyboard
-instance “detached” from the mathfield, and potentially shared by multiple
-mathfield elements.</p>
-<p>That’s the case for example when mathfield elements are displayed in an
-<em>iframe</em>. Since an <em>iframe</em> is essentially a mini embedded document, the
-default virtual keyboard will not display correctly when use in an <em>iframe</em>,
-as it will be attached to the <em>iframe</em> instead of being attached to the
-main document.</p>
-<p>This can be solved by using a “shared” virtual keyboard.</p>
-<p>A shared virtual keyboard is a single instance of the virtual keyboard panel per
-document, which is shared by all mathfield instances, regardless of whether
-they are in the main document or in an <em>iframe</em>.</p>
-<p>Even when not using <em>iframes</em>, having a shared virtual keyboard will result in
-a better user experience when changing focus from mathfield to mathfield.
-With a shared virtual keyboard, the keyboard will remain visible while changing
-focus. Otherwise the virtual keyboard associated with one mathfield will hide, then
-the virtual keyboard keyboard associated with the newly focused mathfield
-will be displayed, resulting in a distracting animation.</p>
-<p><strong>To use a shared virtual keyboard</strong>, call the <code>makeSharedVirtualKeyboard()</code>
-function in the context of the main document.</p>
-<p>You should make that call as early as possible, before changing the options
-of any mathfield or adding mathfields to the DOM.</p>
-<pre><code class="language-javascript"><span class="hljs-title function_">makeSharedVirtualKeyboard</span>({
-  <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;dvorak&#x27;</span>,
-});
-</code></pre>
-<p>In the <em>iframe</em> sub-documents, use the <code>use-shared-virtual-keyboard</code> attribute on
-the <code>math-field</code> elements.</p>
-<p>You can set the <code>virtual-keyboard-mode</code> attribute of each mathfield to control
-when the shared virtual keyboard will be visible.</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">use-shared-virtual-keyboard</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
-</code></pre>
-<h2 id="controlling-which-keyboards-are-displayed" tabindex="-1">Controlling Which Keyboards Are Displayed</h2>
-<p>The virtual keyboard panel displays multiple keyboards which can be
-toggled using the keyboard switcher: <code>numeric</code>, <code>functions</code>, <code>symbols</code>, <code>roman</code>
-and <code>greek</code>.</p>
-<p><strong>To choose which keyboards are available</strong>, use the <code>virtualKeyboards</code>
-configuration property. The value of this property is a space-separated string
-of the name of the keyboards that should be displayed.</p>
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-<div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
-<div slot="javascript">import "mathlive";
-document.getElementById("mf").setOptions({
-  virtualKeyboardMode: "manual",
-  virtualKeyboards: "numeric symbols"
-});</div>
-</code-playground>
-<h2 id="defining-custom-virtual-keyboards" tabindex="-1">Defining Custom Virtual Keyboards</h2>
-<p>A virtual keyboard is made up of one or more “layers”. A keyboard layer is a
-set of keys that can be toggled using another key. For example, the <code>roman</code>
-keyboard has a regular layer and a layer for symbols. Most keyboards have a
-single layer.</p>
-<p><strong>To define a custom virtual keyboard layout</strong>, use an object literal as described
-below.</p>
-<h3 id="defining-a-layer" tabindex="-1">Defining a Layer</h3>
-<p>First, let’s define a layer, which we’ll call <code>&quot;high-school-layer&quot;</code>.</p>
-<p>A layer is an array of rows, a row is an array of keycaps.</p>
-<p>Each keycap can have the following properties:</p>
-<ul>
-<li><code>class</code>: a set of CSS classes to style this keycap. The classes can be custom
-defined (see below about the <code>styles</code> layer property), or be one or more of the
-standard ones:
-<ul>
-<li><code>tex</code>: use the TeX font for its label.
-Using the <code>tex</code> class is not necessary if using the <code>latex</code> property to
-define the label.</li>
-<li><code>small</code>: display the label in a smaller size</li>
-<li><code>modifier</code>: a modifier (shift/option, etc…) keycap</li>
-<li><code>action</code>: an “action” keycap (for arrows, return, etc…)</li>
-<li><code>separator w5</code>: a half-width blank used as a separator. Other widths
-include <code>w15</code> (1.5 width), <code>w20</code> (double width) and <code>w50</code> (five-wide, used
-for the space bar).</li>
-<li><code>bottom</code>, <code>left</code>, <code>right</code>: alignment of the label</li>
-</ul>
-</li>
-<li><code>label</code>: the HTML markup displayed for the keycap. If no <code>label</code> is provided,
-the <code>latex</code> value is used. If no <code>key</code>, <code>command</code> or <code>insert</code> property is
-provided, the label (stripped of any HTML markup) is what will be inserted
-when the keycap is pressed.</li>
-<li><code>latex</code>: a LaTeX fragment used as a label and as the content to insert when
-the keycap is pressed. The LaTeX fragment can contain <a href="#placeholder-tokens">Placeholder Tokens</a>.</li>
-<li><code>key</code>: the keypress to emulate when the keycap is pressed, for example <code>&quot;5&quot;</code>.</li>
-<li><code>aside</code>: an optional small label displayed below the keycap. This label
-may not be displayed if the space available is too small.</li>
-<li><code>insert</code>: a LaTeX fragment to insert when the keycap is pressed. The <code>latex</code>
-property is usually sufficient,</li>
-<li><code>altKeys</code>: the name of a set of alternate keys to display when the keycap is
-long-pressed.</li>
-<li><code>command</code>: the command to perform when the keycap is pressed.</li>
-<li><code>shifted</code>: the HTML markup to display as the label of the keycap when the
-shift key is pressed</li>
-<li><code>shiftedCommand</code>: the command to perform when the keycap is pressed with
-the shift key.</li>
-</ul>
-<p>The following properties, in order, are used to determine how to display
-they keycap: <code>latex</code>, <code>label</code>, <code>insert</code>.</p>
-<p>When the keycap is pressed, the following properties are used, in order, to
-determine the action to perform: <code>command</code>, <code>insert</code>, <code>latex</code>, <code>key</code>.</p>
-<p><strong>To associate a CSS stylesheet with this layer</strong>, use the <code>styles</code> property of the
-layer.</p>
-<p>The appearance of the layer can be further customized by providing a CSS class
-name for the <code>backdrop</code> and <code>container</code> properties of the layer.</p>
-<h3 id="placeholder-tokens" tabindex="-1">Placeholder Tokens</h3>
-<p>The LaTeX fragment that defines what gets inserted when a virtual keyboard key
-is pressed can contain one of the following special placeholder tokens:</p>
-<ul>
-<li><code>#@</code>: replaced with the selection, if there is one. If there is no selection,
-replaced with an implicit argument to the left of the caret. For example, for
-<code>12+34</code>, if the caret is at the end, <code>#@</code> would be replaced with <code>34</code>.</li>
-<li><code>#?</code>: replaced with a <code>\placeholder{}</code> expression</li>
-</ul>
-<h3 id="keycap-variants" tabindex="-1">Keycap Variants</h3>
-<p>The default keyboard include <strong>variants</strong> for many of its keycaps. These
-variants are accessed with a long press on the keycap. The variants are
-typically related, but less frequently used version of the main keycap.</p>
-<p>You can define variants for a custom keyboard by specifying a <code>variants</code>
-property with the definition of a keycap. The value of the <code>variants</code> property
-is an array of <code>VirtualKeyboardKeycap</code>. As a shortcut, a string can also be
-used, which is equivalent to a <code>VirtualKeyboardKeycap</code> with a <code>latex</code> property
-equal to the string, that is, it will display the latex string as the keycap
-label and insert it when the key is pressed.</p>
-<pre><code class="language-json">rows<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
-  <span class="hljs-punctuation">[</span>
-    <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;a&quot;</span><span class="hljs-punctuation">,</span> variants<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;A&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\alpha&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;\\Alpha&quot;</span><span class="hljs-punctuation">]</span> <span class="hljs-punctuation">}</span>
-    ...
-  <span class="hljs-punctuation">]</span>
-<span class="hljs-punctuation">]</span>
-</code></pre>
-<h3 id="keycap-examples" tabindex="-1">Keycap Examples</h3>
-<p>Each keycap must define its label and what happens when the keycap is pressed.
-There are many different ways of doing this using the properties above.</p>
-<p>The simplest case is when pressing a key insert some LaTeX and its label
-is the fragment to be inserted. In that case, the <code>latex</code> property can be
-used to specify both the label and what happens when the key is pressed.</p>
-<p>They <code>keycap</code> class indicates that the appearance of the key should be
-of a regular keycap, as opposed to a modified key (<code>modifier</code>) or an action
-key (<code>action</code>).</p>
-<pre><code class="language-json">  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\beta&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\mu_0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">{</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;\\frac{1}{2}&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-</code></pre>
-<p><strong>To display the key label as some HTML markup instead</strong>, use the <code>label</code>
-property:</p>
-<pre><code class="language-json">  <span class="hljs-punctuation">{</span> label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span><span class="hljs-punctuation">,</span> latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">{</span> class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tex&quot;</span><span class="hljs-punctuation">,</span> 
-    latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span><span class="hljs-punctuation">,</span> 
-    latex<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;8&quot;</span> 
-  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-</code></pre>
-<p>The keycap label is displayed using the system font when the <code>label</code> property
-is used. To display it using the TeX fonts instead, set the value of the <code>class</code>
-property to <code>tex</code>.</p>
-<p><strong>To perform a command other than inserting a LaTeX string</strong> use the <code>command</code>
-property:</p>
-<pre><code class="language-json">  <span class="hljs-punctuation">{</span>
-    class<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;action&quot;</span><span class="hljs-punctuation">,</span>
-    label<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-commit&#x27; /&gt;&lt;/svg&gt;&quot;</span><span class="hljs-punctuation">,</span>
-    command<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;performWithFeedback&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;commit&quot;</span><span class="hljs-punctuation">]</span>
-  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-</code></pre>
-<p>The <code>commit</code> command is triggered when the user presses the <strong>Return</strong> or
-<strong>Enter</strong> key on the physical keyboard and will cause a <code>change</code> event to
-be dispatched.</p>
-<div class='read-more'><a href="/mathlive/guides/commands/">
-Learn more about the available commands
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p><strong>To use a SVG glyph on the keycaps</strong>, use some SVG markup in the <code>label</code>
-property and set the <code>class</code> attribute to <code>svg-glyph</code></p>
-<p>To reference the built-in SVG glyphs, use the <code>&lt;use&gt;</code> SVG command:</p>
-<ul>
-<li><code>svg-commit</code></li>
-<li><code>svg-tab</code></li>
-<li><code>svg-arrow-left</code></li>
-<li><code>svg-arrow-right</code></li>
-<li><code>svg-angle-double-left</code></li>
-<li><code>svg-angle-double-right</code></li>
-<li><code>svg-shift</code></li>
-<li><code>svg-command</code></li>
-<li><code>svg-delete-backward</code></li>
-<li><code>svg-copy</code></li>
-<li><code>svg-undo</code></li>
-<li><code>svg-redo</code></li>
-<li><code>svg-trash</code></li>
-</ul>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span> = {
-      <span class="hljs-string">&quot;high-school-layer&quot;</span>: {
-        <span class="hljs-attr">styles</span>: <span class="hljs-string">&quot;&quot;</span>,
-        <span class="hljs-attr">rows</span>: [
-          [
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;a&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;x&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;7&quot;</span> },
-            <span class="hljs-comment">// Will display the label using the system font. To display </span>
-            <span class="hljs-comment">// with the TeX font, use:</span>
-            <span class="hljs-comment">// { class: &quot;tex&quot;, label: &quot;7&quot;, key: &quot;7&quot; },</span>
-            <span class="hljs-comment">// or </span>
-            <span class="hljs-comment">// { latex: &quot;7&quot;},</span>
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;8&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;9&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\div&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex small&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{2}$$&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex small&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&lt;sup&gt;&amp;thinsp;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;&lt;/span&gt;&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$#@^{}$$&quot;</span>
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;small&quot;</span>,
-              <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>,
-              <span class="hljs-attr">insert</span>: <span class="hljs-string">&quot;$$\\sqrt{#0}$$&quot;</span>,
-            }
-          ],
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;b&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;y&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-attr">latex</span>:<span class="hljs-string">&quot;4&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;5&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;6&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;small&quot;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#0}{#0}&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
-          ],
-          [
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;c&lt;/i&gt;&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;tex&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;i&gt;z&lt;/i&gt;&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;1&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;2&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;3&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator&quot;</span> }
-          ],
-          [
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span> },
-
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            { <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-attr">key</span>: <span class="hljs-string">&quot;0&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\pi&quot;</span> },
-            { <span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span> },
-            { <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;separator w5&quot;</span> },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-left&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToPreviousChar&quot;</span>]
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&lt;svg&gt;&lt;use xlink:href=&#x27;#svg-arrow-right&#x27; /&gt;&lt;/svg&gt;&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;moveToNextChar&quot;</span>]
-            },
-            {
-              <span class="hljs-attr">class</span>: <span class="hljs-string">&quot;action font-glyph bottom right&quot;</span>,
-              <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;&amp;#x232b;&quot;</span>,
-              <span class="hljs-attr">command</span>: [<span class="hljs-string">&quot;performWithFeedback&quot;</span>, <span class="hljs-string">&quot;deleteBackward&quot;</span>]
-            }
-          ]
-        ]
-      }
-    };
-</code></pre>
-<h3 id="defining-a-keyboard" tabindex="-1">Defining a Keyboard</h3>
-<p>Now, let’s define a new keyboard called <code>&quot;high-school-keyboard&quot;</code>.</p>
-<p>The keyboard has a <code>label</code> which is displayed in the keyboard selector area
-of the virtual keyboard. When hovering on this label, a <code>tooltip</code> can be
-displayed to further explain what the keyboard is about.</p>
-<p>Finally, we must provide the layers that make up this keyboard.</p>
-<p>In this example we have a single layer, so we can set the value of the
-<code>layer</code> property to the name of the layer.</p>
-<p>If we had several layers, we could set the property <code>layers</code> to an
-array of their names.</p>
-<pre><code class="language-js">    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD</span> = {
-      <span class="hljs-string">&quot;high-school-keyboard&quot;</span>: {
-        <span class="hljs-string">&quot;label&quot;</span>: <span class="hljs-string">&quot;High School&quot;</span>, <span class="hljs-comment">// Label displayed in the Virtual Keyboard Switcher</span>
-        <span class="hljs-string">&quot;tooltip&quot;</span>: <span class="hljs-string">&quot;High School Level&quot;</span>, <span class="hljs-comment">// Tooltip when hovering over the label</span>
-        <span class="hljs-string">&quot;layer&quot;</span>: <span class="hljs-string">&quot;high-school-layer&quot;</span>
-      }
-    };
-</code></pre>
-<h3 id="adding-the-layers-and-keyboards" tabindex="-1">Adding the Layers and Keyboards</h3>
-<p>Now, we just have to call <code>setOptions()</code> with our custom layer and custom
-keyboard.</p>
-<p>The <code>virtualKeyboards</code> option indicate which keyboards we want to be available.
-Here we only want our keyboard, so we’ll just pass its name.</p>
-<p>If we wanted multiple keyboards, we could provide a space-separated list, for
-example <code>&quot;numeric high-school-keyboard symbols&quot;</code>. If we wanted all the default
-keyboards, plus ours, we could have used the <code>&quot;all&quot;</code> shortcut:
-<code>&quot;all high-school-keyboard&quot;</code>.</p>
-<pre><code class="language-js">  mf.<span class="hljs-title function_">setOptions</span>({
-    <span class="hljs-string">&quot;customVirtualKeyboardLayers&quot;</span>: <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD_LAYER</span>,
-    <span class="hljs-string">&quot;customVirtualKeyboards&quot;</span>: <span class="hljs-variable constant_">HIGH_SCHOOL_KEYBOARD</span>,
-    <span class="hljs-string">&quot;virtualKeyboards&quot;</span>: <span class="hljs-string">&quot;high-school-keyboard&quot;</span>
-  });
-}
-</code></pre>
-<h2 id="changing-the-alphabetical-keyboard-layout" tabindex="-1">Changing the Alphabetical Keyboard Layout</h2>
-<p>By default, the layout of the alphabetic virtual keyboard is determined based
-on the locale (QWERTY for english speaking countries, AZERTY for french speaking
+<h2 id="customizing-the-alphabetical-layout" tabindex="-1">Customizing the Alphabetical Layout</h2>
+<p>By default the alphabetic layout is determined based on the locale (QWERTY
+for english speaking countries, AZERTY for french speaking
 countries, etc…).</p>
-<p><strong>To select a different alphabetic keyboard layout</strong>, such as DVORAK or COLEMAK,
-use the <code>virtualKeyboardLayout</code> configuration property.</p>
+<p><strong>To select a different alphabetic layout</strong>, such as DVORAK or COLEMAK,
+use the <code>mathVirtualKeyboard.alphabeticLayout</code> property.</p>
 <code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">import 'mathlive';
-document.getElementById('mf').setOptions({
-  virtualKeyboardMode: "manual",
-  virtualKeyboardLayout: 'dvorak'
-});
+  <style slot="style">
+    .output:focus-within {
+      outline: Highlight auto 1px;
+      outline: -webkit-focus-ring-color auto 1px
+    }
+    .output math-field:focus, .output math-field:focus-within {
+      outline: none;
+    }
+  </style>
+  <div slot="javascript">import "mathlive";
+mathVirtualKeyboard.alphabeticLayout = "dvorak";
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-<h2 id="customizing-the-appearance-of-the-virtual-keyboard-toggle" tabindex="-1">Customizing the Appearance of the Virtual Keyboard Toggle</h2>
-<p><strong>To apply a CSS rule to the virtual keyboard toggle</strong>, use
-the <code>math-field::part(virtual-keyboard-toggle)</code> CSS selector.</p>
-<p><strong>To change the icon of the virtual keyboard toggle</strong>, use the
-<code>virtualKeyboardToggleGlyph</code>
-configuration property.</p>
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">import 'mathlive';
-document.getElementById('mf').setOptions({
-  virtualKeyboardMode: "manual",
-  virtualKeyboardToggleGlyph: `&lt;span style="width: 21px;">&lt;svg style="width: 21px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path fill="currentColor" d="M192 288H32c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-29 140c3 3 3 8 0 12l-11 11c-4 3-9 3-12 0l-28-28-28 28c-3 3-8 3-12 0l-11-11c-3-4-3-9 0-12l28-28-28-28c-3-3-3-8 0-12l11-11c4-3 9-3 12 0l28 28 28-28c3-3 8-3 12 0l11 11c3 4 3 9 0 12l-28 28 28 28zM480 0H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8h-40v40c0 4-4 8-8 8h-16c-4 0-8-4-8-8v-40h-40c-4 0-8-4-8-8v-16c0-4 4-8 8-8h40V56c0-4 4-8 8-8h16c4 0 8 4 8 8v40h40c4 0 8 4 8 8v16zm16 168H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-16 152c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zm0-64c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zM192 0H32C14 0 0 14 0 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8H56c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16z"/&gt;&lt;/svg&gt&lt;/span>`
-});
-</div>
-    <div slot="html">&lt;style&gt;
-math-field::part(virtual-keyboard-toggle) {
-  color: red;
-  background: #ddd;
-}
-&lt;/style&gt;
-&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
 </code-playground>
@@ -2144,14 +2082,14 @@ math-field::part(virtual-keyboard-toggle) {
         
 
 
-        <meta itemprop="datePublished" content="March 04, 2023">
+        <meta itemprop="datePublished" content="March 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-04'>March 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-19'>March 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -277,11 +277,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/changelog/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/changelog/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -421,7 +461,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1584,14 +1624,430 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
-<h3 id="breaking-change" tabindex="-1">Breaking Change</h3>
+<h2 id="0.90.0-(2023-03-19)" tabindex="-1">0.90.0 (2023-03-19)</h2>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<p>This release contains several breaking changes. As much as possible I try to
+avoid introducing breaking changes, but there was an accumulation of issues that
+required some breaking change and I figured I would introduce them all at once:</p>
 <ul>
-<li>New implementation of <code>\placeholder</code> command for “fill-in-the-blank” feature.
-Instead of each placeholder being an embedded mathfield, the placeholders are
-now special editable regions of a read-only mathfield. This improves their
-layout (for example a placeholder numerator is now displayed at the correct
-size) and simplify their interaction.</li>
+<li>the use case where a page had several mathfields was not handled well. Several
+configuration options were effectively shared, yet each mathfield had its own
+idea of what the setting was. There were also several duplicate ways of
+configuring a mathfield, which was confusing.</li>
+<li>the virtual keyboard was awkward to use and configure with multiple
+mathfields. The virtual keyboard API was also attached to mathfield instances,
+instead of the virtual keyboard being its own entity.</li>
+<li>Fill-in-the-blank is a popular feature, but its current implementation had
+some limitations. Thanks to a contributed new implementation, those
+limitations have been removed, and the API to handle fill-in-the-blank has
+been adjusted accordingly.</li>
+</ul>
+<h4 id="fill-in-the-blank" tabindex="-1">Fill-in-the-blank</h4>
+<ul>
+<li>
+<p>New implementation of the <code>\placeholder{}</code> command for “fill-in-the-blank”
+feature. Thank you to James Mullen (https://github.com/wildyellowfin) for this
+contribution.</p>
+<p>Previously, each placeholder was an embedded mathfield inside a “root”
+mathfield. The placeholders are now special editable regions of a read-only
+mathfield.</p>
+<p>This improves their layout (for example a placeholder numerator is now
+displayed at the correct size) and simplify their interaction. When used as a
+“fill-in-the-blank”, set the mathfield to readonly, and specify an ID with the
+placeholder, i.e. <code>\placeholder[id]{value}</code>. In this situation these
+placeholders are called “prompts”.</p>
+</li>
+<li>
+<p>The <code>mf.getPlaceholderField()</code> function has been replaced with
+<code>mf.getPromptValue()</code></p>
+</li>
+<li>
+<p>Use <code>mf.setPromptValue()</code> to change the content of a prompt.</p>
+</li>
+<li>
+<p>Use <code>mf.getPrompts()</code> to get an array of the ids of all the prompts in the
+expression.</p>
+</li>
+<li>
+<p>Prompts can be either in a correct, incorrect or indeterminate state. In
+correct or incorrect state, their appearance changes to reflect their state.
+Use <code>mf.setPromptState()</code> to flag a prompt as being correct or incorrect.
+<code>mf.setPromptState()</code> can also be used to mark a prompt as no longer being
+editable.</p>
+</li>
+</ul>
+<h4 id="virtual-keyboard" tabindex="-1">Virtual Keyboard</h4>
+<ul>
+<li>
+<p>Previously the virtual keyboard was shared amongst mathfield instances if the
+<code>makeSharedVirtualKeyboard()</code> function was called or the
+<code>use-shared-virtual-keyboard</code> attribute was set on a mathfield. Otherwise a
+virtual keyboard instance was created for each mathfield in the document.</p>
+<p>The virtual keyboard is now always shared.</p>
+<p>The virtual keyboard global instance can be accessed as
+<code>window.mathVirtualKeyboard</code> or just <code>mathVirtualKeyboard</code>. Its value
+implements <code>VirtualKeyboardInterface</code> instance, same as was previously
+returned by <code>makeSharedVirtualKeyboard()</code>.</p>
+</li>
+<li>
+<p>The options related to the virtual keyboard should now be set on the global
+shared virtual keyboard, using <code>window.mathVirtualKeyboard</code> instead of on
+mathfield instances.</p>
+</li>
+<li>
+<p>The MathLive virtual keyboard API (offered by the <code>window.mathVirtualKeyboard</code>
+property) has changed to be consistent with the
+<a href="https://www.w3.org/TR/virtual-keyboard/">W3C Virtual Keyboard</a> API.</p>
+<p>This includes adding a <code>show()</code> and <code>hide()</code> functions, and a <code>boundingRect</code>
+property to <code>VirtualKeyboardInterface</code>.</p>
+<p>A <code>geometrychange</code> event is dispatched when the size of the keyboard changes.</p>
+<p>In addition, the <code>MathfieldElement.virtualKeyboardMode</code> property is now called
+<code>MathfieldElement.mathVirtualKeyboardPolicy</code> and can take a value of <code>&quot;auto&quot;</code>
+or <code>&quot;manual&quot;</code>.</p>
+<p>A value of <code>&quot;manual&quot;</code> corresponds to the previous <code>virtualKeyboardMode</code> value
+of <code>&quot;off&quot;</code>, that is the virtual keyboard is not displayed automatically and
+must be displayed programmatically.</p>
+<p>The value <code>&quot;onfocus&quot;</code> is no longer supported. To implement the behavior
+previously provided by this value, listen for a <code>&quot;focus&quot;</code> or <code>&quot;blur&quot;</code> event on
+the relevant mathfield and call <code>mathVirtualKeyboard.show()</code> or
+<code>mathVirtualKeyboard.hide()</code> as needed.</p>
+<p>If <code>mathVirtualKeyboardPolicy</code> is set to <code>&quot;auto&quot;</code> the virtual keyboard is
+displayed automatically when a mathfield is focused on a touch-enabled device.</p>
+</li>
+<li>
+<p>The virtual keyboard customization API has been simplified.</p>
+</li>
+</ul>
+<p><strong>Before:</strong></p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MINIMAL_LAYER</span> = [
+  <span class="hljs-attr">minimal</span>: {
+    <span class="hljs-attr">rows</span>: [
+      [
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;+&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;-&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\times&quot;</span>},
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\frac{#@}{#?}&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;=&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;.&quot;</span>},
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;(&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;)&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;\\sqrt{#0}&quot;</span>},
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;#@^{#?}&quot;</span>}
+      ],
+      [
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;1&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;2&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;3&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;4&quot;</span>},
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;5&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;6&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;7&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;8&quot;</span>},
+        {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;9&quot;</span>}, {<span class="hljs-attr">latex</span>: <span class="hljs-string">&quot;0&quot;</span>},
+      ]
+    ]
+}];
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MINIMAL_KEYBOARD</span> = {
+  <span class="hljs-string">&#x27;minimal&#x27;</span>: {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Minimal&#x27;</span>,
+    <span class="hljs-attr">layer</span>: <span class="hljs-string">&#x27;minimal&#x27;</span>,
+  },
+};
+
+mf.<span class="hljs-title function_">setOptions</span>({
+  <span class="hljs-attr">customVirtualKeyboardLayers</span>: <span class="hljs-variable constant_">MINIMAL_LAYER</span>,
+  <span class="hljs-attr">customVirtualKeyboards</span>: <span class="hljs-variable constant_">MINIMAL_KEYBOARD</span>,
+  <span class="hljs-attr">virtualKeyboards</span>: <span class="hljs-string">&#x27;minimal&#x27;</span>,
+});
+</code></pre>
+<p><strong>Now:</strong></p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = {
+  <span class="hljs-attr">rows</span>: [
+    [
+      <span class="hljs-string">&#x27;+&#x27;</span>,
+      <span class="hljs-string">&#x27;-&#x27;</span>,
+      <span class="hljs-string">&#x27;\\times&#x27;</span>,
+      <span class="hljs-string">&#x27;\\frac{#@}{#?}&#x27;</span>,
+      <span class="hljs-string">&#x27;=&#x27;</span>,
+      <span class="hljs-string">&#x27;.&#x27;</span>,
+      <span class="hljs-string">&#x27;(&#x27;</span>,
+      <span class="hljs-string">&#x27;)&#x27;</span>,
+      <span class="hljs-string">&#x27;\\sqrt{#0}&#x27;</span>,
+      <span class="hljs-string">&#x27;#@^{#?}&#x27;</span>,
+    ],
+    [<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;4&#x27;</span>, <span class="hljs-string">&#x27;5&#x27;</span>, <span class="hljs-string">&#x27;6&#x27;</span>, <span class="hljs-string">&#x27;7&#x27;</span>, <span class="hljs-string">&#x27;8&#x27;</span>, <span class="hljs-string">&#x27;9&#x27;</span>, <span class="hljs-string">&#x27;0&#x27;</span>],
+  ],
+};
+</code></pre>
+<p>To change the alphabetic layout:</p>
+<p><strong>Before:</strong></p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({ <span class="hljs-attr">virtualKeyboardLayout</span>: <span class="hljs-string">&#x27;azerty&#x27;</span> });
+</code></pre>
+<p><strong>Now:</strong></p>
+<pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">alphabeticLayout</span> = <span class="hljs-string">&#x27;azerty&#x27;</span>;
+</code></pre>
+<ul>
+<li>
+<p>The <code>&quot;roman&quot;</code> virtual keyboard is now called <code>&quot;alphabetic&quot;</code></p>
+</li>
+<li>
+<p>The <code>virtualKeyboardToolbar</code> option is now <code>mathVirtualKeyboard.actionToolbar</code></p>
+</li>
+<li>
+<p>The <code>virtualKeyboardContainer</code> option is now <code>mathVirtualKeyboard.container</code></p>
+</li>
+<li>
+<p>The virtual keyboard toggle glyph can no longer be customized.</p>
+</li>
+<li>
+<p>The virtual keyboard toggle button is displayed by default if the content of
+mathfield can be modified.</p>
+<p>The display of the toggle button is independent of the
+<code>mathVirtualKeyboardPolicy</code>.</p>
+<p>Using the <code>math-field::part(virtual-keyboard-toggle)</code> CSS selector, a
+<code>display: none</code> CSS attribute can be used to hide the virtual keyboard toggle
+if desired. To replicate the previous default behavior, where the toggle was
+displayed on touch-enabled devices, use:</p>
+<pre><code class="language-css"><span class="hljs-keyword">@media</span> <span class="hljs-keyword">not</span> (<span class="hljs-attribute">pointer</span>: coarse) {
+  math-field<span class="hljs-selector-pseudo">::part</span>(virtual-keyboard-toggle) {
+    <span class="hljs-attribute">display</span>: none;
+  }
+}
+</code></pre>
+</li>
+<li>
+<p>The “alt-keys” of the virtual keyboard are now called “variants”. The
+<code>data-alt-keys</code> attribute is now <code>data-variants</code></p>
+</li>
+</ul>
+<h4 id="options" tabindex="-1">Options</h4>
+<p>Previously all the options to configure a mathfield could be changed using
+<code>mf.setOptions({...})</code>. Some of these options affected a specific mathfield
+instance, while others affected all mathfields on the page.</p>
+<p>The options that affect all mathfields are now static properties of the
+<code>MathfieldElement</code> global. The options that affect the virtual keyboard are
+properties of the <code>mathVirtualKeyboard</code> global singleton. The options specific
+to a mathfield are now properties or attribute of this element.</p>
+<p>For example:</p>
+<p><strong>Before:</strong></p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({ <span class="hljs-attr">soundsDirectory</span>: <span class="hljs-literal">null</span> });
+</code></pre>
+<p><strong>Now:</strong></p>
+<pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">soundsDirectory</span> = <span class="hljs-literal">null</span>;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Before</th>
+<th style="text-align:left">Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({defaultMode: ...})</code></td>
+<td style="text-align:left"><code>mf.defaultMode = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({letterShapeStyle: ...})</code></td>
+<td style="text-align:left"><code>mf.letterShapeStyle = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({horizontalSpacingScale: ...})</code></td>
+<td style="text-align:left">Removed. Use <code>&quot;thinmuskip&quot;</code>, <code>&quot;medmuskip&quot;</code>, and <code>&quot;thickmuskip&quot;</code> registers ',</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({macros: ...})</code></td>
+<td style="text-align:left"><code>mf.macros = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({registers: ...})</code></td>
+<td style="text-align:left"><code>mf.registers = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({backgroundColorMap: ...})</code></td>
+<td style="text-align:left"><code>mf.backgroundColorMap = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({colorMap: ...})</code></td>
+<td style="text-align:left"><code>mf.colorMap = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({enablePopover: ...})</code></td>
+<td style="text-align:left"><code>mf.popoverPolicy = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({mathModeSpace: ...})</code></td>
+<td style="text-align:left"><code>mf.mathModeSpace = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({placeholderSymbol: ...})</code></td>
+<td style="text-align:left"><code>mf.placeholderSymbol = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({readOnly: ...})</code></td>
+<td style="text-align:left"><code>mf.readOnly = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({removeExtraneousParentheses: ...})</code></td>
+<td style="text-align:left"><code>mf.removeExtraneousParentheses = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({scriptDepth: ...})</code></td>
+<td style="text-align:left"><code>mf.scriptDepth = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({smartFence: ...})</code></td>
+<td style="text-align:left"><code>mf.smartFence = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({smartMode: ...})</code></td>
+<td style="text-align:left"><code>mf.smartMode = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({smartSuperscript: ...})</code></td>
+<td style="text-align:left"><code>mf.smartSuperscript = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({inlineShortcutTimeout: ...})</code></td>
+<td style="text-align:left"><code>mf.inlineShortcutTimeout = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({inlineShortcuts: ...})</code></td>
+<td style="text-align:left"><code>mf.inlineShortcuts = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({keybindings: ...})</code></td>
+<td style="text-align:left"><code>mf.keybindings = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardMode: ...})</code></td>
+<td style="text-align:left"><code>mf.mathVirtualKeyboardPolicy = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({customVirtualKeyboardLayers: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.layers = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({customVirtualKeyboards: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.layouts = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({keypressSound: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.keypressSound = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({keypressVibration: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.keypressVibration = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({plonkSound: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.plonkSound = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardContainer: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.container = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardLayout: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.alphabeticLayout = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardTheme: ...})</code></td>
+<td style="text-align:left">No longer supported</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardToggleGlyph: ...})</code></td>
+<td style="text-align:left">No longer supported</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboardToolbar: ...})</code></td>
+<td style="text-align:left"><code>mathVirtualKeyboard.actionToolbar = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({virtualKeyboards: ...})</code></td>
+<td style="text-align:left">Use <code>mathVirtualKeyboard.layouts</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({speechEngine: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.speechEngine</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({speechEngineRate: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.speechEngineRate</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({speechEngineVoice: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.speechEngineVoice</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({textToSpeechMarkup: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.textToSpeechMarkup</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({textToSpeechRules: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.textToSpeechRules</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({textToSpeechRulesOptions: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.textToSpeechRulesOptions</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({readAloudHook: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.readAloudHook</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({speakHook: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.speakHook</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({computeEngine: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.computeEngine</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({fontsDirectory: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.fontsDirectory</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({soundsDirectory: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.soundsDirectory</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({createHTML: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.createHTML</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({onExport: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.onExport</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({onInlineShortcut: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.onInlineShortcut</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({locale: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.locale = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({strings: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.strings = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({decimalSeparator: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.decimalSeparator = ...</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mf.setOptions({fractionNavigationOrder: ...})</code></td>
+<td style="text-align:left"><code>MathfieldElement.fractionNavigationOrder = ...</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="miscellaneous-breaking-changes" tabindex="-1">Miscellaneous Breaking Changes</h4>
+<ul>
+<li>For consistency with <code>&lt;textarea&gt;</code> the <code>&lt;math-field&gt;</code> tag now has a default
+display style of “inline”. You can change the display style to “block” using a
+CSS rule.</li>
+<li>The <code>&lt;math-field&gt;</code> tag now has some default styling, including a background
+and border, consistent with a <code>&lt;textarea&gt;</code> element. You can override this
+styling by defining CSS rules for the <code>math-field</code> selector.</li>
+<li>The previously deprecated option <code>horizontalSpacingScale</code>has been removed. It
+is replaced by the standard TeX registers<code>\thinmuskip</code>, <code>\medmuskip</code> and
+<code>\thickmuskip</code>.</li>
+<li>It was previously possible to specify a set of options for a mathfield as a
+<code>&lt;script&gt;</code> tag inside the mathfield, as JSON data structure. This is no longer
+supported.</li>
+<li>It was previously possible to supply a custom style sheet to be applied inside
+the shadow DOM by using a <code>&lt;style&gt;</code> tag inside the mathfield. This is no
+longer supported. Use custom CSS variables or <code>part</code> selectors to apply custom
+styling to the mathfield.</li>
 </ul>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
@@ -1604,6 +2060,26 @@ valid, resulting in more correct results</li>
 <li><strong>#1859</strong> In math mode, after pressing the SPACE key, the variant style
 (upright, italic, etc…) from neighboring atoms is not adopted by subsequent
 characters.</li>
+<li>The <code>disabled</code> and <code>readonly</code> attributes and the <code>user-select</code> CSS property
+are now consistent with <code>&lt;textarea&gt;</code>:
+<ul>
+<li>a <code>readonly</code> mathfield is still focusable</li>
+<li>a <code>disabled</code> mathfield is not focusable</li>
+<li>The content of a <code>readonly</code> or <code>disabled</code> mathfield can be selected, unless
+the <code>contenteditable</code> attribute is set to <code>&quot;false&quot;</code> and the <code>user-select</code>
+CSS property is set to <code>&quot;none&quot;</code>. (fixes <strong>#1136</strong>)</li>
+</ul>
+</li>
+<li>A mathfield can be used inline, for example inside a <code>&lt;p&gt;</code> element.</li>
+<li>For consistency with a <code>&lt;textarea&gt;</code>, <code>click</code> events are not dispatched when a
+disabled <code>&lt;math-element&gt;</code> is clicked.</li>
+<li><strong>#1722</strong> The theme applied to the keyboard can be set programmatically by
+apply a <code>theme</code> attribute to the container of the keyboard, for example
+<code>&lt;body theme=&quot;dark&quot;&gt;</code> or <code>&lt;body theme=&quot;light&quot;&gt;</code>.</li>
+<li>When a mathfield contains placeholders (or prompts), tabbing at the last
+placeholder will move to the next focusable element on the page (previously,
+it would circularly stay inside the current mathfield, with no possibility of
+escape).</li>
 </ul>
 <h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
 <ul>
@@ -1613,6 +2089,12 @@ have the same argument when serialized</li>
 caused the expression to be incorrectly balanced</li>
 <li><strong>#1858</strong> The spoken representation of the <code>\pm</code> command was incorrect</li>
 <li><strong>#1856</strong> Displaying the virtual keyboard in a custom container was broken</li>
+<li><strong>#1877</strong> Setting options on read-only field was not working</li>
+<li><strong>#1771</strong> Incorrect layout of fill-in-the-blank</li>
+<li><strong>#1770</strong> <code>mf.setValue()</code> did not affect fill-in-the-blank sections</li>
+<li><strong>#1736</strong> Layout issues with fill-in-the-blank</li>
+<li><strong>#1048</strong> Virtual keyboard inside a custom container is now displayed
+correctly.</li>
 </ul>
 <h2 id="0.89.4-(2023-02-27)" tabindex="-1">0.89.4 (2023-02-27)</h2>
 <h3 id="bug-fix" tabindex="-1">Bug Fix</h3>
@@ -1744,7 +2226,7 @@ some cases if the <code>z-index</code> of the expression they decorated had cert
 values.</li>
 </ul>
 <h2 id="0.86.0-(2022-12-02)" tabindex="-1">0.86.0 (2022-12-02)</h2>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The Compute Engine has been split from MathLive to reduce the package size and
 improve the TTI (Time To Interactive) metric. The Compute Engine now needs to
@@ -1961,7 +2443,7 @@ coordinate, use <code>mf.offsetFromPoint()</code>.</li>
 <li><strong>#1643</strong> Support for the <code>\kern</code>, <code>\mkern</code> and <code>\mspace</code> command.</li>
 </ul>
 <h2 id="0.79.0-(2022-09-06)" tabindex="-1">0.79.0 (2022-09-06)</h2>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>onMulticharSymbol</code> handler has been renamed to <code>onInlineShortcut</code></li>
 <li>The deprecated <code>modelHooks</code> have been removed. Use the corresponding events
@@ -2042,7 +2524,7 @@ special mapping, e.g. “°”.</p>
 </li>
 </ul>
 <h2 id="0.78.0-(2022-08-11)" tabindex="-1">0.78.0 (2022-08-11)</h2>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p><strong>The way errors are reported has changed.</strong></p>
@@ -2323,7 +2805,7 @@ panel is up</li>
 <li>Typing a <code>,</code> (comma) would be rendered as a <code>.</code> (dot)</li>
 </ul>
 <h2 id="0.73.0-(2022-05-23)" tabindex="-1">0.73.0 (2022-05-23)</h2>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>The following attributes of the <code>&lt;math-field&gt;</code> element that were previously
@@ -2491,7 +2973,7 @@ cases</li>
 <li>Improved display of command popover when editing raw LaTeX</li>
 </ul>
 <h2 id="0.71.0-(2022-04-12)" tabindex="-1">0.71.0 (2022-04-12)</h2>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Removed the <code>find</code> and <code>replace</code> methods. These methods were difficult to use,
 since they were based on LaTeX serialization and the mapping from atom to
@@ -2680,7 +3162,7 @@ location, or scroll with the page.</li>
 <li>Attempt to fix installation of the npm package on some Windows configurations</li>
 </ul>
 <h2 id="0.69.0-(2021-06-09)" tabindex="-1">0.69.0 (2021-06-09)</h2>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>This release requires TypeScript 4.3 or later (the API uses asymmetric
@@ -2810,7 +3292,7 @@ correctly even in non-git environments.</li>
 <li><strong>#968</strong> navigating with arrow keys cannot navigate past a macro</li>
 </ul>
 <h2 id="0.68.0-(2021-05-31)" tabindex="-1">0.68.0 (2021-05-31)</h2>
-<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <p><strong>#500</strong> MathJSON support. The legacy MASTON/JSON format has been removed.<br>
 The MathJSON format is now integrated into MathLive 🚀 🎆 🥳</p>
 <p>To get the MathJSON representation of a formula, use <code>mf.getValue('math-json')</code>.</p>
@@ -2908,7 +3390,7 @@ font size 1 (tiny).</li>
 <li>Macro packages were incorrectly parsed</li>
 </ul>
 <h2 id="0.66.0-(2021-05-20)" tabindex="-1">0.66.0 (2021-05-20)</h2>
-<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>horizontalSpacingScale</code> option is deprecated. It will be removed in an
 upcoming version and replaced by the standard TeX registers <code>\thinmuskip</code>,
@@ -3049,7 +3531,7 @@ yet, even if the output format is not specified.</li>
 arguments contained some spaces, e.g.<code>rgb ( 255 , 255 , 255 )</code>.</li>
 </ul>
 <h2 id="0.65.0-(2021-05-14)" tabindex="-1">0.65.0 (2021-05-14)</h2>
-<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>substituteTextArea</code> option has been removed. This option was in fact not
 working so removing it will presumably have no impact.</li>
@@ -3080,7 +3562,7 @@ fraction of a pixel when moving the caret.</li>
 <li>In LaTeX mode with nested expressions, the edited LaTeX was incorrect.</li>
 </ul>
 <h2 id="0.64.0-(2021-05-09)" tabindex="-1">0.64.0 (2021-05-09)</h2>
-<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>The <code>FontSize</code> type is now an integer between 1 and 10. It previously was
@@ -3314,7 +3796,7 @@ dropping some styling.</li>
 rendered when calling <code>renderMathInElement()</code> or <code>renderMathInDocument()</code>.</li>
 </ul>
 <h2 id="0.61.0-(2021-04-22)" tabindex="-1">0.61.0 (2021-04-22)</h2>
-<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Some format options have been renamed:</p>
@@ -3430,7 +3912,7 @@ field when typing a character in the middle of the formula</li>
 necessary (react-mathlive issue #4).</li>
 </ul>
 <h2 id="0.60.0-(2021-04-12)" tabindex="-1">0.60.0 (2021-04-12)</h2>
-<h3 id="breaking-change-1" tabindex="-1">Breaking Change</h3>
+<h3 id="breaking-change" tabindex="-1">Breaking Change</h3>
 <ul>
 <li>
 <p>Renamed <code>getCaretPosition()</code> and <code>setCaretPosition()</code> to <code>get/set caretPoint</code>.</p>
@@ -4409,7 +4891,7 @@ CHANGELOG to the GitHub release note.</li>
 <li>Added additional contextual information to the parser error message. Detect
 more errors.</li>
 </ul>
-<h3 id="breaking-change-2" tabindex="-1">Breaking Change</h3>
+<h3 id="breaking-change-1" tabindex="-1">Breaking Change</h3>
 <ul>
 <li>Renamed <code>config.error</code> to <code>config.onError</code> for consistency with the other
 listeners.</li>
@@ -4802,7 +5284,7 @@ could result in some spurious characters inserted at the beginning of the
 field.</p>
 </li>
 </ul>
-<h3 id="breaking-change-3" tabindex="-1">Breaking Change</h3>
+<h3 id="breaking-change-2" tabindex="-1">Breaking Change</h3>
 <ul>
 <li>
 <p>The signature of the <code>latexToMarkup()</code> function has changed.<br>
@@ -5149,7 +5631,7 @@ of debugging (some features, such as using JavaScript native modules, require
 a local server)</li>
 </ul>
 <h2 id="0.27-(2019-04-08)" tabindex="-1">0.27 (2019-04-08)</h2>
-<h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-12" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The syntax that MathJSON/MASTON can recognized has been significantly
 expanded. It also has been made more consistent, and in some cases it may be
@@ -5388,7 +5870,7 @@ combined.</li>
 <li>Improve visual blinking when selecting with the mouse to the left</li>
 </ul>
 <h2 id="0.26-(2019-02-04)" tabindex="-1">0.26 (2019-02-04)</h2>
-<h3 id="breaking-changes-12" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-13" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Public method now start with <code>$</code>. This convention is also used, for example,
 by the Vue.js project. For now, aliases exist that begin with ‘_’ (the
@@ -5443,7 +5925,7 @@ of sounds and some other resources.</li>
 <li>#91 - Handling of ‘~’ as an operator and a shortcut.</li>
 </ul>
 <h2 id="0.24-(2018-12-16)" tabindex="-1">0.24 (2018-12-16)</h2>
-<h3 id="breaking-changes-13" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-14" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Several handlers had some inconsistent signatures, or in some cases passed
 invalid values as their arguments. This has been fixed, but it required
@@ -5789,14 +6271,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="March 04, 2023">
+        <meta itemprop="datePublished" content="March 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-04'>March 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-19'>March 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

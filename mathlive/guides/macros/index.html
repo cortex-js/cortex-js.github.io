@@ -308,11 +308,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/guides/macros/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/guides/macros/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/guides/macros/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -452,7 +492,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1624,9 +1664,9 @@
 predefined. Some are primitives but others are macros, that is commands defined
 with a LaTeX expression. You can extend MathLive with your own macros.</p>
 <h2 id="adding%2Fremoving-macros" tabindex="-1">Adding/Removing Macros</h2>
-<p><strong>To add a macro</strong> use <code>setOptions({macros: {...getOptions('macros'), ...}})</code>.</p>
-<p>If you do not include the <code>...getOptions('macros')</code> call, all the standard
-macros will be turned off.</p>
+<p><strong>To add a macro</strong> use <code>mf.macros = {...mf.macros, ...}</code>.</p>
+<p>If you do not include the <code>...mf.macros</code> call, all the standard macros will be
+turned off.</p>
 <code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
@@ -1639,13 +1679,10 @@ macros will be turned off.</p>
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        minutes: '\\,{}^\\prime\\;',
-        seconds: '\\,\\doubleprime\\;',
-    }
-});
+mf.macros = { ...mf.macros,
+    minutes: '\\,{}^\\prime\\;',
+    seconds: '\\,\\doubleprime\\;',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
@@ -1664,12 +1701,9 @@ mf.setOptions({
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
-    }
-});
+mf.macros = {...mf.macros, 
+  smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
@@ -1692,16 +1726,13 @@ in the expanded definition of a macro.</p>
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        smallfrac: {
-          args: 2,
-          def: '{}^{#1}\\!\\!/\\!{}_{#2}',
-          captureSelection: false,
-        },
-    }
-});
+mf.macros = {...mf.macros,
+  smallfrac: {
+    args: 2,
+    def: '{}^{#1}\\!\\!/\\!{}_{#2}',
+    captureSelection: false,
+  },
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
@@ -1720,11 +1751,7 @@ mf.setOptions({
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        diamonds: undefined
-    }
+mf.macros = {...mf.macros, diamonds: undefined };
 });
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
@@ -1752,18 +1779,14 @@ editing mode.</p>
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        minutes: '\\,{}^\\prime\\;',
-        seconds: '\\,\\doubleprime\\;',
-    },
-    inlineShortcuts: {
-        ...mf.getOptions('inlineShortcuts'),
-        minutes: '\\minutes',
-        seconds: '\\seconds',
-    }
-});
+mf.macros = {...mf.macros,
+    minutes: '\\,{}^\\prime\\;',
+    seconds: '\\,\\doubleprime\\;',
+};
+mf.inlineShortcuts = {...mf.inlineShortcuts,
+    minutes: '\\minutes',
+    seconds: '\\seconds',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
@@ -1772,7 +1795,7 @@ mf.setOptions({
 <strong>Next:</strong> Manage <strong>Key bindings and Inline Shortcuts</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="inspecting-available-macros" tabindex="-1">Inspecting Available Macros</h2>
-<p><strong>To view the available macros</strong>, inspect the <code>macros</code> option:</p>
+<p><strong>To view the available macros</strong>, inspect the <code>macros</code> property:</p>
 <code-playground layout="stack" >
     <style slot="style">
       .output:focus-within {
@@ -1785,13 +1808,13 @@ mf.setOptions({
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-console.log(mf.getOptions('macros'));
+console.log(mf.macros);
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>
 </code-playground>
 <h2 id="disabling-macros" tabindex="-1">Disabling Macros</h2>
-<p><strong>To turn off all macros</strong>, use  <code>setOptions({macros: {}})</code>.</p>
+<p><strong>To turn off all macros</strong>, use  <code>mf.macros = {}</code>.</p>
 <div class='read-more'><a href="/mathlive/guides/shortcuts/">
 <strong>Next:</strong> Manage <strong>Key bindings and Inline Shortcuts</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -1804,14 +1827,14 @@ console.log(mf.getOptions('macros'));
         
 
 
-        <meta itemprop="datePublished" content="February 17, 2023">
+        <meta itemprop="datePublished" content="March 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

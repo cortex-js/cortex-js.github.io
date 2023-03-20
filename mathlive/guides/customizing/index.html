@@ -313,11 +313,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/guides/customizing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/guides/customizing/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/guides/customizing/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -457,7 +497,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1650,31 +1690,38 @@
 <code>style</code> attribute on the <code>&lt;math-field&gt;</code> element.</p>
 <p>This can be used to modify the appearance of the mathfield in many ways, for
 example changing the base font size or adding a border around it.</p>
-<p><strong>To display the mathfield as an inline element</strong>, rather than a block element,
-use <code>style=&quot;display: inline-block&quot;</code></p>
+<p><strong>To display the mathfield as a block element</strong>, rather than an inline element,
+add an attribute <code>style=&quot;display: block&quot;</code></p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Answer: <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Answer: <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;display: block&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</code></pre>
 <p><strong>To change the color of the caret (insertion point)</strong> set the value of the
-<code>caret-color</code> CSS property.</p>
+<code>--caret-color</code> CSS custom property.</p>
 <p><strong>To change the background color and ink color of the math content when
-selected</strong> set the value of the <code>color</code> and <code>background-color</code> CSS properties
-with a rule targeting the <code>::selection</code> pseudo-element.</p>
+selected</strong> set the value of the <code>--selection-color</code> and
+<code>--selection-background-color</code> CSS properties with a rule targeting the
+elements you want to customize.</p>
 <pre><code class="language-css">math-field {
-  <span class="hljs-attribute">caret-color</span>: darkblue;
-}
-math-field<span class="hljs-selector-pseudo">::selection</span> {
- <span class="hljs-attribute">background-color</span>: darkblue;
- <span class="hljs-attribute">color</span>: white;
+  <span class="hljs-attr">--caret-color</span>: red;
+  <span class="hljs-attr">--selection-background-color</span>: lightgoldenrodyellow;
+  <span class="hljs-attr">--selection-color</span>: darkblue;
 }
 </code></pre>
+<p>You can also use the <code>style</code> attribute of a <code>&lt;math-field&gt;</code> tag.</p>
 <p>Change the style attribute in the playground below to <code>color: #dde; background: #256291;</code>.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;math-field style="
+    <div slot="html">
+    &lt;math-field style="
     font-size: 32px; 
     margin: 3em;
     padding: 8px; 
     border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, .3); 
     box-shadow: 0 0 8px rgba(0, 0, 0, .2);
+    --caret-color: red;
+    --selection-background-color: lightgoldenrodyellow;
+    --selection-color: darkblue;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
@@ -1685,11 +1732,11 @@ math-field<span class="hljs-selector-pseudo">::selection</span> {
 <p><strong>To customize the appearance of the mathfield</strong>, use the following CSS
 variables (custom properties) in a ruleset that applies to the mathfield element.</p>
 <pre><code class="language-css">math-field {
- <span class="hljs-attr">--hue</span>: <span class="hljs-number">10</span>       <span class="hljs-comment">/* Set the highlight color and caret to a reddish hue */</span>
+ <span class="hljs-attr">--smart-fence-color</span>: red ;
 }
 </code></pre>
 <p>Alternatively you can set these CSS variables programatically:</p>
-<pre><code class="language-js">  <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--hue&quot;</span>, <span class="hljs-string">&quot;10&quot;</span>);
+<pre><code class="language-js">  <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--smart-fence-color&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>);
 </code></pre>
 <div class='symbols-table' style='--first-col-width:25ex'>
 <table>
@@ -1703,10 +1750,6 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 <tr>
 <td style="text-align:left"><code>--contains-highlight-backround-color</code></td>
 <td style="text-align:left">Backround color for items that contain the caret</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>--hue</code></td>
-<td style="text-align:left">Hue of the highlight color and the caret</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>--primary</code></td>
@@ -1745,16 +1788,16 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 <td style="text-align:left">Background color of the selection</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>--selection-color</code></td>
-<td style="text-align:left">Color of the content in the selection</td>
+<td style="text-align:left"><code>--correct-color</code></td>
+<td style="text-align:left">Highlight color of a prompt inside a mathfield when in the <code>&quot;correct&quot;</code> state</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--incorrect-color</code></td>
+<td style="text-align:left">Highlight color of a prompt inside a mathfield when in the <code>&quot;incorrect&quot;</code> state</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Note</strong> To change the placeholder symbol, set the option <code>placeholderSymbol</code>.</p>
-<p><strong>To change the appearance of the selection</strong> set the <code>--selection-background-color</code> and
-<code>--selection-color</code> CSS variables. To have a difference appearance when focused or
-not, set the <code>--selection-background-color-focused</code> and <code>--selection-color-focused</code>
-CSS variables.</p>
 </div>
 <p class="notice--info">Set these CSS variables on any selector that applies to the
 <code>&lt;math-field&gt;</code> element you want to customize, for example, <code>body</code>.
@@ -1772,8 +1815,7 @@ Although CSS styles are “invisible” to custom components, CSS variables are
       }
     </style>
     <div slot="html">&lt;math-field style="
-  --hue: 53;
-  --caret: red;
+  --caret-color: red;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
@@ -1812,7 +1854,7 @@ by displaying an outline on an enclosing element. </p>
 representation, can be controlled with some of the following options:</p>
 <h3 id="color" tabindex="-1">Color</h3>
 <p><strong>To change the foreground (“ink”) and background (“paper”) colors of a formula
-programmatically</strong>, use the <code>applyStyle()</code> function.</p>
+programmatically</strong>, use the <code>mf.applyStyle()</code> function.</p>
 <p><strong>To change the foreground color</strong>, use the <code>\textcolor{}{}</code> command.
 <strong>To change the background color</strong>, use the <code>\colorbox{}{}</code> command.</p>
 <p>The first argument of these commands is a color specified as:</p>
@@ -1924,20 +1966,15 @@ when using the <code>displaystyle</code> or <code>textstyle</code>, the limits o
 or the superscript or subscript of a symbol are displayed using these styles.
 Notice for example that <code>n=0</code> in <code>displaystyle</code> does not include space around
 the <code>=</code> sign because the limit is displayed in <code>scriptstyle</code>.</p>
-<p><strong>To set the default mathstyle of a mathfield</strong>, use the <code>defaultMode</code> option
-(or the <code>default-mode</code> attribute).</p>
-<p>Set it to <code>inline-math</code> to use <code>textstyle</code> or <code>math</code> to use <code>displaystyle</code>.</p>
-<p>By default, the mathfield element is laid out on the page as a block,
-that is with a <code>display: block</code> CSS property. To get it laid out as an inline
-element, set <code>display: inline-block</code> on the mathfield. To set a minimum width
-for the mathfield, use the <code>min-width</code> CSS property.</p>
-<p>Using <code>inline-block</code> is particularly useful when used in conjunction with <code>default-mode=&quot;inline-math&quot;</code>.</p>
+<p><strong>To set the default mathstyle of a mathfield</strong>, set the <code>mf.defaultMode</code>
+property or the <code>default-mode</code> attribute.</p>
+<p>Set it to <code>&quot;inline-math&quot;</code> to use <code>textstyle</code> or <code>&quot;math&quot;</code> to use <code>displaystyle</code>.</p>
+<p>By default, the mathfield element is laid out on the page as an inline element.
+To get it laid out as a block element, set <code>display: inline-block</code> on the mathfield.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
   <div slot="html">The answer is &lt;math-field 
-  default-mode="inline-math"
   style="
-    display: inline-block;
     vertical-align: middle;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, .3);
@@ -1950,7 +1987,7 @@ for the mathfield, use the <code>min-width</code> CSS property.</p>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h3 id="letter-shape-style" tabindex="-1">Letter Shape Style</h3>
-<p><strong>To control which letters are automatically italicized</strong>, use the <code>letterShapeStyle</code> configuration option.</p>
+<p><strong>To control which letters are automatically italicized</strong>, set the <code>letterShapeStyle</code> property or <code>letter-shape-style</code> attribute.</p>
 <div class='symbols-table'>
 <table>
 <thead>
@@ -2001,19 +2038,20 @@ when used as a variable. Mathematical constants such as \(e\) are written uprigh
 letters and lowercase greek letters, but not uppercase greek letters.</p>
 <p>The French typographical convention is to only italicize lowercase roman letters.</p>
 <p>The default letter shape style is <code>auto</code>: if the system locale is “french”,
-the <code>french</code> style is used, <code>tex</code> otherwise.</p>
+the <code>french</code> style is used, otherwise <code>tex</code> is used.</p>
 <section id='editing-options'>
 <h2 id="editing-options" tabindex="-1">Editing Options</h2>
-<p>Some configuration options can be specified when creating a mathfield as
-the argument of <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> or as an attribute to the <code>&amp;lt;math-field&amp;gt;</code> element.
-as we’ve see above with the <code>fontsDirectory</code> option.</p>
-<p>The configuration options can also be changed programmatically using the <a href="http://cortexjs.io/docs/mathlive/?q=%22setOptions%22"><code>setOptions()</code></a> method.</p>
-<p>Several of these configuration options affect the behavior while editing a
-formula:</p>
+<p>The editing behavior of a mathfield can be customized by setting some
+properties on the mathfield, or the equivalent attributes on the
+<code>&lt;math-field&gt;</code> tag.</p>
 <ul>
-<li><code>defaultMode</code>: if <code>inline-math</code> the math field is using inline math mode
-by default. If set to <code>math</code>, it will use the display math mode. If set to
-<code>text</code> it will use the text mode.</li>
+<li><code>defaultMode</code>:
+<ul>
+<li><code>&quot;inline-math&quot;</code>: use inline math mode</li>
+<li><code>&quot;math&quot;</code>: use the display math mode</li>
+<li><code>&quot;text&quot;</code>: use the text mode  |</li>
+</ul>
+</li>
 <li><code>removeExtraneousParentheses</code>: automatically remove extra parentheses around
 a numerator or denominator</li>
 <li><code>scriptDepth</code>: maximum levels of subscript or superscript. Set it to 0 to
@@ -2023,6 +2061,7 @@ prevent the input of superscript and subscripts</li>
 when typing “if x &gt; 0”</li>
 <li><code>smartSuperscript</code>: automatically move out of a superscript when a digit is typed</li>
 </ul>
+<p>These properties can also be passed as an argument to <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> when programmatically creating mathfield elements.</p>
 <p>In the code playground below, try some of these options. For example, change
 line 3 to <code>scriptDepth: 0</code>, then try to type “x^2” in the mathfield.</p>
 <!-- htmlmin:ignore -->
@@ -2056,9 +2095,8 @@ relational, binary or unary operators, etc…</p>
 <code>\qquad</code>, <code>\!</code>, <code>\,</code> (thin space), <code>\:</code> (medium space), <code>\;</code> (thick space), <code>\enskip</code> or <code>\enspace</code>.</p>
 <p>By default, pressing the spacebar when in math mode does not insert anything.</p>
 <p><strong>To insert a LaTeX command when the spacebar is pressed</strong>, set the value of the
-<code>mathModeSpace</code> option to that command:</p>
-<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">mathModeSpace</span>: <span class="hljs-string">&#x27;\\:&#x27;</span>});
-
+<code>mathModeSpace</code> property to that command:</p>
+<pre><code class="language-js">mf.<span class="hljs-property">mathModeSpace</span> = <span class="hljs-string">&#x27;\\:&#x27;</span>;
 </code></pre>
 </section>
 <h2 id="turning-off-the-latex-mode" tabindex="-1">Turning off the LaTeX mode</h2>
@@ -2067,7 +2105,7 @@ is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
 a powerful way to enter or edit LaTeX in an expression. However, users
 unfamiliar with LaTeX may be confused if they accidentally press those keys.</p>
 <p><strong>To prevent the LaTeX mode from being enabled</strong> intercept the trigger keys
-and handle them as desired.</p>
+and call `preventDefault().</p>
 <pre><code class="language-ts">mf.<span class="hljs-title function_">addEventListener</span>(
   <span class="hljs-string">&#x27;keydown&#x27;</span>,
   <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
@@ -2084,9 +2122,8 @@ and handle them as desired.</p>
 <p>The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.</p>
 <p>The language to use is detected automatically, but it can be overridden by
-using the <code>locale</code> option or the <code>locale</code> attribute.</p>
-<p class="notice--info"><strong>Note:</strong> we <code>await</code> for the <code>&lt;math-field&gt;</code> definition to be loaded before
-invoking the <code>getOptions()</code> method, otherwise it would not be found.</p>
+using the <code>MathfieldElement.locale</code> static property. Setting this property
+will affect all mathfield elements on the page.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
     <style slot="style">
@@ -2099,13 +2136,12 @@ invoking the <code>getOptions()</code> method, otherwise it would not be found.<
       }
     </style>
 <div slot="javascript">
-await window.customElements.whenDefined('math-field');
-const mf = document.getElementById('formula');
-const locale = mf.getOptions('locale');
+await customElements.whenDefined('math-field');
+const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
-console.log(mf.getOptions().strings[locale]);
+console.log(MathfieldElement.strings[locale]);
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual" locale="fr"&gt;
+<div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -2114,8 +2150,8 @@ console.log(mf.getOptions().strings[locale]);
 <p>The world is
 <a href="https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg">about evenly split</a>
 between using a dot <code>.</code> or a comma <code>,</code> as a decimal marker.</p>
-<p><strong>To change the marker used with decimal numbers</strong> set the <code>decimalSeparator</code>
-option to <code>&quot;,&quot;</code> or <code>&quot;.&quot;</code>.</p>
+<p><strong>To change the marker used with decimal numbers</strong> set the
+<code>MathfieldElement.decimalSeparator</code> property to <code>&quot;,&quot;</code> or <code>&quot;.&quot;</code>.</p>
 <p>When set to <code>&quot;,&quot;</code>, pressing the <code>,</code> key on a physical keyboard will insert a
 <code>{,}</code> LaTeX string, if in math mode and if before a digit.</p>
 <p>The LaTeX sequence <code>{,}</code> is traditionally used to correctly typeset the comma
@@ -2135,12 +2171,10 @@ keycap is  labeled <code>,</code> instead and contextually inserts a <code>{,}</
       }
     </style>
 <div slot="javascript">
-await window.customElements.whenDefined('math-field');
-document.getElementById('formula').setOptions({
-  decimalSeparator: ","
-});
+await customElements.whenDefined('math-field');
+MathfieldElement.decimalSeparator = ",";
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+<div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -2163,11 +2197,9 @@ before the numerator.</p>
     </style>
 <div slot="javascript">
 await window.customElements.whenDefined('math-field');
-document.getElementById('formula').setOptions({
-  fractionNavigationOrder: "denominator-numerator"
-});
+MathfieldElement.fractionNavigationOrder = "denominator-numerator";
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+<div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -2177,10 +2209,11 @@ document.getElementById('formula').setOptions({
 <p>The content of the mathfield is displayed using a family of high-quality
 fonts based on the original Computer Modern font from TeX. The mathfield
 will not display correctly using another font.</p>
-<p>By default, the directory containing
-the fonts is located next to the file containing the mathlive library.
-If your bundler or asset management system require a different configuration
-you can specify where the fonts can be located using the <a href="http://cortexjs.io/docs/mathlive/?q=fontsDirectory"><code>fontsDirectory</code></a> option or the <code>fonts-directory</code> attribute.</p>
+<p>By default, the directory containing the fonts is located next to the file
+containing the mathlive library. If your bundler or asset management system
+require a different configuration you can specify where the fonts can be
+located using the <a href="http://cortexjs.io/docs/mathlive/?q=fontsDirectory"><code>MathfieldElement.fontsDirectory</code></a>
+property.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
     <style slot="style">
@@ -2192,15 +2225,18 @@ you can specify where the fonts can be located using the <a href="http://cortexj
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+<div slot="javascript">
+await window.customElements.whenDefined("math-field");
+MathfieldElement.fontsDirectory="//unpkg.com/mathlive/dist/fonts/";
+</div>
+<div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
-<p class="notice--warning"><strong>Note:</strong> changing the fonts directory for one mathfield will change the fonts
-used by all the other mathfield elements in the page.</p>
 <div class='read-more'><a href="/mathlive/guides/integration/">
-Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
+Learn more about configuring the MathLive library to your environment,
+including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/mathlive/guides/commands/">
 <strong>Next:</strong> <strong>Executing Commands</strong>: send editing commands to a mathfield
@@ -2214,14 +2250,14 @@ Learn more about configuring the MathLive library to your environment, including
         
 
 
-        <meta itemprop="datePublished" content="February 17, 2023">
+        <meta itemprop="datePublished" content="March 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

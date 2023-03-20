@@ -301,11 +301,51 @@
               
 
               <li>              
+                <a href="/mathlive/guides/react/" data-url=/mathlive/guides/speech/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Using MathLive with React
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
                 <a href="/mathlive/guides/interacting/" data-url=/mathlive/guides/speech/ class="">
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Interacting
+                  Interact
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/guides/fill-in-the-blank/" data-url=/mathlive/guides/speech/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
+                  
+                  Fill in the blank
                 </a></li>
             
           
@@ -445,7 +485,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboards
+                  Virtual Keyboard
                 </a></li>
             
           
@@ -1697,22 +1737,24 @@ the <code>spoken-text</code> format:</p>
 <h3 id="speech-rules" tabindex="-1">Speech Rules</h3>
 <p>A set of <strong>speech rules</strong> define how a math formula is transformed to speakable
 text.</p>
-<p><strong>To use the MathLive built-in speech rules</strong>, set <code>textToSpeechRules</code> to <code>mathlive</code>.</p>
+<p><strong>To use the MathLive built-in speech rules</strong>, set <code>MathfieldElement.textToSpeechRules</code> to <code>&quot;mathlive&quot;</code>.</p>
 <p>Another set of speech rules supported are the SRE speech rules from Volker Sorge</p>
 <p><strong>To use the SRE speech rules</strong>:</p>
 <ol>
-<li>Include the browser version of the SRE JavaScript file in your project. You can download it on <a href="https://github.com/zorkow/speech-rule-engine">GitHub</a></li>
-<li>Set the <code>textToSpeechRules</code> configuration key to <code>&quot;sre&quot;</code>.</li>
+<li>Include the browser version of the SRE JavaScript file in your project.
+You can download it on <a href="https://github.com/zorkow/speech-rule-engine">GitHub</a></li>
+<li>Set <code>MathfieldElement.textToSpeechRules</code> to <code>&quot;sre&quot;</code>.</li>
 </ol>
-<p><strong>To configure SRE</strong>, set the <code>textToSpeechRulesOptions</code> configuration key. For example:</p>
-<pre><code class="language-javascript"><span class="hljs-attr">textToSpeechRulesOptions</span>: {
+<p><strong>To configure SRE</strong>, set the <code>MathfieldElement.textToSpeechRules</code> property.</p>
+<p>For example:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">textToSpeechRules</span> = {
     <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;mathspeak&#x27;</span>, <span class="hljs-comment">// &#x27;mathspeak&#x27; or &#x27;chromevox&#x27;</span>
     <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
-},
+};
 </code></pre>
 <h3 id="text-to-speech-engine" tabindex="-1">Text-to-Speech Engine</h3>
 <h4 id="using-the-local-tts-engine" tabindex="-1">Using the Local TTS Engine</h4>
-<p><strong>To use the local (built-in, OS specific) TTS engine</strong>, set the <code>speechEngine</code> configuration key to <code>&quot;local&quot;</code>.</p>
+<p><strong>To use the local (built-in, OS specific) TTS engine</strong>, set <code>MathfieldElement.speechEngine</code> to <code>&quot;local&quot;</code>.</p>
 <p>There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.</p>
 <h4 id="using-amazon-polly-tts-engine" tabindex="-1">Using Amazon Polly TTS Engine</h4>
 <ol>
@@ -1740,7 +1782,7 @@ This may be as simple as adding this:</li>
 </ol>
 <p>Carefully consider how to handle the access and secret access keys. With the setup above they are somewhat restricted to a domain, however, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.</p>
 <h3 id="speech-output-format" tabindex="-1">Speech Output Format</h3>
-<p><strong>To configure the format of the speech output engine</strong>, use the <code>textToSpeechMarkup</code> configuration option. Set it to:</p>
+<p><strong>To configure the format of the speech output engine</strong>, use the <code>MathfieldElement.textToSpeechMarkup</code>. Set it to:</p>
 <ul>
 <li><code>&quot;ssml&quot;</code> to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.</li>
 <li><code>&quot;mac&quot;</code> to request an output using Mac OS speech markup, e.g. ‘[[slc 150]]’. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.</li>
@@ -1759,14 +1801,14 @@ This may be as simple as adding this:</li>
         
 
 
-        <meta itemprop="datePublished" content="February 17, 2023">
+        <meta itemprop="datePublished" content="March 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
