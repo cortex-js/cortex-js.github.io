@@ -30,25 +30,39 @@
 <link rel="icon" href="data:," />
 
 <script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
 </script>
 
 
+<script>
+  window.moduleMap = {
+"mathlive": "//unpkg.com/mathlive?module",
+// "mathlive": "/js/mathlive.mjs",
+"html-to-image": "///assets/js/html-to-image.js",
+"compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
+};
+
+</script>
+
+
+
+
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
   
 
 
@@ -57,7 +71,12 @@
     
       
     
-    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/mathlive?module" crossorigin="anonymous"></script>
   
 
 
@@ -1671,12 +1690,6 @@
 
 
 
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
-    };
-</script>
 <h2 id="key-bindings" tabindex="-1">Key Bindings</h2>
 <p>A <strong>key binding</strong> is a combination of keys pressed simultaneously on a physical
 keyboard that triggers a command.</p>
@@ -1696,8 +1709,7 @@ for a <code>keydown</code> event.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.addEventListener('keydown', (ev) => {
   if (ev.altKey === true && ev.code === 'KeyS') {
     mf.insert('\\sum^\\infty_{n=0}');
@@ -1788,8 +1800,7 @@ defined, but they can be replaced or enhanced with additional shortcuts.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.inlineShortcuts = 
   ...mf.inlineShortcuts,    // Preserve default shortcuts
   "infty": '\\infty'
@@ -1985,14 +1996,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 17, 2023">
+        <meta itemprop="datePublished" content="March 23, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -30,25 +30,39 @@
 <link rel="icon" href="data:," />
 
 <script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
 </script>
 
 
+<script>
+  window.moduleMap = {
+"mathlive": "//unpkg.com/mathlive?module",
+// "mathlive": "/js/mathlive.mjs",
+"html-to-image": "///assets/js/html-to-image.js",
+"compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
+};
+
+</script>
+
+
+
+
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
   
 
 
@@ -57,7 +71,17 @@
     
       
     
-    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/mathlive?module" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/@cortex-js/compute-engine?module" crossorigin="anonymous"></script>
   
 
 
@@ -1655,10 +1679,6 @@
 
 
 <script>
-  moduleMap = {
-    "mathlive": "//unpkg.com/mathlive/dist/mathlive.mjs",
-    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
-  };
   window.addEventListener('DOMContentLoaded', (event) => 
       import('//unpkg.com/mathlive/dist/mathlive.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive + ' (debug)'
   ));
@@ -1688,7 +1708,7 @@ Try a demo of the <strong>Compute Engine</strong>.
         border: var(--ui-border);
         padding: 8px;
       }
-      .output math-field { font-size: 24px; } 
+      .output math-field { font-size: 24px; border-radius: 8px; } 
       .output math-field:focus-within {
         outline: Highlight auto 1px;
         outline: -webkit-focus-ring-color auto 1px
@@ -1698,9 +1718,7 @@ Try a demo of the <strong>Compute Engine</strong>.
         font-family: var(--monospace-font-family), 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-import  'compute-engine';
-const mf = document.querySelector('#formula');
+    <div slot="javascript">const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
 //
 latexField.addEventListener('input', () => mf.setValue(latexField.value));
@@ -1731,14 +1749,14 @@ onMathfieldInput();</div>
         
 
 
-        <meta itemprop="datePublished" content="March 17, 2023">
+        <meta itemprop="datePublished" content="March 23, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

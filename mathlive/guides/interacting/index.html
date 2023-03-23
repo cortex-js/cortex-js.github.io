@@ -30,25 +30,39 @@
 <link rel="icon" href="data:," />
 
 <script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
 </script>
 
 
+<script>
+  window.moduleMap = {
+"mathlive": "//unpkg.com/mathlive?module",
+// "mathlive": "/js/mathlive.mjs",
+"html-to-image": "///assets/js/html-to-image.js",
+"compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
+};
+
+</script>
+
+
+
+
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
   
 
 
@@ -57,7 +71,12 @@
     
       
     
-    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/mathlive?module" crossorigin="anonymous"></script>
   
 
 
@@ -1671,48 +1690,37 @@
 
 
 
-<script>
-  moduleMap = {
-    mathlive: "//unpkg.com/mathlive?module",
-    "html-to-image": "///assets/js/html-to-image.js",
-    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
-  };
-</script>
 <h2 id="changing-the-content-of-a-mathfield" tabindex="-1">Changing the Content of a Mathfield</h2>
 <p><strong>To change the value of a <code>&lt;math-field&gt;</code> element programatically</strong> set its <code>value</code>
 property.</p>
 <p>In the playground below, the <strong>LaTeX</strong> input field is editable and is reflected
-in the mathfield (and vice-versa).</p>
+in the mathfield, and vice-versa.</p>
 <p class="notice--info">Note that we use the <code>suppressChangeNotifications</code> option when
 changing the content of the mathfield, to prevent an <code>&quot;input&quot;</code> event from being
 triggered and creating an infinite loop.</p>
 <code-playground layout="stack">
-  <div slot="javascript">import 'mathlive';
-    const mf = document.getElementById('formula');
-    mf.addEventListener('input',(ev) => {
-        document.getElementById('latex').value = mf.value;
-    });
+  <div slot="javascript">
+const mf = document.getElementById("formula");
+const latex = document.getElementById("latex");
 //
-    document.getElementById('latex').value = mf.value;
+mf.addEventListener("input",(ev) => latex.value = mf.value);
 //
-    // Listen for changes in the latex text field, and reflect its value in 
-    // the mathfield.
+latex.value = mf.value;
 //
-    document.getElementById('latex').
-      addEventListener('input', (ev) => {
-        mf.setValue(
-          ev.target.value, 
-          {suppressChangeNotifications: true}
-        );
-    });
+// Listen for changes in the "latex" text field, and reflect its value in 
+// the mathfield.
+//
+latex.addEventListener("input", (ev) => 
+    mf.setValue( ev.target.value, {suppressChangeNotifications: true})
+);
   </div>
   <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
   &lt;math-field id="formula"&gt;
-  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+      x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
   &lt;/math-field&gt;                
   &lt;label&gt;Latex&lt;/label&gt;
   <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea></textarea>
+  autocorrect="off" spellcheck="false"></textarea>
   </div>
 </code-playground>
 <h2 id="reading-the-content-of-a-mathfield" tabindex="-1">Reading the Content of a Mathfield</h2>
@@ -1741,7 +1749,7 @@ loses focus and the content has been modified.</p>
   // `ev.target` is an instance of `MathfieldElement`
   console.log(ev.target.value);
 });</div>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
+    <div slot="html">
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -1753,7 +1761,7 @@ no argument.</p>
 For example to get the content as a MathJSON expression, use <code>getValue('math-json')</code>.</p>
 <p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>&quot;math-json&quot;</code> to <code>&quot;spoken-text&quot;</code>.</p>
 <code-playground layout="stack">
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
+    <div slot="html">
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -1999,7 +2007,7 @@ the content of the formula, see <a href="mathlive/guides/customizing/">Customizi
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
+    <div slot="javascript">
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
 mf.applyStyle(
@@ -2025,7 +2033,7 @@ to <code>applyStyle()</code>.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
+    <div slot="javascript">
 const mf = document.getElementById('formula');
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
@@ -2061,14 +2069,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 14, 2023">
+        <meta itemprop="datePublished" content="March 23, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-14'>March 14, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

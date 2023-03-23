@@ -30,25 +30,29 @@
 <link rel="icon" href="data:," />
 
 <script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
 </script>
 
 
+
+
+
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
   
     
       
     
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin='anonymous'></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
   
 
 
@@ -57,7 +61,12 @@
     
       
     
-    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin='anonymous'></script>
+    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/mathlive?module" crossorigin="anonymous"></script>
   
 
 
@@ -1654,11 +1663,6 @@
   
 
 
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-    };
-</script>
 <h1 id="macros" tabindex="-1">Macros</h1>
 <p class="xl">MathLive has over <a href="/mathlive/reference/commands/">800 LaTeX commands</a>
 predefined. Some are primitives but others are macros, that is commands defined
@@ -1677,8 +1681,7 @@ turned off.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
     minutes: '\\,{}^\\prime\\;',
     seconds: '\\,\\doubleprime\\;',
@@ -1699,8 +1702,7 @@ mf.macros = { ...mf.macros,
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, 
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
@@ -1724,8 +1726,7 @@ in the expanded definition of a macro.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros,
   smallfrac: {
     args: 2,
@@ -1749,8 +1750,7 @@ mf.macros = {...mf.macros,
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, diamonds: undefined };
 });
 </div>
@@ -1777,8 +1777,7 @@ editing mode.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros,
     minutes: '\\,{}^\\prime\\;',
     seconds: '\\,\\doubleprime\\;',
@@ -1806,8 +1805,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 console.log(mf.macros);
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
@@ -1827,14 +1825,14 @@ console.log(mf.macros);
         
 
 
-        <meta itemprop="datePublished" content="March 17, 2023">
+        <meta itemprop="datePublished" content="March 23, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
