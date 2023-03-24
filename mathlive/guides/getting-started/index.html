@@ -1684,7 +1684,8 @@ of the mathfield, as a LaTeX expression.</p>
 </code></pre>
 <p class="notice--info"><a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a> is a plain text markup language for structured documents. Most LaTeX commands start with a <code>\</code>, for example <code>\sqrt</code>, <code>\frac</code> and <code>\sin</code>. Read more about the <a href="/mathlive/reference/commands/">LaTeX commands available in a mathfield</a></p>
 <h2 id="try-it-out" tabindex="-1">Try it Out</h2>
-<p><strong>In the code playground below, change line 3 of the HTML to another LaTeX expression.</strong><br>For example <code>f(x) = \frac{x}{2}</code>.</p>
+<p><strong>In the code playground below, change the content inside the <code>&lt;math-field&gt;</code> tag.</strong></p>
+<p>For example change it to <code>f(x) = \frac{x}{2}</code>.</p>
 <p class="notice--info"><strong>Note:</strong> The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
 <br>Press <strong>Reset</strong> to bring back the playground to its original state.</p>
 <code-playground layout="stack" show-line-numbers mark-html-line="3">
@@ -1697,17 +1698,27 @@ of the mathfield, as a LaTeX expression.</p>
         outline: none;
       }
     </style>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
- <div class="notice--warning" markdown="1">
+<div class="notice--warning" markdown="1">
 <h4 id="caution" tabindex="-1">Caution</h4>
 <p>The HTML quirks mode is not supported. This means that the host page
 must use the strict mode, indicated by a <code>&lt;!DOCTYPE html&gt;</code> directive at the top
 of the page. Without it, the layout of the equations inside the mathfield may be incorrect.</p>
 </div>
+<p>Here’s a complete web page:</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>untitled<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">defer</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/mathlive&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
 <div class='read-more'><a href="/mathlive/guides/interacting/">
 <strong>Next:</strong> <strong>Interacting with a Mathfield</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
