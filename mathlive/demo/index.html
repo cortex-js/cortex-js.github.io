@@ -1778,9 +1778,18 @@
     font-weight: bold;
   }
 
+  table.shortcuts {
+
+  }
+
 </style>
 <script type="module">
+
+
 await customElements.whenDefined('math-field');
+
+import {renderMathInDocument} from '//unpkg.com/mathlive?module';
+
 
 const INDENT = '  ';
 
@@ -2115,15 +2124,46 @@ function escapeHTML(s) {
     .replace(/'/g, '&#039;');
 }
 
+renderMathInDocument();
 
 </script>
 <math-field id="formula">
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </math-field>
+<div style="margin-left: auto;padding-top: .5em; text-align: right"><a href="#shortcuts">Keyboard Shortcuts</a></div>
+<h4>LaTeX</h4>
 <textarea id="latex"></textarea>
-<pre class="console" id="math-json"></pred>
+<div class='read-more'><a href="/mathlive/reference/commands/">
+Read more about the supported <strong>LaTeX commands</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h4>MathJSON</h4>
+<pre class="console" id="math-json"></pre>
 <div class='read-more'><a href="/compute-engine/demo/">
-Try a demo of the <strong>Compute Engine</strong>.
+Learn more about MathJSON and try a demo of the <strong>Compute Engine</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="shortcuts">Keyboard Shortcuts</h2>
+<table class='shortcuts'>
+<thead>
+<tr><th>Shortcut</th><th>Result</th><th></th></tr>
+</thead>
+<tbody>
+  <tr><td><kbd>/</kbd></td><td>$$ \frac{\blacksquare}{\blacksquare}$$</td><td>Fraction</td></tr>
+  <tr><td><kbd>^</kbd></td><td>$$ \square^\blacksquare$$</td><td>Superscript, Power</td></tr>
+  <tr><td><kbd>_</kbd></td><td>$$ \square_\blacksquare$$</td><td>Subscript</td></tr>
+  <tr><td><kbd>alt/option</kbd> + <kbd>V</kbd></td><td>$$\sqrt{\blacksquare}$$</td><td>Square root</td></tr>
+  <tr><td><kbd>alt/option</kbd> + <kbd>B</kbd></td><td>$$\int^{\blacksquare}_{\blacksquare}$$</td><td>Integral</td></tr>
+  <tr><td><kbd>alt/option</kbd> + <kbd>W</kbd></td><td>$$\sum$$</td><td>Sum</td></tr>
+  <tr><td><kbd>alt/option</kbd> + <kbd>shift</kbd> + <kbd>P</kbd></td><td>$$\prod^\blacksquare_\blacksquare$$</td><td>Product</td></tr>
+  <tr><td><kbd>p</kbd><kbd>i</kbd></td><td>$$\pi$$</td><td>Pi</td></tr>
+  <tr><td><kbd>x</kbd><kbd>x</kbd></td><td>$$\times$$</td><td>Times</td></tr>
+  <tr><td><kbd>+</kbd><kbd>-</kbd></td><td>$$\pm$$</td><td>Plus or minus</td></tr>
+  <tr><td><kbd>R</kbd><kbd>R</kbd></td><td>$$\mathbb{R}$$</td><td>Blakckboard R</td></tr>
+  <tr><td><kbd>ESC</kbd></td><td></td><td>Enter/exit LaTeX mode</td></tr>
+  <tr><td><kbd>"</kbd></td><td>$$ \text{text}$$</td><td>Enter/exit text mode</td></tr>
+</tbody>
+</table>
+<div class='read-more'><a href="/mathlive/reference/keybindings/">
+Read more about all the available <strong>shortcuts</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
         
@@ -2134,14 +2174,14 @@ Try a demo of the <strong>Compute Engine</strong>.
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2023">
+        <meta itemprop="datePublished" content="March 24, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-24'>March 24, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

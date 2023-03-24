@@ -1801,7 +1801,7 @@ defined, but they can be replaced or enhanced with additional shortcuts.</p>
       }
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
-mf.inlineShortcuts = 
+mf.inlineShortcuts = {
   ...mf.inlineShortcuts,    // Preserve default shortcuts
   "infty": '\\infty'
 };
@@ -1811,7 +1811,7 @@ mf.inlineShortcuts =
 </code-playground>
 <p><strong>To constraint the context in which a shortcut should apply</strong>, use the <code>after</code>
 property:</p>
-<pre><code class="language-javascript">mf.<span class="hljs-property">inlineShortcuts</span> =
+<pre><code class="language-javascript">mf.<span class="hljs-property">inlineShortcuts</span> = {
 ...mf.<span class="hljs-property">inlineShortcuts</span>,    <span class="hljs-comment">// Preserve default shortcuts</span>
   <span class="hljs-attr">in</span>: {
       <span class="hljs-attr">after</span>: <span class="hljs-string">&#x27;space | letter | digit | symbol | fence&#x27;</span>,
@@ -1996,14 +1996,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 23, 2023">
+        <meta itemprop="datePublished" content="March 24, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-23'>March 23, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-24'>March 24, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
