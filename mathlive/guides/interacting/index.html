@@ -1878,6 +1878,13 @@ or <strong>Enter</strong> is used to exit the mode.</p>
 use the keyboard. This behavior matches the <code>&lt;textarea&gt;</code> element.</p>
 <p><strong>To listen specifically for a press of the <strong>Return</strong> or <strong>Enter</strong> key on the
 keyboard</strong> listen for an <code>input</code> event with an <code>inputType</code> property of <code>&quot;insertLineBreak&quot;</code>.</p>
+<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;beforeinput&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">inputType</span> === <span class="hljs-string">&#x27;insertLineBreak&#x27;</span>) {
+    mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&quot;moveToNextPlaceholder&quot;</span>);
+    ev.<span class="hljs-title function_">preventDefault</span>();
+  };
+});
+</code></pre>
 <h2 id="detecting-a-click-on-a-mathfield" tabindex="-1">Detecting a Click on a Mathfield</h2>
 <p>In most cases MathLive will respond to mouse and keyboard interactions with
 the mathfield. However, in some cases it might be useful to detect when a
@@ -2073,14 +2080,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 25, 2023">
+        <meta itemprop="datePublished" content="March 27, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-25'>March 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-27'>March 27, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
