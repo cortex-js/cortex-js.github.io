@@ -48,6 +48,10 @@
 
 
 
+
+
+
+
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
@@ -1645,806 +1649,650 @@
 
 
 <style>
-  td:nth-child(1) code {
+  td:nth-child(1) code, td:nth-child(1) kbd {
+    display: inline-block;
+    min-width: 42px;
+    text-align: center;
     font-size: 24px;
     font-weight:normal;
     margin: 8px;
-    line-height: 1.5
+    line-height: 1.5;
+    font-variant-ligatures: none;
   }
   table {
     table-layout: auto;
   }
+  table tr td {
+    vertical-align: middle;
+  }
   table tr td:first-child {
     min-width: 15ex;
     width: 1ex;
-    white-space: nowrap;  
+    white-space: nowrap;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary-color-dark);
   }
+
+  kbd {
+    font-family: var(--ui-font-family);
+    padding-left: 4px;
+    padding-right: 4px;
+  
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 0.8em;
+    border: var(--code-border);
+    background: var(--code-background);
+    border-radius: 4px;
+    color: var(--primary-color-dark);
+  }
+
+  table td code {
+    border: none;
+    background: none;
+  }
+
+  #special-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
+    font-size: 1.5rem;
+  }
+
+  #special-keys > div {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    width: 8em;
+    height: 8em;
+    font-size: 1rem;
+  }
+
+  #special-keys > div > kbd:first-child {
+    display: flex;
+    width: 96px;
+    height: 64px;
+    
+    font-size: 32px;
+    justify-content: center;
+    align-items: center;
+  }
+
+    #special-keys > div > span, 
+    #special-keys > div > kbd:nth-child(2) {
+      width: 100%;
+      text-align: center;
+      padding: 0;
+      border: none;
+      background: none;
+    }
+    #special-keys .label {
+      font-size: 16px;
+    }
+    #special-keys  .label kbd {
+      padding: 0;
+      border: none;
+      background: none;
+      font-weight: 600;
+    }
+
 </style>
 <h2 id="keybindings" tabindex="-1">Keybindings</h2>
 <p>Commands to edit and modify a formula can be invoked by pressing some key
 combinations.</p>
+<p class="notice--info">The keybinding below are applicable to a US QWERTY keyboard. Some of the
+keybindings may not be available with other keyboard layouts.</p>
+<div class='read-more'><a href="/mathlive/reference/shortcuts/">
+Read more about definining your own <strong>keybindings</strong> and <strong>shortcuts</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h3 id="special-keys" tabindex="-1">Special Keys</h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>⇧</code></td>
-<td style="text-align:left"><code>Shift</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code></td>
-<td style="text-align:left"><code>Ctrl</code> or <code>Control</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code></td>
-<td style="text-align:left"><code>Option</code> or <code>Alt</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌫</code></td>
-<td style="text-align:left"><code>Del</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌦</code></td>
-<td style="text-align:left"><code>Backspace</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌘</code></td>
-<td style="text-align:left"><code>Command</code> (macOS) or <code>Ctrl</code> (Windows)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⤒</code></td>
-<td style="text-align:left"><code>Home</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⤓</code></td>
-<td style="text-align:left"><code>End</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇞</code></td>
-<td style="text-align:left"><code>Page Up</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇟</code></td>
-<td style="text-align:left"><code>Page Down</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⏎</code></td>
-<td style="text-align:left"><code>Return</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌤</code></td>
-<td style="text-align:left"><code>Enter</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇥</code></td>
-<td style="text-align:left"><code>Tab</code></td>
-</tr>
-</tbody>
-</table>
+<div id='special-keys'>
+  <div> <kbd>⇧</kbd><span class="label"><kbd>Shift</kbd></div> 
+   <div> <kbd>⌃</kbd><span class="label"><kbd>Ctrl</kbd> or <kbd>Control</kbd></span></div>
+   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd> or <kbd>Alt</kbd></span></div>
+   <div> <kbd>⌫</kbd><span class="label"><kbd>Backspace</kbd></span></div>
+   <div> <kbd>⌦</kbd><span class="label"><kbd>Del</kbd></span></div>
+   <div> <kbd>⌘</kbd><span class="label"><kbd>Command</kbd> (macOS) or<br><kbd>Ctrl</kbd> (Windows)</span></div>
+   <div> <kbd>⤒</kbd><span class="label"><kbd>Home</kbd></span></div> 
+   <div> <kbd>⤓</kbd><span class="label"><kbd>End</kbd></span></div> 
+   <div> <kbd>⇞</kbd><span class="label"><kbd>Page Up</kbd></span></div>
+   <div> <kbd>⇟</kbd><span class="label"><kbd>Page Down</kbd></span></div>
+   <div> <kbd>⏎</kbd><span class="label"><kbd>Return</kbd></span></div>
+   <div> <kbd>⌤</kbd><span class="label"><kbd>Enter</kbd></span></div>
+   <div> <kbd>⇥</kbd><span class="label"><kbd>Tab</kbd></span></div>
+</div>
 <h3 id="all-modes" tabindex="-1">All Modes</h3>
-<p>The shortcuts in this section apply in all modes.</p>
+<p>The keybindings in this section apply in all modes (math, text and LaTeX).</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">Keybinding</th>
 <th style="text-align:left">Result</th>
-<th style="text-align:right">OS</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>⇠</code></td>
+<td style="text-align:left"><kbd>⇠</kbd></td>
 <td style="text-align:left">move to previous char</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇢</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td style="text-align:left">move to previous char</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇢</kbd></td>
 <td style="text-align:left">move to next char</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇡</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td style="text-align:left">move to next char</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇡</kbd></td>
 <td style="text-align:left">move up</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇣</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>P</kbd></td>
+<td style="text-align:left">move up</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇣</kbd></td>
 <td style="text-align:left">move down</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇠</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>N</kbd></td>
+<td style="text-align:left">move down</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇠</kbd></td>
 <td style="text-align:left">extend selection backward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇢</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td style="text-align:left">extend selection backward</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇢</kbd></td>
 <td style="text-align:left">extend selection forward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇡</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td style="text-align:left">extend selection forward</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇡</kbd></td>
 <td style="text-align:left">extend selection upward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇣</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd></td>
+<td style="text-align:left">extend selection upward</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇣</kbd></td>
 <td style="text-align:left">extend selection downward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌫</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd></td>
+<td style="text-align:left">extend selection downward</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⌫</kbd></td>
 <td style="text-align:left">delete backward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌦</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌦</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌦</code></td>
+<td style="text-align:left"><kbd>⌦</kbd></td>
 <td style="text-align:left">delete forward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌫</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌫</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⇠</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⇠</kbd></td>
 <td style="text-align:left">move to previous word</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⇢</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td style="text-align:left">move to previous word</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⇢</kbd></td>
 <td style="text-align:left">move to next word</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>⇠</code></td>
-<td style="text-align:left">extend to previous word</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td style="text-align:left">move to next word</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>⇢</code></td>
-<td style="text-align:left">extend to next word</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇠</kbd></td>
+<td style="text-align:left">extend selection to previous word</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>⇠</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇢</kbd></td>
+<td style="text-align:left">extend selection to next word</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>⇠</kbd></td>
 <td style="text-align:left">move to group start</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>⇢</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>⇢</kbd></td>
 <td style="text-align:left">move to group end</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>⇠</code></td>
-<td style="text-align:left">extend to group start</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇠</kbd></td>
+<td style="text-align:left">extend selection to group start</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>⇢</code></td>
-<td style="text-align:left">extend to group end</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇢</kbd></td>
+<td style="text-align:left">extend selection to group end</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>space</code></td>
+<td style="text-align:left"><kbd>space</kbd></td>
 <td style="text-align:left">move after parent</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>space</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>space</kbd></td>
 <td style="text-align:left">move before parent</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⤒</code></td>
-<td style="text-align:left">move to math field start</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⤒</kbd></td>
+<td style="text-align:left">move to mathfield start</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>⇠</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>⇠</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⤒</code></td>
-<td style="text-align:left">extend to math field start</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⤒</kbd></td>
+<td style="text-align:left">extend selection to mathfield start</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌘</code> <code>⇠</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⤓</code></td>
-<td style="text-align:left">move to math field end</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⤓</kbd></td>
+<td style="text-align:left">move to mathfield end</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>⇢</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>⇢</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⤓</code></td>
-<td style="text-align:left">extend to math field end</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⤓</kbd></td>
+<td style="text-align:left">extend selection to mathfield end</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌘</code> <code>⇢</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇢</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇞</code></td>
+<td style="text-align:left"><kbd>⇞</kbd></td>
 <td style="text-align:left">move to group start</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇟</code></td>
+<td style="text-align:left"><kbd>⇟</kbd></td>
 <td style="text-align:left">move to group end</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left"><kbd>⇥</kbd></td>
 <td style="text-align:left">move to next placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇥</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇥</kbd></td>
 <td style="text-align:left">move to previous placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left"><kbd>⇥</kbd></td>
 <td style="text-align:left">move to next placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇥</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇥</kbd></td>
 <td style="text-align:left">move to previous placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">switchMode(“latex”)</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>\</code></td>
+<td style="text-align:left"><kbd>Intl Backslash</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Intl Backslash</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code> <code>=</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>=</kbd></td>
 <td style="text-align:left">applyStyle({“mode”:“text”})</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>=</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>esc</code></td>
+<td style="text-align:left"><kbd>esc</kbd></td>
 <td style="text-align:left">complete(“complete”)</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left"><kbd>⇥</kbd></td>
 <td style="text-align:left">In LaTeX mode: accept-suggestion</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⏎</code></td>
+<td style="text-align:left"><kbd>⏎</kbd></td>
 <td style="text-align:left">complete</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌤</code></td>
+<td style="text-align:left"><kbd>⌤</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧esc</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>esc</kbd></td>
 <td style="text-align:left">complete(“reject”)</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>A</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>A</kbd></td>
 <td style="text-align:left">select all</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>A</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>A</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Cut</code></td>
-<td style="text-align:left">cut to clipboard</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Copy</code></td>
-<td style="text-align:left">copy to clipboard</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Paste</code></td>
-<td style="text-align:left">paste from clipboard</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Clear</code></td>
-<td style="text-align:left">delete backward</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code> <code>Z</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>Z</kbd></td>
 <td style="text-align:left">undo</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>Z</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>Z</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Undo</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code> <code>Y</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>Y</kbd></td>
 <td style="text-align:left">redo</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌘</code> <code>Y</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>Z</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌘</code> <code>Z</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Redo</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>A</kbd></td>
+<td style="text-align:left">move to mathfield start</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Erase EOF</code></td>
-<td style="text-align:left">delete to group end</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>E</kbd></td>
+<td style="text-align:left">move to mathfield end</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>B</code></td>
-<td style="text-align:left">move to previous char</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd></td>
+<td style="text-align:left">extend selection to mathfield start</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>F</code></td>
-<td style="text-align:left">move to next char</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd></td>
+<td style="text-align:left">extend selection to mathfield end</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>P</code></td>
-<td style="text-align:left">move up</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td style="text-align:left">extend selection to previous word</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>N</code></td>
-<td style="text-align:left">move down</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td style="text-align:left">extend selection to next word</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>A</code></td>
-<td style="text-align:left">move to math field start</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code> <code>E</code></td>
-<td style="text-align:left">move to math field end</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>B</code></td>
-<td style="text-align:left">extend selection backward</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>F</code></td>
-<td style="text-align:left">extend selection forward</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>P</code></td>
-<td style="text-align:left">extend selection upward</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>N</code></td>
-<td style="text-align:left">extend selection downward</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>A</code></td>
-<td style="text-align:left">extend to math field start</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>E</code></td>
-<td style="text-align:left">extend to math field end</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>B</code></td>
-<td style="text-align:left">move to previous word</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>F</code></td>
-<td style="text-align:left">move to next word</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>⌃</code> <code>B</code></td>
-<td style="text-align:left">extend to previous word</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>⌃</code> <code>F</code></td>
-<td style="text-align:left">extend to next word</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code> <code>H</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>H</kbd></td>
 <td style="text-align:left">delete backward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>D</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>D</kbd></td>
 <td style="text-align:left">delete forward</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>L</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>L</kbd></td>
 <td style="text-align:left">scroll into view</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>'</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>'</kbd></td>
+<td style="text-align:left">toggle math/text mode (may not work in non-US QWERTY layout)</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>T</kbd></td>
 <td style="text-align:left">toggle math/text mode</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>B</code></td>
-<td style="text-align:left">$$\int_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>K</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>K</kbd></td>
 <td style="text-align:left">toggle keystroke caption</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>space</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>space</kbd></td>
 <td style="text-align:left">toggle virtual keyboard</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>⇡</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd></td>
 <td style="text-align:left">speak(“parent”)</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>⌃</code> <code>⇣</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd></td>
 <td style="text-align:left">speak(“all”)</td>
-<td style="text-align:right"></td>
 </tr>
 </tbody>
 </table>
 <h3 id="math-mode-only" tabindex="-1">Math Mode Only</h3>
-<p>The shortcuts in this section apply in math mode only.</p>
+<p>The keybindings in this section apply in math mode only.</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">Keybinding</th>
 <th style="text-align:left">Result</th>
-<th style="text-align:right">OS</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>space</code></td>
+<td style="text-align:left"><kbd>space</kbd></td>
 <td style="text-align:left">move after parent</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>space</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>space</kbd></td>
 <td style="text-align:left">move before parent</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇥</code></td>
+<td style="text-align:left"><kbd>⇥</kbd></td>
 <td style="text-align:left">move to next placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⇥</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⇥</kbd></td>
 <td style="text-align:left">move to previous placeholder</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>esc</code></td>
-<td style="text-align:left">switchMode(“latex”)</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>esc</kbd></td>
+<td style="text-align:left">enter/exit LaTeX mode</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>\</code></td>
+<td style="text-align:left"><kbd>\</kbd></td>
+<td style="text-align:left">enter LaTeX mode</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>Intl Backslash</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Intl Backslash</code></td>
-<td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code> <code>=</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>=</kbd></td>
 <td style="text-align:left">applyStyle({“mode”:“text”})</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>'</code></td>
-<td style="text-align:left">switchMode(“text”)</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌃</code> <code>2</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>2</kbd></td>
 <td style="text-align:left">$$\sqrt{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>5</code></td>
-<td style="text-align:left">move to opposite</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>5</kbd></td>
+<td style="text-align:left">move to opposite (superscript/subscript, upper/lower)</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>6</code></td>
-<td style="text-align:left">move to superscript</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>6</kbd></td>
+<td style="text-align:left">move to superscript/upper</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>-</code></td>
-<td style="text-align:left">move to subscript</td>
-<td style="text-align:right"></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>-</kbd></td>
+<td style="text-align:left">move to subscript/lower</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>[</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>[</kbd></td>
 <td style="text-align:left">$$\left\lbrack \unicode{&quot;2B1A}\right\rbrack$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>[</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>[</kbd></td>
 <td style="text-align:left">$$\left\lbrace \unicode{&quot;2B1A} \right\rbrace$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>⏎</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>⏎</kbd></td>
 <td style="text-align:left">add row after</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>⌤</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>⌤</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>⏎</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>⏎</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code> <code>⌤</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>⌤</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>;</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>;</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘</code>  <code>;</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>  <kbd>;</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>;</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>;</kbd></td>
 <td style="text-align:left">add row before</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌘</code> <code>;</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>;</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌃</code> <code>,</code></td>
+<td style="text-align:left"><kbd>⌃</kbd>+<kbd>,</kbd></td>
 <td style="text-align:left">add column after</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌘,</code></td>
+<td style="text-align:left"><kbd>⌘</kbd>+<kbd>,</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌃</code> <code>,</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>,</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧⌘,</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>,</kbd></td>
 <td style="text-align:left">〃</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>P</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>P</kbd></td>
 <td style="text-align:left">$$\pi$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>V</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>V</kbd></td>
 <td style="text-align:left">$$\sqrt{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>W</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>W</kbd></td>
 <td style="text-align:left">$$\sum_{i=\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>U</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>U</kbd></td>
 <td style="text-align:left">$$\cup$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>N</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>N</kbd></td>
 <td style="text-align:left">$$\cap$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>O</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>O</kbd></td>
 <td style="text-align:left">$$\emptyset$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>D</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>D</kbd></td>
 <td style="text-align:left">$$\differentialD$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>O</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>O</kbd></td>
 <td style="text-align:left">$$\varnothing$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>D</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>D</kbd></td>
 <td style="text-align:left">$$\partial$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>P</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>P</kbd></td>
 <td style="text-align:left">$$\prod_{i=\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>U</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd></td>
 <td style="text-align:left">$$\bigcup$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>N</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>N</kbd></td>
 <td style="text-align:left">$$\bigcap$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>A</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>A</kbd></td>
 <td style="text-align:left">$$\forall$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>E</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>E</kbd></td>
 <td style="text-align:left">$$\exists$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>5</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>B</kbd></td>
+<td style="text-align:left">$$\int_{\unicode{&quot;2B1A}}^{\unicode{&quot;2B1A}}$$</td>
+</tr>
+<tr>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>5</kbd></td>
 <td style="text-align:left">$$$\infty$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>6</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>6</kbd></td>
 <td style="text-align:left">$$\wedge$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⇧</code> <code>⌥</code> <code>6</code></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>6</kbd></td>
 <td style="text-align:left">$$\vee$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>9</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>9</kbd></td>
 <td style="text-align:left">$$($$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>0</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>0</kbd></td>
 <td style="text-align:left">$$)$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>\|</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>|</kbd></td>
 <td style="text-align:left">$$|$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>⌥</code> <code>\</code></td>
+<td style="text-align:left"><kbd>⌥</kbd>+<kbd>\</kbd></td>
 <td style="text-align:left">$$\backslash$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>/</code></td>
+<td style="text-align:left"><kbd>/</kbd></td>
 <td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Numpad /</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⌥</code> <code>Numpad /</code></td>
-<td style="text-align:left">$$\frac{\unicode{&quot;2B1A}}{\unicode{&quot;2B1A}}$$</td>
-<td style="text-align:right"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>⇧</code> <kbd>`</kbd></td>
-<td style="text-align:left"><code>\~</code></td>
-<td style="text-align:right" colspan="2"></td>
+<td style="text-align:left"><kbd>⇧</kbd>+<kbd>`</kbd></td>
+<td style="text-align:left" colspan="2"><code>\~</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="inline-shortcuts" tabindex="-1">Inline Shortcuts</h2>
-<p>Some sequence of characters can be automatically translated to symbols. For example, typing p followed by i will result in “π”.</p>
-<p>If the conversion was not desired, for example you actually meant “pi”, type ctrl/⌘ Z to undo it.</p>
+<p>Some sequence of characters are automatically translated to symbols. For example, typing <code>P</code> followed by <code>I</code> will result in “π”.</p>
+<p>If the conversion was not desired, for example you actually meant “pi”, type <kbd>ctrl/⌘</kbd>+<kbd>Z</kbd> to undo it.</p>
 <table>
 <thead>
 <tr>
@@ -3371,14 +3219,14 @@ combinations.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 24, 2023">
+        <meta itemprop="datePublished" content="March 26, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-24'>March 24, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-26'>March 26, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

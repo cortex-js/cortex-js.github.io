@@ -94,6 +94,10 @@
 
 
 
+
+
+
+
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
@@ -1693,38 +1697,28 @@
 <h2 id="key-bindings" tabindex="-1">Key Bindings</h2>
 <p>A <strong>key binding</strong> is a combination of keys pressed simultaneously on a physical
 keyboard that triggers a command.</p>
-<p>For example, pressing <kbd>Alt/Option/⌥</kbd> and the <kbd>V</kbd> key at the
-same time will insert a square root. Pressing <kbd>Control/Command/⌘</kbd> and the
-<kbd>Z</kbd> key at the same time will undo the last command.</p>
+<p>For example, pressing the <kbd>Alt/Option/⌥</kbd> key and the <kbd>V</kbd> key at the
+same time will insert a square root. Pressing the <kbd>Control/Command/⌘</kbd>
+key and the <kbd>Z</kbd> key at the same time will undo the last command.</p>
 <p>MathLive has an extensive set of <a href="https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts">default key bindings</a>.</p>
-<p><strong>To override, customize or add to the list of supported key bindings</strong>, listen
-for a <code>keydown</code> event.</p>
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
-mf.addEventListener('keydown', (ev) => {
-  if (ev.altKey === true && ev.code === 'KeyS') {
-    mf.insert('\\sum^\\infty_{n=0}');
-    ev.preventDefault();
-  }
-});
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-<p>Call <code>ev.preventDefault()</code> to stop handling of the event, otherwise the default
-command (if any) associated with this keystroke will be processed.</p>
-<p>When using <code>insert()</code>, the LaTeX fragment argument of the function can include
+<p><strong>To override, customize or add to the list of supported key bindings</strong>, set
+the <code>keybindings</code> property on a mathfield element.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>);
+mf.<span class="hljs-property">keybindings</span> = [
+  ...mf.<span class="hljs-property">keybindings</span>,  <span class="hljs-comment">// preserve existing keybindings</span>
+  {
+    <span class="hljs-attr">key</span>: <span class="hljs-string">&#x27;ctrl+alt+shift+[KeyT]&#x27;</span>,
+    <span class="hljs-attr">ifMode</span>: <span class="hljs-string">&#x27;math&#x27;</span>,
+    <span class="hljs-attr">command</span>: [<span class="hljs-string">&#x27;switchMode&#x27;</span>, <span class="hljs-string">&#x27;text&#x27;</span>],
+  },
+  {
+    <span class="hljs-attr">key</span>: <span class="hljs-string">&#x27;ctrl+alt+shift+[KeyT]&#x27;</span>,
+    <span class="hljs-attr">ifMode</span>: <span class="hljs-string">&#x27;text&#x27;</span>,
+    <span class="hljs-attr">command</span>: [<span class="hljs-string">&#x27;switchMode&#x27;</span>, <span class="hljs-string">&#x27;math&#x27;</span>],
+  },
+];
+</code></pre>
+<p>If using an <code>insert</code> command, the LaTeX fragment argument of the function can include
 one of the following special placeholder tokens:</p>
 <ul>
 <li><code>#@</code>: replaced with the selection, if there is one. If there is no selection,
@@ -1996,14 +1990,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 24, 2023">
+        <meta itemprop="datePublished" content="March 26, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-24'>March 24, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-26'>March 26, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
