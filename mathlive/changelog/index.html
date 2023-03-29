@@ -1632,8 +1632,14 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="0.90.8-(2023-03-27)" tabindex="-1">0.90.8 (2023-03-27)</h2>
+<h2 id="0.90.9-(2023-03-28)" tabindex="-1">0.90.9 (2023-03-28)</h2>
 <h3 id="bug-fixed" tabindex="-1">Bug Fixed</h3>
+<ul>
+<li><strong>#1890</strong> Attempt to fix a remaining Typescript declaration issue when using
+MathLive without the Compute Engine</li>
+</ul>
+<h2 id="0.90.8-(2023-03-27)" tabindex="-1">0.90.8 (2023-03-27)</h2>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#1830</strong> The keybinding to toggle text mode (alt+&quot;) could not be used on some
 keyboard layouts. Added shift+alt+T as a keybinding to switch to text mode.</li>
@@ -2458,7 +2464,7 @@ changed programatically.</li>
 <li><strong>#1643</strong> Physical units with multiplication are now rendered correctly, e.g.
 <code>\pu{123 J*s}</code>.</li>
 </ul>
-<h2 id="new-features-2" tabindex="-1">New Features</h2>
+<h3 id="new-features-2" tabindex="-1">New Features</h3>
 <ul>
 <li><strong>#1541</strong> To be notified when the visibility of the virtual keyboard changes
 and using <code>makeSharedVirtualKeyboard()</code>, listen for the
@@ -2896,7 +2902,7 @@ although they are still recognized as valid commands.</p>
 <code>\mleft...\mright</code> commands, and this caused interoperability issues.</p>
 </li>
 </ul>
-<h2 id="new-features-3" tabindex="-1">New Features</h2>
+<h3 id="new-features-3" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>Comma <code>,</code> as a decimal separator</strong></p>
@@ -3082,6 +3088,12 @@ between columns</li>
 variables to customize the appearance of the mathfield.</li>
 </ul>
 <h2 id="0.69.10-(2022-02-23)" tabindex="-1">0.69.10 (2022-02-23)</h2>
+<h3 id="features-5" tabindex="-1">Features</h3>
+<ul>
+<li>Support for the <code>\htmlStyle</code> command (feature contributed by @neokazemi)</li>
+<li>Pressing the <code>\</code> key after a trigonometric function will not include the
+function in the numerator of the fraction.</li>
+</ul>
 <h3 id="bug-fixes-29" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li><strong>#1024</strong> <code>\ne</code> and <code>\neq</code> render correctly (fix contributed by @AceGentile)</li>
@@ -3090,12 +3102,6 @@ contributed by @LuisMesa)</li>
 <li>Boxes in <code>\enclose</code> command render correctly (fix contributed by @Zahara-Nour</li>
 <li><strong>#1357</strong> Alternate (shifted) layers described in the virtual keyboard defined
 with an object literal would not trigger.</li>
-</ul>
-<h1 id="features-5" tabindex="-1">Features</h1>
-<ul>
-<li>Support for the <code>\htmlStyle</code> command (feature contributed by @neokazemi)</li>
-<li>Pressing the <code>\</code> key after a trigonometric function will not include the
-function in the numerator of the fraction.</li>
 </ul>
 <h2 id="0.69.9-(2022-01-06)" tabindex="-1">0.69.9 (2022-01-06)</h2>
 <h3 id="features-6" tabindex="-1">Features</h3>
@@ -3283,7 +3289,7 @@ mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;f
 <p>or:</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">virtual-keyboard-mode</span>=<span class="hljs-string">&quot;manual&quot;</span>&gt;</span>f(x) = \sin x<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 </code></pre>
-<h2 id="improvements-30" tabindex="-1">Improvements</h2>
+<h3 id="improvements-30" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added localization for Dutch (contributed by @harrisnl), Bosnian, Croatian,
 Czeck, Danish, Estonian, Finnish, Icelandic, Norwegian, Portuguese, Serbian,
@@ -3298,7 +3304,7 @@ displayed <strong>inside</strong> the container. The container should have a <co
 the <code>\</code> key), remove the <code>\placeholder{}</code> command.</li>
 <li>In spoken text, correctly handle <code>\mathop</code> and <code>\operatorname</code>.</li>
 </ul>
-<h2 id="new-features-5" tabindex="-1">New Features</h2>
+<h3 id="new-features-5" tabindex="-1">New Features</h3>
 <ul>
 <li>The <code>getOffsetDepth()</code> method can be used to query the depth of a specific
 offset. Use <code>mf.getOffsetDepth(mf.position)</code> for the depth of the current
@@ -5195,7 +5201,7 @@ of 4,500 loc.</p>
 </li>
 </ul>
 <p>Again, this is an internal change that will have no impact for external users of
-the MathLive library, but it will be contribute to improving the maintainability
+the MathLive library, but it will contribute to improving the maintainability
 and velocity of the project.</p>
 <h4 id="other-code-maintenance" tabindex="-1">Other Code Maintenance</h4>
 <ul>
@@ -6317,14 +6323,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="March 27, 2023">
+        <meta itemprop="datePublished" content="March 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-27'>March 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-28'>March 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
