@@ -1814,14 +1814,25 @@
     padding-top: 8px;
   }
 
+  #result-section {
+    display: none;
+  }
+
+  #result-section.is-visible {
+    display: block;
+  }
+
+  #result {
+    margin-left: 8px;
+    font-size: 24px;
+    overflow-x: auto;
+  }
 
 </style>
 <script type="module">
-
-
 await customElements.whenDefined('math-field');
 
-import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+import { renderMathInDocument, convertLatexToMarkup } from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
 
 
 const INDENT = '  ';
@@ -1832,10 +1843,42 @@ const latexField = document.getElementById('latex');
 latexField.addEventListener('input', () => mf.setValue(latexField.value));
 
 function onMathfieldInput() {
-    // Output MathJSON representation of the expression
-    document.getElementById('math-json').innerHTML = asString(0, mf.expression.json).text;  
-    // Update raw LaTeX value
-    latexField.value = mf.value;
+  // Update raw LaTeX value
+  latexField.value = mf.value;
+
+  const expr = mf.expression;
+  
+  // Output MathJSON representation of the expression
+  document.getElementById('math-json').innerHTML = asString(0, expr.json).text;
+
+  let result = '';
+
+  MathfieldElement.computeEngine.precision = 7;
+
+  if (expr.head !== 'Equal') {
+    const exprN = expr.N();
+
+    if (!exprN.isSame(expr)) result = exprN.latex;
+  }
+
+  if (!result) {
+    const exprSimplify = expr.simplify();
+    if (!exprSimplify.isSame(expr)) result = exprSimplify.latex;
+  }
+
+  if (expr.head !== 'Equal') {
+    if (!result) {
+      const exprEval = expr.evaluate();
+      if (!exprEval.isSame(expr)) result = exprEval.latex;
+    }
+  }
+
+  if (result) {
+    document.getElementById('result').innerHTML = convertLatexToMarkup('= ' + result);
+    document.getElementById('result-section').classList.add('is-visible');
+  } else document.getElementById('result-section').classList.remove('is-visible');
+
+
 }
 //
 mf.addEventListener('input', onMathfieldInput);
@@ -2164,6 +2207,12 @@ renderMathInDocument();
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </math-field>
 <div style="margin-left: auto;padding-top: .5em; text-align: right"><a href="#shortcuts">Keyboard Shortcuts</a></div>
+<section id='result-section'>
+<div id='result'></div>
+<div class='read-more'><a href="/compute-engine/">
+Read more about using the <strong>Compute Engine</strong> to evaluate and simplify expression.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</section>
 <h4>LaTeX</h4>
 <textarea id="latex"></textarea>
 <div class='read-more'><a href="/mathlive/reference/commands/">
@@ -2256,14 +2305,14 @@ Read more about all the available <strong>key bindings</strong> and <strong>shor
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2023">
+        <meta itemprop="datePublished" content="March 30, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-26'>March 26, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-30'>March 30, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
