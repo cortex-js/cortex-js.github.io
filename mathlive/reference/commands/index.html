@@ -205,6 +205,66 @@
           
             
             
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/virtual-keyboard/" data-url=/mathlive/reference/commands/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Using the Virtual Keyboard
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/commands/" data-url=/mathlive/reference/commands/ class="active">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  LaTeX Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/keybindings/" data-url=/mathlive/reference/commands/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Keyboard Shortcuts
+                </a></li>
+            
+          
+            
+            
               <li class="separator"></li>
             
           
@@ -329,7 +389,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Fill in the blank
+                  Fill-in-the-Blank
                 </a></li>
             
           
@@ -349,7 +409,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Customize
+                  Customize the Mathfield
                 </a></li>
             
           
@@ -469,7 +529,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboard
+                  Customize the Virtual Keyboard
                 </a></li>
             
           
@@ -496,46 +556,6 @@
             
             
               <li class="separator"></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/mathlive/reference/commands/" data-url=/mathlive/reference/commands/ class="active">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
-                  
-                  LaTeX Commands
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/mathlive/reference/keybindings/" data-url=/mathlive/reference/commands/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
-                  
-                  Keyboard Shortcuts
-                </a></li>
             
           
             
@@ -1629,7 +1649,7 @@
       <section class="page__content" itemprop="text">
 
   
-    <h1>Supported TeX/LaTeX Commands</h1>
+    <h1>LaTeX Commands</h1>
   
 
   
@@ -1793,6 +1813,12 @@
 <div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">
 If you know the shape of a symbol, use <strong>Detexify</strong> to find the
 name of the corresponding LaTeX command
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To enter a LaTeX command</strong> press the <strong>ESC</strong> key or <code>\</code>  to enter LaTeX editing
+mode. Press <strong>ESC</strong> to exit LaTeX editing mode. You can examine the LaTeX
+code for an expression by selecting it, then pressing <strong>ESC</strong>.</p>
+<div class='read-more'><a href="/mathlive/reference/keybindings">
+The most common symbols can be entered using <strong>keyboard shortcuts</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="text-mode%2C-math-mode-and-math-style" tabindex="-1">Text Mode, Math Mode and Math Style</h2>
 <h3 id="math-mode" tabindex="-1">Math Mode</h3>
@@ -1978,7 +2004,6 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 </ul>
 <h2 id="functions" tabindex="-1">Functions</h2>
 <ul class="command-list">
-<li><span class='math'>$$\deg $$</span> <code>\deg</code></li>
 <li><span class='math'>$$\det $$</span> <code>\det</code></li>
 <li><span class='math'>$$\exp $$</span> <code>\exp</code></li>
 <li><span class='math'>$$\ker $$</span> <code>\ker</code></li>
@@ -1987,6 +2012,7 @@ there is less space between <code>-</code> and <code>1</code> than there is betw
 </ul>
 <h3 id="trigonometry" tabindex="-1">Trigonometry</h3>
 <ul class="command-list">
+<li><span class='math'>$$\degree $$</span> <code>\degree</code></li>
 <li><span class='math'>$$\arccos $$</span> <code>\arccos</code></li>
 <li><span class='math'>$$\arcsin $$</span> <code>\arcsin</code></li>
 <li><span class='math'>$$\arctan $$</span> <code>\arctan</code></li>
@@ -2826,7 +2852,6 @@ if there is an equivalent Unicode character available.
 </tbody>
 </table>
 </div>
-<p class="notice--warning">Internally, MathLive uses the non-standard <code>\mleft</code> and <code>\mright</code> command. These commands are use to indicate some delimiters that have been automatically converted to “smart” delimiters when the <code>smartFence</code> option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the <code>latex-expanded</code> format, or when using the clipboard, those commands are automatically removed.</p>
 <p>The left and right delimiters do not have to match:</p>
 <ul>
 <li><span class='math'>\(\displaystyle \left\lparen \frac1x \right\rbrack\)</span> <code>\left\lparen \frac1x \right\rbrack</code></li>
@@ -4098,7 +4123,9 @@ document.body.classList.add('ready');
 document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / Cortex Compute Engine ${ version.computeEngine }`;
 </script>
 
-        
+
+
+
       </section>
 
       <footer class="page__meta">
@@ -4106,14 +4133,14 @@ document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / C
         
 
 
-        <meta itemprop="datePublished" content="February 17, 2023">
+        <meta itemprop="datePublished" content="April 07, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-02-17'>February 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-07'>April 07, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -4124,7 +4151,26 @@ document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / C
     </div>
 
   </article>
+
+  
+  
+
+
+<aside class="sidebar__right">
+  <nav class="toc">
+    <header><h2 class="nav__title"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" style="height:16px; width:12px"><path fill="currentColor" d="M256 0v128h128L256 0zM224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM272 416h-160C103.2 416 96 408.8 96 400C96 391.2 103.2 384 112 384h160c8.836 0 16 7.162 16 16C288 408.8 280.8 416 272 416zM272 352h-160C103.2 352 96 344.8 96 336C96 327.2 103.2 320 112 320h160c8.836 0 16 7.162 16 16C288 344.8 280.8 352 272 352zM288 272C288 280.8 280.8 288 272 288h-160C103.2 288 96 280.8 96 272C96 263.2 103.2 256 112 256h160C280.8 256 288 263.2 288 272z"/></svg>On This Page</h2></header>
+  
+    
+      <div class="toc__menu" >
+        <ol><li><a href="#text-mode%2C-math-mode-and-math-style">Text Mode, Math Mode and Math Style</a><ol><li><a href="#math-mode">Math Mode</a></li><li><a href="#text-mode">Text Mode</a></li></ol></li><li><a href="#fractions-and-binomials">Fractions and Binomials</a></li><li><a href="#binary-operators">Binary Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#trigonometry">Trigonometry</a></li><li><a href="#bounds">Bounds</a></li><li><a href="#projections">Projections</a></li><li><a href="#modulo">Modulo</a></li><li><a href="#custom-functions">Custom Functions</a></li></ol></li><li><a href="#unicode">Unicode</a></li><li><a href="#large-operators">Large Operators</a></li><li><a href="#logic">Logic</a><ol><li><a href="#quantifiers">Quantifiers</a></li><li><a href="#unary%2Fbinary-operators">Unary/Binary Operators</a></li><li><a href="#relational-operators">Relational Operators</a></li></ol></li><li><a href="#arrows">Arrows</a><ol><li><a href="#negated-arrows">Negated Arrows</a></li><li><a href="#extensible-arrows">Extensible Arrows</a></li></ol></li><li><a href="#accents">Accents</a><ol><li><a href="#extensible-accents">Extensible Accents</a></li></ol></li><li><a href="#relational-operators-1">Relational Operators</a><ol><li><a href="#negated-relational-operators">Negated Relational Operators</a></li></ol></li><li><a href="#sets">Sets</a><ol><li><a href="#unary%2Fbinary-set-operators">Unary/Binary Set Operators</a></li><li><a href="#relational-set-operators">Relational Set Operators</a></li></ol></li><li><a href="#greek">Greek</a></li><li><a href="#hebrew">Hebrew</a></li><li><a href="#letterlike-symbols">Letterlike Symbols</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#punctuation">Punctuation</a><ol><li><a href="#dots">Dots</a></li></ol></li><li><a href="#shapes">Shapes</a></li><li><a href="#layout">Layout</a></li><li><a href="#spacing">Spacing</a></li><li><a href="#decorations">Decorations</a><ol><li><a href="#notations">Notations</a></li><li><a href="#colors">Colors</a></li></ol></li><li><a href="#font-styling">Font Styling</a><ol><li><a href="#bold">Bold</a></li><li><a href="#italic">Italic</a></li><li><a href="#font-family">Font Family</a></li><li><a href="#mathjax-html-extension">MathJax HTML Extension</a></li><li><a href="#others">Others</a></li></ol></li><li><a href="#sizing">Sizing</a></li><li><a href="#various">Various</a></li><li><a href="#mediawiki-(texvc.sty-package)">MediaWiki (texvc.sty package)</a></li><li><a href="#physics">Physics</a><ol><li><a href="#braket-notation">Braket Notation</a></li></ol></li><li><a href="#chemistry-(mhchem-package)">Chemistry (mhchem package)</a><ol><li><a href="#chemical-formulae">Chemical Formulae</a></li><li><a href="#charges">Charges</a></li><li><a href="#stoichiometric-numbers">Stoichiometric numbers</a></li><li><a href="#isotopes">Isotopes</a></li><li><a href="#complex-examples">Complex Examples</a></li></ol></li><li><a href="#macros">Macros</a></li><li><a href="#environments-%2F-matrixes">Environments / Matrixes</a><ol><li><a href="#matrixes">Matrixes</a></li><li><a href="#other-environments">Other Environments</a></li></ol></li><li><a href="#tex-registers">TeX Registers</a></li><li><a href="#tex-primitives">TeX Primitives</a></li></ol>
+      </div>
+    
+                            
+  </nav>
+</aside>
+
 </div>
+
 
 
 <script type="module">
@@ -4141,7 +4187,8 @@ whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
           inline: [['\\(', '\\)']],
           display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
-        processEnvironments : false 
+        processEnvironments : false,
+        processClassPattern: /./
       },
       asciiMath: null,
     })

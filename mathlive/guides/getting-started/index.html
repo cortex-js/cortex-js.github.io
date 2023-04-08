@@ -251,6 +251,66 @@
           
             
             
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/virtual-keyboard/" data-url=/mathlive/guides/getting-started/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Using the Virtual Keyboard
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/commands/" data-url=/mathlive/guides/getting-started/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  LaTeX Commands
+                </a></li>
+            
+          
+            
+            
+              
+                
+              
+
+                            
+              
+                
+              
+
+              <li>              
+                <a href="/mathlive/reference/keybindings/" data-url=/mathlive/guides/getting-started/ class="">
+                  
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
+                  
+                  Keyboard Shortcuts
+                </a></li>
+            
+          
+            
+            
               <li class="separator"></li>
             
           
@@ -375,7 +435,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Fill in the blank
+                  Fill-in-the-Blank
                 </a></li>
             
           
@@ -395,7 +455,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Customize
+                  Customize the Mathfield
                 </a></li>
             
           
@@ -515,7 +575,7 @@
                   
                     <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#guide"></use></svg>
                   
-                  Virtual Keyboard
+                  Customize the Virtual Keyboard
                 </a></li>
             
           
@@ -542,46 +602,6 @@
             
             
               <li class="separator"></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/mathlive/reference/commands/" data-url=/mathlive/guides/getting-started/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
-                  
-                  LaTeX Commands
-                </a></li>
-            
-          
-            
-            
-              
-                
-              
-
-                            
-              
-                
-              
-
-              <li>              
-                <a href="/mathlive/reference/keybindings/" data-url=/mathlive/guides/getting-started/ class="">
-                  
-                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#reference"></use></svg>
-                  
-                  Keyboard Shortcuts
-                </a></li>
             
           
             
@@ -1705,10 +1725,22 @@ of the mathfield, as a LaTeX expression.</p>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
 <div class="notice--warning" markdown="1">
-<h4 id="caution" tabindex="-1">Caution</h4>
-<p>The HTML quirks mode is not supported. This means that the host page
-must use the strict mode, indicated by a <code>&lt;!DOCTYPE html&gt;</code> directive at the top
-of the page. Without it, the layout of the equations inside the mathfield may be incorrect.</p>
+<h4 id="caution%3A-html-quirks-mode" tabindex="-1">Caution: HTML quirks mode</h4>
+<p>The <strong>HTML quirks mode</strong> is not supported.</p>
+<p>The host page must use the <strong>strict mode</strong> by including a <code>&lt;!DOCTYPE html&gt;</code>
+directive at the top of the page.</p>
+<p>Without it, the layout of the expression inside the mathfield may be incorrect.</p>
+</div>
+<div class="notice--warning" markdown="1">
+<h4 id="caution%3A-file%3A%2F%2F-protocol" tabindex="-1">Caution: <code>file://</code> protocol</h4>
+<p>For security reasons there are some restrictions when using the <code>file://</code>
+protocol. This happens if you open a file in the browser from your local file
+storage. You will notice the adress in the browser address bar starts with <code>file://</code>.</p>
+<p>In this situation, some functionality may not be available and some errors may
+be displayed in the console.</p>
+<p>To prevent this, use a <strong>local file server</strong>.</p>
+<p>With VSCode, the <strong>Live Server</strong> extension can be used to launch a local
+development server with one click.</p>
 </div>
 <p>Here’s a complete web page:</p>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
@@ -1730,7 +1762,9 @@ of the page. Without it, the layout of the equations inside the mathfield may be
 Learn more about other options to <strong>add MathLive to your project</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-        
+
+
+
       </section>
 
       <footer class="page__meta">
@@ -1738,14 +1772,14 @@ Learn more about other options to <strong>add MathLive to your project</strong>
         
 
 
-        <meta itemprop="datePublished" content="March 25, 2023">
+        <meta itemprop="datePublished" content="April 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-25'>March 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-04'>April 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -1756,7 +1790,13 @@ Learn more about other options to <strong>add MathLive to your project</strong>
     </div>
 
   </article>
+
+  
+  
+
+
 </div>
+
 
 </div>
 
