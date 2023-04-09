@@ -1911,92 +1911,9 @@ the focus on the mathfield, will automatically timeout the shortcuts.</p>
 <h2 id="asciimath-inline-shortcuts" tabindex="-1">ASCIIMath Inline Shortcuts</h2>
 <p><a href="https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js">ASCIIMath</a> defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.</p>
-<p>The most common ASCIIMath shortcuts are part of the default inline shortcuts.</p>
-<p><strong>To support additional ASCIIMath shortcuts</strong>, add them to the <code>inlineShortcuts</code>
-setting.</p>
-<pre><code class="language-js">mf.<span class="hljs-property">inlineShortcuts</span> = {
-  ...mf.<span class="hljs-property">inlineShortcuts</span>,
-  <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// ASCIIIMath</span>
-  <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// Binary operation symbols</span>
-  <span class="hljs-string">&#x27;*&#x27;</span>: <span class="hljs-string">&#x27;\\cdot&#x27;</span>,
-  <span class="hljs-string">&#x27;**&#x27;</span>: <span class="hljs-string">&#x27;\\ast&#x27;</span>,
-  <span class="hljs-string">&#x27;***&#x27;</span>: <span class="hljs-string">&#x27;\\star&#x27;</span>,
-  <span class="hljs-string">&#x27;//&#x27;</span>: <span class="hljs-string">&#x27;\\slash&#x27;</span>,
-  <span class="hljs-string">&#x27;\\\\\&#x27;: &#x27;</span>\\backslash<span class="hljs-string">&#x27;,
-  &#x27;</span>setminus<span class="hljs-string">&#x27;: &#x27;</span>\\backslash<span class="hljs-string">&#x27;,
-  &#x27;</span>|&gt;&lt;<span class="hljs-string">&#x27;: &#x27;</span>\\ltimes<span class="hljs-string">&#x27;,
-  &#x27;</span>&gt;&lt;|<span class="hljs-string">&#x27;: &#x27;</span>\\rtimes<span class="hljs-string">&#x27;,
-  &#x27;</span>|&gt;&lt;|<span class="hljs-string">&#x27;: &#x27;</span>\\bowtie<span class="hljs-string">&#x27;,
-  &#x27;</span>-:<span class="hljs-string">&#x27;: &#x27;</span>\\div<span class="hljs-string">&#x27;,
-  &#x27;</span>divide<span class="hljs-string">&#x27;: &#x27;</span>\\div<span class="hljs-string">&#x27;,
-  &#x27;</span>@<span class="hljs-string">&#x27;: &#x27;</span>\\circ<span class="hljs-string">&#x27;,
-  &#x27;</span>o+<span class="hljs-string">&#x27;: &#x27;</span>\\oplus<span class="hljs-string">&#x27;,
-  &#x27;</span>ox<span class="hljs-string">&#x27;: &#x27;</span>\\otimes<span class="hljs-string">&#x27;,
-  &#x27;</span>o.<span class="hljs-string">&#x27;: &#x27;</span>\\odot<span class="hljs-string">&#x27;,
-  &#x27;</span>^^<span class="hljs-string">&#x27;: &#x27;</span>\\wedge<span class="hljs-string">&#x27;,
-  &#x27;</span>^^^<span class="hljs-string">&#x27;: &#x27;</span>\\bigwedge<span class="hljs-string">&#x27;,
-  &#x27;</span>vv<span class="hljs-string">&#x27;: &#x27;</span>\\vee<span class="hljs-string">&#x27;,
-  &#x27;</span>vvv<span class="hljs-string">&#x27;: &#x27;</span>\\bigvee<span class="hljs-string">&#x27;,
-  &#x27;</span>nn<span class="hljs-string">&#x27;: &#x27;</span>\\cap<span class="hljs-string">&#x27;,
-  &#x27;</span>nnn<span class="hljs-string">&#x27;: &#x27;</span>\\bigcap<span class="hljs-string">&#x27;,
-  &#x27;</span>uu<span class="hljs-string">&#x27;: &#x27;</span>\\cup<span class="hljs-string">&#x27;,
-  &#x27;</span>uuu<span class="hljs-string">&#x27;: &#x27;</span>\\bigcup<span class="hljs-string">&#x27;,
-
-  // Binary relation symbols
-  &#x27;</span>-=<span class="hljs-string">&#x27;: &#x27;</span>\\equiv<span class="hljs-string">&#x27;,
-  &#x27;</span>~=<span class="hljs-string">&#x27;: &#x27;</span>\\cong<span class="hljs-string">&#x27;,
-  &#x27;</span>lt<span class="hljs-string">&#x27;: &#x27;</span>&lt;<span class="hljs-string">&#x27;,
-  &#x27;</span>lt=<span class="hljs-string">&#x27;: &#x27;</span>\\leq<span class="hljs-string">&#x27;,
-  &#x27;</span>gt<span class="hljs-string">&#x27;: &#x27;</span>&gt;<span class="hljs-string">&#x27;,
-  &#x27;</span>gt=<span class="hljs-string">&#x27;: &#x27;</span>\\geq<span class="hljs-string">&#x27;,
-  &#x27;</span>-&lt;<span class="hljs-string">&#x27;: &#x27;</span>\\prec<span class="hljs-string">&#x27;,
-  &#x27;</span>-lt<span class="hljs-string">&#x27;: &#x27;</span>\\prec<span class="hljs-string">&#x27;,
-  &#x27;</span>-&lt;=<span class="hljs-string">&#x27;: &#x27;</span>\\preceq<span class="hljs-string">&#x27;,
-  // &#x27;</span>&gt;-<span class="hljs-string">&#x27;: &#x27;</span>\\succ<span class="hljs-string">&#x27;,
-  &#x27;</span>&gt;-=<span class="hljs-string">&#x27;: &#x27;</span>\\succeq<span class="hljs-string">&#x27;,
-  &#x27;</span>prop<span class="hljs-string">&#x27;: &#x27;</span>\\propto<span class="hljs-string">&#x27;,
-  &#x27;</span>diamond<span class="hljs-string">&#x27;: &#x27;</span>\\diamond<span class="hljs-string">&#x27;,
-  &#x27;</span>square<span class="hljs-string">&#x27;: &#x27;</span>\\square<span class="hljs-string">&#x27;,
-  &#x27;</span>iff<span class="hljs-string">&#x27;: &#x27;</span>\\iff<span class="hljs-string">&#x27;,
-
-  &#x27;</span>sub<span class="hljs-string">&#x27;: &#x27;</span>\\subset<span class="hljs-string">&#x27;,
-  &#x27;</span>sup<span class="hljs-string">&#x27;: &#x27;</span>\\supset<span class="hljs-string">&#x27;,
-  &#x27;</span>sube<span class="hljs-string">&#x27;: &#x27;</span>\\subseteq<span class="hljs-string">&#x27;,
-  &#x27;</span>supe<span class="hljs-string">&#x27;: &#x27;</span>\\supseteq<span class="hljs-string">&#x27;,
-  &#x27;</span>uarr<span class="hljs-string">&#x27;: &#x27;</span>\\uparrow<span class="hljs-string">&#x27;,
-  &#x27;</span>darr<span class="hljs-string">&#x27;: &#x27;</span>\\downarrow<span class="hljs-string">&#x27;,
-  &#x27;</span>rarr<span class="hljs-string">&#x27;: &#x27;</span>\\rightarrow<span class="hljs-string">&#x27;,
-  &#x27;</span>rArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Rightarrow</span><span class="hljs-string">&#x27;,
-  &#x27;</span>larr<span class="hljs-string">&#x27;: &#x27;</span>\\leftarrow<span class="hljs-string">&#x27;,
-  &#x27;</span>lArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Leftarrow</span><span class="hljs-string">&#x27;,
-  &#x27;</span>harr<span class="hljs-string">&#x27;: &#x27;</span>\\leftrightarrow<span class="hljs-string">&#x27;,
-  &#x27;</span>hArr<span class="hljs-string">&#x27;: &#x27;</span>\\<span class="hljs-title class_">Leftrightarrow</span><span class="hljs-string">&#x27;,
-  &#x27;</span>aleph<span class="hljs-string">&#x27;: &#x27;</span>\\aleph<span class="hljs-string">&#x27;,
-
-  // Logic
-  &#x27;</span>and<span class="hljs-string">&#x27;: &#x27;</span>\\land<span class="hljs-string">&#x27;,
-  &#x27;</span>or<span class="hljs-string">&#x27;: &#x27;</span>\\lor<span class="hljs-string">&#x27;,
-  &#x27;</span>not<span class="hljs-string">&#x27;: &#x27;</span>\\neg<span class="hljs-string">&#x27;,
-  &#x27;</span>_|_<span class="hljs-string">&#x27;: &#x27;</span>\\bot<span class="hljs-string">&#x27;,
-  &#x27;</span><span class="hljs-variable constant_">TT</span><span class="hljs-string">&#x27;: &#x27;</span>\\top<span class="hljs-string">&#x27;,
-  &#x27;</span>|--<span class="hljs-string">&#x27;: &#x27;</span>\\vdash<span class="hljs-string">&#x27;,
-  &#x27;</span>|==<span class="hljs-string">&#x27;: &#x27;</span>\\models<span class="hljs-string">&#x27;,
-
-  // Other functions
-  &#x27;</span>|__<span class="hljs-string">&#x27;: &#x27;</span>\\lfloor<span class="hljs-string">&#x27;,
-  &#x27;</span>__|<span class="hljs-string">&#x27;: &#x27;</span>\\rfloor<span class="hljs-string">&#x27;,
-
-  &#x27;</span>|~<span class="hljs-string">&#x27;: &#x27;</span>\\lceiling<span class="hljs-string">&#x27;,
-  &#x27;</span>~|<span class="hljs-string">&#x27;: &#x27;</span>\\rceiling<span class="hljs-string">&#x27;,
-
-  // Arrows
-  &#x27;</span>&gt;-&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\rightarrowtail<span class="hljs-string">&#x27;,
-  &#x27;</span>-&gt;&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\twoheadrightarrow<span class="hljs-string">&#x27;,
-  &#x27;</span>&gt;-&gt;&gt;<span class="hljs-string">&#x27;: &#x27;</span>\\twoheadrightarrowtail<span class="hljs-string">&#x27;
-};
-</span></code></pre>
+<div class='read-more'><a href="/mathlive/reference/keybindings/">
+<strong>Learn more:</strong> ASCIIMath and other default keybindings
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </section>
 <div class='read-more'><a href="/mathlive/guides/speech/">
 <strong>Next:</strong> Control <strong>Speech</strong> output
@@ -2012,14 +1929,14 @@ setting.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 26, 2023">
+        <meta itemprop="datePublished" content="April 08, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-26'>March 26, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-08'>April 08, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
