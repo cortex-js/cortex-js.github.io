@@ -2193,6 +2193,27 @@
         padding: 0;
       } */
 
+      .output {
+    margin: 10px 0 10px 0;
+    border-radius: 5px;
+    border: 1px solid #333;
+
+    min-height: 1em;
+    padding: 5px;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    width: calc(100% - 10px); /* Subtract horizontal padding */
+
+    font-family: 'IBM Plex mono', 'Source Code Pro', Menlo,
+        'Bitstream Vera Sans Mono', Monaco, Courier, 'Andale Mono', monospace;
+    color: #f0c674;
+
+    background: #35434e;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+
       #output {
         display: none;
       }
@@ -2207,20 +2228,20 @@
     <main>
       <div id="inputs">
         <math-field id="mf">f(x)=\sqrt{\frac{1}{x}}</math-field>
-        <h4>LaTeX</h4>
         <textarea
-          class="output"
           id="latex"
+          class="output"
           autocapitalize="off"
           autocomplete="off"
           autocorrect="off"
           spellcheck="false"
         >f(x)=\sqrt{\frac{1}{x}}</textarea>
       </div>
-      <div id="output"></div>
       <div class="buttonbar">
-        <button id="save-to-png">Save to PNG</button>
+        <button id="copy-to-png">Copy</button>
+        <button id="save-to-png">Save</button>
       </div>
+      <div id="output"></div>
     </main>
 
     <script type="module">
@@ -2251,6 +2272,49 @@
           div.classList.remove('is-visible');
         });
       });
+
+      document.getElementById('copy-to-png').addEventListener('click', (ev) => {
+        const div = document.getElementById('output');
+        div.classList.add('is-visible');
+        div.innerHTML = convertLatexToMarkup(
+          document.getElementById('mf').value
+        );
+        htmlToImage.toPng(div).then((data) => {
+          navigator.clipboard.write([
+              new ClipboardItem({
+                  'image/png': dataURItoBlob(data)
+              })
+          ]);
+          div.classList.remove('is-visible');
+        });
+      });
+
+
+      function dataURItoBlob(dataURI) {
+  // convert base64 to raw binary data held in a string
+  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+  var byteString = atob(dataURI.split(',')[1]);
+
+  // separate out the mime component
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+  // write the bytes of the string to an ArrayBuffer
+  var ab = new ArrayBuffer(byteString.length);
+
+  // create a view into the buffer
+  var ia = new Uint8Array(ab);
+
+  // set the bytes of the buffer to the correct values
+  for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+  }
+
+  // write the ArrayBuffer to a blob, and you're done
+  var blob = new Blob([ab], {type: mimeString});
+  return blob;
+
+}
+
 
       function escapeHtml(string) {
         return String(string).replace(/[&<>"'`=/\u200b]/g, function (s) {
