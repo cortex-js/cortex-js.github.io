@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8">
 
-  <meta http-equiv="refresh" content="0; url=https://app.gitter.im/#/room/#cortex-js_community:gitter.im" />
-
 
 
 
@@ -46,6 +44,13 @@
 
 <link rel="stylesheet" href="/assets/css/main.css" crossorigin>
 
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" crossorigin>
+  
+
 
 
 
@@ -66,7 +71,7 @@
 
   </head>
 
-  <body class="layout--default">
+  <body class="layout--single">
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
       <defs>
           <symbol id=svg-chevron aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
@@ -104,7 +109,7 @@
         </a>
         <ul class="visible-links">
               
-              <li class="masthead__menu-item ">
+              <li class="masthead__menu-item active">
                 <a href="/mathlive/" >MathLive</a>
               </li>
               
@@ -116,7 +121,7 @@
                 <a href="/cortex/" >Cortex</a>
               </li>
               
-              <li class="masthead__menu-item active">
+              <li class="masthead__menu-item ">
                 <a href="/gitter/" ><svg class='icon1quarterem' role='img'><title>Gitter Forum</title><use xlink:href='/assets/icons.svg#gitter'></use></svg></a>
               </li>
               
@@ -131,9 +136,246 @@
 
 
     <div class="initial-content">
-<div style="display: flex; align-items:center; justify-content:center; width:100%; height: 60vh; font-size: 4em; font-weight: 900; text-decoration: none;">
-  <a href="https://matrix.to/#/#cortex-js_community:gitter.im">Loading Gitter...</a>
-</div></div>
+
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+
+    <div class="page__inner-wrap">
+    
+    
+      <section class="page__content" itemprop="text">
+
+  
+
+
+    <style>
+      /* .buttonbar button { */
+      button {
+        background: none;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        color: #0066ce;
+        fill: currentColor;
+        position: relative;
+        height: 36px;
+        line-height: 36px;
+        margin: 0 18px 0 0;
+        min-width: 64px;
+        padding: 0 16px;
+        display: inline-block;
+        overflow: hidden;
+        will-change: box-shadow;
+        transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1),
+          background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+          color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        user-select: none;
+
+        font-size: 16px;
+        letter-spacing: 0.08929em;
+        text-transform: uppercase;
+        box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2),
+          0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+      }
+
+      button:first-child {
+        margin-left: 0;
+      }
+
+      button:hover {
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+
+      button:active {
+        background-color: white;
+      }
+
+      button.primary,
+      button.active {
+        color: white;
+        fill: currentColor;
+        background: #0066ce;
+      }
+
+      button.primary:hover {
+        background-color: rgba(0, 102, 206, 0.58);
+      }
+
+      button.primary:active {
+        color: #0066ce;
+        fill: currentColor;
+        background-color: white;
+      }
+
+      button.round {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+      }
+
+      .buttonbar {
+        margin-top: 1em;
+      }
+
+      #inputs {
+        display: flex;
+        flex-flow: column;
+      }
+
+      #mf,
+      #latex {
+        width: 100%;
+      }
+
+      #latex {
+        font-size: 16px;
+      }
+
+      #latex::selection {
+        background: rgba(240, 198, 116, 0.99);
+        color: #333;
+        opacity: 1;
+      }
+
+      math-field {
+        border: 1px solid #eee;
+        border-radius: 5px;
+        padding: 5px;
+        background: #fff;
+        font-size: 24px;
+      }
+
+      h2 {
+        margin: 1em 0 0.5em 0;
+        padding: 0;
+      }
+
+      #output {
+        display: none;
+      }
+
+      #output.is-visible {
+        display: block;
+      }
+    </style>
+    <header>
+      <h1>MathLive LaTeX Editor</h1>
+    </header>
+    <main>
+      <div id="inputs">
+        <h2>Formula</h2>
+        <math-field id="mf"></math-field>
+        <h2>LaTeX</h2>
+        <textarea
+          class="output"
+          id="latex"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        ></textarea>
+      </div>
+      <div id="output"></div>
+      <div class="buttonbar">
+        <button id="save-to-png">Save to PNG</button>
+      </div>
+    </main>
+
+    <script type="module">
+      // import { convertLatexToMarkup } from '/dist/mathlive.mjs';
+      import { convertLatexToMarkup } from 'https://unpkg.com/mathlive?module';
+      import * as htmlToImage from '/assets/js/html-to-image.mjs';
+
+      const mf = document.getElementById('mf');
+      mf.addEventListener('input', (evt) => {
+        document.getElementById('latex').value = mf.getValue();
+      });
+
+      document.getElementById('latex').addEventListener('input', (ev) => {
+        mf.setValue(ev.target.value);
+      });
+
+      document.getElementById('save-to-png').addEventListener('click', (ev) => {
+        const div = document.getElementById('output');
+        div.classList.add('is-visible');
+        div.innerHTML = convertLatexToMarkup(
+          document.getElementById('mf').value
+        );
+        htmlToImage.toPng(div).then((data) => {
+          var link = document.createElement('a');
+          link.download = 'formula.png';
+          link.href = data;
+          link.click();
+          div.classList.remove('is-visible');
+        });
+      });
+
+      function escapeHtml(string) {
+        return String(string).replace(/[&<>"'`=/\u200b]/g, function (s) {
+          return (
+            {
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+              '/': '&#x2F;',
+              '`': '&#x60;',
+              '=': '&#x3D;',
+              '\u200b': '&amp;#zws;',
+            }[s] || s
+          );
+        });
+      }
+    </script>
+
+
+
+
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        <meta itemprop="datePublished" content="April 09, 2023">
+                
+
+        
+
+
+        
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-09'>April 09, 2023</time></p>
+        
+
+          <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
+      </footer>
+
+
+      
+    </div>
+
+  </article>
+
+  
+  
+
+
+</div>
+
+
+</div>
 
     
 
