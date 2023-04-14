@@ -2117,6 +2117,9 @@
 iframe in which the mathfield is to be treated as a top-level browsing context,
 i.e. to display a virtual keyboard instance in the that iframe.</li>
 <li>Added <code>mathVirtualKeycap.actionKeycap</code>, <code>mathVirtualKeycap.shiftKeycap</code>, <code>mathVirtualKeycap.tabKeycap</code>, <code>mathVirtualKeycap.backspaceKeycap</code> to customize the appearance of action keys without having to define new layouts. This can be used to change the “Return” glyph to “Continue” for example, or to use the word “Shift” for the shift key instead of the default shift glyph.</li>
+<li>Added keyboard shorcuts (<kbd>alt/option</kbd>+<kbd>Tab</kbd> and <kbd>alt/option</kbd>+<kbd>Return</kbd>) for matrices/environments. Type <code>(</code> + <kbd>alt/option</kbd>+<kbd>Tab</kbd> to create 2x1 matrix. If at the root, type
+<kbd>alt/option</kbd>+<kbd>Return</kbd> for a multi-line expression.</li>
+<li>More concise LaTeX serialization, avoiding use of braces unless necessary.</li>
 </ul>
 <h3 id="bug-fix" tabindex="-1">Bug Fix</h3>
 <ul>
@@ -2127,6 +2130,9 @@ the previously active layer, pick the first available layer.</li>
 <li>When scrolling the mathfield into view after activating the math keyboard
 correctly account for the position of the keyboard.</li>
 <li><strong>#1914</strong> When the <code>mathVirtualKeyboardPolicy</code> is set to <code>&quot;manual&quot;</code>, the keyboard is not hidden, even when losing focus.</li>
+<li>If the last row of a matrix is empty, it is ignored (LaTeX behavior)</li>
+<li><strong>#1929</strong> The <code>\boldsymbol</code> command was serialized incorrectly after its content
+was modified.</li>
 </ul>
 <h2 id="0.91.2-(2023-04-06)" tabindex="-1">0.91.2 (2023-04-06)</h2>
 <h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
@@ -6912,14 +6918,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="April 09, 2023">
+        <meta itemprop="datePublished" content="April 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-09'>April 09, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-04-13'>April 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
