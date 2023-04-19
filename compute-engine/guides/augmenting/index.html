@@ -2211,6 +2211,7 @@ two arguments using <code>matchRequiredLatexArgument()</code>.</p>
 MathJSON function, i.e. the one that we returned from the <code>parse</code> handler above. It is not the name of the LaTeX command (<code>\smallfrac</code>).</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">defineFunction</span>(<span class="hljs-string">&#x27;Smallfrac&#x27;</span>, {
   <span class="hljs-attr">signature</span>: {
+    <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;NumericFunction&#x27;</span>,
     <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">box</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">N</span>() / args[<span class="hljs-number">1</span>].<span class="hljs-title function_">N</span>()),
   },
 });
