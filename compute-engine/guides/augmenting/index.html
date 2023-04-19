@@ -2175,15 +2175,13 @@
 
 
 
-<p>Let’s say you want to define a new <code>&quot;Smallfrac&quot;</code> function for use with
+<p>Let’s say you want to define a new <code>Smallfrac</code> function for use with
 the Compute Engine.</p>
 <h2 id="parsing" tabindex="-1">Parsing</h2>
-<p>If you want to use this function from a LaTeX string, using <code>ce.parse()</code>,
-you must augment the LaTeX dictionary of the Compute Engine with your new function. You can do this by providing a custom LaTeX dictionary to the constructor of <code>ComputeEngine</code>.</p>
-<p>The <code>triger</code> property indicates that when the <code>\\smallfrac</code> command
-is encountered, the <code>parse</code> handler should be called. The <code>parse</code> handler
-constructs a MathJSON expression from the LaTeX string, by reading the
-two arguments using <code>matchRequiredLatexArgument()</code>.</p>
+<p>To use this function from a LaTeX string, using <code>ce.parse()</code>,
+you must augment the LaTeX dictionary of the Compute Engine with a new
+dictionary entry. You can do this by providing a custom LaTeX dictionary
+to the constructor of <code>ComputeEngine</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
   <span class="hljs-attr">latexDictionary</span>: [
     ...<span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getLatexDictionary</span>(),
@@ -2203,12 +2201,18 @@ two arguments using <code>matchRequiredLatexArgument()</code>.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\smallfrac{1}{2}&#x27;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// -&gt; [&quot;Smallfrac&quot;, 1, 2]</span>
 </code></pre>
+<p>The <code>triger</code> property indicates that when the <code>\\smallfrac</code> command
+is encountered, the <code>parse</code> handler should be called.</p>
+<p>The <code>parse</code> handler constructs a MathJSON expression from the LaTeX string,
+by reading the two expected arguments using <code>matchRequiredLatexArgument()</code>.</p>
 <h2 id="evaluation" tabindex="-1">Evaluation</h2>
-<p>The above is sufficient to be able to parse LaTeX, but if you want to be able to evaluate the function, you will also need to define how to do so.</p>
+<p>The above is sufficient to parse LaTeX, but if you want to evaluate the
+function, you will also need to define how to do so.</p>
 <p>You can define new functions for the Compute Engine to evaluate using
 <code>ce.defineFunction()</code>.</p>
-<p>Note that the first argument to <code>defineFunction</code> is the name of the
-MathJSON function, i.e. the one that we returned from the <code>parse</code> handler above. It is not the name of the LaTeX command (<code>\smallfrac</code>).</p>
+<p>Note that the first argument to <code>defineFunction()</code>, <code>Smallfrac</code>, is the name of the
+MathJSON function, i.e. the one that we returned from the <code>parse</code> handler
+above. It is not the name of the LaTeX command (<code>\smallfrac</code>).</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">defineFunction</span>(<span class="hljs-string">&#x27;Smallfrac&#x27;</span>, {
   <span class="hljs-attr">signature</span>: {
     <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;NumericFunction&#x27;</span>,
@@ -2222,7 +2226,7 @@ MathJSON function, i.e. the one that we returned from the <code>parse</code> han
 <h2 id="using-a-new-function-with-a-mathfield" tabindex="-1">Using a New Function with a Mathfield</h2>
 <p>You may also want to use your new function with a mathfield.</p>
 <p>First you need to define a LaTeX macro so that the mathfield knows
-how to render this command.</p>
+how to render this command. Let’s define the <code>\smallfrac</code> macro.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> mfe = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>);
 
 mfe.<span class="hljs-property">macros</span> = {
@@ -2233,14 +2237,28 @@ mfe.<span class="hljs-property">macros</span> = {
   },
 };
 </code></pre>
-<p>Use the <code>#1</code> token to reference the first argument and <code>#2</code> the second one. The content of the <code>def</code> property is a LaTeX fragment that will
+<p>The content of the <code>def</code> property is a LaTeX fragment that will
 be used to render the <code>\\smallfrac</code> command.</p>
+<p>The <code>#1</code> token in <code>def</code> is a reference to the first argument and <code>#2</code> to the
+second one.</p>
 <p>You may also want to define an inline shortcut to make it easier
-to input the command. With the code below, we define a shortcut “smallfrac”. When typed, the shortcut is replaced with the indicated latex. The <code>#@</code> token represents the argument to the left of shortcut, and the <code>#?</code> represents a placeholder to be filled by the user.</p>
+to input the command.</p>
+<p>With the code below, we define a shortcut “smallfrac”.</p>
+<p>When typed, the shortcut is replaced with the associated LaTeX.</p>
+<p>The <code>#@</code> token represents the argument to the left of the shortcut, and
+the <code>#?</code> token represents a placeholder to be filled by the user.</p>
 <pre><code class="language-js">mfe.<span class="hljs-property">inlineShortcuts</span> = {
   ...mfe.<span class="hljs-property">inlineShortcuts</span>,
   <span class="hljs-attr">smallfrac</span>:<span class="hljs-string">&#x27;\\smallfrac{#@}{#?}&#x27;</span>
 };
+</code></pre>
+<p>You can now parse the input from a mathfield using:</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(mfe.<span class="hljs-property">value</span>).<span class="hljs-property">json</span>)
+</code></pre>
+<p>Alternatively, you can associate the customized compute engine with the
+mathfields in the document:</p>
+<pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = ce;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;math-json&#x27;</span>))
 </code></pre>
 
 
