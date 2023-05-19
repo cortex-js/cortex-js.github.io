@@ -2491,17 +2491,14 @@ definition. For example, the <code>\differentialD</code> command is exported as 
 corresponding definition, <code>\mathrm{d}</code>.</p>
 <p><strong>To customize the content of the <code>text/plain</code> flavor</strong>, use the <code>onExport()</code> hook.</p>
 <p>For example, to wrap the exported latex with <code>&lt;math&gt;...&lt;/math&gt;</code> instead:</p>
-<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>});
+<pre><code class="language-js">mf.<span class="hljs-property">onExport</span> = <span class="hljs-function">(<span class="hljs-params">mf, latex</span>) =&gt;</span> <span class="hljs-string">`&lt;math&gt;<span class="hljs-subst">${latex}</span>&lt;/math&gt;`</span>
 </code></pre>
 <p><strong>To export the “raw” (not expanded) LaTeX)</strong>, use:</p>
-<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
-  <span class="hljs-string">`$$<span class="hljs-subst">${mf.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>$$`</span>
-});
+<pre><code class="language-js">mf.<span class="hljs-property">onExport</span> = <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> <span class="hljs-string">`$$<span class="hljs-subst">${mf.getValue(range, <span class="hljs-string">&#x27;latex&#x27;</span>)}</span>$$`</span>
 </code></pre>
 <p>The exported format doesn’t have to be LaTeX. To export ASCIIMath instead:</p>
-<pre><code class="language-js">mf.<span class="hljs-title function_">setOptions</span>({<span class="hljs-attr">onExport</span>: <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
-  <span class="hljs-string">&quot;`&quot;</span> + mf.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>
-});
+<pre><code class="language-js">mf.<span class="hljs-property">onExport</span> = <span class="hljs-function">(<span class="hljs-params">mf, latex, range</span>) =&gt;</span> 
+    <span class="hljs-string">&quot;`&quot;</span> + mf.<span class="hljs-title function_">getValue</span>(range, <span class="hljs-string">&#x27;ascii-math&#x27;</span>) + <span class="hljs-string">&quot;`&quot;</span>
 </code></pre>
 <p class="notice--info">The standard delimiter for ASCIIMath is the <kbd>`</kbd> (backtick) character .</p>
 <h2 id="applying-style-to-a-mathfield" tabindex="-1">Applying Style to a Mathfield</h2>
@@ -2585,14 +2582,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 27, 2023">
+        <meta itemprop="datePublished" content="May 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-27'>March 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-05-17'>May 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
