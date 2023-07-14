@@ -59,10 +59,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 
- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;1,200;1,400;1,600;1,700&display=swap&subset=latin" rel="stylesheet" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin>
  
 
-<!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" crossorigin> -->
+
+
+<!-- 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700;900&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" crossorigin> -->
   </head>
 
   <body class="layout--single">
@@ -2167,6 +2170,13 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
+<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<ul>
+<li><strong>#1995</strong> When right clicking to bring up the variant panel in the virtual
+keyboard, in some situations the virtual keyboard would lock up.</li>
+<li><strong>#2047</strong> Use <code>\exp</code> instead of <code>\mathrm{exp}</code> in the virtual keyboard</li>
+</ul>
 <h2 id="0.95.0-(2023-07-04)" tabindex="-1">0.95.0 (2023-07-04)</h2>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
@@ -2180,7 +2190,7 @@ the virtual keyboard is visible (current behavior)</li>
 </ul>
 </li>
 </ul>
-<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#2008</strong> The <code>\underline</code> and <code>\overline</code> commands now render correctly.</li>
 <li><strong>#1996</strong>, <strong>#2025</strong> MathML output could occasionally be incorrect for the<br>
@@ -2488,7 +2498,7 @@ in the main document, and not in another browsing context such as an iframe.</li
 <li>Architectural improvements: the virtual keyboard is now more efficient, uses
 fewer event handlers and a simplified and lighter weight DOM tree.</li>
 </ul>
-<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li>On ChromeOS devices with a touch screen, long pressing a keycap in the
 virtual keyboard no longer triggers the contextual menu.</li>
@@ -2507,7 +2517,7 @@ virtual keyboard no longer triggers the contextual menu.</li>
 MathLive without the Compute Engine</li>
 </ul>
 <h2 id="0.90.8-(2023-03-27)" tabindex="-1">0.90.8 (2023-03-27)</h2>
-<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-3" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#1830</strong> The keybinding to toggle text mode (alt+&quot;) could not be used on some
 keyboard layouts. Added shift+alt+T as a keybinding to switch to text mode.</li>
@@ -7193,14 +7203,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="July 04, 2023">
+        <meta itemprop="datePublished" content="July 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-07-04'>July 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-07-14'>July 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
