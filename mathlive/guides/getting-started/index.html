@@ -2242,33 +2242,26 @@ of the mathfield, as a LaTeX expression.</p>
     </style>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
-<h3 id="mathlive-and-react" tabindex="-1">MathLive and React</h3>
-<p>To use MathLive in a React project, use a <code>&lt;math-field&gt;</code> tag with JSX:</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;./App.css&quot;</span>;
-<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;//unpkg.com/mathlive&quot;</span>;
+<h2 id="mathlive-with-react" tabindex="-1">MathLive with React</h2>
+<p><strong>To use MathLive in a React project</strong>, use a <code>&lt;math-field&gt;</code> tag with JSX:</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;//unpkg.com/mathlive&quot;</span>;
 <span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;react&quot;</span>;
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
-  <span class="hljs-keyword">const</span> [value, setValue] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&quot;&quot;</span>);
+<span class="hljs-keyword">export</span> <span class="hljs-title class_">View</span> = <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">const</span> [value, setValue] = <span class="hljs-title function_">useState</span>(<span class="hljs-string">&quot;f(x) = \\frac{x}{2}&quot;</span>);
 
   <span class="hljs-keyword">return</span> (
-    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;App&quot;</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> 
-        <span class="hljs-attr">onInput</span>=<span class="hljs-string">{evt</span> =&gt;</span> setValue(evt.target.value)}
-      &gt;
-        {value}
-      <span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Value: {value}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> 
+      <span class="hljs-attr">onInput</span>=<span class="hljs-string">{evt</span> =&gt;</span> setValue(evt.target.value)}
+    &gt; {value} <span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span></span>
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Value: {value}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
   );
 }
-
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">App</span>;
 </code></pre>
 <div class='read-more'><a href="/mathlive/guides/react/">
 Read more about <strong>MathLive and React</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h3 id="caution" tabindex="-1">Caution</h3>
+<h2 id="caution" tabindex="-1">Caution</h2>
 <div class="notice--warning" markdown="1">
 <h4 id="caution%3A-html-quirks-mode" tabindex="-1">Caution: HTML quirks mode</h4>
 <p>The <strong>HTML quirks mode</strong> is not supported.</p>
