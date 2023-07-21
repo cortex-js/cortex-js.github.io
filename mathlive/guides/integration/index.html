@@ -2177,7 +2177,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#npm">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li></ol>
+        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
       </div>
       
                               
@@ -2189,25 +2189,6 @@
 <p>As discussed in <a href="/mathlive/guides/getting-started/">Getting Started</a> the
 simplest way to use MathLive is by loading it from a CDN.</p>
 <p>In this section we’ll discuss other options for adding a mathfield to a web page.</p>
-<h2 id="creating-mathfield-elements-programmatically" tabindex="-1">Creating Mathfield Elements Programmatically</h2>
-<p><strong>To add an editable mathfield to a document</strong> use a <code>&lt;math-field&gt;</code> tag:</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
-</code></pre>
-<p>If you need to add a mathfield to your DOM dynamically, you can create
-new mathfield DOM elements and add them to the DOM.</p>
-<p><strong>To create a mathfield element programatically</strong>, use <code>new MathfieldElement()</code>.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
-mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
-<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
-</code></pre>
-<p class="notice--info">In Javascript, the <code>\</code> in a string must be escaped and the escape character
-is also <code>\</code>. So, in Javascript strings LaTeX commands start with a <code>\\</code>.</p>
-<div class='read-more'><a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule)">
-Learn more about the attributes, properties, methods and events supported in the <strong><kbd>MathfieldElement</kbd></strong> documentation.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/mathlive/guides/lifecycle/">
-Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="using-mathlive-with-javascript-modules" tabindex="-1">Using MathLive with JavaScript Modules</h2>
 <p>In addition to <code>MathfieldElement</code>, the MathLive library provide some functions
 such as <code>renderMathInDocument()</code>.</p>
@@ -2225,10 +2206,10 @@ dynamic import.</li>
 </ol>
 <p class="notice--info"><strong>Note:</strong> The <code>?module</code> suffix indicates to the CDN we need the ESM (module)
 version of MathLive, not the UMD version.</p>
-<ol>
+<ol start="3">
 <li>Invoke a MathLive API, such as <code>renderMathInDocument()</code>.</li>
 </ol>
-<p>With this setup, MathLive will dynamically insert one or more stylesheets in
+<p>With this setup MathLive will dynamically insert one or more stylesheets in
 the page, as needed, for example when a mathfield is created. MathLive will
 dynamically download the required fonts from the CDN as well.</p>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
@@ -2272,7 +2253,7 @@ in your project:</p>
 <p>Your bundler/transpiler (for example <code>esbuild</code>, <code>Rollup</code>, <code>WebPack</code>, <code>Babel</code>,
 <code>TypeScript</code>) will locate the MathLive library in the <code>node_modules</code> directory
 and apply the necessary transformations to it, as per the settings in your project.</p>
-<p>Make sure the contents of the <code>/fonts/</code> and <code>/sounds/</code> folder are copied to
+<p class="notice--info"><strong>Note:</strong> Make sure the contents of the <code>/fonts/</code> and <code>/sounds/</code> folder are copied to
 your build output directory.</p>
 <h2 id="using-%3Cscript%3E-tags" tabindex="-1">Using <code>&lt;script&gt;</code> Tags</h2>
 <p>If you need to support browsers that don’t support JavaScript modules, you
@@ -2299,11 +2280,10 @@ when required.</li>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 </code></pre>
-<h2 id='npm'>MathLive Library Files</h2>
+<h2 id='files'>MathLive Library Files</h2>
 <p>If you need to incorporate the MathLive library files directly into your project
 (for example if you are building a standalone application), you can obtain
-those files either from npm (see above) or from GitHub: https://github.com/arnog/mathlive/releases
-or from a CDN, for example https://unpkg.com/mathlive/</p>
+those files either from npm (see above) or from a CDN, for example <a href="https://unpkg.com/mathlive/">https://unpkg.com/mathlive/</a></p>
 <p>The <code>/dist</code> folder inside MathLive contains the various flavors of libraries
 and assets required to use MathLive</p>
 <p>The <code>.mjs</code> suffix indicates ESM/module versions. The <code>.min</code> tag
@@ -2318,12 +2298,16 @@ and may be useful for debugging.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>dist/mathlive.min.mjs</code></td>
-<td style="text-align:left">MathLive library, as a JavScript module, minified</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>dist/fonts</code></td>
 <td style="text-align:left">The fonts required to render MathLive content</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dist/sounds</code></td>
+<td style="text-align:left">The optional sound files used when typing on the virtual keyboard</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dist/mathlive.min.mjs</code></td>
+<td style="text-align:left">MathLive library, as a JavScript module, minified</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>dist/mathlive.mjs</code></td>
@@ -2348,10 +2332,6 @@ and may be useful for debugging.</p>
 <tr>
 <td style="text-align:left"><code>dist/types</code></td>
 <td style="text-align:left">The TypeScript declaration files. Not needed at runtime.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>dist/sounds</code></td>
-<td style="text-align:left">The optional sound files used when typing on the virtual keyboard</td>
 </tr>
 </tbody>
 </table>
@@ -2405,6 +2385,65 @@ font loading.</p>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 </code></pre>
+<h2 id="creating-mathfield-elements-programmatically" tabindex="-1">Creating Mathfield Elements Programmatically</h2>
+<p><strong>To add an editable mathfield to a document</strong> use a <code>&lt;math-field&gt;</code> tag:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span>e^{i\pi}<span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+</code></pre>
+<p>If you need to add a mathfield to your DOM dynamically, you can create
+new mathfield DOM elements and add them to the DOM.</p>
+<p><strong>To create a mathfield element programatically</strong>, use <code>new MathfieldElement()</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mfe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MathfieldElement</span>();
+mfe.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{\\pi}{2}&#x27;</span>;
+<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(mfe);
+</code></pre>
+<p class="notice--info">In Javascript, the <code>\</code> in a string must be escaped and the escape character
+is also <code>\</code>. So, in Javascript strings LaTeX commands start with a <code>\\</code>.</p>
+<div class='read-more'><a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule)">
+Learn more about the attributes, properties, methods and events supported in the <strong><kbd>MathfieldElement</kbd></strong> documentation.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/guides/lifecycle/">
+Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id='static-render'>Displaying Non-Editable Formulas</h2>
+<p>While MathLive is primarily a math editor, the same  engine that renders
+an interactive math formula can also render “static” formulas in a web page,
+along the lines of what the MathJax or KaTeX libraries provide.</p>
+<p><strong>To render a non-editable formula</strong>, use <code>renderMathInDocument()</code></p>
+<p>The <code>renderMathInDocument()</code> will parse the DOM and converts LaTeX or MathASCII
+strings it finds into corresponding HTML markup. The options argument of
+<code>renderMathInDocument()</code> can control the delimiters it considers, as well
+as which DOM elements to consider or skip. The necessary stylesheet and
+fonts will be injected in the current page.</p>
+<p><strong>To generate markup for a formula</strong>, use <code>convertLatexToMarkup()</code>. You may
+save the output or return it from a server-side process.</p>
+<p>To correctly display this markup, import the stylesheet with
+<code>import &quot;mathlive/static.css&quot;</code>. The stylesheet can be found in <code>dist/mathlive-static.css</code>.</p>
+<p>When using this method, the MathLive library is not necessary to render the
+formula once the markup has been generated.</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> 
+      <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> 
+      <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive-static.css&quot;</span> 
+    /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> 
+      <span class="hljs-keyword">import</span>(<span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> {
+        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = 
+          mathlive.<span class="hljs-title function_">convertLatexToMarkup</span>(<span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>)
+      })
+    );
+  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<div class='read-more'><a href="/mathlive/guides/static/">
+Learn more about rendering <strong>static</strong> math content.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="optimizing-load-performance" tabindex="-1">Optimizing Load Performance</h2>
 <p>Loading a page with web components involve a complex set of steps.  If there
 are many mathfields in a page, this may result in visible layout shifts as
@@ -2482,46 +2521,6 @@ the mathfield custom elements have been connected to the page.</p>
   <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;../fonts/KaTeX_Typewriter-Regular.woff2&quot;</span>/&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;../mathlive-fonts.css&quot;</span> /&gt;</span>
 </code></pre>
-<h2 id='static-render'>Displaying Non-Editable Formulas</h2>
-<p>While MathLive is primarily a math editor, the same  engine that renders
-an interactive math formula can also render “static” formulas in a web page,
-along the lines of what the MathJax or KaTeX libraries provide.</p>
-<p><strong>To render a non-editable formula</strong>, use <code>renderMathInDocument()</code></p>
-<p>The <code>renderMathInDocument()</code> will parse the DOM and converts LaTeX or MathASCII
-strings it finds into corresponding HTML markup. The options argument of
-<code>renderMathInDocument()</code> can control the delimiters it considers, as well
-as which DOM elements to consider or skip. The necessary stylesheet and
-fonts will be injected in the current page.</p>
-<p><strong>To generate markup for a formula</strong>, use <code>convertLatexToMarkup()</code>. You may
-save the output or return it from a server-side process.</p>
-<p>To correctly display this markup, import the stylesheet with
-<code>import &quot;mathlive/static.css&quot;</code>. The stylesheet can be found in <code>dist/mathlive-static.css</code>.</p>
-<p>When using this method, the MathLive library is not necessary to render the
-formula once the markup has been generated.</p>
-<pre><code class="language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> 
-      <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> 
-      <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://unpkg.com/mathlive/dist/mathlive-static.css&quot;</span> 
-    /&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;formula&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> 
-      <span class="hljs-keyword">import</span>(<span class="hljs-string">&#x27;https://unpkg.com/mathlive?module&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">mathlive</span>) =&gt;</span> {
-        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;formula&quot;</span>).<span class="hljs-property">innerHTML</span> = 
-          mathlive.<span class="hljs-title function_">convertLatexToMarkup</span>(<span class="hljs-string">`\\xrightarrow[\\Delta]{\\text{abcd}}`</span>)
-      })
-    );
-  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
-</code></pre>
-<div class='read-more'><a href="/mathlive/guides/static/">
-Learn more about rendering <strong>static</strong> math content.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 
@@ -2562,7 +2561,7 @@ Learn more about rendering <strong>static</strong> math content.
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#npm">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li></ol>
+        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
       </div>
     
                             
