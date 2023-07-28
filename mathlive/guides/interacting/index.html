@@ -2223,7 +2223,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-navigation-out-of-a-mathfield">Detecting Navigation out of a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
+        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#using-a-mathfield-with-the-compute-engine">Using a Mathfield with the Compute Engine</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-navigation-out-of-a-mathfield">Detecting Navigation out of a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
       </div>
       
                               
@@ -2266,12 +2266,8 @@ latex.addEventListener("input", (ev) =>
   </div>
 </code-playground>
 <h2 id="reading-the-content-of-a-mathfield" tabindex="-1">Reading the Content of a Mathfield</h2>
-<p><strong>To read the content of a <code>&lt;math-field&gt;</code> element</strong> use its <code>value</code> property,
+<p><strong>To read the content of a <code>&lt;math-field&gt;</code> element as a LaTeX string</strong> use its <code>value</code> property,
 just like with a <code>&lt;textarea&gt;</code>.</p>
-<p>The <code>expression.json</code> property of a mathfield contains a MathJSON representation
-of its content. The <a href="/math-json">MathJSON</a> format is a lightweight
-mathematical notation interchange format.</p>
-<p class="notice--info">To use MathJSON, import the compute-engine library, e.g. <code>import &quot;https://unpkg.com/@cortex-js/compute-engine?module&quot;</code></p>
 <p><strong>To be notified when the content of the mathfield is modified</strong> listen for
 an <code>&quot;input&quot;</code> event.</p>
 <p class="notice--info"><strong>Try</strong>: modify the <code>&quot;input&quot;</code> event below to a <code>&quot;change&quot;</code> event. Notice how the <code>&quot;change&quot;</code> event
@@ -2312,6 +2308,27 @@ For example to get the content as a MathJSON expression, use <code>getValue('mat
 mf.addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.getValue('math-json'));
+});</div>
+</code-playground>
+<h2 id="using-a-mathfield-with-the-compute-engine" tabindex="-1">Using a Mathfield with the Compute Engine</h2>
+<p>The <a href="/math-json">MathJSON</a> format is a lightweight mathematical notation interchange format.</p>
+<p>The CortexJS Compute Engine is a JavaScript library that can perform
+mathematical operations on MathJSON expressions.</p>
+<p class="notice--info"><strong>To use MathJSON</strong>, import the compute-engine library, e.g. <code>import &quot;https://unpkg.com/@cortex-js/compute-engine?module&quot;</code></p>
+<p><strong>To read the content of a <code>&lt;math-field&gt;</code> element as a boxed MathJSON expression</strong> use the mathfield <code>expression</code> property.</p>
+<p>The instance of the compute engine used by mathfields is accessible
+with the <code>MathfieldElement.engine</code> property.</p>
+<p>Using <code>mf.expression</code> is equivalent to calling <code>MathfieldElement.box(mf.getValue('math-json'))</code>.</p>
+<code-playground layout="stack">
+    <div slot="html">
+&lt;math-field id="formula"&gt;
+    \mathrm{Expand}((a+b)^6)
+&lt;/math-field&gt;</div>
+    <div slot="javascript">import 'compute-engine';
+const mf = document.getElementById('formula');
+console.log(mf.expression.evaluate());
+mf.addEventListener('input',(ev) => {
+    console.log(mf.expression.evaluate());
 });</div>
 </code-playground>
 <h2 id="listening-for-changes-to-a-mathfield" tabindex="-1">Listening for Changes to a Mathfield</h2>
@@ -2617,14 +2634,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="May 17, 2023">
+        <meta itemprop="datePublished" content="July 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-05-17'>May 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-07-28'>July 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2646,7 +2663,7 @@ property to <code>&quot;auto&quot;</code>.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-navigation-out-of-a-mathfield">Detecting Navigation out of a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
+        <ol><li><a href="#changing-the-content-of-a-mathfield">Changing the Content of a Mathfield</a></li><li><a href="#reading-the-content-of-a-mathfield">Reading the Content of a Mathfield</a></li><li><a href="#using-a-mathfield-with-the-compute-engine">Using a Mathfield with the Compute Engine</a></li><li><a href="#listening-for-changes-to-a-mathfield">Listening for Changes to a Mathfield</a></li><li><a href="#detecting-when-the-user-has-finished-editing-a-mathfield">Detecting When the User has Finished Editing a Mathfield</a></li><li><a href="#detecting-a-click-on-a-mathfield">Detecting a Click on a Mathfield</a></li><li><a href="#detecting-navigation-out-of-a-mathfield">Detecting Navigation out of a Mathfield</a></li><li><a href="#interacting-with-the-clipboard">Interacting with the Clipboard</a></li><li><a href="#applying-style-to-a-mathfield">Applying Style to a Mathfield</a></li></ol>
       </div>
     
                             
