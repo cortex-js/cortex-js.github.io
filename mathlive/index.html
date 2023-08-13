@@ -2358,7 +2358,6 @@
 
 h1 {
   display: flex;
-  margin-bottom: 2rem;
   flex-flow: column;
   justify-content: center;
   text-align: center;
@@ -2372,8 +2371,17 @@ h1 {
   background-clip: text;
   -webkit-background-clip: text;
   -moz-background-clip: text;
-  background-image: linear-gradient(0deg, #2f475e, #cc6666);
+  background-image: linear-gradient(0deg, #b95a52, #2c5072);
+  padding-top: 10rem;
+  padding-bottom: 8rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  margin-top: -2rem;
+  animation: zoom-in-zoom-out 1.2s ease 1;
 }
+
 
 h1 span.first-part {
   font-size:160px;
@@ -2385,15 +2393,34 @@ h1 span.second-part {
   font-weight: 400;
   letter-spacing: -6px;
   font-variant: all-small-caps;
+  /* animation-delay: .2s; */
+  /* animation: zoom-in-zoom-out 1s ease infinite; */
+  /* animation: 0.2s zoom-in-zoom-out 1s ease infinite;; */
 
 }
 
 h1 span.third-part {
-  font-size: 142px; letter-spacing: -8px
+  font-size: 142px; letter-spacing: -8px;
+  /* animation-delay: .4s; */
+  /* animation: 0.5s zoom-in-zoom-out 1s ease; */
 }
 
 
-h1::selection {
+@keyframes zoom-in-zoom-out {
+  0% {
+    transform: scale(0, 0);
+  }
+  50% {
+    transform: scale(1.2, 1.2);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+
+
+h1::selection, h1 span::selection {
   -webkit-text-fill-color: #000;
   background: #abd;
   background-clip:inherit;
@@ -2403,6 +2430,7 @@ h1::selection {
 
 
 .page__content p.intro-copy {
+  text-align: center;
   margin-left: 2rem;
   margin-right: 2rem;
   border: 1px solid var(--border-color);
@@ -2412,6 +2440,7 @@ h1::selection {
   color: var(--text-color);
   opacity: .9;
   font-size: 3rem;
+  margin-bottom: 8rem;
 }
 
 .page__content h2 {
@@ -2549,7 +2578,7 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 <h1><span class="first-part">EQUATIONS</span> <span class="second-part">SERVED WITH A SIDE OF</span> <span class="third-part">INTERACTION</span></h1>
 
-<p class="intro-copy">Introducing the MathLive <kbd>&lt;math-field&gt;</kbd>: a ready to use web component that works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
+<p class="intro-copy">Introducing the MathLive <kbd>&lt;math-field&gt;</kbd>:<br> a ready to use web component that works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
 
 <section class="m-lg mb-xl">
 <code-playground layout="stack" style="width:100%">
@@ -2649,14 +2678,14 @@ Read more about the <strong>virtual keyboard</strong>
         
 
 
-        <meta itemprop="datePublished" content="August 12, 2023">
+        <meta itemprop="datePublished" content="August 13, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>MathLive version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-12'>August 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-13'>August 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
