@@ -2238,6 +2238,93 @@ some feedback to make sure that it fits in with:</p>
 </ul>
 <p>After it has has been accepted, you Pull Request will be merged into the main branch.</p>
 <p>Thank you for your contribution!</p>
+<h2 id="overview-of-the-mathlive-repository" tabindex="-1">Overview of the MathLive Repository</h2>
+<p>Here’s an overview of the MathLive code structure, designed to help you understand the project if you’re interested in contributing:</p>
+<h3 id="source-directory-(src)" tabindex="-1">Source Directory (<code>src</code>)</h3>
+<p>The source directory contains all the essential code for MathLive:</p>
+<ul>
+<li><strong><code>core</code></strong>: Handles parsing and rendering LaTeX into HTML markup.</li>
+<li><strong><code>core-atoms</code></strong>: Contains definitions for rendering and generating LaTeX for mathematical layout objects (fractions, delimiters, arrays, etc.).</li>
+<li><strong><code>core-definitions</code></strong>: Contains definitions of supported LaTeX commands, interpreting their arguments and mapping them to appropriate atoms.</li>
+<li><strong><code>editor</code></strong>: Utilities to handle specific features of the editor, such as virtual keyboard, localization, keybindings, etc.</li>
+<li><strong><code>editor-mathfield</code></strong>: Manages user interactions with the math field, including keyboard and pointer input.</li>
+<li><strong><code>editor-model</code></strong>: Represents the state of the math expression, including its content and selection, along with the code necessary to modify it.</li>
+<li><strong><code>addons</code></strong>: Miscellaneous.</li>
+</ul>
+<h3 id="core-components" tabindex="-1">Core Components</h3>
+<ul>
+<li><strong><code>core</code></strong>: Contains the code to parse and render LaTeX. It uses <code>core-definitions</code> to interpret LaTeX commands and <code>core-atoms</code> to render them.</li>
+<li><strong><code>core-atoms</code></strong>: Contains the definition of supported layout primitives, each being a subclass of the base <code>Atom</code> class.</li>
+<li><strong><code>core-definitions</code></strong>: Contains the definitions of supported LaTeX commands, specifying how to interpret each command.</li>
+</ul>
+<h3 id="editor-components" tabindex="-1">Editor Components</h3>
+<ul>
+<li><strong><code>editor-mathfield</code></strong>: Contains the code to handle user interactions with the math field, including mouse or touch and keyboard input.</li>
+<li><strong><code>editor-model</code></strong>: Contains the code for the <code>ModelPrivate</code> class, representing the state of the math field, including its content and selection.</li>
+</ul>
+<h3 id="documentation" tabindex="-1">Documentation</h3>
+<ul>
+<li><strong><code>CONTRIBUTOR_GUIDE.md</code></strong>: A comprehensive guide for developers who want to contribute to the project. It includes details about setting up the development environment, code structure, language and coding style, bundling, browser support, accessibility, and architecture.</li>
+</ul>
+<h3 id="commands-reference" tabindex="-1">Commands Reference</h3>
+<ul>
+<li><strong><code>COMMANDS_REFERENCE.md</code></strong>: MathLive supports over 800 standard TeX and LaTeX commands. A complete list can be found in this document.</li>
+</ul>
+<h3 id="conclusion" tabindex="-1">Conclusion</h3>
+<p>The MathLive project is well-structured, with clear separation of concerns between core functionalities, rendering, and user interactions. Understanding these components will provide a solid foundation for contributing to the project, whether you’re fixing a bug or adding a new feature.</p>
+<h2 id="mathlive-theory-of-operations" tabindex="-1">MathLive Theory of Operations</h2>
+<p>Here’s a basic description of the algorithm used by MathLive to render and edit an equation:</p>
+<h3 id="1.-parsing-latex-input" tabindex="-1">1. Parsing LaTeX Input</h3>
+<ul>
+<li><strong>Lexer</strong>: Converts the LaTeX string into tokens (<code>Token[]</code>).</li>
+<li><strong>Parser</strong>: Uses the tokens to create a tree of mathematical symbols or “atoms” (<code>Atom[]</code>), interpreting LaTeX commands with the help of <code>core-definitions</code>.</li>
+</ul>
+<h3 id="2.-rendering-latex-to-html" tabindex="-1">2. Rendering LaTeX to HTML</h3>
+<ul>
+<li><strong>Atoms to Boxes</strong>: The atoms are turned into “boxes” (<code>Box[]</code>), which are virtual DOM nodes representing layout units.</li>
+<li><strong>HTML/SVG Markup Generation</strong>: The boxes are rendered into HTML/SVG markup, using TeX layout algorithms to ensure high-quality rendering.</li>
+</ul>
+<h3 id="3.-editing-and-user-interaction" tabindex="-1">3. Editing and User Interaction</h3>
+<ul>
+<li><strong>Mathfield Class</strong>: Captures keyboard and pointing device events, presenting an appropriate user interface.</li>
+<li><strong>Model Class</strong>: Encapsulates operations on the tree of atoms, including adding/removing content and tracking/modifying the insertion point and selection.</li>
+<li><strong>Editor Components</strong>: Handle specific user interactions, such as virtual keyboards, localization, text-to-speech, and more.</li>
+</ul>
+<h3 id="4.-accessibility-and-alternate-renditions" tabindex="-1">4. Accessibility and Alternate Renditions</h3>
+<ul>
+<li><strong>Spoken Text Generation</strong>: MathLive can generate spoken text representations of the formula, with prosody hints for natural text-to-speech rendition.</li>
+<li><strong>Accessibility Support</strong>: Includes keyboard shortcuts for aural navigation and understanding of complex formulas, and support for screen readers.</li>
+</ul>
+<h3 id="5.-architecture-overview" tabindex="-1">5. Architecture Overview</h3>
+<ul>
+<li><strong>Core</strong>: Handles rendering of LaTeX to HTML markup, following TeX algorithms for accurate rendering.</li>
+<li><strong>Editor</strong>: Manages user interaction with the formula, using Core for rendering and Model for manipulating the in-memory representation.</li>
+</ul>
+<h3 id="conclusion-1" tabindex="-1">Conclusion</h3>
+<p>The MathLive algorithm is a multi-step process that involves parsing LaTeX input, rendering it into HTML/SVG markup, and providing a rich editing interface with accessibility support. The architecture is divided into Core and Editor components, each handling specific aspects of rendering and user interaction.</p>
+<p>This high-level overview provides a basic understanding of how MathLive renders and edits equations. For a more in-depth exploration, the source code and contributor documentation would be valuable resources.</p>
+<h2 id="compute-engine-repo-and-theory-of-operations" tabindex="-1">Compute Engine Repo and Theory of Operations</h2>
+<h3 id="overview" tabindex="-1">Overview</h3>
+<p>The repository is primarily focused on mathematical computation and provides a robust engine for symbolic and numeric computations. It’s structured into several key parts:</p>
+<ol>
+<li><strong>Compute Engine</strong>: Core logic for computations.</li>
+<li><strong>Library</strong>: Mathematical functions and constants.</li>
+<li><strong>LaTeX Syntax</strong>: Parsing and handling LaTeX expressions.</li>
+<li><strong>Cortex</strong>: Additional documentation and details.</li>
+<li><strong>Docs</strong>: Guides and assumptions related to symbolic computing.</li>
+<li><strong>Math JSON</strong>: JSON format for mathematical expressions.</li>
+</ol>
+<h3 id="theory-of-operations" tabindex="-1">Theory of Operations</h3>
+<h4 id="compute-engine" tabindex="-1">Compute Engine</h4>
+<p>The compute engine is the heart of the system, providing symbolic and numeric computations. It’s designed to be extensible and can handle a wide range of mathematical expressions.</p>
+<h4 id="library" tabindex="-1">Library</h4>
+<p>The library contains predefined mathematical functions, constants, and symbols. It’s a vital part of the system, allowing users to perform complex calculations without having to define basic mathematical constructs.</p>
+<h4 id="latex-syntax" tabindex="-1">LaTeX Syntax</h4>
+<p>This part of the system focuses on parsing and handling LaTeX expressions. It translates LaTeX into a format that the compute engine can understand, bridging the gap between human-readable notation and machine processing.</p>
+<h4 id="math-json" tabindex="-1">Math JSON</h4>
+<p>Math JSON is a specific JSON format designed to represent mathematical expressions. It’s a standardized way to communicate mathematical constructs between different parts of the system or with external applications.</p>
+<h3 id="conclusion-2" tabindex="-1">Conclusion</h3>
+<p>The cortex-js/compute-engine repository is a comprehensive solution for mathematical computations, offering a wide range of features from basic arithmetic to complex symbolic calculations. Its modular design and extensive documentation make it a versatile tool for anyone working with mathematical expressions, whether in LaTeX or other formats.</p>
 
 
 
@@ -2249,14 +2336,14 @@ some feedback to make sure that it fits in with:</p>
         
 
 
-        <meta itemprop="datePublished" content="July 17, 2022">
+        <meta itemprop="datePublished" content="August 15, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2022-07-17'>July 17, 2022</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-15'>August 15, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
