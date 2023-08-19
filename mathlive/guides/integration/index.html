@@ -2177,7 +2177,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
+        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#checking-the-version-of-mathlive">Checking the Version of MathLive</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
       </div>
       
                               
@@ -2279,6 +2279,13 @@ when required.</li>
     </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<h2 id="checking-the-version-of-mathlive" tabindex="-1">Checking the Version of MathLive</h2>
+<p>The version of MathLive currently loaded can be obtained with:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(globalThis[<span class="hljs-title class_">Symbol</span>.<span class="hljs-title function_">for</span>(<span class="hljs-string">&#x27;io.cortexjs.mathlive&#x27;</span>)].<span class="hljs-property">version</span>);
+</code></pre>
+<p>For more recent versions of MathLive, this is also available as:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">version</span>);
 </code></pre>
 <h2 id='files'>MathLive Library Files</h2>
 <p>If you need to incorporate the MathLive library files directly into your project
@@ -2532,14 +2539,14 @@ the mathfield custom elements have been connected to the page.</p>
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2023">
+        <meta itemprop="datePublished" content="August 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-07-21'>July 21, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-19'>August 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2561,7 +2568,7 @@ the mathfield custom elements have been connected to the page.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
+        <ol><li><a href="#using-mathlive-with-javascript-modules">Using MathLive with JavaScript Modules</a></li><li><a href="#npm">Using NPM</a></li><li><a href="#using-%3Cscript%3E-tags">Using &lt;script&gt; Tags</a></li><li><a href="#checking-the-version-of-mathlive">Checking the Version of MathLive</a></li><li><a href="#files">MathLive Library Files</a></li><li><a href="#fonts-folder"> Controlling the Location of the fonts Folder</a></li><li><a href="#asset-pipeline">Integrating with a Bundler or an Asset Pipeline</a></li><li><a href="#creating-mathfield-elements-programmatically">Creating Mathfield Elements Programmatically</a></li><li><a href="#static-render">Displaying Non-Editable Formulas</a></li><li><a href="#optimizing-load-performance">Optimizing Load Performance</a></li></ol>
       </div>
     
                             
