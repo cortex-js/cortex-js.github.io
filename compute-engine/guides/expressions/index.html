@@ -2303,14 +2303,14 @@ expression.</p>
 <div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
 <strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>By default, <code>ce.box()</code> and <code>ce.parse()</code> produce a canonical expression.</p>
-<p><strong>To get a “raw” (non-canonical) expression instead</strong>, use <code>ce.box(expr, {canonical: false})</code>
-or <code>ce.parse(latex, {canonical: false})</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = <span class="hljs-string">&quot;\\frac{3}{-5}&quot;</span>;
+<p><strong>To get a “raw” (non-canonical) expression instead</strong>, use
+<code>ce.box(expr, {canonical: false})</code> or <code>ce.parse(latex, {canonical: false})</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = <span class="hljs-string">&#x27;\\frac{3}{-5}&#x27;</span>;
 
 ce.<span class="hljs-title function_">parse</span>(expr);
 <span class="hljs-comment">// canonical form ➔ [&quot;Rational&quot;, -3, 5]</span>
 
-ce.<span class="hljs-title function_">parse</span>(expr, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})
+ce.<span class="hljs-title function_">parse</span>(expr, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// non-canonical form ➔ [&quot;Divide&quot;, 3, -5]</span>
 </code></pre>
 <p>A non-canonical expression may include errors as a result of parsing from LaTeX,
@@ -2473,8 +2473,8 @@ property.</p>
 <td style="text-align:left">not enough arguments provided</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>invalid-symbol-name</code></td>
-<td style="text-align:left">the name of the symbol cannot be used (see <a href="/math-json/#symbols">MathJSON Symbols</a>)</td>
+<td style="text-align:left"><code>invalid-identifier</code></td>
+<td style="text-align:left">the identifier cannot be used (see <a href="/math-json/#symbols">MathJSON Symbols</a>)</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>invalid-domain</code></td>
@@ -2597,14 +2597,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="August 18, 2023">
+        <meta itemprop="datePublished" content="August 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-18'>August 18, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-19'>August 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

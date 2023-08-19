@@ -2223,7 +2223,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#pseudo-elements">Pseudo-elements</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
       
                               
@@ -2236,45 +2236,16 @@
 <p>Here are a few common examples.</p>
 <h2 id="styling" tabindex="-1">Styling</h2>
 <p><strong>To style the mathfield</strong> define a CSS rule targeting the mathfield or use the
-<code>style</code> attribute on the <code>&lt;math-field&gt;</code> element.</p>
+<code>style</code> attribute of the <code>&lt;math-field&gt;</code> element.</p>
 <p>This can be used to modify the appearance of the mathfield in many ways, for
 example changing the base font size or adding a border around it.</p>
 <p><strong>To display the mathfield as a block element</strong>, rather than an inline element,
 add an attribute <code>style=&quot;display: block&quot;</code></p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Answer: <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Answer: <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;display: block&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-</code></pre>
-<p><strong>To change the color of the caret (insertion point)</strong> set the value of the
-<code>--caret-color</code> CSS custom property.</p>
-<p><strong>To change the background color and ink color of the math content when
-selected</strong> set the value of the <code>--selection-color</code> and
-<code>--selection-background-color</code> CSS properties with a rule targeting the
-elements you want to customize.</p>
-<pre><code class="language-css">math-field {
-  <span class="hljs-attr">--caret-color</span>: red;
-  <span class="hljs-attr">--selection-background-color</span>: lightgoldenrodyellow;
-  <span class="hljs-attr">--selection-color</span>: darkblue;
-}
-</code></pre>
-<p>You can also use the <code>style</code> attribute of a <code>&lt;math-field&gt;</code> tag.</p>
-<p>Change the style attribute in the playground below to <code>color: #dde; background: #256291;</code>.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">
-    &lt;math-field style="
-    font-size: 32px; 
-    margin: 3em;
-    padding: 8px; 
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, .3); 
-    box-shadow: 0 0 8px rgba(0, 0, 0, .2);
-    --caret-color: red;
-    --selection-background-color: lightgoldenrodyellow;
-    --selection-color: darkblue;
-"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+<div slot="html">
+&lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
+&lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h2 id="css-variables" tabindex="-1">CSS Variables</h2>
@@ -2284,6 +2255,10 @@ variables (custom properties) in a ruleset that applies to the mathfield element
  <span class="hljs-attr">--smart-fence-color</span>: red ;
 }
 </code></pre>
+<p>Set these CSS variables on any selector that applies to the
+<code>&lt;math-field&gt;</code> element you want to customize, for example, <code>body</code>.
+Although CSS styles are “invisible” to custom components, CSS variables are
+“passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 <p>Alternatively you can set these CSS variables programatically:</p>
 <pre><code class="language-js">  <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--smart-fence-color&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>);
 </code></pre>
@@ -2297,8 +2272,28 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left"><code>--caret-color</code></td>
+<td style="text-align:left">Color of the insertion point</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--selection-background-color</code></td>
+<td style="text-align:left">Background color of the selection</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--selection-background-color-focused</code></td>
+<td style="text-align:left">Background color of the selection, when the mathfield is focused. By default, same as <code>--selection-background-color</code></td>
+</tr>
+<tr>
 <td style="text-align:left"><code>--contains-highlight-background-color</code></td>
 <td style="text-align:left">Background color for items that contain the caret</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--placeholder-color</code></td>
+<td style="text-align:left">Color of the placeholder symbol</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>--placeholder-opacity</code></td>
+<td style="text-align:left">Opacity (0-1) of the placeholder symbol</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>--primary</code></td>
@@ -2317,22 +2312,6 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 <td style="text-align:left">The font stack used in text mode</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>--placeholder-color</code></td>
-<td style="text-align:left">Color of the placeholder symbol</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>--placeholder-opacity</code></td>
-<td style="text-align:left">Opacity (0-1) of the placeholder symbol</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>--selection-background-color-focused</code></td>
-<td style="text-align:left">Background color of the selection, when the mathfield is focused. By default, same as <code>--selection-background-color</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>--selection-background-color</code></td>
-<td style="text-align:left">Background color of the selection</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>--correct-color</code></td>
 <td style="text-align:left">Highlight color of a prompt inside a mathfield when in the <code>&quot;correct&quot;</code> state</td>
 </tr>
@@ -2344,24 +2323,16 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 </table>
 <p><strong>Note</strong> To change the placeholder symbol, set the option <code>placeholderSymbol</code>.</p>
 </div>
-<p class="notice--info">Set these CSS variables on any selector that applies to the
-<code>&lt;math-field&gt;</code> element you want to customize, for example, <code>body</code>.
-Although CSS styles are “invisible” to custom components, CSS variables are
-“passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="html">&lt;math-field style="
+    <div slot="html">&lt;style&gt;
+math-field {
   --caret-color: red;
-"&gt;
+  --selection-background-color: lightgoldenrodyellow;
+  --selection-color: darkblue;
+}
+&lt;/style&gt;
+&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
@@ -2394,6 +2365,57 @@ with a keyboard. However, you can change the appearance of the outline,
 for example to indicate an error condition. If you remove the outline on the
 mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element. </p>
+<h2 id="pseudo-elements" tabindex="-1">Pseudo-elements</h2>
+<p>Because the mathfield is a custom element with a shadow DOM, it is not possible
+to style its children using CSS selectors.</p>
+<p>However, there are a few pseudo-elements (parts) that can be used to style the
+content of the mathfield.</p>
+<div class='symbols-table' style='--first-col-width:25ex'>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Pseudo-element</th>
+<th style="text-align:left">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>virtual-keyboard-toggle</code></td>
+<td style="text-align:left">The virtual keyboard toggle button</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>content</code></td>
+<td style="text-align:left">The math formula</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>container</code></td>
+<td style="text-align:left">The element containing the formula and keyboard toggle</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>keyboard-sink</code></td>
+<td style="text-align:left">The hidden element capturing the physical keyboard input</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>prompt</code></td>
+<td style="text-align:left">The prompts (<code>placeholder{}</code>) inside the mathfield</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For example:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Right align the formula */</span>
+math-field<span class="hljs-selector-pseudo">::part</span>(<span class="hljs-attribute">content</span>) {
+  <span class="hljs-attribute">text-align</span>: right;
+}
+<span class="hljs-comment">/* Right align the virtual keyboard toggle */</span>
+math-field<span class="hljs-selector-pseudo">::part</span>(container) {
+  <span class="hljs-attribute">flex-flow</span>: row-reverse;
+}
+<span class="hljs-comment">/* Hide the virtual keyboard toggle */</span>
+math-field<span class="hljs-selector-pseudo">::part</span>(virtual-keyboard-toggle) {
+  <span class="hljs-attribute">display</span>: none;
+}
+</code></pre>
 <h2 id="display-options" tabindex="-1">Display Options</h2>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
@@ -2797,14 +2819,14 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
         
 
 
-        <meta itemprop="datePublished" content="August 10, 2023">
+        <meta itemprop="datePublished" content="August 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-10'>August 10, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-19'>August 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2826,7 +2848,7 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#pseudo-elements">Pseudo-elements</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
     
                             
