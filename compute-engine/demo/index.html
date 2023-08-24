@@ -2649,7 +2649,7 @@
 
   <div class="output-section" id="canonical-form">
     <math-field class="latex" read-only></math-field>
-    <div class="output mathjson"></div>
+    <textarea class="output mathjson"></textarea>
   </div>
 
   <div class="output-section" id="domain">
@@ -2875,6 +2875,16 @@
 
   mf.addEventListener('input', (ev) => updateContent(mf));
   updateContent(mf);
+
+document.querySelector('.output.mathjson')?.addEventListener('input', (ev) => {
+let latex = '';
+try {
+  latex = ce.box(JSON.parse(ev.target.value)).latex
+} catch(e) {
+  latex = '\\error{\\text{Invalid JSON}}';
+}
+  mf.value = latex;
+});
 
   async function updateContent(mf) {
     const latex = mf.getValue('latex-expanded');
@@ -3120,14 +3130,14 @@
         
 
 
-        <meta itemprop="datePublished" content="March 17, 2023">
+        <meta itemprop="datePublished" content="August 24, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Compute Engine version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-03-17'>March 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-24'>August 24, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
