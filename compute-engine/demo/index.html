@@ -2545,7 +2545,7 @@
   <div id="input">
     <code class="label">expr = </code>
     <div class="row">
-      <math-field id="mf" class="mathfield" >
+      <math-field id="mf" class="mathfield">
         <!-- 2+3.001 -->
         e^{i\pi}
         <!-- 1 + 2 + 3.001 -->
@@ -2649,7 +2649,7 @@
 
   <div class="output-section" id="canonical-form">
     <math-field class="latex" read-only></math-field>
-    <textarea class="output mathjson"></textarea>
+    <textarea id="mathjson" class="output mathjson"></textarea>
   </div>
 
   <div class="output-section" id="domain">
@@ -2876,18 +2876,30 @@
   mf.addEventListener('input', (ev) => updateContent(mf));
   updateContent(mf);
 
-document.querySelector('.output.mathjson')?.addEventListener('input', (ev) => {
-let latex = '';
-try {
-  latex = ce.box(JSON.parse(ev.target.value)).latex
-} catch(e) {
-  latex = '\\error{\\text{Invalid JSON}}';
-}
-  mf.value = latex;
-});
+  document.getElementById('mathjson').addEventListener('input', (ev) => {
+    let expr = ce.box([]);
+    let latex = '';
+    const value = ev.target.value;
+    if (value.trim().length === 0) {
+      mf.value = '';
+      updateContent(mf);
+    } else
+      try {
+        expr = ce.box(JSON.parse(value));
+        latex = expr.latex;
+      } catch (e) {
+        expr = ce.box([]);
+        latex = `\\error{\\text{${e.toString()}}}`;
+      }
+    updateContent(mf, expr);
+    mf.value = latex;
+  });
 
-  async function updateContent(mf) {
+  async function updateContent(mf, expr) {
     const latex = mf.getValue('latex-expanded');
+    try {
+      if (expr === undefined) expr = ce.parse(latex);
+    } catch (e) {}
 
     document.getElementById('numeric-mode').classList.remove('is-visible');
     updateExpr(null, 'canonical-form');
@@ -2898,7 +2910,6 @@ try {
 
     // document.getElementById('output-latex').innerText = '';
 
-    let expr;
     try {
       const latexEl = document.getElementById('mathfield-latex');
       if (latexEl) latexEl.innerHTML = escapeHtml(latex);
@@ -2908,9 +2919,6 @@ try {
           mf.getValue('ascii-math')
         );
       }
-
-      expr = ce.parse(latex);
-
       const mathJsonEl = document.getElementById('mathfield-math-json');
       if (mathJsonEl) mathJsonEl.innerHTML = exprToString(expr.json);
     } catch (e) {
