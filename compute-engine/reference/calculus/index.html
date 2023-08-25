@@ -2192,17 +2192,17 @@
     <p><code>[“Integrate”, <em>expression</em>]</code></p>
 <p><code>[“Integrate”, <em>expression</em>, <em>symbol</em>]</code></p>
 <p>Indefinite integral</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, x], &quot;x&quot;]</code></p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], &quot;x&quot;]</code></p>
 <p>$$ \int \sin x ,\mathrm{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate</em>]</code></p>
 <p>Definite integral.</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
+<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
 <p>$$ \int_0^\infty \sin x ,\mathrm{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
 <p>Multiple integral.</p>
-<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  x [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, x, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, y, [&quot;Interval&quot;, 0, 1]]]</code></p>
+<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  &quot;x&quot;, [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, &quot;y&quot;, [&quot;Interval&quot;, 0, 1]]]</code></p>
 <p>$$ \int_0^1 \int_0^2 x\sin y ,\mathrm{d}x,\mathrm{d}y $$</p>
 </td></tr>
 <tr><td><code>D</code></td><td>
@@ -2224,7 +2224,7 @@
 <tbody>
 <tr>
 <td style="text-align:left"><code>f'(x)</code></td>
-<td style="text-align:left"><code>[&quot;D&quot;, f, x]</code></td>
+<td style="text-align:left"><code>[&quot;D&quot;, &quot;f&quot;, &quot;x&quot;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f''(x)</code></td>
@@ -2301,24 +2301,25 @@
 relative to time t</p>
 <h3 id="integral" tabindex="-1">Integral</h3>
 <h2 id="indefinite-integral" tabindex="-1">Indefinite Integral</h2>
-<p><code>\int f dx</code> -&gt; [“Integrate”, f, x,] <code>\int\int f dxdy</code> -&gt; [“Integrate”, f, x, y]</p>
-<p>Note: <code>[&quot;Integrate&quot;, [&quot;Integrate&quot;, f , x], y]</code> is equivalent to
-<code>[&quot;Integrate&quot;, f , x, y]</code></p>
+<p><code>\int f dx</code> -&gt; [“Integrate”, “f”, “x”]</p>
+<p><code>\int\int f dxdy</code> -&gt; [“Integrate”, “f”, “x”, “y”]</p>
+<p>Note: <code>[&quot;Integrate&quot;, [&quot;Integrate&quot;, &quot;f&quot; , &quot;x&quot;], &quot;y&quot;]</code> is equivalent to
+<code>[&quot;Integrate&quot;, &quot;f&quot; , &quot;x&quot;, &quot;y&quot;]</code></p>
 <h2 id="definite-integral" tabindex="-1">Definite Integral</h2>
 <p><code>\int_{a}^{b} f dx</code> -&gt; [“Integrate”, f, [x, a, b]]
-<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, f, [x, a, b], [y, c, d]]</p>
-<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, f, -1], [x, a, b]]</p>
-<p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, f, [x, a, b]]</p>
+<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”, “b”], [“Triple”, “y”, “c”, “d”]]</p>
+<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, “f”, -1], [“Triple”, “x”, “a”, “b”]]</p>
+<p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”, “b”]]</p>
 <p>If <code>[a, b]</code> are numeric, numeric methods are used to approximate the integral.</p>
 <h2 id="domain-integral" tabindex="-1">Domain Integral</h2>
 <p><code>\int_{x\in D}</code> -&gt; [“Integrate”, f, [“In”, x, D]]</p>
 <h3 id="contour-integral" tabindex="-1">Contour Integral</h3>
-<p><code>\oint f dx</code> -&gt; <code>[&quot;ContourIntegral&quot;, f, x,]</code></p>
-<p><code>\varointclockwise f dx</code> -&gt; <code>[&quot;ClockwiseContourIntegral&quot;, f, x]</code></p>
-<p><code>\ointctrclockwise f dx</code> -&gt; <code>[&quot;CounterclockwiseContourIntegral&quot;, f, x,]</code></p>
-<p><code>\oiint f ds</code> -&gt; <code>[&quot;DoubleCountourIntegral&quot;, f, s]</code> : integral over closed
+<p><code>\oint f dx</code> -&gt; <code>[&quot;ContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
+<p><code>\varointclockwise f dx</code> -&gt; <code>[&quot;ClockwiseContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
+<p><code>\ointctrclockwise f dx</code> -&gt; <code>[&quot;CounterclockwiseContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
+<p><code>\oiint f ds</code> -&gt; <code>[&quot;DoubleCountourIntegral&quot;, &quot;f&quot;, &quot;s&quot;]</code> : integral over closed
 surfaces</p>
-<p><code>\oiiint</code> f dv -&gt; <code>[&quot;TripleCountourIntegral&quot;, f, v]</code> : integral over closed
+<p><code>\oiiint</code> f dv -&gt; <code>[&quot;TripleCountourIntegral&quot;, &quot;f&quot;, &quot;v&quot;]</code> : integral over closed
 volumes</p>
 <p><code>\intclockwise</code></p>
 <p><code>\intctrclockwise</code></p>
@@ -2335,14 +2336,14 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="August 24, 2023">
+        <meta itemprop="datePublished" content="August 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-24'>August 24, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-25'>August 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
