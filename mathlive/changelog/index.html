@@ -2171,17 +2171,27 @@
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
 <h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<ul>
+<li>A closing parenthesis following a function application would be ignored,
+i.e. <code>(f(x))</code> would be parsed as <code>(f(x)</code>.</li>
+<li><strong>#2116</strong> Pressing the “/” key after an expression ending with a superscript would
+not recognize the left argument as a numerator.</li>
+</ul>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added support for additional commands from the <code>mathtools</code> , <code>actuarialangle</code>, <code>colonequals</code>, <code>statmath</code> and <code>amsopn</code> packages</li>
 <li>Added support for <code>longdiv</code> enclosure (<code>\mathenclose{longdiv}{...}</code>)</li>
+<li>The decimal separator key (<code>.</code>) in the virtual keyboard was displayed as a blank key.</li>
 <li><strong>#2109</strong> In the virtual keyboard, some placeholders could be hard to see when
 a keycap was in a pressed state.</li>
 <li><strong>#2105</strong> The keycap <code>shift +</code> in the numeric keyboard was inserting a sum
 with limits contrary to what the keycap label indicated.</li>
+<li>In the alphabetic virtual keyboard, the <code>,</code> key now produces a semicolon
+when shifted and has a variant panel with additional punctuation.</li>
 </ul>
 <h2 id="0.95.5-(2023-08-18)" tabindex="-1">0.95.5 (2023-08-18)</h2>
-<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#2091</strong> The variant panel for the <code>7</code> key was the variant panel for <code>4</code>.</li>
 <li><strong>#2093</strong> Inline shortcuts can be corrected with backspace, i.e. typing
@@ -2208,7 +2218,7 @@ keyboard is now a singleton, accessible as <code>window.mathVirtualKeyboard</cod
 <li>When a <code>command</code> attribute is associated with a keycap, a <code>math-virtual-keyboard-command</code> event is dispatched when the keycap is pressed.</li>
 </ul>
 <h2 id="0.95.4-(2023-08-11)" tabindex="-1">0.95.4 (2023-08-11)</h2>
-<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#2090</strong> A runtime error could occur when adding a superscript inside a square root</li>
 <li><strong>#2068</strong> Use a more compact keyboard layout for phones in landscape mode.</li>
@@ -2232,7 +2242,7 @@ virtual keyboard keys.</li>
 <li><strong>#2064</strong>, <strong>#2065</strong> Improved behavior of virtual keyboard shift key,
 contributed by https://github.com/oscarhermoso</li>
 </ul>
-<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-3" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#1995</strong> When right clicking to bring up the variant panel in the virtual
 keyboard, in some situations the virtual keyboard would lock up.</li>
@@ -2253,7 +2263,7 @@ the virtual keyboard is visible (current behavior)</li>
 </ul>
 </li>
 </ul>
-<h3 id="bugs-fixed-3" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-4" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#2008</strong> The <code>\underline</code> and <code>\overline</code> commands now render correctly.</li>
 <li><strong>#1996</strong>, <strong>#2025</strong> MathML output could occasionally be incorrect for the<br>
@@ -2561,7 +2571,7 @@ in the main document, and not in another browsing context such as an iframe.</li
 <li>Architectural improvements: the virtual keyboard is now more efficient, uses
 fewer event handlers and a simplified and lighter weight DOM tree.</li>
 </ul>
-<h3 id="bugs-fixed-4" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-5" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li>On ChromeOS devices with a touch screen, long pressing a keycap in the
 virtual keyboard no longer triggers the contextual menu.</li>
@@ -2580,7 +2590,7 @@ virtual keyboard no longer triggers the contextual menu.</li>
 MathLive without the Compute Engine</li>
 </ul>
 <h2 id="0.90.8-(2023-03-27)" tabindex="-1">0.90.8 (2023-03-27)</h2>
-<h3 id="bugs-fixed-5" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-6" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#1830</strong> The keybinding to toggle text mode (alt+&quot;) could not be used on some
 keyboard layouts. Added shift+alt+T as a keybinding to switch to text mode.</li>
@@ -7266,14 +7276,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="August 25, 2023">
+        <meta itemprop="datePublished" content="August 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-25'>August 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-29'>August 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
