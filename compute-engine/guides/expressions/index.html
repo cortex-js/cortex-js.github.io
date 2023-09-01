@@ -2395,17 +2395,18 @@ have no value if it represents a free variable.</p>
 <section id=errors>
 <h2 id="errors" tabindex="-1">Errors</h2>
 <p>Sometimes, things go wrong.</p>
-<p>When something goes wrong the Compute Engine uses an <code>[&quot;Error&quot;]</code> expression.</p>
-<p>The <strong>first argument</strong> of an <code>[&quot;Error&quot;]</code> expression provides details about the
-nature of the problem. This can be either a string or an <code>[&quot;ErrorCode&quot;]</code>
-expression if there are additional arguments to the error.</p>
-<p>For example if the problem is that an argument of a function expression is not
-of the expected domain, an expression such as
-<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Anything&quot;]]</code> could
-be returned to indicate that a value of domain <code>&quot;Number&quot;</code> was expected.</p>
-<p>The <strong>second argument</strong> of an <code>[&quot;Error&quot;]</code> expression indicate the context of the
-error. This can be a <code>[&quot;Latex&quot;]</code> expression when the problem occurred while
-parsing a LaTeX string, or another expression if the problem was detected later.</p>
+<p>When something goes wrong the Compute Engine uses an
+<code>[&quot;Error&quot;, &lt;cause&gt;, &lt;location&gt;]</code> expression.</p>
+<p>The <code>&lt;cause&gt;</code> argument provides details about the nature of the problem. This
+can be either a string or an <code>[&quot;ErrorCode&quot;]</code> expression if there are additional
+arguments to the error.</p>
+<p>For example if the problem is that an argument of a function expression is a
+boolean when a number was expected, an expression such as
+<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Boolean&quot;]]</code> could
+be returned.</p>
+<p>The <code>&lt;location&gt;</code> argument indicates the context of the error. This can be a
+<code>[&quot;Latex&quot;]</code> expression when the problem occurred while parsing a LaTeX string,
+or another expression if the problem was detected later.</p>
 <h3 id="parsing-errors" tabindex="-1">Parsing Errors</h3>
 <p>When parsing a LaTeX expression, the Compute Engine uses the <strong>maximum effort</strong>
 doctrine. That is, even partially complete expressions are parsed, and as much
