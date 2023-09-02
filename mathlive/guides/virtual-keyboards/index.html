@@ -2474,18 +2474,23 @@ for those keys.</p>
 <p><code>&quot;[separator]&quot;</code> <code>[&quot;hr&quot;]</code></p>
 <p><code>&quot;[foreground-color]&quot;</code> <code>&quot;[background-color]&quot;</code></p>
 <h3 id="advanced-keycaps" tabindex="-1">Advanced Keycaps</h3>
-<p>For more control over the appearance and behaviro of a keycap, instead of a
-string, use an object literal with the following properties:</p>
+<p>For more control over the appearance and behavior of a keycap use an object
+literal with the following properties:</p>
 <ul>
 <li><code>label</code>: the label of the keycap, displayed using the system font. This
 can include some HTML markup, for example <code>&quot;&lt;span&gt;&lt;i&gt;x&lt;/i&gt;&amp;thinsp;²&lt;/span&gt;&quot;</code>.
-If none is provided, the <code>latex</code> property is used instead for the label of
+If property is absent, the <code>latex</code> property is used for the label of
 the keycap. The label can also be one of the keycap shortcuts mentioned
 above, e.g. <code>[left]</code>. If a keycap shortcut is used, the other properties
 override the values defined by the shortcut.</li>
 <li><code>latex</code>: if no <code>label</code> is provided, the value of the <code>latex</code> property is used as
 the label of the keycap. This property is also used to insert content in
 the mathfield when the keycap is pressed.</li>
+<li><code>key</code>: if present, when the keycap is pressed the corresponding physical
+keyboard key is simulated, potentially triggering keyboard shortcuts.</li>
+<li><code>insert</code>: if present, a LaTeX string to be inserted when the keycap is pressed.</li>
+<li><code>command</code>: the command to perform when the keycap is pressed. For example:
+<code>[&quot;performWithFeedback&quot;, &quot;commit&quot;]</code>.</li>
 <li><code>class</code>: a set of CSS classes to style this keycap. The classes can be custom
 defined (see below about the <code>style</code> layer property), or be one or more of the
 standard ones:
@@ -2502,23 +2507,16 @@ a <code>shift</code> property is provided.</li>
 </ul>
 </li>
 <li><code>width</code>: the width of the keycap, as a multiple of a standard keycap. That
-is 0.5 for half-wide keys, 1.5 for one and half wide keys, etc…</li>
+is, 0.5 for half-wide keys, 1.5 for one and half wide keys, etc…</li>
 <li><code>aside</code>: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.</li>
-<li><code>altKeys</code>: a set of variants to display when the keycap is long-pressed.</li>
-<li><code>shift</code>: either a LaTeX string indicated what is inserted when the shift
-key is pressed with this keycap, or a keycap record</li>
+<li><code>shift</code>: a LaTeX string or a keycap record indicating what happens when
+this keycap is pressed with the shift key down.</li>
 <li><code>variants</code>: an array of keycaps (either as string or keycap records) defining
 the variants for this keycap (see below).</li>
 </ul>
-<p>The action when the keycap is pressed is defined by one of these properties:</p>
-<ul>
-<li><code>insert</code>: the LaTeX to be inserted when the keycap is pressed.</li>
-<li><code>command</code>: the command to perform when the keycap is pressed. For example:
-<code>[&quot;performWithFeedback&quot;, &quot;commit&quot;]</code>.</li>
-</ul>
-<p>If neither <code>insert</code> nor <code>command</code> are provided, the <code>latex</code> property is used to
-define the content inserted when the keycap is pressed.</p>
+<p>If neither <code>insert</code> nor <code>command</code> are provided, the <code>latex</code> or <code>key</code> properties
+are used to define the content inserted when the keycap is pressed.</p>
 <div class='read-more'><a href="/mathlive/guides/commands/">
 Learn more about the available commands
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -2867,14 +2865,14 @@ document.querySelector('math-field').addEventListener('focus', () => {
         
 
 
-        <meta itemprop="datePublished" content="August 19, 2023">
+        <meta itemprop="datePublished" content="September 01, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-08-19'>August 19, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-01'>September 01, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
