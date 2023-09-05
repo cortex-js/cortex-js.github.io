@@ -2363,11 +2363,13 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.</p
 <p><strong>Symbol</strong></p>
 <pre><code class="language-json"><span class="hljs-string">&quot;x&quot;</span>
 <span class="hljs-string">&quot;Pi&quot;</span>
+<span class="hljs-string">&quot;🍎&quot;</span>
+<span class="hljs-string">&quot;半径&quot;</span>
 <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;sym&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;wikidata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Q167&quot;</span><span class="hljs-punctuation">}</span>
 </code></pre>
 <p><strong>String</strong></p>
 <pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Diameter of a circle&#x27;&quot;</span>
-<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;str&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Radius&quot;</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;str&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Srinivasa Ramanujan&quot;</span><span class="hljs-punctuation">}</span>
 </code></pre>
 <p><strong>Function</strong></p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
@@ -2568,7 +2570,7 @@ the following characters must be escaped as indicated:</p>
 </div>
 <p>The encoding of the string follows the encoding of the JSON payload: UTF-8,
 UTF-16LE, UTF-16BE, etc…</p>
-<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Hello world&#x27;&quot;</span>
+<pre><code class="language-json"><span class="hljs-string">&quot;&#x27;Alan Turing&#x27;&quot;</span>
 </code></pre>
 <h2 id="symbols" tabindex="-1">Symbols</h2>
 <p>A MathJSON <strong>symbol</strong> is either:</p>
@@ -2671,7 +2673,12 @@ preceeded with emoji modifiers. The definition below is based on
 <a href="https://unicode.org/reports/tr51/#EBNF_and_Regex">Unicode TR51</a> but modified
 to exclude invalid identifiers.</li>
 </ul>
-<p>Identifiers match one of those regular expressions:</p>
+<p>Identifiers match either the <code>NON_EMOJI_IDENTIFIER</code> or the <code>EMOJI_IDENTIFIER</code>
+patterns below:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">NON_EMOJI_IDENTIFIER</span> = <span class="hljs-regexp">/^[\p{XIDS}_]\p{XIDC}*$/u</span>;
+</code></pre>
+<p>(from <a href="https://unicode.org/reports/tr51/#EBNF_and_Regex">Unicode TR51</a>)</p>
+<p>or</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">VS16</span> = <span class="hljs-string">&#x27;\\u{FE0F}&#x27;</span>; <span class="hljs-comment">// Variation Selector-16, forces emoji presentation</span>
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">KEYCAP</span> = <span class="hljs-string">&#x27;\\u{20E3}&#x27;</span>; <span class="hljs-comment">// Combining Enclosing Keycap</span>
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ZWJ</span> = <span class="hljs-string">&#x27;\\u{200D}&#x27;</span>; <span class="hljs-comment">// Zero Width Joiner</span>
@@ -2685,17 +2692,13 @@ to exclude invalid identifiers.</li>
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">POSSIBLE_EMOJI</span> = <span class="hljs-string">`(?:<span class="hljs-subst">${ZWJ_ELEMENT}</span>)(<span class="hljs-subst">${ZWJ}</span><span class="hljs-subst">${ZWJ_ELEMENT}</span>)*`</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMOJI_IDENTIFIER</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">`^(?:<span class="hljs-subst">${POSSIBLE_EMOJI}</span>)+$`</span>, <span class="hljs-string">&#x27;u&#x27;</span>);
 </code></pre>
-<p>(from <a href="https://unicode.org/reports/tr51/#EBNF_and_Regex">Unicode TR51</a>)</p>
-<p>or</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">NON_EMOJI_IDENTIFIER</span> = <span class="hljs-regexp">/^[\p{XIDS}_]\p{XIDC}*$/u</span>;
-</code></pre>
 <p>In summary, when using Latin characters, identifiers can start with a letter or
 an underscore, followed by zero or more letters, digits and underscores.</p>
 <p>Carefully consider when to use non-latin characters. Use non-latin characters
-for whole words, for example: <code>&quot;半径&quot;</code> (radius), “מְהִירוּת” (speed), “速度”
-(speed) or “वेग” (speed).</p>
+for whole words, for example: <code>&quot;半径&quot;</code> (radius), “מְהִירוּת” (speed), “直徑”
+(diameter) or “सतह” (surface).</p>
 <p>Avoid mixing Unicode characters from different scripts in the same identifier.</p>
-<p>Do not include bidi markers such as <strong>U+200E</strong> or RTL <strong>U+200F</strong> in identifiers.
+<p>Do not include bidi markers such as LTR <strong>U+200E</strong> or RTL <strong>U+200F</strong> in identifiers.
 LTR and RTL marks should be added as needed by the client displaying the
 identifier. They should be ignored when parsing identifiers.</p>
 <p>Avoid visual ambiguity issues that might arise with some Unicode characters. For
