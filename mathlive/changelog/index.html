@@ -2177,10 +2177,14 @@
 i.e. <code>(f(x))</code> would be parsed as <code>(f(x)</code>.</li>
 <li><strong>#2116</strong> Pressing the “/” key after an expression ending with a superscript would
 not recognize the left argument as a numerator.</li>
+<li><strong>#2124</strong> In text mode, some characters were incorrectly interpreted as a math command, for example <code>(</code> was interpreted as \lparen`. This could cause some interoperability issues.</li>
+<li><strong>#2110</strong> If using the keyboard to enter several macros mapping to an
+<code>\operatorname</code> command,  some of the commands could fail to render. For example,
+typing “1mm + 2mm” in a mathfield would result in “1 + 2mm” to be displayed.</li>
 </ul>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
-<li>Added support for additional commands from the <code>mathtools</code> , <code>actuarialangle</code>, <code>colonequals</code>, <code>statmath</code> and <code>amsopn</code> packages</li>
+<li>Added support for additional commands from the <code>mathtools</code>, <code>actuarialangle</code>, <code>colonequals</code>, <code>statmath</code> and <code>amsopn</code> packages</li>
 <li>Added support for <code>longdiv</code> enclosure (<code>\mathenclose{longdiv}{...}</code>)</li>
 <li>The decimal separator key (<code>.</code>) in the virtual keyboard was displayed as a blank key.</li>
 <li><strong>#2109</strong> In the virtual keyboard, some placeholders could be hard to see when
@@ -2197,6 +2201,8 @@ of <code>\times</code>. Use shift to produce <code>\times</code>.</li>
 <li>Improved serialization to ASCIIMath and MathML</li>
 <li><strong>#2121</strong> For ASCIIMath and MathML serialization, including phantom closing
 delimiter in the output.</li>
+<li>Pressing the Action keycap on the virtual keyboard with the shift key pressed
+now inserts a new line (similar to what shift+enter does on a physical keyboard).</li>
 </ul>
 <h2 id="0.95.5-(2023-08-18)" tabindex="-1">0.95.5 (2023-08-18)</h2>
 <h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
@@ -7284,14 +7290,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 02, 2023">
+        <meta itemprop="datePublished" content="September 05, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-02'>September 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-05'>September 05, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2232,7 +2232,9 @@
 
 
 
-<p class="notice--info">In this documentation, functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a
+<p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript code. This guide
+assumes you are familiar with JavaScript or TypeScript.</p>
+<p class="notice--info"><strong>Note:</strong> In this guide, functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a
 <code>ComputeEngine</code> instance which is denoted by a <code>ce.</code> prefix.<br>Functions that
 apply to a boxed expression, such as <code>expr.simplify()</code> are denoted with a
 <code>expr.</code> prefix.</p>
@@ -2293,7 +2295,14 @@ apply to a boxed expression, such as <code>expr.simplify()</code> are denoted wi
 </tbody>
 </table>
 </div>
-<p>For example, if <code>f</code> is \( 2 + (\sqrt{x^2 \times 4} + 1) \) and <code>x</code> is \( \pi \):</p>
+<p>For example, if <code>f</code> is \( 2 + (\sqrt{4x^2} + 1) \) and <code>x</code> is \( \pi \):</p>
+<pre><code class="language-javascript">
+<span class="hljs-keyword">const</span> f = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + (\\sqrt{4x^2} + 1)&#x27;</span>);
+ce.<span class="hljs-title function_">set</span>({<span class="hljs-string">&#x27;x&#x27;</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>});
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">simplify</span>().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{x}+3</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.evaluate().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{\pi}+3</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 9.283\,185\,307\ldots</span>
+</code></pre>
 <div class="symbols-table first-column-header">
 <table>
 <thead>
@@ -2306,17 +2315,17 @@ apply to a boxed expression, such as <code>expr.simplify()</code> are denoted wi
 <tbody>
 <tr>
 <td style="text-align:left"><code>f.simplify()</code></td>
-<td style="text-align:left">\[ 2 + 2x \]</td>
+<td style="text-align:left">\[ \sqrt{x}+3 \]</td>
 <td style="text-align:left">Exact calculations of some integer constants, simplification</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f.evaluate()</code></td>
-<td style="text-align:left">\[ 2 + 2\pi \]</td>
+<td style="text-align:left">\[ \sqrt{\pi}+3 \]</td>
 <td style="text-align:left">Evaluation of symbols</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f.N()</code></td>
-<td style="text-align:left">\[  8.283,185,307 \ldots \]</td>
+<td style="text-align:left">\[ 9.283,185,307 \ldots \]</td>
 <td style="text-align:left">Evaluation of constants</td>
 </tr>
 </tbody>
@@ -2455,14 +2464,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="September 02, 2023">
+        <meta itemprop="datePublished" content="September 05, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-02'>September 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-05'>September 05, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
