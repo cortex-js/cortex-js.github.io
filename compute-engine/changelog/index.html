@@ -886,7 +886,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/augmenting/"
+                    href="/compute-engine/guides/symbols/"
                     data-url=/compute-engine/changelog/
                     class="">
                     
@@ -894,7 +894,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Defining New Symbols
+                    Symbols
                   </a>
                 </li>
               
@@ -938,7 +938,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/latex-syntax/"
+                    href="/compute-engine/guides/augmenting/"
                     data-url=/compute-engine/changelog/
                     class="">
                     
@@ -946,7 +946,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    LaTeX Syntax
+                    Adding New Definitions
                   </a>
                 </li>
               
@@ -964,7 +964,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/symbols/"
+                    href="/compute-engine/guides/latex-syntax/"
                     data-url=/compute-engine/changelog/
                     class="">
                     
@@ -972,7 +972,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Symbols
+                    LaTeX Syntax
                   </a>
                 </li>
               
@@ -2170,12 +2170,34 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.12.6" tabindex="-1">0.12.6</h2>
+<p><strong>Release Date:</strong> 2023-09-08</p>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<ul>
+<li>New API for the <code>Parser</code> class.</li>
+</ul>
+<h3 id="improvements-and-bux-fixes" tabindex="-1">Improvements and Bux Fixes</h3>
+<ul>
+<li>The <code>ComputeEngine</code> now exports the <code>bignum()</code> and <code>complex()</code> methods that
+can be used to create bignum and complex numbers from strings or numbers. The
+methods <code>isBigNum()</code> and <code>isComplex()</code> have also been added to check if a
+value is a bignum (<code>Decimal</code>) or complex (<code>Complex</code>) number, for example as
+returned by <code>expr.numericValue</code>.</li>
+<li><strong>#69</strong> <code>\leq</code> was incorrectly parsed as <code>Equals</code> instead of <code>LessEqual</code></li>
+<li><strong>#94</strong> The <code>\exp</code> command was not parsed correctly.</li>
+<li>Handle <code>PlusMinus</code> in infix and prefix position, i.e. <code>a\pm b</code> and <code>\pm a</code>.</li>
+<li>Improved parsing, serialization</li>
+<li>Improved simplification</li>
+<li>Improved evaluation of <code>Sum</code> and <code>Product</code></li>
+<li>Support complex identifiers (i.e. non-latin scripts, emojis).</li>
+<li>Fixed serialization of mixed numbers.</li>
+</ul>
 <h2 id="0.12.1" tabindex="-1">0.12.1</h2>
 <p><strong>Release Date:</strong> 2022-12-01</p>
 <p>Work around unpckg.com issue with libraries using BigInt.</p>
 <h2 id="0.12.0" tabindex="-1">0.12.0</h2>
 <p><strong>Release Date:</strong> 2022-11-27</p>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
@@ -2206,7 +2228,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 </ul>
 <h2 id="0.11.0" tabindex="-1">0.11.0</h2>
 <p><strong>Release Date:</strong> 2022-11-18</p>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
@@ -2228,7 +2250,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 </ul>
 <h2 id="0.10.0" tabindex="-1">0.10.0</h2>
 <p><strong>Release Date:</strong> 2022-11-17</p>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
@@ -2247,7 +2269,7 @@ when evaluating a simple polynomial in a loop.</li>
 </ul>
 <h2 id="0.9.0" tabindex="-1">0.9.0</h2>
 <p><strong>Release Date:</strong> 2022-11-15</p>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The head of a number expression is always <code>Number</code>. Use <code>expr.domain</code> to be
 get more specific info about what kind of number this is.</li>
@@ -2261,8 +2283,7 @@ etc… have been replaced with a single <code>numericValue</code> property.</li>
 <h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>
-<p>Support angles in degrees with <code>30\degree</code>, <code>30^\circ</code> and
-<code>\ang{30}</code>.</p>
+<p>Support angles in degrees with <code>30\degree</code>, <code>30^\circ</code> and <code>\ang{30}</code>.</p>
 </li>
 <li>
 <p>More accurate error expressions, for example if there is a missing closing
@@ -2388,7 +2409,7 @@ rendered to LaTeX correctly, e.g. <code>V20_20</code>.</li>
 </ul>
 <h2 id="0.8.0" tabindex="-1">0.8.0</h2>
 <p><strong>Release Date:</strong> 2022-10-02</p>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
@@ -2412,7 +2433,7 @@ affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead o
 </ul>
 <h2 id="0.7.0" tabindex="-1">0.7.0</h2>
 <p><strong>Release Date:</strong> 2022-09-30</p>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
@@ -2654,14 +2675,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 05, 2023">
+        <meta itemprop="datePublished" content="September 08, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-05'>September 05, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-08'>September 08, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

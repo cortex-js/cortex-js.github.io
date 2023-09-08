@@ -910,7 +910,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/augmenting/"
+                    href="/compute-engine/guides/symbols/"
                     data-url=/compute-engine/guides/expressions/
                     class="">
                     
@@ -918,7 +918,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Defining New Symbols
+                    Symbols
                   </a>
                 </li>
               
@@ -962,7 +962,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/latex-syntax/"
+                    href="/compute-engine/guides/augmenting/"
                     data-url=/compute-engine/guides/expressions/
                     class="">
                     
@@ -970,7 +970,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    LaTeX Syntax
+                    Adding New Definitions
                   </a>
                 </li>
               
@@ -988,7 +988,7 @@
 
                 <li>
                   <a
-                    href="/compute-engine/guides/symbols/"
+                    href="/compute-engine/guides/latex-syntax/"
                     data-url=/compute-engine/guides/expressions/
                     class="">
                     
@@ -996,7 +996,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Symbols
+                    LaTeX Syntax
                   </a>
                 </li>
               
@@ -2390,6 +2390,20 @@ dictionary, use the following boolean expressions:</p>
 </tbody>
 </table>
 </div>
+<p>The value of <code>expr.numericValue</code> may be:</p>
+<ul>
+<li><code>typeof expr.numericValue === 'number'</code>: the expression is a JavaScript number</li>
+<li><code>ce.isBignum(expr.numericValue)</code>: the expression is a bignum. Use
+<code>expr.numericValue.toNumber()</code> to convert it to a JavaScript number.</li>
+<li><code>ce.isComplex(expr.numericValue)</code>: the expression is a complex number. Use
+<code>expr.numericValue.re</code> and <code>expr.numericValue.im</code> to access the real and
+imaginary parts.</li>
+<li><code>Array.isArray(expr.numericValue)</code>: the expression is a rational as a tuple
+of two Javascript <code>number</code> or two Javascript <code>bigint</code>.</li>
+</ul>
+<p><strong>To access a numerical approximation of an expression if available</strong>, use
+<code>expr.N().valueOf()</code>. It will return a Javascript number approximation of the
+value.</p>
 <p>A symbol may have a value if it represents a bound variable, but it may also
 have no value if it represents a free variable.</p>
 <section id=errors>
@@ -2598,14 +2612,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 05, 2023">
+        <meta itemprop="datePublished" content="September 08, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-05'>September 05, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-08'>September 08, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
