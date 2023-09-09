@@ -2196,6 +2196,32 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.12.8" tabindex="-1">0.12.8</h2>
+<p><strong>Release Date:</strong> 2023-09-09</p>
+<h2 id="new-features" tabindex="-1">New Features</h2>
+<ul>
+<li>Some expressions can be compiled to Javascript. This is useful to evaluate an
+expression many times, for example in a loop. The compiled expression is
+faster to evaluate than the original expression. To get the compiled
+expression, use <code>expr.compile()</code>. Read more at
+https://cortexjs.io/compute-engine/guides/compiling</li>
+</ul>
+<h2 id="bug-fixes-and-improvements" tabindex="-1">Bug Fixes and Improvements</h2>
+<ul>
+<li>Fixed parsing and serialization of extended LaTeX synonyms for <code>e</code> and <code>i</code>.</li>
+<li>Fixed serialization of <code>Half</code>.</li>
+<li>Fixed serialization of <code>Which</code></li>
+<li>Improved serialization of <code>[&quot;Delimiter&quot;]</code> expressions.</li>
+</ul>
+<h2 id="0.12.7" tabindex="-1">0.12.7</h2>
+<p><strong>Release Date:</strong> 2023-09-08</p>
+<h2 id="improvements" tabindex="-1">Improvements</h2>
+<ul>
+<li>Made customization of the LaTeX dictionary simpler. The <code>ce.latexDictionary</code>
+property can be used to access and modify the dictionary. The documentation at
+https://cortexjs.io/compute-engine/guides/latex-syntax/#customizing-the-latex-dictionary
+has been updated.</li>
+</ul>
 <h2 id="0.12.6" tabindex="-1">0.12.6</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
@@ -2228,7 +2254,7 @@ returned by <code>expr.numericValue</code>.</li>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
 </ul>
-<h3 id="improvements" tabindex="-1">Improvements</h3>
+<h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
 <li>Rewrote the rational computation engine to use JavaScript <code>bigint</code> instead of
 <code>Decimal</code> instances. Performance improvements of up to 100x.</li>
@@ -2259,7 +2285,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
 </ul>
-<h3 id="improvements-1" tabindex="-1">Improvements</h3>
+<h3 id="improvements-2" tabindex="-1">Improvements</h3>
 <ul>
 <li>When a constant should be held or substituted with its value can now be more
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
@@ -2286,7 +2312,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
 </ul>
-<h3 id="improvements-2" tabindex="-1">Improvements</h3>
+<h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>More accurate calculations of some trig functions when using bignums.</li>
 <li>Improved performance when changing a value with <code>ce.set()</code>. Up to 10x faster
@@ -2306,7 +2332,7 @@ can be used if a non-canonical expression is desired.</li>
 etc… have been replaced with a single <code>numericValue</code> property.</li>
 <li><code>parseUnknownSymbol</code> is now <code>parseUnknownIdentifier</code></li>
 </ul>
-<h3 id="improvements-3" tabindex="-1">Improvements</h3>
+<h3 id="improvements-4" tabindex="-1">Improvements</h3>
 <ul>
 <li>
 <p>Support angles in degrees with <code>30\degree</code>, <code>30^\circ</code> and <code>\ang{30}</code>.</p>
@@ -2505,7 +2531,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.6.0" tabindex="-1">0.6.0</h2>
 <p><strong>Release Date:</strong> 2022-04-18</p>
-<h3 id="improvements-4" tabindex="-1">Improvements</h3>
+<h3 id="improvements-5" tabindex="-1">Improvements</h3>
 <ul>
 <li>Parse more cases of tabular environments</li>
 <li>Handle simplify and evaluate of inert functions by default</li>
@@ -2518,7 +2544,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.5.0" tabindex="-1">0.5.0</h2>
 <p><strong>Release Date:</strong> 2022-04-05</p>
-<h3 id="improvements-5" tabindex="-1">Improvements</h3>
+<h3 id="improvements-6" tabindex="-1">Improvements</h3>
 <ul>
 <li>Correctly parse tabular content (for example in
 <code>\begin{pmatrix}...\end{pmatrix}</code></li>
@@ -2532,7 +2558,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.4.4" tabindex="-1">0.4.4</h2>
 <p><strong>Release Date</strong>: 2022-03-27</p>
-<h3 id="improvements-6" tabindex="-1">Improvements</h3>
+<h3 id="improvements-7" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added option to specify custom LaTeX dictionaries in <code>ComputeEngine</code>
 constructor</li>
@@ -2686,7 +2712,7 @@ such as <code>Equal</code>:</p>
 </table>
 <h2 id="0.3.0" tabindex="-1">0.3.0</h2>
 <p><strong>Release Date</strong>: 2021-06-18</p>
-<h3 id="improvements-7" tabindex="-1">Improvements</h3>
+<h3 id="improvements-8" tabindex="-1">Improvements</h3>
 <ul>
 <li>In LaTeX, parse <code>\operatorname{foo}</code> as the MathJSON symbol <code>&quot;foo&quot;</code>.</li>
 </ul>
