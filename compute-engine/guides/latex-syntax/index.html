@@ -2665,7 +2665,7 @@ of the Compute Engine</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 ce.<span class="hljs-property">latexDictionary</span> = [
   <span class="hljs-comment">// Expand the default dictionary...</span>
-  ...ce.<span class="hljs-title function_">latexDictionary</span>(),
+  ...ce.<span class="hljs-property">latexDictionary</span>,
   <span class="hljs-comment">// ...and add the `\smoll` command</span>
   {
     <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\smoll&#x27;</span>],
@@ -2680,11 +2680,12 @@ ce.<span class="hljs-property">latexDictionary</span> = [
       ];
     },
   },
-],
-;
+];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\smoll{1}{5}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 1, 5]</span>
+<span class="hljs-comment">// The &quot;Divide&quot; get represented a &quot;Rational&quot; by default when </span>
+<span class="hljs-comment">// both arguments are integers.</span>
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, 1, 5]</span>
 </code></pre>
 <p class="notice--info">If you are using a mathfield, all the mathfields on the page
 share a Compute Engine instance, which is available as <code>MathfieldElement.computeEngine</code>.
@@ -2970,14 +2971,14 @@ mathfields in the document:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 08, 2023">
+        <meta itemprop="datePublished" content="September 09, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-08'>September 08, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-09'>September 09, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
