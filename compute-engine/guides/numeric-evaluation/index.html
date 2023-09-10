@@ -2227,7 +2227,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#repeated-evaluation">Repeated Evaluation</a></li><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
+        <ol><li><a href="#repeated-evaluation">Repeated Evaluation</a></li><li><a href="#compiling">Compiling</a></li><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
       </div>
       
                               
@@ -2244,7 +2244,7 @@ values are:</p>
 <li>constants such as <code>ExponentialE</code> and <code>Pi</code></li>
 </ul>
 <p>If one of the arguments is not an exact value the expression is evaluated
-as a numeric approximation.</p>
+as a <strong>numeric approximation</strong>.</p>
 <p><strong>To obtain a numeric approximation, use <code>expr.N()</code></strong>. If <code>expr.N()</code> cannot
 provide a numeric evaluation, a symbolic representation of the partially
 evaluated expression is returned.</p>
@@ -2303,7 +2303,7 @@ expression.</p>
 <p><strong>To repeatedly evaluate an expression</strong> use <code>ce.set()</code> to change the value
 of variables. <code>ce.set()</code> changes the value associated with one or more
 variables in the current scope.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+c&quot;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
   ce.<span class="hljs-title function_">set</span>({x : x});
@@ -2312,7 +2312,7 @@ variables in the current scope.</p>
 </code></pre>
 <p>You can also use <code>expr.subs()</code>, but this will create a brand new expression
 on each iteration, and will be much slower.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+c&quot;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({x: x}).N().valueOf()}</span>`</span>);
@@ -2331,6 +2331,23 @@ ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#
 ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-literal">undefined</span>;
 
 </code></pre>
+<p>If performance is important, you can compile the expression to a JavaScript
+function.</p>
+<h2 id="compiling" tabindex="-1">Compiling</h2>
+<p><strong>To get a compiled version of an expression</strong> use the <code>expr.compile()</code> method:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
+<span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) 
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({x}));
+</code></pre>
+<p class="notice--info">The syntax <code>{x}</code> is a shortcut for <code>{&quot;x&quot;: x}</code>, in other words it defines
+an argument named <code>&quot;x&quot;</code> (which is used the expression <code>expr</code>) as having
+the value of the JavaScript variable <code>x</code> (which is used in the for loop).</p>
+<p>This will usually result in a much faster evaluation than using <code>expr.N()</code>
+but this approach has some limitations.</p>
+<div class='read-more'><a href="/compute-engine/guides/compiling/">
+Read more about <strong>Compiling Expressions to JavaScript</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="numeric-modes" tabindex="-1">Numeric Modes</h2>
 <p>Four numeric modes may be used to perform numeric evaluations with the Compute
 Engine: <code>&quot;machine&quot;</code> <code>&quot;bignum&quot;</code> <code>&quot;complex&quot;</code> and <code>&quot;auto&quot;</code>. The default mode is
@@ -2588,7 +2605,7 @@ functions:</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#repeated-evaluation">Repeated Evaluation</a></li><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
+        <ol><li><a href="#repeated-evaluation">Repeated Evaluation</a></li><li><a href="#compiling">Compiling</a></li><li><a href="#numeric-modes">Numeric Modes</a><ol><li><a href="#machine-numeric-mode">Machine Numeric Mode</a></li><li><a href="#bignum-numeric-mode">Bignum Numeric Mode</a></li><li><a href="#complex-numeric-mode">Complex Numeric Mode</a></li><li><a href="#auto-numeric-mode">Auto Numeric Mode</a></li></ol></li><li><a href="#simplifying-before-evaluating">Simplifying Before Evaluating</a></li><li><a href="#tolerance">Tolerance</a></li><li><a href="#numeric-functions">Numeric Functions</a></li></ol>
       </div>
     
                             

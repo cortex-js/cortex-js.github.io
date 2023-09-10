@@ -205,13 +205,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/</loc>
-    <lastmod>2023-09-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/mathlive/virtual-keyboard/</loc>
     <lastmod>2023-09-05</lastmod>
     <changefreq>monthly</changefreq>
@@ -234,6 +227,13 @@
 
   <url>
     <loc>https://cortexjs.io/mathlive/guides/integration/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -268,6 +268,27 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/cortex/comments/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/goals/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/implementation/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/cortex/literals/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
@@ -296,6 +317,13 @@
   </url>
 
   <url>
+    <loc>https://cortexjs.io/cortex/principles/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://cortexjs.io/cortex/source-code/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
@@ -310,35 +338,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/comments/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/goals/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/implementation/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/principles/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/contributing/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/canonical-form/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -353,13 +360,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/augmenting/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/canonical-form/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -395,13 +395,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/expressions/</loc>
-    <lastmod>2023-09-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/latex-syntax/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -514,6 +507,13 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
+    <lastmod>2023-09-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/latex-syntax/</loc>
     <lastmod>2023-09-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
