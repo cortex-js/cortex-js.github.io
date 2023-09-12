@@ -2694,7 +2694,7 @@ ce.<span class="hljs-property">latexDictionary</span> = [
   ...ce.<span class="hljs-property">latexDictionary</span>,
   <span class="hljs-comment">// ...and add the `\smoll` command</span>
   {
-    <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\smoll&#x27;</span>],
+    <span class="hljs-attr">latxTrigger</span>: <span class="hljs-string">&#x27;\\smoll&#x27;</span>,
     <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser</span>) =&gt;</span> {
       <span class="hljs-comment">// We&#x27;re expecting two arguments, so we&#x27;re calling </span>
       <span class="hljs-comment">// `parseGroup()` twice. If `parseGroup()` returns null,</span>
@@ -2722,8 +2722,13 @@ You can modify the LaTeX dictionary used by the mathfields with <code>MathfieldE
 <li><code>kind</code>: the kind of expression associated with this entry. Valid values are <code>prefix</code>,
 <code>postfix</code>, <code>infix</code>, <code>expression</code>, <code>function</code>, <code>symbol</code>, <code>environment</code> and <code>matchfix</code>.
 If not provided, the default is <code>expression</code>.</li>
-<li><code>trigger</code>: a LaTeX command or a sequence of LaTeX tokens that will trigger
-the entry. For example, <code>^{+}</code>.</li>
+<li><code>latexTrigger</code>: a sequence of LaTeX tokens that will trigger
+the entry. For example, <code>^{+}</code> or <code>\mathbb{D}</code>.</li>
+<li><code>identifierTrigger</code>: a string, usually wrapped in a LaTeX command, that will
+trigger the entry. For example, if <code>identifierTrigger</code> is <code>floor</code>, the
+LaTeX command <code>\mathrm{floor}</code> or <code>\operatorname{floor}</code> will trigger the entry.
+Only one of <code>latexTrigger</code> or <code>identifierTrigger</code> should be provided.
+If kind is <code>environment</code>, only <code>identifierTrigger</code> is valid.</li>
 <li><code>parse</code>: a function that will be invoked when the trigger is encountered in
 the LaTeX input. It will be passed a <code>parser</code> object that can be used to
 parse the input. The <code>parse</code> function should return a MathJSON expression.
@@ -2744,14 +2749,12 @@ will be invoked when the trigger is encountered in the LaTeX input. The <code>pa
 handler will be passed a <code>parser</code> object that can be used to parse the input.
 The <code>parse</code> handler should return a MathJSON expression.</p>
 <p>The <code>function</code> kind is a special case of <code>expression</code> where the expression
-is a function, possibly using mutly-character identifiers, as in <code>\mathrm{concat}</code>.
-The <code>trigger</code> property defines the name of the function, not a sequence of tokens.
-The parse handler should return the idenfitier corresponding
-to the function, such as <code>Concatenate</code>. As a shortcut, the <code>parse</code> handler
-can be provided as an Expression. For example:</p>
+is a function. The parse handler should return the MathJSON idenfitier
+corresponding to the function, such as <code>Concatenate</code>. As a shortcut, the
+<code>parse</code> handler can be provided as an Expression. For example:</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;function&#x27;</span>,
-  <span class="hljs-attr">trigger</span>: <span class="hljs-string">&#x27;concat&#x27;</span>,
+  <span class="hljs-attr">identifierTrigger</span>: <span class="hljs-string">&#x27;concat&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-string">&#x27;Concatenate&#x27;</span>
 }
 </code></pre>
@@ -2761,7 +2764,7 @@ object can be used to parse the right-hand side of the expression. The <code>par
 handler should return a MathJSON expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;infix&#x27;</span>,
-  <span class="hljs-attr">trigger</span>: <span class="hljs-string">&#x27;\\oplus&#x27;</span>,
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\oplus&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Concatenate&#x27;</span>, lhs, parser.<span class="hljs-title function_">parseExpression</span>()];
   },
@@ -2772,7 +2775,7 @@ passed a <code>parser</code> object. The <code>parse</code> handler should retur
 expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;prefix&#x27;</span>,
-  <span class="hljs-attr">trigger</span>: <span class="hljs-string">&#x27;\\neg&#x27;</span>,
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\neg&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Negate&#x27;</span>, lhs];
   },
@@ -2783,20 +2786,20 @@ passed a <code>parser</code> object and the left-hand side of the operator. The 
 handler should return a MathJSON expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;postfix&#x27;</span>,
-  <span class="hljs-attr">trigger</span>: <span class="hljs-string">&#x27;\\!&#x27;</span>,
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\!&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Factorial&#x27;</span>, lhs];
   },
 }
 </code></pre>
-<p>The <code>environment</code> kind is used for LaTeX environments. The <code>trigger</code> property
+<p>The <code>environment</code> kind is used for LaTeX environments. The <code>identifierTrigger</code> property
 in that case is the name of the environment. The <code>parse</code> handler will
 be passed a <code>parser</code> object. The <code>parseTabular()</code> method can be used to parse
 the rows and columns of the environment. It returns a two dimensional array
 of expressions. The <code>parse</code> handler should return a MathJSON expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;environment&#x27;</span>,
-  <span class="hljs-attr">trigger</span>: <span class="hljs-string">&#x27;matrix&#x27;</span>,
+  <span class="hljs-attr">identifierTrigger</span>: <span class="hljs-string">&#x27;matrix&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser</span>) =&gt;</span> {
     <span class="hljs-keyword">const</span> content = parser.<span class="hljs-title function_">parseTabular</span>();
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Matrix&#x27;</span>, [<span class="hljs-string">&#x27;List&#x27;</span>, content.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">row</span> =&gt;</span> [<span class="hljs-string">&#x27;List&#x27;</span>, row.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">cell</span> =&gt;</span> cell)])]];
@@ -2804,15 +2807,14 @@ of expressions. The <code>parse</code> handler should return a MathJSON expressi
 }
 </code></pre>
 <p>The <code>matchfix</code> kind is used for LaTeX commands that are used to enclose an
-expression. There is no <code>trigger</code> property in this case. Instead the
-<code>openDelimiter</code> and <code>closeDelimiter</code> indicate the LaTeX commands that will
-be used to enclose the expression. The <code>parse</code> handler will be passed a
+expression. The <code>openTrigger</code> and <code>closeTrigger</code> indicate the LaTeX commands
+that enclose the expression. The <code>parse</code> handler is passed a
 <code>parser</code> object and the “body” (the expression between the open and close
 delimiters). The <code>parse</code> handler should return a MathJSON expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;matchfix&#x27;</span>,
-  <span class="hljs-attr">openDelimiter</span>: <span class="hljs-string">&#x27;\\lvert&#x27;</span>,
-  <span class="hljs-attr">closeDelimiter</span>: <span class="hljs-string">&#x27;\\rvert&#x27;</span>,
+  <span class="hljs-attr">openTrigger</span>: <span class="hljs-string">&#x27;\\lvert&#x27;</span>,
+  <span class="hljs-attr">closeTrigger</span>: <span class="hljs-string">&#x27;\\rvert&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, body</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Abs&#x27;</span>, body];
   },
@@ -2825,13 +2827,13 @@ will result in the tokens <code>[&quot;\\frac&quot;, &quot;{&quot;, &quot;a&quot
 Note that each LaTeX command is a single token, but that digits and ordinary
 letters are each separate tokens.</p>
 <p>The <code>parse</code> handler is invoked when the trigger is encountered in the LaTeX
-token strings. The trigger can be one or more tokens.</p>
+token strings.</p>
 <p>A common case is to return from the parse handler a MathJSON identifier
 for a symbol or function.</p>
 <p>For example, let’s say you wanted to map the LaTeX command <code>\div</code> to the
 MathJSON <code>Divide</code> function. You would write:</p>
 <pre><code class="language-javascript">{
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\div&#x27;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\div&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Divide&#x27;</span>;
   },
@@ -2839,19 +2841,19 @@ MathJSON <code>Divide</code> function. You would write:</p>
 </code></pre>
 <p>As a shortcut, you can also write:</p>
 <pre><code class="language-javascript">{
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\div&#x27;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\div&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&#x27;Divide&#x27;</span>
 }
 </code></pre>
 <p>Or even more succintly:</p>
 <pre><code class="language-javascript">{
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\div&#x27;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\div&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-string">&#x27;Divide&#x27;</span>
 }
 </code></pre>
 <p>The LaTeX <code>\div(1, 2)</code> would then produce the MathJSON expression
 <code>[&quot;Divide&quot;, 1, 2]</code>. Note that the arguments are provided as comma-separated,
-parenthesized expressions.</p>
+parenthesized expressions, not as LaTeX arguments in curly brackets.</p>
 <p>If you need to parse some more complex LaTeX syntax, you can use the <code>parser</code>
 argument of the <code>parse</code> handler. The <code>parser</code> object has numerous methods to
 help you parse the LaTeX string:</p>
@@ -2894,7 +2896,7 @@ indicates that the method will return a MathJSON expression or <code>null</code>
 as an argument to a LaTeX command.</p>
 <p>For example:</p>
 <pre><code class="language-javascript">{
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\div&#x27;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\div&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Divide&#x27;</span>, parser.<span class="hljs-title function_">parseGroup</span>(), parser.<span class="hljs-title function_">parseGroup</span>()];
   },
@@ -2906,7 +2908,7 @@ in the LaTeX input).</p>
 <p>If we wanted instead to treat the <code>\div</code> command as a binary operator, we could
 write:</p>
 <pre><code class="language-javascript">{
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&#x27;\\div&#x27;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\div&#x27;</span>,
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;infix&#x27;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&#x27;Divide&#x27;</span>, lhs, parser.<span class="hljs-title function_">parseExpression</span>()];
@@ -2921,7 +2923,7 @@ is invoked. You must specify a <code>name</code> property to associate the seria
 handler with a MathJSON identifier.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Concatenate&quot;</span>,
-  <span class="hljs-attr">trigger</span>: [<span class="hljs-string">&quot;\\oplus&quot;</span>],
+  <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&quot;\\oplus&quot;</span>,
   <span class="hljs-attr">serialize</span>: <span class="hljs-function">(<span class="hljs-params">serializer, expr</span>) =&gt;</span> 
     <span class="hljs-string">&quot;\\oplus&quot;</span> + serializer.<span class="hljs-title function_">wrapArguments</span>(expr),
   <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> {
@@ -2948,7 +2950,9 @@ handler with a MathJSON identifier.</p>
 a default <code>parse</code> handler will be used that is equivalent to:
 <code>parse: name</code>.</p>
 <p>It is possible to have multiple definitions with the same triggers, but the
-<code>name</code> property must be unique.</p>
+<code>name</code> property must be unique. The record with the <code>name</code> property will be
+used to serialize the expression. A <code>serialize</code> handler is invalid if the
+<code>name</code> property is not provided.</p>
 <h2 id="using-a-new-function-with-a-mathfield" tabindex="-1">Using a New Function with a Mathfield</h2>
 <p>You may also want to use your new function with a mathfield.</p>
 <p>First you need to define a LaTeX macro so that the mathfield knows
@@ -2997,14 +3001,14 @@ mathfields in the document:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 09, 2023">
+        <meta itemprop="datePublished" content="September 12, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-09'>September 09, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-12'>September 12, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
