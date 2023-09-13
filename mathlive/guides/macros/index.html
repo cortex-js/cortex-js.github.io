@@ -2255,6 +2255,9 @@ with a LaTeX expression. You can extend MathLive with your own macros.</p>
 <p><strong>To add a macro</strong> use <code>mf.macros = {...mf.macros, ...}</code>.</p>
 <p>If you do not include the <code>...mf.macros</code> call, all the standard macros will be
 turned off.</p>
+<p>The example below will define a new command, <code>\average</code>, which will be
+replaced by <code>\operatorname{average}</code>, that is displayed as a single unit
+using an upright font.</p>
 <code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
@@ -2267,13 +2270,21 @@ turned off.</p>
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
-    minutes: '\\,{}^\\prime\\;',
-    seconds: '\\,\\doubleprime\\;',
+  average: '\operatorname{average};',
 };
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
 </code-playground>
+<p>You can use standard LaTeX commands in the definition of a macro. For example,
+the following macro definition uses the <code>\,</code> and <code>\;</code> commands to insert
+horizontal spacing and <code>{}^</code> to place the <code>\prime</code> command on the subscript
+line.</p>
+<pre><code class="language-javascript">mf.<span class="hljs-property">macros</span> = { ...mf.<span class="hljs-property">macros</span>,
+  <span class="hljs-attr">minutes</span>: <span class="hljs-string">&#x27;\\,{}^\\prime\\;&#x27;</span>,
+  <span class="hljs-attr">seconds</span>: <span class="hljs-string">&#x27;\\,\\doubleprime\\;&#x27;</span>,
+};
+</code></pre>
 <hr>
 <p>The macro definition can contain up to eight arguments, represented by <code>#1</code> to <code>#9</code>.</p>
 <code-playground layout="stack">
@@ -2291,7 +2302,7 @@ mf.macros = {...mf.macros,
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
 </code-playground>
 <hr>
@@ -2410,14 +2421,14 @@ console.log(mf.macros);
         
 
 
-        <meta itemprop="datePublished" content="September 02, 2023">
+        <meta itemprop="datePublished" content="September 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-02'>September 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-13'>September 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

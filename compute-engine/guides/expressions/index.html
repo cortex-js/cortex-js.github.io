@@ -2239,7 +2239,7 @@
 <p class="xl">The CortexJS Compute Engine produces and manipulates
 <a href="https://en.wikipedia.org/wiki/Expression_(mathematics)">symbolic expressions</a>
 such as numbers, constants, variables and functions.</p>
-<p>In the CortexJS Compute Engine, expressions are represented using the
+<p>In the CortexJS Compute Engine, expressions are represented internally using the
 <a href="/math-json/">MathJSON format</a>.</p>
 <p>They are wrapped in a JavaScript object, a process called <strong>boxing</strong>, and the
 resulting expressions are <strong>Boxed Expressions</strong>.</p>
@@ -2248,6 +2248,8 @@ repetitive calculations.</p>
 <p>Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
 as VSCode Studio, to provide suitable hints in the editor, and to check that the
 correct functions and properties are used, particularly when using TypeScript.</p>
+<p>Boxed Expression can be created from a LaTeX string or from a raw MathJSON
+expression.</p>
 <h2 id="boxing" tabindex="-1">Boxing</h2>
 <p><strong>To create a Boxed Expression from a MathJSON expression</strong>, use the <code>ce.box()</code>
 function.</p>
@@ -2638,14 +2640,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 12, 2023">
+        <meta itemprop="datePublished" content="September 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-12'>September 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-13'>September 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
