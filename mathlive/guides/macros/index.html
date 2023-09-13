@@ -2270,12 +2270,13 @@ using an upright font.</p>
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
-  average: '\operatorname{average};',
+  average: '\\operatorname{average}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;
 </div>
 </code-playground>
+<hr>
 <p>You can use standard LaTeX commands in the definition of a macro. For example,
 the following macro definition uses the <code>\,</code> and <code>\;</code> commands to insert
 horizontal spacing and <code>{}^</code> to place the <code>\prime</code> command on the subscript
@@ -2354,12 +2355,12 @@ mf.macros = {...mf.macros, diamonds: undefined };
 <h2 id="adding-a-matching-shortcut" tabindex="-1">Adding a Matching Shortcut</h2>
 <p>By defining a new macro, a new LaTeX command is added to the dictionary
 of commands that can be used in a LaTeX expression.</p>
-<p>To input a macro, type <kbd>&lt;/kbd&gt; followed by the macro name, then <kbd>RETURN</kbd></p>
+<p>To input a macro, type <kbd>\</kbd> followed by the macro name, then <kbd>RETURN</kbd></p>
 <p>Custom macros are also included in the value of the mathfield
 expressed as a LaTeX string (<code>mf.value</code>).</p>
 <p>It may also be convenient to associate the macro with an inline
 shortcut. Inline shortcuts can be typed without having to enter the LaTeX
-editing mode (without having to type the <kbd>&lt;/kbd&gt; key).</p>
+editing mode (without having to type the <kbd>\</kbd> key).</p>
 <p><strong>To define an associated inline shortcut</strong>, use the <code>inlineShortcuts</code> option.</p>
 <code-playground layout="stack">
     <style slot="style">
