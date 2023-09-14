@@ -2214,29 +2214,32 @@
 
 <h3 id="functions" tabindex="-1">Functions</h3>
 <table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>Integrate</code></td><td>
-    <p><code>[“Integrate”, <em>expression</em>]</code></p>
+     <tr><td><code>Integrate</code></td><td>
+    <p><code>[“Integrate”,
+<em>expression</em>]</code></p>
 <p><code>[“Integrate”, <em>expression</em>, <em>symbol</em>]</code></p>
 <p>Indefinite integral</p>
 <p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], &quot;x&quot;]</code></p>
-<p>$$ \int \sin x \,\mathrm{d}x $$</p>
+<p>$$ \int \sin x \,\operatorname{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate</em>]</code></p>
 <p>Definite integral.</p>
 <p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
-<p>$$ \int_0^\infty \sin x \,\mathrm{d}x $$</p>
+<p>$$ \int_0^\infty \sin x \,\operatorname{d}x $$</p>
 <hr>
 <p><code>[“Integrate”, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
 <p>Multiple integral.</p>
-<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;,  &quot;x&quot;, [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, &quot;y&quot;, [&quot;Interval&quot;, 0, 1]]]</code></p>
-<p>$$ \int_0^1 \int_0^2 x\sin y \,\mathrm{d}x\,\mathrm{d}y $$</p>
+<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;, &quot;x&quot;, [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, &quot;y&quot;, [&quot;Interval&quot;, 0, 1]]]</code></p>
+<p>$$ \int_0^1 \int_0^2 x\sin y \,\operatorname{d}x\,\operatorname{d}y $$</p>
 </td></tr>
 <tr><td><code>D</code></td><td>
     <p><code>[“D”, <em>f</em>, <em>x</em>]</code></p>
-<p>Evaluate to the partial derivative \( \frac{\partial f}{\partial x} \) or \( f^{\prime}(x) \)</p>
+<p>Evaluate to the partial derivative \( \frac{\partial f}{\partial x} \) or \(
+f^{\prime}(x) \)</p>
 <hr>
 <p><code>[“D”, <em>f</em>, [“Tuple”, <em>x</em>, <em>n</em>]]</code></p>
-<p>Evaluate to the multiple derivative \( \frac{\partial^n f}{\partial x^n} \) (Leibniz notation) or \( f^{(n)}(x) \) (Lagrange notation)</p>
+<p>Evaluate to the multiple derivative \( \frac{\partial^n f}{\partial x^n} \)
+(Leibniz notation) or \( f^{(n)}(x) \) (Lagrange notation)</p>
 </td></tr>
 </tbody></table>
 <h3 id="lagrange-notation" tabindex="-1">Lagrange Notation</h3>
@@ -2333,8 +2336,10 @@ relative to time t</p>
 <code>[&quot;Integrate&quot;, &quot;f&quot; , &quot;x&quot;, &quot;y&quot;]</code></p>
 <h2 id="definite-integral" tabindex="-1">Definite Integral</h2>
 <p><code>\int_{a}^{b} f dx</code> -&gt; [“Integrate”, f, [x, a, b]]
-<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”, “b”], [“Triple”, “y”, “c”, “d”]]</p>
-<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, “f”, -1], [“Triple”, “x”, “a”, “b”]]</p>
+<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”,
+“b”], [“Triple”, “y”, “c”, “d”]]</p>
+<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, “f”, -1], [“Triple”, “x”,
+“a”, “b”]]</p>
 <p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”, “b”]]</p>
 <p>If <code>[a, b]</code> are numeric, numeric methods are used to approximate the integral.</p>
 <h2 id="domain-integral" tabindex="-1">Domain Integral</h2>
@@ -2362,14 +2367,14 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="September 13, 2023">
+        <meta itemprop="datePublished" content="September 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-13'>September 13, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

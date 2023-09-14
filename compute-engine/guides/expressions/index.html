@@ -2378,8 +2378,8 @@ ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#
 no side effect.</p>
 <p>The \( \sin() \) function is pure: it evaluates to the same value when the
 same arguments are applied to it.</p>
-<p>On the other hand, the \( \mathrm{Random}() \) function is not pure: by its
-nature it evaluates to a different value on every evaluation.</p>
+<p>On the other hand, the \( \operatorname{Random}() \) function is not pure: by
+its nature it evaluates to a different value on every evaluation.</p>
 <p>Numbers, symbols and strings are pure. A function expression is pure if the
 function itself is pure, and all its arguments are pure as well.</p>
 <p><strong>To check if an expression is pure</strong>, use <code>expr.isPure</code>.</p>
@@ -2426,8 +2426,8 @@ dictionary, use the following boolean expressions:</p>
 <li><code>ce.isComplex(expr.numericValue)</code>: the expression is a complex number. Use
 <code>expr.numericValue.re</code> and <code>expr.numericValue.im</code> to access the real and
 imaginary parts.</li>
-<li><code>Array.isArray(expr.numericValue)</code>: the expression is a rational as a tuple
-of two JavaScript <code>number</code> or two JavaScript <code>bigint</code>.</li>
+<li><code>Array.isArray(expr.numericValue)</code>: the expression is a rational as a tuple of
+two JavaScript <code>number</code> or two JavaScript <code>bigint</code>.</li>
 </ul>
 <p><strong>To access a numerical approximation of an expression if available</strong>, use
 <code>expr.N().valueOf()</code>. It will return a JavaScript number approximation of the
@@ -2640,14 +2640,14 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 13, 2023">
+        <meta itemprop="datePublished" content="September 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-13'>September 13, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

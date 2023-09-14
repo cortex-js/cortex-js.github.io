@@ -2197,24 +2197,90 @@
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
 <h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="breaking-changes" tabindex="-1">Breaking Changes</h2>
+<ul>
+<li>The entries in the LaTeX syntax dictionary can now have LaTeX triggers
+(<code>latexTrigger</code>) or triggers based on identifiers (<code>identifierTrigger</code>). The
+former replaces the <code>trigger</code> property. The latter is new. An entry with a
+<code>triggerIdentifier</code> of <code>average</code> will match <code>\operatorname{average}</code>,
+<code>\mathrm{average}</code> and other variants.</li>
+<li>The <code>ce.latexSerializationOptions</code> property is read-only.</li>
+</ul>
 <h2 id="improvements" tabindex="-1">Improvements</h2>
 <ul>
-<li>Added more expressions and symbols supported by <code>expr.compile()</code>:
+<li>
+<p>Added more functions and symbols supported by <code>expr.compile()</code>:</p>
 <ul>
 <li><code>Factorial</code> postfix operator <code>5!</code></li>
 <li><code>Gamma</code> function <code>\Gamma(2)</code></li>
-<li><code>LogGamma</code> function <code>\mathrm{LogGamma}(2)</code></li>
-<li><code>Gcd</code> function <code>\mathrm{gcd}(20, 5)</code></li>
-<li><code>Lcm</code> function <code>\mathrm{lcm}(20, 5)</code></li>
-<li><code>Chop</code> function <code>\mathrm{chop}(0.00000000001)</code></li>
+<li><code>LogGamma</code> function <code>\operatorname{LogGamma}(2)</code></li>
+<li><code>Gcd</code> function <code>\operatorname{gcd}(20, 5)</code></li>
+<li><code>Lcm</code> function <code>\operatorname{lcm}(20, 5)</code></li>
+<li><code>Chop</code> function <code>\operatorname{chop}(0.00000000001)</code></li>
 <li><code>Half</code> constant <code>\frac{1}{2}</code></li>
 <li>‘MachineEpsilon’ constant</li>
 <li><code>GoldenRatio</code> constant</li>
 <li><code>CatalanConstant</code> constant</li>
 <li><code>EulerGamma</code> constant <code>\gamma</code></li>
-<li><code>Max</code> function <code>\mathrm{max}(1, 2, 3)</code></li>
-<li><code>Min</code> function <code>\mathrm{min}(13, 5, 7)</code></li>
+<li><code>Max</code> function <code>\operatorname{max}(1, 2, 3)</code></li>
+<li><code>Min</code> function <code>\operatorname{min}(13, 5, 7)</code></li>
+<li>Relational operators: <code>Less</code>, <code>Greater</code>, <code>LessEqual</code>, <code>GreaterEqual</code>,
+‘Equal’, ‘NotEqual’</li>
+<li>Some logical operators and constants: <code>And</code>, <code>Or</code>, <code>Not</code>, <code>True</code>, <code>False</code></li>
 </ul>
+</li>
+<li>
+<p>More complex identifiers syntax are recognized, including <code>\\mathbin{}</code>,
+<code>\\mathord{}</code>, etc… <code>\\operatorname{}</code> is the recommended syntax, though: it
+will display the identifier in upright font and with the propert spacing, and
+is properly enclosing. Some commands, such as <code>\\mathrm{}</code> are not properly
+enclosing: two adjacent <code>\\mathrm{}</code> command could be merged into one.</p>
+</li>
+<li>
+<p>Environments are now parsed and serialized correctly.</p>
+</li>
+<li>
+<p>When parsing LaTeX, function application is properly handled in more cases,
+including custom functions, e.g. <code>f(x)</code></p>
+</li>
+<li>
+<p>When parsing LaTeX, multiple arguments are properly handled, e.g. <code>f(x, y)</code></p>
+</li>
+<li>
+<p>Add LaTeX syntax for logical operators:</p>
+<ul>
+<li><code>And</code>: <code>\land</code>, <code>\operatorname{and}</code> (infix or function)</li>
+<li><code>Or</code>: <code>\lor</code>, <code>\operatorname{or}</code> (infix or function)</li>
+<li><code>Not</code>: <code>\lnot</code>, <code>\operatorname{not}</code> (prefix or function)</li>
+<li><code>Xor</code>: <code>\veebar</code> (infix)</li>
+<li><code>Nand</code>: <code>\barwedge</code> (infix)</li>
+<li><code>Nor</code>: <code>^^^^22BD</code> (infix)</li>
+<li><code>Implies</code>: <code>\implies</code> (infix)</li>
+<li><code>Equivalent</code>: <code>\iff</code> (infix)</li>
+</ul>
+</li>
+<li>
+<p>When a postfix operator is defined in the LaTeX syntax dictionary of the form
+<code>^</code> plus a single token, a definition with braces is added automatically so
+that both forms will be recognized.</p>
+</li>
+<li>
+<p>Extended the LaTeX dictionary with:</p>
+<ul>
+<li><code>floor</code></li>
+<li><code>ceil</code></li>
+<li><code>round</code></li>
+<li><code>sgn</code></li>
+<li><code>exp</code></li>
+<li><code>abs</code></li>
+<li><code>gcd</code></li>
+<li><code>lcm</code></li>
+<li><code>apply</code></li>
+</ul>
+</li>
+<li>
+<p>Properly handle inverse and derivate notations, e.g. <code>\sin^{-1}(x)</code>,
+<code>\sin'(x)</code>, <code>\cos''(x)</code>, \cos^{(4)}(x)<code>or even</code>\sin^{-1}‘’(x)`</p>
 </li>
 </ul>
 <h2 id="0.13.0" tabindex="-1">0.13.0</h2>
@@ -2245,7 +2311,7 @@ has been updated.</li>
 </ul>
 <h2 id="0.12.6" tabindex="-1">0.12.6</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>New API for the <code>Parser</code> class.</li>
 </ul>
@@ -2270,7 +2336,7 @@ returned by <code>expr.numericValue</code>.</li>
 <p>Work around unpckg.com issue with libraries using BigInt.</p>
 <h2 id="0.12.0" tabindex="-1">0.12.0</h2>
 <p><strong>Release Date:</strong> 2022-11-27</p>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
@@ -2301,7 +2367,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 </ul>
 <h2 id="0.11.0" tabindex="-1">0.11.0</h2>
 <p><strong>Release Date:</strong> 2022-11-18</p>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
@@ -2323,7 +2389,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 </ul>
 <h2 id="0.10.0" tabindex="-1">0.10.0</h2>
 <p><strong>Release Date:</strong> 2022-11-17</p>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
@@ -2342,7 +2408,7 @@ when evaluating a simple polynomial in a loop.</li>
 </ul>
 <h2 id="0.9.0" tabindex="-1">0.9.0</h2>
 <p><strong>Release Date:</strong> 2022-11-15</p>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The head of a number expression is always <code>Number</code>. Use <code>expr.domain</code> to be
 get more specific info about what kind of number this is.</li>
@@ -2482,7 +2548,7 @@ rendered to LaTeX correctly, e.g. <code>V20_20</code>.</li>
 </ul>
 <h2 id="0.8.0" tabindex="-1">0.8.0</h2>
 <p><strong>Release Date:</strong> 2022-10-02</p>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
@@ -2506,7 +2572,7 @@ affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead o
 </ul>
 <h2 id="0.7.0" tabindex="-1">0.7.0</h2>
 <p><strong>Release Date:</strong> 2022-09-30</p>
-<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
@@ -2748,14 +2814,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 13, 2023">
+        <meta itemprop="datePublished" content="September 14, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-13'>September 13, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
