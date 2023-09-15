@@ -1364,6 +1364,32 @@
 
                 <li>
                   <a
+                    href="/compute-engine/reference/complex/"
+                    data-url=/compute-engine/changelog/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Complex
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/compute-engine/reference/control-structures/"
                     data-url=/compute-engine/changelog/
                     class="">
@@ -1529,6 +1555,32 @@
                       </svg>
                     
                     Special Functions
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/compute-engine/reference/statistics/"
+                    data-url=/compute-engine/changelog/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Statistics
                   </a>
                 </li>
               
@@ -2196,6 +2248,26 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.15.0" tabindex="-1">0.15.0</h2>
+<p><strong>Release Date:</strong> 2023-09-14</p>
+<h2 id="improvements" tabindex="-1">Improvements</h2>
+<ul>
+<li>The <code>ce.serialize()</code> function now takes an optional <code>canonical</code> argument. Set
+it to <code>false</code> to prevent some transformations that are done to produce more
+readable LaTeX, but that may not match exactly the MathJSON. For example, by
+default <code>ce.serialize([&quot;Power&quot;, &quot;x&quot;, -1])</code> returns <code>\frac{1}{x}</code> while
+ce.serialize([“Power”, “x”, -1], {canonical: false}) returns<code>x^{-1}</code>.</li>
+<li>Improved parsing of delimiters, i.e. <code>\left(</code>, <code>\right]</code>, etc…</li>
+<li>Added complex functions <code>Real</code>, <code>Imaginary</code>, <code>Arg</code>, <code>Conjugate</code>, <code>AbsArg</code>. See
+https://cortexjs.io/compute-engine/reference/complex/</li>
+<li>Added parsing and evaluation of <code>\Re</code>, <code>\Im</code>, <code>\arg</code>, <code>^\star</code> (Conjugate).</li>
+<li><strong>#104</strong> Added the <code>[&quot;ComplexRoots&quot;, x, n]</code> function which returns the nthroot
+of <code>x</code>.</li>
+<li>Added parsing and evaluation of statistics functions <code>Mean</code>, <code>Median</code>,
+<code>StandardDeviation</code>, <code>Variance</code>, <code>Skewness</code>, <code>Kurtosis</code>, <code>Quantile</code>,
+<code>Quartiles</code>, <code>InterquartileRange</code>, <code>Mode</code>, <code>Count</code>, <code>Erf</code>, <code>Erfc</code>. See
+https://cortexjs.io/compute-engine/reference/statistics/</li>
+</ul>
 <h2 id="0.14.0" tabindex="-1">0.14.0</h2>
 <p><strong>Release Date:</strong> 2023-09-13</p>
 <h2 id="breaking-changes" tabindex="-1">Breaking Changes</h2>
@@ -2205,9 +2277,11 @@
 former replaces the <code>trigger</code> property. The latter is new. An entry with a
 <code>triggerIdentifier</code> of <code>average</code> will match <code>\operatorname{average}</code>,
 <code>\mathrm{average}</code> and other variants.</li>
-<li>The <code>ce.latexSerializationOptions</code> property is read-only.</li>
+<li>The <code>ce.latexOptions</code> and <code>ce.jsonSerializationOptions</code> properties are more
+robust. They can be modified directly or one of their properties can be
+modified.</li>
 </ul>
-<h2 id="improvements" tabindex="-1">Improvements</h2>
+<h2 id="improvements-1" tabindex="-1">Improvements</h2>
 <ul>
 <li>
 <p>Added more functions and symbols supported by <code>expr.compile()</code>:</p>
@@ -2303,7 +2377,7 @@ https://cortexjs.io/compute-engine/guides/compiling</li>
 </ul>
 <h2 id="0.12.7" tabindex="-1">0.12.7</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h2 id="improvements-1" tabindex="-1">Improvements</h2>
+<h2 id="improvements-2" tabindex="-1">Improvements</h2>
 <ul>
 <li>Made customization of the LaTeX dictionary simpler. The <code>ce.latexDictionary</code>
 property can be used to access and modify the dictionary. The documentation at
@@ -2342,7 +2416,7 @@ returned by <code>expr.numericValue</code>.</li>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
 </ul>
-<h3 id="improvements-2" tabindex="-1">Improvements</h3>
+<h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>Rewrote the rational computation engine to use JavaScript <code>bigint</code> instead of
 <code>Decimal</code> instances. Performance improvements of up to 100x.</li>
@@ -2373,7 +2447,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
 </ul>
-<h3 id="improvements-3" tabindex="-1">Improvements</h3>
+<h3 id="improvements-4" tabindex="-1">Improvements</h3>
 <ul>
 <li>When a constant should be held or substituted with its value can now be more
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
@@ -2400,7 +2474,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
 </ul>
-<h3 id="improvements-4" tabindex="-1">Improvements</h3>
+<h3 id="improvements-5" tabindex="-1">Improvements</h3>
 <ul>
 <li>More accurate calculations of some trig functions when using bignums.</li>
 <li>Improved performance when changing a value with <code>ce.set()</code>. Up to 10x faster
@@ -2420,7 +2494,7 @@ can be used if a non-canonical expression is desired.</li>
 etc… have been replaced with a single <code>numericValue</code> property.</li>
 <li><code>parseUnknownSymbol</code> is now <code>parseUnknownIdentifier</code></li>
 </ul>
-<h3 id="improvements-5" tabindex="-1">Improvements</h3>
+<h3 id="improvements-6" tabindex="-1">Improvements</h3>
 <ul>
 <li>
 <p>Support angles in degrees with <code>30\degree</code>, <code>30^\circ</code> and <code>\ang{30}</code>.</p>
@@ -2619,7 +2693,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.6.0" tabindex="-1">0.6.0</h2>
 <p><strong>Release Date:</strong> 2022-04-18</p>
-<h3 id="improvements-6" tabindex="-1">Improvements</h3>
+<h3 id="improvements-7" tabindex="-1">Improvements</h3>
 <ul>
 <li>Parse more cases of tabular environments</li>
 <li>Handle simplify and evaluate of inert functions by default</li>
@@ -2632,7 +2706,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.5.0" tabindex="-1">0.5.0</h2>
 <p><strong>Release Date:</strong> 2022-04-05</p>
-<h3 id="improvements-7" tabindex="-1">Improvements</h3>
+<h3 id="improvements-8" tabindex="-1">Improvements</h3>
 <ul>
 <li>Correctly parse tabular content (for example in
 <code>\begin{pmatrix}...\end{pmatrix}</code></li>
@@ -2646,7 +2720,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.4.4" tabindex="-1">0.4.4</h2>
 <p><strong>Release Date</strong>: 2022-03-27</p>
-<h3 id="improvements-8" tabindex="-1">Improvements</h3>
+<h3 id="improvements-9" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added option to specify custom LaTeX dictionaries in <code>ComputeEngine</code>
 constructor</li>
@@ -2800,7 +2874,7 @@ such as <code>Equal</code>:</p>
 </table>
 <h2 id="0.3.0" tabindex="-1">0.3.0</h2>
 <p><strong>Release Date</strong>: 2021-06-18</p>
-<h3 id="improvements-9" tabindex="-1">Improvements</h3>
+<h3 id="improvements-10" tabindex="-1">Improvements</h3>
 <ul>
 <li>In LaTeX, parse <code>\operatorname{foo}</code> as the MathJSON symbol <code>&quot;foo&quot;</code>.</li>
 </ul>

@@ -1388,6 +1388,32 @@
 
                 <li>
                   <a
+                    href="/compute-engine/reference/complex/"
+                    data-url=/compute-engine/guides/latex-syntax/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Complex
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/compute-engine/reference/control-structures/"
                     data-url=/compute-engine/guides/latex-syntax/
                     class="">
@@ -1553,6 +1579,32 @@
                       </svg>
                     
                     Special Functions
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/compute-engine/reference/statistics/"
+                    data-url=/compute-engine/guides/latex-syntax/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Statistics
                   </a>
                 </li>
               
@@ -2240,19 +2292,31 @@
 <code>ComputeEngine</code> instance which is denoted by a <code>ce.</code> prefix.<br>Functions that
 apply to a boxed expression, such as <code>expr.simplify()</code> are denoted with a
 <code>expr.</code> prefix.</p>
-<p>If you are using a mathfield, all the mathfields on the page
-share a Compute Engine instance, which is available as <code>MathfieldElement.computeEngine</code>. You can modify the LaTeX dictionary used by the mathfields with <code>MathfieldElement.computeEngine.latexDictionary</code>.</p>
-<p>Alternatively, you can associate the customized compute engine with the
-mathfields in the document:</p>
-<pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = ce;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;math-json&#x27;</span>))
+<p><strong>To create a new instance of the Compute Engine</strong>, use the
+<code>new ComputeEngine()</code> constructor.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 </code></pre>
-<p class="notice--info"></p>
+<hr>
+<p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
+<p>A MathLive <code>&lt;math-field&gt;</code> DOM element works like a <code>&lt;textarea&gt;</code> in HTML, but for
+math. It provides its content as a LaTeX string or a MathJSON expression, ready
+to be used with the Compute Engine.</p>
+<div class='read-more'><a href="/mathlive/"> Read more about the MathLive <strong>mathfield
+element</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>All the mathfields on the page share a Compute Engine instance, which is
+available as <code>MathfieldElement.computeEngine</code>.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>;
+</code></pre>
+<p>You can associate a customized compute engine with the mathfields in the
+document:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
+<span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = ce;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-property">expression</span>.<span class="hljs-property">json</span>);
+</code></pre>
+<hr>
 <p><strong>To parse a LaTeX string as a MathJSON expression</strong>, call the <code>ce.parse()</code>
 function.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>).<span class="hljs-property">json</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
 </code></pre>
 <p>By default, <code>ce.parse()</code> return a
@@ -2265,13 +2329,6 @@ non-canonical form is closer to the literal LaTeX input.</p>
 ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{7}{-4}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> }).<span class="hljs-property">json</span>;
 <span class="hljs-comment">// ➔  [&quot;Divide&quot;, 7, -4]</span>
 </code></pre>
-<hr>
-<p><strong>To input math using an interactive mathfield</strong>, use <a href="/mathlive/">MathLive</a>.</p>
-<p>A MathLive <code>&lt;math-field&gt;</code> DOM element works like a <code>&lt;textarea&gt;</code> in HTML, but for
-math. It provides its content as a LaTeX string or a MathJSON expression, ready
-to be used with the Compute Engine.</p>
-<div class='read-more'><a href="/mathlive/"> Read more about the MathLive <strong>mathfield
-element</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="the-compute-engine-natural-parser" tabindex="-1">The Compute Engine Natural Parser</h2>
 <p>Unlike a programming language, mathematical notation is surprisingly ambiguous
 and full of idiosyncrasies. Mathematicians frequently invent new notations, or
@@ -2324,10 +2381,22 @@ an array of <code>[&quot;Error&quot;]</code> expressions.</p>
 <h2 id="serializing-to-latex" tabindex="-1">Serializing to LaTeX</h2>
 <p><strong>To serialize an expression to a LaTeX string</strong>, read the <code>expr.latex</code>
 property.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, [<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, [<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔  &quot;x^3 + 2&quot;</span>
+</code></pre>
+<p>Alternatively, you can use the <code>ce.serialize()</code> function.</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, [<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>], <span class="hljs-number">2</span>]));
+<span class="hljs-comment">// ➔  &quot;x^3 + 2&quot;</span>
+</code></pre>
+<p>The <code>ce.serialize()</code> function takes an optional <code>canonical</code> argument. Set it to
+<code>false</code> to prevent some transformations that are done by default to produce more
+readable LaTeX, but that may not match exactly the MathJSON.</p>
+<p>For example:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, -<span class="hljs-number">1</span>]));
+<span class="hljs-comment">// ➔  &quot;\\frac{1}{x}&quot;</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">serialize</span>([<span class="hljs-string">&#x27;Power&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, -<span class="hljs-number">1</span>], { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> }));
+<span class="hljs-comment">// ➔  &quot;x^{-1}&quot;</span>
 </code></pre>
 <h2 id="customizing-parsing-and-serialization" tabindex="-1">Customizing Parsing and Serialization</h2>
 <p><strong>To customize the behavior of <code>ce.parse()</code> and <code>expr.latex</code></strong> set the
@@ -2688,25 +2757,25 @@ common math expressions.</p>
 <li>“<em>The <code>Power</code> function is represented as “<code>x^{n}</code>”</em>”</li>
 <li>“<em>The <code>Divide</code> function is represented as “<code>\frac{x}{y}</code>”</em>”.</li>
 </ul>
-<p>Note that the dictionary will include LaTeX commands as triggers. LaTeX
-commands are usually prefixed with a backslash, such as <code>\frac</code> or <code>\pm</code>.
-It will also reference MathJSON identifiers. MathJSON identifiers are usually
-capitalized, such as <code>Divide</code> or <code>PlusMinus</code> and are not prefixed with a backslash.</p>
+<p>Note that the dictionary will include LaTeX commands as triggers. LaTeX commands
+are usually prefixed with a backslash, such as <code>\frac</code> or <code>\pm</code>. It will also
+reference MathJSON identifiers. MathJSON identifiers are usually capitalized,
+such as <code>Divide</code> or <code>PlusMinus</code> and are not prefixed with a backslash.</p>
 <p>The Compute Engine includes a default LaTeX dictionary to parse and serialize
 common math expressions.</p>
 <p><strong>To extend the LaTeX syntax</strong> update the <code>latexDictionary</code> property of the
 Compute Engine</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 ce.<span class="hljs-property">latexDictionary</span> = [
-  <span class="hljs-comment">// Incldue all the entries in the default dictionary...</span>
+  <span class="hljs-comment">// Include all the entries from the default dictionary...</span>
   ...ce.<span class="hljs-property">latexDictionary</span>,
-  <span class="hljs-comment">// ...and add the `\smoll` command</span>
+  <span class="hljs-comment">// ...and add the `\smoll{}{}` command</span>
   {
-    <span class="hljs-comment">// We&#x27;re defining a `\smoll{}{}` command:</span>
-    <span class="hljs-attr">latxTrigger</span>: <span class="hljs-string">&#x27;\\smoll&#x27;</span>,
+    <span class="hljs-comment">// The parse handler below will be invoked when this LaTeX command is encountered</span>
+    <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\smoll&#x27;</span>,
     <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser</span>) =&gt;</span> {
       <span class="hljs-comment">// We&#x27;re expecting two arguments, so we&#x27;re calling</span>
-      <span class="hljs-comment">// `parseGroup()` twice. If `parseGroup()` returns null,</span>
+      <span class="hljs-comment">// `parseGroup()` twice. If `parseGroup()` returns `null`,</span>
       <span class="hljs-comment">// we assume that the argument is missing.</span>
       <span class="hljs-keyword">return</span> [
         <span class="hljs-string">&#x27;Divide&#x27;</span>,
@@ -2718,13 +2787,10 @@ ce.<span class="hljs-property">latexDictionary</span> = [
 ];
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\smoll{1}{5}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// The &quot;Divide&quot; get represented a &quot;Rational&quot; by default when</span>
+<span class="hljs-comment">// The &quot;Divide&quot; get represented as a &quot;Rational&quot; by default when</span>
 <span class="hljs-comment">// both arguments are integers.</span>
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, 1, 5]</span>
 </code></pre>
-<p class="notice--info">If you are using a mathfield, all the mathfields on the page
-share a Compute Engine instance, which is available as <code>MathfieldElement.computeEngine</code>.
-You can modify the LaTeX dictionary used by the mathfields with <code>MathfieldElement.computeEngine.latexDictionary</code>.</p>
 <h3 id="latex-dictionary-entries" tabindex="-1">LaTeX Dictionary Entries</h3>
 <p>Each entry in the LaTeX dictionary is an object with the following properties:</p>
 <ul>
@@ -2974,43 +3040,42 @@ to serialize the expression. A <code>serialize</code> handler is invalid if the 
 property is not provided.</p>
 <h2 id="using-a-new-function-with-a-mathfield" tabindex="-1">Using a New Function with a Mathfield</h2>
 <p>You may also want to use your new function with a mathfield.</p>
-<p>First you need to define a LaTeX macro so that the mathfield knows
-how to render this command. Let’s define the <code>\smallfrac</code> macro.</p>
+<p>First you need to define a LaTeX macro so that the mathfield knows how to render
+this command. Let’s define the <code>\smallfrac</code> macro.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> mfe = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>);
 
 mfe.<span class="hljs-property">macros</span> = {
   ...mfe.<span class="hljs-property">macros</span>,
   <span class="hljs-attr">smallfrac</span>: {
     <span class="hljs-attr">args</span>: <span class="hljs-number">2</span>,
-    <span class="hljs-attr">def</span>: <span class="hljs-string">&#x27;{}^{#1}\\!\\!/\\!{}_{#2}&#x27;</span>
+    <span class="hljs-attr">def</span>: <span class="hljs-string">&#x27;{}^{#1}\\!\\!/\\!{}_{#2}&#x27;</span>,
   },
 };
 </code></pre>
-<p>The content of the <code>def</code> property is a LaTeX fragment that will
-be used to render the <code>\\smallfrac</code> command.</p>
+<p>The content of the <code>def</code> property is a LaTeX fragment that will be used to
+render the <code>\\smallfrac</code> command.</p>
 <p>The <code>#1</code> token in <code>def</code> is a reference to the first argument and <code>#2</code> to the
 second one.</p>
-<p>You may also want to define an inline shortcut to make it easier
-to input the command.</p>
+<p>You may also want to define an inline shortcut to make it easier to input the
+command.</p>
 <p>With the code below, we define a shortcut “smallfrac”.</p>
 <p>When typed, the shortcut is replaced with the associated LaTeX.</p>
-<p>The <code>#@</code> token represents the argument to the left of the shortcut, and
-the <code>#?</code> token represents a placeholder to be filled by the user.</p>
+<p>The <code>#@</code> token represents the argument to the left of the shortcut, and the <code>#?</code>
+token represents a placeholder to be filled by the user.</p>
 <pre><code class="language-js">mfe.<span class="hljs-property">inlineShortcuts</span> = {
   ...mfe.<span class="hljs-property">inlineShortcuts</span>,
-  <span class="hljs-attr">smallfrac</span>:<span class="hljs-string">&#x27;\\smallfrac{#@}{#?}&#x27;</span>
+  <span class="hljs-attr">smallfrac</span>: <span class="hljs-string">&#x27;\\smallfrac{#@}{#?}&#x27;</span>,
 };
 </code></pre>
-<div class='read-more'><a href="/mathlive/guides/shortcuts/">
-Learn more about  <strong>Key Bindings and Inline Shortcuts</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/guides/shortcuts/"> Learn more about <strong>Key
+Bindings and Inline Shortcuts</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>You can now parse the input from a mathfield using:</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(mfe.<span class="hljs-property">value</span>).<span class="hljs-property">json</span>)
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(mfe.<span class="hljs-property">value</span>).<span class="hljs-property">json</span>);
 </code></pre>
 <p>Alternatively, you can associate the customized compute engine with the
 mathfields in the document:</p>
 <pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = ce;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;math-json&#x27;</span>))
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;math-json&#x27;</span>));
 </code></pre>
 
 

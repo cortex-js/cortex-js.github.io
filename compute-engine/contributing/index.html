@@ -1388,6 +1388,32 @@
 
                 <li>
                   <a
+                    href="/compute-engine/reference/complex/"
+                    data-url=/compute-engine/contributing/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Complex
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/compute-engine/reference/control-structures/"
                     data-url=/compute-engine/contributing/
                     class="">
@@ -1553,6 +1579,32 @@
                       </svg>
                     
                     Special Functions
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/compute-engine/reference/statistics/"
+                    data-url=/compute-engine/contributing/
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Statistics
                   </a>
                 </li>
               
@@ -2225,28 +2277,47 @@
 <p>It’s in the <code>/src/docs/</code> directory, as markdown files.</p>
 <p>The guides are explainers and “how-tos”. The reference documentation is a
 description of each available function.</p>
-<p>Some of it is incomplete, some is probably just wrong. Any addition/correction to it is super helpful.</p>
+<p>Some of it is incomplete, some is probably just wrong. Any addition/correction
+to it is super helpful.</p>
 <p>It could also be some examples, etc…</p>
 <h2 id="test-cases" tabindex="-1">Test Cases</h2>
 <p>Contribute test cases.</p>
 <p>There is a test suite right now, (in <code>/test/compute-engine</code>) but it would
 benefit from being extended.</p>
-<p>The test suite is run each time a change is made to the code, and the more complete it is, the less likely that a regression will be introduced (i.e. break something)</p>
+<p>The test suite is run each time a change is made to the code, and the more
+complete it is, the less likely that a regression will be introduced (i.e. break
+something)</p>
 <h2 id="code-contributions" tabindex="-1">Code Contributions</h2>
 <h3 id="core-engine" tabindex="-1">Core Engine</h3>
-<p>That’s the hardest part, because it really requires an understanding of the entire architecture. Thankfully, that’s also probably the part that needs least contribution: it’s pretty complete and robust right now.</p>
+<p>That’s the hardest part, because it really requires an understanding of the
+entire architecture. Thankfully, that’s also probably the part that needs least
+contribution: it’s pretty complete and robust right now.</p>
 <h3 id="latex-dictionary" tabindex="-1">LaTeX Dictionary</h3>
-<p>Contribute to the default LaTeX dictionary. It’s in <code>/src/compute-engine/latex-syntax/dictionary/</code>.</p>
-<p>That’s where a LaTeX expression is parsed into a MathJSON expression (or a MathJSON expression serialized into LaTeX).</p>
-<p>There’s a decent dictionary already, but it could be extended with either new “idioms” or existing definitions could be made more robust or more complete.</p>
-<p>There are still a lot of mathematical expressions that can be expressed in LaTeX that cannot be understood by the LaTeX parser, so there’s work to be done there.</p>
+<p>Contribute to the default LaTeX dictionary. It’s in
+<code>/src/compute-engine/latex-syntax/dictionary/</code>.</p>
+<p>That’s where a LaTeX expression is parsed into a MathJSON expression (or a
+MathJSON expression serialized into LaTeX).</p>
+<p>There’s a decent dictionary already, but it could be extended with either new
+“idioms” or existing definitions could be made more robust or more complete.</p>
+<p>There are still a lot of mathematical expressions that can be expressed in LaTeX
+that cannot be understood by the LaTeX parser, so there’s work to be done there.</p>
 <h3 id="standard-library" tabindex="-1">Standard Library</h3>
 <p>Contributing to the function dictionary. It’s in <code>/src/compute-engine/library/</code>.</p>
-<p>The Standard Library provides the definition of MathJSON functions like <code>Add</code> or <code>Sum</code>.</p>
-<p>There is much to do here, both in fleshing out what’s there and adding new entries.</p>
-<p>For example, the entry for integral doesn’t know how to do a numerical evaluation. That would be handy.</p>
-<p>Derivatives are also not supported yet, either symbolically or numerically. That would be super nice to have, and probably not too hard. Symbolic integration would be nice too, but that’s a bit more complex 🙂</p>
-<p>To contribute to this dictionary, a good way to approach it is to write a utility function in JavaScript taking a MathJSON expression as input and returning another MathJSON expression. This can be done without any knowledge/understanding of the internals of the Compute Engine, and once you have the JS function that does what you want, it’s easy to plug in in the standard library so that it becomes part of the default engine.</p>
+<p>The Standard Library provides the definition of MathJSON functions like <code>Add</code> or
+<code>Sum</code>.</p>
+<p>There is much to do here, both in fleshing out what’s there and adding new
+entries.</p>
+<p>For example, the entry for integral doesn’t know how to do a numerical
+evaluation. That would be handy.</p>
+<p>Derivatives are also not supported yet, either symbolically or numerically. That
+would be super nice to have, and probably not too hard. Symbolic integration
+would be nice too, but that’s a bit more complex 🙂</p>
+<p>To contribute to this dictionary, a good way to approach it is to write a
+utility function in JavaScript taking a MathJSON expression as input and
+returning another MathJSON expression. This can be done without any
+knowledge/understanding of the internals of the Compute Engine, and once you
+have the JS function that does what you want, it’s easy to plug in in the
+standard library so that it becomes part of the default engine.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">numericAdd2</span>(<span class="hljs-params">
   ce: IComputeEngine,
   lhs: BoxedExpression,
@@ -2262,8 +2333,13 @@ benefit from being extended.</p>
 }
 
 </code></pre>
-<p>If you are looking for some inspiration, you can have a look at the issues that have been filed to see what others have requested, or you can just follow your interest.</p>
-<p>There’s almost no statistical functions, for example (<code>Average</code>, <code>Mean</code>, <code>Variance</code>, <code>StdDev</code>, <code>Median</code>, <code>Quantile</code>…), linear-algebra (<code>Transpose</code>, <code>Determinant</code>, <code>Rank</code>…). Also, in the source file for the standard library, I have left some comments as to what some future functions would be nice to have. That can also be a source of inspiration.</p>
+<p>If you are looking for some inspiration, you can have a look at the issues that
+have been filed to see what others have requested, or you can just follow your
+interest.</p>
+<p>There’s almost no linear-algebra (<code>Transpose</code>, <code>Determinant</code>, <code>Rank</code>…). Also,
+in the source file for the standard library, I have left some comments as to
+what some future functions would be nice to have. That can also be a source of
+inspiration.</p>
 
 
 
