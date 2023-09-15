@@ -2272,9 +2272,8 @@
 
 
 <h2 id="functions" tabindex="-1">Functions</h2>
-<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>Function</code></td><td>
-    <p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
+<div class="defs"> 
+<div class="def"><span class="visually-hidden">Function</span><p><code>[“Function”, list-of-variables_, <em>body</em>]</code><br>
 <code>[“Function”, <em>variable</em>, <em>body</em>]</code></p>
 <p>Create a <a href="https://en.wikipedia.org/wiki/Anonymous_function">Lambda-function</a>,
 also called <strong>anonymous function</strong>.</p>
@@ -2284,9 +2283,8 @@ variables (parameters) of the Lambda-function.</p>
 a <code>[&quot;Return&quot;]</code> expression is encountered.</p>
 <p>The <code>[&quot;Function&quot;]</code> expression creates a new scope.</p>
 <p><strong>To apply some arguments to a function expression</strong>, use <code>[&quot;Apply&quot;]</code>.</p>
-</td></tr> 
-<tr><td><code>Apply</code></td><td>
-    <p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Apply</span><p><code>[“Apply”, <em>body</em>, <em>expr-1</em>, …<em>expr-n</em>]</code></p>
 <p><a href="https://en.wikipedia.org/wiki/Apply">Apply</a> a list of arguments to a lambda expression or function.</p>
 <p>The following wildcards in <em>body</em> are replaced as indicated</p>
 <ul>
@@ -2307,13 +2305,12 @@ are replaced by the wildcards.</p>
 cube(5)
 // ➔ 125
 </code></pre>
-</td></tr> 
-<tr><td><code>Return</code></td><td>
-    <p><code>[“Return”, <em>expression</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Return</span><p><code>[“Return”, <em>expression</em>]</code></p>
 <p>If in an <code>[&quot;Function&quot;]</code> expression, interupts the evaluation of the function.
 The value of the <code>[&quot;Function&quot;]</code> expression is <em>expression</em></p>
-</td></tr> 
-</tbody></table>
+</div> 
+</div>
 
 
 
@@ -2325,14 +2322,14 @@ The value of the <code>[&quot;Function&quot;]</code> expression is <em>expressio
         
 
 
-        <meta itemprop="datePublished" content="September 14, 2023">
+        <meta itemprop="datePublished" content="September 15, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-15'>September 15, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

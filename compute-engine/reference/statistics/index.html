@@ -2298,9 +2298,9 @@ take the following forms:</p>
 <li>A linear space: <code>[&quot;Mean&quot;, [&quot;Linspace&quot;, 1, 5, 10]]</code></li>
 </ul>
 <h2 id="functions" tabindex="-1">Functions</h2>
-<table class="defs"><thead><tr><th>Function</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>Mean</code></td><td>
-    <div class="signature">["<strong>Mean</strong>", <i>list</i>]</div>
+<div class="defs">
+<div class="def"><span class="visually-hidden">Mean</span><p class="signature">[&quot;<strong>Mean</strong>&quot;, <em>list</em>]</p>
+<div class='latex'><div class="source">\operatorname{mean}(\lbrack3, 5, 7\rbrack)</div><div class="display">\[ \operatorname{mean}(\lbrack3, 5, 7\rbrack) \]</div></div>
 <p>Evaluate to the <strong>arithmetic mean</strong> of a list of numbers.</p>
 <p>The arithmetic mean is the average of the list of numbers. The mean is
 calculated by dividing the sum of the numbers by the number of numbers in the
@@ -2311,9 +2311,8 @@ list.</p>
 <pre><code class="language-mathjson">[&quot;Mean&quot;, [&quot;List&quot;, 7, 8, 3.1, 12, 77]]
 // 21.02
 </code></pre>
-</td></tr>
-<tr><td><code>Median</code></td><td>
-    <div class="signature">["<strong>Median</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Median</span><p class="signature">[&quot;<strong>Median</strong>&quot;, <i>list</i>]</p>
 <p>Evaluate to the <strong>median</strong> of a list of numbers.</p>
 <p>The median is the value separating the higher half from the lower half of a data
 sample. For a list of numbers sorted in ascending order, the median is the
@@ -2323,18 +2322,16 @@ the average of the two middle elements.</p>
 <pre><code class="language-mathjson">[&quot;Median&quot;, [&quot;List&quot;, 1, 2, 3, 4, 5]]
 // 3
 </code></pre>
-</td></tr>
-<tr><td><code>Mode</code></td><td>
-    <div class="signature">["<strong>Mode</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Mode</span><p class="signature">[&quot;<strong>Mode</strong>&quot;, <i>list</i>]</p>
 <p>Evaluate to the <strong>mode</strong> of a list of numbers.</p>
 <p>The mode is the value that appears most often in a list of numbers. A list of
 numbers can have more than one mode. If there are two modes, the list is called
 <strong>bimodal</strong>. For example \( \lbrack 2, 5, 5, 3, 2\rbrack\). If there are three
 modes, the list is called <strong>trimodal</strong>. If there are more than three modes, the
 list is called <strong>multimodal</strong>.</p>
-</td></tr>
-<tr><td><code>Variance</code></td><td>
-    <div class="signature">["<strong>Variance</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Variance</span><p class="signature">[&quot;<strong>Variance</strong>&quot;, <i>list</i>]</p>
 <p>Evaluate to the <strong>variance</strong> of a list of numbers.</p>
 <p>The variance is a measure of the amount of variation or dispersion of a set of
 values. A low variance indicates that the values tend to be close to the mean of
@@ -2343,9 +2340,8 @@ wider range.</p>
 <p>The formula for the variance of a list of numbers is</p>
 <p>\[\frac{1}{n} \sum_{i=1}^n(x_i - \mu)^2\]</p>
 <p>where \(\mu\) is the mean of the list.</p>
-</td></tr>
-<tr><td><code>StandardDeviation</code></td><td>
-    <div class="signature">["<strong>StandardDeviation</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">StandardDeviation</span><p class="signature">[&quot;<strong>StandardDeviation</strong>&quot;, <i>list</i>]</p>
 <p>Evaluate to the <strong>standard deviation</strong> of a list of numbers.</p>
 <p>The standard deviation is a measure of the amount of variation or dispersion of
 a set of values. A low standard deviation indicates that the values tend to be
@@ -2354,9 +2350,8 @@ values are spread out over a wider range.</p>
 <p>The formula for the standard deviation of a list of numbers is</p>
 <p>\[\sqrt{\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2}\]</p>
 <p>where \(\mu\) is the mean of the list.</p>
-</td></tr>
-<tr><td><code>Skewness</code></td><td>
-    <div class="signature">["<strong>Skewness</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Skewness</span><p class="signature">[&quot;<strong>Skewness</strong>&quot;, <i>list</i>]</p>
 <p>Evaluate to the <strong>skewness</strong> of a list of numbers.</p>
 <p>The skewness is a measure of the asymmetry of the distribution of a real-valued
 random variable about its mean. The skewness value can be positive or negative,
@@ -2365,9 +2360,8 @@ or undefined.</p>
 \sum_{i=1}^n \left(\frac{x_i - \mu}{\sigma}\right)^3\]</p>
 <p>where \(\mu\) is the mean of the list, and \(\sigma\) is the standard
 deviation of the list.</p>
-</td></tr>
-<tr><td><code>Kurtosis</code></td><td>
-    <div class="signature">["<strong>Kurtosis</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Kurtosis</span><div class="signature">["<strong>Kurtosis</strong>", <i>list</i>]</div>
 <p>Evaluate to the <strong>kurtosis</strong> of a list of numbers.</p>
 <p>The kurtosis is a measure of the “tailedness” of the distribution of a
 real-valued random variable. The kurtosis value can be positive or negative, or
@@ -2376,37 +2370,31 @@ undefined.</p>
 <p>\[ \frac{1}{n} \sum_{i=1}^n \left(\frac{x_i - \mu}{\sigma}\right)^4\]</p>
 <p>where \(\mu\) is the mean of the list, and \(\sigma\) is the standard
 deviation of the list.</p>
-</td></tr>
-<tr><td><code>Quantile</code></td><td>
-    <div class="signature">["<strong>Quantile</strong>", <i>list</i>, <i>q:number</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Quantile</span><p class="signature">[&quot;<strong>Quantile</strong>&quot;, <em>list</em>, <em>q:number</em>]</p>
 <p>Evaluate to the <strong>quantile</strong> of a list of numbers.</p>
 <p>The quantile is a value that divides a list of numbers into equal-sized groups.
 The quantile is a generalization of the median, which divides a list of numbers
 into two equal-sized groups.</p>
 <p>So, \(\operatorname{median} = \operatorname{quantile}(0.5)\).</p>
-</td></tr>
-<tr><td><code>Quartiles</code></td><td>
-    <div class="signature">["<strong>Quartiles</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Quartiles</span><div class="signature">["<strong>Quartiles</strong>", <i>list</i>]</div>
 <p>Evaluate to the <strong>quartiles</strong> of a list of numbers.</p>
 <p>The quartiles are the three points that divide a list of numbers into four equal
 groups, each group comprising a quarter of the list.</p>
-</td></tr>
-<tr><td><code>InterquartileRange</code></td><td>
-    <div class="signature">["<strong>InterquartileRange</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">InterquartileRange</span><p class="signature">[&quot;<strong>InterquartileRange</strong>&quot;, <em>list</em>]</p>
 <p>Evaluate to the <strong>interquartile range</strong> (IRQ) of a list of numbers.</p>
 <p>The interquartile range is the difference between the third quartile and the
 first quartile.</p>
-</td></tr>
-<tr><td><code>Sum</code></td><td>
-    <div class="signature">["<strong>Sum</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Sum</span><p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>list</em>]</p>
 <p>Evaluate to the sum of a list of numbers.</p>
-</td></tr>
-<tr><td><code>Product</code></td><td>
-    <div class="signature">["<strong>Product</strong>", <i>list</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Product</span><p class="signature">[&quot;<strong>Product</strong>&quot;, <em>list</em>]</p>
 <p>Evaluate to the product of a list of numbers.</p>
-</td></tr>
-<tr><td><code>Erf</code></td><td>
-    <div class="signature">["<strong>Erf</strong>", <i>z:complex</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Erf</span><p class="signature">[&quot;<strong>Erf</strong>&quot;, <em>z:complex</em>]</p>
 <p>Evaluate to the <strong>error function</strong> of a complex number.</p>
 <p>The error function is an odd function ( \( \operatorname{erf} -z = -
 \operatorname{erf} z\) ) that is used in statistics to calculate probabilities
@@ -2414,14 +2402,13 @@ of normally distributed events.</p>
 <p>The formula for the error function of a complex number is:</p>
 <p>\[ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt\]</p>
 <p>where \(z\) is a complex number.</p>
-</td></tr>
-<tr><td><code>Erfc</code></td><td>
-    <div class="signature">["<strong>Erfc</strong>", <i>z:complex</i>]</div>
+</div>
+<div class="def"><span class="visually-hidden">Erfc</span><p class="signature">[&quot;<strong>Erfc</strong>&quot;, <em>z:complex</em>]</p>
 <p>Evaluate to the <strong>complementary error function</strong> of a complex number.</p>
 <p>It is defined as:</p>
 <p>\[ \operatorname{erfc} z = 1 - \operatorname{erf} z \]</p>
-</td></tr>
-</tbody></table>
+</div>
+</div>
 
 
 
@@ -2433,14 +2420,14 @@ of normally distributed events.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 14, 2023">
+        <meta itemprop="datePublished" content="September 15, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-15'>September 15, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

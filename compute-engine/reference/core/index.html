@@ -2334,11 +2334,10 @@ value other than themselves.</p>
 </table>
 </section>
 <h2 id="assignment%2C-declaration-and-assumptions" tabindex="-1">Assignment, Declaration and Assumptions</h2>
-<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>Assume</code></td><td>
-    <p><code>[“Assume”, <em>symbol</em>, <em>value</em>]</code><br></p>
-<p><code>[“Assume”, <em>symbol</em>, <em>domain</em>]</code><br></p>
-<p><code>[“Assume”, <em>predicate</em>]</code></p>
+<div class="defs"> 
+<div class="def"><span class="visually-hidden">Assume</span><p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
+<p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>symbol</em>, <em>domain</em>]</p>
+<p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>predicate</em>]</p>
 <p>The predicate is an expression that evaluates to <code>True</code> or `False. The symbols
 or functions in the predicate expression may be free (i.e. not have a definition).</p>
 <p>The predicate can take the form of an equality, an inequality or a membership
@@ -2348,10 +2347,9 @@ expression:</p>
 <li><code>[&quot;Assume&quot;, [&quot;Greater&quot;, &quot;x&quot;, 0]]</code></li>
 <li><code>[&quot;Assume&quot;, [&quot;Element&quot;, &quot;x&quot;, &quot;Integer&quot;]]</code></li>
 </ul>
-</td></tr> 
-<tr><td><code>Let</code></td><td>
-    <p><code>[“Let”, <em>symbol</em>, <em>value</em>]</code><br>
-<code>[“Let”, <em>symbol</em>, <em>value</em>, <em>domain</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Let</span><p class="signature">[&quot;<strong>Let</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
+<p class="signature">[&quot;<strong>Let</strong>&quot;, <em>symbol</em>, <em>value</em>, <em>domain</em>]</p>
 <p>Define a new symbol in the current scope, and set its value and domain.
 If <em><kbd>domain</kbd></em> is not provided, the domain is inferred based on the value.</p>
 <p>If the symbol already has a definition in the current scope, evaluate to
@@ -2372,89 +2370,74 @@ using the arguments from <em><kbd>function-expression</kbd></em>.</p>
 <pre><code>// Define f(n) := 2n, where n is an integer
 [&quot;Let&quot;, [&quot;f&quot;, [&quot;Tuple&quot;, &quot;n&quot;, &quot;Integer]], [&quot;Multiply&quot;, &quot;n&quot;, 2]]
 </code></pre>
-</td></tr> 
-<tr><td><code>Set</code></td><td>
-    <p><code>[“Set”, <em>symbol</em>, <em>value</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Set</span><p class="signature">[&quot;<strong>Set</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
 <p>Set the value of <em><kbd>symbol</kbd></em> to <em><kbd>value</kbd></em>.</p>
 <p>If <em><kbd>symbol</kbd></em> does not exist in the current context, consider parent
 scopes until a definition for the symbol is found.</p>
 <p>If there is no definition for the symbol, evaluate to an error, otherwise
 evaluate to <em><kbd>value</kbd></em>.  To define a new symbol, use a <code>[&quot;Let&quot;]</code>
 expression.</p>
-</td></tr> 
-</tbody></table>
+</div> 
+</div>
 <section id='core-functions'>
 <h2 id="core-functions" tabindex="-1">Core Functions</h2>
-<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>About</code></td><td>
-    <p><code>[&quot;About&quot;, _symbol_]</code></p>
+<div class="defs"> 
+<div class="def"><span class="visually-hidden">About</span><p class="signature">[&quot;<strong>About</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
 <p>Evaluate to a dictionary containing information about a symbol such as its
 domain, its attributes, its value, etc…</p>
-</td></tr> 
-<tr><td><code>Domain</code></td><td>
-    <p><code>[“Domain”, <em>expression</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Domain</span><p class="signature">[&quot;<strong>Domain</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the domain of <em>expression</em></p>
-</td></tr> 
-<tr><td><code>Evaluate</code></td><td>
-    <p><code>[“Evaluate”, <em>expression</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Evaluate</span><p class="signature">[&quot;<strong>Evaluate</strong>&quot;, <em>expression</em>]</p>
 <p>Apply a sequence of definitions to an expression in order to reduce, simplify
 and calculate its value. Overrides <code>Hold</code> and hold attributes of a function.</p>
-</td></tr> 
-<tr><td><code>Error</code></td><td>
-    <p><span class='tags float-right'><span class='tag inert'>inert</span></span>
-<code>[“Error”, <em>expression</em>, <em>string</em>, <em>rest</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Error</span><p class="signature">[&quot;<strong>Error</strong>&quot;, <em>expression</em>, <em>string</em>, <em>rest</em>]</p>
 <p>Tag an expression that could not be interpreted correctly. It may have a syntax
 error, a reference to an unknown symbol or function or some other problem.</p>
 <p>Note that an <code>Error</code> expression can be a sub-expression.</p>
 <p>The second argument is a string indicating the problem.</p>
 <p>The third argument, if present, is an expression describing what could not be parsed.</p>
-</td></tr> 
-<tr><td><code>Hold</code></td><td>
-    <p><code>[“Hold”,
-<em>expression</em>]</code><span class='tags float-right'><span class='tag inert'>inert</span></span></p>
+</div> 
+<div class="def"><span class="visually-hidden">Hold</span><p class="signature">[&quot;<strong>Hold</strong>&quot;, <em>expression</em>]</p>
 <p>Tag an expression that should be kept in an unevaluated form</p>
-</td></tr>
-<tr><td><code>Html</code></td><td>
-    <p><code>[“Html”, <em>expr</em>]</code></p>
+</div>
+<div class="def"><span class="visually-hidden">Html</span><p><code>[“Html”, <em>expr</em>]</code></p>
 <p>Evaluate to a string which is the HTML markup corresponding to the expression.
 If the head of <em>expr</em> is <code>LatexString</code>, <code>Latex</code> or <code>LatexTokens</code>, renders the
 LaTeX to HTML markup</p>
-</td></tr> <tr><td><code>Identity</code></td><td>
-    <p><code>[“Identity”,
+</div> <div class="def"><span class="visually-hidden">Identity</span><p><code>[“Identity”,
 <em>expression</em>]</code></p>
 <p>Evaluate to its argument</p>
-</td></tr> <tr><td><code>InverseFunction</code></td><td>
-    <p><code>[“InverseFunction”, <em>expression</em>]</code></p>
+</div> <div class="def"><span class="visually-hidden">InverseFunction</span><p><code>[“InverseFunction”, <em>expression</em>]</code></p>
 <p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code></p>
-</td></tr> 
-<tr><td><code>Latex</code></td><td>
-    <p><code>[“Latex”, <em>expr</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Latex</span><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a <code>LatexString</code> which is the expression serialized to LaTeX</p>
-</td></tr> 
-<tr><td><code>LatexString</code></td><td>
-    <p><span class='tags float-right'><span class='tag inert'>inert</span></span><code>[“LatexString”, <em>string</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">LatexString</span><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>string</em>]</p>
 <p>Tag a string as a LaTeX string</p>
-</td></tr> 
-<tr><td><code>LatexTokens</code></td><td>
-    <p><code>[“LatexTokens”, …<em>token</em>[]]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">LatexTokens</span><p class="signature">[&quot;<strong>LatexTokens</strong>&quot;, …<em>tokens</em>]</p>
 <p>Evaluate to a <code>LatexString</code> made of the concatenation of the token arguments</p>
-</td></tr> 
-<tr><td><code>Parse</code></td><td>
-    <p><code>[“Parse”, <em>expr</em>]</code></p>
+</div> 
+<div class="def"><span class="visually-hidden">Parse</span><p class="signature">[&quot;<strong>Parse</strong>&quot;, <em>expression</em>]</p>
 <p>If <em>expr</em> is a <code>LatexString</code> or <code>LatexTokens</code>, evaluate to a MathJSON expression
 corresponding to the LaTeX string.</p>
-</td></tr> 
-<tr><td><code>String</code></td><td>
-    <p><code>[“String”, …<em>expr</em>]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+</div> 
+<div class="def"><span class="visually-hidden">String</span><p class="signature">[&quot;<strong>String</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a string made from the concatenation of the arguments converted to
-string</p>
-</td></tr> 
-<tr><td><code>Symbol</code></td><td>
-    <p><code>[“Symbol”, …<em>expr</em>]</code><span class='tags float-right'><span class='tag constructor'>constructor</span></span></p>
+strings</p>
+</div> 
+<div class="def"><span class="visually-hidden">Symbol</span><p class="signature">[&quot;<strong>Symbol</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a new symbol made of a concatenation of the arguments.</p>
-<p>For example <code>[&quot;Symbol&quot;, &quot;x&quot;, 2] -&gt; &quot;x2&quot;</code></p>
-</td></tr>
-</tbody></table>
+<pre><code class="language-mathjson">[&quot;Symbol&quot;, &quot;x&quot;, 2] 
+// -&gt; &quot;x2&quot;
+</code></pre>
+</div>
+</div>
 </section>
 <h2 id="parse%2C-latex%2C-latextokens-and-latexstring" tabindex="-1"><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h2>
 <p><code>[“Latex”, <em>expr</em> ]</code></p>
@@ -2609,14 +2592,14 @@ tokens.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 14, 2023">
+        <meta itemprop="datePublished" content="September 15, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-15'>September 15, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2526,10 +2526,9 @@ functions<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 </table>
 </div>
 <h3 id="other-functions" tabindex="-1">Other Functions</h3>
-<table class="defs"><thead><tr><th>Function</th><th>Operation</th></tr></thead><tbody>
-<tr><td><code>BaseForm</code></td><td>
-    <p><code>[“BaseForm”, <em>value:Integer</em>]</code><br> <code>[“BaseForm”,
-<em>value:Integer</em>, <em>base</em>]</code></p>
+<div class="defs">
+<div class="def"><span class="visually-hidden">BaseForm</span><p class="signature">[&quot;<strong>BaseForm</strong>&quot;, <em>value:integer</em>]</p>
+<p class="signature">[&quot;<strong>BaseForm</strong>&quot;, <em>value:integer</em>, <em>base</em>]</p>
 <p>Format an <em>integer</em> in a specific <em>base</em>, such as hexadecimal or binary.</p>
 <p>If no <em>base</em> is specified, use base-10.</p>
 <p>The sign of <em>integer</em> is ignored.</p>
@@ -2545,10 +2544,9 @@ functions<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 String(BaseForm(42, 16))
 // ➔ &quot;'0x2a'&quot;
 </code></pre>
-</td></tr>
-<tr><td><code>Clamp</code></td><td>
-    <p><code>[“Clamp”, <em>value</em>]</code><br> <code>[“Clamp”, <em>value</em>,
-<em>lower</em>, <em>upper</em>]</code></p>
+</div>
+<div class="def"><span class="visually-hidden">Clamp</span><p class="signature">[&quot;<strong>Clamp</strong>&quot;, <em>value</em>]</p>
+<p class="signature">[&quot;<strong>Clamp</strong>&quot;, <em>value</em>, <em>lower</em>, <em>upper</em>]</p>
 <ul>
 <li>If <code>_value_</code> is less than <code>_lower_</code>, evaluate to <code>_lower_</code></li>
 <li>If <code>_value_</code> is greater than <code>_upper_</code>, evaluate to <code>_upper_</code></li>
@@ -2565,10 +2563,9 @@ and +1.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">100</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 11</span>
 </code></pre>
-</td></tr>
-<tr><td><code>Max</code></td><td>
-    <p><code>[“Max”, <em>expr1</em>, …<em>expr-n</em>]</code><br> <code>[“Max”,
-<em>list-of-values</em>]</code></p>
+</div>
+<div class="def"><span class="visually-hidden">Max</span><p class="signature">[&quot;<strong>Max</strong>&quot;, <em>x1</em>, <em>x2</em>, …]</p>
+<p class="signature">[&quot;<strong>Max</strong>&quot;, <em>list</em>]</p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the largest
 of the arguments.</p>
 <p>Otherwise, simplify the expression by removing values that are smaller than or
@@ -2578,23 +2575,21 @@ equal to the largest real number.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Max&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7.1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;NaN&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;Max&quot;, 7.1, &quot;NaN&quot;, &quot;x&quot;]</span>
 </code></pre>
-</td></tr>
-<tr><td><code>Min</code></td><td>
-    <p><code>[“Min”, <em>expr1</em>, …<em>expr-n</em>]</code><br> <code>[“Min”,
-<em>list-of-values</em>]</code></p>
+</div>
+<div class="def"><span class="visually-hidden">Min</span><p class="signature">[&quot;<strong>Max</strong>&quot;, <em>x1</em>, <em>x2</em>, …]</p>
+<p class="signature">[&quot;<strong>Max</strong>&quot;, <em>list</em>]</p>
 <p>If all the arguments are real numbers, excluding <code>NaN</code>, evaluate to the smallest
 of the arguments.</p>
 <p>Otherwise, simplify the expression by removing values that are greater than or
 equal to the smallest real number.</p>
-</td></tr>
-<tr><td><code>Rational</code></td><td>
-    <p><code>[“Rational”, <em>n:Number</em>]</code><br></p>
-<p>Evaluate to a rational approximating the value of the <code>_n_</code>.</p>
+</div>
+<div class="def"><span class="visually-hidden">Rational</span><p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>n</em>]</p>
+<p>Evaluate to a rational approximating the value of the number <code>_n_</code>.</p>
 <br>
-<p><code>[“Rational”, <em>numerator:Integer</em>, <em>denominator:Integer</em>]</code></p>
+<p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>numerator</em>, <em>denominator</em>]</p>
 <p>Represent a rational number equal to <code>_numerator_</code> over <code>_denominator_</code>.</p>
-</td></tr>
-</tbody></table>
+</div>
+</div>
 
 
 
@@ -2606,14 +2601,14 @@ equal to the smallest real number.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 14, 2023">
+        <meta itemprop="datePublished" content="September 15, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-14'>September 14, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime='2023-09-15'>September 15, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
