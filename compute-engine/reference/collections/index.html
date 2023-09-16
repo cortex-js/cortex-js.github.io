@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#collection-types">Collection Types</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#collection-operations">Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li></ol></li></ol>
+        <ol><li><a href="#collection-types">Collection Types</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#collection-operations">Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Reverse">Reverse</a></li></ol></li></ol>
       </div>
       
                               
@@ -2445,7 +2445,7 @@ negative indexes (or ranges) reverses the order of the elements.</p>
 <span class="hljs-comment">// -&gt; &quot;&#x27;stressed&#x27;&quot;</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Drop" tabindex="-1">Drop</h3><div class="defs"><div class="def"><p>[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>index</em>]{.signature} [&quot;<strong>Drop</strong>&quot;,</p>
+<h3 class="visually-hidden" id="Drop" tabindex="-1">Drop</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
 <p>Drop is the opposite of <code>Take</code>. It returns a list of the elements that are not
 at the specified indexes.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
@@ -2461,6 +2461,52 @@ at the specified indexes.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
  
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="First" tabindex="-1">First</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>First</strong>&quot;, <em>collection</em>]</p>
+<p>Return the first element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, 1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 5</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;x&quot;</span>
+ 
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Second" tabindex="-1">Second</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Second</strong>&quot;, <em>collection</em>]</p>
+<p>Return the first element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, 2]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Second&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;y&quot;</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Last" tabindex="-1">Last</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Last</strong>&quot;, <em>collection</em>]</p>
+<p>Return the last element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, -1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Last&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 18</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Rest" tabindex="-1">Rest</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rest</strong>&quot;, <em>collection</em>]</p>
+<p>Return everything but the first element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, 1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 10, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Most" tabindex="-1">Most</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Most</strong>&quot;, <em>collection</em>]</p>
+<p>Return everything but the last element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, -1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Most&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Reverse" tabindex="-1">Reverse</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reverse</strong>&quot;, <em>collection</em>]</p>
+<p>Return the collection in reverse order.</p>
+<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, [&quot;Tuple&quot;, -1, 1]]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reverse&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10, 2, 5]</span>
 </code></pre>
 </div></div>
 
@@ -2503,7 +2549,7 @@ at the specified indexes.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#collection-types">Collection Types</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#collection-operations">Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li></ol></li></ol>
+        <ol><li><a href="#collection-types">Collection Types</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#collection-operations">Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Reverse">Reverse</a></li></ol></li></ol>
       </div>
     
                             
