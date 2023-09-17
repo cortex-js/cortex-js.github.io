@@ -38,11 +38,35 @@
 
 
 
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
+  
+
 
 
 
 
 <link rel="stylesheet" href="/assets/css/main.css" crossorigin>
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css" crossorigin>
+  
 
 
 
@@ -2262,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a></li><li><a href="#leibniz-notation">Leibniz Notation</a></li><li><a href="#Integrate">Integrate</a></li><li><a href="#euler-modified-notation">Euler Modified Notation</a></li><li><a href="#D">D</a></li><li><a href="#newton-notation-(%40todo)">Newton Notation (@todo)</a><ol><li><a href="#integral">Integral</a></li></ol></li><li><a href="#lagrange-notation">Lagrange Notation</a></li><li><a href="#indefinite-integral">Indefinite Integral</a></li><li><a href="#definite-integral">Definite Integral</a></li><li><a href="#domain-integral">Domain Integral</a><ol><li><a href="#contour-integral">Contour Integral</a></li></ol></li></ol>
+        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Integrate">Integrate</a></li><li><a href="#Derivative">Derivative</a></li></ol></li></ol>
       </div>
       
                               
@@ -2271,33 +2295,107 @@
 
 
 
-<h3 id="functions" tabindex="-1">Functions</h3>
- <h3 class="visually-hidden" id="Integrate" tabindex="-1">Integrate</h3><div class="defs"><div class="def"><p><code>[“Integrate”,
-<em>expression</em>]</code></p>
-<p><code>[“Integrate”, <em>expression</em>, <em>symbol</em>]</code></p>
-<p>Indefinite integral</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], &quot;x&quot;]</code></p>
-<p>$$ \int \sin x \,\operatorname{d}x $$</p>
-<hr>
-<p><code>[“Integrate”, <em>expression</em>, <em>predicate</em>]</code></p>
-<p>Definite integral.</p>
-<p><code>[&quot;Integrate&quot;, [&quot;Sin&quot;, &quot;x&quot;], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, +Infinity]]]</code></p>
-<p>$$ \int_0^\infty \sin x \,\operatorname{d}x $$</p>
-<hr>
-<p><code>[“Integrate”, <em>expression</em>, <em>predicate1</em>, <em>predicate2</em>…]</code></p>
-<p>Multiple integral.</p>
-<p><code>[&quot;Integrate&quot;, ['&quot;Multiply&quot;, &quot;x&quot;, [&quot;Sin&quot;, &quot;y&quot;]], [&quot;Element&quot;, &quot;x&quot;, [&quot;Interval&quot;, 0, 2]], [&quot;Element&quot;, &quot;y&quot;, [&quot;Interval&quot;, 0, 1]]]</code></p>
-<p>$$ \int_0^1 \int_0^2 x\sin y \,\operatorname{d}x\,\operatorname{d}y $$</p>
-</div></div>
-<h3 class="visually-hidden" id="D" tabindex="-1">D</h3><div class="defs"><div class="def"><p><code>[“D”, <em>f</em>, <em>x</em>]</code></p>
-<p>Evaluate to the partial derivative \( \frac{\partial f}{\partial x} \) or \(
-f^{\prime}(x) \)</p>
-<hr>
-<p><code>[“D”, <em>f</em>, [“Tuple”, <em>x</em>, <em>n</em>]]</code></p>
-<p>Evaluate to the multiple derivative \( \frac{\partial^n f}{\partial x^n} \)
-(Leibniz notation) or \( f^{(n)}(x) \) (Lagrange notation)</p>
-</div></div>
-<h3 id="lagrange-notation" tabindex="-1">Lagrange Notation</h3>
+<p>Calculus is the mathematical study of continuous change.</p>
+<p>It has two main branches: differential calculus and integral calculus.
+These two branches are related by the fundamental theorem of calculus:</p>
+<p>\[ \int_a^b f(x) \,\mathrm{d}x = F(b) - F(a) \]</p>
+<p>where \( F \) is an antiderivative of \( f \), that is \( F’ = f \).</p>
+<h2 id="functions" tabindex="-1">Functions</h2>
+<h3 class="visually-hidden" id="Integrate" tabindex="-1">Integrate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>]</p>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>index</em>]</p>
+<p>An <strong>indefinite integral</strong>, also known as an antiderivative, refers to the reverse
+process of differentiation.</p>
+<div class='latex'><div class="source">\int \sin x \,\mathrm{d}x</div><div class="display">\[ \int \sin x \,\mathrm{d}x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="notice--info">Note that the LaTeX expression above include a LaTeX spacing command <code>\\,</code> to add a
+small space between the function and the differential operator. This is
+optional, but it makes the expression easier to read.</p>
+<p class="notice--info">Note that the <code>d</code> indicating the variable of integration is wrapped with
+a <code>\\mathrm{}</code> command so it can be displayed upright. This is
+also optional, but this a recommended typographical convention.</p>
+<p>Given a function \(f(x)\), finding its indefinite integral, denoted as
+\(\int f(x) \,\mathrm{d}x\), involves finding a new function
+\(F(x)\) such that \(F’(x) = f(x)\).</p>
+<p>Mathematically, this is expressed as:</p>
+<p>\[ \int f(x) \,\mathrm{d}x = F(x) + C \]</p>
+<p>where:</p>
+<ul>
+<li>\(dx\) specifies the variable of integration.</li>
+<li>\(F(x)\) is the antiderivative or the original function.</li>
+<li>\(C\) is the constant of integration, accounting for the fact that there are
+many functions that can have the same derivative, differing only by a constant.</li>
+</ul>
+<p><b>Reference</b></p>
+<ul>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Integral">Integral</a>, <a href="https://en.wikipedia.org/wiki/Antiderivative">Antiderivative</a>, <a href="https://en.wikipedia.org/wiki/Integral_symbol">Integral Symbol</a></li>
+<li>Wolfram Mathworld: <a href="https://mathworld.wolfram.com/Integral.html">Integral</a></li>
+<li>NIST: <a href="https://dlmf.nist.gov/2.1#E1">Integral</a></li>
+</ul>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>]</p>
+<p>A <strong>definite integral</strong> computes the net area between a function \( f(x) \) and
+the x-axis over a specified interval \([a, b]\). The “net area” accounts for
+areas below the x-axis subtracting from the total.</p>
+<div class='latex'><div class="source">\int_{0}^{2} x^2 \,\mathrm{d}x</div><div class="display">\[ \int_{0}^{2} x^2 \,\mathrm{d}x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>The notation for the definite integral of \( f(x) \) from \( a \) to \( b \)
+is given by:</p>
+<p>\[ \int_{a}^{b} f(x) \mathrm{d}x = F(b) - F(a) \]</p>
+<p>where:</p>
+<ul>
+<li>\( dx \) indicates the variable of integration.</li>
+<li>\( [a, b] \) are the bounds of integration, with \( a \) being the lower bound and \( b \) being the upper bound.</li>
+<li>\( F(x) \) is an antiderivative of \( f(x) \), meaning \( F’(x) = f(x) \).</li>
+</ul>
+<p>This value can be calculated symbolically or numerically. Symbolic integration
+is the process of finding an antiderivative of a function. Numerical integration
+is the process of approximating the value of a definite integral using numerical
+methods.</p>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>, <em>bounds</em>]</p>
+<p>A <strong>double integral</strong> computes the net volume between a function \( f(x, y) \)
+and the xy-plane over a specified region \([a, b] \times [c, d]\). The
+“net volume” accounts for volumes below the xy-plane subtracting from the
+total. The notation for the double integral of \( f(x, y) \) from \( a \) to
+\( b \) and \( c \) to \( d \) is given by:</p>
+<p>\[ \int_{a}^{b} \int_{c}^{d} f(x, y) \,\mathrm{d}x \,\mathrm{d}y\]</p>
+<div class='latex'><div class="source">\int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y</div><div class="display">\[ \int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</div></div> 
+<h3 class="visually-hidden" id="Derivative" tabindex="-1">Derivative</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>, <em>index</em>]</p>
+<p>The <code>Derivative</code> function represents the derivative of a function <em>expr</em> with respect to
+the variable <em>index</em>.</p>
+<div class='latex'><div class="source"> f^\prime(x)</div><div class="display">\[  f^\prime(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>The derivative is a measure of how a function changes as its input changes. It is the ratio of the change in the value of a function to the change in its input value.</p>
+<p>The derivative of a function \( f(x) \) with respect to its input \( x \) is denoted by \( f’(x) \) or \( \frac{df}{dx} \). The derivative of a function \( f(x) \) is defined as:</p>
+<p>\[
+f’(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
+\]</p>
+<p>where:</p>
+<ul>
+<li>\( h \) is the change in the input variable.</li>
+<li>\( f(x + h) - f(x) \) is the change in the value of the function.</li>
+<li>\( \frac{f(x + h) - f(x)}{h} \) is the ratio of the change in the value of the function to the change in its input value.</li>
+<li>\( \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \) is the limit of the ratio of the change in the value of the function to the change in its input value as \( h \) approaches \( 0 \).</li>
+<li>The limit is taken as \( h \) approaches \( 0 \) because the derivative is the instantaneous rate of change of the function at a point, and the change in the input value must be infinitesimally small to be instantaneous.</li>
+</ul>
+<p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>, <em>index</em>, <em>n</em>]</p>
+<p>The <code>Derivative</code> function represents the <em>n</em>-th derivative of a function <em>expr</em> with
+respect to the variable <em>index</em>.</p>
+<div class='latex'><div class="source">f^{(n)}(x)</div><div class="display">\[ f^{(n)}(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p><b>Reference</b></p>
+<ul>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Derivative">Derivative</a></li>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Notation_for_differentiation">Notation for Differentiation</a>, <a href="https://en.wikipedia.org/wiki/Leibniz%27s_notation">Leibniz’s Notation</a>, <a href="https://en.wikipedia.org/wiki/Lagrange%27s_notation">Lagrange’s Notation</a>,  <a href="https://en.wikipedia.org/wiki/Newton%27s_notation">Newton’s Notation</a></li>
+<li>Wolfram Mathworld: <a href="https://mathworld.wolfram.com/Derivative.html">Derivative</a></li>
+<li>NIST: <a href="https://dlmf.nist.gov/2.1#E1">Derivative</a></li>
+</ul>
+<p><b>Lagrange Notation</b></p>
 <table>
 <thead>
 <tr>
@@ -2308,109 +2406,39 @@ f^{\prime}(x) \)</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>f'(x)</code></td>
-<td style="text-align:left"><code>[&quot;D&quot;, &quot;f&quot;, &quot;x&quot;]</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>f''(x)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f\prime(x)</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>f\prime\prime(x)</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>f\doubleprime(x)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f^{\prime}(x)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;]</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>f''(x)</code></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;, 2]</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>f\prime\prime(x)</code></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;, 2]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f^{\prime\prime}(x)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;, 2]</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>f^{\doubleprime}(x)</code></td>
-<td style="text-align:left"></td>
+<td style="text-align:left"><code>f\doubleprime(x)</code></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;, 2]</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>f^{(n)}(x)</code></td>
+<td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, &quot;x&quot;, &quot;n&quot;]</code></td>
 </tr>
 </tbody>
 </table>
-<p>@todo: <code>f^{(4)}</code></p>
-<h2 id="leibniz-notation" tabindex="-1">Leibniz Notation</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">LaTeX</th>
-<th style="text-align:left">MathJSON</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>\frac{\partial f}{\partial x}</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>\frac{\partial^2 f}{\partial x\partial y}</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="euler-modified-notation" tabindex="-1">Euler Modified Notation</h2>
-<p>This notation is used by Mathematica. The Euler notation uses <code>D</code> instead of
-<code>\partial</code></p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">LaTeX</th>
-<th style="text-align:left">MathJSON</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>\partial_{x} f</code></td>
-<td style="text-align:left"></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>\partial_{x,y} f</code></td>
-<td style="text-align:left"></td>
-</tr>
-</tbody>
-</table>
-<h2 id="newton-notation-(%40todo)" tabindex="-1">Newton Notation (@todo)</h2>
-<p><code>\dot{v}</code> -&gt; first derivative relative to time t <code>\ddot{v}</code> -&gt; second derivative
-relative to time t</p>
-<h3 id="integral" tabindex="-1">Integral</h3>
-<h2 id="indefinite-integral" tabindex="-1">Indefinite Integral</h2>
-<p><code>\int f dx</code> -&gt; [“Integrate”, “f”, “x”]</p>
-<p><code>\int\int f dxdy</code> -&gt; [“Integrate”, “f”, “x”, “y”]</p>
-<p>Note: <code>[&quot;Integrate&quot;, [&quot;Integrate&quot;, &quot;f&quot; , &quot;x&quot;], &quot;y&quot;]</code> is equivalent to
-<code>[&quot;Integrate&quot;, &quot;f&quot; , &quot;x&quot;, &quot;y&quot;]</code></p>
-<h2 id="definite-integral" tabindex="-1">Definite Integral</h2>
-<p><code>\int_{a}^{b} f dx</code> -&gt; [“Integrate”, f, [x, a, b]]
-<code>\int_{c}^{d} \int_{a}^{b} f dxdy</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”,
-“b”], [“Triple”, “y”, “c”, “d”]]</p>
-<p><code>\int_{a}^{b}\frac{dx}{f}</code> -&gt; [“Integrate”, [“Power”, “f”, -1], [“Triple”, “x”,
-“a”, “b”]]</p>
-<p><code>\int_{a}^{b}dx f</code> -&gt; [“Integrate”, “f”, [“Triple”, “x”, “a”, “b”]]</p>
-<p>If <code>[a, b]</code> are numeric, numeric methods are used to approximate the integral.</p>
-<h2 id="domain-integral" tabindex="-1">Domain Integral</h2>
-<p><code>\int_{x\in D}</code> -&gt; [“Integrate”, f, [“In”, x, D]]</p>
-<h3 id="contour-integral" tabindex="-1">Contour Integral</h3>
-<p><code>\oint f dx</code> -&gt; <code>[&quot;ContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
-<p><code>\varointclockwise f dx</code> -&gt; <code>[&quot;ClockwiseContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
-<p><code>\ointctrclockwise f dx</code> -&gt; <code>[&quot;CounterclockwiseContourIntegral&quot;, &quot;f&quot;, &quot;x&quot;]</code></p>
-<p><code>\oiint f ds</code> -&gt; <code>[&quot;DoubleCountourIntegral&quot;, &quot;f&quot;, &quot;s&quot;]</code> : integral over closed
-surfaces</p>
-<p><code>\oiiint</code> f dv -&gt; <code>[&quot;TripleCountourIntegral&quot;, &quot;f&quot;, &quot;v&quot;]</code> : integral over closed
-volumes</p>
-<p><code>\intclockwise</code></p>
-<p><code>\intctrclockwise</code></p>
-<p><code>\iint</code></p>
-<p><code>\iiint</code></p>
+</div></div> 
 
 
 
@@ -2422,14 +2450,14 @@ volumes</p>
         
 
 
-        <meta itemprop="datePublished" content="September 15, 2023">
+        <meta itemprop="datePublished" content="September 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-15">September 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2451,7 +2479,7 @@ volumes</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a></li><li><a href="#leibniz-notation">Leibniz Notation</a></li><li><a href="#Integrate">Integrate</a></li><li><a href="#euler-modified-notation">Euler Modified Notation</a></li><li><a href="#D">D</a></li><li><a href="#newton-notation-(%40todo)">Newton Notation (@todo)</a><ol><li><a href="#integral">Integral</a></li></ol></li><li><a href="#lagrange-notation">Lagrange Notation</a></li><li><a href="#indefinite-integral">Indefinite Integral</a></li><li><a href="#definite-integral">Definite Integral</a></li><li><a href="#domain-integral">Domain Integral</a><ol><li><a href="#contour-integral">Contour Integral</a></li></ol></li></ol>
+        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Integrate">Integrate</a></li><li><a href="#Derivative">Derivative</a></li></ol></li></ol>
       </div>
     
                             

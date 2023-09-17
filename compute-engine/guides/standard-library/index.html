@@ -2256,9 +2256,10 @@
 
 <h1 id="standard-library" tabindex="-1">Standard Library</h1>
 <p>The <strong>standard library</strong> defines the <strong>vocabulary</strong> used by a MathJSON
-expression. This dictionary is independent of the syntax used to parse/serialize
-from another language but it defines the meaning of the symbols used in a
-MathJSON expression.</p>
+expression.</p>
+<p>This library defines the meaning of the identifiers used in a MathJSON
+expression. It is independent of the syntax used to parse/serialize from another
+language such as LaTeX.</p>
 <p>A library contains definitions for symbols and functions, for example:</p>
 <p>For example:</p>
 <ul>
@@ -2273,52 +2274,15 @@ for example: <em>“x is a positive integer”</em>.</p>
 <p>The codomain of a function indicates the set of values that a function maps to,
 or the domain of the “result” of the function.</p>
 <p>Each entry in the symbol dictionary indicate the domain of the symbol, and for
-functions its codomain.</p>
-<h2 id="functions" tabindex="-1">Functions</h2>
-<p>A MathJSON function such as <code>Add</code>, <code>Sin</code> or <code>Equal</code> can be used for a variety of
-purposes. It can be helpful to classify them in some broad categories:</p>
+functions its codomain (the domain of the result of evaluating the function).</p>
+<h2 id="topics" tabindex="-1">Topics</h2>
+<p>The standard library is organized by topics, each topic is a separate page in
+the documentation.</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Category</th>
-<th style="text-align:left"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><span class='tags'><span class='tag inert'>inert</span></span></td>
-<td style="text-align:left">The result of evaluating an inert function is the function and its arguments. This is more useful than it sounds: it can be used to ‘tag’ an input an indicate how it should be interpreted. Examples: <code>Hold</code> <code>Evaluate</code> <code>Complex</code> <code>LatexString</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><span class='tags'><span class='tag constructor'>constructor</span></span></td>
-<td style="text-align:left">A function that takes a variety of inputs and return a new kind of object. Examples: <code>Symbol</code> <code>String</code> <code>Interval</code> <code>Range</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><span class='tags'><span class='tag numeric'>numeric</span></span></td>
-<td style="text-align:left">A function whose arguments and return value are all numeric. Examples: <code>Add</code> <code>Sin</code> <code>Exp</code> <code>Sqrt</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>predicate</span></span></td>
-<td style="text-align:left">A predicate function returns a boolean. It can evaluate if a proposition is true or false. Examples: <code>Equal</code> <code>IsPrime</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><span class='tags'><span class='tag predicate'>logical</span></span></td>
-<td style="text-align:left">A predicate whose arguments are also booleans. Examples: <code>And</code> <code>Not</code> <code>Or</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="custom-library" tabindex="-1">Custom Library</h2>
-<p><strong>To define a custom syntax</strong>, provide custom syntax and custom symbol
-dictionaries when creating a <code>ComputeEngine</code> instance.</p>
-<p>If no custom dictionaries are provided, the default ones are used. They are
-organized by topic as follow:</p>
-<div class=symbols-table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Dictionary</th>
+<th style="text-align:left">Topic</th>
 <th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
@@ -2333,11 +2297,15 @@ organized by topic as follow:</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/collections/">Collections</a></td>
-<td style="text-align:left"><code>Sequence</code> <code>List</code> <code>Dictionary</code> <code>Set</code>…</td>
+<td style="text-align:left"><code>List</code> <code>Reverse</code> <code>Filter</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/complex/">Complex</a></td>
+<td style="text-align:left"><code>Real</code> <code>Conjugate</code>, <code>ComplexRoots</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/control-structures/">Control Structures</a></td>
-<td style="text-align:left"><code>If</code> <code>Block</code> <code>Loop</code> <code>Sum</code>  …</td>
+<td style="text-align:left"><code>If</code> <code>Block</code> <code>Loop</code> <code>Sum</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/core/">Core</a></td>
@@ -2349,7 +2317,7 @@ organized by topic as follow:</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/functions/">Functions</a></td>
-<td style="text-align:left"><code>Function</code> <code>Apply</code> <code>Return</code>  …</td>
+<td style="text-align:left"><code>Function</code> <code>Apply</code> <code>Return</code> …</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/logic/">Logic</a></td>
@@ -2361,7 +2329,11 @@ organized by topic as follow:</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
-<td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
+<td style="text-align:left"><code>Gamma</code> <code>Factorial</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/statistics/">Statistics</a></td>
+<td style="text-align:left"><code>StandardDeviation</code> <code>Mean</code> <code>Erf</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/styling/">Styling</a></td>
@@ -2374,6 +2346,10 @@ organized by topic as follow:</p>
 </tbody>
 </table>
 </div>
+<h2 id="custom-library" tabindex="-1">Custom Library</h2>
+<div class='read-more'><a href="undefined"> Read more about
+<a href="/compute-compute-engine/guides/augmenting/">Adding New Definitions</a>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 
@@ -2385,14 +2361,14 @@ organized by topic as follow:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 15, 2023">
+        <meta itemprop="datePublished" content="September 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-15">September 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

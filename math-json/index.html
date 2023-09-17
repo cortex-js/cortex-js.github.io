@@ -2783,9 +2783,9 @@ an underscore, followed by zero or more letters, digits and underscores.</p>
 for whole words, for example: <code>&quot;半径&quot;</code> (radius), “מְהִירוּת” (speed), “直徑”
 (diameter) or “सतह” (surface).</p>
 <p>Avoid mixing Unicode characters from different scripts in the same identifier.</p>
-<p>Do not include bidi markers such as LTR <strong>U+200E</strong> or RTL <strong>U+200F</strong> in identifiers.
-LTR and RTL marks should be added as needed by the client displaying the
-identifier. They should be ignored when parsing identifiers.</p>
+<p>Do not include bidi markers such as LTR <strong>U+200E</strong> or RTL <strong>U+200F</strong> in
+identifiers. LTR and RTL marks should be added as needed by the client
+displaying the identifier. They should be ignored when parsing identifiers.</p>
 <p>Avoid visual ambiguity issues that might arise with some Unicode characters. For
 example:</p>
 <ul>
@@ -3596,7 +3596,7 @@ already provides relevant definitions.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Dictionary</th>
+<th style="text-align:left">Topic</th>
 <th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
@@ -3611,7 +3611,11 @@ already provides relevant definitions.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/collections/">Collections</a></td>
-<td style="text-align:left"><code>Sequence</code> <code>List</code> <code>Dictionary</code> <code>Set</code>…</td>
+<td style="text-align:left"><code>List</code> <code>Reverse</code> <code>Filter</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/complex/">Complex</a></td>
+<td style="text-align:left"><code>Real</code> <code>Conjugate</code>, <code>ComplexRoots</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/control-structures/">Control Structures</a></td>
@@ -3639,7 +3643,11 @@ already provides relevant definitions.</p>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
-<td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
+<td style="text-align:left"><code>Gamma</code> <code>Factorial</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/statistics/">Statistics</a></td>
+<td style="text-align:left"><code>StandardDeviation</code> <code>Mean</code> <code>Erf</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/styling/">Styling</a></td>
@@ -3652,10 +3660,13 @@ already provides relevant definitions.</p>
 </tbody>
 </table>
 </div>
-<p>If you need to define a new function, avoid using a name already defined in the
-Standard Library.</p>
+<p>When defining a new function, avoid using a name already defined in the Standard
+Library.</p>
 <div class='read-more'><a href="/compute-engine/guides/standard-library/"> Read more about the
 <strong>MathJSON Standard Library</strong>.<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="undefined"> Read more about
+<a href="/compute-compute-engine/guides/augmenting/">Adding New Definitions</a>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 
@@ -3667,14 +3678,14 @@ Standard Library.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 15, 2023">
+        <meta itemprop="datePublished" content="September 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-15">September 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

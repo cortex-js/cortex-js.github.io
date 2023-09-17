@@ -2295,34 +2295,33 @@
 
 
 
-<p>An evaluation with <code>expr.evaluate()</code> preserves <strong>exact values</strong>. Exact
-values are:</p>
+<p>An evaluation with <code>expr.evaluate()</code> preserves <strong>exact values</strong>.</p>
+<p>Exact values are:</p>
 <ul>
 <li>integers and rationals</li>
 <li>square roots of integers and rationals</li>
 <li>constants such as <code>ExponentialE</code> and <code>Pi</code></li>
 </ul>
-<p>If one of the arguments is not an exact value the expression is evaluated
-as a <strong>numeric approximation</strong>.</p>
+<p>If one of the arguments is not an exact value the expression is evaluated as a
+<strong>numeric approximation</strong>.</p>
 <p><strong>To obtain a numeric approximation, use <code>expr.N()</code></strong>. If <code>expr.N()</code> cannot
 provide a numeric evaluation, a symbolic representation of the partially
 evaluated expression is returned.</p>
-<p>The value of <code>N()</code> is a boxed expression. The <code>numericValue</code> property is
-either a machine number, a <code>Decimal</code> object or a <code>Complex</code> object,
-depending on the <code>numericMode</code> of the compute engine, or <code>null</code> if the
-result is not a number.</p>
-<p><strong>To check if the <code>numericValue</code> is a <code>Decimal</code></strong> use <code>ce.isBignum(expr.N().numericValue)</code>.</p>
-<p><strong>To check if the <code>numericValue</code> is a <code>Complex</code></strong> use <code>ce.isComplex(expr.N().numericValue)</code>.</p>
+<p>The value of <code>N()</code> is a boxed expression. The <code>numericValue</code> property is either
+a machine number, a <code>Decimal</code> object or a <code>Complex</code> object, depending on the
+<code>numericMode</code> of the compute engine, or <code>null</code> if the result is not a number.</p>
+<p><strong>To check if the <code>numericValue</code> is a <code>Decimal</code></strong> use
+<code>ce.isBignum(expr.N().numericValue)</code>.</p>
+<p><strong>To check if the <code>numericValue</code> is a <code>Complex</code></strong> use
+<code>ce.isComplex(expr.N().numericValue)</code>.</p>
 <p><strong>To access a JavaScript machine number approximation of the result</strong> use
-<code>valueOf()</code>. If <code>numericValue</code> is a machine number, a <code>Decimal</code> object, or
-a rational, <code>valueOf()</code> will return a machine number approximation. Otherwise
-it returns a string serialization of the MathJSON representation of the
-expression.</p>
+<code>valueOf()</code>. If <code>numericValue</code> is a machine number, a <code>Decimal</code> object, or a
+rational, <code>valueOf()</code> will return a machine number approximation. Otherwise it
+returns a string serialization of the MathJSON representation of the expression.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;11 + \\sqrt{x}&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-title function_">valueOf</span>());
 <span class="hljs-comment">// ➔ &quot;[&quot;Add&quot;,11,[&quot;Sqrt&quot;,&quot;x&quot;]]&quot;</span>
 <span class="hljs-comment">// Note: if the result is not a number, valueOf() returns a string</span>
 <span class="hljs-comment">// representation of the expression</span>
-
 
 <span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>();
 
@@ -2337,76 +2336,77 @@ expression.</p>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ [Decimal]</span>
-<span class="hljs-comment">// Note: depending on the numeric mode, this may be a machine number, </span>
+<span class="hljs-comment">// Note: depending on the numeric mode, this may be a machine number,</span>
 <span class="hljs-comment">// a Decimal object or a Complex object</span>
 
 <span class="hljs-keyword">if</span> (ce.<span class="hljs-title function_">isBignum</span>(expr.<span class="hljs-property">numericValue</span>)) {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The numeric value is a Decimal object&#x27;</span>, 
-      expr.<span class="hljs-property">numericValue</span>.<span class="hljs-title function_">toNumber</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">&#x27;The numeric value is a Decimal object&#x27;</span>,
+    expr.<span class="hljs-property">numericValue</span>.<span class="hljs-title function_">toNumber</span>()
+  );
 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ce.<span class="hljs-title function_">isComplex</span>(expr.<span class="hljs-property">numericValue</span>)) {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The numeric value is a Complex object&#x27;</span>, 
-      expr.<span class="hljs-property">numericValue</span>.<span class="hljs-property">re</span>, 
-      expr.<span class="hljs-property">numericValue</span>.<span class="hljs-property">im</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">&#x27;The numeric value is a Complex object&#x27;</span>,
+    expr.<span class="hljs-property">numericValue</span>.<span class="hljs-property">re</span>,
+    expr.<span class="hljs-property">numericValue</span>.<span class="hljs-property">im</span>
+  );
 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(expr.<span class="hljs-property">numericValue</span>)) {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The numeric value is a rational&#x27;</span>, 
-      expr.<span class="hljs-property">numericValue</span>[<span class="hljs-number">0</span>], 
-      expr.<span class="hljs-property">numericValue</span>[<span class="hljs-number">1</span>]);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">&#x27;The numeric value is a rational&#x27;</span>,
+    expr.<span class="hljs-property">numericValue</span>[<span class="hljs-number">0</span>],
+    expr.<span class="hljs-property">numericValue</span>[<span class="hljs-number">1</span>]
+  );
 } <span class="hljs-keyword">else</span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;The numeric value is a machine number&#x27;</span>, expr.<span class="hljs-property">numericValue</span>);
 }
-
 </code></pre>
 <div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
 <strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="repeated-evaluation" tabindex="-1">Repeated Evaluation</h2>
-<p><strong>To repeatedly evaluate an expression</strong> use <code>ce.set()</code> to change the value
-of variables. <code>ce.set()</code> changes the value associated with one or more
-variables in the current scope.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
+<p><strong>To repeatedly evaluate an expression</strong> use <code>ce.set()</code> to change the value of
+variables. <code>ce.set()</code> changes the value associated with one or more variables in
+the current scope.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2+4x+2&#x27;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
-  ce.<span class="hljs-title function_">set</span>({x : x});
+  ce.<span class="hljs-title function_">set</span>({ <span class="hljs-attr">x</span>: x });
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.N().valueOf()}</span>`</span>);
 }
 </code></pre>
-<p>You can also use <code>expr.subs()</code>, but this will create a brand new expression
-on each iteration, and will be much slower.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
+<p>You can also use <code>expr.subs()</code>, but this will create a brand new expression on
+each iteration, and will be much slower.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2+4x+2&#x27;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({x: x}).N().valueOf()}</span>`</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({ x: x }).N().valueOf()}</span>`</span>);
 }
 </code></pre>
 <p><strong>To reset a variable to be unbound to a value</strong> use <code>ce.set()</code></p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">set</span>({<span class="hljs-attr">x</span>: <span class="hljs-literal">null</span>});
+<pre><code class="language-js">ce.<span class="hljs-title function_">set</span>({ <span class="hljs-attr">x</span>: <span class="hljs-literal">null</span> });
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;3x^2+4x+c&quot;</span>
 </code></pre>
 <p>You can change the value of a variable by setting its <code>value</code> property:</p>
-<pre><code class="language-ts">
-ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
+<pre><code class="language-ts">ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 
 ce.<span class="hljs-title function_">symbol</span>(<span class="hljs-string">&#x27;x&#x27;</span>).<span class="hljs-property">value</span> = <span class="hljs-literal">undefined</span>;
-
 </code></pre>
 <p>If performance is important, you can compile the expression to a JavaScript
 function.</p>
 <h2 id="compiling" tabindex="-1">Compiling</h2>
 <p><strong>To get a compiled version of an expression</strong> use the <code>expr.compile()</code> method:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3x^2+4x+2&quot;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2+4x+2&#x27;</span>);
 <span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) 
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({x}));
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({ x }));
 </code></pre>
-<p class="notice--info">The syntax <code>{x}</code> is a shortcut for <code>{&quot;x&quot;: x}</code>, in other words it defines
-an argument named <code>&quot;x&quot;</code> (which is used the expression <code>expr</code>) as having
-the value of the JavaScript variable <code>x</code> (which is used in the for loop).</p>
-<p>This will usually result in a much faster evaluation than using <code>expr.N()</code>
-but this approach has some limitations.</p>
-<div class='read-more'><a href="/compute-engine/guides/compiling/">
-Read more about <strong>Compiling Expressions to JavaScript</strong>
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p class="notice--info">The syntax <code>{x}</code> is a shortcut for <code>{&quot;x&quot;: x}</code>, in other words it defines an
+argument named <code>&quot;x&quot;</code> (which is used the expression <code>expr</code>) as having the value
+of the JavaScript variable <code>x</code> (which is used in the for loop).</p>
+<p>This will usually result in a much faster evaluation than using <code>expr.N()</code> but
+this approach has some limitations.</p>
+<div class='read-more'><a href="/compute-engine/guides/compiling/"> Read more about <strong>Compiling
+Expressions to JavaScript</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="numeric-modes" tabindex="-1">Numeric Modes</h2>
 <p>Four numeric modes may be used to perform numeric evaluations with the Compute
 Engine: <code>&quot;machine&quot;</code> <code>&quot;bignum&quot;</code> <code>&quot;complex&quot;</code> and <code>&quot;auto&quot;</code>. The default mode is
@@ -2426,8 +2426,8 @@ involving the specified number types:</p>
 <li><svg class="icon1em" style="color:var(--green-700)"><use xlink:href="/assets/icons.svg#circle-check"></use></svg> indicate that no transformation is done</li>
 <li><code>upgraded</code> indicate that a transformation is done without loss of precision</li>
 <li><code>downgraded</code> indicate that a transformation is done with may result in a loss
-of precision, a rounding towards 0 if underflow occurs, or a rounding
-towards \( \pm\infty \) if overflow occurs.</li>
+of precision, a rounding towards 0 if underflow occurs, or a rounding towards
+\( \pm\infty \) if overflow occurs.</li>
 </ul>
 <div class="symbols-table first-column-header">
 <table>
@@ -2509,8 +2509,9 @@ Arithmetic”</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"><
 <h3 id="bignum-numeric-mode" tabindex="-1">Bignum Numeric Mode</h3>
 <p>In the <code>bignum</code> numeric mode, numbers are represented as a string of base-10
 digits and an exponent.</p>
-<p>Bignum numbers have a minimum value of \( \pm 10^{-9\,000\,000\,000\,000\,000} \) and a
-maximum value of \( \pm9.99999\ldots \times  10^{+9\,000\,000\,000\,000\,000} \).</p>
+<p>Bignum numbers have a minimum value of \( \pm
+10^{-9\,000\,000\,000\,000\,000} \) and a maximum value of \(
+\pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} \).</p>
 <p><strong>To change the numeric mode to the <code>bignum</code> mode</strong>, use
 <code>engine.numericMode = &quot;bignum&quot;</code>.</p>
 <pre><code class="language-ts">ce.<span class="hljs-property">numericMode</span> = <span class="hljs-string">&#x27;bignum&#x27;</span>;
@@ -2548,8 +2549,8 @@ MathJSON number that looks like this:</p>
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <div class='read-more'><a href="https://mikemcl.github.io/decimal.js/"> Support for the <code>bignum</code>
-mode is implemented using the <strong>decimal.js</strong> library. This library is built-in with the Compute Engine.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+mode is implemented using the <strong>decimal.js</strong> library. This library
+is built-in with the Compute Engine. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h3 id="complex-numeric-mode" tabindex="-1">Complex Numeric Mode</h3>
 <p>The <code>complex</code> numeric mode can represent complex numbers as a pair of real and
 imaginary components. The real and imaginary components are stored as 64-bit
@@ -2562,13 +2563,15 @@ This is a convenient shorthand for
 <code>engine.numericMode = &quot;complex&quot;</code>.</p>
 <p>Changing the numeric mode to <code>complex</code> automatically sets the precision to 15.</p>
 <div class='read-more'><a href="https://github.com/infusion/Complex.js"> Support for the
-<code>complex</code> mode is implemented using the <strong>Complex.js</strong> library. This library is built-in with the Compute Engine.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<code>complex</code> mode is implemented using the <strong>Complex.js</strong> library.
+This library is built-in with the Compute Engine. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h3 id="auto-numeric-mode" tabindex="-1"><code>Auto</code> Numeric Mode</h3>
 <p>When using the <code>auto</code> numeric mode, calculations are performed using bignum
 numbers.</p>
-<p>Computations which result in a complex number will return a complex number as
-a <code>Complex</code> object.</p>
+<p>Computations which result in a complex number will return a complex number as a
+<code>Complex</code> object.</p>
+<p>To check the type of the result, use <code>ce.isComplex(expr.N().numericValue)</code> and
+<code>ce.isBignum(expr.N().numericValue)</code>.</p>
 <h2 id="simplifying-before-evaluating" tabindex="-1">Simplifying Before Evaluating</h2>
 <p><strong>When using <code>expr.N()</code>, no rewriting of the expression is done before it is
 evaluated.</strong></p>
@@ -2598,28 +2601,41 @@ replace a number of a small magnitude with the exact integer 0.</p>
 <p>It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.</p>
 <h2 id="numeric-functions" tabindex="-1">Numeric Functions</h2>
-<p>The dictionaries below can provide numeric evaluations for their numeric
-functions:</p>
+<p>The topics below from the
+<a href="/compute-engine/guides/standard-library/">Standard Library</a> can provide numeric
+evaluations for their numeric functions:</p>
 <div class=symbols-table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left"></th>
-<th style="text-align:left"></th>
+<th style="text-align:left">Topic</th>
+<th style="text-align:left">Symbols/Functions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/arithmetic/">Arithmetic</a></td>
-<td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Sqrt</code> <code>Log</code> <code>Abs</code> <code>Round</code>…</td>
+<td style="text-align:left"><code>Add</code> <code>Multiply</code> <code>Power</code> <code>Exp</code> <code>Log</code> <code>ExponentialE</code> <code>ImaginaryUnit</code>…</td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
-<td style="text-align:left"><code>Sin</code> <code>Cos</code> <code>Tan</code> <code>Sinh</code> <code>Arcsin</code>…</td>
+<td style="text-align:left"><a href="/compute-engine/reference/calculus/">Calculus</a></td>
+<td style="text-align:left"><code>Derive</code> <code>Integrate</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/complex/">Complex</a></td>
+<td style="text-align:left"><code>Real</code> <code>Conjugate</code>, <code>ComplexRoots</code>…</td>
 </tr>
 <tr>
 <td style="text-align:left"><a href="/compute-engine/reference/special-functions/">Special Functions</a></td>
-<td style="text-align:left"><code>Erf</code> <code>Gamma</code> <code>Factorial</code>…</td>
+<td style="text-align:left"><code>Gamma</code> <code>Factorial</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/statistics/">Statistics</a></td>
+<td style="text-align:left"><code>StandardDeviation</code> <code>Mean</code> <code>Erf</code>…</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/compute-engine/reference/trigonometry/">Trigonometry</a></td>
+<td style="text-align:left"><code>Pi</code> <code>Cos</code> <code>Sin</code> <code>Tan</code>…</td>
 </tr>
 </tbody>
 </table>
@@ -2635,14 +2651,14 @@ functions:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 15, 2023">
+        <meta itemprop="datePublished" content="September 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-15">September 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

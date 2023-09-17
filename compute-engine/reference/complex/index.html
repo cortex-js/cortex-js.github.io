@@ -2317,34 +2317,70 @@
 <h3 class="visually-hidden" id="Real" tabindex="-1">Real</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Real</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">\Re(3+4\imaginaryI)</div><div class="display">\[ \Re(3+4\imaginaryI) \]</div></div>
 <p>Evaluate to the real part of a complex number.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Real&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 3</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Imaginary" tabindex="-1">Imaginary</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Imaginary</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">\Im(3+4\imaginaryI)</div><div class="display">\[ \Im(3+4\imaginaryI) \]</div></div>
-<p>Evaluate to the imaginary part of a complex number.</p>
+<p>Evaluate to the imaginary part of a complex number. If <em>z</em> is a real number, the
+imaginary part is zero.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Imaginary&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 4</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Imaginary&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 0</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Conjugate" tabindex="-1">Conjugate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Conjugate</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">z^\ast</div><div class="display">\[ z^\ast \]</div></div>
-<p>Evaluate to the complex conjugate of a complex number.</p>
+<p>Evaluate to the complex conjugate of a complex number. The conjugates of complex
+numbers give the mirror image of the complex number about the real axis.</p>
+<p>\[ z^\ast = \Re z - \imaginaryI \Im z \]</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Conjugate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Complex&quot;, 3, -4]</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Abs" tabindex="-1">Abs</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Abs</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">|z|</div><div class="display">\[ |z| \]</div></div>
 <div class='latex'><div class="source">\operatorname{abs}(z)</div><div class="display">\[ \operatorname{abs}(z) \]</div></div>
 <p>Evaluate to the magnitude of a complex number.</p>
-<p>The magnitude of a complex number is the distance from the origin to the point representing the complex number in the complex plane.</p>
+<p>The <strong>magnitude</strong> of a complex number is the distance from the origin to the
+point representing the complex number in the complex plane.</p>
+<p>\[ |z| = \sqrt{(\Im z)^2 + (\Re z)^2} \]</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Abs&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 5</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Arg" tabindex="-1">Arg</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Arg</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">\arg(z)</div><div class="display">\[ \arg(z) \]</div></div>
 <p>Evaluate to the argument of a complex number.</p>
-<p>The argument of a complex number is the angle between the positive real axis and the line joining the origin to the point representing the complex number in the complex plane.</p>
+<p>The <strong>argument</strong> of a complex number is the angle between the positive real axis
+and the line joining the origin to the point representing the complex number in
+the complex plane.</p>
+<p>\[ \arg z = \tan^{-1} \frac{\Im z}{\Re z} \]</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Arg&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 0.9272952180016122</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="AbsArg" tabindex="-1">AbsArg</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>AbsArg</strong>&quot;, <em>z</em>]</p>
-<p>Evaluate to the a tuple of the magnitude and argument of a complex number.</p>
+<p>Return a tuple of the magnitude and argument of a complex number.</p>
 <p>This corresponds to the polar representation of a complex number.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;AbsArg&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Complex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [5, 0.9272952180016122]</span>
+</code></pre>
+<p>\[ 3+4\imaginaryI = 5 (\cos 0.9272 + \imaginaryI \sin 0.9272) = 5
+\exponentialE^{0.9272}\]</p>
 </div></div>
 <h3 class="visually-hidden" id="ComplexRoots" tabindex="-1">ComplexRoots</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>ComplexRoots</strong>&quot;, <em>z</em>, <em>n</em>]</p>
 <div class='latex'><div class="source">\operatorname{ComplexRoot}(1, 3)</div><div class="display">\[ \operatorname{ComplexRoot}(1, 3) \]</div></div>
-<p>Evaluate to a list of the n<sup>th</sup> roots of a number <em>z</em>.</p>
+<p>Retrurn a list of the n<sup>th</sup> roots of a number <em>z</em>.</p>
 <p>The complex roots of a number are the solutions of the equation \(z^n = a\).</p>
+<ul>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Nth_root">n<sup>th</sup> root</a></li>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Root_of_unity">Root of unity</a></li>
+<li>Wolfram MathWorld: <a href="http://mathworld.wolfram.com/nthRoot.html">Root of unity</a></li>
+</ul>
 <pre><code class="language-json"><span class="hljs-comment">// The three complex roots of unity (1)</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;ComplexRoots&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [1, -1/2 + sqrt(3)/2, -1/2 - sqrt(3)/2]</span>
@@ -2361,14 +2397,14 @@
         
 
 
-        <meta itemprop="datePublished" content="September 15, 2023">
+        <meta itemprop="datePublished" content="September 17, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-15">September 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
