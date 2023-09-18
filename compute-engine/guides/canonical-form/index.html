@@ -2355,7 +2355,7 @@ is applied to the internal representation before being returned, for example
 <span class="hljs-comment">// This is a rational without modifying the arguments, so a `[&quot;Rational&quot;]`</span>
 <span class="hljs-comment">// expression is returned</span>
 
-ce.<span class="hljs-property">jsonSerializationOptions</span> = { <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Rational&#x27;</span>] };
+ce.<span class="hljs-property">jsonSerializationOptions</span> = { <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&quot;Rational&quot;</span>] };
 ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{5}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, 5]</span>
 <span class="hljs-comment">// We&#x27;ve excluded `[&quot;Rational&quot;]` expressions, so it is interepreted as a</span>
@@ -2366,7 +2366,7 @@ Compute Engine instance. However, do not rely on the canonical form as future
 versions of the Compute Engine could provide a different result.</p>
 <p><strong>To obtain the canonical representation of an non-canonical expression</strong>, use
 the <code>expr.canonical</code> property.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">3</span>]).<span class="hljs-property">canonical</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">3</span>]).<span class="hljs-property">canonical</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 5, &quot;x&quot;]</span>
 </code></pre>
 <p><strong>To check if an expression is canonical</strong> use <code>expr.isCanonical</code>.</p>

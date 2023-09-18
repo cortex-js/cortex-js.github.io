@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li><li><a href="#Return">Return</a></li></ol></li></ol>
+        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
       </div>
       
                               
@@ -2314,6 +2314,10 @@ The wildcard <code>_</code> is a shorthand for <code>_1</code>, the first parame
 <p>In the example below, both the function and its parameters are anonymous.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
+<div class='read-more'><a href="/compute-engine/reference/control-structures/">The examples in
+this section define functions as a simple expression, but functions can include
+more complex control structures, including blocks, loops and conditionals. Learn
+more about <strong>control structures</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="evaluating-an-anonymous-function" tabindex="-1">Evaluating an Anonymous Function</h2>
 <p>To apply a function to some arguments, use an <code>[&quot;Apply&quot;]</code> expression.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
@@ -2373,12 +2377,6 @@ are replaced by the wildcards.</p>
 <span class="hljs-comment">// ➔ 9</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Return" tabindex="-1">Return</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Return</strong>&quot;, <em>value</em>]</p>
-<p>If in a <code>[&quot;Function&quot;]</code> expression, interupts the evaluation of the function. The
-value of the <code>[&quot;Function&quot;]</code> expression is <em>value</em></p>
-<p>The <code>[&quot;Return&quot;]</code> expression is useful when used with more complex functions that
-have multiple exit points, conditional logic, loops, etc…</p>
-</div></div>
 
 
 
@@ -2419,7 +2417,7 @@ have multiple exit points, conditional logic, loops, etc…</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li><li><a href="#Return">Return</a></li></ol></li></ol>
+        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
       </div>
     
                             

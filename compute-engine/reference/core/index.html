@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#assignment%2C-declaration-and-assumptions">Assignment, Declaration and Assumptions</a><ol><li><a href="#Assume">Assume</a></li><li><a href="#Let">Let</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Html">Html</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li><li><a href="#LatexTokens">LatexTokens</a></li><li><a href="#Parse">Parse</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declare%2C-assign-and-assume">Declare, Assign and Assume</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#expression-inspection">Expression Inspection</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Head">Head</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
       
                               
@@ -2295,9 +2295,11 @@
 
 
 
-<section id='constants'>
+<p>The functions described in this section are part of the <strong>core</strong> of the Compute
+Engine.</p>
+<section id="constants">
 <h2 id="constants" tabindex="-1">Constants</h2>
-<p>The constants below are <strong>inert</strong>. They are used as tokens and have no
+<p>The symbols below are <strong>inert constants</strong>. They are used as tags and have no
 value other than themselves.</p>
 <table>
 <thead>
@@ -2309,225 +2311,137 @@ value other than themselves.</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>All</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span> All the possible values apply</td>
+<td style="text-align:left">All the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>None</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>None of the possible values apply</td>
+<td style="text-align:left">None of the possible values apply</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Nothing</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>An <strong>optional</strong> expression is not present. Used in sparse list to indicate  skipped elements.</td>
+<td style="text-align:left">An <strong>optional</strong> expression is not present. Used in sparse list to indicate skipped elements.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Undefined</code></td>
-<td style="text-align:left"><span class='tags float-right'><span class='tag inert'>inert</span></span>The result is not defined. For example, the domain of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
+<td style="text-align:left">The result is not defined. For example, the domain of an unknown symbol is <code>Undefined</code>.<br>Note that for numbers, the equivalent is <code>NaN</code> (Not a Number) and for booleans, <code>Maybe</code></td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">LaTeX</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;List&quot;, 2, &quot;Nothing&quot;, 3]</code></td>
-<td style="text-align:left">\[\lbrack 2, ,3 \rbrack\]</td>
-</tr>
-</tbody>
-</table>
+<div class='latex'><div class="source">\lbrack 2, ,3 \rbrack </div><div class="display">\[ \lbrack 2, ,3 \rbrack  \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Nothing&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+</code></pre>
 </section>
-<h2 id="assignment%2C-declaration-and-assumptions" tabindex="-1">Assignment, Declaration and Assumptions</h2>
-<h3 class="visually-hidden" id="Assume" tabindex="-1">Assume</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
-<p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>symbol</em>, <em>domain</em>]</p>
-<p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>predicate</em>]</p>
-<p>The predicate is an expression that evaluates to <code>True</code> or `False. The symbols
-or functions in the predicate expression may be free (i.e. not have a definition).</p>
-<p>The predicate can take the form of an equality, an inequality or a membership
-expression:</p>
+<h2 id="declare%2C-assign-and-assume" tabindex="-1">Declare, Assign and Assume</h2>
+<h3 class="visually-hidden" id="Declare" tabindex="-1">Declare</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Declare</strong>&quot;, <em>identifier</em>, <em>domain</em>]</p>
+<p class="signature">[&quot;<strong>Declare</strong>&quot;, <em>identifier</em>, <em>domain</em>, <em>value</em>]</p>
+<p>Declare a new identifier in the current scope, and set its value and domain.</p>
+<p>If the identifier already has a definition in the current scope, evaluate to an
+error, otherwise evaluate to <code>value</code>.</p>
+<p><strong>To change the value of an existing identifier</strong>, use a <code>[&quot;Set&quot;]</code> expression.</p>
+<div class='read-more'><a href="/compute-engine/guides/augmenting/">Read more about using
+<code>ce.declare()</code> to declare a new symbol or function. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
+<h3 class="visually-hidden" id="Assign" tabindex="-1">Assign</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Assign</strong>&quot;, <em>identifier</em>, <em>value</em>]</p>
+<p>Set the value of <code>identifier</code> to <code>value</code>.</p>
+<p>If <code>identifier</code> does not exist in the current scope, consider parent
+scopes until a definition for the identifier is found.</p>
+<p>If a definition is found, change the value of the identifier to <code>value</code>
+if the value is compatible with the domain of the identifier. Once set,
+the domain of the identifier cannot be changed.</p>
+<p>If there is no definition for the identifier, add a new definition in the
+current scope, and use the <code>value</code> to infer the domain of the identifier.</p>
+<div class='read-more'><a href="/compute-engine/guides/augmenting/">Read more about using <code>Set</code>
+to change the value of a symbol or function. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
+<h3 class="visually-hidden" id="Assume" tabindex="-1">Assume</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Assume</strong>&quot;, <em>predicate</em>]</p>
+<p>The predicate is an expression that evaluates to <code>True</code> or <code>False</code>.</p>
+<p>The identifiers in the predicate expression may be free, i.e. they may not have
+have been declared yet. Asserting an assumption does not declare the identifiers
+in the predicate.</p>
+<p>The predicate can take the form of:</p>
 <ul>
-<li><code>[&quot;Assume&quot;, [&quot;Equal&quot;, &quot;x&quot;, 3]]</code></li>
-<li><code>[&quot;Assume&quot;, [&quot;Greater&quot;, &quot;x&quot;, 0]]</code></li>
-<li><code>[&quot;Assume&quot;, [&quot;Element&quot;, &quot;x&quot;, &quot;Integer&quot;]]</code></li>
+<li>an equality: <code>[&quot;Assume&quot;, [&quot;Equal&quot;, &quot;x&quot;, 3]]</code></li>
+<li>an inequality: <code>[&quot;Assume&quot;, [&quot;Greater&quot;, &quot;x&quot;, 0]]</code></li>
+<li>a membership expression: <code>[&quot;Assume&quot;, [&quot;Element&quot;, &quot;x&quot;, &quot;Integer&quot;]]</code></li>
 </ul>
-</div></div> 
-<h3 class="visually-hidden" id="Let" tabindex="-1">Let</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Let</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
-<p class="signature">[&quot;<strong>Let</strong>&quot;, <em>symbol</em>, <em>value</em>, <em>domain</em>]</p>
-<p>Define a new symbol in the current scope, and set its value and domain.
-If <em><kbd>domain</kbd></em> is not provided, the domain is inferred based on the value.</p>
-<p>If the symbol already has a definition in the current scope, evaluate to
-an error, otherwise evaluate to <em><kbd>value</kbd></em>. To change the value of
-an existing symbol, use a <code>[&quot;Set&quot;]</code> expression.</p>
-<p><code>[“Let”, <em>function-expression</em>, <em>value</em>]</code></p>
-<p>Define a new function in the current scope. The name of the function and its
-arguments are provided by the function expression. The value is an expression
-using the arguments from <em><kbd>function-expression</kbd></em>.</p>
-<pre><code>// Define f(x) := x + 1
-[&quot;Let&quot;, [&quot;f&quot;, &quot;x&quot;], [&quot;Add&quot;, &quot;x&quot;, 1]]
-</code></pre>
-<p>The arguments of the function expression should be either</p>
-<ul>
-<li>symbols</li>
-<li>pairs of symbol and domain.</li>
-</ul>
-<pre><code>// Define f(n) := 2n, where n is an integer
-[&quot;Let&quot;, [&quot;f&quot;, [&quot;Tuple&quot;, &quot;n&quot;, &quot;Integer]], [&quot;Multiply&quot;, &quot;n&quot;, 2]]
-</code></pre>
-</div></div> 
-<h3 class="visually-hidden" id="Set" tabindex="-1">Set</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Set</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
-<p>Set the value of <em><kbd>symbol</kbd></em> to <em><kbd>value</kbd></em>.</p>
-<p>If <em><kbd>symbol</kbd></em> does not exist in the current context, consider parent
-scopes until a definition for the symbol is found.</p>
-<p>If there is no definition for the symbol, evaluate to an error, otherwise
-evaluate to <em><kbd>value</kbd></em>.  To define a new symbol, use a <code>[&quot;Let&quot;]</code>
-expression.</p>
-</div></div> 
-<section id='core-functions'>
-<h2 id="core-functions" tabindex="-1">Core Functions</h2>
-<h3 class="visually-hidden" id="About" tabindex="-1">About</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>About</strong>&quot;, <em>symbol</em>, <em>value</em>]</p>
-<p>Evaluate to a dictionary containing information about a symbol such as its
-domain, its attributes, its value, etc…</p>
-</div></div> 
+</div></div>
+<h2 id="expression-inspection" tabindex="-1">Expression Inspection</h2>
+<p>The following functions can be used to obtain information about an expression.</p>
+<h3 class="visually-hidden" id="About" tabindex="-1">About</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>About</strong>&quot;, <em>identifier</em>]</p>
+<p>Evaluate to a dictionary expression containing information about an identifier
+such as its domain, its attributes, its value, etc…</p>
+</div></div>
 <h3 class="visually-hidden" id="Domain" tabindex="-1">Domain</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Domain</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the domain of <em>expression</em></p>
-</div></div> 
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Domain&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2.4531</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;RealNumber&quot;</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Head" tabindex="-1">Head</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Head</strong>&quot;, <em>expression</em>]</p>
+<p>Evaluate to the head of <em>expression</em></p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Head&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;Add&quot;</span>
+</code></pre>
+</div></div>
+<section id='core-functions'>
+<h2 id="core-functions" tabindex="-1">Core Functions</h2>
 <h3 class="visually-hidden" id="Evaluate" tabindex="-1">Evaluate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Evaluate</strong>&quot;, <em>expression</em>]</p>
 <p>Apply a sequence of definitions to an expression in order to reduce, simplify
 and calculate its value. Overrides <code>Hold</code> and hold attributes of a function.</p>
-</div></div> 
-<h3 class="visually-hidden" id="Error" tabindex="-1">Error</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Error</strong>&quot;, <em>expression</em>, <em>string</em>, <em>rest</em>]</p>
+</div></div>
+<h3 class="visually-hidden" id="Error" tabindex="-1">Error</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Error</strong>&quot;, <em>error-code</em>, <em>context</em>]</p>
 <p>Tag an expression that could not be interpreted correctly. It may have a syntax
-error, a reference to an unknown symbol or function or some other problem.</p>
-<p>Note that an <code>Error</code> expression can be a sub-expression.</p>
-<p>The second argument is a string indicating the problem.</p>
-<p>The third argument, if present, is an expression describing what could not be parsed.</p>
-</div></div> 
+error, a reference to an unknown identifier or some other problem.</p>
+<p>The first argument, <code>error-code</code> is either a string, or an <code>[&quot;ErrorCode&quot;]</code>
+expression.</p>
+<p>The <em>context</em> is an optional expression that provides additional information
+about the error.</p>
+</div></div>
 <h3 class="visually-hidden" id="Hold" tabindex="-1">Hold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Hold</strong>&quot;, <em>expression</em>]</p>
 <p>Tag an expression that should be kept in an unevaluated form</p>
 </div></div>
-<h3 class="visually-hidden" id="Html" tabindex="-1">Html</h3><div class="defs"><div class="def"><p><code>[“Html”, <em>expr</em>]</code></p>
-<p>Evaluate to a string which is the HTML markup corresponding to the expression.
-If the head of <em>expr</em> is <code>LatexString</code>, <code>Latex</code> or <code>LatexTokens</code>, renders the
-LaTeX to HTML markup</p>
-</div></div> <h3 class="visually-hidden" id="Identity" tabindex="-1">Identity</h3><div class="defs"><div class="def"><p><code>[“Identity”,
-<em>expression</em>]</code></p>
+<h3 class="visually-hidden" id="Identity" tabindex="-1">Identity</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Identity</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to its argument</p>
-</div></div> <h3 class="visually-hidden" id="InverseFunction" tabindex="-1">InverseFunction</h3><div class="defs"><div class="def"><p><code>[“InverseFunction”, <em>expression</em>]</code></p>
+</div></div>
+<h3 class="visually-hidden" id="InverseFunction" tabindex="-1">InverseFunction</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>InverseFunction</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code></p>
-</div></div> 
-<h3 class="visually-hidden" id="Latex" tabindex="-1">Latex</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>expression</em>]</p>
-<p>Evaluate to a <code>LatexString</code> which is the expression serialized to LaTeX</p>
-</div></div> 
-<h3 class="visually-hidden" id="LatexString" tabindex="-1">LatexString</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>string</em>]</p>
-<p>Tag a string as a LaTeX string</p>
-</div></div> 
-<h3 class="visually-hidden" id="LatexTokens" tabindex="-1">LatexTokens</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>LatexTokens</strong>&quot;, …<em>tokens</em>]</p>
-<p>Evaluate to a <code>LatexString</code> made of the concatenation of the token arguments</p>
-</div></div> 
-<h3 class="visually-hidden" id="Parse" tabindex="-1">Parse</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Parse</strong>&quot;, <em>expression</em>]</p>
-<p>If <em>expr</em> is a <code>LatexString</code> or <code>LatexTokens</code>, evaluate to a MathJSON expression
-corresponding to the LaTeX string.</p>
-</div></div> 
+<div class='latex'><div class="source">\sin^{-1}(x)</div><div class="display">\[ \sin^{-1}(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</div></div>
 <h3 class="visually-hidden" id="String" tabindex="-1">String</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>String</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a string made from the concatenation of the arguments converted to
 strings</p>
-</div></div> 
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;String&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;&#x27;x2&#x27;&quot;</span>
+</code></pre>
+</div></div>
 <h3 class="visually-hidden" id="Symbol" tabindex="-1">Symbol</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Symbol</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a new symbol made of a concatenation of the arguments.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Symbol&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span> 
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Symbol&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; &quot;x2&quot;</span>
+</code></pre>
+<p>The symbol is not declared, it remains a free variable. To declare the symbol
+use <code>Declare</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Declare&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Symbol&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumber&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 </div></div>
 </section>
-<h2 id="parse%2C-latex%2C-latextokens-and-latexstring" tabindex="-1"><code>Parse</code>, <code>Latex</code>, <code>LatexTokens</code> and <code>LatexString</code></h2>
-<p><code>[“Latex”, <em>expr</em> ]</code></p>
-<ul>
-<li><code><em>expr</em></code>: a MathJSON expression</li>
-<li>Returns a LaTeX string representing the expression.</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
+<h2 id="parsing-and-serializing-latex" tabindex="-1">Parsing and Serializing Latex</h2>
+<h3 class="visually-hidden" id="Parse" tabindex="-1">Parse</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Parse</strong>&quot;, <em>string</em>]</p>
+<p>If <em>expr</em> is a <code>[&quot;LatexString&quot;]</code> expression, evaluate to a MathJSON expression
+corresponding to the LaTeX string.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Parse&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexString&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac{\\pi}{2}&#x27;&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
 </code></pre>
-<p><code>[“LatexTokens”, <em>token-1</em>, <em>token-2</em>, …<em>token-n</em>]</code></p>
-<p>The arguments <code><em>token-n</em></code> are interpreted as LaTeX tokens:</p>
-<div class=symbols-table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Token</th>
-<th style="text-align:left"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>&lt;{&gt;</code></td>
-<td style="text-align:left">begin group</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&lt;}&gt;</code></td>
-<td style="text-align:left">end group</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&lt;space&gt;</code></td>
-<td style="text-align:left">blank space</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&lt;$$&gt;</code></td>
-<td style="text-align:left">display mode shift</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&lt;$&gt;</code></td>
-<td style="text-align:left">inline mode shift</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>#0</code>-<code>#9</code></td>
-<td style="text-align:left">argument</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>#?</code></td>
-<td style="text-align:left">placeholder</td>
-</tr>
-<tr>
-<td style="text-align:left">string that starts with <code>\</code></td>
-<td style="text-align:left">a LaTeX command</td>
-</tr>
-<tr>
-<td style="text-align:left">other strings</td>
-<td style="text-align:left">ordinary symbols</td>
-</tr>
-</tbody>
-</table>
-</div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexTokens&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;pi&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;{&gt;&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;&lt;}&gt;&#x27;&quot;</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ &quot;&#x27;\frac{\pi}{2}&#x27;&quot;</span>
-</code></pre>
-<p>See: <a href="http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web">TeX:289</a></p>
-<p>This function can be returned when the parser fails to parse a sequence of LaTeX
-tokens.</p>
-<h2 id="piecewise" tabindex="-1"><code>Piecewise</code></h2>
-<h2 id="prime" tabindex="-1"><code>Prime</code></h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">MathJSON</th>
-<th style="text-align:left">LaTeX</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;]</code></td>
-<td style="text-align:left"><code>f^\prime</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>[&quot;Prime&quot;, &quot;f&quot;, 2]</code></td>
-<td style="text-align:left"><code>f^\doubleprime</code></td>
-</tr>
-</tbody>
-</table>
-<section id='supsub'>
+</div></div>
+<h3 class="visually-hidden" id="Latex" tabindex="-1">Latex</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>expression</em>]</p>
+<p>Evaluate to a <code>LatexString</code> which is the expression serialized to LaTeX</p>
+</div></div>
+<h3 class="visually-hidden" id="LatexString" tabindex="-1">LatexString</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>LatexString</strong>&quot;, <em>string</em>]</p>
+<p>Tag a string as a LaTeX string</p>
+</div></div>
+<section id="supsub">
 <h2 id="superscripts-and-subscripts" tabindex="-1">Superscripts and Subscripts</h2>
 <p>These functions are all inert functions, that is they evaluate to themselves.</p>
 <div class=symbols-table>
@@ -2624,7 +2538,7 @@ tokens.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#assignment%2C-declaration-and-assumptions">Assignment, Declaration and Assumptions</a><ol><li><a href="#Assume">Assume</a></li><li><a href="#Let">Let</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Html">Html</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li><li><a href="#LatexTokens">LatexTokens</a></li><li><a href="#Parse">Parse</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parse%2C-latex%2C-latextokens-and-latexstring">Parse, Latex, LatexTokens and LatexString</a></li><li><a href="#piecewise">Piecewise</a></li><li><a href="#prime">Prime</a></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declare%2C-assign-and-assume">Declare, Assign and Assume</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#expression-inspection">Expression Inspection</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Head">Head</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
     
                             

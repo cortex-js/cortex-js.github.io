@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#block-and-if">Block and If</a><ol><li><a href="#Block">Block</a></li><li><a href="#If">If</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#FixedPoint">FixedPoint</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Loop">Loop</a></li><li><a href="#Product">Product</a></li><li><a href="#Sum">Sum</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
+        <ol><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li><li><a href="#Return">Return</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
       </div>
       
                               
@@ -2297,147 +2297,142 @@
 
 <ul>
 <li>A <code>[&quot;Block&quot;]</code> expression defines a <strong>sequential</strong> control structure</li>
-<li>An <code>[&quot;If&quot;]</code> expression defines a <strong>conditional</strong> control structure.</li>
-<li>A <code>[&quot;FixedPoint&quot;]</code>, <code>[&quot;Loop&quot;]</code>, <code>[&quot;Sum&quot;]</code> or <code>[&quot;Product&quot;]</code> expression
-defines an <strong>iterative</strong> control structure.</li>
+<li>An <code>[&quot;If&quot;]</code> or <code>[&quot;Which&quot;]</code> expression define a <strong>conditional</strong> control structure.</li>
+<li>A <code>[&quot;Loop&quot;]</code> or <code>[&quot;FixedPoint&quot;]</code> expression define an <strong>iterative</strong> control structure.</li>
 </ul>
-<h2 id="block-and-if" tabindex="-1">Block and If</h2>
+<h2 id="sequential-control-structure" tabindex="-1">Sequential Control Structure</h2>
 <h3 class="visually-hidden" id="Block" tabindex="-1">Block</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Block</strong>&quot;, <em>expr-1</em>, …<em>expr-n</em>]</p>
-<p class="signature">[&quot;<strong>Block</strong>&quot;, <em>dictionary</em>, <em>expr1</em>, …<em>expr-n</em>]</p>
 <p>The evaluation of a <code>[&quot;Block&quot;]</code> expression follows these steps:</p>
 <ol>
 <li>
 <p>Create a new scope</p>
 </li>
 <li>
-<p>Set the value of the symbols in <code>_dictionary_</code> in this scope.</p>
-<p>The <em>dictionary</em> argument can be a <code>[&quot;Dictionary&quot;]</code> expression, a
-<code>[&quot;KeyValuePair&quot;]</code> expression, a <code>[&quot;Pair&quot;]</code> expression or a <code>[&quot;Tuple&quot;]</code> expression.</p>
-</li>
-<li>
-<p>Evaluate each <em>expr</em> sequentially.</p>
+<p>Evaluate each <code>expr</code> sequentially.</p>
 <p>If the value of an expression is a <code>[&quot;Return&quot;]</code> expression, a <code>[&quot;Break&quot;]</code>
-expression or a <code>[&quot;Continue&quot;]</code> expression, no more expressions are
-evaluated and the value of the <code>[&quot;Block&quot;]</code> is this expression.</p>
+expression or a <code>[&quot;Continue&quot;]</code> expression, no more expressions are evaluated
+and the value of the <code>[&quot;Block&quot;]</code> is this expression.</p>
 <p>Otherwise, the value of the <code>[&quot;Block&quot;]</code> expression is the value of the last
 expression</p>
 </li>
 </ol>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> 
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> 
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
 </code></pre>
-</div></div> 
+</div></div>
+<h3 class="visually-hidden" id="Return" tabindex="-1">Return</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Return</strong>&quot;, <em>value</em>]</p>
+<p>If evaluated as an argument to a <code>[&quot;Function&quot;]</code> expression, interupts the
+evaluation of the function. The value of the <code>[&quot;Function&quot;]</code> expression is <code>value</code>.</p>
+<p>The <code>[&quot;Return&quot;]</code> expression is useful when used with functions that
+have multiple exit points, conditional logic, loops, etc…</p>
+<div class='read-more'><a href="/compute-engine/reference/functions/">Read more about
+<strong>functions</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
+<h2 id="conditional-control-structure" tabindex="-1">Conditional Control Structure</h2>
 <h3 class="visually-hidden" id="If" tabindex="-1">If</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>If</strong>&quot;, <em>condition</em>, <em>expr-1</em>]</p>
-<ul>
-<li>If the value of <code>_condition_</code> is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
-expression is <code>_expr-1_</code>, otherwise <code>Nothing</code>.</li>
-</ul>
+<p>If the value of <code>condition</code>is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
+expression is <code>expr-1</code>, otherwise <code>Nothing</code>.</p>
 <p class="signature">[&quot;<strong>If</strong>&quot;, <em>condition</em>, <em>expr-1</em>, <em>expr-2</em>]</p>
-<ul>
-<li>If the value of <code>_condition_</code> is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
-expression is <code>_expr-1_</code>, otherwise <code>_expr-2_</code>.</li>
-</ul>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Value&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<p>If the value of <code>condition</code>is the symbol <code>True</code>, the value of the <code>[&quot;If&quot;]</code>
+expression is <code>expr-1</code>, otherwise <code>expr-2</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> 
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 10</span>
 </code></pre>
-</div></div> 
+</div></div>
+<h3 class="visually-hidden" id="Which" tabindex="-1">Which</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Which</strong>&quot;, <em>condition-1</em>, <em>expr-1</em>, …<em>condition-n</em>,
+<em>expr-n</em>]</p>
+<p>The value of the <code>[&quot;Which&quot;]</code> expression is the value of the first expression
+<code>expr-n</code> for which the corresponding condition <code>condition-n</code> is <code>True</code>.</p>
+<div class='latex'><div class="source">\begin{cases} x &amp; \text{if } x &gt; 0 \\ -x &amp; \text{if } x &lt; 0 \\ 0 &amp; \text{otherwise} \end{cases}</div><div class="display">\[ \begin{cases} x &amp; \text{if } x &gt; 0 \\ -x &amp; \text{if } x &lt; 0 \\ 0 &amp; \text{otherwise} \end{cases} \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-10</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Which&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Negate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 10</span>
+</code></pre>
+<p>A <code>[&quot;Which&quot;]</code> expression is equivalent to the following <code>[&quot;If&quot;]</code> expression:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> condition<span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;True&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> expr<span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> 
+    <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> condition<span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;True&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> _expr<span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> 
+    ... <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Equal&quot;</span><span class="hljs-punctuation">,</span> condition-n<span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;True&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> 
+          expr-n<span class="hljs-punctuation">,</span> 
+          <span class="hljs-string">&quot;Nothing&quot;</span>
+    <span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<p>A <code>[&quot;Which&quot;]</code> expression is equivalent to a <code>switch</code> statement in JavaScript
+or the <code>Which[]</code> function in Mathematica.</p>
+</div></div>
 <h2 id="loops" tabindex="-1">Loops</h2>
-<p>The <code>Fold</code>, <code>Loop</code>, <code>Sum</code> and <code>Product</code> functions are iteration control
-structures that share a similar form.</p>
-<p>Their first argument, <code>body</code> is an expression that gets evaluated repeatedly.
-The <code>body</code> expression is evaluated with an implicit argument <code>_</code> whose value is
-the current iteration element.</p>
-<p>Their second argument, <code>iterator</code> can take the following shapes:</p>
-<ul>
-<li><code>[&quot;List&quot;, _expr-1_, ..._expr-n]</code>: the <code>_</code> implicit argument takes in turn each
-element</li>
-<li><code>[&quot;Range&quot;, _upper_]</code>: the <code>_</code> implicit argument is assigned
-the value 1, then incremented by 1 until it reaches at least <em>upper</em>.</li>
-<li><code>[&quot;Range&quot;, _lower_, _upper_]</code>: the <code>_</code> implicit argument is assigned
-the values from the lower bound to the upper bound of the range, with a step of 1.</li>
-<li><code>[&quot;Range&quot;, _lower_, _upper_, _step_]</code>: the <code>_</code> implicit argument is assigned
-the value <em>lower</em> then incremented by <em>step</em> until it reaches at least <em>upper</em>.</li>
-</ul>
-<p>To use a named argument, use a <code>[&quot;Function&quot;]</code> expression for the <code>body</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 1 4 9 16 25</span>
-</code></pre>
-<h3 class="visually-hidden" id="FixedPoint" tabindex="-1">FixedPoint</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>FixedPoint</strong>&quot;, <em>body</em>, <em>initial-value</em>]</p>
-<p class="signature">[&quot;<strong>FixedPoint</strong>&quot;, <em>body</em>, <em>initial-value</em>, <em>max-iterations</em>]</p>
-<p>Assumes <code>_body_</code> is an expression using an implicit argument <code>_</code>.</p>
-<p>Apply <code>_body_</code> to <code>_initial-value_</code>, then apply <code>_body_</code> to the result until
-the result no longer changes.</p>
-<p>To determine if a fixed point has been reached and the loop should terminate,
-the previous and current values are compared with <code>Same</code>.</p>
-<p>Inside <code>_body_</code>, use <code>[&quot;Break&quot;]</code> to exit the loop immediately or <code>[&quot;Continue&quot;]</code>
-to skip to the next iteration.</p>
-</div></div> 
-<h3 class="visually-hidden" id="Fold" tabindex="-1">Fold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>body</em>, <em>iterator</em>]</p>
-<p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>body</em>, <em>initial-value</em>, <em>iterator</em>]</p>
-<p>Evaluate to <code>[_body_, [_body_, _initial-value_, _elem-1_], _elem-2]]...</code> where
-<em>elem-1</em> and <em>elem-2</em> are the first two elements from the iterator.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 385</span>
-</code></pre>
-<p>See above for the definition of <em>iterator</em>.</p>
-</div></div> 
 <h3 class="visually-hidden" id="Loop" tabindex="-1">Loop</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Loop</strong>&quot;, <em>body</em>]</p>
-<p>Repeatedly evaluate <code>_body_</code> until the last element of the iterator is reached.</p>
-<p>See above for the definition of <em>iterator</em>.</p>
-<p>To exit the loop early, <em>body</em> should evaluate to a <code>[&quot;Break&quot;]</code> expression,
-a <code>[&quot;Continue&quot;]</code> expression or a <code>[&quot;Return&quot;]</code> expression.</p>
+<p>Repeatedly evaluate <code>body</code>until the value of <code>body</code>is a <code>[&quot;Break&quot;]</code>
+expression, a <code>[&quot;Continue&quot;]</code> expression or a <code>[&quot;Return&quot;]</code> expression.</p>
+<ul>
+<li><code>[&quot;Break&quot;]</code> exits the loop immediately.</li>
+<li><code>[&quot;Continue&quot;]</code> skips to the next iteration of the loop.</li>
+<li><code>[&quot;Return&quot;]</code> exits the loop and returns the value of the <code>[&quot;Return&quot;]</code>
+expression.</li>
+</ul>
+<p><code>Loop</code> with only a <em>body</em> argument is equivalent to a <code>while(true)</code> in
+JavaScript or a <code>While[True, ...]</code> in Mathematica.</p>
+<p class="signature">[&quot;<strong>Loop</strong>&quot;, <em>body</em>, <em>collection</em>]</p>
+<p class="signature">[&quot;<strong>Loop</strong>&quot;, <em>body</em>, <em>collection</em>, <em>index</em>]</p>
+<p>Iterates over the elements of <code>collection</code> and evaluates <code>body</code> with an implicit
+argument <code>_</code> whose value is the current element. The value of the <code>[&quot;Loop&quot;]</code>
+expression is the value of the last iteration of the loop, or the value of the
+<code>[&quot;Break&quot;]</code> expression if the loop was exited with a <code>[&quot;Break&quot;]</code> expression.</p>
+<p>If <code>index</code> is provided, the corresponding symbol is assigned the value of the
+current element.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 1 4 9 16 25</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Loop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Print&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Square&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 1 4 9 16 25</span>
 </code></pre>
-</div></div> 
-<h3 class="visually-hidden" id="Product" tabindex="-1">Product</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Product</strong>&quot;, <em>iterator</em>]</p>
-<p>Evaluate to a product of all the elements in <code>_iterator_</code>. If all the
-elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
-<p>Equivalent to <code>[&quot;Fold&quot;, &quot;Multiply&quot;, _iterator_]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 385</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
-</code></pre>
-<p class="signature">[&quot;<strong>Product</strong>&quot;, <em>body</em>, <em>iterator</em>]</p>
-<p>Evaluate <code>_body_</code> and make a product of the result.</p>
-<p>Equivalent to <code>[&quot;Fold&quot;, [&quot;Multiply&quot;, _1, [_body_, _2]], _iterator_]</code>.</p>
-<p>See above for the definition of <em>iterator</em>.</p>
-</div></div> 
-<h3 class="visually-hidden" id="Sum" tabindex="-1">Sum</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>body</em>]</p>
-<p>Evaluate to a sum of all the elements in <code>_iterator_</code>. If all the
-elements are numbers, the result is a number. Otherwise it is a simplified list.</p>
-<p>Equivalent to <code>[&quot;Fold&quot;, &quot;Add&quot;, _iterator_]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 23</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ [&quot;List&quot;, 16, &quot;x&quot;]</span>
-</code></pre>
-<p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>body</em>, <em>iterator</em>]</p>
-<p>Evaluate <code>_body_</code> and make a sum of the result.</p>
-<p>Equivalent to <code>[&quot;Fold&quot;, [&quot;Add&quot;, _1, [_body_, _2]], _iterator_]</code>.</p>
-</div></div> 
+<p><code>Loop</code> with a <code>body</code> and <code>collection</code> to iterate is equivalent to a <code>forEach()</code>
+in JavaScript. It is somewhat similar to a <code>Do[...]</code> in Mathematica.</p>
+</div></div>
+<h3 class="visually-hidden" id="FixedPoint" tabindex="-1">FixedPoint</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>FixedPoint</strong>&quot;, <em>body</em>, <em>initial-value</em>]</p>
+<p class="signature">[&quot;<strong>FixedPoint</strong>&quot;, <em>body</em>, <em>initial-value</em>,
+<em>max-iterations</em>]</p>
+<p>Assumes <code>body</code>is an expression using an implicit argument <code>_</code>.</p>
+<p>Apply <code>body</code>to <code>initial-value</code>, then apply <code>body</code>to the result until the
+result no longer changes.</p>
+<p>To determine if a fixed point has been reached and the loop should terminate,
+the previous and current values are compared with <code>Same</code>.</p>
+<p>Inside <code>body</code>, use <code>Break</code> to exit the loop immediately or <code>Continue</code>
+to skip to the next iteration.</p>
+<div class='read-more'><a href="/compute-engine/reference/collections/#Fold">See also the
+<strong><code>Fold</code> function</strong> which operates on a collection <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
+<div class='read-more'><a href="/compute-engine/reference/statistics/">Read more about the
+<code>Product</code> and <code>Sum</code> functions which are specialized version of loops.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/reference/collections/">Read more about
+operations on collection such as <code>Map</code> and <code>Fold</code> which are functional
+programming constructs that can be used to replace loops. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="break-and-continue" tabindex="-1">Break and Continue</h2>
-<p><strong>To control the flow of a loop expression</strong>, use <code>[&quot;Break&quot;]</code> and <code>[&quot;Continue&quot;]</code>.</p>
+<p><strong>To control the flow of a loop expression</strong>, use <code>Break</code> and
+<code>Continue</code>.</p>
 <h3 class="visually-hidden" id="Break" tabindex="-1">Break</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Break</strong>&quot; ]</p>
 <p class="signature">[&quot;<strong>Break</strong>&quot;, <em>expr</em>]</p>
 <p>When in a block, exit the block immediately. The value of the <code>[&quot;Block&quot;]</code>
 expression is the <code>[&quot;Break&quot;]</code> expression.</p>
-<p>When  in a loop exit the loop immediately. The final value of the loop is
-<code>_expr_</code> or <code>Nothing</code> if not provided.</p>
-</div></div> 
+<p>When in a loop exit the loop immediately. The final value of the loop is
+<code>expr</code>or <code>Nothing</code> if not provided.</p>
+</div></div>
 <h3 class="visually-hidden" id="Continue" tabindex="-1">Continue</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Continue</strong>&quot; ]</p>
 <p class="signature">[&quot;<strong>Continue</strong>&quot;, <em>expr</em>]</p>
 <p>When in a loop, skip to the next iteration of the loop. The value of the
-iteration is <code>_expr_</code> or <code>Nothing</code> if not provided.</p>
+iteration is <code>expr</code>or <code>Nothing</code> if not provided.</p>
 <p>When in a block, exit the block immediately, and return the <code>[&quot;Continue&quot;]</code>
 expression as the value of the block.</p>
-</div></div> 
+</div></div>
 
 
 
@@ -2478,7 +2473,7 @@ expression as the value of the block.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#block-and-if">Block and If</a><ol><li><a href="#Block">Block</a></li><li><a href="#If">If</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#FixedPoint">FixedPoint</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Loop">Loop</a></li><li><a href="#Product">Product</a></li><li><a href="#Sum">Sum</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
+        <ol><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li><li><a href="#Return">Return</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
       </div>
     
                             

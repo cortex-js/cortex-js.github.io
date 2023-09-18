@@ -2303,7 +2303,7 @@ simplifications and to optimize computations.</p>
 <h2 id="defining-new-assumptions" tabindex="-1">Defining New Assumptions</h2>
 <p><strong>To make an assumption about a symbol</strong>, use the <code>ce.assume()</code> function.</p>
 <p>For example, to indicate \(\beta \in \R\):</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\beta \\in \\R&#x27;</span>));
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\beta \\in \\R&#x27;</span>));
 
 <span class="hljs-comment">// or:</span>
 
@@ -2340,16 +2340,18 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 </div>
 <p>If the <code>assume()</code> function is invoked with two arguments, it is equivalent to
 <code>ce.assume([&quot;Element&quot;, &lt;arg1&gt;, &lt;arg2&gt;])</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumber&quot;])</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumber&quot;])</span>
 </code></pre>
 <p>The argument to the <code>assume()</code> function is a <strong>proposition</strong>. That proposition
 is analyzed and the fact it describes are recorded in the Compute Engine
 assumptions knowledge base. Some propositions can be described in several
 different but equivalent ways. You can use whichever form you prefer. Similarly,
 when querying the knowledge base later, you can use any form you’d like.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveNumber&#x27;</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveNumber&#x27;</span>]);
+ 
 <span class="hljs-comment">// Equivalent to...</span>
 ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">0</span>]);
+ 
 <span class="hljs-comment">// ... or ...</span>
 ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Interval&#x27;</span>, [<span class="hljs-string">&#x27;Open&#x27;</span>, <span class="hljs-number">0</span>], <span class="hljs-string">&#x27;Infinity&#x27;</span>]]);
 </code></pre>
@@ -2357,7 +2359,7 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 <h3 id="multivariate-assumptions" tabindex="-1">Multivariate Assumptions</h3>
 <p>Assumptions are frequently describing the property of a symbol. However, it is
 also possible to describe relationships betwen multiple symbols.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;xy + 1 = 0&#x27;</span>))<span class="hljs-string">&#x27;
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;xy + 1 = 0&#x27;</span>))<span class="hljs-string">&#x27;
 </span></code></pre>
 </section>
 <section id='using-assumptions-to-declare-symbols'>
@@ -2421,7 +2423,7 @@ when creating a Compute Engine instance:</p>
 </code></pre>
 <p>As a shorthand, you can pass a symbol as a first argument and a domain as a
 second.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>); <span class="hljs-comment">// same as ce.is([&#x27;Element&#x27;, &#x27;x&#x27;, &#x27;RealNumber])</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>); <span class="hljs-comment">// same as ce.is([&quot;Element&quot;, &quot;x&quot;, &#x27;RealNumber])</span>
 ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&#x27;x&#x27;</span>, [<span class="hljs-string">&#x27;Range&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
 <p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
@@ -2432,12 +2434,12 @@ also be made.</p>
 <p>The argument of <code>ask()</code> can be a pattern, and it returns an array of matches as
 <code>Substitution</code> objects.</p>
 <pre><code class="language-js"><span class="hljs-comment">// &quot;x is a positive integer&quot;</span>
-ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveInteger&#x27;</span>);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;PositiveInteger&#x27;</span>]);
 
 <span class="hljs-comment">// &quot;What is x greater than?&quot;</span>
 ce.<span class="hljs-title function_">ask</span>([<span class="hljs-string">&#x27;Greater&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;_val&#x27;</span>]);
 
-<span class="hljs-comment">//  -&gt; [{&#x27;val&#x27;: 0}] &quot;It is greater than 0&quot;</span>
+<span class="hljs-comment">//  -&gt; [{&quot;val&quot;: 0}] &quot;It is greater than 0&quot;</span>
 </code></pre>
 <div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/"> Read more about
 <strong>Patterns and Rules</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -2453,7 +2455,7 @@ symbols.</li>
 <li>Passing a symbol name will only remove assumptions about that particular
 symbol.</li>
 </ul>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 <span class="hljs-comment">// ➔  true</span>
 
@@ -2472,7 +2474,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27
 
 ce.<span class="hljs-title function_">pushScope</span>();
 
-ce.<span class="hljs-title function_">assume</span>(<span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 <span class="hljs-comment">// ➔  true</span>
 

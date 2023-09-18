@@ -2276,7 +2276,7 @@
       <section class="page__content" itemprop="text">
 
   
-    <picture class=full-width style='aspect-ratio:1.775;clip-path: inset(0 0 0 0 round 8px 8px 0 0); margin-bottom: 2em'> <source srcset=/assets/MathJSON@1x.webp type=image/webp> <source srcset=/assets/MathJSON@1x.jpg type=image/jpeg>  <img src=/assets/MathJSON@1x.jpg alt='MathJSON'> </picture> <h2 style='font-size:3rem'>MathJSON: a lightweight data interchange format for mathematical notation.</h2>
+    <picture class=full-width style='aspect-ratio:1.775;clip-path: inset(0 0 0 0 round 8px 8px 0 0); margin-bottom: 2em'> <source srcset=/assets/MathJSON@1x.webp type=image/webp> <source srcset=/assets/MathJSON@1x.jpg type=image/jpeg>  <img src=/assets/MathJSON@1x.jpg alt="MathJSON"> </picture> <h2 style='font-size:3rem'>MathJSON: a lightweight data interchange format for mathematical notation.</h2>
   
 
   
@@ -2353,11 +2353,11 @@
 <script type="module">
     // import 'https://unpkg.com/mathlive?module';
     import 'https://unpkg.com/@cortex-js/compute-engine@latest/dist/compute-engine.min.esm.js';
-    const mf = document.getElementById('mf');
+    const mf = document.getElementById("mf");
 
     window.customElements.whenDefined("math-field").then(() => {
       document.getElementById('mathfield-json').innerHTML = exprToString(mf.expression.json);
-      mf.addEventListener('input', (ev) => {
+      mf.addEventListener("input", (ev) => {
         document.getElementById('mathfield-json').innerHTML = exprToString(mf.expression.json);
       });
     });
@@ -2371,8 +2371,8 @@
         if (start + result.length < MAX_LINE_LENGTH) return result;
         return `[\n${indent}  ${elements.join(`,\n${indent}  `)}\n${indent}]`;
       }
-      if (expr === null) return 'null';
-      if (typeof expr === 'object') {
+      if (expr === null) return "null";
+      if (typeof expr === "object") {
         const elements = {};
         Object.keys(expr).forEach(x => 
            elements[x] = exprToStringRecursive(expr[x], start + 2)
@@ -2775,7 +2775,7 @@ patterns below:</p>
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMOJI_NOT_IDENTIFIER</span> = <span class="hljs-string">`(?:(?=\\P{XIDC})\\p{Emoji})`</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ZWJ_ELEMENT</span> = <span class="hljs-string">`(?:<span class="hljs-subst">${EMOJI_NOT_IDENTIFIER}</span><span class="hljs-subst">${EMOJI_MOD}</span>*|\\p{Emoji}<span class="hljs-subst">${EMOJI_MOD}</span>+|<span class="hljs-subst">${FLAG_SEQUENCE}</span>)`</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">POSSIBLE_EMOJI</span> = <span class="hljs-string">`(?:<span class="hljs-subst">${ZWJ_ELEMENT}</span>)(<span class="hljs-subst">${ZWJ}</span><span class="hljs-subst">${ZWJ_ELEMENT}</span>)*`</span>;
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMOJI_IDENTIFIER</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">`^(?:<span class="hljs-subst">${POSSIBLE_EMOJI}</span>)+$`</span>, <span class="hljs-string">&#x27;u&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMOJI_IDENTIFIER</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">`^(?:<span class="hljs-subst">${POSSIBLE_EMOJI}</span>)+$`</span>, <span class="hljs-string">&quot;u&quot;</span>);
 </code></pre>
 <p>In summary, when using Latin characters, identifiers can start with a letter or
 an underscore, followed by zero or more letters, digits and underscores.</p>
@@ -3518,9 +3518,9 @@ value of the key is a JSON object literal holding the content of the dictionary.
 expression, but this is quite a bit more verbose:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span>
   <span class="hljs-string">&quot;Dictionary&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;first&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;second&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;third&#x27;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&quot;</span>first<span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&quot;</span>second<span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;KeyValuePair&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&quot;</span>third<span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">]</span>
 </code></pre>
 <h2 id="metadata" tabindex="-1">Metadata</h2>

@@ -2329,17 +2329,17 @@ Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a><
 expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
-ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>).<span class="hljs-property">domain</span>;
+ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>).<span class="hljs-property">domain</span>;
 <span class="hljs-comment">// ➔ &quot;TranscendentalNumber&quot;</span>
 
-ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Divide&#x27;</span>).<span class="hljs-property">domain</span>;
+ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Divide&quot;</span>).<span class="hljs-property">domain</span>;
 <span class="hljs-comment">// ➔ &#x27;[&quot;Function&quot;,  &quot;Number&quot;, &quot;Number&quot;, &quot;Number]&#x27;: domain of the function &quot;Divide&quot;</span>
 
-ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-property">domain</span>;
+ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-property">domain</span>;
 <span class="hljs-comment">// ➔ &quot;Number&quot;: the result of the &quot;Add&quot; function</span>
 <span class="hljs-comment">// (its codomain) in general is a &quot;Number&quot;</span>
 
-ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">domain</span>;
+ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">domain</span>;
 <span class="hljs-comment">// ➔ &quot;Integer&quot;: once evaluated, the domain of the result may be more specific</span>
 </code></pre>
 </section>
@@ -2396,10 +2396,10 @@ every domain.</li>
 </ul>
 <p><strong>To evaluate the compatibility of two domains</strong> use <code>domain.isCompatible()</code></p>
 <p>By default, <code>domain.isCompatible()</code> will check for covariant compatibility.</p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;PositiveNumber&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;Integer&#x27;</span>);
+<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;PositiveNumber&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;Integer&quot;</span>);
 <span class="hljs-comment">// ➔ true</span>
 
-ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&#x27;Number&#x27;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&#x27;RealNumber&#x27;</span>, <span class="hljs-string">&#x27;contravariant&#x27;</span>);
+ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;Number&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;RealNumber&quot;</span>, <span class="hljs-string">&quot;contravariant&quot;</span>);
 <span class="hljs-comment">// ➔ true</span>
 </code></pre>
 </section>

@@ -2322,8 +2322,8 @@
 </script>
 <p><strong>To change the value or domain of a symbol</strong>, use the <code>value</code> and <code>domain</code>
 properties of the symbol.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;n&#x27;</span>);
-n.<span class="hljs-property">domain</span> = <span class="hljs-string">&#x27;Integer&#x27;</span>;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;n&quot;</span>);
+n.<span class="hljs-property">domain</span> = <span class="hljs-string">&quot;Integer&quot;</span>;
 n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;n:&quot;</span>, n.<span class="hljs-property">domain</span>.<span class="hljs-property">json</span>, <span class="hljs-string">&quot;=&quot;</span>, n.<span class="hljs-property">value</span>.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ n: Integer = 5</span>
@@ -2332,8 +2332,8 @@ n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 symbol has a domain of <code>ce.defaultDomain</code> and no value.</p>
 <code-playground layout="stack" show-line-numbers>
 <div slot="javascript">
-const n = ce.box('n');
-n.domain = 'Integer';
+const n = ce.box("n");
+n.domain = "Integer";
 n.value = 5;
 console.log("n:", n.domain.json, "=", n.value.json);</div></code-playground>
 <p>Symbols are defined within a <strong>scope</strong>.</p>
@@ -2366,12 +2366,12 @@ a definition with the name of a symbol).</p>
 <div class='read-more'><a href="/compute-engine/guides/evaluate/#binding"> Read more about
 <strong>name binding</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <pre><code class="language-js">ce.<span class="hljs-property">precision</span> = <span class="hljs-number">4</span>;
-<span class="hljs-keyword">const</span> smallPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>); <span class="hljs-comment">// π with 4 digits</span>
+<span class="hljs-keyword">const</span> smallPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>); <span class="hljs-comment">// π with 4 digits</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(smallPi.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ 3.1415</span>
 
 ce.<span class="hljs-property">precision</span> = <span class="hljs-number">10</span>;
-<span class="hljs-keyword">const</span> bigPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;Pi&#x27;</span>); <span class="hljs-comment">// π with 10 digits</span>
+<span class="hljs-keyword">const</span> bigPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>); <span class="hljs-comment">// π with 10 digits</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(bigPi.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ 3.1415926535</span>
 
@@ -2387,7 +2387,7 @@ one is created automatically.</p>
 with it, so the symbol will be a <strong>free variable</strong>.</p>
 <p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
 automatically assumed to be a real number.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;m&#x27;</span>); <span class="hljs-comment">// m for mystery</span>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;m&quot;</span>); <span class="hljs-comment">// m for mystery</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
 symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;

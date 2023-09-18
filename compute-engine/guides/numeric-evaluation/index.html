@@ -2363,13 +2363,13 @@ returns a string serialization of the MathJSON representation of the expression.
 <div class='read-more'><a href="/compute-engine/guides/symbolic-computing/"> Read more about
 <strong>Symbolic Computing</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="repeated-evaluation" tabindex="-1">Repeated Evaluation</h2>
-<p><strong>To repeatedly evaluate an expression</strong> use <code>ce.set()</code> to change the value of
-variables. <code>ce.set()</code> changes the value associated with one or more variables in
-the current scope.</p>
+<p><strong>To repeatedly evaluate an expression</strong> use <code>ce.assign()</code> to change the value
+of variables. <code>ce.assign()</code> changes the value associated with one or more
+variables in the current scope.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2+4x+2&#x27;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
-  ce.<span class="hljs-title function_">set</span>({ <span class="hljs-attr">x</span>: x });
+  ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;x&#x27;</span>, x);
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.N().valueOf()}</span>`</span>);
 }
 </code></pre>
@@ -2381,8 +2381,8 @@ each iteration, and will be much slower.</p>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({ x: x }).N().valueOf()}</span>`</span>);
 }
 </code></pre>
-<p><strong>To reset a variable to be unbound to a value</strong> use <code>ce.set()</code></p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">set</span>({ <span class="hljs-attr">x</span>: <span class="hljs-literal">null</span> });
+<p><strong>To reset a variable to be unbound to a value</strong> use <code>ce.assign()</code></p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-literal">null</span>);
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;3x^2+4x+c&quot;</span>

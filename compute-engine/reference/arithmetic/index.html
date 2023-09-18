@@ -2554,11 +2554,11 @@ String(BaseForm(42, 16))
 <h3 class="visually-hidden" id="Clamp" tabindex="-1">Clamp</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Clamp</strong>&quot;, <em>value</em>]</p>
 <p class="signature">[&quot;<strong>Clamp</strong>&quot;, <em>value</em>, <em>lower</em>, <em>upper</em>]</p>
 <ul>
-<li>If <code>_value_</code> is less than <code>_lower_</code>, evaluate to <code>_lower_</code></li>
-<li>If <code>_value_</code> is greater than <code>_upper_</code>, evaluate to <code>_upper_</code></li>
-<li>Otherwise, evaluate to <code>_value_</code></li>
+<li>If <code>value</code> is less than <code>lower</code>, evaluate to <code>lower</code></li>
+<li>If <code>value</code> is greater than <code>upper</code>, evaluate to <code>upper</code></li>
+<li>Otherwise, evaluate to <code>value</code></li>
 </ul>
-<p>If <code>_lower_</code> and <code>_upper_</code> are not provided, they take the default values of -1
+<p>If <code>lower</code>and <code>upper</code>are not provided, they take the default values of -1
 and +1.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 5</span>
@@ -2590,10 +2590,10 @@ of the arguments.</p>
 equal to the smallest real number.</p>
 </div></div>
 <h3 class="visually-hidden" id="Rational" tabindex="-1">Rational</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>n</em>]</p>
-<p>Evaluate to a rational approximating the value of the number <code>_n_</code>.</p>
+<p>Evaluate to a rational approximating the value of the number <code>n</code>.</p>
 <br>
 <p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>numerator</em>, <em>denominator</em>]</p>
-<p>Represent a rational number equal to <code>_numerator_</code> over <code>_denominator_</code>.</p>
+<p>Represent a rational number equal to <code>numerator</code>over <code>denominator</code>.</p>
 </div></div>
 
 

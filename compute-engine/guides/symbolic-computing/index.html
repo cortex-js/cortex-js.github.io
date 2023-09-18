@@ -2317,7 +2317,9 @@
 
 
 
-<p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript or TypeScript code. This guide assumes you are familiar with one of these programming languages.</p>
+<p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript or TypeScript
+code. This guide assumes you are familiar with one of these programming
+languages.</p>
 <p class="notice--info"><strong>Note:</strong> In this guide, functions such as <code>ce.box()</code> and <code>ce.parse()</code> require a
 <code>ComputeEngine</code> instance which is denoted by a <code>ce.</code> prefix.<br>Functions that
 apply to a boxed expression, such as <code>expr.simplify()</code> are denoted with a
@@ -2380,9 +2382,8 @@ apply to a boxed expression, such as <code>expr.simplify()</code> are denoted wi
 </table>
 </div>
 <p>For example, if <code>f</code> is \( 2 + (\sqrt{4x^2} + 1) \) and <code>x</code> is \( \pi \):</p>
-<pre><code class="language-javascript">
-<span class="hljs-keyword">const</span> f = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + (\\sqrt{4x^2} + 1)&#x27;</span>);
-ce.<span class="hljs-title function_">set</span>({<span class="hljs-string">&#x27;x&#x27;</span>: <span class="hljs-string">&#x27;Pi&#x27;</span>});
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> f = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + (\\sqrt{4x^2} + 1)&#x27;</span>);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">simplify</span>().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{x}+3</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.evaluate().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{\pi}+3</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 9.283\,185\,307\ldots</span>
@@ -2501,11 +2502,11 @@ assumptions may result in a different answer.</p>
 <td style="text-align:left">Synonym for <code>isSame()</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>ce.box(['Equal', lhs, rhs]).evaluate()</code></td>
+<td style="text-align:left"><code>ce.box([&quot;Equal&quot;, lhs, rhs]).evaluate()</code></td>
 <td style="text-align:left">Synonym for <code>isEqual()</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>ce.box(['Same', lhs, rhs]).evaluate()</code></td>
+<td style="text-align:left"><code>ce.box([&quot;Same&quot;, lhs, rhs]).evaluate()</code></td>
 <td style="text-align:left">Synonym for <code>isSame()</code></td>
 </tr>
 </tbody>
@@ -2514,8 +2515,8 @@ assumptions may result in a different answer.</p>
 <h2 id="replacing-a-symbol-in-an-expresssion" tabindex="-1">Replacing a Symbol in an Expresssion</h2>
 <p><strong>To replace a symbol in an expression</strong> use the <code>subs()</code> function.</p>
 <p>The argument of the <code>subs()</code> function is an object literal. Each key value pairs
-is an identifier and the value to be substituted with. The value can be
-either a number or a boxed expression.</p>
+is an identifier and the value to be substituted with. The value can be either a
+number or a boxed expression.</p>
 <code-playground layout="stack" show-line-numbers mark-line="7">
 <div slot="javascript">import { ComputeEngine } from 'compute-engine';
 const ce = new ComputeEngine();

@@ -2324,7 +2324,7 @@ expr = ce.<span class="hljs-title function_">box</span>({ <span class="hljs-attr
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ +\infty</span>
 
-expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
+expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&quot;x&quot;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">head</span>);
 <span class="hljs-comment">// ➔ &quot;Add&quot;</span>
 
@@ -2342,7 +2342,7 @@ function.</p>
 </code></pre>
 <p><strong>To get a Boxed Expression representing the content of a MathLive mathfield</strong>
 use the <code>mf.expression</code> property:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;input&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;input&quot;</span>);
 mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{10}{5}&#x27;</span>;
 <span class="hljs-keyword">const</span> expr = mf.<span class="hljs-property">expression</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.evaluate().<span class="hljs-property">latex</span>);
@@ -2351,9 +2351,9 @@ mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\
 <h2 id="unboxing" tabindex="-1">Unboxing</h2>
 <p><strong>To access the MathJSON expression of a boxed expression</strong>, use the <code>expr.json</code>
 property. Use this property to “unbox” the expression.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&quot;x&quot;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&#x27;Add&#x27;, 3, &#x27;x&#x27;]</span>
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;]</span>
 </code></pre>
 <p><strong>To customize the format of the MathJSON expression</strong> use the
 <code>ce.jsonSerializationOptions</code> property.</p>
@@ -2366,7 +2366,7 @@ more info about the formatting options.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = {
-  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Divide&#x27;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
+  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&quot;Divide&quot;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
   <span class="hljs-comment">// use `Multiply`/`Power` instead</span>
   <span class="hljs-attr">shorthands</span>: [], <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
 };
@@ -2379,7 +2379,7 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
 <span class="hljs-comment">//      ]</span>
 <span class="hljs-comment">//    ]]</span>
 </code></pre>
-<section id='canonical'>
+<section id="canonical">
 <h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
 <p>The canonical form of an expression is a conventional way of writing an
 expression.</p>
@@ -2423,7 +2423,7 @@ depend on contextual information which can change over time.</p>
 <p>For example, <code>expr.isPositive</code> may return <code>undefined</code> if nothing is known about
 a symbol. But if an assumption about the symbol is made later, or a value
 assigned to it, then <code>expr.isPositive</code> may take a different value.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;x&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;x&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isPositive</span>);
 <span class="hljs-comment">// ➔ undefined</span>
 
@@ -2460,7 +2460,7 @@ dictionary, use the following boolean expressions:</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Symbol</strong></td>
-<td style="text-align:left"><code>expr.symbol !== null</code> <br> <code>expr.head === 'Symbol'</code></td>
+<td style="text-align:left"><code>expr.symbol !== null</code> <br> <code>expr.head === &quot;Symbol&quot;</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Function</strong></td>
@@ -2468,18 +2468,18 @@ dictionary, use the following boolean expressions:</p>
 </tr>
 <tr>
 <td style="text-align:left"><strong>String</strong></td>
-<td style="text-align:left"><code>expr.string !== null</code> <br> <code>expr.head === 'String'</code></td>
+<td style="text-align:left"><code>expr.string !== null</code> <br> <code>expr.head === &quot;String&quot;</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>Dictionary</strong></td>
-<td style="text-align:left"><code>expr.keys !== null</code> <br> <code>expr.head === 'Dictionary'</code></td>
+<td style="text-align:left"><code>expr.keys !== null</code> <br> <code>expr.head === &quot;Dictionary&quot;</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>The value of <code>expr.numericValue</code> may be:</p>
 <ul>
-<li><code>typeof expr.numericValue === 'number'</code>: the expression is a JavaScript number</li>
+<li><code>typeof expr.numericValue === &quot;number&quot;</code>: the expression is a JavaScript number</li>
 <li><code>ce.isBignum(expr.numericValue)</code>: the expression is a bignum. Use
 <code>expr.numericValue.toNumber()</code> to convert it to a JavaScript number.</li>
 <li><code>ce.isComplex(expr.numericValue)</code>: the expression is a complex number. Use
@@ -2513,7 +2513,7 @@ or another expression if the problem was detected later.</p>
 doctrine. That is, even partially complete expressions are parsed, and as much
 of the input as possible is reflected in the MathJSON result.</p>
 <p>If required operands are missing (the denominator of a fraction, for example), a
-<code>[&quot;Error&quot;, &quot;'missing'&quot;]</code> error expression is inserted where the missing operand
+<code>[&quot;Error&quot;, &quot;&quot;missing&quot;&quot;]</code> error expression is inserted where the missing operand
 should have been.</p>
 <p>Problems that occur while parsing a LaTeX string will usually indicate a LaTeX
 syntax error or typo: missing <code>}</code>, mistyped command name, etc…</p>
@@ -2638,13 +2638,13 @@ property.</p>
 <span class="hljs-comment">//    ]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\begin{oops}\\end{oops}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Error&quot;,[&quot;ErrorCode&quot;,&quot;&#x27;unknown-environment&#x27;&quot;,&quot;&#x27;oops&#x27;&quot;],[&quot;Latex&quot;,&quot;&#x27;\\\\begin{oops}\\\\end{oops}&#x27;&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;Error&quot;,[&quot;ErrorCode&quot;,&quot;&#x27;unknown-environment&#x27;&quot;,&quot;&quot;oops&quot;&quot;],[&quot;Latex&quot;,&quot;&#x27;\\\\begin{oops}\\\\end{oops}&#x27;&quot;]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+\\sqrt&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1 ,[&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]]</span>
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1 ,[&quot;Sqrt&quot;, [&quot;Error&quot;, &quot;&quot;missing&quot;&quot;]]]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+\\frac{2}&#x27;</span>).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, [&quot;Divide&quot;, 2, [&quot;Error&quot;,&quot;&#x27;missing&#x27;&quot;]]]</span>
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, [&quot;Divide&quot;, 2, [&quot;Error&quot;,&quot;&quot;missing&quot;&quot;]]]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;1+(2=2)+2&#x27;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, [&quot;Delimiter&quot;, [&quot;Equal&quot;, 2, 2]]]</span>

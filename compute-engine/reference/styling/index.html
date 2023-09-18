@@ -2269,16 +2269,16 @@ other typographic variations.</p>
 <p>If <em>expr</em> is a <code>[&quot;List&quot;]</code> expression, serialize each element of the list, separated by <em>sep</em>.</p>
 <p>If no <em>sep</em> is provided, use a comma <code>,</code> as a separator.</p>
 <p>If no <em>open</em> and <em>close</em> strings are provided, use parentheses <code>(</code> and <code>)</code>.</p>
-<p>The <code>Delimiter</code> function is <strong>inert</strong> and the value of a <code>[&quot;Delimiter&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
+<p>The <code>Delimiter</code> function is <strong>inert</strong> and the value of a <code>[&quot;Delimiter&quot;, _expr_]</code> expression is <code>expr</code>.</p>
 </div></div>
 <h3 class="visually-hidden" id="Spacing" tabindex="-1">Spacing</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Spacing</strong>&quot;, <em>width</em>]</p>
-<p>When serializing to LaTeX,  <code>_width_</code> is the dimension of the spacing, in 1/18 em.</p>
-<p>The <code>Spacing</code> function is <strong>inert</strong> and the value of a <code>[&quot;Spacing&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
+<p>When serializing to LaTeX,  <code>width</code>is the dimension of the spacing, in 1/18 em.</p>
+<p>The <code>Spacing</code> function is <strong>inert</strong> and the value of a <code>[&quot;Spacing&quot;, _expr_]</code> expression is <code>expr</code>.</p>
 </div></div>
 <h3 class="visually-hidden" id="Style" tabindex="-1">Style</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Style</strong>&quot;, <em>expr</em>, <em>dictionary</em>]</p>
 <ul>
-<li><code>_expr_</code> an expression</li>
-<li><code>_dictionary_</code> a dictionary with one or more of the following keys:
+<li><code>expr</code>an expression</li>
+<li><code>dictionary</code>a dictionary with one or more of the following keys:
 <ul>
 <li><code>_&quot;display&quot;_</code>:
 <ul>
@@ -2293,7 +2293,7 @@ other typographic variations.</p>
 </ul>
 </li>
 </ul>
-<p>The <code>Style</code> function is <strong>inert</strong> and the value of a <code>[&quot;Style&quot;, _expr_]</code> expression is <code>_expr_</code>.</p>
+<p>The <code>Style</code> function is <strong>inert</strong> and the value of a <code>[&quot;Style&quot;, _expr_]</code> expression is <code>expr</code>.</p>
 </div></div>
 </section>
 

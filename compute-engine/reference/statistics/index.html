@@ -2295,8 +2295,8 @@
 
 
 
-<p>For the following functions, when the input is a <em>list</em>, it can
-take the following forms:</p>
+<p>For the following functions, when the input is a <em>collection</em>, it can take the
+following forms:</p>
 <ul>
 <li>Multiple arguments, e.g. <code>[&quot;Mean&quot;, 1, 2, 3]</code></li>
 <li>A list of numbers, e.g. <code>[&quot;Mean&quot;, [&quot;List&quot;, 1, 2, 3]]</code></li>
@@ -2305,9 +2305,9 @@ take the following forms:</p>
 <li>A linear space: <code>[&quot;Mean&quot;, [&quot;Linspace&quot;, 1, 5, 10]]</code></li>
 </ul>
 <h2 id="functions" tabindex="-1">Functions</h2>
-<h3 class="visually-hidden" id="Mean" tabindex="-1">Mean</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Mean</strong>&quot;, <em>list</em>]</p>
+<h3 class="visually-hidden" id="Mean" tabindex="-1">Mean</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Mean</strong>&quot;, <em>collection</em>]</p>
 <div class='latex'><div class="source">\operatorname{mean}(\lbrack3, 5, 7\rbrack)</div><div class="display">\[ \operatorname{mean}(\lbrack3, 5, 7\rbrack) \]</div></div>
-<p>Evaluate to the <strong>arithmetic mean</strong> of a list of numbers.</p>
+<p>Evaluate to the <strong>arithmetic mean</strong> of a collection of numbers.</p>
 <p>The arithmetic mean is the average of the list of numbers. The mean is
 calculated by dividing the sum of the numbers by the number of numbers in the
 list.</p>
@@ -2318,8 +2318,8 @@ list.</p>
 <span class="hljs-comment">// 21.02</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Median" tabindex="-1">Median</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Median</strong>&quot;, <i>list</i>]</p>
-<p>Evaluate to the <strong>median</strong> of a list of numbers.</p>
+<h3 class="visually-hidden" id="Median" tabindex="-1">Median</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Median</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>median</strong> of a <em>collection</em> of numbers.</p>
 <p>The median is the value separating the higher half from the lower half of a data
 sample. For a list of numbers sorted in ascending order, the median is the
 middle value of the list. If the list has an odd number of elements, the median
@@ -2329,16 +2329,16 @@ the average of the two middle elements.</p>
 <span class="hljs-comment">// 3</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Mode" tabindex="-1">Mode</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Mode</strong>&quot;, <i>list</i>]</p>
-<p>Evaluate to the <strong>mode</strong> of a list of numbers.</p>
+<h3 class="visually-hidden" id="Mode" tabindex="-1">Mode</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Mode</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>mode</strong> of a <em>collection</em> of numbers.</p>
 <p>The mode is the value that appears most often in a list of numbers. A list of
 numbers can have more than one mode. If there are two modes, the list is called
 <strong>bimodal</strong>. For example \( \lbrack 2, 5, 5, 3, 2\rbrack\). If there are three
 modes, the list is called <strong>trimodal</strong>. If there are more than three modes, the
 list is called <strong>multimodal</strong>.</p>
 </div></div>
-<h3 class="visually-hidden" id="Variance" tabindex="-1">Variance</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Variance</strong>&quot;, <i>list</i>]</p>
-<p>Evaluate to the <strong>variance</strong> of a list of numbers.</p>
+<h3 class="visually-hidden" id="Variance" tabindex="-1">Variance</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Variance</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>variance</strong> of a <em>collection</em> of numbers.</p>
 <p>The variance is a measure of the amount of variation or dispersion of a set of
 values. A low variance indicates that the values tend to be close to the mean of
 the set, while a high variance indicates that the values are spread out over a
@@ -2347,58 +2347,85 @@ wider range.</p>
 <p>\[\frac{1}{n} \sum_{i=1}^n(x_i - \mu)^2\]</p>
 <p>where \(\mu\) is the mean of the list.</p>
 </div></div>
-<h3 class="visually-hidden" id="StandardDeviation" tabindex="-1">StandardDeviation</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>StandardDeviation</strong>&quot;, <i>list</i>]</p>
-<p>Evaluate to the <strong>standard deviation</strong> of a list of numbers.</p>
+<h3 class="visually-hidden" id="StandardDeviation" tabindex="-1">StandardDeviation</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>StandardDeviation</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>standard deviation</strong> of a <em>collection</em> of numbers.</p>
 <p>The standard deviation is a measure of the amount of variation or dispersion of
 a set of values. A low standard deviation indicates that the values tend to be
 close to the mean of the set, while a high standard deviation indicates that the
 values are spread out over a wider range.</p>
-<p>The formula for the standard deviation of a list of numbers is</p>
+<p>The formula for the standard deviation of a <em>collection</em> of numbers is</p>
 <p>\[\sqrt{\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2}\]</p>
 <p>where \(\mu\) is the mean of the list.</p>
 </div></div>
-<h3 class="visually-hidden" id="Skewness" tabindex="-1">Skewness</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Skewness</strong>&quot;, <i>list</i>]</p>
+<h3 class="visually-hidden" id="Skewness" tabindex="-1">Skewness</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Skewness</strong>&quot;, <em>collection</em>]</p>
 <p>Evaluate to the <strong>skewness</strong> of a list of numbers.</p>
 <p>The skewness is a measure of the asymmetry of the distribution of a real-valued
 random variable about its mean. The skewness value can be positive or negative,
 or undefined.</p>
-<p>The formula for the skewness of a list of numbers is: \[\frac{1}{n}
+<p>The formula for the skewness of a <em>collection</em> of numbers is: \[\frac{1}{n}
 \sum_{i=1}^n \left(\frac{x_i - \mu}{\sigma}\right)^3\]</p>
-<p>where \(\mu\) is the mean of the list, and \(\sigma\) is the standard
-deviation of the list.</p>
+<p>where \(\mu\) is the mean of the <em>collection</em>, and \(\sigma\) is the
+standard deviation of the <em>collection</em>.</p>
 </div></div>
-<h3 class="visually-hidden" id="Kurtosis" tabindex="-1">Kurtosis</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Kurtosis</strong>&quot;, <em>list</em>]</p>
-<p>Evaluate to the <strong>kurtosis</strong> of a list of numbers.</p>
+<h3 class="visually-hidden" id="Kurtosis" tabindex="-1">Kurtosis</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Kurtosis</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>kurtosis</strong> of a <em>collection</em> of numbers.</p>
 <p>The kurtosis is a measure of the “tailedness” of the distribution of a
 real-valued random variable. The kurtosis value can be positive or negative, or
 undefined.</p>
-<p>The formula for the kurtosis of a list of numbers is</p>
+<p>The formula for the kurtosis of a <em>collection</em> of numbers is</p>
 <p>\[ \frac{1}{n} \sum_{i=1}^n \left(\frac{x_i - \mu}{\sigma}\right)^4\]</p>
 <p>where \(\mu\) is the mean of the list, and \(\sigma\) is the standard
 deviation of the list.</p>
 </div></div>
-<h3 class="visually-hidden" id="Quantile" tabindex="-1">Quantile</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Quantile</strong>&quot;, <em>list</em>, <em>q:number</em>]</p>
-<p>Evaluate to the <strong>quantile</strong> of a list of numbers.</p>
-<p>The quantile is a value that divides a list of numbers into equal-sized groups.
-The quantile is a generalization of the median, which divides a list of numbers
-into two equal-sized groups.</p>
+<h3 class="visually-hidden" id="Quantile" tabindex="-1">Quantile</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Quantile</strong>&quot;, <em>collection</em>, <em>q:number</em>]</p>
+<p>Evaluate to the <strong>quantile</strong> of a <em>collection</em> of numbers.</p>
+<p>The quantile is a value that divides a <em>collection</em> of numbers into equal-sized
+groups. The quantile is a generalization of the median, which divides a
+<em>collection</em> of numbers into two equal-sized groups.</p>
 <p>So, \(\operatorname{median} = \operatorname{quantile}(0.5)\).</p>
 </div></div>
-<h3 class="visually-hidden" id="Quartiles" tabindex="-1">Quartiles</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Quartiles</strong>&quot;, <em>list</em>]</p>
-<p>Evaluate to the <strong>quartiles</strong> of a list of numbers.</p>
-<p>The quartiles are the three points that divide a list of numbers into four equal
-groups, each group comprising a quarter of the list.</p>
+<h3 class="visually-hidden" id="Quartiles" tabindex="-1">Quartiles</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Quartiles</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>quartiles</strong> of a <em>collection</em> of numbers.</p>
+<p>The quartiles are the three points that divide a <em>collection</em> of numbers into
+four equal groups, each group comprising a quarter of the <em>collection</em>.</p>
 </div></div>
-<h3 class="visually-hidden" id="InterquartileRange" tabindex="-1">InterquartileRange</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>InterquartileRange</strong>&quot;, <em>list</em>]</p>
-<p>Evaluate to the <strong>interquartile range</strong> (IRQ) of a list of numbers.</p>
+<h3 class="visually-hidden" id="InterquartileRange" tabindex="-1">InterquartileRange</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>InterquartileRange</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to the <strong>interquartile range</strong> (IRQ) of a <em>collection</em> of numbers.</p>
 <p>The interquartile range is the difference between the third quartile and the
 first quartile.</p>
 </div></div>
-<h3 class="visually-hidden" id="Sum" tabindex="-1">Sum</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>list</em>]</p>
-<p>Evaluate to the sum of a list of numbers.</p>
+<h3 class="visually-hidden" id="Sum" tabindex="-1">Sum</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to a sum of all the elements in <em>collection</em>. If all the elements are
+numbers, the result is a number. Otherwise it is a simplified <em>collection</em>.</p>
+<div class='latex'><div class="source">\sum x_{i}</div><div class="display">\[ \sum x_{i} \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 23</span>
+</code></pre>
+<p class="signature">[&quot;<strong>Sum</strong>&quot;, <em>body</em>, <em>bounds</em>]</p>
+<p>Return the sum of <code>body</code>for each value in <code>bounds</code>.</p>
+<div class='latex'><div class="source">\sum{i=1}^{n} f(i)</div><div class="display">\[ \sum{i=1}^{n} f(i) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 65</span>
+</code></pre>
+<pre><code>
+<p></code></pre></p>
 </div></div>
-<h3 class="visually-hidden" id="Product" tabindex="-1">Product</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Product</strong>&quot;, <em>list</em>]</p>
-<p>Evaluate to the product of a list of numbers.</p>
+<h3 class="visually-hidden" id="Product" tabindex="-1">Product</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Product</strong>&quot;, <em>collection</em>]</p>
+<p>Evaluate to a product of all the elements in <code>collection</code>.</p>
+<p>If all the elements are numbers, the result is a number. Otherwise it is a
+simplified <em>collection</em>.</p>
+<div class='latex'><div class="source">\prod x_{i}</div><div class="display">\[ \prod x_{i} \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 385</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
+</code></pre>
+<p class="signature">[&quot;<strong>Product</strong>&quot;, <em>body</em>, <em>bounds</em>]</p>
+<p>Return the product of <code>body</code>for each value in <code>bounds</code>.</p>
+<div class='latex'><div class="source">\prod_{i=1}^{n} f(i)</div><div class="display">\[ \prod_{i=1}^{n} f(i) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 39916800</span>
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Erf" tabindex="-1">Erf</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Erf</strong>&quot;, <em>z:complex</em>]</p>
 <p>Evaluate to the <strong>error function</strong> of a complex number.</p>
