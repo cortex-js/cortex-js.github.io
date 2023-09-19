@@ -2306,13 +2306,13 @@ can be evaluated much faster.</p>
 
 <span class="hljs-comment">// Numerical evaluation using the Compute Engine</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.evaluate().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// -&gt; 3.14159169866146</span>
+<span class="hljs-comment">// ➔ 3.14159169866146</span>
 <span class="hljs-comment">// Timing: 1,531ms</span>
 
 <span class="hljs-comment">// Compilation to a JavaScript function and execution</span>
 <span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>());
-<span class="hljs-comment">// -&gt; 3.1415916986605086</span>
+<span class="hljs-comment">// ➔ 3.1415916986605086</span>
 <span class="hljs-comment">// Timing: 6.2ms (247x faster)</span>
 </code></pre>
 <h2 id="compiling" tabindex="-1">Compiling</h2>
@@ -2322,7 +2322,7 @@ can be evaluated much faster.</p>
 </code></pre>
 <p><strong>To evaluate the compiled expression</strong> call the function returned by <code>expr.compile()</code>:</p>
 <pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>());
-<span class="hljs-comment">// -&gt; 3.141592653589793</span>
+<span class="hljs-comment">// ➔ 3.141592653589793</span>
 </code></pre>
 <p>If the expression cannot be compiled, the <code>compile()</code> method will return
 <code>undefined</code>.</p>
@@ -2333,15 +2333,15 @@ containing the value of the arguments:</p>
 <span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">10</span>; i++) 
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({<span class="hljs-attr">n</span>: i}));
-<span class="hljs-comment">// -&gt; 1, 4, 9, 16, 25, 36, 49, 64, 81</span>
+<span class="hljs-comment">// ➔ 1, 4, 9, 16, 25, 36, 49, 64, 81</span>
 </code></pre>
 <p><strong>To get a list of the arguments (or <em>free variables</em>) of an expression</strong>
 use the <code>expr.freeVars</code> property:</p>
 <pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n^2&quot;</span>).<span class="hljs-property">freeVars</span>);
-<span class="hljs-comment">// -&gt; [&quot;n&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;n&quot;]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;a^2+b^3&quot;</span>).<span class="hljs-property">freeVars</span>);
-<span class="hljs-comment">// -&gt; [&quot;a&quot;, &quot;b&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;a&quot;, &quot;b&quot;]</span>
 
 </code></pre>
 <h2 id="limitations" tabindex="-1">Limitations</h2>
@@ -2355,7 +2355,7 @@ are not supported.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">compile</span>() ?? expr.<span class="hljs-title function_">N</span>().<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// Compile cannot handle complex numbers, so it returns `undefined`</span>
 <span class="hljs-comment">// and we fall back to numerical evaluation with expr.N()</span>
-<span class="hljs-comment">// -&gt; 1</span>
+<span class="hljs-comment">// ➔ 1</span>
 </code></pre>
 
 
@@ -2368,14 +2368,14 @@ are not supported.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 18, 2023">
+        <meta itemprop="datePublished" content="September 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-18">September 18, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

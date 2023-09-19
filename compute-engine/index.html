@@ -2257,9 +2257,13 @@
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 <p class="xl">The <strong>CortexJS Compute Engine</strong> is a JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.</p>
+<p>The <strong>Compute Engine</strong> is for educators, students, scientists and engineers
+who need to make technical computing apps running in the browser or in
+server-side JavaScript environments such as Node.</p>
+<div style="height:2rem"></div>
 <pre><code class="language-ts"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).evaluate().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
 
 
@@ -2268,9 +2272,6 @@ computing and numeric evaluation of mathematical expressions.</p>
 <span class="hljs-comment">// ➔ &quot;a^2 + 2ab + b^2&quot;</span>
 
 </code></pre>
-<p>The Compute Engine is for anyone who wants to make technical computing apps
-in the browser or in server-side environments such as Node: educators,
-students, scientists and engineers.</p>
 <p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript code. This guide
 assumes you are familiar with JavaScript or TypeScript.</p>
 <p>The CortexJS Compute Engine manipulates math expressions represented with the <a href ="/math-json/">MathJSON format</a>.</p>
@@ -2294,7 +2295,7 @@ from a CDN.</p>
     <span class="hljs-string">&#x27;https://unpkg.com/@cortex-js/compute-engine?module&#x27;</span>;
 
   <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).evaluate().<span class="hljs-property">latex</span>);
   <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
@@ -2302,7 +2303,8 @@ from a CDN.</p>
 <p>The ESM (module) version is also available in the npm package in <code>dist/compute-engine.min.esm.js</code></p>
 <h3 id="using-vintage-javascript" tabindex="-1">Using Vintage JavaScript</h3>
 <p>If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version.</p>
+modern JavaScript features, use the UMD version. You can load the UMD
+version by using a <code>&lt;script&gt;</code> tag.</p>
 <p>For example, WebPack 4 does not support the optional chaining operator, using
 the UMD version will make use of polyfills as necessary.</p>
 <p>The UMD version is also available in the npm package in <code>dist/compute-engine.min.js</code></p>
@@ -2310,7 +2312,7 @@ the UMD version will make use of polyfills as necessary.</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
   <span class="hljs-variable language_">window</span>.<span class="hljs-property">onload</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
     <span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title class_">ComputeEngine</span>();
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).evaluate().<span class="hljs-property">latex</span>);
     <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
   }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
@@ -2319,9 +2321,9 @@ the UMD version will make use of polyfills as necessary.</p>
 <p>A non-minified module which may be useful for debugging is available in
 the npm package as <code>dist/compute-engine.esm.js</code>.</p>
 <h2 id="standard-library" tabindex="-1">Standard Library</h2>
-<p>Expressions reference identifiers that are defined in libraries.</p>
-<p>By default, a <code>ComputeEngine</code> instance includes a robust set of
-functions and symbols, the standard library, grouped in several topics.</p>
+<p>The identifiers in a MathJSON expression are defined libraries. The standard
+library is a collection of functions and symbols that are available by default
+in a <code>ComputeEngine</code> instance.</p>
 <div class=symbols-table>
 <table>
 <thead>
@@ -2390,23 +2392,31 @@ functions and symbols, the standard library, grouped in several topics.</p>
 </tbody>
 </table>
 </div>
-<p>You can define your own identifiers to complement or replace the standard
-library.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
-  <span class="hljs-attr">symbolTables</span>: <span class="hljs-title class_">ComputeEngine</span>.<span class="hljs-title function_">getSymbolTable</span>(<span class="hljs-string">&quot;arithmetic&quot;</span>)
-});
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">json</span>);
-</code></pre>
-<p>Each entry in a symbol table defines the properties of that function or
-symbol, as well as how to put expressions using that function in canonical form
-and how to simplify and evaluate it.</p>
 <div class='read-more'><a href="/compute-engine/guides/standard-library/">
 Read more about <strong>Standard Library</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h3 id="extending-the-standard-library" tabindex="-1">Extending the Standard Library</h3>
+<p>The standard library can be extended by defining new definitions:</p>
+<pre><code class="language-js"><span class="hljs-comment">// Declare that the identifier &quot;f&quot; is a function, </span>
+<span class="hljs-comment">// but without giving it a value</span>
+ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;Function&quot;</span>);
+
+<span class="hljs-comment">// Define a new function `double` that returns twice its input</span>
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;double(x)&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>]);
+
+<span class="hljs-comment">// LaTeX can be used for the definition as well...</span>
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;half(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{x}{2}&quot;</span>));
+</code></pre>
+<div class='read-more'><a href="/compute-engine/guides/augmenting/">
+Read more about <strong>Augmenting the Standard Library</strong>
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>Each entry in a symbol table defines the properties of that function or
+symbol, as well as how to put expressions using that function in canonical form
+and how to simplify and evaluate it.</p>
 <p>You can also customize the LaTeX syntax, that is how to parse and serialize
 LaTeX to MathJSON.</p>
 <div class='read-more'><a href="/compute-engine/guides/latex-syntax/">
-Read more about the <strong>LaTeX Syntax</strong>
+Read more about <strong>Parsing and Serializing LaTeX</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
@@ -2419,14 +2429,14 @@ Read more about the <strong>LaTeX Syntax</strong>
         
 
 
-        <meta itemprop="datePublished" content="September 17, 2023">
+        <meta itemprop="datePublished" content="September 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

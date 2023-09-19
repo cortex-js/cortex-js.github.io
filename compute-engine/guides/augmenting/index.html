@@ -2359,7 +2359,7 @@ be created. The domain of the symbol will be set to inferred from the value.</p>
 <p>Let’s say you want to parse the following expression:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\operatorname{double}(3)&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// -&gt; [&quot;Multiply&quot;, &quot;double&quot;, &quot;3&quot;]</span>
+<span class="hljs-comment">// ➔ [&quot;Multiply&quot;, &quot;double&quot;, &quot;3&quot;]</span>
 </code></pre>
 <p>🤔 Hmmm… That’s probably not what you want.</p>
 <p>You probably want to get <code>[&quot;double&quot;, 3]</code> instead. The problem is that the
@@ -2398,14 +2398,14 @@ associated with a function definition.</p>
 <p>Now, when you parse the expression, you get the expected result:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\operatorname{double}(3)&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// -&gt; [&quot;double&quot;, 2] 🎉</span>
+<span class="hljs-comment">// ➔ [&quot;double&quot;, 2] 🎉</span>
 </code></pre>
 <h3 id="defining-a-function" tabindex="-1">Defining a Function</h3>
 <p>However, you still can’t evaluate the expression, because the Compute Engine
 doesn’t know how to evaluate <code>double</code> yet, it just knows that <code>double</code> is a
 function.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.evaluate(expr).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// -&gt; [&quot;double&quot;, 3]</span>
+<span class="hljs-comment">// ➔ [&quot;double&quot;, 3]</span>
 </code></pre>
 <p>For the Compute Engine to evaluate <code>double</code>, you need to define provide a
 definition for it.</p>
@@ -2427,7 +2427,7 @@ arguments.</li>
 </ul>
 <p>If you evaluate the expression now, you get the expected result:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.evaluate(expr).<span class="hljs-property">json</span>);
-<span class="hljs-comment">// -&gt; 6 🎉</span>
+<span class="hljs-comment">// ➔ 6 🎉</span>
 </code></pre>
 <h3 id="changing-the-definition-of-a-function" tabindex="-1">Changing the Definition of a Function</h3>
 <p><strong>To change the definition of a function</strong>, use <code>ce.assign()</code>.</p>
@@ -2489,14 +2489,14 @@ LaTeX command.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 18, 2023">
+        <meta itemprop="datePublished" content="September 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-18">September 18, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

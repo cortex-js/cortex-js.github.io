@@ -2383,13 +2383,13 @@ such as its domain, its attributes, its value, etc…</p>
 <h3 class="visually-hidden" id="Domain" tabindex="-1">Domain</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Domain</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the domain of <em>expression</em></p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Domain&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2.4531</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;RealNumber&quot;</span>
+<span class="hljs-comment">// ➔ &quot;RealNumber&quot;</span>
 </code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Head" tabindex="-1">Head</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Head</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the head of <em>expression</em></p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Head&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;Add&quot;</span>
+<span class="hljs-comment">// ➔ &quot;Add&quot;</span>
 </code></pre>
 </div></div>
 <h2 id="transforming-an-expression" tabindex="-1">Transforming an Expression</h2>
@@ -2404,7 +2404,7 @@ in order to reduce, simplify and calculate its value.</p>
 <h3 class="visually-hidden" id="N" tabindex="-1">N</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>N</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a numerical approximation of the expression.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;N&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 3.141592653589793</span>
+<span class="hljs-comment">// ➔ 3.141592653589793</span>
 </code></pre>
 </div></div>
 <section id='core-functions'>
@@ -2437,13 +2437,13 @@ as an argument and returns a function).</p>
 <p>Evaluate to a string made from the concatenation of the arguments converted to
 strings</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;String&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;&#x27;x2&#x27;&quot;</span>
+<span class="hljs-comment">// ➔ &quot;&#x27;x2&#x27;&quot;</span>
 </code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Symbol" tabindex="-1">Symbol</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Symbol</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a new symbol made of a concatenation of the arguments.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Symbol&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;x2&quot;</span>
+<span class="hljs-comment">// ➔ &quot;x2&quot;</span>
 </code></pre>
 <p>The symbol is not declared, it remains a free variable. To declare the symbol
 use <code>Declare</code>.</p>
@@ -2456,7 +2456,7 @@ use <code>Declare</code>.</p>
 <p>If <em>expr</em> is a <code>[&quot;LatexString&quot;]</code> expression, evaluate to a MathJSON expression
 corresponding to the LaTeX string.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Parse&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;LatexString&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&#x27;\\frac{\\pi}{2}&#x27;&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, &quot;Pi&quot;, 2]</span>
 </code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Latex" tabindex="-1">Latex</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Latex</strong>&quot;, <em>expression</em>]</p>
@@ -2533,14 +2533,14 @@ corresponding to the LaTeX string.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 18, 2023">
+        <meta itemprop="datePublished" content="September 19, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-18">September 18, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
