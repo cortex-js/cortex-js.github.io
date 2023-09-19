@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#finite-collections">Finite Collections</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Fill">Fill</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#infinite-collections">Infinite Collections</a><ol><li><a href="#Repeat">Repeat</a></li><li><a href="#Cycle">Cycle</a></li><li><a href="#Iterate">Iterate</a></li></ol></li><li><a href="#iterable-collection-operations">Iterable Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Dimensions">Dimensions</a></li><li><a href="#Rank">Rank</a></li><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Reverse">Reverse</a></li><li><a href="#Map">Map</a></li><li><a href="#Filter">Filter</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Zip">Zip</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#Join">Join</a></li></ol></li><li><a href="#indexable-collection-operations">Indexable Collection Operations</a><ol><li><a href="#At">At</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Sort">Sort</a></li><li><a href="#Ordering">Ordering</a></li><li><a href="#Shuffle">Shuffle</a></li><li><a href="#RotateLeft">RotateLeft</a></li><li><a href="#RotateRight">RotateRight</a></li><li><a href="#Tally">Tally</a></li><li><a href="#Unique">Unique</a></li></ol></li></ol>
+        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#creating-collections">Creating Collections</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li><li><a href="#Fill">Fill</a></li><li><a href="#Repeat">Repeat</a></li><li><a href="#Cycle">Cycle</a></li><li><a href="#Iterate">Iterate</a></li></ol></li><li><a href="#transforming-collections">Transforming Collections</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Reverse">Reverse</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#Join">Join</a></li><li><a href="#Extract">Extract</a></li><li><a href="#Exclude">Exclude</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Sort">Sort</a></li><li><a href="#Shuffle">Shuffle</a></li><li><a href="#RotateLeft">RotateLeft</a></li><li><a href="#RotateRight">RotateRight</a></li><li><a href="#Unique">Unique</a></li></ol></li><li><a href="#operating-on-collections">Operating On Collections</a><ol><li><a href="#At">At</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Dimensions">Dimensions</a></li><li><a href="#Rank">Rank</a></li><li><a href="#Ordering">Ordering</a></li><li><a href="#Tally">Tally</a></li><li><a href="#Map">Map</a></li><li><a href="#Filter">Filter</a></li><li><a href="#Zip">Zip</a></li></ol></li></ol>
       </div>
       
                               
@@ -2295,29 +2295,22 @@
 
 
 
+<h2 id="introduction" tabindex="-1">Introduction</h2>
 <p>In the Compute Engine, <strong>collections</strong> are used to represent data structures.
 They group together multiple elements into one unit. Each element in a
 collection is a
 <a href="https://cortexjs.io/compute-engine/guides/expressions/"><strong>Boxed Expression</strong></a>.</p>
 <p>Collections are <strong>immutable</strong>. They cannot be modified. Operations on
 collections return new collections.</p>
-<p>Collections can be <strong>finite</strong> or <strong>infinite</strong>. Finite collections have a finite
-number of elements. Infinite collections have an infinite number of elements.</p>
-<p>Collections can be <strong>ordered</strong> or <strong>unordered</strong>. Ordered collections are finite
-and have a well-defined order for their elements. Unordered collections do not
-have a well-defined order for their elements.</p>
-<p>Collections can be <strong>indexable</strong> or <strong>iterable</strong>. Indexable collections can be
-accessed with a numeric index. Iterable collections can be enumerated one
-element at a time. Indexable collections are iterable.</p>
-<p><code>List</code> is an example of a of finite, ordered, indexable collection.</p>
+<p>A <code>[&quot;List&quot;]</code> expression can represent an heterogeneous collection of elements.</p>
 <div class='latex'><div class="source">\lbrack 42, 3.14, x, y \rbrack</div><div class="display">\[ \lbrack 42, 3.14, x, y \rbrack \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3.14</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Lists can be used to represent <strong>vectors</strong>.</p>
+<p>List of numbers can be used to represent <strong>vectors</strong>.</p>
 <div class='latex'><div class="source">\lbrack 1, 2, 3 \rbrack</div><div class="display">\[ \lbrack 1, 2, 3 \rbrack \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>A <strong>matrix</strong> is represented using a <code>List</code> of <code>List</code>s.</p>
+<p>A <strong>matrix</strong> is represented using a <code>List</code> of <code>List</code> of numbers.</p>
 <div class='latex'><div class="source">\lbrack \lbrack 1, 2, 3 \rbrack, \lbrack 4, 5, 6 \rbrack, \lbrack 7, 8, 9 \rbrack \rbrack</div><div class="display">\[ \lbrack \lbrack 1, 2, 3 \rbrack, \lbrack 4, 5, 6 \rbrack, \lbrack 7, 8, 9 \rbrack \rbrack \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">6</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">8</span><span class="hljs-punctuation">,</span> <span class="hljs-number">9</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
@@ -2326,21 +2319,25 @@ element at a time. Indexable collections are iterable.</p>
 <p>And matrixes can be represented using LaTeX environments:</p>
 <div class='latex'><div class="source">\begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{pmatrix}</div><div class="display">\[ \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{pmatrix} \]</div></div>
 <p>Another common collection is the <code>Range</code> which is used to represent a sequence
-of numbers.</p>
+of numbers from a lower bound to an upper bound. Both lower and upper bounds
+are included in the range.</p>
 <div class='latex'><div class="source">\lbrack 1..10 \rbrack</div><div class="display">\[ \lbrack 1..10 \rbrack \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>Collection operations such as <code>IsEmpty</code>, <code>Take</code>, <code>IndexOf</code> can be applied to any
+<p>Collection operations such as <code>IsEmpty</code>, <code>Extract</code>, <code>IndexOf</code> can be applied to any
 collection types.</p>
 <div class='latex'><div class="source">\lbrack 2, 5, 7 \rbrack_{2}</div><div class="display">\[ \lbrack 2, 5, 7 \rbrack_{2} \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 5</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5]</span>
 </code></pre>
 <div class='latex'><div class="source">(2..10)_5</div><div class="display">\[ (2..10)_5 \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 7</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 7]</span>
 </code></pre>
-<h2 id="finite-collections" tabindex="-1">Finite Collections</h2>
+<h2 id="creating-collections" tabindex="-1">Creating Collections</h2>
+<p>This section contains functions that return a collection, but
+whose arguments are not collections. They are used to create
+collections.</p>
 <h3 class="visually-hidden" id="List" tabindex="-1">List</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>List</strong>&quot;, <em>x-1</em>, …<em>x-2</em>]</p>
 <p>A <code>List</code> is an <strong>ordered</strong>, <strong>indexable</strong> collection of elements. An element in
 a list may be repeated.</p>
@@ -2415,13 +2412,19 @@ collection is specified with <code>count</code> instead of a <code>step</code> v
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 9.11111111111111, 8.222222222222221, 7.333333333333333, 6.444444444444445, 5.555555555555555, 4.666666666666666, 3.7777777777777777, 2.888888888888889, 2]</span>
 </code></pre>
 </div></div>
+<h3 class="visually-hidden" id="Set" tabindex="-1">Set</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Set</strong>&quot;, <em>expr-1</em>, …<em>expr-2</em>]</p>
+<p>An <strong>unordered</strong> collection of unique elements.</p>
+<div class='latex'><div class="source">\lbrace 12, 15, 17 \rbrace</div><div class="display">\[ \lbrace 12, 15, 17 \rbrace \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-number">15</span><span class="hljs-punctuation">,</span> <span class="hljs-number">17</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</div></div>
 <h3 class="visually-hidden" id="Fill" tabindex="-1">Fill</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Fill</strong>&quot;, <em>dimensions</em>, <em>value</em>]</p>
 <p class="signature">[&quot;<strong>Fill</strong>&quot;, <em>dimensions</em>, <em>function</em>]</p>
 <p>Create a list of the specified dimensions.</p>
-<p>If a <em>value</em> is provided, the elements of the list are all set to that value.</p>
-<p>If a <em>function</em> is provided, the elements of the list are computed by applying
+<p>If a <code>value</code> is provided, the elements of the list are all set to that value.</p>
+<p>If a <code>function</code> is provided, the elements of the list are computed by applying
 the function to the index of the element.</p>
-<p>If <em>dimensions</em> is a number, a list of that length is created.</p>
+<p>If <code>dimensions</code> is a number, a list of that length is created.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fill&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 0, 0, 0]</span>
 </code></pre>
@@ -2429,39 +2432,25 @@ the function to the index of the element.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fill&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 0, 0, 0], [&quot;List&quot;, 0, 0, 0]]</span>
 </code></pre>
-<p>If a function is specified, it is applied to the index of the element to compute
+<p>If a <code>function</code> is specified, it is applied to the index of the element to compute
 the value of the element.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fill&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;i&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;j&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;i&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;j&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 0, 1, 2], [&quot;List&quot;, 1, 2, 3]]</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Set" tabindex="-1">Set</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Set</strong>&quot;, <em>expr-1</em>, …<em>expr-2</em>]</p>
-<p>An <strong>unordered</strong> collection of unique elements.</p>
-<div class='latex'><div class="source">\lbrace 12, 15, 17 \rbrace</div><div class="display">\[ \lbrace 12, 15, 17 \rbrace \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-number">15</span><span class="hljs-punctuation">,</span> <span class="hljs-number">17</span><span class="hljs-punctuation">]</span>
-</code></pre>
-</div></div>
-<h2 id="infinite-collections" tabindex="-1">Infinite Collections</h2>
-<p>The functions in this section create collections with an infinite number of
-elements.</p>
-<p>Negative indexes relative to the “last” element are not allowed when using
-infinite collections.</p>
-<p>The <code>Length</code> of infinite collection is <code>+Infinity</code>.</p>
 <h3 class="visually-hidden" id="Repeat" tabindex="-1">Repeat</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Repeat</strong>&quot;, <em>expr</em>]</p>
 <p>An infinite collection of the same element.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Repeat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 0, 0, 0, ...]</span>
 </code></pre>
-<p>Use <code>Take</code> or <code>First</code> to get a finite number of elements.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Repeat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 42, 42, 42]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Repeat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
+<p>Use <code>Take</code> to get a finite number of elements.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Repeat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 42, 42, 42]</span>
 </code></pre>
+<p><strong>Note:</strong> <code>[&quot;Repeat&quot;, n]</code> is equivalent to <code>[&quot;Cycle&quot;, [&quot;List&quot;, n]]</code>.</p>
 </div></div>
 <h3 class="visually-hidden" id="Cycle" tabindex="-1">Cycle</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Cycle</strong>&quot;, <em>seed</em>]</p>
-<p>A collection that repeats the elements of the <em>seed</em> collection. The input
+<p>A collection that repeats the elements of the <code>seed</code> collection. The input
 collection must be finite.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cycle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 7, 2, 5, 7, 2, 5, 7, ...]</span>
@@ -2469,11 +2458,8 @@ collection must be finite.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cycle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 1, 2, 3, 1, 2, 3, 1, 2, ...]</span>
 </code></pre>
-<p>Use <code>Take</code> or <code>First</code> to get a finite number of elements.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cycle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 7, 2, 5, 7]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cycle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
+<p>Use <code>Take</code> to get a finite number of elements.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Cycle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 7, 2, 5, 7]</span>
 </code></pre>
 </div></div>
@@ -2486,15 +2472,263 @@ value.</p>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 1, 2, 4, 8, 16, ...]</span>
 </code></pre>
 <p>Use <code>Take</code> to get a finite number of elements.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Iterate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Iterate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 7, 9, 11, 13, 15]</span>
 </code></pre>
 </div></div>
-<h2 id="iterable-collection-operations" tabindex="-1">Iterable Collection Operations</h2>
-<p>The elements of an <strong>iterable collection</strong> can be enumerated one at a time.</p>
-<p>They may contain an infinite number of elements. The elements may not be
-ordered.</p>
-<p>Examples include <code>List</code>, <code>Set</code>.</p>
+<h2 id="transforming-collections" tabindex="-1">Transforming Collections</h2>
+<p>This section contains functions whose argument is a collection
+and which return a collection made of a subset of the elements of the input.</p>
+<h3 class="visually-hidden" id="Flatten" tabindex="-1">Flatten</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Flatten</strong>&quot;, <em>collection</em>]</p>
+<p>Returns a list of all the elements of the collection, recursively.</p>
+<p>Only elements with the same head as the collection are flattened.</p>
+<p>For a matrix, it returns a list of all the elements in the matrix, in row-major
+order.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18, 1, 2, 3]</span>
+</code></pre>
+<p>This is similar to the APL <code>,</code> Ravel operator or <code>numpy.ravel</code>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ravel.html">Numpy</a>.</p>
+</div></div>
+<h3 class="visually-hidden" id="Reshape" tabindex="-1">Reshape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reshape</strong>&quot;, <em>collection</em>, <em>dimensions</em>]</p>
+<p>Returns a collection with the specified dimensions.</p>
+<p><code>Reshape</code> can be used to convert a list into a matrix.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reshape&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">9</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 1, 2, 3], [&quot;List&quot;, 4, 5, 6], [&quot;List&quot;, 7, 8, 9]]</span>
+</code></pre>
+<p>This is similar to the APL <code>⍴</code> Reshape operator or <code>numpy.reshape</code>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.reshape.html">Numpy</a>.</p>
+</div></div>
+<h3 class="visually-hidden" id="Reverse" tabindex="-1">Reverse</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reverse</strong>&quot;, <em>collection</em>]</p>
+<p>Return the collection in reverse order.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reverse&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10, 2, 5]</span>
+</code></pre>
+<p>It’s equivalent to <code>[&quot;Extract&quot;, _collection_, [&quot;Tuple&quot;, -1, 1]]</code>.</p>
+</div></div>
+<h3 class="visually-hidden" id="Transpose" tabindex="-1">Transpose</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Transpose</strong>&quot;, <em>matrix</em>]</p>
+<p>Returns the transpose of the matrix.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Transpose&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">6</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 1, 4], [&quot;List&quot;, 2, 5], [&quot;List&quot;, 3, 6]]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Join" tabindex="-1">Join</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Join</strong>&quot;, <em>collection-1</em>, <em>collection-2</em>, …]</p>
+<p>Returns a collection that contains the elements of the first collection followed
+by the elements of the second collection.</p>
+<p>All the collections should have the same head.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Join&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+ 
+```json example
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Join&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18, 1, 2, 3]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Extract" tabindex="-1">Extract</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Extract</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
+<p class="signature">[&quot;<strong>Extract</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>]</p>
+<p class="signature">[&quot;<strong>Extract</strong>&quot;, <em>collection</em>, <em>range</em>]</p>
+<p>Returns a list of the elements at the specified indexes.</p>
+<p><code>Extract</code> is a flexible function that can be used to extract a single element, a
+range of elements, or a list of elements.</p>
+<p><code>Extract</code> always return a list, even if the result is a single element. If no
+elements match, an empty list is returned.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 5]</span>
+ 
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">17</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;]</span>
+</code></pre>
+<p>When using a range, it is specified as a <a href="/#Range"><code>Range</code></a> expression.</p>
+<pre><code class="language-json"><span class="hljs-comment">// Elements 2 to 3</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 10, 18]</span>
+ 
+<span class="hljs-comment">// From start to end, every other element</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 10]</span>
+</code></pre>
+<p>The elements are returned in the order in which they’re specified. Using
+negative indexes (or ranges) reverses the order of the elements.</p>
+<pre><code class="language-json"><span class="hljs-comment">// From last to first = reverse</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10, 2, 5]</span>
+ 
+<span class="hljs-comment">// From last to first = reverse</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&quot;</span>desserts<span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;&quot;stressed&quot;&quot;</span>
+</code></pre>
+<p>An index can be repeated to extract the same element multiple times.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 10, 5]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Exclude" tabindex="-1">Exclude</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Exclude</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
+<p class="signature">[&quot;<strong>Exclude</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>]</p>
+<p class="signature">[&quot;<strong>Exclude</strong>&quot;, <em>collection</em>, <em>range</em>]</p>
+<p><code>Exclude</code> is the opposite of <code>Extract</code>. It returns a list of the elements that are not
+at the specified indexes.</p>
+<p>The elements are returned in the same order as they appear in the collection.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exclude&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 10, 18]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exclude&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exclude&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exclude&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+ 
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
+</code></pre>
+<p>An index may be repeated, but the corresponding element will only be dropped
+once.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exclude&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Take" tabindex="-1">Take</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Take</strong>&quot;, <em>collection</em>, <em>n</em>]</p>
+<p>Return a list of the first <code>n</code> elements of the collection.</p>
+<p>If <code>n</code> is negative, it returns the last <code>n</code> elements.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Drop" tabindex="-1">Drop</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>n</em>]</p>
+<p>Return a list without the first <code>n</code> elements.</p>
+<p>If <code>n</code> is negative, it returns a list without the last <code>n</code> elements.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="First" tabindex="-1">First</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>First</strong>&quot;, <em>collection</em>]</p>
+<p>Return the first element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, 1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 5</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;x&quot;</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Second" tabindex="-1">Second</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Second</strong>&quot;, <em>collection</em>]</p>
+<p>Return the second element of the collection.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Second&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; &quot;y&quot;</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Last" tabindex="-1">Last</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Last</strong>&quot;, <em>collection</em>]</p>
+<p>Return the last element of the collection.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Last&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 18</span>
+</code></pre>
+<p class="signature">[&quot;<strong>Last</strong>&quot;, <em>collection</em>, <em>n</em>]</p>
+<p>Return the last <em>n</em> elements of the collection.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Last&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Rest" tabindex="-1">Rest</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rest</strong>&quot;, <em>collection</em>]</p>
+<p>Return everything but the first element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, 1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 10, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Most" tabindex="-1">Most</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Most</strong>&quot;, <em>collection</em>]</p>
+<p>Return everything but the last element of the collection.</p>
+<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, -1]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Most&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Sort" tabindex="-1">Sort</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Sort</strong>&quot;, <em>collection</em>]</p>
+<p class="signature">[&quot;<strong>Sort</strong>&quot;, <em>collection</em>, <em>order-function</em>]</p>
+<p>Return the collection in sorted order.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sort&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Shuffle" tabindex="-1">Shuffle</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Shuffle</strong>&quot;, <em>collection</em>]</p>
+<p>Return the collection in random order.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Shuffle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 5]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="RotateLeft" tabindex="-1">RotateLeft</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>RotateLeft</strong>&quot;, <em>collection</em>, <em>count</em>]</p>
+<p>Returns a collection where the elements are rotated to the left by the specified
+count.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;RotateLeft&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 2]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="RotateRight" tabindex="-1">RotateRight</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>RotateRight</strong>&quot;, <em>collection</em>, <em>count</em>]</p>
+<p>Returns a collection where the elements are rotated to the right by the
+specified count.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;RotateRight&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 2]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Unique" tabindex="-1">Unique</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Unique</strong>&quot;, <em>collection</em>]</p>
+<p>Returns a list of the elements in <code>collection</code> without duplicates.</p>
+<p>This is equivalent to the first element of the result of <code>Tally</code>:
+<code>[&quot;First&quot;, [&quot;Tally&quot;, _collection_]]</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Unique&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18]</span>
+</code></pre>
+</div></div>
+<h2 id="operating-on-collections" tabindex="-1">Operating On Collections</h2>
+<p>The section contains functions whose argument is a collection,
+but whose return value is not a collection.</p>
+<h3 class="visually-hidden" id="At" tabindex="-1">At</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>At</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
+<p class="signature">[&quot;<strong>At</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>, …]</p>
+<p>Returns the element at the specified index.</p>
+<p>There can be multiple indexes, up to the rank of the collection.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 10</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 10</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 3</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Fold" tabindex="-1">Fold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>collection</em>, <em>fn</em>]</p>
+<p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>collection</em>, <em>fn</em>, <em>initial</em>]</p>
+<p>Returns a collection where the reducing function <em>fn</em> is applied to each element
+of the collection.</p>
+<p><code>Fold</code> performs a <em>left fold</em> operation: the reducing function is applied to the
+first two elements, then to the result of the previous application and the next
+element, etc…</p>
+<p>When an <code>initial</code> value is provided, the reducing function is applied to the
+initial value and the first element of the collection, then to the result of the
+previous application and the next element, etc…</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_2&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+<span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 35</span>
+</code></pre>
+<p>The name of a function can be used as a shortcut for a function that takes two
+arguments.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 35</span>
+</code></pre>
+<div class='read-more'><a href="/compute-engine/reference/control-structures/#FixedPoint">See
+also the <strong><code>FixedPoint</code> function</strong> which operates without a collection.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
 <h3 class="visually-hidden" id="Length" tabindex="-1">Length</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Length</strong>&quot;, <em>collection</em>]</p>
 <p>Returns the number of elements in the collection.</p>
 <p>When the collection is a matrix (list of lists), <code>Length</code> returns the number of
@@ -2558,32 +2792,31 @@ a tensor has rank 3, etc.</p>
 <span class="hljs-comment">// -&gt; 2</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Flatten" tabindex="-1">Flatten</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Flatten</strong>&quot;, <em>collection</em>]</p>
-<p>Returns a list of all the elements of the collection, recursively.</p>
-<p>Only elements with the same head as the collection are flattened.</p>
-<p>For a matrix, it returns a list of all the elements in the matrix, in row-major
-order.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18, 1, 2, 3]</span>
+<h3 class="visually-hidden" id="Ordering" tabindex="-1">Ordering</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Ordering</strong>&quot;, <em>collection</em>]</p>
+<p class="signature">[&quot;<strong>Ordering</strong>&quot;, <em>collection</em>, <em>order-function</em>]</p>
+<p>Return the indexes of the collection in sorted order.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ordering&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 1, 3, 4]</span>
 </code></pre>
-<p>This is similar to the APL <code>,</code> Ravel operator or <code>numpy.ravel</code>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ravel.html">Numpy</a>.</p>
+<p>To get the values in sorted order, use <code>Extract</code>:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Extract&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ordering&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
+ 
+<span class="hljs-comment">// Same as Sort:</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sort&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
+</code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Reshape" tabindex="-1">Reshape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reshape</strong>&quot;, <em>collection</em>, <em>dimensions</em>]</p>
-<p>Returns a collection with the specified dimensions.</p>
-<p><code>Reshape</code> can be used to convert a list into a matrix.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reshape&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">9</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 1, 2, 3], [&quot;List&quot;, 4, 5, 6], [&quot;List&quot;, 7, 8, 9]]</span>
+<h3 class="visually-hidden" id="Tally" tabindex="-1">Tally</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Tally</strong>&quot;, <em>collection</em>]</p>
+<p>Returns a tuples of two lists:</p>
+<ul>
+<li>The first list contains the unique elements of the collection.</li>
+<li>The second list contains the number of times each element appears in the collection.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tally&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Tuple&quot;, [&quot;List&quot;, 5, 2, 10, 18], [&quot;List&quot;, 3, 2, 1, 1]]</span>
 </code></pre>
-<p>This is similar to the APL <code>⍴</code> Reshape operator or <code>numpy.reshape</code>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.reshape.html">Numpy</a>.</p>
-</div></div>
-<h3 class="visually-hidden" id="Reverse" tabindex="-1">Reverse</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reverse</strong>&quot;, <em>collection</em>]</p>
-<p>Return the collection in reverse order.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reverse&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10, 2, 5]</span>
-</code></pre>
-<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, [&quot;Tuple&quot;, -1, 1]]</code>.</p>
 </div></div>
 <h3 class="visually-hidden" id="Map" tabindex="-1">Map</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Map</strong>&quot;, <em>collection</em>, <em>function</em>]</p>
 <p>Returns a collection where <em>function</em> is applied to each element of the input
@@ -2602,32 +2835,6 @@ collection. Only the elements for which the function returns <code>&quot;True&qu
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="Fold" tabindex="-1">Fold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>collection</em>, <em>fn</em>]</p>
-<p class="signature">[&quot;<strong>Fold</strong>&quot;, <em>collection</em>, <em>fn</em>, <em>initial</em>]</p>
-<p>Returns a collection where the reducing function <em>fn</em> is applied to each element
-of the collection.</p>
-<p><code>Fold</code> performs a <em>left fold</em> operation: the reducing function is applied to the
-first two elements, then to the result of the previous application and the next
-element, etc…</p>
-<p>When an <code>initial</code> value is provided, the reducing function is applied to the
-initial value and the first element of the collection, then to the result of the
-previous application and the next element, etc…</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>
-  <span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span>
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_2&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-<span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 35</span>
-</code></pre>
-<p>The name of a function can be used as a shortcut for a function that takes two
-arguments.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Fold&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 35</span>
-</code></pre>
-<div class='read-more'><a href="/compute-engine/reference/control-structures/#FixedPoint">See
-also the <strong><code>FixedPoint</code> function</strong> which operates without a collection.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-</div></div>
 <h3 class="visually-hidden" id="Zip" tabindex="-1">Zip</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Zip</strong>&quot;, <em>collection-1</em>, <em>collection-2</em>, …]</p>
 <p>Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
@@ -2635,221 +2842,6 @@ second element of the second collection, etc.</p>
 <p>The length of the resulting collection is the length of the shortest collection.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Zip&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">6</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;Tuple&quot;, 1, 4], [&quot;Tuple&quot;, 2, 5], [&quot;Tuple&quot;, 3, 6]]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Transpose" tabindex="-1">Transpose</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Transpose</strong>&quot;, <em>matrix</em>]</p>
-<p>Returns the transpose of the matrix.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Transpose&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">6</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, [&quot;List&quot;, 1, 4], [&quot;List&quot;, 2, 5], [&quot;List&quot;, 3, 6]]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Join" tabindex="-1">Join</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Join</strong>&quot;, <em>collection-1</em>, <em>collection-2</em>, …]</p>
-<p>Returns a collection that contains the elements of the first collection followed
-by the elements of the second collection.</p>
-<p>All the collections should have the same head.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Join&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
- 
-```json example
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Join&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18, 1, 2, 3]</span>
-</code></pre>
-</div></div>
-<h2 id="indexable-collection-operations" tabindex="-1">Indexable Collection Operations</h2>
-<p>An <strong>indexable collection</strong> is a collection where the elements can be accessed
-with a numeric index from 1 to the length of the collection. The length of an
-indexable is finite and can be computed.</p>
-<p>Some <code>Set</code> are finite.</p>
-<p>The elements of an <strong>indexable collection</strong> are finite and ordered. They can be
-accessed with a numeric index from 1 to the length of the collection.</p>
-<p>Indexable collections are <strong>finite</strong> and <strong>iterable</strong>.</p>
-<p>Examples include <code>List</code>, <code>Range</code> and <code>String</code>.</p>
-<h3 class="visually-hidden" id="At" tabindex="-1">At</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>At</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
-<p class="signature">[&quot;<strong>At</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>, …]</p>
-<p>Returns the element at the specified index.</p>
-<p>There can be multiple indexes, up to the rank of the collection.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 10</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 10</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;At&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 3</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Take" tabindex="-1">Take</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Take</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
-<p class="signature">[&quot;<strong>Take</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>]</p>
-<p class="signature">[&quot;<strong>Take</strong>&quot;, <em>collection</em>, <em>range</em>]</p>
-<p>Returns a list of the elements at the specified indexes.</p>
-<p><code>Take</code> is a flexible function that can be used to extract a single element, a
-range of elements, or a list of elements.</p>
-<p><code>Take</code> always return a list, even if the result is a single element. If no
-elements match, an empty list is returned.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 5]</span>
- 
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">17</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;]</span>
-</code></pre>
-<p>When using a range, it is specified as a <a href="/#Range"><code>Range</code></a> expression.</p>
-<pre><code class="language-json"><span class="hljs-comment">// Elements 2 to 3</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 10, 18]</span>
- 
-<span class="hljs-comment">// From start to end, every other element</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 10]</span>
-</code></pre>
-<p>The elements are returned in the order in which they’re specified. Using
-negative indexes (or ranges) reverses the order of the elements.</p>
-<pre><code class="language-json"><span class="hljs-comment">// From last to first = reverse</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 18, 10, 2, 5]</span>
- 
-<span class="hljs-comment">// From last to first = reverse</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;&quot;</span>desserts<span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;&quot;stressed&quot;&quot;</span>
-</code></pre>
-<p>An index can be repeated to extract the same element multiple times.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 10, 5]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Drop" tabindex="-1">Drop</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>index</em>]</p>
-<p class="signature">[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>index1</em>, <em>index2</em>]</p>
-<p class="signature">[&quot;<strong>Drop</strong>&quot;, <em>collection</em>, <em>range</em>]</p>
-<p>Drop is the opposite of <code>Take</code>. It returns a list of the elements that are not
-at the specified indexes.</p>
-<p>The elements are returned in the same order as they appear in the collection.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 10, 18]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
- 
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
-</code></pre>
-<p>An index may be repeated, but the corresponding element will only be dropped
-once.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Drop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 18]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="First" tabindex="-1">First</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>First</strong>&quot;, <em>collection</em>]</p>
-<p>Return the first element of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, 1]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 5</span>
- 
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;x&quot;</span>
-</code></pre>
-<p class="signature">[&quot;<strong>First</strong>&quot;, <em>collection</em>, <em>n</em>]</p>
-<p>Return the first <em>n</em> elements of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, [&quot;Tuple&quot;, 1, _n_]]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Second" tabindex="-1">Second</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Second</strong>&quot;, <em>collection</em>]</p>
-<p>Return the second element of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, 2]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Second&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; &quot;y&quot;</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Last" tabindex="-1">Last</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Last</strong>&quot;, <em>collection</em>]</p>
-<p>Return the last element of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Take&quot;, _collection_, -1]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Last&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; 18</span>
-</code></pre>
-<p class="signature">[&quot;<strong>Last</strong>&quot;, <em>collection</em>, <em>n</em>]</p>
-<p>Return the last <em>n</em> elements of the collection.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Last&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Rest" tabindex="-1">Rest</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rest</strong>&quot;, <em>collection</em>]</p>
-<p>Return everything but the first element of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, 1]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rest&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 10, 18]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Most" tabindex="-1">Most</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Most</strong>&quot;, <em>collection</em>]</p>
-<p>Return everything but the last element of the collection.</p>
-<p>It’s equivalent to <code>[&quot;Drop&quot;, _collection_, -1]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Most&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Sort" tabindex="-1">Sort</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Sort</strong>&quot;, <em>collection</em>]</p>
-<p class="signature">[&quot;<strong>Sort</strong>&quot;, <em>collection</em>, <em>order-function</em>]</p>
-<p>Return the collection in sorted order.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sort&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Ordering" tabindex="-1">Ordering</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Ordering</strong>&quot;, <em>collection</em>]</p>
-<p class="signature">[&quot;<strong>Ordering</strong>&quot;, <em>collection</em>, <em>order-function</em>]</p>
-<p>Return the indexes of the collection in sorted order.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ordering&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 1, 3, 4]</span>
-</code></pre>
-<p>To get the values in sorted order, user <code>Take</code>:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Set&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Take&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Ordering&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
- 
-<span class="hljs-comment">// Same as Sort:</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sort&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;l&quot;</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 2, 5, 10, 18]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Shuffle" tabindex="-1">Shuffle</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Shuffle</strong>&quot;, <em>collection</em>]</p>
-<p>Return the collection in random order.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Shuffle&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 5]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="RotateLeft" tabindex="-1">RotateLeft</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>RotateLeft</strong>&quot;, <em>collection</em>, <em>count</em>]</p>
-<p>Returns a collection where the elements are rotated to the left by the specified
-count.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;RotateLeft&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 2]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="RotateRight" tabindex="-1">RotateRight</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>RotateRight</strong>&quot;, <em>collection</em>, <em>count</em>]</p>
-<p>Returns a collection where the elements are rotated to the right by the
-specified count.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;RotateRight&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 10, 18, 5, 2]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Tally" tabindex="-1">Tally</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Tally</strong>&quot;, <em>collection</em>]</p>
-<p>Returns a tuples of two lists. The first list contains the unique elements of
-the collection. The second list contains the number of times each element
-appears in the collection.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tally&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;Tuple&quot;, [&quot;List&quot;, 5, 2, 10, 18], [&quot;List&quot;, 3, 2, 1, 1]]</span>
-</code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Unique" tabindex="-1">Unique</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Unique</strong>&quot;, <em>collection</em>]</p>
-<p>Returns a collection of the unique elements of the collection.</p>
-<p>This is equivalent to the first element of the result of <code>Tally</code>:
-<code>[&quot;First&quot;, [&quot;Tally&quot;, _collection_]]</code>.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Unique&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// -&gt; [&quot;List&quot;, 5, 2, 10, 18]</span>
 </code></pre>
 </div></div>
 
@@ -2863,14 +2855,14 @@ appears in the collection.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 17, 2023">
+        <meta itemprop="datePublished" content="September 18, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-18">September 18, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2892,7 +2884,7 @@ appears in the collection.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#finite-collections">Finite Collections</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Fill">Fill</a></li><li><a href="#Set">Set</a></li></ol></li><li><a href="#infinite-collections">Infinite Collections</a><ol><li><a href="#Repeat">Repeat</a></li><li><a href="#Cycle">Cycle</a></li><li><a href="#Iterate">Iterate</a></li></ol></li><li><a href="#iterable-collection-operations">Iterable Collection Operations</a><ol><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Dimensions">Dimensions</a></li><li><a href="#Rank">Rank</a></li><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Reverse">Reverse</a></li><li><a href="#Map">Map</a></li><li><a href="#Filter">Filter</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Zip">Zip</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#Join">Join</a></li></ol></li><li><a href="#indexable-collection-operations">Indexable Collection Operations</a><ol><li><a href="#At">At</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Sort">Sort</a></li><li><a href="#Ordering">Ordering</a></li><li><a href="#Shuffle">Shuffle</a></li><li><a href="#RotateLeft">RotateLeft</a></li><li><a href="#RotateRight">RotateRight</a></li><li><a href="#Tally">Tally</a></li><li><a href="#Unique">Unique</a></li></ol></li></ol>
+        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#creating-collections">Creating Collections</a><ol><li><a href="#List">List</a></li><li><a href="#Range">Range</a></li><li><a href="#Linspace">Linspace</a></li><li><a href="#Set">Set</a></li><li><a href="#Fill">Fill</a></li><li><a href="#Repeat">Repeat</a></li><li><a href="#Cycle">Cycle</a></li><li><a href="#Iterate">Iterate</a></li></ol></li><li><a href="#transforming-collections">Transforming Collections</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Reverse">Reverse</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#Join">Join</a></li><li><a href="#Extract">Extract</a></li><li><a href="#Exclude">Exclude</a></li><li><a href="#Take">Take</a></li><li><a href="#Drop">Drop</a></li><li><a href="#First">First</a></li><li><a href="#Second">Second</a></li><li><a href="#Last">Last</a></li><li><a href="#Rest">Rest</a></li><li><a href="#Most">Most</a></li><li><a href="#Sort">Sort</a></li><li><a href="#Shuffle">Shuffle</a></li><li><a href="#RotateLeft">RotateLeft</a></li><li><a href="#RotateRight">RotateRight</a></li><li><a href="#Unique">Unique</a></li></ol></li><li><a href="#operating-on-collections">Operating On Collections</a><ol><li><a href="#At">At</a></li><li><a href="#Fold">Fold</a></li><li><a href="#Length">Length</a></li><li><a href="#IsEmpty">IsEmpty</a></li><li><a href="#Dimensions">Dimensions</a></li><li><a href="#Rank">Rank</a></li><li><a href="#Ordering">Ordering</a></li><li><a href="#Tally">Tally</a></li><li><a href="#Map">Map</a></li><li><a href="#Filter">Filter</a></li><li><a href="#Zip">Zip</a></li></ol></li></ol>
       </div>
     
                             

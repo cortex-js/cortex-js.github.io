@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Integrate">Integrate</a></li><li><a href="#Derivative">Derivative</a></li></ol></li></ol>
+        <ol><li><a href="#D">D</a></li><li><a href="#ND">ND</a></li><li><a href="#Derivative">Derivative</a></li><li><a href="#Integrate">Integrate</a></li><li><a href="#NIntegrate">NIntegrate</a></li></ol>
       </div>
       
                               
@@ -2300,75 +2300,29 @@
 These two branches are related by the fundamental theorem of calculus:</p>
 <p>\[ \int_a^b f(x) \,\mathrm{d}x = F(b) - F(a) \]</p>
 <p>where \( F \) is an antiderivative of \( f \), that is \( F’ = f \).</p>
-<h2 id="functions" tabindex="-1">Functions</h2>
-<h3 class="visually-hidden" id="Integrate" tabindex="-1">Integrate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>]</p>
-<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>index</em>]</p>
-<p>An <strong>indefinite integral</strong>, also known as an antiderivative, refers to the reverse
-process of differentiation.</p>
-<div class='latex'><div class="source">\int \sin x \,\mathrm{d}x</div><div class="display">\[ \int \sin x \,\mathrm{d}x \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<p class="notice--info">Note that the LaTeX expression above include a LaTeX spacing command <code>\,</code> to add a
-small space between the function and the differential operator. This is
-optional, but it makes the expression easier to read.</p>
-<p class="notice--info">Note that the <code>d</code> indicating the variable of integration is wrapped with
-a <code>\mathrm{}</code> command so it can be displayed upright. This is
-also optional, but this a recommended typographical convention.</p>
-<p>Given a function \(f(x)\), finding its indefinite integral, denoted as
-\(\int f(x) \,\mathrm{d}x\), involves finding a new function
-\(F(x)\) such that \(F’(x) = f(x)\).</p>
-<p>Mathematically, this is expressed as:</p>
-<p>\[ \int f(x) \,\mathrm{d}x = F(x) + C \]</p>
-<p>where:</p>
-<ul>
-<li>\(dx\) specifies the variable of integration.</li>
-<li>\(F(x)\) is the antiderivative or the original function.</li>
-<li>\(C\) is the constant of integration, accounting for the fact that there are
-many functions that can have the same derivative, differing only by a constant.</li>
-</ul>
-<p><b>Reference</b></p>
-<ul>
-<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Integral">Integral</a>, <a href="https://en.wikipedia.org/wiki/Antiderivative">Antiderivative</a>, <a href="https://en.wikipedia.org/wiki/Integral_symbol">Integral Symbol</a></li>
-<li>Wolfram Mathworld: <a href="https://mathworld.wolfram.com/Integral.html">Integral</a></li>
-<li>NIST: <a href="https://dlmf.nist.gov/2.1#E1">Integral</a></li>
-</ul>
-<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>]</p>
-<p>A <strong>definite integral</strong> computes the net area between a function \( f(x) \) and
-the x-axis over a specified interval \([a, b]\). The “net area” accounts for
-areas below the x-axis subtracting from the total.</p>
-<div class='latex'><div class="source">\int_{0}^{2} x^2 \,\mathrm{d}x</div><div class="display">\[ \int_{0}^{2} x^2 \,\mathrm{d}x \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-</code></pre>
-<p>The notation for the definite integral of \( f(x) \) from \( a \) to \( b \)
-is given by:</p>
-<p>\[ \int_{a}^{b} f(x) \mathrm{d}x = F(b) - F(a) \]</p>
-<p>where:</p>
-<ul>
-<li>\( dx \) indicates the variable of integration.</li>
-<li>\( [a, b] \) are the bounds of integration, with \( a \) being the lower bound and \( b \) being the upper bound.</li>
-<li>\( F(x) \) is an antiderivative of \( f(x) \), meaning \( F’(x) = f(x) \).</li>
-</ul>
-<p>This value can be calculated symbolically or numerically. Symbolic integration
-is the process of finding an antiderivative of a function. Numerical integration
-is the process of approximating the value of a definite integral using numerical
-methods.</p>
-<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>, <em>bounds</em>]</p>
-<p>A <strong>double integral</strong> computes the net volume between a function \( f(x, y) \)
-and the xy-plane over a specified region \([a, b] \times [c, d]\). The
-“net volume” accounts for volumes below the xy-plane subtracting from the
-total. The notation for the double integral of \( f(x, y) \) from \( a \) to
-\( b \) and \( c \) to \( d \) is given by:</p>
-<p>\[ \int_{a}^{b} \int_{c}^{d} f(x, y) \,\mathrm{d}x \,\mathrm{d}y\]</p>
-<div class='latex'><div class="source">\int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y</div><div class="display">\[ \int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-</code></pre>
-</div></div> 
-<h3 class="visually-hidden" id="Derivative" tabindex="-1">Derivative</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>, <em>index</em>]</p>
-<p>The <code>Derivative</code> function represents the derivative of a function <em>expr</em> with respect to
-the variable <em>index</em>.</p>
+<p><strong>To calculate the derivative of a function</strong>, use the <code>D</code> function or <code>ND</code>
+to calculate a numerical approximation</p>
+<p><strong>To calculate the integral (antiderivative) of a function</strong>, use the <code>Integrate</code> function or <code>NIntegrate</code> to calculate a numerical approximation.</p>
+<h3 class="visually-hidden" id="D" tabindex="-1">D</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>D</strong>&quot;, <em>expr</em>, <em>var</em>]</p>
+<p>The <code>D</code> function represents the partial derivative of a function <code>expr</code> with respect to
+the variable <code>var</code>.</p>
 <div class='latex'><div class="source"> f^\prime(x)</div><div class="display">\[  f^\prime(x) \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;D&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
+<p class="signature">[&quot;<strong>D</strong>&quot;, <em>expr</em>, <em>var-1</em>, <em>var-2</em>, …]</p>
+<p>Multiple variables can be specified to compute the partial derivative of a multivariate
+function.</p>
+<div class='latex'><div class="source"> f^\prime(x, y)</div><div class="display">\[  f^\prime(x, y) \]</div></div>
+<div class='latex'><div class="source"> f'(x, y)</div><div class="display">\[  f'(x, y) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;D&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="signature">[&quot;<strong>D</strong>&quot;, <em>expr</em>, <em>var</em>, <em>var</em>]</p>
+<p>A variable can be repeated to compute the second derivative of a function.</p>
+<div class='latex'><div class="source"> f^{\prime\prime}(x)</div><div class="display">\[  f^{\prime\prime}(x) \]</div></div>
+<div class='latex'><div class="source"> f\doubleprime(x)</div><div class="display">\[  f\doubleprime(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;D&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p><strong>Explanation</strong></p>
 <p>The derivative is a measure of how a function changes as its input changes. It is the ratio of the change in the value of a function to the change in its input value.</p>
 <p>The derivative of a function \( f(x) \) with respect to its input \( x \) is denoted by \( f’(x) \) or \( \frac{df}{dx} \). The derivative of a function \( f(x) \) is defined as:</p>
 <p>\[
@@ -2376,18 +2330,28 @@ f’(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
 \]</p>
 <p>where:</p>
 <ul>
-<li>\( h \) is the change in the input variable.</li>
-<li>\( f(x + h) - f(x) \) is the change in the value of the function.</li>
-<li>\( \frac{f(x + h) - f(x)}{h} \) is the ratio of the change in the value of the function to the change in its input value.</li>
-<li>\( \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \) is the limit of the ratio of the change in the value of the function to the change in its input value as \( h \) approaches \( 0 \).</li>
-<li>The limit is taken as \( h \) approaches \( 0 \) because the derivative is the instantaneous rate of change of the function at a point, and the change in the input value must be infinitesimally small to be instantaneous.</li>
+<li>
+<p>\( h \) is the change in the input variable.</p>
+</li>
+<li>
+<p>\( f(x + h) - f(x) \) is the change in the value of the function.</p>
+</li>
+<li>
+<p>\( \frac{f(x + h) - f(x)}{h} \) is the ratio of the change in the value of the function to the change in its input value.</p>
+</li>
+<li>
+<p>\( \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \) is the limit of the ratio of the change in the value of the function to the change in its input value as \( h \) approaches \( 0 \).</p>
+</li>
+<li>
+<p>The limit is taken as \( h \) approaches \( 0 \) because the derivative is the instantaneous rate of change of the function at a point, and the change in the input value must be infinitesimally small to be instantaneous.</p>
+</li>
+<li>
+<p>Wikipedia: <a href="https://en.wikipedia.org/wiki/Derivative">Derivative</a></p>
+</li>
+<li>
+<p>Wolfram Mathworld: <a href="https://mathworld.wolfram.com/Derivative.html">Derivative</a></p>
+</li>
 </ul>
-<p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>, <em>index</em>, <em>n</em>]</p>
-<p>The <code>Derivative</code> function represents the <em>n</em>-th derivative of a function <em>expr</em> with
-respect to the variable <em>index</em>.</p>
-<div class='latex'><div class="source">f^{(n)}(x)</div><div class="display">\[ f^{(n)}(x) \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span>
-</code></pre>
 <p><b>Reference</b></p>
 <ul>
 <li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Derivative">Derivative</a></li>
@@ -2438,7 +2402,101 @@ respect to the variable <em>index</em>.</p>
 </tr>
 </tbody>
 </table>
+</div></div>
+<h3 class="visually-hidden" id="ND" tabindex="-1">ND</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>ND</strong>&quot;, <em>expr</em>, <em>value</em>]</p>
+<p>The <code>ND</code> function returns a numerical approximation of the partial derivative of a function <em>expr</em> at the point <em>value</em>.</p>
+<div class='latex'><div class="source"> \sin^{\prime}(x)|_{x=1}</div><div class="display">\[  \sin^{\prime}(x)|_{x=1} \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;ND&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 0.5403023058681398</span>
+</code></pre>
+<p><strong>Note:</strong> <code>[&quot;ND&quot;, &quot;Sin&quot;, 1]</code> is equivalent to <code>[&quot;N&quot;, [&quot;D&quot;, &quot;Sin&quot;, 1]]</code>.</p>
+</div></div>
+<h3 class="visually-hidden" id="Derivative" tabindex="-1">Derivative</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>]</p>
+<p>The <code>Derivative</code> function represents the derivative of a function <em>expr</em>.</p>
+<div class='latex'><div class="source"> f^\prime(x)</div><div class="display">\[  f^\prime(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+ 
+<span class="hljs-comment">// This is equivalent to:</span>
+<span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="signature">[&quot;<strong>Derivative</strong>&quot;, <em>expr</em>, <em>n</em>]</p>
+<p>When a <code>n</code> argument is present it represents the <em>n</em>-th derivative of a function <em>expr</em>.</p>
+<div class='latex'><div class="source">f^{(n)}(x)</div><div class="display">\[ f^{(n)}(x) \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Derivative&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;n&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p><code>Derivative</code> is an operator in the mathematical sense, that is, a function that takes a function
+as an argument and returns a function.</p>
+<p>The <code>Derivative</code> function is used to represent the derivative of a function in a symbolic form. It is not used to calculate the derivative of a function. To calculate the derivative of a function, use the <code>D</code> function or <code>ND</code> to calculate a numerical approximation.</p>
 </div></div> 
+<h3 class="visually-hidden" id="Integrate" tabindex="-1">Integrate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>]</p>
+<p>An <strong>indefinite integral</strong>, also known as an antiderivative, refers to the reverse
+process of differentiation.</p>
+<div class='latex'><div class="source">\int \sin</div><div class="display">\[ \int \sin \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>index</em>]</p>
+<div class='latex'><div class="source">\int \sin x \,\mathrm{d}x</div><div class="display">\[ \int \sin x \,\mathrm{d}x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p class="notice--info"><strong>Note</strong> The LaTeX expression above include a LaTeX spacing command <code>\,</code> to add a
+small space between the function and the differential operator. The differential
+operator is wrapped with a <code>\mathrm{}</code> command so it can be displayed upright.
+Both of these typographical conventions are optional, but they make the
+expression easier to read. The expression <code>\int \sin x dx</code> \(\int f(x) dx\) is equivalent.</p>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>]</p>
+<p>A <strong>definite integral</strong> computes the net area between a function \( f(x) \) and
+the x-axis over a specified interval \([a, b]\). The “net area” accounts for
+areas below the x-axis subtracting from the total.</p>
+<div class='latex'><div class="source">\int_{0}^{2} x^2 \,\mathrm{d}x</div><div class="display">\[ \int_{0}^{2} x^2 \,\mathrm{d}x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>The notation for the definite integral of \( f(x) \) from \( a \) to \( b \)
+is given by:</p>
+<p>\[ \int_{a}^{b} f(x) \mathrm{d}x = F(b) - F(a) \]</p>
+<p>where:</p>
+<ul>
+<li>\( dx \) indicates the variable of integration.</li>
+<li>\( [a, b] \) are the bounds of integration, with \( a \) being the lower bound and \( b \) being the upper bound.</li>
+<li>\( F(x) \) is an antiderivative of \( f(x) \), meaning \( F’(x) = f(x) \).</li>
+</ul>
+<p>Use <code>NIntegrate</code> to calculate a numerical approximation of the definite integral of a function.</p>
+<p class="signature">[&quot;<strong>Integrate</strong>&quot;, <em>expr</em>, <em>bounds</em>, <em>bounds</em>]</p>
+<p>A <strong>double integral</strong> computes the net volume between a function \( f(x, y) \)
+and the xy-plane over a specified region \([a, b] \times [c, d]\). The
+“net volume” accounts for volumes below the xy-plane subtracting from the
+total. The notation for the double integral of \( f(x, y) \) from \( a \) to
+\( b \) and \( c \) to \( d \) is given by:</p>
+<p>\[ \int_{a}^{b} \int_{c}^{d} f(x, y) \,\mathrm{d}x \,\mathrm{d}y\]</p>
+<div class='latex'><div class="source">\int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y</div><div class="display">\[ \int_{0}^{2} \int_{0}^{3} x^2 \,\mathrm{d}x \,\mathrm{d}y \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Integrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p><strong>Explanation</strong></p>
+<p>Given a function \(f(x)\), finding its indefinite integral, denoted as
+\(\int f(x) \,\mathrm{d}x\), involves finding a new function
+\(F(x)\) such that \(F’(x) = f(x)\).</p>
+<p>Mathematically, this is expressed as:</p>
+<p>\[ \int f(x) \,\mathrm{d}x = F(x) + C \]</p>
+<p>where:</p>
+<ul>
+<li>\(\mathrm{d}x\) specifies the variable of integration.</li>
+<li>\(F(x)\) is the antiderivative or the original function.</li>
+<li>\(C\) is the constant of integration, accounting for the fact that there are
+many functions that can have the same derivative, differing only by a constant.</li>
+</ul>
+<p><b>Reference</b></p>
+<ul>
+<li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Integral">Integral</a>, <a href="https://en.wikipedia.org/wiki/Antiderivative">Antiderivative</a>, <a href="https://en.wikipedia.org/wiki/Integral_symbol">Integral Symbol</a></li>
+<li>Wolfram Mathworld: <a href="https://mathworld.wolfram.com/Integral.html">Integral</a></li>
+<li>NIST: <a href="https://dlmf.nist.gov/2.1#E1">Integral</a></li>
+</ul>
+</div></div> 
+<h3 class="visually-hidden" id="NIntegrate" tabindex="-1">NIntegrate</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>NIntegrate</strong>&quot;, <em>expr</em>, <em>lower-bound</em>, <em>upper-bound</em>]</p>
+<p>Calculate the numerical approximation of the definite integral of a function
+\( f(x) \) from \( a \) to \( b \).</p>
+<div class='latex'><div class="source">\int_{0}^{2} x^2 \,\mathrm{d}x</div><div class="display">\[ \int_{0}^{2} x^2 \,\mathrm{d}x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NIntegrate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
+</code></pre>
+</div></div>
 
 
 
@@ -2450,14 +2508,14 @@ respect to the variable <em>index</em>.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 17, 2023">
+        <meta itemprop="datePublished" content="September 18, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-17">September 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-18">September 18, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2479,7 +2537,7 @@ respect to the variable <em>index</em>.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Integrate">Integrate</a></li><li><a href="#Derivative">Derivative</a></li></ol></li></ol>
+        <ol><li><a href="#D">D</a></li><li><a href="#ND">ND</a></li><li><a href="#Derivative">Derivative</a></li><li><a href="#Integrate">Integrate</a></li><li><a href="#NIntegrate">NIntegrate</a></li></ol>
       </div>
     
                             

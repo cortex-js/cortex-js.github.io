@@ -437,12 +437,15 @@ TEMPLATE.innerHTML = `
 
 
   /* Tomorrow Comment */
-  .hljs-comment,
-  .hljs-title {
+  .hljs-comment {
       color: var(--base-04, ${base04});
-      font-style: italic;
   }
   
+  /* Function (JS) and tag (HTML) names */
+  .hljs-tag, .hljs-title {
+      color: var(--base-0a, ${base0a});
+  }
+    
   /* Tomorrow Red */
   .hljs-variable,
   .hljs-attribute,
@@ -562,19 +565,19 @@ TEMPLATE.innerHTML = `
   .cm-s-tomorrow-night .CodeMirror-linenumber { color: var(--base-04, ${base04}); opacity: .7; }
   .cm-s-tomorrow-night .CodeMirror-cursor { border-left: 1px solid ${base0d}; }
   
-  .cm-s-tomorrow-night span.cm-comment { color: var(--base-09, ${base09}); }
+  .cm-s-tomorrow-night span.cm-comment { color: var(--base-04, ${base04}); }
   .cm-s-tomorrow-night span.cm-atom { color: var(--base-0e, ${base0e}); }
   .cm-s-tomorrow-night span.cm-number { color: var(--base-0e, ${base0e}); }
   
-  .cm-s-tomorrow-night span.cm-property, .cm-s-tomorrow-night span.cm-attribute { color: var(--base-0b, ${base0b}); }
+  .cm-s-tomorrow-night span.cm-property, .cm-s-tomorrow-night span.cm-attribute { color: var(--base-0a, ${base0a}); }
   .cm-s-tomorrow-night span.cm-keyword { color: var(--base-0c, ${base0c}); }
-  .cm-s-tomorrow-night span.cm-string { color: var(--base-0a, ${base0a}); }
+  .cm-s-tomorrow-night span.cm-string { color: var(--base-0b, ${base0b}); }
   
   .cm-s-tomorrow-night span.cm-variable { color: var(--base-0b, ${base0b}); }
   .cm-s-tomorrow-night span.cm-variable-2 { color: var(--base-0d, ${base0d}); }
   .cm-s-tomorrow-night span.cm-def { color: var(--base-09, ${base09}); }
   .cm-s-tomorrow-night span.cm-bracket { color: var(--base-05, ${base05}); }
-  .cm-s-tomorrow-night span.cm-tag { color: var(--base-0c, ${base0c}); }
+  .cm-s-tomorrow-night span.cm-tag { color: var(--base-0a, ${base0a}); }
   .cm-s-tomorrow-night span.cm-link { color: var(--base-0e, ${base0e}); }
   .cm-s-tomorrow-night span.cm-error { background: var(--base-0c, ${base0c}); color: var(--base-03, ${base03}); }
   
