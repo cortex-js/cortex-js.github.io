@@ -261,35 +261,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/comments/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/goals/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/cortex/implementation/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/literals/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/cortex/naming/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -310,14 +282,42 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/principles/</loc>
+    <loc>https://cortexjs.io/cortex/source-code/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/cortex/source-code/</loc>
+    <loc>https://cortexjs.io/cortex/comments/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/goals/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/literals/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/naming/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/cortex/principles/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -352,21 +352,7 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/compiling/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/calculus/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
+    <loc>https://cortexjs.io/compute-engine/guides/simplify/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -374,6 +360,13 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/augmenting/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/compiling/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -394,13 +387,6 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/guides/latex-syntax/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
     <loc>https://cortexjs.io/compute-engine/guides/numeric-evaluation/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
@@ -409,13 +395,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/patterns-and-rules/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/guides/simplify/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -443,7 +422,14 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/reference/arithmetic/</loc>
+    <loc>https://cortexjs.io/compute-engine/reference/calculus/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/collections/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -458,13 +444,6 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/reference/control-structures/</loc>
-    <lastmod>2023-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://cortexjs.io/compute-engine/reference/core/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -492,14 +471,28 @@
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/reference/statistics/</loc>
+    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://cortexjs.io/compute-engine/reference/trigonometry/</loc>
+    <loc>https://cortexjs.io/compute-engine/reference/arithmetic/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/core/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/reference/statistics/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -514,6 +507,13 @@
 
   <url>
     <loc>https://cortexjs.io/compute-engine/guides/expressions/</loc>
+    <lastmod>2023-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cortexjs.io/compute-engine/guides/latex-syntax/</loc>
     <lastmod>2023-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

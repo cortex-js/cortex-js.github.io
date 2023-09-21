@@ -2295,11 +2295,11 @@
 
 
 
-<p>The <a href="/compute-engine/guides/standard-library/">MathJSON Standard Library</a> is
-a collection of definitions for <strong>symbols</strong> and <strong>functions</strong> such as <code>Pi</code>,
-<code>Add</code>, <code>Sin</code>, <code>Power</code>, <code>List</code>, etc…</p>
-<p>In this guide we discuss how to augment the MathJSON Standard Library with your own
-definitions.</p>
+<p>The <a href="/compute-engine/guides/standard-library/">MathJSON Standard Library</a> is a
+collection of definitions for <strong>symbols</strong> and <strong>functions</strong> such as <code>Pi</code>, <code>Add</code>,
+<code>Sin</code>, <code>Power</code>, <code>List</code>, etc…</p>
+<p>In this guide we discuss how to augment the MathJSON Standard Library with your
+own definitions.</p>
 <div class='read-more'><a href="/compute-engine/guides/latex-syntax/#customizing-the-latex-dictionary">
 You may also be interested in <strong>augmenting the LaTeX dictionary</strong> which defines
 how LaTeX is parsed from and serialized to MathJSON. This is useful if you want
@@ -2315,26 +2315,28 @@ The “kind” of an object is called its <strong>domain</strong>.</p>
 <div class='read-more'><a href="/compute-engine/guides/domains"> Learn more about <strong>domains</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To declare an identifier</strong> use the <code>ce.declare()</code> method:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m_e&quot;</span>, { 
-    <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;RealNumber&quot;</span>,<span class="hljs-string">&quot;, 
-    constant: true, 
-    value: 9.1e-31 
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m_e&quot;</span>, {
+  <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;RealNumber&quot;</span>,
+  <span class="hljs-attr">constant</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">value</span>: <span class="hljs-number">9.1e-31</span>,
 });
-</span></code></pre>
-<p>After an identifier is declared, its domain cannot be changed: other
-expressions may depend on it, and changing its domain would invalidate them.</p>
+</code></pre>
+<p>After an identifier is declared, its domain cannot be changed: other expressions
+may depend on it, and changing its domain would invalidate them.</p>
 <p>You can also declare an identifier without providing a value:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;Function&quot;</span>);
-<span class="hljs-comment">// (Shortcut for ce.declare(&quot;f&quot;, { signature: { domain: &quot;Function&quot;} }))</span>
+
+<span class="hljs-comment">// Shortcut for:</span>
+ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> } });
 </code></pre>
 <p>By default, when a new identifier is encountered in an expression, it is
-declared automatically with a domain of <code>ce.defaultDomain</code> and no value.
-To prevent this behavior, set <code>ce.defaultDomain</code> to <code>null</code>. An error
-will be produced instead when an unknown identifier is encountered.</p>
-<div class='read-more'><a href="/compute-engine/guides/evaluate/#default-domain">
-Read more about the <strong>default domain</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p>We will discuss in more details below how to declare and define symbols
-and functions.</p>
+declared automatically with a domain of <code>ce.defaultDomain</code> and no value. To
+prevent this behavior, set <code>ce.defaultDomain</code> to <code>null</code>. An error will be
+produced instead when an unknown identifier is encountered.</p>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/#default-domain"> Read more about
+the <strong>default domain</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>We will discuss in more details below how to declare and define symbols and
+functions.</p>
 <h3 id="scope" tabindex="-1">Scope</h3>
 <p>The declaration of an identifier is done within a <strong>scope</strong>. A scope is a
 hierarchical collection of definitions.</p>
@@ -2343,30 +2345,30 @@ if you want to create a new scope.</p>
 <div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
 <strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h3 id="assigning-a-value" tabindex="-1">Assigning a Value</h3>
-<p>Once declared an identifier can be used in expressions, and it can be
-assigned a value.</p>
+<p>Once declared an identifier can be used in expressions, and it can be assigned a
+value.</p>
 <p>To change the value of a symbol, use the <code>value</code> property of the symbol.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;n&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;n&quot;</span>);
 n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${n.latex}</span> = <span class="hljs-subst">${n.value.json}</span>`</span>);
 <span class="hljs-comment">// ➔ n = 5</span>
 </code></pre>
 <p>Alternatively, use <code>ce.assign()</code>:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;n&#x27;</span>, <span class="hljs-number">5</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">5</span>);
 </code></pre>
 <h2 id="defining-a-symbol" tabindex="-1">Defining a Symbol</h2>
 <p>A symbol is a named value, such as <code>Pi</code> or <code>x</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/symbols"> Learn more about <strong>symbols</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To declare a new symbol</strong> use the <code>ce.declare()</code> method.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&#x27;m&#x27;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> });
-ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&#x27;n&#x27;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Integer&#x27;</span> });
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m&quot;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> });
+ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;n&quot;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Integer&quot;</span> });
 </code></pre>
 <p>The <code>domain</code> property is optional when a value is provided.</p>
 <p>See the <code>SymbolDefinition</code> type for more details on the properties associated
 with a symbol.</p>
 <p>You can change the value of one or more symbols using <code>ce.assign()</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;m&#x27;</span>, <span class="hljs-number">10</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;m&quot;</span>, <span class="hljs-number">10</span>);
 </code></pre>
 <p>As a shortcut, if the symbol was not previously defined, a new definition will
 be created. The domain of the symbol will be set to inferred from the value.</p>
@@ -2377,7 +2379,7 @@ be created. The domain of the symbol will be set to inferred from the value.</p>
 <div class='read-more'><a href="/compute-engine/guides/functions"> Learn more about
 <strong>functions</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>Let’s say you want to parse the following expression:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\operatorname{double}(3)&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\operatorname{double}(3)&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Multiply&quot;, &quot;double&quot;, &quot;3&quot;]</span>
 </code></pre>
@@ -2393,7 +2395,7 @@ convention you want. This only affects what happens when parsing LaTeX, though,
 and has no effect when using MathJSON expressions.</p>
 <p>To tell the Compute Engine that <code>double</code> is a function, you need to declare it.</p>
 <p><strong>To declare a function</strong>, use the <code>ce.declare()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&#x27;double&#x27;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Function&#x27;</span> } });
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> } });
 </code></pre>
 <p>The <code>signature</code> property defines how the function can be used. It is a
 <code>FunctionDefinition</code> object with the following properties (all are optional):</p>
@@ -2416,7 +2418,7 @@ arguments may be evaluated symbolically.</li>
 <p>See <code>FunctionDefinition</code> for more details on these properties and others
 associated with a function definition.</p>
 <p>Now, when you parse the expression, you get the expected result:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\operatorname{double}(3)&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\operatorname{double}(3)&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;double&quot;, 2] 🎉</span>
 </code></pre>
@@ -2429,9 +2431,9 @@ function.</p>
 </code></pre>
 <p>For the Compute Engine to evaluate <code>double</code>, you need to define provide a
 definition for it.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&#x27;double&#x27;</span>, {
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, {
   <span class="hljs-attr">signature</span>: {
-    <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Function&#x27;</span>,
+    <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span>,
     <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">2</span>),
   },
 });
@@ -2462,17 +2464,17 @@ declared, a new function definition is created, if the value is a function.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">5</span>)};
 </code></pre>
 <p>The value can be a MathJSON expression:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;f(x)&#x27;</span>, [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">5</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">5</span>]);
 </code></pre>
 <p>Note in this case we added <code>(x)</code> to the first argument of <code>ce.assign()</code> to
 indicate that <code>f</code> is a function. This is equivalent to the more verbose:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;f&#x27;</span>, [<span class="hljs-string">&#x27;Function&#x27;</span>, [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">5</span>], <span class="hljs-string">&#x27;x&#x27;</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">5</span>], <span class="hljs-string">&quot;x&quot;</span>]);
 </code></pre>
 <p>The value can be a LaTeX expression:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;f(x)&#x27;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x&#x27;</span>));
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x&quot;</span>));
 </code></pre>
 <p>Evaluating an <code>[&quot;Assign&quot;]</code> expression is equivalent to calling <code>ce.assign()</code>:</p>
-<pre><code class="language-js">ce.evaluate([<span class="hljs-string">&#x27;Assign&#x27;</span>, <span class="hljs-string">&#x27;f&#x27;</span>, [<span class="hljs-string">&#x27;Function&#x27;</span>, [<span class="hljs-string">&#x27;Multiply&#x27;</span>, <span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&#x27;x&#x27;</span>]]);
+<pre><code class="language-js">ce.evaluate([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]]);
 </code></pre>
 <h2 id="acting-on-multiple-functions-and-symbols" tabindex="-1">Acting on Multiple Functions and Symbols</h2>
 <p><strong>To declare multiple functions and symbols</strong>, use the <code>ce.declare()</code> method
@@ -2481,12 +2483,12 @@ with a dictionary of definitions.</p>
 identifiers, not LaTeX commands. For example, if you have a symbol <code>α</code>, use
 <code>alpha</code>, not <code>\alpha</code></p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>({
-  <span class="hljs-attr">m</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> },
-  <span class="hljs-attr">f</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Function&#x27;</span> },
-  <span class="hljs-attr">g</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;Function&#x27;</span> },
+  <span class="hljs-attr">m</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> },
+  <span class="hljs-attr">f</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> },
+  <span class="hljs-attr">g</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> },
   <span class="hljs-title class_">Smallfrac</span>: {
     <span class="hljs-attr">signature</span>: {
-      <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;NumericFunction&#x27;</span>,
+      <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;NumericFunction&quot;</span>,
       <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">box</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() / args[<span class="hljs-number">1</span>].<span class="hljs-title function_">valueOf</span>()),
     },
   },
@@ -2495,16 +2497,16 @@ identifiers, not LaTeX commands. For example, if you have a symbol <code>α</cod
 <p><strong>To assign multiple functions and symbols</strong>, use the <code>ce.assign()</code> method with
 a dictionary of values.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>({
-  <span class="hljs-string">&#x27;m&#x27;</span>: <span class="hljs-number">10</span>,
-  <span class="hljs-string">&#x27;f(x)&#x27;</span>: ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2x^2 + 3x + 5&#x27;</span>),
-  <span class="hljs-string">&#x27;g(t)&#x27;</span>: ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;t^3 + 4t + 1&#x27;</span>),
+  <span class="hljs-string">&quot;m&quot;</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-string">&quot;f(x)&quot;</span>: ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2x^2 + 3x + 5&quot;</span>),
+  <span class="hljs-string">&quot;g(t)&quot;</span>: ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;t^3 + 4t + 1&quot;</span>),
 });
 </code></pre>
 <h2 id="summary" tabindex="-1">Summary</h2>
 <p>Before a function can be used in an expression, it must be declared. This is
 done by adding a definition to the MathJSON library.</p>
 <p>The quickest way to declare and define a function is to use <code>ce.assign()</code>:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;f(x)&#x27;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x&#x27;</span>));
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x&quot;</span>));
 </code></pre>
 
 

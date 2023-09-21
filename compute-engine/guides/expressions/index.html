@@ -2320,11 +2320,11 @@ function.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isPositive</span>);
 <span class="hljs-comment">// ➔ true</span>
 
-expr = ce.<span class="hljs-title function_">box</span>({ <span class="hljs-attr">num</span>: <span class="hljs-string">&#x27;+Infinity&#x27;</span> });
+expr = ce.<span class="hljs-title function_">box</span>({ <span class="hljs-attr">num</span>: <span class="hljs-string">&quot;+Infinity&quot;</span> });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ +\infty</span>
 
-expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&quot;x&quot;</span>]);
+expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">head</span>);
 <span class="hljs-comment">// ➔ &quot;Add&quot;</span>
 
@@ -2333,7 +2333,7 @@ expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-strin
 </code></pre>
 <p><strong>To create a Boxed Expression from a LaTeX string</strong>, call the <code>ce.parse()</code>
 function.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3 + x + y&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3 + x + y&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">head</span>);
 <span class="hljs-comment">// ➔ &quot;Add&quot;</span>
 
@@ -2342,7 +2342,7 @@ function.</p>
 </code></pre>
 <p><strong>To get a Boxed Expression representing the content of a MathLive mathfield</strong>
 use the <code>mf.expression</code> property:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;input&quot;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;input&#x27;</span>);
 mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\frac{10}{5}&#x27;</span>;
 <span class="hljs-keyword">const</span> expr = mf.<span class="hljs-property">expression</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.evaluate().<span class="hljs-property">latex</span>);
@@ -2351,7 +2351,7 @@ mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\
 <h2 id="unboxing" tabindex="-1">Unboxing</h2>
 <p><strong>To access the MathJSON expression of a boxed expression</strong>, use the <code>expr.json</code>
 property. Use this property to “unbox” the expression.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&quot;x&quot;</span>]);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;]</span>
 </code></pre>
@@ -2366,7 +2366,7 @@ more info about the formatting options.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = {
-  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&quot;Divide&quot;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
+  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Divide&#x27;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
   <span class="hljs-comment">// use `Multiply`/`Power` instead</span>
   <span class="hljs-attr">shorthands</span>: [], <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
 };
@@ -2423,7 +2423,7 @@ depend on contextual information which can change over time.</p>
 <p>For example, <code>expr.isPositive</code> may return <code>undefined</code> if nothing is known about
 a symbol. But if an assumption about the symbol is made later, or a value
 assigned to it, then <code>expr.isPositive</code> may take a different value.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;x&quot;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&#x27;x&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isPositive</span>);
 <span class="hljs-comment">// ➔ undefined</span>
 
