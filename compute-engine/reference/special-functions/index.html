@@ -2279,9 +2279,29 @@
 
 
 <h1 id="special-functions" tabindex="-1">Special Functions</h1>
-<h3 class="visually-hidden" id="Real" tabindex="-1">Real</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Factorial</strong>&quot;, <em>n</em>]</p>
+<h3 class="visually-hidden" id="Factorial" tabindex="-1">Factorial</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Factorial</strong>&quot;, <em>n</em>]</p>
 <div class='latex'><div class="source">n!</div><div class="display">\[ n! \]</div></div>
-<p>The products of all positive integers less than or equal to \( n\)</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Factorial&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 120</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Factorial2" tabindex="-1">Factorial2</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Factorial2</strong>&quot;, <em>n</em>]</p>
+<p>The double factorial of <code>n</code>: \( n!! = n \cdot (n-2) \cdot (n-4) \times
+\cdots\), that is the product of all the positive integers up to <code>n</code> that have
+the same parity (odd or even) as <code>n</code>.</p>
+<div class='latex'><div class="source">n!!</div><div class="display">\[ n!! \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Factorial2&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; 15</span>
+</code></pre>
+<p>It can also be written in terms of the \( \Gamma \) function:</p>
+<p>\n!! = [ 2^{\frac{n}{2}+\frac{1}{4}(1-\cos(\pi n))}\pi^{\frac{1}{4}(\cos(\pi
+n)-1)}\Gamma\left(\frac{n}{2}+1\right) \]</p>
+<p>This is not the same as the factorial of the factorial of <code>n</code> (i.e.
+\((n!)!)\)).</p>
+<p><strong>Reference</strong></p>
+<ul>
+<li>WikiPedia: <a href="https://en.wikipedia.org/wiki/Double_factorial">Double Factorial</a></li>
+</ul>
 </div></div>
 <h3 class="visually-hidden" id="Gamma" tabindex="-1">Gamma</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Gamma</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">\Gamma(n) = (n-1)!</div><div class="display">\[ \Gamma(n) = (n-1)! \]</div></div>
@@ -2298,14 +2318,13 @@ complex numbers.</p>
 <span class="hljs-comment">// 24</span>
 </code></pre>
 </div></div>
-<h3 class="visually-hidden" id="LogGamma" tabindex="-1">LogGamma</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>LogGamma</strong>&quot;, <em>z</em>]</p>
+<h3 class="visually-hidden" id="GammaLn" tabindex="-1">GammaLn</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>GammaLn</strong>&quot;, <em>z</em>]</p>
 <div class='latex'><div class="source">\ln(\gamma(z))</div><div class="display">\[ \ln(\gamma(z)) \]</div></div>
+<p>This function is called <code>gammaln</code> in MatLab and SciPy and <code>LogGamma</code> in
+Mathematica.</p>
 </div></div>
-<h3 class="visually-hidden" id="SignGamma" tabindex="-1">SignGamma</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>SignGamma</strong>&quot;, <em>z</em>]</p>
-<div class='latex'><div class="source">\operatorname{sgn}(\gamma(z))</div><div class="display">\[ \operatorname{sgn}(\gamma(z)) \]</div></div>
-</div></div>
-<div class='read-more'><a href="/compute-engine/reference/statistics/"> See also
-<strong>Statistics</strong> for Error Function <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/reference/statistics/"> See also Statistics for
+the <strong>Error Functions</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 

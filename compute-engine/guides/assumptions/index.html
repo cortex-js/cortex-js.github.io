@@ -2467,7 +2467,10 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27
 </section>
 <section id='scoped-assumptions'>
 <h2 id="scoped-assumptions" tabindex="-1">Scoped Assumptions</h2>
-<p>When an assumption is made, it is only valid in the current scope.</p>
+<p>When an assumption is made, it is applicable to the current scope and all
+subsequent scopes. Scopes “inherit” assumptions from their parent scopes.</p>
+<p>When exiting a scope, with <code>ce.popScope()</code>, all assumptions made in that scope
+are forgotten.</p>
 <p><strong>To temporarily define a series of assumptions</strong>, create a new scope.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 <span class="hljs-comment">// ➔ undefined</span>
@@ -2479,22 +2482,6 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27
 <span class="hljs-comment">// ➔  true</span>
 
 ce.<span class="hljs-title function_">popScope</span>(); <span class="hljs-comment">// all assumptions made in the current scope are forgotten</span>
-
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
-<span class="hljs-comment">// ➔  undefined</span>
-</code></pre>
-<p>You can also specify a series of assumptions when creating the scope:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">pushScope</span>({
-  <span class="hljs-attr">assumptions</span>: [
-    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>],
-    [<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\beta&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>],
-  ],
-});
-
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
-<span class="hljs-comment">// ➔  true</span>
-
-ce.<span class="hljs-title function_">popScope</span>();
 
 ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&#x27;Element&#x27;</span>, <span class="hljs-string">&#x27;\\alpha&#x27;</span>, <span class="hljs-string">&#x27;RealNumber&#x27;</span>]);
 <span class="hljs-comment">// ➔  undefined</span>

@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Mean">Mean</a></li><li><a href="#Median">Median</a></li><li><a href="#Mode">Mode</a></li><li><a href="#Variance">Variance</a></li><li><a href="#StandardDeviation">StandardDeviation</a></li><li><a href="#Skewness">Skewness</a></li><li><a href="#Kurtosis">Kurtosis</a></li><li><a href="#Quantile">Quantile</a></li><li><a href="#Quartiles">Quartiles</a></li><li><a href="#InterquartileRange">InterquartileRange</a></li><li><a href="#Sum">Sum</a></li><li><a href="#Product">Product</a></li><li><a href="#Erf">Erf</a></li><li><a href="#Erfc">Erfc</a></li></ol></li></ol>
+        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Mean">Mean</a></li><li><a href="#Median">Median</a></li><li><a href="#Mode">Mode</a></li><li><a href="#Variance">Variance</a></li><li><a href="#StandardDeviation">StandardDeviation</a></li><li><a href="#Skewness">Skewness</a></li><li><a href="#Kurtosis">Kurtosis</a></li><li><a href="#Quantile">Quantile</a></li><li><a href="#Quartiles">Quartiles</a></li><li><a href="#InterquartileRange">InterquartileRange</a></li><li><a href="#Sum">Sum</a></li><li><a href="#Product">Product</a></li><li><a href="#Erf">Erf</a></li><li><a href="#Erfc">Erfc</a></li><li><a href="#ErfInv">ErfInv</a></li></ol></li></ol>
       </div>
       
                               
@@ -2438,8 +2438,14 @@ of normally distributed events.</p>
 </div></div>
 <h3 class="visually-hidden" id="Erfc" tabindex="-1">Erfc</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Erfc</strong>&quot;, <em>z:complex</em>]</p>
 <p>Evaluate to the <strong>complementary error function</strong> of a complex number.</p>
-<p>It is defined as:</p>
-<p>\[ \operatorname{erfc} z = 1 - \operatorname{erf} z \]</p>
+<p>It is defined as \( \operatorname {erf} \left(\operatorname {erf} ^{-1}x\right)
+= x \).</p>
+</div></div>
+<h3 class="visually-hidden" id="ErfInv" tabindex="-1">ErfInv</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>ErfInv</strong>&quot;, <em>x:real</em>]</p>
+<p>Evaluate to the <strong>inverse error function</strong> of a complex number.</p>
+<p><code>x</code> is a real number between -1 and 1.</p>
+<p>It is defined as \( operatorname {erf} \left(\operatorname {erf}
+^{-1}x\right)=x \).</p>
 </div></div>
 
 
@@ -2481,7 +2487,7 @@ of normally distributed events.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Mean">Mean</a></li><li><a href="#Median">Median</a></li><li><a href="#Mode">Mode</a></li><li><a href="#Variance">Variance</a></li><li><a href="#StandardDeviation">StandardDeviation</a></li><li><a href="#Skewness">Skewness</a></li><li><a href="#Kurtosis">Kurtosis</a></li><li><a href="#Quantile">Quantile</a></li><li><a href="#Quartiles">Quartiles</a></li><li><a href="#InterquartileRange">InterquartileRange</a></li><li><a href="#Sum">Sum</a></li><li><a href="#Product">Product</a></li><li><a href="#Erf">Erf</a></li><li><a href="#Erfc">Erfc</a></li></ol></li></ol>
+        <ol><li><a href="#functions">Functions</a><ol><li><a href="#Mean">Mean</a></li><li><a href="#Median">Median</a></li><li><a href="#Mode">Mode</a></li><li><a href="#Variance">Variance</a></li><li><a href="#StandardDeviation">StandardDeviation</a></li><li><a href="#Skewness">Skewness</a></li><li><a href="#Kurtosis">Kurtosis</a></li><li><a href="#Quantile">Quantile</a></li><li><a href="#Quartiles">Quartiles</a></li><li><a href="#InterquartileRange">InterquartileRange</a></li><li><a href="#Sum">Sum</a></li><li><a href="#Product">Product</a></li><li><a href="#Erf">Erf</a></li><li><a href="#Erfc">Erfc</a></li><li><a href="#ErfInv">ErfInv</a></li></ol></li></ol>
       </div>
     
                             
