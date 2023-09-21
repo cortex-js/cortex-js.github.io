@@ -1314,7 +1314,7 @@
                         <use xlink:href="/assets/icons.svg#intro"></use>
                       </svg>
                     
-                    Standard Library
+                    MathJSON Standard Library
                   </a>
                 </li>
               
@@ -2436,9 +2436,16 @@ console.log(ce.parse('3x^2 + 2x^2 + x + 5').simplify().latex);</div>
 <li>mathematical equality</li>
 </ul>
 <h3 id="structural-equality%3A-issame()" tabindex="-1">Structural Equality: <code>isSame()</code></h3>
-<p>Structural equality (or syntactic equality) consider the symbolic structure used
-to represent an expression. If a symbol, is it the same symbol, if a function,
-does it have the same head, and are each arguments structurally equal, etc…</p>
+<p>Structural equality (or syntactic equality) considers the <strong>symbolic structure</strong> used
+to represent an expression.</p>
+<p>The symbolic structure of an expression is the tree of symbols and functions
+that make up the expression.</p>
+<p>For example, the symbolic structure of \(x + 1\) is a sum of two terms, the
+first term is a symbol <code>x</code> and the second term is the number <code>1</code>.</p>
+<p>The symbolic structure of \(2 + 1\) is also a sum of two terms, the first term
+is the number <code>2</code> and the second term is the symbol <code>1</code>.</p>
+<p>The symbolic structure of \(2 + 1\) and \(3\) are different, even though
+they represent the same mathematical object.</p>
 <p>The <code>lhs.isSame(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> are structurally
 exactly identical, that is each sub-expression is recursively identical in <code>lhs</code>
 and <code>rhs</code>.</p>
@@ -2450,27 +2457,60 @@ arguments is different</li>
 <li>\( (x + 1)^2 \) and \( x^2 + 2x + 1 \) are not structural equal, one is a
 power of a sum, the other a sum of terms.</li>
 </ul>
-<p>For a less strict version of <code>isSame()</code>, you can use the canonical version of
-both expressions, that is <code>lhs.canonical.isSame(rhs.canonical)</code>. In this case,
-because the arguments are ordered in a standard way, the canonical form of \(
-x + 1 \) and the canonical form of \(1 + x \) would be the same. However, \(
-(x + 1)^2 \) and \( x^2 + 2x + 1 \) would still be considered different.</p>
+<code-playground layout="stack" show-line-numbers mark-line="7">
+<div slot="javascript">import { ComputeEngine } from 'compute-engine';
+const ce = new ComputeEngine();
+//
+const a = ce.parse('2 + 1');
+const b = ce.parse('3');
+console.log('isSame?', a.isSame(b));
+</div>
+</code-playground>
+<p>By default, when parsing or boxing an expression, they are put in canonical
+form. For example, fractions are automatically reduced to their simplest form,
+and arguments are sorted in a standard way. If you want to compare two
+expressions without canonicalizing them, you can parse or box them with the
+<code>canonicalize</code> option set to <code>false</code>.</p>
+<code-playground layout="stack" show-line-numbers mark-line="7">
+<div slot="javascript">import { ComputeEngine } from 'compute-engine';
+const ce = new ComputeEngine();
+//
+const a = ce.parse('\\frac{1}{10}');
+const b = ce.parse('\\frac{2}{20}');
+console.log('Canonical isSame?', a.isSame(b));
+//
+const aPrime = ce.parse('\\frac{1}{10}', {canonical: false});
+const bPrime = ce.parse('\\frac{2}{20}', {canonical: false});
+console.log('Non-canonical isSame?', aPrime.isSame(bPrime));
+</div>
+</code-playground>
 <h3 id="mathematical-equality%3A-isequal()" tabindex="-1">Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
-problem. In fact,
+problem.</p>
+<p>In fact,
 <a href="https://en.wikipedia.org/wiki/Richardson%27s_theorem">Richardson’s Theorem</a>
 proves that it is impossible to determine if two symbolic expressions are
 identical in general.</p>
 <p>However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.</p>
 <p>The <code>lhs.isEqual(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> represent the
-same mathematical object. If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are
+same mathematical object.</p>
+<p>If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are
 evaluated before being compared. They are considered equal if the absolute value
 of the difference between them is less than <code>ce.tolerance</code>.</p>
 <p>Note that unlike <code>expr.isSame()</code>, <code>expr.isEqual()</code> can return <code>true</code>, <code>false</code> or
 <code>undefined</code>. The latter value indicates that there is not enough information to
 determine if the two expressions are mathematically equal. Adding some
 assumptions may result in a different answer.</p>
+<code-playground layout="stack" show-line-numbers mark-line="7">
+<div slot="javascript">import { ComputeEngine } from 'compute-engine';
+const ce = new ComputeEngine();
+//
+const a = ce.parse('\\frac{1}{10}');
+const b = ce.parse('\\frac{2}{20}');
+console.log('isEqual?', a.isEqual(b));
+</div>
+</code-playground>
 <h3 id="other-comparisons" tabindex="-1">Other Comparisons</h3>
 <div class=symbols-table>
 <table>
@@ -2562,14 +2602,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="September 19, 2023">
+        <meta itemprop="datePublished" content="September 21, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

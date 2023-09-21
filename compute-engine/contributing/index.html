@@ -1292,7 +1292,7 @@
                         <use xlink:href="/assets/icons.svg#intro"></use>
                       </svg>
                     
-                    Standard Library
+                    MathJSON Standard Library
                   </a>
                 </li>
               
@@ -2308,9 +2308,9 @@ MathJSON expression serialized into LaTeX).</p>
 “idioms” or existing definitions could be made more robust or more complete.</p>
 <p>There are still a lot of mathematical expressions that can be expressed in LaTeX
 that cannot be understood by the LaTeX parser, so there’s work to be done there.</p>
-<h3 id="standard-library" tabindex="-1">Standard Library</h3>
+<h3 id="mathjson-standard-library" tabindex="-1">MathJSON Standard Library</h3>
 <p>Contributing to the function dictionary. It’s in <code>/src/compute-engine/library/</code>.</p>
-<p>The Standard Library provides the definition of MathJSON functions like <code>Add</code> or
+<p>The MathJSON Standard Library provides the definition of MathJSON functions like <code>Add</code> or
 <code>Sum</code>.</p>
 <p>There is much to do here, both in fleshing out what’s there and adding new
 entries.</p>
@@ -2324,7 +2324,7 @@ utility function in JavaScript taking a MathJSON expression as input and
 returning another MathJSON expression. This can be done without any
 knowledge/understanding of the internals of the Compute Engine, and once you
 have the JS function that does what you want, it’s easy to plug in in the
-standard library so that it becomes part of the default engine.</p>
+MathJSON Standard Library so that it becomes part of the default engine.</p>
 <pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">numericAdd2</span>(<span class="hljs-params">
   ce: IComputeEngine,
   lhs: BoxedExpression,
@@ -2344,7 +2344,7 @@ standard library so that it becomes part of the default engine.</p>
 have been filed to see what others have requested, or you can just follow your
 interest.</p>
 <p>There’s almost no linear-algebra (<code>Transpose</code>, <code>Determinant</code>, <code>Rank</code>…). Also,
-in the source file for the standard library, I have left some comments as to
+in the source file for the MathJSON Standard Library, I have left some comments as to
 what some future functions would be nice to have. That can also be a source of
 inspiration.</p>
 
@@ -2358,14 +2358,14 @@ inspiration.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 19, 2023">
+        <meta itemprop="datePublished" content="September 21, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

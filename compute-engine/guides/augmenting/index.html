@@ -1292,7 +1292,7 @@
                         <use xlink:href="/assets/icons.svg#intro"></use>
                       </svg>
                     
-                    Standard Library
+                    MathJSON Standard Library
                   </a>
                 </li>
               
@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#declaring-a-symbol">Declaring a Symbol</a></li><li><a href="#declaring-a-function">Declaring a Function</a><ol><li><a href="#defining-a-function">Defining a Function</a></li><li><a href="#changing-the-definition-of-a-function">Changing the Definition of a Function</a></li><li><a href="#summary">Summary</a></li></ol></li><li><a href="#declaring-multiple-functions-and-symbols">Declaring Multiple Functions and Symbols</a></li></ol>
+        <ol><li><a href="#introduction">Introduction</a><ol><li><a href="#declaring-an-identifier">Declaring an Identifier</a></li><li><a href="#scope">Scope</a></li><li><a href="#assigning-a-value">Assigning a Value</a></li></ol></li><li><a href="#defining-a-symbol">Defining a Symbol</a></li><li><a href="#declaring-a-function">Declaring a Function</a><ol><li><a href="#defining-a-function">Defining a Function</a></li><li><a href="#changing-the-definition-of-a-function">Changing the Definition of a Function</a></li></ol></li><li><a href="#summary">Summary</a></li><li><a href="#declaring-multiple-functions-and-symbols">Declaring Multiple Functions and Symbols</a></li></ol>
       </div>
       
                               
@@ -2295,23 +2295,55 @@
 
 
 
-<p>The MathJSON library is a collection of definitions for <strong>symbols</strong> and
-<strong>functions</strong> that are used by the Compute Engine, such as <code>Pi</code>, <code>Add</code>, <code>Sin</code>,
-<code>Power</code>, etc…</p>
-<p>In this guide we discuss how to augment the MathJSON library with your own
+<p>The <a href="/compute-engine/guides/standard-library/">MathJSON Standard Library</a> is
+a collection of definitions for <strong>symbols</strong> and <strong>functions</strong> such as <code>Pi</code>,
+<code>Add</code>, <code>Sin</code>, <code>Power</code>, <code>List</code>, etc…</p>
+<p>In this guide we discuss how to augment the MathJSON Standard Library with your own
 definitions.</p>
-<div class='read-more'><a href="/compute-engine/guides/standard-library/"> The <strong>standard library
-reference</strong> describes the content of the Compute Engine standard library.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/compute-engine/guides/latex-syntax/#customizing-the-latex-dictionary">
 You may also be interested in <strong>augmenting the LaTeX dictionary</strong> which defines
 how LaTeX is parsed from and serialized to MathJSON. This is useful if you want
 to add support for new LaTeX commands, or if you’ve defined custom LaTeX macros
 that you’d like to parse to MathJSON. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="introduction" tabindex="-1">Introduction</h2>
+<h3 id="declaring-an-identifier" tabindex="-1">Declaring an Identifier</h3>
 <p>Before it can be used, an identifier must be <strong>declared</strong> as a symbol or a
-function. This is done by adding a definition to the MathJSON library.</p>
-<p>Once declared a symbol or function can be used in expressions, and it can be
+function.</p>
+<p>Declaring it indicates to the Compute Engine the “kind” of object it is (a
+string, a real number, a function…), and allows it to be used in expressions.
+The “kind” of an object is called its <strong>domain</strong>.</p>
+<div class='read-more'><a href="/compute-engine/guides/domains"> Learn more about <strong>domains</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p><strong>To declare an identifier</strong> use the <code>ce.declare()</code> method:</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m_e&quot;</span>, { 
+    <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;RealNumber&quot;</span>,<span class="hljs-string">&quot;, 
+    constant: true, 
+    value: 9.1e-31 
+});
+</span></code></pre>
+<p>After an identifier is declared, its domain cannot be changed: other
+expressions may depend on it, and changing its domain would invalidate them.</p>
+<p>You can also declare an identifier without providing a value:</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;Function&quot;</span>);
+<span class="hljs-comment">// (Shortcut for ce.declare(&quot;f&quot;, { signature: { domain: &quot;Function&quot;} }))</span>
+</code></pre>
+<p>By default, when a new identifier is encountered in an expression, it is
+declared automatically with a domain of <code>ce.defaultDomain</code> and no value.
+To prevent this behavior, set <code>ce.defaultDomain</code> to <code>null</code>. An error
+will be produced instead when an unknown identifier is encountered.</p>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/#default-domain">
+Read more about the <strong>default domain</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>We will discuss in more details below how to declare and define symbols
+and functions.</p>
+<h3 id="scope" tabindex="-1">Scope</h3>
+<p>The declaration of an identifier is done within a <strong>scope</strong>. A scope is a
+hierarchical collection of definitions.</p>
+<p><code>ce.declare()</code> will add a definition in the current scope. Use <code>ce.pushScope()</code>
+if you want to create a new scope.</p>
+<div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
+<strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h3 id="assigning-a-value" tabindex="-1">Assigning a Value</h3>
+<p>Once declared an identifier can be used in expressions, and it can be
 assigned a value.</p>
 <p>To change the value of a symbol, use the <code>value</code> property of the symbol.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;n&quot;</span>);
@@ -2322,26 +2354,14 @@ n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <p>Alternatively, use <code>ce.assign()</code>:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">5</span>);
 </code></pre>
-<p>The declaration of a symbol or function is done within a <strong>scope</strong>. A scope is a
-collection of definitions.</p>
-<p>After a symbol or function is declared, its domain cannot be changed: other
-expressions may depend on it, and changing its domain would invalidate them.</p>
-<div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
-<strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2 id="declaring-a-symbol" tabindex="-1">Declaring a Symbol</h2>
+<h2 id="defining-a-symbol" tabindex="-1">Defining a Symbol</h2>
 <p>A symbol is a named value, such as <code>Pi</code> or <code>x</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/symbols"> Learn more about <strong>symbols</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<p>Before it can be used, a symbol must be <strong>declared</strong>. This is done by adding a
-definition to the MathJSON library.</p>
 <p><strong>To declare a new symbol</strong> use the <code>ce.declare()</code> method.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m&quot;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> });
 ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;n&quot;</span>, { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Integer&quot;</span> });
 </code></pre>
-<p><code>ce.declare()</code> will add a definition in the current scope. Use <code>ce.pushScope()</code>
-if you want to create a new scope.</p>
-<div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
-<strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>The <code>domain</code> property is optional when a value is provided.</p>
 <p>See the <code>SymbolDefinition</code> type for more details on the properties associated
 with a symbol.</p>
@@ -2453,7 +2473,7 @@ indicate that <code>f</code> is a function. This is equivalent to the more verbo
 <p>You can also evaluate an <code>[&quot;Assign&quot;]</code> expression to define a function.</p>
 <pre><code class="language-js">ce.evaluate([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]]);
 </code></pre>
-<h3 id="summary" tabindex="-1">Summary</h3>
+<h2 id="summary" tabindex="-1">Summary</h2>
 <p>Before a function can be used in an expression, it must be declared. This is
 done by adding a definition to the MathJSON library.</p>
 <p>The quickest way to declare and define a function is to use <code>ce.assign()</code>:</p>
@@ -2489,14 +2509,14 @@ LaTeX command.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 19, 2023">
+        <meta itemprop="datePublished" content="September 21, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-19">September 19, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2518,7 +2538,7 @@ LaTeX command.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#declaring-a-symbol">Declaring a Symbol</a></li><li><a href="#declaring-a-function">Declaring a Function</a><ol><li><a href="#defining-a-function">Defining a Function</a></li><li><a href="#changing-the-definition-of-a-function">Changing the Definition of a Function</a></li><li><a href="#summary">Summary</a></li></ol></li><li><a href="#declaring-multiple-functions-and-symbols">Declaring Multiple Functions and Symbols</a></li></ol>
+        <ol><li><a href="#introduction">Introduction</a><ol><li><a href="#declaring-an-identifier">Declaring an Identifier</a></li><li><a href="#scope">Scope</a></li><li><a href="#assigning-a-value">Assigning a Value</a></li></ol></li><li><a href="#defining-a-symbol">Defining a Symbol</a></li><li><a href="#declaring-a-function">Declaring a Function</a><ol><li><a href="#defining-a-function">Defining a Function</a></li><li><a href="#changing-the-definition-of-a-function">Changing the Definition of a Function</a></li></ol></li><li><a href="#summary">Summary</a></li><li><a href="#declaring-multiple-functions-and-symbols">Declaring Multiple Functions and Symbols</a></li></ol>
       </div>
     
                             
