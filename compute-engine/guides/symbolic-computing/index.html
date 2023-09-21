@@ -2440,20 +2440,17 @@ console.log(ce.parse('3x^2 + 2x^2 + x + 5').simplify().latex);</div>
 to represent an expression.</p>
 <p>The symbolic structure of an expression is the tree of symbols and functions
 that make up the expression.</p>
-<p>For example, the symbolic structure of \(x + 1\) is a sum of two terms, the
-first term is a symbol <code>x</code> and the second term is the number <code>1</code>.</p>
-<p>The symbolic structure of \(2 + 1\) is also a sum of two terms, the first term
-is the number <code>2</code> and the second term is the symbol <code>1</code>.</p>
+<p>For example, the symbolic structure of \(2 + 1\) is a sum of two terms,
+the first term is the number <code>2</code> and the second term is the number <code>1</code>.</p>
+<p>The symbolic structure of \(3\) is a number <code>3</code>.</p>
 <p>The symbolic structure of \(2 + 1\) and \(3\) are different, even though
 they represent the same mathematical object.</p>
-<p>The <code>lhs.isSame(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> are structurally
+<p>The <code>lhs.isSame(rhs)</code> function returns true if <code>lhs</code> and <code>rhs</code> are structurally
 exactly identical, that is each sub-expression is recursively identical in <code>lhs</code>
 and <code>rhs</code>.</p>
 <ul>
 <li>\(1 + 1 \) and \( 2 \) are not structurally equal, one is a sum of two
 integers, the other is an integer</li>
-<li>\(x + 1 \) and \( 1 + x \) are not structurally equal, the order of the
-arguments is different</li>
 <li>\( (x + 1)^2 \) and \( x^2 + 2x + 1 \) are not structural equal, one is a
 power of a sum, the other a sum of terms.</li>
 </ul>
@@ -2468,9 +2465,12 @@ console.log('isSame?', a.isSame(b));
 </code-playground>
 <p>By default, when parsing or boxing an expression, they are put in canonical
 form. For example, fractions are automatically reduced to their simplest form,
-and arguments are sorted in a standard way. If you want to compare two
-expressions without canonicalizing them, you can parse or box them with the
-<code>canonicalize</code> option set to <code>false</code>.</p>
+and arguments are sorted in a standard way.</p>
+<p>The expressions \( \frac{1}{10} \) and \( \frac{2}{20} \) are
+structurally equal because they get put into a canonical form when parsed,
+in which the fractions are reduced.</p>
+<p><strong>To compare two expressions without canonicalizing them</strong>, parse or box
+them with the <code>canonical</code> option set to <code>false</code>.</p>
 <code-playground layout="stack" show-line-numbers mark-line="7">
 <div slot="javascript">import { ComputeEngine } from 'compute-engine';
 const ce = new ComputeEngine();
@@ -2487,17 +2487,16 @@ console.log('Non-canonical isSame?', aPrime.isSame(bPrime));
 <h3 id="mathematical-equality%3A-isequal()" tabindex="-1">Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
 problem.</p>
-<p>In fact,
-<a href="https://en.wikipedia.org/wiki/Richardson%27s_theorem">Richardson’s Theorem</a>
+<p>In fact, <a href="https://en.wikipedia.org/wiki/Richardson%27s_theorem">Richardson’s Theorem</a>
 proves that it is impossible to determine if two symbolic expressions are
 identical in general.</p>
 <p>However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.</p>
 <p>The <code>lhs.isEqual(rhs)</code> function return true if <code>lhs</code> and <code>rhs</code> represent the
 same mathematical object.</p>
-<p>If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are
-evaluated before being compared. They are considered equal if the absolute value
-of the difference between them is less than <code>ce.tolerance</code>.</p>
+<p>If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are evaluated before being
+compared. They are considered equal if the absolute value of the difference
+between them is less than <code>ce.tolerance</code>.</p>
 <p>Note that unlike <code>expr.isSame()</code>, <code>expr.isEqual()</code> can return <code>true</code>, <code>false</code> or
 <code>undefined</code>. The latter value indicates that there is not enough information to
 determine if the two expressions are mathematically equal. Adding some
@@ -2506,8 +2505,8 @@ assumptions may result in a different answer.</p>
 <div slot="javascript">import { ComputeEngine } from 'compute-engine';
 const ce = new ComputeEngine();
 //
-const a = ce.parse('\\frac{1}{10}');
-const b = ce.parse('\\frac{2}{20}');
+const a = ce.parse('1 + 2');
+const b = ce.parse('3');
 console.log('isEqual?', a.isEqual(b));
 </div>
 </code-playground>
