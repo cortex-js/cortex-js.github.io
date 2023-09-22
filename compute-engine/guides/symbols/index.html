@@ -2308,7 +2308,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#bound-variables%2C-free-variables-and-constants">Bound Variables, Free Variables and Constants</a></li><li><a href="#symbol-auto-binding">Symbol Auto-binding</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li></ol>
+        <ol><li><a href="#scope">Scope</a></li><li><a href="#unknowns-and-constants">Unknowns and Constants</a></li><li><a href="#automatic-declaration-of-symbols">Automatic Declaration of Symbols</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li></ol>
       </div>
       
                               
@@ -2336,35 +2336,29 @@ const n = ce.box("n");
 n.domain = "Integer";
 n.value = 5;
 console.log("n:", n.domain.json, "=", n.value.json);</div></code-playground>
+<p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
+<div class='read-more'><a href="/compute-engine/guides/augmenting/"> Read more about
+<strong>adding definitions</strong> for symbols and functions <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="scope" tabindex="-1">Scope</h2>
 <p>Symbols are defined within a <strong>scope</strong>.</p>
 <div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
 <strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<div class='read-more'><a href="/compute-engine/guides/augmenting/"> Read more about
-<strong>adding definitions</strong> for symbols and functions <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2 id="bound-variables%2C-free-variables-and-constants" tabindex="-1">Bound Variables, Free Variables and Constants</h2>
-<p>If the definition of a symbol has a value, the symbol is said to be a <strong>bound
-variable</strong> (value binding).</p>
-<p>This is in opposition to <strong>free variables</strong> which are symbols that have no
-value, and <strong>constants</strong> which are symbols that have a value that cannot be
-altered.</p>
-<p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
-<p>The property <code>expr.isFree</code> is <code>true</code> if a symbol is a free variable.</p>
-<p>Assigning a value to a free variable makes it a bound variable.</p>
-<p><strong>To get a list of all the free variables in an expression</strong> use
-<code>expr.freeVars</code>.</p>
+<h2 id="unknowns-and-constants" tabindex="-1">Unknowns and Constants</h2>
+<p>A symbol that has been declared, but has no values associated with it, is said to
+be an <strong>unknown</strong>.</p>
+<p>A symbol whose value cannot be changed is a <strong>constant</strong>. Constants are
+identified by a special flag in their definition.</p>
 <p>The property <code>expr.isConstant</code> is <code>true</code> if a symbol is a constant.</p>
-<p class="notice-warning">The value of constants may depend on settings of the compute engine. For
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;x&quot;</span>).<span class="hljs-property">isConstant</span>);
+<span class="hljs-comment">// ➔ false</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>).<span class="hljs-property">isConstant</span>);
+<span class="hljs-comment">// ➔ true</span>
+</code></pre>
+<p class="notice-warning">The value of constants may depend on settings of the Compute Engine. For
 example, the value of <code>Pi</code> is determined based on the value of the <code>precision</code>
 property. The values of constants in scope when the <code>precision</code> setting is
 changed will be updated.</p>
-<p>The property <code>expr.symbolDefinition</code> is not <code>undefined</code> if a symbol has a
-definition (name binding).</p>
-<p class="notice--info"><a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables"><strong>Value binding</strong></a>
-(associating a value with the definition of a symbol) should not be confused
-with <a href="https://en.wikipedia.org/wiki/Name_binding"><strong>name binding</strong></a> (associating
-a definition with the name of a symbol).</p>
-<div class='read-more'><a href="/compute-engine/guides/evaluate/#binding"> Read more about
-<strong>name binding</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <pre><code class="language-js">ce.<span class="hljs-property">precision</span> = <span class="hljs-number">4</span>;
 <span class="hljs-keyword">const</span> smallPi = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>); <span class="hljs-comment">// π with 4 digits</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(smallPi.<span class="hljs-property">latex</span>);
@@ -2380,13 +2374,14 @@ ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100<
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;pi = &#x27;</span>, smallPi.<span class="hljs-property">numericValue</span>, <span class="hljs-string">&#x27;=&#x27;</span>, bigPi.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ pi  = 3.1415 = 3.1415926535</span>
 </code></pre>
-<h2 id="symbol-auto-binding" tabindex="-1">Symbol Auto-binding</h2>
-<p>If <code>ce.defaultDomain</code> is not<code>null</code> and no definition exist for the symbol, a new
-one is created automatically.</p>
+<h2 id="automatic-declaration-of-symbols" tabindex="-1">Automatic Declaration of Symbols</h2>
+<p>If <code>ce.defaultDomain</code> is not <code>null</code>, an unknown symbol is automatically
+declared when it is first used in an expression.</p>
 <p>The new definition has a domain of <code>ce.defaultDomain</code> and no value associated
-with it, so the symbol will be a <strong>free variable</strong>.</p>
+with it, so the symbol will be an <strong>unknwon</strong>.</p>
 <p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
-automatically assumed to be a real number.</p>
+automatically assumed to be a real number. Use <code>ce.declare()</code> to explictly
+specify the domain of a symbol.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;m&quot;</span>); <span class="hljs-comment">// m for mystery</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
@@ -2449,7 +2444,7 @@ effect.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#bound-variables%2C-free-variables-and-constants">Bound Variables, Free Variables and Constants</a></li><li><a href="#symbol-auto-binding">Symbol Auto-binding</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li></ol>
+        <ol><li><a href="#scope">Scope</a></li><li><a href="#unknowns-and-constants">Unknowns and Constants</a></li><li><a href="#automatic-declaration-of-symbols">Automatic Declaration of Symbols</a></li><li><a href="#forgetting-a-symbol">Forgetting a Symbol</a></li></ol>
       </div>
     
                             

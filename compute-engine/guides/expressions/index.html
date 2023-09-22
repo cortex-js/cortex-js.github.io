@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
+        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li></ol>
       </div>
       
                               
@@ -2303,10 +2303,11 @@ such as numbers, constants, variables and functions.</p>
 <p>They are wrapped in a JavaScript object, a process called <strong>boxing</strong>, and the
 resulting expressions are <strong>Boxed Expressions</strong>.</p>
 <p>Boxed Expressions improve performance by implementing caching to avoid
-repetitive calculations.</p>
+repetitive calculations. They also ensure that expressions are valid and
+in a standard format.</p>
 <p>Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
-as VSCode Studio, to provide suitable hints in the editor, and to check that the
-correct functions and properties are used, particularly when using TypeScript.</p>
+as VSCode Studio, to provide suitable hints in the editor regarding which
+methods and properties are available for a given expression.</p>
 <p>Boxed Expression can be created from a LaTeX string or from a raw MathJSON
 expression.</p>
 <h2 id="boxing" tabindex="-1">Boxing</h2>
@@ -2331,6 +2332,8 @@ expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-strin
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isPositive</span>);
 <span class="hljs-comment">// undefined</span>
 </code></pre>
+<p>By default, <code>ce.box()</code> returns a canonical expression. See
+<a href="#canonical">Canonical Expressions</a> for more info.</p>
 <p><strong>To create a Boxed Expression from a LaTeX string</strong>, call the <code>ce.parse()</code>
 function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3 + x + y&quot;</span>);
@@ -2340,6 +2343,8 @@ function.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;, &quot;y&quot;]</span>
 </code></pre>
+<p>By default, <code>ce.parse()</code> returns a canonical expression. See
+<a href="#canonical-expressions">Canonical Expressions</a> for more info.</p>
 <p><strong>To get a Boxed Expression representing the content of a MathLive mathfield</strong>
 use the <code>mf.expression</code> property:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;input&#x27;</span>);
@@ -2349,24 +2354,29 @@ mf.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;\\
 <span class="hljs-comment">// ➔ 2</span>
 </code></pre>
 <h2 id="unboxing" tabindex="-1">Unboxing</h2>
-<p><strong>To access the MathJSON expression of a boxed expression</strong>, use the <code>expr.json</code>
-property. Use this property to “unbox” the expression.</p>
+<p><strong>To access the MathJSON expression of a boxed expression as plain JSON</strong>,
+use the <code>expr.json</code> property. This property is an “unboxed” version of the
+expression.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Add&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;x&#x27;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 3, &quot;x&quot;]</span>
 </code></pre>
-<p><strong>To customize the format of the MathJSON expression</strong> use the
-<code>ce.jsonSerializationOptions</code> property.</p>
-<p>Use this option to control which metadata, if any, should be included, whether
-to use shorthand notation, and to exclude some functions. See
-<a href="/docs/compute-engine/?q=JsonSerializationOptions">JsonSerializationOptions</a> for
-more info about the formatting options.</p>
-<pre><code class="language-ts"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + \\frac{q}{p}&#x27;</span>).<span class="hljs-property">canonical</span>;
+<p><strong>To customize the format of the MathJSON expression returned by <code>expr.json</code></strong>
+use the <code>ce.jsonSerializationOptions</code> property.</p>
+<p>Use this option to control:</p>
+<ul>
+<li>which metadata, if any, should be included</li>
+<li>whether to use shorthand notation</li>
+<li>to exclude some functions.</li>
+</ul>
+<p>See <a href="/docs/compute-engine/?q=JsonSerializationOptions">JsonSerializationOptions</a> for
+more info about the formatting options available.</p>
+<pre><code class="language-ts"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2 + \\frac{q}{p}&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 2, [&quot;Divide&quot;, &quot;q&quot;, &quot;p&quot;]]</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = {
-  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&#x27;Divide&#x27;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
+  <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&quot;Divide&quot;</span>], <span class="hljs-comment">// Don&#x27;t use `Divide` functions,</span>
   <span class="hljs-comment">// use `Multiply`/`Power` instead</span>
   <span class="hljs-attr">shorthands</span>: [], <span class="hljs-comment">// Don&#x27;t use any shorthands</span>
 };
@@ -2381,25 +2391,37 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = {
 </code></pre>
 <section id="canonical">
 <h2 id="canonical-expressions" tabindex="-1">Canonical Expressions</h2>
-<p>The canonical form of an expression is a conventional way of writing an
+<p>The <strong>canonical form</strong> of an expression is a conventional way of writing an
 expression.</p>
-<p><strong>To check if an expression is already in canonical form</strong>, use
-<code>expr.isCanonical</code>.</p>
-<p><strong>To obtain the canonical representation of an expression</strong>, use
-<code>expr.canonical</code>.</p>
+<p>For example, the canonical form of a fraction of two integers is a reduced
+rational number, written as a tuple of two integers, such that the GCD of
+the numerator and denominator is 1, and the denominator is positive.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
+</code></pre>
+<p>The canonical form of an addition or mulipication will have its arguments
+ordered in a canonical way.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2+x+\\pi+\\sqrt2+1&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, &quot;Pi&quot;, [&quot;Sqrt&quot;, 2], &quot;x&quot;, 1, 2]</span>
+</code></pre>
 <div class='read-more'><a href="/compute-engine/guides/canonical-form/"> Read more about the
 <strong>Canonical Form</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>By default, <code>ce.box()</code> and <code>ce.parse()</code> produce a canonical expression.</p>
-<p><strong>To get a “raw” (non-canonical) expression instead</strong>, use
+<p><strong>To get a non-canonical expression instead</strong>, use
 <code>ce.box(expr, {canonical: false})</code> or <code>ce.parse(latex, {canonical: false})</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = <span class="hljs-string">&#x27;\\frac{3}{-5}&#x27;</span>;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = <span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>;
 
 ce.<span class="hljs-title function_">parse</span>(expr);
 <span class="hljs-comment">// canonical form ➔ [&quot;Rational&quot;, -3, 5]</span>
 
 ce.<span class="hljs-title function_">parse</span>(expr, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
-<span class="hljs-comment">// non-canonical form ➔ [&quot;Divide&quot;, 3, -5]</span>
+<span class="hljs-comment">// non-canonical form ➔ [&quot;Divide&quot;, 30, -50]</span>
 </code></pre>
+<p><strong>To check if an expression is in canonical form</strong>, use <code>expr.isCanonical</code>.</p>
+<p><strong>To obtain the canonical representation of an expression</strong>, use
+<code>expr.canonical</code>.</p>
 <p>A non-canonical expression may include errors as a result of parsing from LaTeX,
 if the LaTeX input contained LaTeX syntax errors.</p>
 <p>The arguments of a function in canonical form are validated to make sure they
@@ -2489,10 +2511,8 @@ imaginary parts.</li>
 two JavaScript <code>number</code> or two JavaScript <code>bigint</code>.</li>
 </ul>
 <p><strong>To access a numerical approximation of an expression if available</strong>, use
-<code>expr.N().valueOf()</code>. It will return a JavaScript number approximation of the
+<code>expr.N().valueOf()</code>. The result is a JavaScript number approximation of the
 value.</p>
-<p>A symbol may have a value if it represents a bound variable, but it may also
-have no value if it represents a free variable.</p>
 <section id=errors>
 <h2 id="errors" tabindex="-1">Errors</h2>
 <p>Sometimes, things go wrong.</p>
@@ -2675,19 +2695,6 @@ property.</p>
 <span class="hljs-comment">// ➔ [&quot;Sequence&quot;, &quot;x&quot;, [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;&#x27;unexpected-token&#x27;&quot;, &quot;&#x27;@&#x27;&quot;], [&quot;Latex&quot;, &quot;&#x27;@2&#x27;&quot;]]]</span>
 </code></pre>
 </section>
-<h2 id="return-value-conventions" tabindex="-1">Return Value Conventions</h2>
-<p>The Compute Engine API uses the following conventions for the return values of a
-function and the values of an object property:</p>
-<ul>
-<li><strong><code>null</code></strong>: this property/function does not apply, and will never apply. You
-can think of this as an answer of “never”. Example: <code>expr.isPositive</code> on a
-Boxed String.</li>
-<li><strong><code>undefined</code></strong>: at the moment, the result is not available, but it may be
-available later. You can think of this as an answer of “maybe”. For example,
-<code>expr.sgn</code> for a symbol with no assigned value and no assumptions.</li>
-<li><strong><code>this</code></strong>: this function was not applicable, or there was nothing to do. For
-example, invoking <code>expr.simplify()</code> on a boxed string.</li>
-</ul>
 
 
 
@@ -2728,7 +2735,7 @@ example, invoking <code>expr.simplify()</code> on a boxed string.</li>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li><li><a href="#return-value-conventions">Return Value Conventions</a></li></ol>
+        <ol><li><a href="#boxing">Boxing</a></li><li><a href="#unboxing">Unboxing</a></li><li><a href="#canonical-expressions">Canonical Expressions</a></li><li><a href="#mutability">Mutability</a></li><li><a href="#pure-expressions">Pure Expressions</a></li><li><a href="#checking-the-kind-of-expression">Checking the Kind of Expression</a></li><li><a href="#errors">Errors</a><ol><li><a href="#parsing-errors">Parsing Errors</a></li><li><a href="#semantic-errors">Semantic Errors</a></li></ol></li></ol>
       </div>
     
                             
