@@ -2317,25 +2317,27 @@
 
 
 
-<script>
- const ce = new ComputeEngine.ComputeEngine()
+<script type="module">
+  window.addEventListener("DOMContentLoaded", () => 
+    import("//unpkg.com/@cortex-js/compute-engine?module").then((ComputeEngine) => {
+      globalThis.ce = new ComputeEngine.ComputeEngine();
+      const playgrounds = [...document.querySelectorAll("code-playground")];
+      for (const playground of playgrounds) {
+        playground.autorun = 1000; // delay in ms
+        playground.run();
+      }
+    })
+);
 </script>
 <p><strong>To change the value or domain of a symbol</strong>, use the <code>value</code> and <code>domain</code>
 properties of the symbol.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;n&quot;</span>);
-n.<span class="hljs-property">domain</span> = <span class="hljs-string">&quot;Integer&quot;</span>;
-n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;n:&quot;</span>, n.<span class="hljs-property">domain</span>.<span class="hljs-property">json</span>, <span class="hljs-string">&quot;=&quot;</span>, n.<span class="hljs-property">value</span>.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ n: Integer = 5</span>
-</code></pre>
-<p>A symbol does not have to be declared before it can be used. A previously unknown
-symbol has a domain of <code>ce.defaultDomain</code> and no value.</p>
-<code-playground layout="stack" show-line-numbers>
+<p>A symbol does not have to be declared before it can be used. A previously
+unknown symbol has a domain of <code>ce.defaultDomain</code> and no value.</p>
+<code-playground layout="stack" show-line-numbers autorun="never">
 <div slot="javascript">
 const n = ce.box("n");
-n.domain = "Integer";
 n.value = 5;
-console.log("n:", n.domain.json, "=", n.value.json);</div></code-playground>
+console.log("n =", n.value.json);</div></code-playground>
 <p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/augmenting/"> Read more about
 <strong>adding definitions</strong> for symbols and functions <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -2344,8 +2346,8 @@ console.log("n:", n.domain.json, "=", n.value.json);</div></code-playground>
 <div class='read-more'><a href="/compute-engine/guides/evaluate/#scopes">Read more about
 <strong>scopes</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="unknowns-and-constants" tabindex="-1">Unknowns and Constants</h2>
-<p>A symbol that has been declared, but has no values associated with it, is said to
-be an <strong>unknown</strong>.</p>
+<p>A symbol that has been declared, but has no values associated with it, is said
+to be an <strong>unknown</strong>.</p>
 <p>A symbol whose value cannot be changed is a <strong>constant</strong>. Constants are
 identified by a special flag in their definition.</p>
 <p>The property <code>expr.isConstant</code> is <code>true</code> if a symbol is a constant.</p>
@@ -2375,8 +2377,8 @@ ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100<
 <span class="hljs-comment">// ➔ pi  = 3.1415 = 3.1415926535</span>
 </code></pre>
 <h2 id="automatic-declaration-of-symbols" tabindex="-1">Automatic Declaration of Symbols</h2>
-<p>If <code>ce.defaultDomain</code> is not <code>null</code>, an unknown symbol is automatically
-declared when it is first used in an expression.</p>
+<p>If <code>ce.defaultDomain</code> is not <code>null</code>, an unknown symbol is automatically declared
+when it is first used in an expression.</p>
 <p>The new definition has a domain of <code>ce.defaultDomain</code> and no value associated
 with it, so the symbol will be an <strong>unknwon</strong>.</p>
 <p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
@@ -2397,10 +2399,10 @@ symbol and the symbol will evaluate to an <code>[&quot;Error&quot;]</code> expre
 <p>The <code>ce.forget()</code> function will remove the definition associated with a symbol,
 including its domain and value, and any
 <a href="/compute-engine/guides/assumptions">assumptions</a> about the symbol.</p>
-<p><strong>To forget about a specific symbol</strong>, pass the name of the symbol as an argument to
-<code>ce.forget()</code>.</p>
-<p><strong>To forget about all the symbols in the current scope</strong>, use <code>ce.forget()</code> without
-any arguments.</p>
+<p><strong>To forget about a specific symbol</strong>, pass the name of the symbol as an
+argument to <code>ce.forget()</code>.</p>
+<p><strong>To forget about all the symbols in the current scope</strong>, use <code>ce.forget()</code>
+without any arguments.</p>
 <p class="notice--info">Note that only symbols in the current scope are forgotten. If a definition for
 the symbol existed in a previous scope, that definition will now be in
 effect.</p>
@@ -2415,14 +2417,14 @@ effect.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 21, 2023">
+        <meta itemprop="datePublished" content="September 22, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

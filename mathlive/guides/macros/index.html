@@ -2317,7 +2317,8 @@ turned off.</p>
 <p>The example below will define a new command, <code>\average</code>, which will be
 replaced by <code>\operatorname{average}</code>, that is displayed as a single unit
 using an upright font.</p>
-<code-playground layout="stack">
+<p>Try changing <code>\operatorname</code> to <code>\mathbf</code> to see the difference.</p>
+<code-playground layout="stack" show-line-numbers mark-javascript-line="3">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2330,10 +2331,8 @@ using an upright font.</p>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
   average: '\\operatorname{average}',
-};
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;
-</div>
+};</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;</div>
 </code-playground>
 <hr>
 <p>You can use standard LaTeX commands in the definition of a macro. For example,
@@ -2341,13 +2340,13 @@ the following macro definition uses the <code>\,</code> and <code>\;</code> comm
 horizontal spacing and <code>{}^</code> to place the <code>\prime</code> command on the subscript
 line.</p>
 <pre><code class="language-javascript">mf.<span class="hljs-property">macros</span> = { ...mf.<span class="hljs-property">macros</span>,
-  <span class="hljs-attr">minutes</span>: <span class="hljs-string">&#x27;\\,{}^\\prime\\;&#x27;</span>,
-  <span class="hljs-attr">seconds</span>: <span class="hljs-string">&#x27;\\,\\doubleprime\\;&#x27;</span>,
+  <span class="hljs-attr">minutes</span>: <span class="hljs-string">&quot;\\,{}^\\prime\\;&quot;</span>,
+  <span class="hljs-attr">seconds</span>: <span class="hljs-string">&quot;\\,\\doubleprime\\;&quot;</span>,
 };
 </code></pre>
 <hr>
 <p>The macro definition can contain up to eight arguments, represented by <code>#1</code> to <code>#9</code>.</p>
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers >
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2362,8 +2361,7 @@ mf.macros = {...mf.macros,
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
 </code-playground>
 <hr>
 <p>By default, a macro command behaves as a group whose subcomponents cannot be
@@ -2371,7 +2369,7 @@ modified. This behavior can be controlled using the <code>captureSelection</code
 in the expanded definition of a macro.</p>
 <p><strong>To define a macro whose content is selectable and editable</strong> set
 <code>captureSelection</code> to <code>false</code>.</p>
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers mark-javascript-line=6>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2390,12 +2388,11 @@ mf.macros = {...mf.macros,
   },
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
 </code-playground>
 <hr>
 <p><strong>To remove a macro</strong> set its definition to undefined:</p>
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2406,10 +2403,8 @@ mf.macros = {...mf.macros,
       }
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
-mf.macros = {...mf.macros, diamonds: undefined };
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
-</div>
+mf.macros = {...mf.macros, diamonds: undefined };</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;</div>
 </code-playground>
 <h2 id="adding-a-matching-shortcut" tabindex="-1">Adding a Matching Shortcut</h2>
 <p>By defining a new macro, a new LaTeX command is added to the dictionary
@@ -2421,7 +2416,7 @@ expressed as a LaTeX string (<code>mf.value</code>).</p>
 shortcut. Inline shortcuts can be typed without having to enter the LaTeX
 editing mode (without having to type the <kbd>\</kbd> key).</p>
 <p><strong>To define an associated inline shortcut</strong>, use the <code>inlineShortcuts</code> option.</p>
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2441,15 +2436,14 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
     seconds: '\\seconds',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;</div>
 </code-playground>
 <div class='read-more'><a href="/mathlive/guides/shortcuts/">
 <strong>Next:</strong> Manage <strong>Key bindings and Inline Shortcuts</strong>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="inspecting-available-macros" tabindex="-1">Inspecting Available Macros</h2>
 <p><strong>To view the available macros</strong>, inspect the <code>macros</code> property:</p>
-<code-playground layout="stack" >
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2462,8 +2456,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
     <div slot="javascript">const mf = document.getElementById('mf');
 console.log(mf.macros);
 </div>
-    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
 <h2 id="disabling-macros" tabindex="-1">Disabling Macros</h2>
 <p><strong>To turn off all macros</strong>, use  <code>mf.macros = {}</code>.</p>
@@ -2481,14 +2474,14 @@ console.log(mf.macros);
         
 
 
-        <meta itemprop="datePublished" content="September 13, 2023">
+        <meta itemprop="datePublished" content="September 22, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-13">September 13, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

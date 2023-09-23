@@ -2327,7 +2327,7 @@ example changing the base font size or adding a border around it.</p>
 <p><strong>To display the mathfield as a block element</strong>, rather than an inline element,
 add an attribute <code>style=&quot;display: block&quot;</code></p>
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
+<code-playground layout="stack" mark-html-line="2">
 <div slot="html">
 &lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
 &lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
@@ -2345,7 +2345,7 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 Although CSS styles are “invisible” to custom components, CSS variables are
 “passed through” and will affect the content of the <code>&lt;math-field&gt;</code> custom component.</p>
 <p>Alternatively you can set these CSS variables programatically:</p>
-<pre><code class="language-js">  <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--smart-fence-color&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--smart-fence-color&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>);
 </code></pre>
 <div class='symbols-table' style='--first-col-width:25ex'>
 <table>
@@ -2419,8 +2419,7 @@ math-field {
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 <br>
@@ -2441,8 +2440,7 @@ virtual keyboard panel container.</p>
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 <p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
@@ -2634,8 +2632,7 @@ To get it laid out as a block element, set <code>display: inline-block</code> on
     min-width: 100px;
   "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;.
-</div>
+  &lt;/math-field&gt;.</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h3 id="letter-shape-style" tabindex="-1">Letter Shape Style</h3>
@@ -2714,10 +2711,11 @@ when typing “if x &gt; 0”</li>
 <li><code>smartSuperscript</code>: automatically move out of a superscript when a digit is typed</li>
 </ul>
 <p>These properties can also be passed as an argument to <a href="https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> when programmatically creating mathfield elements.</p>
-<p>In the code playground below, try some of these options. For example, change
-line 3 to <code>scriptDepth: 0</code>, then try to type “x^2” in the mathfield.</p>
+<p>In the interactive code playground below, try some of these options. For example,
+in line 1 add the attribute <code>smart-mode=false</code>, then type some parentheses
+in the mathfield.</p>
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
+<code-playground layout="stack" show-line-numbers mark-html-line="1">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -2758,7 +2756,7 @@ a powerful way to enter or edit LaTeX in an expression. However, users
 unfamiliar with LaTeX may be confused if they accidentally press those keys.</p>
 <p><strong>To prevent the LaTeX mode from being enabled</strong> intercept the trigger keys
 and call `preventDefault().</p>
-<pre><code class="language-ts">mf.<span class="hljs-title function_">addEventListener</span>(
+<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(
   <span class="hljs-string">&#x27;keydown&#x27;</span>,
   <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;\\&#x27;</span>) {
@@ -2791,7 +2789,7 @@ will affect all mathfield elements on the page.</p>
 await customElements.whenDefined('math-field');
 const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
-console.log(MathfieldElement.strings[locale]);
+console.log(MathfieldElement.strings[locale.substring(0, 2)]);
 </div>
 <div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -2824,8 +2822,7 @@ keycap is  labeled <code>,</code> instead and contextually inserts a <code>{,}</
     </style>
 <div slot="javascript">
 await customElements.whenDefined('math-field');
-MathfieldElement.decimalSeparator = ",";
-</div>
+MathfieldElement.decimalSeparator = ",";</div>
 <div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -2879,7 +2876,7 @@ property.</p>
     </style>
 <div slot="javascript">
 await window.customElements.whenDefined("math-field");
-MathfieldElement.fontsDirectory="//unpkg.com/mathlive/dist/fonts/";
+MathfieldElement.fontsDirectory = "//unpkg.com/mathlive/dist/fonts/";
 </div>
 <div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -2904,14 +2901,14 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
         
 
 
-        <meta itemprop="datePublished" content="August 19, 2023">
+        <meta itemprop="datePublished" content="September 22, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-08-19">August 19, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

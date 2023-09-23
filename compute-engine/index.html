@@ -38,11 +38,42 @@
 
 
 
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js" crossorigin="anonymous"></script>
+  
+    
+      
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js" crossorigin="anonymous"></script>
+  
 
+
+
+  
+    
+      
+    
+    <script defer type="module" src="/assets/js/code-playground.min.js" crossorigin="anonymous"></script>
+  
 
 
 
 <link rel="stylesheet" href="/assets/css/main.css" crossorigin>
+
+  
+    
+      
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css" crossorigin>
+  
 
 
 
@@ -2254,6 +2285,18 @@
   
 
 
+<script type="module">
+  window.addEventListener("DOMContentLoaded", () => 
+    import("//unpkg.com/@cortex-js/compute-engine?module").then((ComputeEngine) => {
+      globalThis.ce = new ComputeEngine.ComputeEngine();
+      const playgrounds = [...document.querySelectorAll("code-playground")];
+      for (const playground of playgrounds) {
+        playground.autorun = 1000; // delay in ms
+        playground.run();
+      }
+    })
+);
+</script>
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 <p class="xl">The <strong>CortexJS Compute Engine</strong> is a JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.</p>
@@ -2261,16 +2304,17 @@ computing and numeric evaluation of mathematical expressions.</p>
 who need to make technical computing apps running in the browser or in
 server-side JavaScript environments such as Node.</p>
 <div style="height:2rem"></div>
-<pre><code class="language-ts"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).evaluate().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;-1&quot;</span>
-
-
-<span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;(a+b)^2&quot;</span>);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Expand&quot;</span>, expr]).evaluate().<span class="hljs-property">latex</span>);
-<span class="hljs-comment">// ➔ &quot;a^2 + 2ab + b^2&quot;</span>
-</code></pre>
+<code-playground layout="stack" show-line-numbers autorun="never">
+<div slot="javascript">
+console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);
+//
+const expr = ce.parse("(a+b)^2");
+console.log(ce.box(["Expand", expr]).evaluate().latex);
+//
+const lhs = ce.parse("2x^2 + 3x + 1");
+const rhs = ce.parse("1 + 2x + x + 2x^2");
+console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</div>
+</code-playground>
 <p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript code. This guide
 assumes you are familiar with JavaScript or TypeScript.</p>
 <p>The CortexJS Compute Engine manipulates math expressions represented with the <a href ="/math-json/">MathJSON format</a>.</p>
@@ -2297,7 +2341,6 @@ from a CDN.</p>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;e^{i\\pi}&quot;</span>).evaluate().<span class="hljs-property">latex</span>);
   <span class="hljs-comment">// ➔ &quot;-1&quot;</span>
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-
 </code></pre>
 <p>The ESM (module) version is also available in the npm package in <code>dist/compute-engine.min.esm.js</code></p>
 <h3 id="using-vintage-javascript" tabindex="-1">Using Vintage JavaScript</h3>
@@ -2415,14 +2458,14 @@ Read more about <strong>Parsing and Serializing LaTeX</strong>
         
 
 
-        <meta itemprop="datePublished" content="September 21, 2023">
+        <meta itemprop="datePublished" content="September 22, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

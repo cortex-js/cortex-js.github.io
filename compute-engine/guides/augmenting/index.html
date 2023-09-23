@@ -2426,7 +2426,7 @@ associated with a function definition.</p>
 <p>However, you still can’t evaluate the expression, because the Compute Engine
 doesn’t know how to evaluate <code>double</code> yet, it just knows that <code>double</code> is a
 function.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.evaluate(expr).<span class="hljs-property">json</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">evaluate</span>(expr).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;double&quot;, 3]</span>
 </code></pre>
 <p>For the Compute Engine to evaluate <code>double</code>, you need to define provide a
@@ -2448,7 +2448,7 @@ argument is a <code>MathJSON</code> expression. The array may be empty if there 
 arguments.</li>
 </ul>
 <p>If you evaluate the expression now, you get the expected result:</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.evaluate(expr).<span class="hljs-property">json</span>);
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">evaluate</span>(expr).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ 6 🎉</span>
 </code></pre>
 <h3 id="changing-the-definition-of-a-function" tabindex="-1">Changing the Definition of a Function</h3>
@@ -2474,7 +2474,7 @@ indicate that <code>f</code> is a function. This is equivalent to the more verbo
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x&quot;</span>));
 </code></pre>
 <p>Evaluating an <code>[&quot;Assign&quot;]</code> expression is equivalent to calling <code>ce.assign()</code>:</p>
-<pre><code class="language-js">ce.evaluate([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">evaluate</span>([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]]);
 </code></pre>
 <h2 id="acting-on-multiple-functions-and-symbols" tabindex="-1">Acting on Multiple Functions and Symbols</h2>
 <p><strong>To declare multiple functions and symbols</strong>, use the <code>ce.declare()</code> method
@@ -2519,14 +2519,14 @@ done by adding a definition to the MathJSON library.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 21, 2023">
+        <meta itemprop="datePublished" content="September 22, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-21">September 21, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
