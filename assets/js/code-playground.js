@@ -146,6 +146,13 @@ TEMPLATE.innerHTML = `
     border: var(--ui-border, 1px solid rgba(0, 0, 0, .2));
   }
 
+  div.result > pre.console::selection, 
+  div.result > pre.console *::selection {
+    background: var(--selection-background, var(--base-01, ${base01}));
+    color: var(--selection-color, inherit);
+  }
+
+
   div.result > pre.console.visible {
     display: block;
   }
@@ -434,7 +441,7 @@ TEMPLATE.innerHTML = `
     }
 @media (prefers-color-scheme: dark) {
   :root {
-    --selection-background-color: var(--primary-color);
+    --selection-background: var(--primary-color);
     --selection-color: #fff;
   }
   
