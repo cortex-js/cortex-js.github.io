@@ -2297,26 +2297,23 @@
 
 <p>A domain is represented by a <strong>domain expression</strong>. For example:</p>
 <ul>
-<li><code>&quot;Integer&quot;</code></li>
-<li><code>&quot;Boolean&quot;</code></li>
-<li><code>[&quot;Range&quot;, -1, +1]</code>.</li>
+<li><code>&quot;Integers&quot;</code></li>
+<li><code>&quot;Booleans&quot;</code></li>
+<li><code>[&quot;Functions&quot;, &quot;Integers&quot;, &quot;Integers&quot;]</code></li>
 </ul>
 <p>A domain expression is either a <strong>domain literal</strong> represented by an identifier
-such as <code>&quot;Integer&quot;</code> and <code>&quot;Boolean&quot;</code> or a <strong>constructed domain</strong> represented by
+such as <code>&quot;Integers&quot;</code> and <code>&quot;Booleans&quot;</code> or a <strong>constructed domain</strong> represented by
 a function expression.</p>
 <p>Of course, it wouldn’t make sense for it to be any function, so the
-name of that function must be among a limited set of <strong>domain constructor</strong>.</p>
+name of that function must be among a limited set of <strong>domain constructors</strong>.</p>
 <p>This effectively defines a specialized language to represent domains. In some
 cases the same function name can be used in a domain expression and a value
 expression, but they will be interpreted differently.</p>
-<p>For example, the expression <code>[&quot;List&quot;, 5, 7, 11]</code> is a value representing a list
-of three integers. On the other hand, the domain expression <code>[&quot;List&quot;, &quot;Integer&quot;]</code>
-represents the domain of all the lists that have integers as their element.</p>
 <p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
 they are used to select the correct function definition.</p>
-<p>For example a function <code>Add</code> could operate either on numbers or matrixes. The
-domain of the arguments would be used to select the appropriate function
-definition.</p>
+<p>For example a function <code>Add</code> could have several implementation to operate
+on numbers or on matrixes. The domain of the arguments would be used to select
+the appropriate function definition.</p>
 <p>Symbolic manipulation algorithms also use domains to decide when certain
 transformations are applicable.</p>
 <p>For example, \( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
@@ -2327,20 +2324,18 @@ Engine <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a><
 <h2 id="obtaining-the-domain-of-an-expression" tabindex="-1">Obtaining the Domain of an Expression</h2>
 <p><strong>To query the domain of an expression</strong> read the <code>domain</code> property of the
 expression.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
-
-ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>).<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &quot;TranscendentalNumber&quot;</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Pi&quot;</span>).<span class="hljs-property">domain</span>;
+<span class="hljs-comment">// ➔ &quot;TranscendentalNumbers&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Divide&quot;</span>).<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &#x27;[&quot;Function&quot;,  &quot;Number&quot;, &quot;Number&quot;, &quot;Number]&#x27;: domain of the function &quot;Divide&quot;</span>
+<span class="hljs-comment">// ➔ &#x27;[&quot;Functions&quot;,  &quot;Numbers&quot;, &quot;Numbers&quot;, &quot;Numbers]&#x27;: domain of the function &quot;Divide&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &quot;Number&quot;: the result of the &quot;Add&quot; function</span>
-<span class="hljs-comment">// (its codomain) in general is a &quot;Number&quot;</span>
+<span class="hljs-comment">// ➔ &quot;Numbers&quot;: the result of the &quot;Add&quot; function</span>
+<span class="hljs-comment">// (its codomain) belongs to the domain &quot;Numbers&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &quot;Integer&quot;: once evaluated, the domain of the result may be more specific</span>
+<span class="hljs-comment">// ➔ &quot;Integers&quot;: once evaluated, the domain of the result may be more specific</span>
 </code></pre>
 </section>
 <section id='domain-lattice'>
@@ -2359,8 +2354,8 @@ the return domain of a function that never returns. Not to be confused with
 </ul>
 <p>There are a few other important domains:</p>
 <ul>
-<li>The <strong><code>Domain</code></strong> domain contains all the domain expressions.</li>
-<li>The <strong><code>Value</code></strong> domain contains all the expressions which are not domains,<br>
+<li>The <strong><code>Domains</code></strong> domain contains all the domain expressions.</li>
+<li>The <strong><code>Values</code></strong> domain contains all the expressions which are not domains,<br>
 for example the number <code>42</code>, the symbol <code>alpha</code>, the expression
 <code>[&quot;Add&quot;, &quot;x&quot;, 1]</code>.</li>
 <li>The <strong><code>Nothing</code></strong> domain has exactly one value, the symbol <code>Nothing</code>. It is
@@ -2396,21 +2391,18 @@ every domain.</li>
 </ul>
 <p><strong>To evaluate the compatibility of two domains</strong> use <code>domain.isCompatible()</code></p>
 <p>By default, <code>domain.isCompatible()</code> will check for covariant compatibility.</p>
-<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;PositiveNumber&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;Integer&quot;</span>);
+<pre><code class="language-ts">ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;PositiveNumbers&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;Integers&quot;</span>);
 <span class="hljs-comment">// ➔ true</span>
 
-ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;Number&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;RealNumber&quot;</span>, <span class="hljs-string">&quot;contravariant&quot;</span>);
+ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&quot;Numbers&quot;</span>).<span class="hljs-title function_">isCompatible</span>(<span class="hljs-string">&quot;RealNumbers&quot;</span>, <span class="hljs-string">&quot;contravariant&quot;</span>);
 <span class="hljs-comment">// ➔ true</span>
 </code></pre>
 </section>
 <h2 id="constructing-new-domains" tabindex="-1">Constructing New Domains</h2>
 <p>A domain constructor is a function expression with one of the identifiers below.</p>
 <p><strong>To define a new domain</strong> use a domain constructor.</p>
-<pre><code class="language-json"><span class="hljs-comment">// Range of non-negative integers</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>num<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span>
- 
-<span class="hljs-comment">// Functions with a single real number argument and that return an integer</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumber&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integer&quot;</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-comment">// Functions with a single real number argument and that return an integer</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Functions&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumbers&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integers&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <p>When a domain expression is boxed, it is automatically put in canonical form.</p>
 <div class="symbols-table first-column-header">
@@ -2423,16 +2415,12 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>Function</code></td>
-<td style="text-align:left"><code>[&quot;Function&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;Function&quot;, &quot;Number&quot;, &quot;Boolean&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance for the arguments and contravariance for the co-domain.</td>
+<td style="text-align:left"><code>Functions</code></td>
+<td style="text-align:left"><code>[&quot;Functions&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;Functions&quot;, &quot;Numbers&quot;, &quot;Booleans&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance for the arguments and contravariance for the co-domain.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>List</code></td>
 <td style="text-align:left"><code>[&quot;List&quot;, &lt;element-domain&gt;]</code> <br></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Record</code></td>
-<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Tuple</code></td>
@@ -2488,7 +2476,7 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 </tr>
 <tr>
 <td style="text-align:left"><code>Multiple</code></td>
-<td style="text-align:left"><code>[&quot;Multiple&quot;, &lt;factor&gt;, &lt;domain&gt;, &lt;offset&gt;]</code> <br> The set of numbers that satisfy <code>&lt;factor&gt; * x + &lt;offset&gt;</code> with <code>x</code> in <code>domain</code>. For example, the set of odd numbers is <code>[&quot;Multiple&quot;, 2, &quot;Integer&quot;, 1]</code></td>
+<td style="text-align:left"><code>[&quot;Multiple&quot;, &lt;factor&gt;, &lt;domain&gt;, &lt;offset&gt;]</code> <br> The set of numbers that satisfy <code>&lt;factor&gt; * x + &lt;offset&gt;</code> with <code>x</code> in <code>domain</code>. For example, the set of odd numbers is <code>[&quot;Multiple&quot;, 2, &quot;Integers&quot;, 1]</code></td>
 </tr>
 </tbody>
 </table>
@@ -2504,14 +2492,14 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="September 25, 2023">
+        <meta itemprop="datePublished" content="September 27, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-25">September 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2276,23 +2276,6 @@
       <section class="page__content" itemprop="text">
 
   
-    <h1>Canonical Form</h1>
-  
-
-  
-
-    <nav class="toc">
-      <header><h2 class="nav__title"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" style="height:16px; width:12px"><path fill="currentColor" d="M256 0v128h128L256 0zM224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM272 416h-160C103.2 416 96 408.8 96 400C96 391.2 103.2 384 112 384h160c8.836 0 16 7.162 16 16C288 408.8 280.8 416 272 416zM272 352h-160C103.2 352 96 344.8 96 336C96 327.2 103.2 320 112 320h160c8.836 0 16 7.162 16 16C288 344.8 280.8 352 272 352zM288 272C288 280.8 280.8 288 272 288h-160C103.2 288 96 280.8 96 272C96 263.2 103.2 256 112 256h160C280.8 256 288 263.2 288 272z"/></svg>On This Page</h2></header>
-
-      
-        <div class="toc__menu" >
-        <ol><li><a href="#canonical-form-transformations">Canonical Form Transformations</a></li></ol>
-      </div>
-      
-                              
-    </nav>
-  
-
 
 
 <p>Many mathematical objects can be represented by several equivalent expressions.</p>
@@ -2327,7 +2310,8 @@ object:</p>
 </table>
 </div>
 <p>The Compute Engine stores expressions internally in a canonical form to simplify
-the implementation of some algorithms.</p>
+comparisons and to make it easier to implement algorithms that work with
+expressions.</p>
 <p>The value of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are canonical
 expressions.</p>
 <p>The <code>ce.box()</code> and <code>ce.parse()</code> functions return a canonical expression by
@@ -2336,29 +2320,29 @@ default, which is the desirable behavior in most cases.</p>
 of <code>ce.parse()</code> or <code>ce.box()</code> to <code>false</code>.</p>
 <p>The non-canonical version will be closer to the literal LaTeX input, which may
 be desirable to compare a “raw” user input with an expected answer.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{-5}&#x27;</span>);
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>);
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
-<span class="hljs-comment">// The canonical version moves the sign to the numerator</span>
+<span class="hljs-comment">// The canonical version moves the sign to the numerator and reduces the </span>
+<span class="hljs-comment">// numerator and denominator</span>
 
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{-5}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
-<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, -5]</span>
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 30, -50]</span>
 <span class="hljs-comment">// The non-canonical version does not change the arguments,</span>
 <span class="hljs-comment">// so this is interpreted as a regular fraction (&quot;Divide&quot;), </span>
-<span class="hljs-comment">// not a rational.</span>
+<span class="hljs-comment">// not as a rational number.</span>
 </code></pre>
 <p>The value of <code>expr.json</code> (the plain JSON representation of an expression) may
 not be in canonical form: some “sugaring” is applied to the internal
-representation before being returned, for example
-<code>[&quot;Add&quot;, -1, &quot;x&quot;]</code> may be returned as <code>[&quot;Subtract&quot;, &quot;x &quot;, 1]</code>.</p>
-<p>You can further customize how an expression is serialized to plain JSON by using
+representation before being returned, for example <code>[&quot;Power&quot;, &quot;x&quot;, 2]</code> is
+returned as <code>[&quot;Square&quot;, &quot;x&quot;]</code>.</p>
+<p>You can customize how an expression is serialized to plain JSON by using
 <a href="/docs/guide-expressions#unboxing"><code>ce.jsonSerializationOptions</code></a>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{5}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{3}{5}&quot;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>)
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, 3, 5]</span>
-<span class="hljs-comment">// This is a rational without modifying the arguments, </span>
-<span class="hljs-comment">// so a `[&quot;Rational&quot;]` expression is returned</span>
 
 ce.<span class="hljs-property">jsonSerializationOptions</span> = { <span class="hljs-attr">exclude</span>: [<span class="hljs-string">&quot;Rational&quot;</span>] };
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{3}{5}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Divide&quot;, 3, 5]</span>
 <span class="hljs-comment">// We have excluded `[&quot;Rational&quot;]` expressions, so it </span>
 <span class="hljs-comment">// is interepreted as a division instead.</span>
@@ -2366,14 +2350,14 @@ ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x
 <p>The canonical form of an expression is always the same when used with a given
 Compute Engine instance. However, do not rely on the canonical form as future
 versions of the Compute Engine could provide a different result.</p>
+<p><strong>To check if an expression is canonical</strong> use <code>expr.isCanonical</code>.</p>
 <p><strong>To obtain the canonical representation of a non-canonical expression</strong>, use
 the <code>expr.canonical</code> property.</p>
-<p><strong>To check if an expression is canonical</strong> use <code>expr.isCanonical</code>.</p>
 <p>If the expression is already canonical, <code>expr.canonical</code> immediately returns
 <code>expr</code>.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{10}{30}&quot;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
-<span class="hljs-comment">// ➔ [&quot;Rational&quot;, 10, 30]</span>
+<span class="hljs-comment">// ➔ [&quot;Divide&quot;, 10, 30]</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isCanonical</span>);
 <span class="hljs-comment">// ➔ false</span>
@@ -2382,114 +2366,57 @@ the <code>expr.canonical</code> property.</p>
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, 1, 3]</span>
 </code></pre>
 <h2 id="canonical-form-transformations" tabindex="-1">Canonical Form Transformations</h2>
-<p>The canonical form used by the Compute Engine follows common conventions. It is
-not always “the simplest” way to represent an expression.</p>
-<p>Calculating the canonical form of an expression is applying some rewriting rules
-to an expression to put sums, products, numbers, roots, etc… in canonical
-form. In that sense, it is similar to simplifying an expression with
-<code>expr.simplify()</code>, but it is more conservative in the transformations it
-applies, and it will not take into account any assumptions about symbols or
-their value.</p>
+<p>The canonical form used by the Compute Engine follows common conventions.
+However, it is not always “the simplest” way to represent an expression.</p>
+<p>Calculating the canonical form of an expression involves applying some
+rewriting rules to an expression to put sums, products, numbers, roots,
+etc… in canonical form. In that sense, it is similar to simplifying an
+expression with <code>expr.simplify()</code>, but it is more conservative in the
+transformations it applies, and it will not take into account any assumptions
+about symbols or their value.</p>
 <p>Below is a list of some of the transformations applied to obtain the canonical
 form:</p>
 <ul>
-<li>
-<p>Idempotency: \( f(f(x)) \to f(x) \)</p>
-</li>
-<li>
-<p>Involution: \( f(f(x)) \to x \)</p>
-</li>
-<li>
-<p>Associativity: \( f(a, f(b, c)) \to f(a, b, c) \)</p>
-</li>
-<li>
-<p><strong>Literals</strong></p>
+<li>Idempotency: \( f(f(x)) \to f(x) \)</li>
+<li>Involution: \( f(f(x)) \to x \)</li>
+<li>Associativity: \( f(a, f(b, c)) \to f(a, b, c) \)</li>
+<li><strong>Literals</strong>
 <ul>
-<li>Rationals are reduced, e.g. \[(\frac{6}{4} \longrightarrow \frac{3}{2}\]</li>
-<li>The denominator of rationals is made positive, e.g. \[(\frac{5}{-11}
-\longrightarrow \frac{-5}{11}\]</li>
+<li>Rationals are reduced, e.g. \( \frac{6}{4} \to \frac{3}{2}\)</li>
+<li>The denominator of rationals is made positive, e.g. \(\frac{5}{-11}
+\to \frac{-5}{11}\)</li>
 <li>A rational with a denominator of 1 is replaced with a number, e.g.
-\[(\frac{19}{1} \longrightarrow 19\]</li>
-<li>Square roots of rationals have their perfect squared factored out, e.g.
-\[(\sqrt{63} \longrightarrow 3\sqrt{7}\]</li>
+\(\frac{19}{1} \to 19\)</li>
 <li>Complex numbers with no imaginary component are replaced with a real number</li>
 </ul>
 </li>
-<li>
-<p><code>Abs</code></p>
-<ul>
-<li>The absolute value of literals is evaluated</li>
-</ul>
-</li>
-<li>
-<p><code>Add</code></p>
+<li><code>Add</code>
 <ul>
 <li>Arguments are sorted</li>
-<li>Literal <code>0</code> is removed</li>
 <li>Sum of a literal and the product of a literal with the imaginary unit are
 replaced with a complex number.</li>
 </ul>
 </li>
-<li>
-<p><code>Multiply</code></p>
+<li><code>Multiply</code>: Arguments are sorted</li>
+<li><code>Negate</code>: <code>[&quot;Negate&quot;, 3]</code> \(\to\) <code>-3</code></li>
+<li><code>Power</code>
 <ul>
-<li>Arguments are sorted</li>
-<li>$x \times x$ is replaced with <code>[&quot;Square&quot;, x]</code></li>
-<li>The product of two integers literals is evaluated <strong>But not exact literals?
-I.e. rationals or Square Root of fractional?</strong>
-<ul>
-<li>If any argument is <code>NaN</code> or <code>Undefined</code> evaluates to <code>NaN</code> <strong>Might be too
-aggressive</strong></li>
+<li>\(x^{\tilde\infty} \to \operatorname{NaN}\)</li>
+<li>\(x^0 \to 1\)</li>
+<li>\(x^1 \to x\)</li>
+<li>\((\pm 1)^{-1} \to -1\)</li>
+<li>\((\pm\infty)^{-1} \to 0\)</li>
+<li>\(0^{\infty} \to \tilde\infty\)</li>
+<li>\((\pm 1)^{\pm \infty} \to \operatorname{NaN}\)</li>
+<li>\(\infty^{\infty} \to \infty\)</li>
+<li>\(\infty^{-\infty} \to 0\)</li>
+<li>\((-\infty)^{\pm \infty} \to \operatorname{NaN}\)</li>
 </ul>
 </li>
-</ul>
-</li>
-<li>
-<p><code>Divide</code></p>
-</li>
-<li>
-<p><code>Power</code></p>
-<ul>
-<li>$x^{\tilde\infty} \longrightarrow \operatorname{NaN}$</li>
-<li>$x^0 \longrightarrow 1$</li>
-<li>$x^1 \longrightarrow x$</li>
-<li>$(\pm 1)^{-1} \longrightarrow -1$</li>
-<li>$(\pm\infty)^{-1} \longrightarrow 0$</li>
-<li>$0^{\infty} \longrightarrow \tilde\infty$</li>
-<li>$(\pm 1)^{\pm \infty} \longrightarrow \operatorname{NaN}$</li>
-<li>$\infty^{\infty} \longrightarrow \infty$</li>
-<li>$\infty^{-\infty} \longrightarrow 0$</li>
-<li>$(-\infty)^{\pm \infty} \longrightarrow \operatorname{NaN}$</li>
-</ul>
-</li>
-<li>
-<p><code>Square</code></p>
-</li>
-<li>
-<p><code>Sqrt</code></p>
-</li>
-<li>
-<p><code>Root</code></p>
-</li>
-<li>
-<p><code>Subtract</code></p>
-</li>
-<li>
-<p><code>Negate</code></p>
-</li>
-<li>
-<p>For <code>Multiply</code>, literal 1 is removed, small integers and small rations are
-multiplied together.</p>
-</li>
-<li>
-<p>For <code>Divide</code>, replaced by <code>Multiply</code> / <code>Power</code></p>
-</li>
-<li>
-<p>For <code>Subtract</code>, replaced by <code>Add</code></p>
-</li>
-<li>
-<p>For <code>Sqrt</code> and <code>Root</code>, replaced by <code>Power</code></p>
-</li>
+<li><code>Square</code>: <code>[&quot;Power&quot;, &quot;x&quot;, 2]</code> \(\to\) <code>[&quot;Square&quot;, &quot;x&quot;]</code></li>
+<li><code>Sqrt</code>: <code>[&quot;Sqrt&quot;, &quot;x&quot;]</code> \(\to\)<code>[&quot;Power&quot;, &quot;x&quot;, &quot;Half&quot;]</code></li>
+<li><code>Root</code>:  <code>[&quot;Root&quot;, &quot;x&quot;, 3]</code> \(\to\) <code>[&quot;Power&quot;, &quot;x&quot;, [&quot;Rational&quot;, 1, 3]]</code></li>
+<li><code>Subtract</code>: <code>[&quot;Subtract&quot;, &quot;a&quot;, &quot;b&quot;]</code> \(\to\) <code>[&quot;Add&quot;, [&quot;Negate&quot;, &quot;b&quot;], &quot;a&quot;]</code></li>
 </ul>
 
 
@@ -2502,14 +2429,14 @@ multiplied together.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 25, 2023">
+        <meta itemprop="datePublished" content="September 27, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-25">September 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2524,19 +2451,6 @@ multiplied together.</p>
   
   
 
-
-<aside class="sidebar__right">
-  <nav class="toc">
-    <header><h2 class="nav__title"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" style="height:16px; width:12px"><path fill="currentColor" d="M256 0v128h128L256 0zM224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM272 416h-160C103.2 416 96 408.8 96 400C96 391.2 103.2 384 112 384h160c8.836 0 16 7.162 16 16C288 408.8 280.8 416 272 416zM272 352h-160C103.2 352 96 344.8 96 336C96 327.2 103.2 320 112 320h160c8.836 0 16 7.162 16 16C288 344.8 280.8 352 272 352zM288 272C288 280.8 280.8 288 272 288h-160C103.2 288 96 280.8 96 272C96 263.2 103.2 256 112 256h160C280.8 256 288 263.2 288 272z"/></svg>On This Page</h2></header>
-  
-    
-      <div class="toc__menu" >
-        <ol><li><a href="#canonical-form-transformations">Canonical Form Transformations</a></li></ol>
-      </div>
-    
-                            
-  </nav>
-</aside>
 
 </div>
 

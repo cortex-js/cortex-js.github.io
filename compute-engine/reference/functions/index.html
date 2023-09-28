@@ -2286,7 +2286,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
+        <ol><li><a href="#anonymous-functions">Anonymous Functions</a></li><li><a href="#anonymous-parameters">Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
       </div>
       
                               
@@ -2300,32 +2300,54 @@
 <p>The standard library can be extended with your own functions.</p>
 <div class='read-more'><a href="/compute-engine/guides/augmenting/">Read more about adding new
 definitions to the Compute Engine.<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2 id="anonymous-functions-and-anonymous-parameters" tabindex="-1">Anonymous Functions and Anonymous Parameters</h2>
+<h2 id="anonymous-functions" tabindex="-1">Anonymous Functions</h2>
 <p>A function that is not bound to an identifier is called an <strong>anonymous
 function</strong>.</p>
 <p>Anonymous functions are frequently used as arguments to other functions.</p>
 <p>In the example below, the <code>[&quot;Function&quot;]</code> expression is an anonymous function
 that is passed as an argument to the <code>[&quot;Sum&quot;]</code> function.</p>
+<p>The first argument of the <code>[&quot;Function&quot;]</code> expression is the body of the function,
+the remaining arguments are the name of the parameters of the function.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
-<p>The parameters of a function can also be anonymous. In this case, the arguments
-are bound to the wildcards <code>_</code>, <code>_1</code>, <code>_2</code>, etc… in the body of the function.
-The wildcard <code>_</code> is a shorthand for <code>_1</code>, the first parameter.</p>
-<p>In the example below, both the function and its parameters are anonymous.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<p>To specify an anonymous function with LaTeX use the <code>\mapsto</code> command:</p>
+<div class='latex'><div class="source"> x \mapsto 2x</div><div class="display">\[  x \mapsto 2x \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<div class='latex'><div class="source"> (x, y) \mapsto 2x + y</div><div class="display">\[  (x, y) \mapsto 2x + y \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;y&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <div class='read-more'><a href="/compute-engine/reference/control-structures/">The examples in
 this section define functions as a simple expression, but functions can include
 more complex control structures, including blocks, loops and conditionals. Learn
 more about <strong>control structures</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<h2 id="anonymous-parameters" tabindex="-1">Anonymous Parameters</h2>
+<p>The parameters of a function can also be anonymous.</p>
+<p>In this case, the parameters are bound to the wildcards <code>_</code>, <code>_1</code>, <code>_2</code>, etc…
+in the body of the function. The wildcard <code>_</code> is a shorthand for <code>_1</code>, the
+first parameter.</p>
+<p>In the example below, both the function and its parameters are anonymous.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>Note that as a shortcut when using anonymous parameters, the <code>[&quot;Function&quot;]</code>
+expression can be omitted.</p>
+<p>Anonymous parameters can also be used in LaTeX, but the anonymous parameters
+must be wrapped with an <code>\operatorname</code> command except for <code>\_</code>.</p>
+<div class='latex'><div class="source"> () \mapsto \_ + \operatorname{\_2}</div><div class="display">\[  () \mapsto \_ + \operatorname{\_2} \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_2&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+</code></pre>
 <h2 id="evaluating-an-anonymous-function" tabindex="-1">Evaluating an Anonymous Function</h2>
 <p>To apply a function to some arguments, use an <code>[&quot;Apply&quot;]</code> expression.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 22</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 6</span>
+ 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 8</span>
 </code></pre>
-<p>The first argument of <code>Apply</code> is a an anonymous function, either as an
+<p>The first argument of <code>Apply</code> is an anonymous function, either as an
 identifier, or as a <code>[&quot;Function&quot;]</code> expression. The rest of the arguments are the
 arguments of the anonymous function.</p>
 <h2 id="operating-on-functions" tabindex="-1">Operating on Functions</h2>
@@ -2353,7 +2375,7 @@ applied to some arguments.</p>
 <p>The identifier <em>id</em> should either not have been declared yet, or been declared
 as a function. If <em>id</em> is already defined as a <code>Number</code> for example, it is an
 error to assign a function to it.</p>
-<div class='latex'><div class="source">\operatorname{double} = x \mapsto 2x</div><div class="display">\[ \operatorname{double} = x \mapsto 2x \]</div></div>
+<div class='latex'><div class="source">\operatorname{double} \coloneqq x \mapsto 2x</div><div class="display">\[ \operatorname{double} \coloneqq x \mapsto 2x \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;double&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
 </div></div>
@@ -2373,8 +2395,15 @@ arguments</li>
 are replaced by the wildcards.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 9</span>
+ 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 9</span>
+</code></pre>
+<p>The <code>\lhd</code> and <code>\rhd</code> operators can be used to apply a function to a single
+argument on the left or right respectively.</p>
+<div class='latex'><div class="source">f\lhd g \lhd x</div><div class="display">\[ f\lhd g \lhd x \]</div></div>
+<div class='latex'><div class="source">x \rhd g \rhd f</div><div class="display">\[ x \rhd g \rhd f \]</div></div>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;f&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Apply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;g&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
 </div></div>
 
@@ -2388,14 +2417,14 @@ are replaced by the wildcards.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 25, 2023">
+        <meta itemprop="datePublished" content="September 27, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-25">September 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2417,7 +2446,7 @@ are replaced by the wildcards.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#anonymous-functions-and-anonymous-parameters">Anonymous Functions and Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
+        <ol><li><a href="#anonymous-functions">Anonymous Functions</a></li><li><a href="#anonymous-parameters">Anonymous Parameters</a></li><li><a href="#evaluating-an-anonymous-function">Evaluating an Anonymous Function</a></li><li><a href="#operating-on-functions">Operating on Functions</a><ol><li><a href="#Function">Function</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Apply">Apply</a></li></ol></li></ol>
       </div>
     
                             
