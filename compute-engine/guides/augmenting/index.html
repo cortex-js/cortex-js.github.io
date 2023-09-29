@@ -2321,8 +2321,8 @@ The “kind” of an object is called its <strong>domain</strong>.</p>
   <span class="hljs-attr">value</span>: <span class="hljs-number">9.1e-31</span>,
 });
 </code></pre>
-<p>After an identifier has been declared, its domain cannot be changed: other expressions
-may depend on it, and changing its domain would invalidate them.</p>
+<p>After an identifier has been declared, its domain cannot be changed: other
+expressions may depend on it, and changing its domain would invalidate them.</p>
 <p>You can also declare an identifier without providing a value:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;Functions&quot;</span>);
 
@@ -2358,28 +2358,60 @@ with a symbol.</p>
 <p>As a shortcut, if the symbol was not previously defined, a new definition will
 be created. The domain of the symbol will be set to inferred from the value.</p>
 <h3 id="assigning-a-value" tabindex="-1">Assigning a Value</h3>
-<p>Once declared an identifier can be used in expressions, and it can be
-assigned a value.</p>
-<p>To change the value of a symbol, use the <code>value</code> property of the symbol.</p>
+<p>Once declared an identifier can be used in expressions, and it can be assigned a
+value.</p>
+<p><strong>To change the value of a symbol</strong>, use the <code>value</code> property of the symbol or
+the <code>ce.assign()</code> method.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> n = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;n&quot;</span>);
 n.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${n.latex}</span> = <span class="hljs-subst">${n.value.json}</span>`</span>);
 <span class="hljs-comment">// ➔ n = 5</span>
-</code></pre>
-<p>Alternatively, use <code>ce.assign()</code>:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">5</span>);
+
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">18</span>);
+<span class="hljs-comment">// ➔ n = 18</span>
 </code></pre>
 <p>You can also evaluate a MathJSON expression that contains an <code>[&quot;Assign&quot;]</code>
 expression:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">5</span>]).<span class="hljs-title function_">evaluate</span>();
+<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">42</span>]).<span class="hljs-title function_">evaluate</span>();
+<span class="hljs-comment">// ➔ n = 42</span>
 </code></pre>
 <p>or parse a LaTeX expression that contains an assignment:</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n := 5&quot;</span>).<span class="hljs-title function_">evaluate</span>();
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n := 31&quot;</span>).<span class="hljs-title function_">evaluate</span>();
+<span class="hljs-comment">// ➔ n = 31</span>
 </code></pre>
-<p>In LaTeX, assignments are indicated by the <code>:=</code> or <code>\coloneqq</code> operator (note the two <code>qq</code>s). The
-<code>=</code> operator is used for equality.</p>
-<p class="--notice-info">You can also change the value of a symbol with
-<code>ce.box(&quot;m&quot;).value = 10</code>.</p>
+<p>In LaTeX, assignments are indicated by the <code>:=</code> or <code>\coloneqq</code> operator (note
+the two <code>qq</code>s). The <code>=</code> operator is used for equality.</p>
+<p>The right hand side argument of an assignment (with a <code>ce.assign()</code>,
+<code>expr.value</code> or <code>[&quot;Assign&quot;]</code> expression) can be one of the following:</p>
+<ul>
+<li>a JavaScript boolean: interpreted as <code>True</code> or <code>False</code></li>
+<li>a JavaScript number</li>
+<li>a tuple of two numbers, for a rational</li>
+<li>a <code>bignum</code>, for a large number</li>
+<li>a <code>complex</code>, for a complex number</li>
+<li>a JavaScript string: interpreted as string, unless it starts and ends with a
+<code>$</code> in which case it is interpreted as a LaTeX expression that defines a
+function.</li>
+<li>a MathJSON expression, which defines a function</li>
+<li>a JavaScript function, which also defines a functon</li>
+</ul>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-literal">true</span>);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-number">5</span>);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;q&quot;</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>]);
+ce.<span class="hljs-title function_">assign</span>(
+  <span class="hljs-string">&quot;d&quot;</span>,
+  ce.<span class="hljs-title function_">bignum</span>(<span class="hljs-string">&quot;123456789012345678901234567890.123456789012345678901234567890e512&quot;</span>)
+);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;z&quot;</span>, ce.<span class="hljs-title function_">complex</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>));
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;s&quot;</span>, <span class="hljs-string">&quot;Hello&quot;</span>);
+ 
+<span class="hljs-comment">// Functions</span>
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;$$ 2x + 3 $$&quot;</span>);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;double&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]);
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;halve&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() / <span class="hljs-number">2</span>));
+</code></pre>
+<p>Note that when assigning an expression to a symbol, the expression is not
+evaluated. It is used to define a function</p>
 <h2 id="declaring-a-function" tabindex="-1">Declaring a Function</h2>
 <p>A function is a named operation, such as <code>Add</code>, <code>Sin</code> or <code>f</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/functions"> Learn more about
@@ -2391,11 +2423,11 @@ expression:</p>
 </code></pre>
 <p>🤔 Hmmm… That’s probably not what you want.</p>
 <p>You probably want to get <code>[&quot;double&quot;, 3]</code> instead.</p>
-<p>The problem is that the Compute Engine doesn’t know what <code>double</code> is, so
-it assumes it’s a symbol.</p>
+<p>The problem is that the Compute Engine doesn’t know what <code>double</code> is, so it
+assumes it’s a symbol.</p>
 <p class="notice--info">You can control how unknown identifiers are handled by setting the
 <code>ce.latexOptions.parseUnknownIdentifier</code> property to a function that returns
-<code>function</code> if the argument string is a function, <code>symbol</code> if it’s a symbol or
+<code>function</code> if the parameter string is a function, <code>symbol</code> if it’s a symbol or
 <code>unknown</code> otherwise. For example, you set it up so that identifiers that start
 with an upper case letter are always assume to be functions, or any other
 convention you want. This only affects what happens when parsing LaTeX, though,
@@ -2403,18 +2435,18 @@ and has no effect when using MathJSON expressions.</p>
 <p>To tell the Compute Engine that <code>double</code> is a function, you need to declare it.</p>
 <p><strong>To declare a function</strong>, use the <code>ce.declare()</code> function.</p>
 <p><code>ce.declare()</code> can be used to declare symbols or functions depending on its
-second argument.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> } });
+second parameter.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> } });
 </code></pre>
-<p>If the definition (the second argument of <code>ce.declare()</code>) includes a
+<p>If the definition (the second parameter of <code>ce.declare()</code>) includes a
 <code>signature</code> property, a function is being declared.</p>
 <p>The <code>signature</code> property defines how the function can be used. It is a
 <code>FunctionDefinition</code> object with the following properties (all are optional):</p>
 <ul>
-<li><code>domain</code>: the domain of the function. The <code>Function</code> domain represents any
-function. “NumericFunction” represents a function whose arguments are number
+<li><code>domain</code>: the domain of the function. The <code>Functions</code> domain represents any
+function. “NumericFunctions” represents a function whose parameters are number
 and that returns a numeric value. More complex domains can be specified to
-described the domain of the arguments of the function and the domain of its
+described the domain of the parameters of the function and the domain of its
 return v</li>
 <li><code>canonical(ce, args)</code> returns a canonical representation of the function. This
 is an opportunity to check that the arguments are valid, and to return a
@@ -2439,18 +2471,18 @@ knows that <code>double</code> is a function but it doesn’t know how to evalua
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">evaluate</span>(expr).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;double&quot;, 3]</span>
 </code></pre>
-<p>For the Compute Engine to evaluate <code>double</code>, you need to provide a
-definition for it. You can do this by adding a <code>evaluate</code> handler to the
-definition of <code>double</code>:</p>
+<p>For the Compute Engine to evaluate <code>double</code>, you need to provide a definition
+for it. You can do this by adding a <code>evaluate</code> handler to the definition of
+<code>double</code>:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, {
   <span class="hljs-attr">signature</span>: {
-    <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span>,
+    <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span>,
     <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">2</span>),
   },
 });
 </code></pre>
 <p>The <code>evaluate</code> handler is called when the corresponding function is evaluated.</p>
-<p>It receives two arguments:</p>
+<p>It has two parameters:</p>
 <ul>
 <li><code>ce</code>: the Compute Engine instance</li>
 <li><code>args</code>: an array of the arguments that have been applied to the function. Each
@@ -2468,39 +2500,39 @@ error will be thrown. The domain of a symbol cannot be changed after its
 declaration.</p>
 <p>As a shortcut, if you assign a value to an identifier that was not previously
 declared, a new function definition is created, if the value is a function.</p>
-<p>Using <code>ce.assign()</code> gives you more flexibility than <code>ce.declare()</code>:
-the “value” of the function can be a JavaScript function, a MathJSON expression
-or a LaTeX expression.</p>
+<p>Using <code>ce.assign()</code> gives you more flexibility than <code>ce.declare()</code>: the “value”
+of the function can be a JavaScript function, a MathJSON expression or a LaTeX
+expression.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">5</span>)};
 </code></pre>
 <p>The value can also be a MathJSON expression:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">5</span>]);
 </code></pre>
-<p>Note in this case we added <code>(x)</code> to the first argument of <code>ce.assign()</code> to
+<p>Note in this case we added <code>(x)</code> to the first parameter of <code>ce.assign()</code> to
 indicate that <code>f</code> is a function. This is equivalent to the more verbose:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">5</span>], <span class="hljs-string">&quot;x&quot;</span>]);
 </code></pre>
 <p>The value can be a LaTeX expression:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, <span class="hljs-string">&quot;$$ 5x $$&quot;</span>));
 </code></pre>
-<p>You can also use <code>ce.parse()</code> but you have to watch out and make sure you
-parse a non-canonical expression, otherwise any unknowns (such as <code>x</code>) will be
-automatically declared, instead of being interpreted as an argument to the
+<p>You can also use <code>ce.parse()</code> but you have to watch out and make sure you parse
+a non-canonical expression, otherwise any unknowns (such as <code>x</code>) will be
+automatically declared, instead of being interpreted as a parameter of the
 function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>}));
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x&quot;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> }));
 </code></pre>
 <p>You can also use a more explicit LaTeX syntax:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;(x) \\mapsto 5x&quot;</span>));
 </code></pre>
-<p>The arguments on the left hand side of the <code>\\mapsto</code> operator are the arguments
-of the function. The right hand side is the body of the function. The parenthesis
-around the argument is optional if there is only one argument. If there are
-multiple arguments, they must be enclosed in parenthesis and separatated by
-commas. If there are <em>no</em> arguments (rare, but possible), the parenthesis are
-still required to indicate the argument list is empty.</p>
-<p>When using <code>\\mapsto</code> you don’t have to worry about the canonical flag, because the
-expression indicates what the arguments are, and so they are not intepreted as
-unknowns in the body of the function.</p>
+<p>The arguments on the left hand side of the <code>\\mapsto</code> operator are the
+parameters of the function. The right hand side is the body of the function. The
+parenthesis around the parameters is optional if there is only one parameter. If
+there are multiple parameters, they must be enclosed in parenthesis and
+separatated by commas. If there are <em>no</em> parameters (rare, but possible), the
+parenthesis are still required to indicate the parameter list is empty.</p>
+<p>When using <code>\\mapsto</code> you don’t have to worry about the canonical flag, because
+the expression indicates what the parameters are, and so they are not intepreted
+as unknowns in the body of the function.</p>
 <p>Evaluating an <code>[&quot;Assign&quot;]</code> expression is equivalent to calling <code>ce.assign()</code>:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]]).<span class="hljs-title function_">evaluate</span>();
 </code></pre>
@@ -2515,11 +2547,11 @@ identifiers, not LaTeX commands. For example, if you have a symbol <code>α</cod
 <code>alpha</code>, not <code>\alpha</code></p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>({
   <span class="hljs-attr">m</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> },
-  <span class="hljs-attr">f</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> },
-  <span class="hljs-attr">g</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Function&quot;</span> },
+  <span class="hljs-attr">f</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> },
+  <span class="hljs-attr">g</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> },
   <span class="hljs-title class_">Smallfrac</span>: {
     <span class="hljs-attr">signature</span>: {
-      <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;NumericFunction&quot;</span>,
+      <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;NumericFunctions&quot;</span>,
       <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">box</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() / args[<span class="hljs-number">1</span>].<span class="hljs-title function_">valueOf</span>()),
     },
   },
@@ -2554,14 +2586,14 @@ ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

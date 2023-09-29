@@ -2712,8 +2712,8 @@ names (see below).</p>
 </li>
 <li>
 <p>If the head is an expression, it may include the wildcard <code>_</code> or <code>_1</code> to
-represent the first argument, <code>_2</code> to represent the second argument, etc…
-The wildcard <code>__</code> represents the sequence of all the arguments.</p>
+represent the first parameter, <code>_2</code> to represent the second parameter, etc…
+The wildcard <code>__</code> represents the sequence of all the parameter.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span>
 </code></pre>
 </li>
@@ -2764,11 +2764,11 @@ patterns below:</p>
 </code></pre>
 <p>(from <a href="https://unicode.org/reports/tr51/#EBNF_and_Regex">Unicode TR51</a>)</p>
 <p>or</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">VS16</span> = <span class="hljs-string">&#x27;\\u{FE0F}&#x27;</span>; <span class="hljs-comment">// Variation Selector-16, forces emoji presentation</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">KEYCAP</span> = <span class="hljs-string">&#x27;\\u{20E3}&#x27;</span>; <span class="hljs-comment">// Combining Enclosing Keycap</span>
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ZWJ</span> = <span class="hljs-string">&#x27;\\u{200D}&#x27;</span>; <span class="hljs-comment">// Zero Width Joiner</span>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">VS16</span> = <span class="hljs-string">&quot;\\u{FE0F}&quot;</span>; <span class="hljs-comment">// Variation Selector-16, forces emoji presentation</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">KEYCAP</span> = <span class="hljs-string">&quot;\\u{20E3}&quot;</span>; <span class="hljs-comment">// Combining Enclosing Keycap</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ZWJ</span> = <span class="hljs-string">&quot;\\u{200D}&quot;</span>; <span class="hljs-comment">// Zero Width Joiner</span>
 
-<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">FLAG_SEQUENCE</span> = <span class="hljs-string">&#x27;\\p{RI}\\p{RI}&#x27;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">FLAG_SEQUENCE</span> = <span class="hljs-string">&quot;\\p{RI}\\p{RI}&quot;</span>;
 
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">TAG_MOD</span> = <span class="hljs-string">`(?:[\\u{E0020}-\\u{E007E}]+\\u{E007F})`</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMOJI_MOD</span> = <span class="hljs-string">`(?:\\p{EMod}|<span class="hljs-subst">${VS16}</span><span class="hljs-subst">${KEYCAP}</span>?|<span class="hljs-subst">${TAG_MOD}</span>)`</span>;
@@ -2800,7 +2800,7 @@ names are recommendations.</p>
 <h3 id="wildcards-naming-convention" tabindex="-1">Wildcards Naming Convention</h3>
 <p>Symbols that begin with <code>_</code> <strong>U+005F LOW LINE</strong> (underscore) should be used to
 denote wildcards and other placeholders.</p>
-<p>For example, they may be used to denote the positional arguments in a function
+<p>For example, they may be used to denote the positional parameter in a function
 expression. They may also denote placeholders and captured expression in
 patterns.</p>
 <div class=symbols-table>
@@ -2855,8 +2855,8 @@ uppercase letter <code>A</code>-<code>Z</code></li>
 </ul>
 <h3 id="function-names-naming-convention" tabindex="-1">Function Names Naming Convention</h3>
 <ul>
-<li>The name of the functions in the MathJSON Standard Library starts with an uppercase
-letter <code>A</code>-<code>Z</code>. For example <code>&quot;Sin&quot;</code>, <code>&quot;Fold&quot;</code>.</li>
+<li>The name of the functions in the MathJSON Standard Library starts with an
+uppercase letter <code>A</code>-<code>Z</code>. For example <code>&quot;Sin&quot;</code>, <code>&quot;Fold&quot;</code>.</li>
 <li>The name of your own functions can start with a lowercase or uppercase letter.</li>
 <li>If a function name is made up of several words, use camelCase. For example
 <code>&quot;InverseFunction&quot;</code></li>
@@ -3587,10 +3587,11 @@ array must be transformed into the equivalent object literal to be annotated.</p
 <span class="hljs-punctuation">}</span>
 </code></pre>
 <h2 id="mathjson-standard-library" tabindex="-1">MathJSON Standard Library</h2>
-<p>This document defines the structure of MathJSON expression. The MathJSON Standard Library
-defines a recommended <strong>vocabulary</strong> to use in MathJSON expressions.</p>
-<p>Before considering inventing your own vocabulary, check if the MathJSON Standard Library
-already provides relevant definitions.</p>
+<p>This document defines the structure of MathJSON expression. The MathJSON
+Standard Library defines a recommended <strong>vocabulary</strong> to use in MathJSON
+expressions.</p>
+<p>Before considering inventing your own vocabulary, check if the MathJSON Standard
+Library already provides relevant definitions.</p>
 <p>The MathJSON Standard Library includes definitions for:</p>
 <div class=symbols-table>
 <table>
@@ -3665,8 +3666,7 @@ Library.</p>
 <div class='read-more'><a href="/compute-engine/guides/standard-library/"> Read more about the
 <strong>MathJSON Standard Library</strong>.<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <div class='read-more'><a href="/compute-compute-engine/guides/augmenting/"> Read more about
-<strong>Adding New Definitions</strong>.
-<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<strong>Adding New Definitions</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 
@@ -3678,14 +3678,14 @@ Library.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

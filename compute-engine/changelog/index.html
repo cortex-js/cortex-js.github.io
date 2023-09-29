@@ -2263,31 +2263,73 @@
 <li>The method <code>ce.assume()</code> requires a predicate.</li>
 <li>The signatures of <code>ce.assume()</code> and <code>ce.ask()</code> have been simplified.</li>
 <li>The signature of <code>ce.pushScope()</code> has been simplified.</li>
+<li>The <code>expr.freeVars</code> property has been renamed to <code>expr.unknowns</code>. It returns
+the identifiers used in the expression that do not have a value associated
+with them. The <code>expr.freeVariables</code> property now return the identifiers used
+in the expression that are defined outside of the local scope and are not
+arguments of the function, if a function.</li>
 </ul>
 <h2 id="new-features" tabindex="-1">New Features</h2>
 <ul>
 <li>
-<p>Added <code>Assume</code>, <code>Identity</code>, <code>Which</code>, <code>FixedPoint</code>, <code>Parse</code>, <code>Block</code>, <code>If</code>,
-<code>Loop</code>, <code>N</code>, <code>Evaluate</code>, <code>Simplify</code>, <code>Domain</code>.</p>
+<p><strong>Domain Inference</strong> when the domain of a symbol is not set explicitly (for
+example with <code>ce.declare()</code>), the domain is inferred from the value of the
+symbol or from the context of its usage.</p>
 </li>
 <li>
-<p>Added <code>Break</code>, <code>Continue</code> and <code>Return</code> statements</p>
+<p>Added <code>Assume</code>, <code>Identity</code>, <code>Which</code>, <code>Parse</code>, <code>N</code>, <code>Evaluate</code>, <code>Simplify</code>,
+<code>Domain</code>.</p>
+</li>
+<li>
+<p>Assignments in LaTeX: <code>x \\coloneq 42</code> produce <code>[&quot;Assign&quot;, &quot;x&quot;, 42]</code></p>
 </li>
 <li>
 <p>Added <code>ErfInv</code> (inverse error function)</p>
 </li>
 <li>
-<p>Added ‘Factorial2’ (double factorial)</p>
+<p>Added <code>Factorial2</code> (double factorial)</p>
+</li>
+</ul>
+<h2 id="functions" tabindex="-1">Functions</h2>
+<ul>
+<li>
+<p>Functions can now be defined:</p>
+<ul>
+<li>using <code>ce.assign()</code> or <code>ce.declare()</code></li>
+<li>evaluating LaTeX: <code>(x, y) \\mapsto x^2 + y^2</code></li>
+<li>evaluating MathJSON:
+<code>[&quot;Function&quot;, [&quot;Add&quot;, [&quot;Power&quot;, &quot;x&quot;, 2], [&quot;Power&quot;, &quot;y&quot;, 2]]], &quot;x&quot;, &quot;y&quot;]</code></li>
+</ul>
 </li>
 <li>
-<p>Added implementation for numeric approximation of derivatives (using an 8-th
-order centered difference approximation) and integrals (using a Monte Carlo
-method with rebasing for improper integrals) using the <code>[&quot;ND&quot;]</code> and
-<code>[&quot;NIntegrate&quot;]</code> functions.</p>
+<p>Function can be applied using <code>\operatorname{apply}</code> or the operators <code>\rhd</code>
+and <code>\lhd</code>:</p>
+<ul>
+<li><code>\operatorname{apply}(f, x)</code></li>
+<li><code>f \rhd x</code></li>
+<li><code>x \lhd f</code></li>
+</ul>
 </li>
-<li>
-<p>Added support for <strong>collections</strong> such as lists, tuples, ranges, etc… See
-https://cortexjs.io/compute-engine/reference/collections/</p>
+</ul>
+<p>See http://localhost:8080/compute-engine/guides/augmenting/ and
+https://cortexjs.io/compute-engine/reference/functions/</p>
+<h2 id="control-structures" tabindex="-1">Control Structures</h2>
+<ul>
+<li>Added <code>FixedPoint</code>, <code>Block</code>, <code>If</code>, <code>Loop</code></li>
+<li>Added <code>Break</code>, <code>Continue</code> and <code>Return</code> statements</li>
+</ul>
+<p>See https://cortexjs.io/compute-engine/reference/control-structures/</p>
+<h3 id="calculus" tabindex="-1">Calculus</h3>
+<ul>
+<li>Added numeric approximation of derivatives, using an 8-th order centered
+difference approximation, with the <code>ND</code> function.</li>
+<li>Added numeric approximation of integrals, using a Monte Carlo method with
+rebasing for improper integrals, with the <code>NIntegrate</code> function</li>
+<li>Added symbolic calculation of derivatives with the <code>D</code> function.</li>
+</ul>
+<h3 id="collections" tabindex="-1">Collections</h3>
+<p>Added support for <strong>collections</strong> such as lists, tuples, ranges, etc…</p>
+<p>See https://cortexjs.io/compute-engine/reference/collections/</p>
 <p>Collections can be used to represent various data structures, such as lists,
 vectors, matrixes and more.</p>
 <p>They can be iterated, sliced, filtered, mapped, etc…</p>
@@ -2310,8 +2352,6 @@ vectors, matrixes and more.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">33</span><span class="hljs-punctuation">,</span> <span class="hljs-number">45</span><span class="hljs-punctuation">,</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-number">89</span><span class="hljs-punctuation">,</span> <span class="hljs-number">65</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; 33</span>
 </code></pre>
-</li>
-</ul>
 <h2 id="improvements" tabindex="-1">Improvements</h2>
 <ul>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
@@ -2889,7 +2929,7 @@ is not important.</li>
 </ul>
 <p>It is also possible to evaluate a boolean expression with a relational operator,
 such as <code>Equal</code>:</p>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&#x27;Equal&#x27;</span>, expr, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">symbol</span>);
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Equal&quot;</span>, expr, <span class="hljs-number">2</span>]).evaluate().<span class="hljs-property">symbol</span>);
 <span class="hljs-comment">// -&gt; &quot;True&quot;</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">isEqual</span>(ce.<span class="hljs-title function_">box</span>(<span class="hljs-number">2</span>)));
@@ -2963,14 +3003,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

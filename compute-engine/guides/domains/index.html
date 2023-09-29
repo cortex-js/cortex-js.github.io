@@ -2276,7 +2276,7 @@
       <section class="page__content" itemprop="text">
 
   
-    <h1>Domains</h1><p class="xl">The <b>domain</b> of an expression is the set  of the possible values of that expression.</p>
+    <h1>Domains</h1><p class="xl">The <b>domain</b> of an expression is the set of the possible values of that expression.</p>
   
 
   
@@ -2304,16 +2304,16 @@
 <p>A domain expression is either a <strong>domain literal</strong> represented by an identifier
 such as <code>&quot;Integers&quot;</code> and <code>&quot;Booleans&quot;</code> or a <strong>constructed domain</strong> represented by
 a function expression.</p>
-<p>Of course, it wouldn’t make sense for it to be any function, so the
-name of that function must be among a limited set of <strong>domain constructors</strong>.</p>
+<p>Of course, it wouldn’t make sense for it to be any function, so the name of that
+function must be among a limited set of <strong>domain constructors</strong>.</p>
 <p>This effectively defines a specialized language to represent domains. In some
 cases the same function name can be used in a domain expression and a value
 expression, but they will be interpreted differently.</p>
 <p>Domains are similar to <em>types</em> in programming languages. Amongst other things,
 they are used to select the correct function definition.</p>
-<p>For example a function <code>Add</code> could have several implementation to operate
-on numbers or on matrixes. The domain of the arguments would be used to select
-the appropriate function definition.</p>
+<p>For example a function <code>Add</code> could have several implementation to operate on
+numbers or on matrixes. The domain of the arguments would be used to select the
+appropriate function definition.</p>
 <p>Symbolic manipulation algorithms also use domains to decide when certain
 transformations are applicable.</p>
 <p>For example, \( \sqrt{x^2} = x\) only if \(x \geq 0\)</p>
@@ -2328,14 +2328,16 @@ expression.</p>
 <span class="hljs-comment">// ➔ &quot;TranscendentalNumbers&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Divide&quot;</span>).<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &#x27;[&quot;Functions&quot;,  &quot;Numbers&quot;, &quot;Numbers&quot;, &quot;Numbers]&#x27;: domain of the function &quot;Divide&quot;</span>
+<span class="hljs-comment">// ➔ &#x27;[&quot;Functions&quot;,  &quot;Numbers&quot;, &quot;Numbers&quot;, &quot;Numbers]&#x27;:</span>
+<span class="hljs-comment">//   domain of the function &quot;Divide&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-property">domain</span>;
 <span class="hljs-comment">// ➔ &quot;Numbers&quot;: the result of the &quot;Add&quot; function</span>
-<span class="hljs-comment">// (its codomain) belongs to the domain &quot;Numbers&quot;</span>
+<span class="hljs-comment">//   (its codomain) belongs to the domain &quot;Numbers&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &quot;Integers&quot;: once evaluated, the domain of the result may be more specific</span>
+<span class="hljs-comment">// ➔ &quot;Integers&quot;: once evaluated, the domain of</span>
+<span class="hljs-comment">//   the result may be more specific</span>
 </code></pre>
 </section>
 <section id='domain-lattice'>
@@ -2365,7 +2367,7 @@ returns nothing would have a return domain of <code>Nothing</code> and would ret
 <code>Nothing</code> symbol.</li>
 </ul>
 <p>The <em>parent</em> of a domain represents a <em>is-a</em>/<em>subset-of</em> relationship, for
-example, a <code>List</code> <em>is-a</em> <code>Collection</code>.</p>
+example, a <code>List</code> <em>is-a</em> <code>Collections</code>.</p>
 <p><img src="/assets/domains.001.jpeg" alt="Anything domains" title="The top-level domains"></p>
 <p><img src="/assets/domains.002.jpeg" alt="Value domains" title="The Value sub-domains"></p>
 <p><img src="/assets/domains.003.jpeg" alt="Tensor domains" title="The Tensor sub-domains"></p>
@@ -2384,7 +2386,7 @@ that can be determined:</p>
 <li><strong>Invariance</strong>: two domains are invariant if they represent exactly the same
 set of values</li>
 <li><strong>Covariance</strong>: domain <strong>A</strong> is covariant with domain <strong>B</strong> if all the values
-in <strong>A</strong> are also in <strong>B</strong>. For example <code>Integer</code> is covariant with <code>Number</code></li>
+in <strong>A</strong> are also in <strong>B</strong>. For example <code>Integers</code> is covariant with <code>Numbers</code></li>
 <li><strong>Contravariant</strong>: domain <strong>A</strong> is contravariant with domain <strong>B</strong> if all the
 values in <strong>B</strong> are in <strong>A</strong>. For example <code>Anything</code> is contravariant with
 every domain.</li>
@@ -2452,7 +2454,7 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 </tr>
 <tr>
 <td style="text-align:left"><code>Literal</code></td>
-<td style="text-align:left">This constructor defines a domain with a single value, the value of its argument. `                                                                                                                                                                                                                                                            |</td>
+<td style="text-align:left">This constructor defines a domain with a single value, the value of its argument. `                                                                                                                                                                                                                                                                |</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Covariant</code></td>
@@ -2492,14 +2494,14 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

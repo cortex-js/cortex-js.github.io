@@ -2297,11 +2297,13 @@
 
 
 <h2 id="introduction" tabindex="-1">Introduction</h2>
-<p>Some expressions can take a long time to numerically evaluate, for example
-if they contain a large number of terms or involve a loop \((\sum\) or \(\prod\)).</p>
-<p>In this case, it is useful to compile the expression into a JavaScript function that
-can be evaluated much faster.</p>
-<p>For example this approximation of \(\pi\): \( \sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} \)</p>
+<p>Some expressions can take a long time to evaluate numerically, for example if
+they contain a large number of terms or involve a loop \((\sum\) or
+\(\prod\)).</p>
+<p>In this case, it is useful to compile the expression into a JavaScript function
+that can be evaluated much faster.</p>
+<p>For example this approximation of \(\pi\): \(
+\sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} \)</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\sqrt{6\\sum^{10^6}_{n=1}\\frac{1}{n^2}}&quot;</span>);
 
 <span class="hljs-comment">// Numerical evaluation using the Compute Engine</span>
@@ -2320,7 +2322,8 @@ can be evaluated much faster.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}&quot;</span>);
 <span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
 </code></pre>
-<p><strong>To evaluate the compiled expression</strong> call the function returned by <code>expr.compile()</code>:</p>
+<p><strong>To evaluate the compiled expression</strong> call the function returned by
+<code>expr.compile()</code>:</p>
 <pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>());
 <span class="hljs-comment">// ➔ 3.141592653589793</span>
 </code></pre>
@@ -2331,22 +2334,20 @@ can be evaluated much faster.</p>
 containing the value of the arguments:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n^2&quot;</span>);
 <span class="hljs-keyword">const</span> fn = expr.<span class="hljs-title function_">compile</span>();
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">10</span>; i++) 
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({<span class="hljs-attr">n</span>: i}));
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">10</span>; i++) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">fn</span>({ <span class="hljs-attr">n</span>: i }));
 <span class="hljs-comment">// ➔ 1, 4, 9, 16, 25, 36, 49, 64, 81</span>
 </code></pre>
-<p><strong>To get a list of the arguments (or <em>free variables</em>) of an expression</strong>
-use the <code>expr.freeVars</code> property:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n^2&quot;</span>).<span class="hljs-property">freeVars</span>);
+<p><strong>To get a list of the unknows of an expression</strong> use the <code>expr.unknowns</code>
+property:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;n^2&quot;</span>).<span class="hljs-property">unknowns</span>);
 <span class="hljs-comment">// ➔ [&quot;n&quot;]</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;a^2+b^3&quot;</span>).<span class="hljs-property">freeVars</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;a^2+b^3&quot;</span>).<span class="hljs-property">unknowns</span>);
 <span class="hljs-comment">// ➔ [&quot;a&quot;, &quot;b&quot;]</span>
-
 </code></pre>
 <h2 id="limitations" tabindex="-1">Limitations</h2>
-<p>Complex numbers, arbitrary precision numbers, and symbolic calculations
-are not supported.</p>
+<p>Complex numbers, arbitrary precision numbers, and symbolic calculations are not
+supported.</p>
 <p>The calculations are only performed using machine precision numbers.</p>
 <p>Some functions are not supported.</p>
 <p>If the expression cannot be compiled, the <code>compile()</code> method will return
@@ -2368,14 +2369,14 @@ are not supported.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

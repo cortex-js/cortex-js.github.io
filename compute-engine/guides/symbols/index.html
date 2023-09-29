@@ -2373,7 +2373,7 @@ ce.<span class="hljs-property">precision</span> = <span class="hljs-number">10</
 
 ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100</span>; <span class="hljs-comment">// Future computations will be done with 100 digits</span>
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;pi = &#x27;</span>, smallPi.<span class="hljs-property">numericValue</span>, <span class="hljs-string">&#x27;=&#x27;</span>, bigPi.<span class="hljs-property">numericValue</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;pi = &quot;</span>, smallPi.<span class="hljs-property">numericValue</span>, <span class="hljs-string">&quot;=&quot;</span>, bigPi.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ pi  = 3.1415 = 3.1415926535</span>
 </code></pre>
 <h2 id="automatic-declaration-of-symbols" tabindex="-1">Automatic Declaration of Symbols</h2>
@@ -2381,12 +2381,12 @@ ce.<span class="hljs-property">precision</span> = <span class="hljs-number">100<
 when it is first used in an expression.</p>
 <p>The new definition has a domain of <code>ce.defaultDomain</code> and no value associated
 with it, so the symbol will be an <strong>unknwon</strong>.</p>
-<p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumber&quot;</code> so any unknown variable is
-automatically assumed to be a real number. Use <code>ce.declare()</code> to explictly
+<p>By default, <code>defaultDomain</code> is <code>&quot;ExtendedRealNumbers&quot;</code> so any unknown variable
+is automatically assumed to be a real number. Use <code>ce.declare()</code> to explictly
 specify the domain of a symbol.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;m&quot;</span>); <span class="hljs-comment">// m for mystery</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
-<span class="hljs-comment">// ➔ &quot;ExtendedRealNumber&quot;</span>
+<span class="hljs-comment">// ➔ &quot;ExtendedRealNumbers&quot;</span>
 symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ 5</span>
@@ -2417,14 +2417,14 @@ effect.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 27, 2023">
+        <meta itemprop="datePublished" content="September 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-27">September 27, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
