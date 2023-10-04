@@ -2380,7 +2380,7 @@ and comparing the value of the prompts to the expected answer.
 We also change the state of the prompts to indicate whether the answer
 was correct or not.</p>
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById('mf');
 //
 mf.addEventListener('input', (ev) => {
@@ -2395,12 +2395,12 @@ mf.addEventListener('input', (ev) => {
     console.info('Correct!');
    else 
     console.info('Incorrect!');
-});</div>
-  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+});</pre>
+  <pre slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
   \frac{15}{12}= \frac
     {\placeholder[numerator]{?}}
     {\placeholder[denominator]{?}}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <p>The value returned by <code>mf.getPromptValue()</code> is a LaTeX string. If you need to
 use the value in a computation, you will need to convert it to a number.
@@ -2409,7 +2409,7 @@ For example, <code>parseInt(mf.getPromptValue('numerator'))</code>.</p>
 This allows you to check the answer using more sophisticated symbolic
 computation.</p>
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById("mf");
 //
 let typingTimer;  // Timer identifier
@@ -2428,10 +2428,10 @@ function checkAnswer () {
   const ok = answer.isSame(correctAnswer);
 //
   console.info(ok ? "Correct!" : "Incorrect!");
-}</div>
-  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+}</pre>
+  <pre slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
   (x+1)(x-1) = \placeholder[answer]{?}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <p>In the example above, we use the Compute Engine to parse the answer provided
 by the student, and compare it to the correct answer. The Compute Engine
@@ -2442,8 +2442,13 @@ would be distracting for the student.</p>
 <p>Because we are using <code>isSame()</code> to compare the answer, the student can
 provide the answer in a different form, for example <code>x^2 - 1</code> or <code>-1 + x^2</code>.</p>
 <p>If you want a more strict comparison, you can use the non-canonical form
-of the answer, i.e. <code>ce.parse(mf.getPromptValue('answer'), {canonical: false});</code> and
-<code>ce.parse(&quot;x^2 - 1&quot;, {canonical: false})</code>.</p>
+of the answer, i.e.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> answer = ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-title function_">getPromptValue</span>(<span class="hljs-string">&quot;answer&quot;</span>), {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>});
+<span class="hljs-keyword">const</span> correctAnswer = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;x^2 - 1&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>});
+</code></pre>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/#comparing-expressions">
+Read more about <strong>Comparing Expressions</strong> using the Compute Engine.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="accessing-all-the-prompts" tabindex="-1">Accessing all the Prompts</h2>
 <p><strong>To get a list of all the prompts in a mathfield</strong>, use
 <code>mf.getPrompts()</code>. It returns an array of identifiers, or
