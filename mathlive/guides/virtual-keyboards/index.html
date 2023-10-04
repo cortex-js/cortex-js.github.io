@@ -2507,13 +2507,13 @@ and <code>greek</code>.</p>
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">
+<pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
+<pre slot="javascript">
 document.querySelector('math-field').
   addEventListener('focus', () => { 
     mathVirtualKeyboard.layouts = ["numeric", "symbols"];
     mathVirtualKeyboard.visible = true;
-  });</div>
+  });</pre>
 </code-playground>
 <hr>
 <p>To revert to the default layouts, use:</p>
@@ -2552,8 +2552,8 @@ literal with a <code>rows</code> property, an array of keycaps.</p>
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">
+<pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
+<pre slot="javascript">
 document.querySelector('math-field').
   addEventListener('focus', () => {
     mathVirtualKeyboard.layouts = {
@@ -2566,7 +2566,7 @@ document.querySelector('math-field').
       ]
   };
   mathVirtualKeyboard.visible = true;
-});</div>
+});</pre>
 </code-playground>
 <p><img src="/assets/images/mathfield/custom-layout.png" alt=""></p>
 <p>Each keycap is a LaTeX string which is used both as the label of the keycap,
@@ -2947,15 +2947,15 @@ use the <code>mathVirtualKeyboard.alphabeticLayout</code> property.</p>
       outline: none;
     }
   </style>
-  <div slot="javascript">const mf = document.querySelector('math-field');
+  <pre slot="javascript">const mf = document.querySelector('math-field');
 document.querySelector('math-field').addEventListener('focus', () => {
   mathVirtualKeyboard.layouts = ["alphabetic"];
   mathVirtualKeyboard.alphabeticLayout = "dvorak";
   mathVirtualKeyboard.visible = true;
 });
-</div>
-    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 <h3 id="qwertz-layout" tabindex="-1">QWERTZ Layout</h3>
 <div style="display: flex">
@@ -3001,14 +3001,14 @@ document.querySelector('math-field').addEventListener('focus', () => {
         
 
 
-        <meta itemprop="datePublished" content="September 22, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2378,10 +2378,10 @@ properties of the symbol.</p>
 <p>A symbol does not have to be declared before it can be used. A previously
 unknown symbol has a domain of <code>ce.defaultDomain</code> and no value.</p>
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
+<pre slot="javascript">
 const n = ce.box("n");
 n.value = 5;
-console.log("n =", n.value.json);</div></code-playground>
+console.log("n =", n.value.json);</pre></code-playground>
 <p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
 <div class='read-more'><a href="/compute-engine/guides/augmenting/"> Read more about
 <strong>adding definitions</strong> for symbols and functions <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>

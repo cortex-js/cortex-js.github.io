@@ -2371,10 +2371,14 @@ example changing the base font size or adding a border around it.</p>
 <p><strong>To display the mathfield as a block element</strong>, rather than an inline element,
 add an attribute <code>style=&quot;display: block&quot;</code></p>
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" mark-html-line="2">
-<div slot="html">
-&lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
-&lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
+<code-playground layout="stack" mark-html-line="5">
+<pre slot="html">
+&lt;p>Answer: 
+  &lt;math-field style="font-size:2rem">42&lt;/math-field>.
+&lt;/p>
+&lt;p>Answer: 
+  &lt;math-field style="font-size:2rem; display: block">3.1415&lt;/math-field>
+&lt;/p></pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h2 id="css-variables" tabindex="-1">CSS Variables</h2>
@@ -2454,7 +2458,7 @@ Although CSS styles are “invisible” to custom components, CSS variables are
 </div>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
+    <pre slot="html">&lt;style&gt;
 math-field {
   --caret-color: red;
   --selection-background-color: lightgoldenrodyellow;
@@ -2463,7 +2467,7 @@ math-field {
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <br>
@@ -2475,7 +2479,7 @@ virtual keyboard panel container.</p>
 <p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
+    <pre slot="html">&lt;style&gt;
   math-field:focus-within {
     outline: 4px solid #d7170b;
     border-radius: 4px;
@@ -2484,7 +2488,7 @@ virtual keyboard panel container.</p>
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
@@ -2663,22 +2667,18 @@ the <code>=</code> sign because the limit is displayed in <code>scriptstyle</cod
 <p><strong>To set the default mathstyle of a mathfield</strong>, set the <code>mf.defaultMode</code>
 property or the <code>default-mode</code> attribute.</p>
 <p>Set it to <code>&quot;inline-math&quot;</code> to use <code>textstyle</code> or <code>&quot;math&quot;</code> to use <code>displaystyle</code>.</p>
-<p>By default, the mathfield element is laid out on the page as an inline element.
-To get it laid out as a block element, set <code>display: inline-block</code> on the mathfield.</p>
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-  <div slot="html">The answer is &lt;math-field 
-  style="
-    vertical-align: middle;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, .3);
-    padding-left: 5px; padding-right: 5px;
-    min-width: 100px;
-  "&gt;
+<code-playground layout="stack" mark-html-line="2">
+  <pre slot="html">&lt;p>The answer is 
+  &lt;math-field default-mode="inline-math"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;.</div>
+  &lt;/math-field&gt;.
+&lt;/p></pre>
 </code-playground>
 <!-- htmlmin:ignore -->
+<p>By default, the mathfield element is laid out on the page as an inline element
+when in an inline context (when inside a <code>&lt;p&gt;</code> tag for example).</p>
+<p>To get it laid out as a block element, set <code>display: block</code> on the mathfield.</p>
 <h3 id="letter-shape-style" tabindex="-1">Letter Shape Style</h3>
 <p><strong>To control which letters are automatically italicized</strong>, set the <code>letterShapeStyle</code> property or <code>letter-shape-style</code> attribute.</p>
 <div class='symbols-table'>
@@ -2769,9 +2769,9 @@ in the mathfield.</p>
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field smart-mode&gt;
+<pre slot="html">&lt;math-field smart-mode&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <br>
@@ -2829,15 +2829,15 @@ will affect all mathfield elements on the page.</p>
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await customElements.whenDefined('math-field');
 const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
 console.log(MathfieldElement.strings[locale.substring(0, 2)]);
-</div>
-<div slot="html">&lt;math-field id='formula'&gt;
+</pre>
+<pre slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h3 id="decimal-marker" tabindex="-1">Decimal Marker</h3>
@@ -2864,12 +2864,12 @@ keycap is  labeled <code>,</code> instead and contextually inserts a <code>{,}</
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await customElements.whenDefined('math-field');
-MathfieldElement.decimalSeparator = ",";</div>
-<div slot="html">&lt;math-field id='formula'&gt;
+MathfieldElement.decimalSeparator = ",";</pre>
+<pre slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <h3 id="fraction-navigation-order" tabindex="-1">Fraction Navigation Order</h3>
@@ -2888,13 +2888,13 @@ before the numerator.</p>
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await window.customElements.whenDefined('math-field');
 MathfieldElement.fractionNavigationOrder = "denominator-numerator";
-</div>
-<div slot="html">&lt;math-field&gt;
+</pre>
+<pre slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 </section>
@@ -2918,13 +2918,13 @@ property.</p>
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await window.customElements.whenDefined("math-field");
 MathfieldElement.fontsDirectory = "//unpkg.com/mathlive/dist/fonts/";
-</div>
-<div slot="html">&lt;math-field&gt;
+</pre>
+<pre slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 <div class='read-more'><a href="/mathlive/guides/integration/">
@@ -2945,14 +2945,14 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
         
 
 
-        <meta itemprop="datePublished" content="September 22, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2370,7 +2370,7 @@ in the mathfield, and vice-versa.</p>
 changing the content of the mathfield, to prevent an <code>&quot;input&quot;</code> event from being
 triggered and creating an infinite loop.</p>
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById("formula");
 const latex = document.getElementById("latex");
 //
@@ -2378,20 +2378,23 @@ mf.addEventListener("input",(ev) => latex.value = mf.value);
 //
 latex.value = mf.value;
 //
-// Listen for changes in the "latex" text field, and reflect its value in 
-// the mathfield.
+// Listen for changes in the "latex" text field, 
+// and reflect its value in the mathfield.
 //
 latex.addEventListener("input", (ev) => 
-    mf.setValue( ev.target.value, {suppressChangeNotifications: true})
+    mf.setValue(
+      ev.target.value, 
+      {suppressChangeNotifications: true}
+    )
 );
-  </div>
-  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
-  &lt;math-field id="formula"&gt;
-      x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;                
-  &lt;label&gt;Latex&lt;/label&gt;
-  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea></div>
+  </pre>
+  <pre slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+&lt;math-field id="formula"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;                
+&lt;label&gt;Latex&lt;/label&gt;
+&lt;textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
+  autocorrect="off" spellcheck="false">&lt;/textarea></pre>
 </code-playground>
 <h2 id="reading-the-content-of-a-mathfield" tabindex="-1">Reading the Content of a Mathfield</h2>
 <p><strong>To read the content of a <code>&lt;math-field&gt;</code> element as a LaTeX string</strong> use its <code>value</code> property,
@@ -2411,14 +2414,14 @@ loses focus and the content has been modified.</p>
       outline: none;
     }
   </style>
-  <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
+  <pre slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
   // `ev.target` is an instance of `MathfieldElement`
   console.log(ev.target.value);
-});</div>
-    <div slot="html">
+});</pre>
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 <hr>
 <p>Reading the <code>value</code> property is equivalent to calling the <code>getValue()</code> method with
@@ -2427,16 +2430,17 @@ no argument.</p>
 For example to get the content as a MathJSON expression, use <code>mf.getValue('math-json')</code>.</p>
 <p class="notice--info"><strong>Try:</strong> <a href="/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)">Other formats</a> are available: change <code>&quot;math-json&quot;</code> to <code>&quot;spoken-text&quot;</code>.</p>
 <code-playground layout="stack">
-    <div slot="html">
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
-    <div slot="javascript">import 'compute-engine';
-    const mf = document.getElementById('formula');
-mf.addEventListener('input',(ev) => {
-    // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.getValue('math-json'));
-});</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
+    <pre slot="javascript">import 'compute-engine';
+const mf = document.getElementById('formula');
+//
+// `ev.target` is an instance of `MathfieldElement`
+mf.addEventListener('input',
+  (ev) => console.log(ev.target.getValue('math-json'))
+);</pre>
 </code-playground>
 <h2 id="using-a-mathfield-with-the-cortexjs-compute-engine" tabindex="-1">Using a Mathfield with the CortexJS Compute Engine</h2>
 <p>The <a href="/math-json">MathJSON</a> format is a lightweight mathematical notation interchange format.</p>
@@ -2449,13 +2453,15 @@ mathematical operations on MathJSON expressions.</p>
 with the <code>MathfieldElement.computeEngine</code> property. If you do not set this property,
 a default instance of the compute engine will be used.</p>
 <code-playground layout="stack">
-    <div slot="html">
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    \mathrm{Expand}((a+b)^6)
-&lt;/math-field&gt;</div>
-    <div slot="javascript">import 'compute-engine';
+  \mathrm{Expand}((a+b)^6)
+&lt;/math-field&gt;</pre>
+    <pre slot="javascript">import 'compute-engine';
 const mf = document.getElementById('formula');
-mf.addEventListener('input',() => console.log(mf.expression.evaluate()));</div>
+mf.addEventListener('input', () => 
+  console.log(mf.expression.evaluate())
+);</pre>
 console.log(mf.expression.evaluate());
 </code-playground>
 <h2 id="listening-for-changes-to-a-mathfield" tabindex="-1">Listening for Changes to a Mathfield</h2>
@@ -2696,18 +2702,18 @@ the content of the formula, see <a href="mathlive/guides/customizing/">Customizi
         outline: none;
       }
     </style>
-    <div slot="javascript">
+    <pre slot="javascript">
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
 mf.applyStyle(
   {backgroundColor: 'yellow' }, 
   {range: [0, -1]}
 );
-</div>
-<div slot="html">
+</pre>
+<pre slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <p><strong>To change the style of a portion of the mathfield</strong>, specify a selection range
 to <code>applyStyle()</code>.</p>
@@ -2721,15 +2727,15 @@ to <code>applyStyle()</code>.</p>
         outline: none;
       }
     </style>
-    <div slot="javascript">
+    <pre slot="javascript">
 const mf = document.getElementById('formula');
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
-</div>
-<div slot="html">
+</pre>
+<pre slot="html">
 &lt;math-field id="formula"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 <p><strong>To remove a style</strong>, set the value of the <code>fontFamily</code>, <code>color</code> or <code>backgroundColor</code>
 property to <code>&quot;none&quot;</code>, or the value of the <code>fontShape</code>, <code>fontSeries</code> or <code>fontSize</code>
@@ -2758,14 +2764,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 22, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-22">September 22, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

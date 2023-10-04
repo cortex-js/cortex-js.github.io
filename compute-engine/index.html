@@ -2353,19 +2353,19 @@ who need to make technical computing apps running in the browser or in
 server-side JavaScript environments such as Node.</p>
 <div style="height:2rem"></div>
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
-console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);</div>
+<pre slot="javascript">
+console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);</pre>
 </code-playground>
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
+<pre slot="javascript">
 const expr = ce.parse("(a+b)^2");
-console.log(ce.box(["Expand", expr]).evaluate().latex);</div>
+console.log(ce.box(["Expand", expr]).evaluate().latex);</pre>
 </code-playground>
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
+<pre slot="javascript">
 const lhs = ce.parse("2x^2 + 3x + 1");
 const rhs = ce.parse("1 + 2x + x + 2x^2");
-console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</div>
+console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</pre>
 </code-playground>
 <p class="notice--info"><strong>Note:</strong> To use the Compute Engine you must write JavaScript code. This guide
 assumes you are familiar with JavaScript or TypeScript.</p>
@@ -2510,14 +2510,14 @@ Read more about <strong>Parsing and Serializing LaTeX</strong>
         
 
 
-        <meta itemprop="datePublished" content="September 24, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-24">September 24, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

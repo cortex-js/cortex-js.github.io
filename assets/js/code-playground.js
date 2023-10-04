@@ -1643,15 +1643,21 @@ function mark(root, language, arg) {
 // Register the tag for the element, only if it isn't already registered
 (_a = customElements.get('code-playground')) !== null && _a !== void 0 ? _a : customElements.define('code-playground', CodePlaygroundElement);
 function echo(rest, tty, finalize, output) {
-    if (!rest) {
-        finalize();
-        return;
-    }
-    let delay = 4;
-    setTimeout(() => requestAnimationFrame(() => {
-        tty((output !== null && output !== void 0 ? output : '') + rest[0]);
-        echo(rest.substring(1), tty, finalize, (output !== null && output !== void 0 ? output : '') + rest[0]);
-    }), delay);
+    tty(output !== null && output !== void 0 ? output : '' + rest);
+    finalize();
+    // if (!rest) {
+    //   finalize();
+    //   return;
+    // }
+    // let delay = 4;
+    // setTimeout(
+    //   () =>
+    //     requestAnimationFrame(() => {
+    //       tty((output ?? '') + rest[0]);
+    //       echo(rest.substring(1), tty, finalize, (output ?? '') + rest[0]);
+    //     }),
+    //   delay
+    // );
 }
 
 export { CodePlaygroundElement };
