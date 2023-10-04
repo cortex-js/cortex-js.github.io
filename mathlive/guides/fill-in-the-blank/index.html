@@ -68,6 +68,11 @@
     
     <script defer type="module" src="//unpkg.com/mathlive/dist/mathlive.min.js" crossorigin="anonymous"></script>
   
+    
+      
+    
+    <script defer type="module" src="//unpkg.com/@cortex-js/compute-engine?module" crossorigin="anonymous"></script>
+  
 
 
 
@@ -155,7 +160,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2075,7 +2080,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/mathlive/guides/fill-in-the-blank/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/mathlive/guides/fill-in-the-blank/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/mathlive/guides/fill-in-the-blank/"
                     class="">
                     
@@ -2083,7 +2140,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2231,9 +2288,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2267,13 +2321,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2298,7 +2347,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#accessing-all-the-prompts">Accessing all the Prompts</a></li><li><a href="#accessing-the-value-of-a-prompt">Accessing the Value of a Prompt</a></li><li><a href="#accessing-the-state-of-a-prompt">Accessing the State of a Prompt</a></li></ol>
+        <ol><li><a href="#example">Example</a></li><li><a href="#accessing-all-the-prompts">Accessing all the Prompts</a></li><li><a href="#accessing-the-value-of-a-prompt">Accessing the Value of a Prompt</a></li><li><a href="#accessing-the-state-of-a-prompt">Accessing the State of a Prompt</a></li></ol>
       </div>
       
                               
@@ -2310,26 +2359,91 @@
 <p><strong>To have one or more portions of a mathfield editable, while the rest is
 read-only</strong>, use a <code>readonly</code> mathfield, and the <code>\placeholder[]{}</code> command.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">readonly</span>&gt;</span>
-  x=\frac
-  {\placeholder[numerator]{}}
-  {\placholder[denominator]{}}
+  x=\placeholder[answer]{}
 <span class="hljs-tag">&lt;/<span class="hljs-name">mathfield</span>&gt;</span>
 </code></pre>
-<p>This feature is called “fill-in-the-blank”.
-It’s often used to prompt a student to fill in portions of a formula.</p>
-<p>The first argument of the <code>\placeholder</code> command, i.e. the one provided
-in <code>[]</code>, is a string identifier made of letters and digits. This argument
-must be provided (i.e. it’s not optional) for the placeholder to be
-interpreted as editable.</p>
+<p>This feature is called <strong>“fill-in-the-blank”</strong>.</p>
+<p>It’s often used to prompt a student to provide an answer to a quizz by
+filling in portions of a formula.</p>
+<p>The first argument of the <code>\placeholder</code> command, i.e. <code>[answer]</code> in the
+example above, is the identifier of the placeholder. It can be any string
+that does not contain spaces or special characters. The identifier
+indicates that the placeholder is editable, and it is used
+to access the value of the placeholder.</p>
 <p>The main argument of the <code>\placeholder</code> command, i.e. the one in <code>{}</code> is the
 value of the prompt. You can leave it blank, but the brackets must be present.</p>
+<h2 id="example" tabindex="-1">Example</h2>
+<p>In the example below a student is asked to fill in the blanks to provide
+a reduced fraction.</p>
+<p>We check the answer by listening to the <code>input</code> event of the mathfield,
+and comparing the value of the prompts to the expected answer.
+We also change the state of the prompts to indicate whether the answer
+was correct or not.</p>
 <code-playground layout="stack">
   <div slot="javascript">
 const mf = document.getElementById('mf');
-mf.addEventListener('input', (ev) => console.log(mf.getPromptValue('blank1')));
-  </div>
-  <div slot="html">&lt;math-field id=mf readonly style="font-size:3em"&gt;f(x)= \frac{\placeholder[numerator][x]{}}{\placeholder[denominator]{y}}&lt;/math-field&gt;</div>
+//
+mf.addEventListener('input', (ev) => {
+  const num = mf.getPromptValue('numerator');
+  const den = mf.getPromptValue('denominator');
+//
+  mf.setPromptState('numerator', num === "5" ? 'correct' : 'incorrect');
+  mf.setPromptState('denominator', den === "4" ? 'correct' : 'incorrect');
+//
+  console.clear();
+  if (num === "5" && den === "4") 
+    console.info('Correct!');
+   else 
+    console.info('Incorrect!');
+});</div>
+  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+  \frac{15}{12}= \frac
+    {\placeholder[numerator]{?}}
+    {\placeholder[denominator]{?}}
+&lt;/math-field&gt;</div>
 </code-playground>
+<p>The value returned by <code>mf.getPromptValue()</code> is a LaTeX string. If you need to
+use the value in a computation, you will need to convert it to a number.
+For example, <code>parseInt(mf.getPromptValue('numerator'))</code>.</p>
+<p>You can also use the Compute Engine to evaluate the value of the prompt.
+This allows you to check the answer using more sophisticated symbolic
+computation.</p>
+<code-playground layout="stack">
+  <div slot="javascript">
+const mf = document.getElementById("mf");
+//
+let typingTimer;  // Timer identifier
+//
+// On input, start the countdown
+mf.addEventListener("input", () => {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(checkAnswer, 2000);
+});
+//
+function checkAnswer () {
+  const ce = MathfieldElement.computeEngine;
+  const answer = ce.parse(mf.getPromptValue("answer"));
+  const correctAnswer = ce.parse("x^2 - 1");
+//
+  const ok = answer.isSame(correctAnswer);
+//
+  console.info(ok ? "Correct!" : "Incorrect!");
+}</div>
+  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+  (x+1)(x-1) = \placeholder[answer]{?}
+&lt;/math-field&gt;</div>
+</code-playground>
+<p>In the example above, we use the Compute Engine to parse the answer provided
+by the student, and compare it to the correct answer. The Compute Engine
+can also be used to evaluate the answer, or to simplify it.</p>
+<p>We use a timer to wait for the student to finish typing before checking
+the answer. This avoids checking the answer after every keystroke, which
+would be distracting for the student.</p>
+<p>Because we are using <code>isSame()</code> to compare the answer, the student can
+provide the answer in a different form, for example <code>x^2 - 1</code> or <code>-1 + x^2</code>.</p>
+<p>If you want a more strict comparison, you can use the non-canonical form
+of the answer, i.e. <code>ce.parse(mf.getPromptValue('answer'), {canonical: false});</code> and
+<code>ce.parse(&quot;x^2 - 1&quot;, {canonical: false})</code>.</p>
 <h2 id="accessing-all-the-prompts" tabindex="-1">Accessing all the Prompts</h2>
 <p><strong>To get a list of all the prompts in a mathfield</strong>, use
 <code>mf.getPrompts()</code>. It returns an array of identifiers, or
@@ -2338,10 +2452,8 @@ an empty array if there are no prompts.</p>
 <p><strong>To access the value of a prompt</strong>, use <code>mf.getPromptValue()</code> and <code>mf.setPromptValue()</code>. The first argument of these functions is the id of the prompt. The optional second
 argument of <code>getPromptValue()</code> is the same as <code>mf.getValue()</code> and can be used to customize the output format.</p>
 <h2 id="accessing-the-state-of-a-prompt" tabindex="-1">Accessing the State of a Prompt</h2>
-<p>A prompt can be locked or unlocked. When locked, it is not
-editable.</p>
-<p>A prompt can also be either in a correct or incorrect state.The prompt renders accordingly, which can be used to indicate
-that a provided answer was correct or incorrect.</p>
+<p>A prompt can be locked or unlocked. When locked, it is not editable.</p>
+<p>A prompt can also be either in a correct or incorrect state.The prompt renders accordingly, which can be used to indicate that a provided answer was correct or incorrect.</p>
 <p><strong>To change the lock state of a prompt</strong>, use <code>mf.setPromptState()</code> and <code>mf.getPromptState()</code> to read the
 current state of the prompt.</p>
 
@@ -2355,14 +2467,14 @@ current state of the prompt.</p>
         
 
 
-        <meta itemprop="datePublished" content="March 17, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-03-17">March 17, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2384,7 +2496,7 @@ current state of the prompt.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#accessing-all-the-prompts">Accessing all the Prompts</a></li><li><a href="#accessing-the-value-of-a-prompt">Accessing the Value of a Prompt</a></li><li><a href="#accessing-the-state-of-a-prompt">Accessing the State of a Prompt</a></li></ol>
+        <ol><li><a href="#example">Example</a></li><li><a href="#accessing-all-the-prompts">Accessing all the Prompts</a></li><li><a href="#accessing-the-value-of-a-prompt">Accessing the Value of a Prompt</a></li><li><a href="#accessing-the-state-of-a-prompt">Accessing the State of a Prompt</a></li></ol>
       </div>
     
                             
@@ -2417,8 +2529,8 @@ current state of the prompt.</p>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      

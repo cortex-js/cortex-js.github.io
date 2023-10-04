@@ -165,7 +165,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2085,7 +2085,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/compute-engine/guides/symbols/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/compute-engine/guides/symbols/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/compute-engine/guides/symbols/"
                     class="">
                     
@@ -2093,7 +2145,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2241,9 +2293,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2277,13 +2326,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2350,7 +2394,7 @@ console.log("n =", n.value.json);</div></code-playground>
 to be an <strong>unknown</strong>.</p>
 <p>A symbol whose value cannot be changed is a <strong>constant</strong>. Constants are
 identified by a special flag in their definition.</p>
-<p>The property <code>expr.isConstant</code> is <code>true</code> if a symbol is a constant.</p>
+<p><strong>To check if a symbol is a constant</strong>, use the <code>expr.isConstant</code> property.</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;x&quot;</span>).<span class="hljs-property">isConstant</span>);
 <span class="hljs-comment">// ➔ false</span>
 
@@ -2387,6 +2431,7 @@ specify the domain of a symbol.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> symbol = ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;m&quot;</span>); <span class="hljs-comment">// m for mystery</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">domain</span>.<span class="hljs-property">symbol</span>);
 <span class="hljs-comment">// ➔ &quot;ExtendedRealNumbers&quot;</span>
+
 symbol.<span class="hljs-property">value</span> = <span class="hljs-number">5</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(symbol.<span class="hljs-property">numericValue</span>);
 <span class="hljs-comment">// ➔ 5</span>
@@ -2396,16 +2441,16 @@ symbol is <strong>unbound</strong> (no name binding). This will limit the useful
 symbol and the symbol will evaluate to an <code>[&quot;Error&quot;]</code> expression.</p>
 <h2 id="forgetting-a-symbol" tabindex="-1">Forgetting a Symbol</h2>
 <p><strong>To <em>reset</em> what is known about a symbol</strong> use the <code>ce.forget()</code> function.</p>
-<p>The <code>ce.forget()</code> function will remove the definition associated with a symbol,
-including its domain and value, and any
-<a href="/compute-engine/guides/assumptions">assumptions</a> about the symbol.</p>
+<p>The <code>ce.forget()</code> function will remove any <a href="/compute-engine/guides/assumptions">assumptions</a>
+associated with a symbol, and remove its value. Howeve, the symbol
+will remained declared, since other expressions may depend on it.</p>
 <p><strong>To forget about a specific symbol</strong>, pass the name of the symbol as an
 argument to <code>ce.forget()</code>.</p>
 <p><strong>To forget about all the symbols in the current scope</strong>, use <code>ce.forget()</code>
 without any arguments.</p>
-<p class="notice--info">Note that only symbols in the current scope are forgotten. If a definition for
-the symbol existed in a previous scope, that definition will now be in
-effect.</p>
+<p class="notice--info">Note that only symbols in the current scope are forgotten. If assumptions about
+the symbol existed in a previous scope, those assumptions will be in effect
+when returning to the previous scope.</p>
 
 
 
@@ -2417,14 +2462,14 @@ effect.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2479,8 +2524,8 @@ effect.</p>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      

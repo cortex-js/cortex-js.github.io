@@ -143,7 +143,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2063,7 +2063,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/compute-engine/guides/expressions/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/compute-engine/guides/expressions/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/compute-engine/guides/expressions/"
                     class="">
                     
@@ -2071,7 +2123,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2219,9 +2271,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2255,13 +2304,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2419,17 +2463,17 @@ ce.<span class="hljs-title function_">parse</span>(expr);
 ce.<span class="hljs-title function_">parse</span>(expr, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// non-canonical form ➔ [&quot;Divide&quot;, 30, -50]</span>
 </code></pre>
-<p><strong>To check if an expression is in canonical form</strong>, use <code>expr.isCanonical</code>.</p>
 <p><strong>To obtain the canonical representation of an expression</strong>, use
 <code>expr.canonical</code>.</p>
 <p>A non-canonical expression may include errors as a result of parsing from LaTeX,
 if the LaTeX input contained LaTeX syntax errors.</p>
-<p>The arguments of a function in canonical form are validated to make sure they
-match expectations.</p>
 <p>A canonical expression may include additional errors compared to a non-canonical
 expression, for example <code>[&quot;Divide&quot;, 2, 5, 6]</code> (three arguments instead of two),
 <code>[&quot;Add&quot;, 2, &quot;True&quot;]</code> (mismatched argument domain, expected a number but got a
 boolean).</p>
+<p>The canonical form of an expression which is not valid will
+include one or more <code>[&quot;Error&quot;]</code> expressions indicating the nature of the
+problem.</p>
 <p><strong>To check if an expression contains errors</strong> use <code>expr.isValid</code>.</p>
 <p>When doing this check on a canonical expression it takes into consideration not
 only possible syntax errors, but also semantic errors (incorrect number or
@@ -2706,14 +2750,14 @@ property.</p>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2768,8 +2812,8 @@ property.</p>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      

@@ -143,7 +143,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2063,7 +2063,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/compute-engine/guides/canonical-form/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/compute-engine/guides/canonical-form/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/compute-engine/guides/canonical-form/"
                     class="">
                     
@@ -2071,7 +2123,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2219,9 +2271,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2255,13 +2304,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2278,6 +2322,7 @@
   
 
 
+<h1 id="canonical-form" tabindex="-1">Canonical Form</h1>
 <p>Many mathematical objects can be represented by several equivalent expressions.</p>
 <p>For example, the expressions in each row below represent the same mathematical
 object:</p>
@@ -2322,8 +2367,8 @@ of <code>ce.parse()</code> or <code>ce.box()</code> to <code>false</code>.</p>
 be desirable to compare a “raw” user input with an expected answer.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>);
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
-<span class="hljs-comment">// The canonical version moves the sign to the numerator and reduces the </span>
-<span class="hljs-comment">// numerator and denominator</span>
+<span class="hljs-comment">// The canonical version moves the sign to the numerator </span>
+<span class="hljs-comment">// and reduces the numerator and denominator</span>
 
 ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> });
 <span class="hljs-comment">// ➔ [&quot;Divide&quot;, 30, -50]</span>
@@ -2364,6 +2409,28 @@ the <code>expr.canonical</code> property.</p>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">canonical</span>);
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, 1, 3]</span>
+</code></pre>
+<h2 id="canonical-form-and-validity" tabindex="-1">Canonical Form and Validity</h2>
+<p>The canonical form of an expression may not be <strong>valid</strong>. A canonical expression
+may include <code>[&quot;Error&quot;]</code> expressions, for example, indicating missing arguments,
+excess arguments, or arguments of the wrong type.</p>
+<p>For example the canonical form of <code>[&quot;Ln&quot;]</code> is <code>[&quot;Ln&quot;, [&quot;Error&quot;, &quot;'missing'&quot;]]</code>
+and it is not a valid expression.</p>
+<p><strong>To check if an expression is valid</strong> use <code>expr.isValid</code>.</p>
+<p><strong>To get a list of errors in an expression</strong> use <code>expr.errors</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;Ln&quot;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Ln&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]</span>
+<span class="hljs-comment">// The canonical form of `Ln` is not valid</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isCanonical</span>);
+<span class="hljs-comment">// ➔ true</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isValid</span>);
+<span class="hljs-comment">// ➔ false</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">errors</span>);
+<span class="hljs-comment">// ➔ [[&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]</span>
 </code></pre>
 <h2 id="canonical-form-transformations" tabindex="-1">Canonical Form Transformations</h2>
 <p>The canonical form used by the Compute Engine follows common conventions.
@@ -2429,14 +2496,14 @@ replaced with a complex number.</li>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2501,8 +2568,8 @@ whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      

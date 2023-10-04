@@ -119,7 +119,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2039,7 +2039,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/compute-engine/changelog/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/compute-engine/changelog/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/compute-engine/changelog/"
                     class="">
                     
@@ -2047,7 +2099,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2195,9 +2247,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2231,13 +2280,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2255,9 +2299,25 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<ul>
+<li>The <code>Nothing</code> domain has been renamed to <code>NothingDomain</code></li>
+<li>The <code>Functions</code>, <code>Maybe</code>, <code>Sequence</code>, <code>Dictionary</code>, <code>List</code> and <code>Tuple</code> domain
+constructors have been renamed to <code>FunctionOf</code>, <code>OptArg</code>, <code>VarArg</code>,
+<code>DictionaryOf</code>, <code>ListOf</code> and <code>TupleOf</code>, respectively.</li>
+<li>Domains no longer require a <code>[&quot;Domain&quot;]</code> expression wrapper, so for example
+<code>ce.box(&quot;Pi&quot;).domain</code> returns <code>&quot;TranscendentalNumbers&quot;</code> instead of
+<code>[&quot;Domain&quot;, &quot;TranscendentalNumbers&quot;]</code>.</li>
+</ul>
+<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<ul>
+<li>Invoking a function repeatedly would invoke the function in the original scope
+rather than using a new scope for each invocation.</li>
+</ul>
 <h2 id="0.16.0" tabindex="-1">0.16.0</h2>
 <p><strong>Release Date:</strong> 2023-09-29</p>
-<h2 id="breaking-changes" tabindex="-1">Breaking Changes</h2>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The methods <code>ce.let()</code> and <code>ce.set()</code> have been renamed to <code>ce.declare()</code> and
 <code>ce.assign()</code> respectively.</li>
@@ -2270,7 +2330,7 @@ with them. The <code>expr.freeVariables</code> property now return the identifie
 in the expression that are defined outside of the local scope and are not
 arguments of the function, if a function.</li>
 </ul>
-<h2 id="new-features" tabindex="-1">New Features</h2>
+<h3 id="new-features" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>Domain Inference</strong> when the domain of a symbol is not set explicitly (for
@@ -2291,7 +2351,7 @@ symbol or from the context of its usage.</p>
 <p>Added <code>Factorial2</code> (double factorial)</p>
 </li>
 </ul>
-<h2 id="functions" tabindex="-1">Functions</h2>
+<h3 id="functions" tabindex="-1">Functions</h3>
 <ul>
 <li>
 <p>Functions can now be defined:</p>
@@ -2315,14 +2375,14 @@ and <code>\lhd</code>:</p>
 <p>See
 <a href="https://cortexjs.io/compute-engine/guides/augmenting/">Adding New Definitions</a>
 and <a href="https://cortexjs.io/compute-engine/reference/functions/">Functions</a>.</p>
-<h2 id="control-structures" tabindex="-1">Control Structures</h2>
+<h3 id="control-structures" tabindex="-1">Control Structures</h3>
 <ul>
 <li>Added <code>FixedPoint</code>, <code>Block</code>, <code>If</code>, <code>Loop</code></li>
 <li>Added <code>Break</code>, <code>Continue</code> and <code>Return</code> statements</li>
 </ul>
 <p>See
 <a href="https://cortexjs.io/compute-engine/reference/control-structures/">Control Structures</a></p>
-<h3 id="calculus" tabindex="-1">Calculus</h3>
+<h4 id="calculus" tabindex="-1">Calculus</h4>
 <ul>
 <li>Added numeric approximation of derivatives, using an 8-th order centered
 difference approximation, with the <code>ND</code> function.</li>
@@ -2330,7 +2390,7 @@ difference approximation, with the <code>ND</code> function.</li>
 rebasing for improper integrals, with the <code>NIntegrate</code> function</li>
 <li>Added symbolic calculation of derivatives with the <code>D</code> function.</li>
 </ul>
-<h3 id="collections" tabindex="-1">Collections</h3>
+<h4 id="collections" tabindex="-1">Collections</h4>
 <p>Added support for <strong>collections</strong> such as lists, tuples, ranges, etc…</p>
 <p>See <a href="https://cortexjs.io/compute-engine/reference/collections/">Collections</a></p>
 <p>Collections can be used to represent various data structures, such as lists,
@@ -2355,19 +2415,19 @@ vectors, matrixes and more.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">33</span><span class="hljs-punctuation">,</span> <span class="hljs-number">45</span><span class="hljs-punctuation">,</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-number">89</span><span class="hljs-punctuation">,</span> <span class="hljs-number">65</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; 33</span>
 </code></pre>
-<h2 id="improvements" tabindex="-1">Improvements</h2>
+<h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
 significantly rewritten with help from an AI-powered writing assistant.</li>
 </ul>
-<h2 id="bug-fixes" tabindex="-1">Bug Fixes</h2>
+<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>The LaTeX string returned in <code>[&quot;Error&quot;]</code> expression was incorrectly tagged as
 <code>Latex</code> instead of <code>LatexString</code>.</li>
 </ul>
 <h2 id="0.15.0" tabindex="-1">0.15.0</h2>
 <p><strong>Release Date:</strong> 2023-09-14</p>
-<h2 id="improvements-1" tabindex="-1">Improvements</h2>
+<h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
 <li>The <code>ce.serialize()</code> function now takes an optional <code>canonical</code> argument. Set
 it to <code>false</code> to prevent some transformations that are done to produce more
@@ -2387,7 +2447,7 @@ https://cortexjs.io/compute-engine/reference/statistics/</li>
 </ul>
 <h2 id="0.14.0" tabindex="-1">0.14.0</h2>
 <p><strong>Release Date:</strong> 2023-09-13</p>
-<h2 id="breaking-changes-1" tabindex="-1">Breaking Changes</h2>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The entries in the LaTeX syntax dictionary can now have LaTeX triggers
 (<code>latexTrigger</code>) or triggers based on identifiers (<code>identifierTrigger</code>). The
@@ -2398,7 +2458,7 @@ former replaces the <code>trigger</code> property. The latter is new. An entry w
 robust. They can be modified directly or one of their properties can be
 modified.</li>
 </ul>
-<h2 id="improvements-2" tabindex="-1">Improvements</h2>
+<h3 id="improvements-2" tabindex="-1">Improvements</h3>
 <ul>
 <li>
 <p>Added more functions and symbols supported by <code>expr.compile()</code>:</p>
@@ -2477,7 +2537,7 @@ that both forms will be recognized.</p>
 </ul>
 <h2 id="0.13.0" tabindex="-1">0.13.0</h2>
 <p><strong>Release Date:</strong> 2023-09-09</p>
-<h2 id="new-features-1" tabindex="-1">New Features</h2>
+<h3 id="new-features-1" tabindex="-1">New Features</h3>
 <ul>
 <li>Some expressions can be compiled to Javascript. This is useful to evaluate an
 expression many times, for example in a loop. The compiled expression is
@@ -2485,7 +2545,7 @@ faster to evaluate than the original expression. To get the compiled
 expression, use <code>expr.compile()</code>. Read more at
 https://cortexjs.io/compute-engine/guides/compiling</li>
 </ul>
-<h2 id="bug-fixes-and-improvements" tabindex="-1">Bug Fixes and Improvements</h2>
+<h3 id="bug-fixes-and-improvements" tabindex="-1">Bug Fixes and Improvements</h3>
 <ul>
 <li>Fixed parsing and serialization of extended LaTeX synonyms for <code>e</code> and <code>i</code>.</li>
 <li>Fixed serialization of <code>Half</code>.</li>
@@ -2494,7 +2554,7 @@ https://cortexjs.io/compute-engine/guides/compiling</li>
 </ul>
 <h2 id="0.12.7" tabindex="-1">0.12.7</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h2 id="improvements-3" tabindex="-1">Improvements</h2>
+<h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>Made customization of the LaTeX dictionary simpler. The <code>ce.latexDictionary</code>
 property can be used to access and modify the dictionary. The documentation at
@@ -2503,7 +2563,7 @@ has been updated.</li>
 </ul>
 <h2 id="0.12.6" tabindex="-1">0.12.6</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>New API for the <code>Parser</code> class.</li>
 </ul>
@@ -2528,7 +2588,7 @@ returned by <code>expr.numericValue</code>.</li>
 <p>Work around unpckg.com issue with libraries using BigInt.</p>
 <h2 id="0.12.0" tabindex="-1">0.12.0</h2>
 <p><strong>Release Date:</strong> 2022-11-27</p>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
@@ -2559,7 +2619,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 </ul>
 <h2 id="0.11.0" tabindex="-1">0.11.0</h2>
 <p><strong>Release Date:</strong> 2022-11-18</p>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
@@ -2581,7 +2641,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 </ul>
 <h2 id="0.10.0" tabindex="-1">0.10.0</h2>
 <p><strong>Release Date:</strong> 2022-11-17</p>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
@@ -2600,7 +2660,7 @@ when evaluating a simple polynomial in a loop.</li>
 </ul>
 <h2 id="0.9.0" tabindex="-1">0.9.0</h2>
 <p><strong>Release Date:</strong> 2022-11-15</p>
-<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The head of a number expression is always <code>Number</code>. Use <code>expr.domain</code> to be
 get more specific info about what kind of number this is.</li>
@@ -2716,7 +2776,7 @@ in the MathJSON serialization.</p>
 <li><code>\sum</code> is now correctly parsed and evaluated. This includes creating a local
 scope with the index and expression value of the sum.</li>
 </ul>
-<h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li>The parsing and evaluation of log functions could produce unexpected results</li>
 <li>The <code>\gamma</code> command now correctly maps to <code>[&quot;Gamma&quot;]</code></li>
@@ -2740,7 +2800,7 @@ rendered to LaTeX correctly, e.g. <code>V20_20</code>.</li>
 </ul>
 <h2 id="0.8.0" tabindex="-1">0.8.0</h2>
 <p><strong>Release Date:</strong> 2022-10-02</p>
-<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
@@ -2757,14 +2817,14 @@ affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead o
 <code>decimal', </code>expr.decimalValue<code>-&gt;</code>expr.bignumValue<code>, </code>decimalValue()<code>-&gt; </code>bignumValue()`</p>
 </li>
 </ul>
-<h3 id="bugs-fixed-1" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li>Numerical evaluation of expressions containing complex numbers when in
 <code>decimal</code> or <code>auto</code> mode produced incorrect results. Example: <code>e^{i\\pi}</code></li>
 </ul>
 <h2 id="0.7.0" tabindex="-1">0.7.0</h2>
 <p><strong>Release Date:</strong> 2022-09-30</p>
-<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
@@ -2800,7 +2860,7 @@ range of a 64-bit float.</li>
 <a href="https://cortexjs.io/compute-engine/reference/core/">Core Reference</a> and
 [Arithmetic Reference]
 (https://cortexjs.io/compute-engine/reference/arithmetic/)</p>
-<h3 id="bugs-fixed-2" tabindex="-1">Bugs Fixed</h3>
+<h3 id="bugs-fixed-3" tabindex="-1">Bugs Fixed</h3>
 <ul>
 <li><strong>#43</strong> If the input of <code>ce.parse()</code> is an empty string, return an empty
 string for <code>expr.latex</code> or <code>expr.json.latex</code>: that is, ensure verbatim LaTeX
@@ -3006,14 +3066,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -3055,8 +3115,8 @@ such as <code>Equal</code>:</p>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      

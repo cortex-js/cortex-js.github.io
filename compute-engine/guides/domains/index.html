@@ -143,7 +143,7 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/gitter/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2063,7 +2063,59 @@
 
                 <li>
                   <a
-                    href="/gitter/"
+                    href="https://github.com/arnog/mathlive"
+                    data-url="/compute-engine/guides/domains/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (MathLive)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://github.com/cortex-js/compute-engine"
+                    data-url="/compute-engine/guides/domains/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#github"></use>
+                      </svg>
+                    
+                    GitHub Repo (Compute Engine)
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/forum/"
                     data-url="/compute-engine/guides/domains/"
                     class="">
                     
@@ -2071,7 +2123,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discuss in Gitter Forum
+                    Discussion Forum
                   </a>
                 </li>
               
@@ -2219,9 +2271,6 @@
       while (el && ! el.classList.contains('nav__section')) 
         el = el.parentElement;
       
-
-
-
       return el;
     }
 
@@ -2255,13 +2304,8 @@
         }
       })
 
-
-
     
 
-
-
-// });
   })();
 </script>
     
@@ -2299,7 +2343,7 @@
 <ul>
 <li><code>&quot;Integers&quot;</code></li>
 <li><code>&quot;Booleans&quot;</code></li>
-<li><code>[&quot;Functions&quot;, &quot;Integers&quot;, &quot;Integers&quot;]</code></li>
+<li><code>[&quot;FunctionOf&quot;, &quot;Integers&quot;, &quot;Integers&quot;]</code></li>
 </ul>
 <p>A domain expression is either a <strong>domain literal</strong> represented by an identifier
 such as <code>&quot;Integers&quot;</code> and <code>&quot;Booleans&quot;</code> or a <strong>constructed domain</strong> represented by
@@ -2328,7 +2372,7 @@ expression.</p>
 <span class="hljs-comment">// ➔ &quot;TranscendentalNumbers&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>(<span class="hljs-string">&quot;Divide&quot;</span>).<span class="hljs-property">domain</span>;
-<span class="hljs-comment">// ➔ &#x27;[&quot;Functions&quot;,  &quot;Numbers&quot;, &quot;Numbers&quot;, &quot;Numbers]&#x27;:</span>
+<span class="hljs-comment">// ➔ &#x27;[&quot;FunctionOf&quot;,  &quot;Numbers&quot;, &quot;Numbers&quot;, &quot;Numbers]&#x27;:</span>
 <span class="hljs-comment">//   domain of the function &quot;Divide&quot;</span>
 
 ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">5</span>, <span class="hljs-number">2</span>]).<span class="hljs-property">domain</span>;
@@ -2404,7 +2448,7 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 <p>A domain constructor is a function expression with one of the identifiers below.</p>
 <p><strong>To define a new domain</strong> use a domain constructor.</p>
 <pre><code class="language-json"><span class="hljs-comment">// Functions with a single real number argument and that return an integer</span>
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Functions&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumbers&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integers&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;FunctionOf&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;RealNumbers&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Integers&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <p>When a domain expression is boxed, it is automatically put in canonical form.</p>
 <div class="symbols-table first-column-header">
@@ -2417,16 +2461,16 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>Functions</code></td>
-<td style="text-align:left"><code>[&quot;Functions&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;Functions&quot;, &quot;Numbers&quot;, &quot;Booleans&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance for the arguments and contravariance for the co-domain.</td>
+<td style="text-align:left"><code>FunctionOf</code></td>
+<td style="text-align:left"><code>[&quot;FunctionOf&quot;, ...&lt;arg-domain&gt;, &lt;co-domain&gt;]</code> <br> For example, <code>[&quot;FunctionOf&quot;, &quot;Numbers&quot;, &quot;Booleans&quot;]</code> is the domain of the functions that have a single argument, a number, and return a boolean (has a boolean codomain).<br>By default, compatibility is determined by using covariance for the arguments and contravariance for the co-domain.</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>List</code></td>
-<td style="text-align:left"><code>[&quot;List&quot;, &lt;element-domain&gt;]</code> <br></td>
+<td style="text-align:left"><code>ListOf</code></td>
+<td style="text-align:left"><code>[&quot;ListOf&quot;, &lt;element-domain&gt;]</code> <br></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Tuple</code></td>
-<td style="text-align:left"><code>[&quot;Tuple&quot;, &lt;element-1-domain&gt;]</code>, <code>[&quot;Tuple&quot;, &lt;element-1-domain&gt;] ... &lt;element-n-domain&gt;]</code></td>
+<td style="text-align:left"><code>TupleOf</code></td>
+<td style="text-align:left"><code>[&quot;TupleOf&quot;, &lt;element-1-domain&gt;]</code>, <code>[&quot;TupleOf&quot;, &lt;element-1-domain&gt;] ... &lt;element-n-domain&gt;]</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Intersection</code></td>
@@ -2437,12 +2481,12 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 <td style="text-align:left"><code>[&quot;Union&quot;, &lt;domain-1&gt;, &lt;domain-2&gt;]</code> <br>All the values that are a member of <code>&lt;domain-1&gt;</code> or <code>&lt;domain-2&gt;</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Maybe</code></td>
-<td style="text-align:left"><code>[&quot;Maybe&quot;, &lt;domain&gt;]</code><br> A value of <code>&lt;domain&gt;</code> or <code>Nothing</code></td>
+<td style="text-align:left"><code>OptArg</code></td>
+<td style="text-align:left"><code>[&quot;OptArg&quot;, &lt;domain&gt;]</code><br> A value of <code>&lt;domain&gt;</code> or <code>Nothing</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Sequence</code></td>
-<td style="text-align:left"><code>[&quot;Sequence&quot;, &lt;domain&gt;]</code> <br>As a function argument one or more values of <code>&lt;domain&gt;</code>.</td>
+<td style="text-align:left"><code>VarArg</code></td>
+<td style="text-align:left"><code>[&quot;VarArg&quot;, &lt;domain&gt;]</code> <br>As a function argument zero or more values of <code>&lt;domain&gt;</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Head</code></td>
@@ -2469,12 +2513,7 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
 <td style="text-align:left"><code>[&quot;Invariant&quot;, &lt;domain&gt;]</code><br> This constructor indicate that a domain is compatible with this domain only if they are invariants with regard to each other.</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>Interval</code></td>
-<td style="text-align:left"><code>[&quot;Interval&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of real numbers between <code>&lt;min&gt;</code> and <code>&lt;max&gt;</code>.<br> Use <code>[&quot;Interval&quot;, [&quot;Open&quot;, &lt;min&gt;], &lt;max&gt;]</code> to indicate an open-left interval.</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>Range</code></td>
-<td style="text-align:left"><code>[&quot;Range&quot;, &lt;min&gt;, &lt;max&gt;]</code> <br> The set of integers from <code>&lt;min&gt;</code> to <code>&lt;max&gt;</code> (inclusive).</td>
+<td style="text-align:left"></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Multiple</code></td>
@@ -2494,14 +2533,14 @@ ce.<span class="hljs-title function_">domain</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="October 04, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2579,8 +2618,8 @@ whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
      
     
     <li>
-      <a href="/gitter/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
+      <a href="/forum/" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
       >
     </li>
      
