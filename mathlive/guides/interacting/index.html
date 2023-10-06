@@ -2448,12 +2448,39 @@ mf.addEventListener('input',
 <p>The <a href="/math-json">MathJSON</a> format is a lightweight mathematical notation interchange format.</p>
 <p>The CortexJS Compute Engine is a JavaScript library that can perform
 mathematical operations on MathJSON expressions.</p>
-<p class="notice--info"><strong>To use MathJSON</strong>, import the compute-engine library, e.g. <code>import &quot;https://unpkg.com/@cortex-js/compute-engine?module&quot;</code></p>
+<p><strong>To use the Compute Engine</strong>, import the Compute Engine library, e.g. <code>import &quot;https://unpkg.com/@cortex-js/compute-engine?module&quot;</code></p>
+<p>If the Compute Engine has been loaded in the page, mathfields will automatically
+create an instance of the compute engine when needed.</p>
+<p><strong>To access that shared Compute Engine instance</strong>, use <code>MathfieldElement.computeEngine</code>.</p>
+<p class="notice--info">If the value returned is <code>undefined</code>, it means that the Compute Engine has not
+been loaded in the page.</p>
+<p>You can also create your own instance of the Compute Engine and pass it to the
+mathfield using the <code>computeEngine</code> property.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComputeEngine</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;compute-engine&#x27;</span>;
+<span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
+</code></pre>
+<p class="notice--info">This is usually not necessary and you can rely on the default shared instance
+of the Compute Engine.</p>
 <p><strong>To read the content of a <code>&lt;math-field&gt;</code> element as a boxed MathJSON expression</strong> use the mathfield <code>expression</code> property.</p>
-<p>Using <code>mf.expression</code> is equivalent to calling <code>MathfieldElement.computeEngine.box(mf.getValue(&quot;math-json&quot;))</code>.</p>
-<p>The instance of the compute engine used by mathfields is accessible
-with the <code>MathfieldElement.computeEngine</code> property. If you do not set this property,
-a default instance of the compute engine will be used.</p>
+<p>Using <code>mf.expression</code> is equivalent to calling <code>MathfieldElement.computeEngine.parse(mf.value)</code> or <code>MathfieldElement.computeEngine.box(mf.getValue(&quot;math-json&quot;))</code>.</p>
+<p>Once you have a boxed expression, you can perform operations on it using the
+Compute Engine.</p>
+<p>For example, you can:</p>
+<ul>
+<li><a href="/compute-engine/guides/evaluate/">evaluate it</a> using <code>mf.expression.evaluate()</code></li>
+<li>simplify it using <code>mf.expression.simplify()</code></li>
+<li><a href="/compute-engine/guides/symbolic-computing/#comparing-expressions">compare it to another expression</a> using <code>mf.expression.isEqual()</code> and
+<code>mf.expression.isSame()</code></li>
+<li><a href="/compute-engine/guides/compiling/">compile it</a> to JavaScript</li>
+</ul>
+<p class="notice--info">Note that the expressions are returned by default in a canonical form, which means that
+they may be different from the original input. For example, <code>x + 1</code> and <code>1 + x</code>
+are considered equal, and will be returned as <code>1 + x</code>. If necessary you
+can request non-canonical forms.</p>
+<div class='read-more'><a href="/compute-engine/guides/canonical-form/">
+Learn more about <strong>canonical forms</strong>.
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>You can also extend the definitions of the Compute Engine <a href="/compute-engine/guides/augmenting/">by adding your own</a>.</p>
 <code-playground layout="stack">
     <pre slot="html">
 &lt;math-field id="formula"&gt;
@@ -2466,6 +2493,9 @@ mf.addEventListener('input', () =>
 );</pre>
 console.log(mf.expression.evaluate());
 </code-playground>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">
+Learn more about <strong>symbolic computing</strong> with the Compute Engine
+<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <h2 id="listening-for-changes-to-a-mathfield" tabindex="-1">Listening for Changes to a Mathfield</h2>
 <p>The mathfield element dispatches the <code>beforeinput</code> and <code>input</code>
 <a href="https://www.w3.org/TR/input-events-1/">Input Events</a>, which are also
@@ -2566,7 +2596,8 @@ or <strong>Enter</strong> is used to exit the mode.</p>
 <p>This event is also fired if the mathfield loses focus, even if the user did not
 use the keyboard. This behavior matches the <code>&lt;textarea&gt;</code> element.</p>
 <p><strong>To listen specifically for a press of the <strong>Return</strong> or <strong>Enter</strong> key on the
-keyboard</strong> listen for an <code>input</code> event with an <code>inputType</code> property of <code>&quot;insertLineBreak&quot;</code>.</p>
+keyboard</strong> listen for an <code>input</code> event with an <code>inputType</code>
+(or <code>ev.data</code> on iOS) property of <code>&quot;insertLineBreak&quot;</code>.</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;beforeinput&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
   <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">inputType</span> === <span class="hljs-string">&#x27;insertLineBreak&#x27;</span>) {
     mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&quot;moveToNextPlaceholder&quot;</span>);
@@ -2615,8 +2646,7 @@ doing nothing when reaching the start or end of the mathfield when navigation wi
 for the <code>focus-out</code> and <code>move-out</code> events.</p>
 <p>The <code>detail</code> property of those events indicate the direction of navigation.
 To cancel the default behavior, use <code>ev.preventDefault()</code>.</p>
-<pre><code class="language-js">
-mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;move-out&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
+<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;move-out&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">ev</span>) =&gt;</span> {
 ev.<span class="hljs-title function_">preventDefault</span>();
   <span class="hljs-comment">// Remove focus from mathfield</span>
   mf.<span class="hljs-title function_">blur</span>();
@@ -2633,7 +2663,6 @@ mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-
   <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ev.<span class="hljs-property">detail</span>.<span class="hljs-property">direction</span> === <span class="hljs-string">&#x27;backward&#x27;</span>)
     mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;moveToMathfieldStart&#x27;</span>);
 });
-
 </code></pre>
 <section id='clipboard'>
 <h2 id="interacting-with-the-clipboard" tabindex="-1">Interacting with the Clipboard</h2>
@@ -2706,15 +2735,16 @@ the content of the formula, see <a href="mathlive/guides/customizing/">Customizi
     </style>
     <pre slot="javascript">
 const mf = document.getElementById('formula');
+//
 // Change the background color of the entire mathfield
 mf.applyStyle(
-  {backgroundColor: 'yellow' }, 
-  {range: [0, -1]}
+  { backgroundColor: 'yellow' },
+  { range: [0, -1] }
 );
 </pre>
 <pre slot="html">
 &lt;math-field id="formula"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</pre>
 </code-playground>
 <p><strong>To change the style of a portion of the mathfield</strong>, specify a selection range
@@ -2731,6 +2761,7 @@ to <code>applyStyle()</code>.</p>
     </style>
     <pre slot="javascript">
 const mf = document.getElementById('formula');
+//
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
 </pre>
@@ -2766,14 +2797,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 04, 2023">
+        <meta itemprop="datePublished" content="October 06, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-06">October 06, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
