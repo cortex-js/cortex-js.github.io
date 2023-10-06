@@ -79,13 +79,15 @@
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
 
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin>
+<!-- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin> -->
  
 
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
 
 <!-- 
@@ -2567,7 +2569,7 @@ can be either a string or an <code>[&quot;ErrorCode&quot;]</code> expression if 
 arguments to the error.</p>
 <p>For example if the problem is that an argument of a function expression is a
 boolean when a number was expected, an expression such as
-<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Number&quot;, &quot;Boolean&quot;]]</code> could
+<code>[&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;'incompatible-domain'&quot;, &quot;Numbers&quot;, &quot;Booleans&quot;]]</code> could
 be returned.</p>
 <p>The <code>&lt;location&gt;</code> argument indicates the context of the error. This can be a
 <code>[&quot;Latex&quot;]</code> expression when the problem occurred while parsing a LaTeX string,
@@ -2717,7 +2719,7 @@ property.</p>
 <span class="hljs-comment">// ➔ [&quot;Add&quot;,</span>
 <span class="hljs-comment">//      1,</span>
 <span class="hljs-comment">//      [&quot;Error&quot;,</span>
-<span class="hljs-comment">//          [&quot;ErrorCode&quot;, &quot;&#x27;incompatible-domain&#x27;&quot;, &quot;Number&quot;, &quot;Boolean&quot;],</span>
+<span class="hljs-comment">//          [&quot;ErrorCode&quot;, &quot;&#x27;incompatible-domain&#x27;&quot;, &quot;Numbers&quot;, &quot;Booleans&quot;],</span>
 <span class="hljs-comment">//          [&quot;Delimiter&quot;, [&quot;Equal&quot;, 2, 2]]</span>
 <span class="hljs-comment">//      ],</span>
 <span class="hljs-comment">//      3</span>

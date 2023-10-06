@@ -79,13 +79,15 @@
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
 
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin>
+<!-- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin> -->
  
 
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
 
 <!-- 
@@ -2351,7 +2353,7 @@ simplifications and to optimize computations.</p>
 
 <span class="hljs-comment">// or:</span>
 
-ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 </code></pre>
 <p>The head of the proposition can be one of the following:</p>
 <div class=symbols-table>
@@ -2369,7 +2371,7 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 </tr>
 <tr>
 <td style="text-align:left"><code>Less</code><br><code>LessEqual</code><br><code>Greater</code><br><code>GreaterEqual</code></td>
-<td style="text-align:left">Inequality. Both sides are assumed to be <code>RealNumber</code></td>
+<td style="text-align:left">Inequality. Both sides are assumed to be <code>RealNumbers</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>Equal</code><br><code>NotEqual</code></td>
@@ -2384,14 +2386,14 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 </div>
 <p>If the <code>assume()</code> function is invoked with two arguments, it is equivalent to
 <code>ce.assume([&quot;Element&quot;, &lt;arg1&gt;, &lt;arg2&gt;])</code>.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumber&quot;])</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>); <span class="hljs-comment">// same as ce.assume([&quot;Element&quot;, &quot;x&quot;, &quot;RealNumbers&quot;])</span>
 </code></pre>
 <p>The argument to the <code>assume()</code> function is a <strong>proposition</strong>. That proposition
 is analyzed and the fact it describes are recorded in the Compute Engine
 assumptions knowledge base. Some propositions can be described in several
 different but equivalent ways. You can use whichever form you prefer. Similarly,
 when querying the knowledge base later, you can use any form you’d like.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;PositiveNumber&quot;</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;PositiveNumbers&quot;</span>]);
  
 <span class="hljs-comment">// Equivalent to...</span>
 ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Greater&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">0</span>]);
@@ -2427,19 +2429,19 @@ made:</p>
 <tbody>
 <tr>
 <td style="text-align:left"><code>a</code> <code>b</code> <code>c</code> <code>d</code><br><code>i</code> <code>j</code> <code>k</code><br><code>r</code> <code>t</code><br><code>x</code> <code>y</code></td>
-<td style="text-align:left"><code>RealNumber</code></td>
+<td style="text-align:left"><code>RealNumbers</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>f</code> <code>g</code> <code>h</code></td>
-<td style="text-align:left"><code>Function</code></td>
+<td style="text-align:left"><code>Functions</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>m</code> <code>n</code><br><code>p</code> <code>q</code></td>
-<td style="text-align:left"><code>Integer</code></td>
+<td style="text-align:left"><code>Integers</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>w</code> <code>z</code></td>
-<td style="text-align:left"><code>ComplexNumber</code></td>
+<td style="text-align:left"><code>ComplexNumbers</code></td>
 </tr>
 </tbody>
 </table>
@@ -2450,8 +2452,8 @@ as <code>x</code> or <code>y</code> without having to declare them explicitly.</
 when creating a Compute Engine instance:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({
   <span class="hljs-attr">assumptions</span>: [
-    [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;Integer&quot;</span>],
-    [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;y&quot;</span>, <span class="hljs-string">&quot;Integer&quot;</span>],
+    [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;Integers&quot;</span>],
+    [<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;y&quot;</span>, <span class="hljs-string">&quot;Integers&quot;</span>],
   ],
 });
 </code></pre>
@@ -2463,11 +2465,11 @@ when creating a Compute Engine instance:</p>
 <section id='testing-assumptions'>
 <h2 id="testing-assumptions" tabindex="-1">Testing Assumptions</h2>
 <p><strong>To test if a particular assumption is valid</strong>, call the <code>ce.is()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 </code></pre>
 <p>As a shorthand, you can pass a symbol as a first argument and a domain as a
 second.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>); <span class="hljs-comment">// same as ce.is([&quot;Element&quot;, &quot;x&quot;, &#x27;RealNumber])</span>
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>); <span class="hljs-comment">// same as ce.is([&quot;Element&quot;, &quot;x&quot;, &#x27;RealNumbers])</span>
 ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
 </code></pre>
 <p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
@@ -2499,13 +2501,13 @@ symbols.</li>
 <li>Passing a symbol name will only remove assumptions about that particular
 symbol.</li>
 </ul>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 <span class="hljs-comment">// ➔  true</span>
 
 ce.<span class="hljs-title function_">forget</span>(<span class="hljs-string">&quot;\\alpha&quot;</span>);
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 <span class="hljs-comment">// ➔  undefined</span>
 </code></pre>
 </section>
@@ -2516,18 +2518,18 @@ subsequent scopes. Scopes “inherit” assumptions from their parent scopes.</p
 <p>When exiting a scope, with <code>ce.popScope()</code>, all assumptions made in that scope
 are forgotten.</p>
 <p><strong>To temporarily define a series of assumptions</strong>, create a new scope.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 <span class="hljs-comment">// ➔ undefined</span>
 
 ce.<span class="hljs-title function_">pushScope</span>();
 
-ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 <span class="hljs-comment">// ➔  true</span>
 
 ce.<span class="hljs-title function_">popScope</span>(); <span class="hljs-comment">// all assumptions made in the current scope are forgotten</span>
 
-ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumber&quot;</span>]);
+ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;\\alpha&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 <span class="hljs-comment">// ➔  undefined</span>
 </code></pre>
 </section>

@@ -79,13 +79,15 @@
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
 
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin>
+<!-- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin> -->
  
 
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
 
 <!-- 
@@ -2417,7 +2419,7 @@ applied to some arguments.</p>
 <h3 class="visually-hidden" id="Assign" tabindex="-1">Assign</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Assign</strong>&quot;, <em>id</em>, <em>fn</em>]</p>
 <p>Assign the anonymous function <em>fn</em> to the identifier <em>id</em>.</p>
 <p>The identifier <em>id</em> should either not have been declared yet, or been declared
-as a function. If <em>id</em> is already defined as a <code>Number</code> for example, it is an
+as a function. If <em>id</em> is already defined in the domain of <code>Numbers</code> for example, it is an
 error to assign a function to it.</p>
 <div class='latex'><div class="source">\operatorname{double} \coloneqq x \mapsto 2x</div><div class="display">\[ \operatorname{double} \coloneqq x \mapsto 2x \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;double&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>

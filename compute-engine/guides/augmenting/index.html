@@ -79,13 +79,15 @@
     <link rel="preconnect" href="https://kit.fontawesome.com" crossorigin>
 <script defer src="https://kit.fontawesome.com/523e3eb8bb.js" crossorigin="anonymous"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
 
 
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin>
+<!-- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,200;0,400;0,600;0,700;0,900;1,200;1,400;1,600;1,700&subset=latin" rel="stylesheet" crossorigin> -->
  
 
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
 
 <!-- 
@@ -2360,7 +2362,7 @@ The “kind” of an object is called its <strong>domain</strong>.</p>
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p><strong>To declare an identifier</strong> use the <code>ce.declare()</code> method:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;m_e&quot;</span>, {
-  <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;RealNumber&quot;</span>,
+  <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;RealNumbers&quot;</span>,
   <span class="hljs-attr">constant</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">value</span>: <span class="hljs-number">9.1e-31</span>,
 });
@@ -2590,7 +2592,7 @@ with a dictionary of definitions.</p>
 identifiers, not LaTeX commands. For example, if you have a symbol <code>α</code>, use
 <code>alpha</code>, not <code>\alpha</code></p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>({
-  <span class="hljs-attr">m</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Number&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> },
+  <span class="hljs-attr">m</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Numbers&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-number">5</span> },
   <span class="hljs-attr">f</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> },
   <span class="hljs-attr">g</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> },
   <span class="hljs-title class_">Smallfrac</span>: {
