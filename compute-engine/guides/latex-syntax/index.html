@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li><li><a href="#customizing-the-serialization-style">Customizing the Serialization Style</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a><ol><li><a href="#latex-dictionary-entries">LaTeX Dictionary Entries</a></li><li><a href="#parsing">Parsing</a></li><li><a href="#serializing">Serializing</a></li></ol></li><li><a href="#using-a-new-function-with-a-mathfield">Using a New Function with a Mathfield</a></li></ol>
+        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li><li><a href="#customizing-the-serialization-style">Customizing the Serialization Style</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a><ol><li><a href="#latex-dictionary-entries">LaTeX Dictionary Entries</a></li><li><a href="#expressions">Expressions</a></li><li><a href="#parsing">Parsing</a></li><li><a href="#serializing">Serializing</a></li></ol></li><li><a href="#using-a-new-function-with-a-mathfield">Using a New Function with a Mathfield</a></li></ol>
       </div>
       
                               
@@ -2399,17 +2399,17 @@ document:</p>
 <hr>
 <p><strong>To parse a LaTeX string as a MathJSON expression</strong>, call the <code>ce.parse()</code>
 function.</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;5x + 1&#x27;</span>).<span class="hljs-property">json</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;5x + 1&quot;</span>).<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔  [&quot;Add&quot;, [&quot;Multiply&quot;, 5, &quot;x&quot;], 1]</span>
 </code></pre>
 <p>By default, <code>ce.parse()</code> return a
 <a href="/compute-engine/guides/canonical-form/">canonical expression</a>. To get a
 non-canonical expression instead, use the <code>{canonical: false}</code> option: The
 non-canonical form is closer to the literal LaTeX input.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{7}{-4}&#x27;</span>).<span class="hljs-property">json</span>;
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{7}{-4}&quot;</span>).<span class="hljs-property">json</span>;
 <span class="hljs-comment">// ➔  [&quot;Rational&quot;, -7, 4]</span>
 
-ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{7}{-4}&#x27;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> }).<span class="hljs-property">json</span>;
+ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{7}{-4}&quot;</span>, { <span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span> }).<span class="hljs-property">json</span>;
 <span class="hljs-comment">// ➔  [&quot;Divide&quot;, 7, -4]</span>
 </code></pre>
 <h2 id="the-compute-engine-natural-parser" tabindex="-1">The Compute Engine Natural Parser</h2>
@@ -2507,10 +2507,10 @@ Refer to these interfaces for more details.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
 ce.<span class="hljs-property">latexOptions</span> = {
   <span class="hljs-attr">precision</span>: <span class="hljs-number">3</span>,
-  <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&#x27;{,}&#x27;</span>,
+  <span class="hljs-attr">decimalMarker</span>: <span class="hljs-string">&quot;{,}&quot;</span>,
 };
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{1}{7}&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{1}{7}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;0{,}14\\ldots&quot;</span>
 </code></pre>
 <h3 id="customizing-the-decimal-marker" tabindex="-1">Customizing the Decimal Marker</h3>
@@ -2519,7 +2519,7 @@ ce.<span class="hljs-property">latexOptions</span> = {
 between using a dot or a comma as a decimal marker.</p>
 <p>By default, the ComputeEngine is configured to use a dot.</p>
 <p><strong>To use a comma as a decimal marker</strong>, set the <code>decimalMarker</code> option:</p>
-<pre><code class="language-ts">ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">decimalMarker</span> = <span class="hljs-string">&#x27;{,}&#x27;</span>;
+<pre><code class="language-ts">ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">decimalMarker</span> = <span class="hljs-string">&quot;{,}&quot;</span>;
 </code></pre>
 <p>Note that in LaTeX, in order to get the correct spacing around the comma, it
 must be surrounded by curly brackets.</p>
@@ -2568,19 +2568,19 @@ positive and negative infinity, respectively. Defaults are <code>&quot;\infty&qu
 example thousands. Default is <code>&quot;\,&quot;</code>. To turn off group separators, set to
 <code>&quot;&quot;</code></li>
 </ul>
-<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;700&#x27;</span>).<span class="hljs-property">latex</span>);
+<pre><code class="language-ts"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;700&quot;</span>).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;700&quot;</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;123456.789&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;123456.789&quot;</span>).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;123\,456.789&quot;</span>
 
 <span class="hljs-comment">// Always use the scientific notation</span>
 ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">notation</span> = <span class="hljs-string">&quot;scientific&quot;</span>;
 ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">avoidExponentsInRange</span> = <span class="hljs-literal">null</span>;
-ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">exponentProduct</span> = <span class="hljs-string">&#x27;\\times&#x27;</span>;
+ce.<span class="hljs-property">latexOptions</span>.<span class="hljs-property">exponentProduct</span> = <span class="hljs-string">&quot;\\times&quot;</span>;
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;700&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;700&quot;</span>).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;7\times10^{2}&quot;</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;123456.789&#x27;</span>).<span class="hljs-property">latex</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;123456.789&quot;</span>).<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;1.234\,567\,89\times10^{5}&quot;</span>
 </code></pre>
 <h3 id="customizing-the-serialization-style" tabindex="-1">Customizing the Serialization Style</h3>
@@ -2601,7 +2601,7 @@ command:</p>
 <p>For example, to serialize rational numbers and division deeper than level 2 as
 an inline solidus:</p>
 <pre><code class="language-ts">ce.<span class="hljs-property">latexSyntax</span>.<span class="hljs-property">options</span>.<span class="hljs-property">fractionStyle</span> = <span class="hljs-function">(<span class="hljs-params">expr, level</span>) =&gt;</span>
-  <span class="hljs-title function_">head</span>(expr) === <span class="hljs-string">&quot;Rational&quot;</span> || level &gt; <span class="hljs-number">2</span> ? <span class="hljs-string">&#x27;inline-solidus&#x27;</span> : <span class="hljs-string">&quot;quotient&quot;</span>;
+  <span class="hljs-title function_">head</span>(expr) === <span class="hljs-string">&quot;Rational&quot;</span> || level &gt; <span class="hljs-number">2</span> ? <span class="hljs-string">&quot;inline-solidus&quot;</span> : <span class="hljs-string">&quot;quotient&quot;</span>;
 </code></pre>
 <h4 id="function-application" tabindex="-1">Function Application</h4>
 <p><code>[&quot;Sin&quot;, &quot;x&quot;]</code></p>
@@ -2879,52 +2879,120 @@ ce.<span class="hljs-property">latexDictionary</span> = [
 <ul>
 <li><code>kind</code>: the kind of expression associated with this entry. Valid values are
 <code>prefix</code>, <code>postfix</code>, <code>infix</code>, <code>expression</code>, <code>function</code>, <code>symbol</code>,
-<code>environment</code> and <code>matchfix</code>. If not provided, the default is <code>expression</code>.</li>
+<code>environment</code> and <code>matchfix</code>. If not provided, the default is <code>expression</code>.
+The meaning of the values and how to use them is explained below.</li>
 <li><code>latexTrigger</code>: a sequence of LaTeX tokens that will trigger the entry. For
 example, <code>^{+}</code> or <code>\mathbb{D}</code>.</li>
 <li><code>identifierTrigger</code>: a string, usually wrapped in a LaTeX command, that will
 trigger the entry. For example, if <code>identifierTrigger</code> is <code>floor</code>, the LaTeX
 command <code>\mathrm{floor}</code> or <code>\operatorname{floor}</code> will trigger the entry.
 Only one of <code>latexTrigger</code> or <code>identifierTrigger</code> should be provided. If kind
-is <code>environment</code>, only <code>identifierTrigger</code> is valid.</li>
-<li><code>parse</code>: a function that will be invoked when the trigger is encountered in
-the LaTeX input. It will be passed a <code>parser</code> object that can be used to parse
-the input. The <code>parse</code> function should return a MathJSON expression. See below
-for more info about parsing.</li>
-<li><code>serialize</code>: a function that will be invoked when the <code>expr.latex</code> property is
+is <code>environment</code>, only <code>identifierTrigger</code> is valid. If kind is <code>matchfix</code>,
+both <code>openTrigger</code> and <code>closeTrigger</code> must be provided instead.</li>
+<li><code>parse</code>: a handler that will be invoked when the trigger is encountered in the
+LaTeX input. It will be passed a <code>parser</code> object that can be used to parse the
+input. The <code>parse</code> handler should return a MathJSON expression. The signature
+of the <code>parse</code> handler will vary depending on the <code>kind</code>. See below for more
+info about parsing.</li>
+<li><code>serialize</code>: a handler that will be invoked when the <code>expr.latex</code> property is
 read. It will be passed a <code>serializer</code> object that can be used to serialize
-the expression. The <code>serialize</code> function should return a LaTeX string. See
+the expression. The <code>serialize</code> handler should return a LaTeX string. See
 below for more info about serialization.</li>
 <li><code>name</code>: the name of the MathJSON identifier associated with this entry. If
 provided, a default <code>parse</code> handler will be used that is equivalent to:
 <code>parse: name</code>. The <code>name</code> property must be unique. However, multiple entries
 can have different triggers that produce the same expression. This is useful
-for synonyms, such as <code>\operatorname{floor{</code> and <code>\lfloor</code>…<code>\rfloor</code>.</li>
+for synonyms, such as <code>\operatorname{floor}</code> and <code>\lfloor</code>…<code>\rfloor</code>.</li>
 </ul>
-<p>The most general type of entry is one using <code>expression</code> as the <code>kind</code>, which is
-also the default if no <code>kind</code> is provided. In this case, the <code>parse</code> handler
-will be invoked when the trigger is encountered in the LaTeX input. The <code>parse</code>
-handler will be passed a <code>parser</code> object that can be used to parse the input.
-The <code>parse</code> handler should return a MathJSON expression.</p>
+<h3 id="expressions" tabindex="-1">Expressions</h3>
+<p>The most general type of entry is one of kind <code>expression</code>. If no <code>kind</code>
+property is provided, the kind is assumed to be <code>expression</code>.</p>
+<p>For entries of kind <code>expression</code> the <code>parse</code> handler is invoked when the trigger
+is encountered in the LaTeX input. The <code>parse</code> handler is passed a <code>parser</code>
+object that can be used to parse the input. The <code>parse</code> handler should return a
+MathJSON expression.</p>
+<p>The kind <code>expression</code> is suitable for a simple symbol, for example a
+mathematical constant. It can also be used for more complex constructs, such as
+to parse a series of tokens representing an integral expression. In this case,
+the <code>parse</code> handler would be responsible for parsing the entire expression and
+would use the <code>parser</code> object to parse the tokens.</p>
+<p>If the tokens are not recognized, the <code>parse</code> handler should return <code>null</code> and
+the parser will continue to look for another handler that matches the current
+token.</p>
+<h4 id="functions" tabindex="-1">Functions</h4>
 <p>The <code>function</code> kind is a special case of <code>expression</code> where the expression is a
 function, possibly using mutly-character identifiers, as in
-<code>\operatorname{concat}</code>. The <code>trigger</code> property defines the name of the
-function, not a sequence of tokens. The parse handler should return the
-idenfitier corresponding to the function, such as <code>Concatenate</code>. As a shortcut,
-the <code>parse</code> handler can be provided as an Expression. For example:</p>
+<code>\operatorname{concat}</code>. Unlike an <code>expression</code> entry, after the <code>parse</code> handler
+is invoked, the parser will look for a pair of parentheses to parse the
+arguments of the function and apply them to the function.</p>
+<p>The parse handler should return the identifier corresponding to the function,
+such as <code>Concatenate</code>. As a shortcut, the <code>parse</code> handler can be provided as an
+Expression. For example:</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;function&quot;</span>,
   <span class="hljs-attr">identifierTrigger</span>: <span class="hljs-string">&quot;concat&quot;</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-string">&quot;Concatenate&quot;</span>
 }
 </code></pre>
-<p>The <code>infix</code> kind is used for binary operators. The <code>parse</code> handler will be
-passed a <code>parser</code> object and the left-hand side of the operator. The <code>parser</code>
-object can be used to parse the right-hand side of the expression. The <code>parse</code>
-handler should return a MathJSON expression.</p>
+<h4 id="operators%3A-prefix%2C-infix%2C-postfix" tabindex="-1">Operators: prefix, infix, postfix</h4>
+<p>The <code>prefix</code>, <code>infix</code> and <code>postfix</code> kinds are used for operators. The <code>parse</code>
+handler will be passed a <code>parser</code> object and the left-hand side of the operator.</p>
+<p>Entries for <code>prefix</code>, <code>infix</code> and <code>postfix</code> operators must include a
+<code>precedence</code> property. The <code>precedence</code> property is a number that indicates the
+precedence of the operator. The higher the number, the higher the precedence,
+that is the more “binding” the operator is.</p>
+<p>For example, the <code>precedence</code> of the <code>Add</code> operator is 275
+(<code>ADDITION_PRECEDENCE</code>), while the <code>precedence</code> of the <code>Multiply</code> operator is
+390 (<code>MULTIPLICATION_PRECEDENCE</code>).</p>
+<p>In <code>1 + 2 * 3</code>, the <code>Multiply</code> operator has a <strong>higher</strong> precedence than the
+<code>Add</code> operator, so it is applied first.</p>
+<p>The precedence range is an integer from 0 to 1000.</p>
+<p>The larger the number, the higher the precedence, the more “binding” the
+operator is.</p>
+<p>Here are some rough ranges for the precedence:</p>
+<ul>
+<li>800: prefix and postfix operators: <code>\lnot</code> etc…
+<ul>
+<li><code>POSTFIX_PRECEDENCE</code> = 810: <code>!</code>, <code>'</code></li>
+</ul>
+</li>
+<li>700: some arithmetic operators
+<ul>
+<li><code>EXPONENTIATION_PRECEDENCE</code> = 700: <code>^</code></li>
+</ul>
+</li>
+<li>600: some binary operators
+<ul>
+<li><code>DIVISION_PRECEDENCE</code> = 600: <code>\div</code></li>
+</ul>
+</li>
+<li>300: some logic and arithmetic operators: <code>\land</code>, <code>\lor</code> etc…
+<ul>
+<li><code>MULTIPLICATION_PRECEDENCE</code> = 390: <code>\times</code></li>
+</ul>
+</li>
+<li>200: arithmetic operators, inequalities:
+<ul>
+<li><code>ADDITION_PRECEDENCE</code> = 275: <code>+</code> <code>-</code></li>
+<li><code>ARROW_PRECEDENCE</code> = 270: <code>\to</code> <code>\rightarrow</code></li>
+<li><code>ASSIGNMENT_PRECEDENCE</code> = 260: <code>:=</code></li>
+<li><code>COMPARISON_PRECEDENCE</code> = 245: <code>\lt</code> <code>\gt</code></li>
+<li>241: <code>\leq</code></li>
+</ul>
+</li>
+<li>0: <code>,</code>, <code>;</code>, etc…</li>
+</ul>
+<p>The <code>infix</code> kind is used for binary operators (operators with a left-hand-side
+and right-hand-side). The <code>parse</code> handler will be passed a <code>parser</code> object and
+the left-hand side of the operator, for <code>postfix</code> and <code>infix</code> operators. The
+<code>parser</code> object can be used to parse the right-hand side of the expression. The
+<code>parse</code> handler should return a MathJSON expression or <code>null</code> if the operator is
+not recognized, or the left-hand side or right-hand side of the operator is not
+valid.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;infix&quot;</span>,
   <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\oplus&#x27;</span>,
+  <span class="hljs-attr">precedence</span>: <span class="hljs-variable constant_">ADDITION_PRECEDENCE</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&quot;Concatenate&quot;</span>, lhs, parser.<span class="hljs-title function_">parseExpression</span>()];
   },
@@ -2936,6 +3004,7 @@ expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;prefix&quot;</span>,
   <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\neg&#x27;</span>,
+  <span class="hljs-attr">precedence</span>: <span class="hljs-variable constant_">ADDITION_PRECEDENCE</span>,
   <span class="hljs-attr">parse</span>: <span class="hljs-function">(<span class="hljs-params">parser, lhs</span>) =&gt;</span> {
     <span class="hljs-keyword">return</span> [<span class="hljs-string">&quot;Negate&quot;</span>, lhs];
   },
@@ -2952,6 +3021,7 @@ handler should return a MathJSON expression.</p>
   },
 }
 </code></pre>
+<h4 id="environment" tabindex="-1">Environment</h4>
 <p>The <code>environment</code> kind is used for LaTeX environments. The <code>identifierTrigger</code>
 property in that case is the name of the environment. The <code>parse</code> handler will
 be passed a <code>parser</code> object. The <code>parseTabular()</code> method can be used to parse
@@ -2966,6 +3036,7 @@ expressions. The <code>parse</code> handler should return a MathJSON expression.
   },
 }
 </code></pre>
+<h4 id="matchfix" tabindex="-1">Matchfix</h4>
 <p>The <code>matchfix</code> kind is used for LaTeX commands that are used to enclose an
 expression. The <code>openTrigger</code> and <code>closeTrigger</code> indicate the LaTeX commands
 that enclose the expression. The <code>parse</code> handler is passed a <code>parser</code> object and
@@ -3125,13 +3196,13 @@ property is not provided.</p>
 <p>You may also want to use your new function with a mathfield.</p>
 <p>First you need to define a LaTeX macro so that the mathfield knows how to render
 this command. Let’s define the <code>\smallfrac</code> macro.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> mfe = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;math-field&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> mfe = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;math-field&quot;</span>);
 
 mfe.<span class="hljs-property">macros</span> = {
   ...mfe.<span class="hljs-property">macros</span>,
   <span class="hljs-attr">smallfrac</span>: {
     <span class="hljs-attr">args</span>: <span class="hljs-number">2</span>,
-    <span class="hljs-attr">def</span>: <span class="hljs-string">&#x27;{}^{#1}\\!\\!/\\!{}_{#2}&#x27;</span>,
+    <span class="hljs-attr">def</span>: <span class="hljs-string">&quot;{}^{#1}\\!\\!/\\!{}_{#2}&quot;</span>,
   },
 };
 </code></pre>
@@ -3147,7 +3218,7 @@ command.</p>
 token represents a placeholder to be filled by the user.</p>
 <pre><code class="language-js">mfe.<span class="hljs-property">inlineShortcuts</span> = {
   ...mfe.<span class="hljs-property">inlineShortcuts</span>,
-  <span class="hljs-attr">smallfrac</span>: <span class="hljs-string">&#x27;\\smallfrac{#@}{#?}&#x27;</span>,
+  <span class="hljs-attr">smallfrac</span>: <span class="hljs-string">&quot;\\smallfrac{#@}{#?}&quot;</span>,
 };
 </code></pre>
 <div class='read-more'><a href="/mathlive/guides/shortcuts/"> Learn more about <strong>Key
@@ -3158,7 +3229,7 @@ Bindings and Inline Shortcuts</strong> <svg class="svg-chevron"><use xlink:href=
 <p>Alternatively, you can associate the customized compute engine with the
 mathfields in the document:</p>
 <pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span> = ce;
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&#x27;math-json&#x27;</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(mfe.<span class="hljs-title function_">getValue</span>(<span class="hljs-string">&quot;math-json&quot;</span>));
 </code></pre>
 
 
@@ -3171,14 +3242,14 @@ mathfields in the document:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 08, 2023">
+        <meta itemprop="datePublished" content="October 12, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-08">October 08, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -3200,7 +3271,7 @@ mathfields in the document:</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li><li><a href="#customizing-the-serialization-style">Customizing the Serialization Style</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a><ol><li><a href="#latex-dictionary-entries">LaTeX Dictionary Entries</a></li><li><a href="#parsing">Parsing</a></li><li><a href="#serializing">Serializing</a></li></ol></li><li><a href="#using-a-new-function-with-a-mathfield">Using a New Function with a Mathfield</a></li></ol>
+        <ol><li><a href="#the-compute-engine-natural-parser">The Compute Engine Natural Parser</a></li><li><a href="#serializing-to-latex">Serializing to LaTeX</a></li><li><a href="#customizing-parsing-and-serialization">Customizing Parsing and Serialization</a><ol><li><a href="#customizing-the-decimal-marker">Customizing the Decimal Marker</a></li><li><a href="#customizing-the-number-formatting">Customizing the Number Formatting</a></li><li><a href="#customizing-the-serialization-style">Customizing the Serialization Style</a></li></ol></li><li><a href="#customizing-the-latex-dictionary">Customizing the LaTeX Dictionary</a><ol><li><a href="#latex-dictionary-entries">LaTeX Dictionary Entries</a></li><li><a href="#expressions">Expressions</a></li><li><a href="#parsing">Parsing</a></li><li><a href="#serializing">Serializing</a></li></ol></li><li><a href="#using-a-new-function-with-a-mathfield">Using a New Function with a Mathfield</a></li></ol>
       </div>
     
                             

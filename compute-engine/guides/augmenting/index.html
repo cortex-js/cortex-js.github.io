@@ -2406,9 +2406,7 @@ expressions may depend on it, and changing its domain would invalidate them.</p>
 ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, { <span class="hljs-attr">signature</span>: { <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span> } });
 </code></pre>
 <p>By default, when a new identifier is encountered in an expression, it is
-declared automatically with a domain of <code>ce.defaultDomain</code> and no value. To
-prevent this behavior, set <code>ce.defaultDomain</code> to <code>null</code>. An error will be
-produced instead when an unknown identifier is encountered.</p>
+declared automatically with no domain and no value.</p>
 <div class='read-more'><a href="/compute-engine/guides/evaluate/#default-domain"> Read more about
 the <strong>default domain</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>We will discuss in more details below how to declare and define symbols and
@@ -2662,14 +2660,14 @@ ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="October 08, 2023">
+        <meta itemprop="datePublished" content="October 12, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-08">October 08, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
