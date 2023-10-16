@@ -2389,7 +2389,16 @@ expression.</p>
 <h2 id="boxing" tabindex="-1">Boxing</h2>
 <p><strong>To create a Boxed Expression from a MathJSON expression</strong>, use the <code>ce.box()</code>
 function.</p>
+<p>The input of <code>ce.box()</code> can be:</p>
+<ul>
+<li>a <a href="/math-json/">MathJSON expression</a></li>
+<li>a <code>BoxedExpression</code> (in which case it is returned as-is)</li>
+<li>a <code>SemiBoxedExpression</code>, that is a MathJSON expression with some of its
+subexpressions already boxed.</li>
+</ul>
 <p>The result is an instance of a <code>BoxedExpression</code>.</p>
+<p>By default, <code>ce.box()</code> returns a canonical expression. See
+<a href="#canonical">Canonical Expressions</a> for more info.</p>
 <pre><code class="language-js"><span class="hljs-keyword">let</span> expr = ce.<span class="hljs-title function_">box</span>(<span class="hljs-number">1.729e3</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">machineNumber</span>);
 <span class="hljs-comment">// ➔ 1729</span>
@@ -2404,12 +2413,7 @@ expr = ce.<span class="hljs-title function_">box</span>({ <span class="hljs-attr
 expr = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">3</span>, <span class="hljs-string">&quot;x&quot;</span>]);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">head</span>);
 <span class="hljs-comment">// ➔ &quot;Add&quot;</span>
-
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">isPositive</span>);
-<span class="hljs-comment">// undefined</span>
 </code></pre>
-<p>By default, <code>ce.box()</code> returns a canonical expression. See
-<a href="#canonical">Canonical Expressions</a> for more info.</p>
 <p><strong>To create a Boxed Expression from a LaTeX string</strong>, call the <code>ce.parse()</code>
 function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;3 + x + y&quot;</span>);
@@ -2781,14 +2785,14 @@ property.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 12, 2023">
+        <meta itemprop="datePublished" content="October 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

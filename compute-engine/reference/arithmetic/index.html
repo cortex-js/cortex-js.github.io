@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
       </div>
       
                               
@@ -2619,6 +2619,7 @@ functions<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a
 <li><em>base</em> should be an integer from 2 to 36.</li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Latex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;BaseForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">42</span><span class="hljs-punctuation">,</span> <span class="hljs-number">16</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+ 
 <span class="hljs-comment">// ➔ (\text(2a))_{16}</span>
 </code></pre>
 <pre><code class="language-cortex">Latex(BaseForm(42, 16))
@@ -2634,10 +2635,10 @@ String(BaseForm(42, 16))
 <li>If <code>value</code> is greater than <code>upper</code>, evaluate to <code>upper</code></li>
 <li>Otherwise, evaluate to <code>value</code></li>
 </ul>
-<p>If <code>lower</code>and <code>upper</code>are not provided, they take the default values of -1
-and +1.</p>
+<p>If <code>lower</code>and <code>upper</code>are not provided, they take the default values of -1 and
++1.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ 5</span>
+<span class="hljs-comment">// ➔ 1</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4.2</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 1</span>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;+Infinity&quot;</span><span class="hljs-punctuation">]</span>
@@ -2645,6 +2646,26 @@ and +1.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Clamp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">100</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 11</span>
 </code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Limit" tabindex="-1">Limit</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Limit</strong>&quot;, <em>fn</em>, <em>value</em>]</p>
+<p>Evaluate the expression <em>fn</em> as it approaches the value <em>value</em>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Limit&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Limit&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
+</code></pre>
+<p>This function evaluates to a numerical approximation when using <code>expr.N()</code>. To
+get a numerical evaluation with <code>expr.evaluate()</code>, use <code>NLimit</code>.</p>
+</div></div>
+<h3 class="visually-hidden" id="NLimit" tabindex="-1">NLimit</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>NLimit</strong>&quot;, <em>fn</em>, <em>value</em>]</p>
+<p>Evaluate the expression <em>fn</em> as it approaches the value <em>value</em>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NLimit&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;_&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NLimit&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Divide&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1</span>
+</code></pre>
+<p>The numerical approximation is computed using a Richardson extrapolation
+algorithm.</p>
 </div></div>
 <h3 class="visually-hidden" id="Max" tabindex="-1">Max</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Max</strong>&quot;, <em>x1</em>, <em>x2</em>, …]</p>
 <p class="signature">[&quot;<strong>Max</strong>&quot;, <em>list</em>]</p>
@@ -2682,14 +2703,14 @@ equal to the smallest real number.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 12, 2023">
+        <meta itemprop="datePublished" content="October 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2711,7 +2732,7 @@ equal to the smallest real number.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
       </div>
     
                             

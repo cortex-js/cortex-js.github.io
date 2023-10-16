@@ -2469,8 +2469,8 @@ apply to a boxed expression, such as <code>expr.simplify()</code> are denoted wi
 </tbody>
 </table>
 </div>
-<p>For example, if <code>f</code> is \( 2 + (\sqrt{4x^2} + 1) \) and <code>x</code> is \( \pi \):</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> f = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + (\\sqrt{4x^2} + 1)&#x27;</span>);
+<p>For example:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> f = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;2 + (\\sqrt{4x} + 1)&#x27;</span>);
 ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;Pi&#x27;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">simplify</span>().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{x}+3</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.evaluate().<span class="hljs-property">latex</span>); <span class="hljs-comment">// 2\sqrt{\pi}+3</span>
@@ -2684,14 +2684,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="October 12, 2023">
+        <meta itemprop="datePublished" content="October 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

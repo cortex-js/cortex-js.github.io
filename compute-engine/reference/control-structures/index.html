@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#overview">Overview</a></li><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li><li><a href="#Return">Return</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
+        <ol><li><a href="#overview">Overview</a></li><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#controlling-the-flow-of-execution">Controlling the Flow of Execution</a><ol><li><a href="#Return">Return</a></li><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
       </div>
       
                               
@@ -2388,37 +2388,20 @@ repeatedly</li>
 <p>A <code>[&quot;Block&quot;]</code> expression is a sequence of expressions that are evaluated
 sequentially.</p>
 <p>A new scope is created for the <code>[&quot;Block&quot;]</code> expression. The scope is destroyed
-when the <code>[&quot;Block&quot;]</code> expression is finished evaluating.</p>
+when the <code>[&quot;Block&quot;]</code> expression is finished evaluating. This means that
+variables defined in the <code>[&quot;Block&quot;]</code> expression are not accessible outside of
+the <code>[&quot;Block&quot;]</code> expression.</p>
 <p>The value of the <code>[&quot;Block&quot;]</code> expression is the value of the last expression
 <code>expr-n</code>.</p>
-<p>If an expression <code>expr</code> is a <code>[&quot;Return&quot;]</code> expression, a <code>[&quot;Break&quot;]</code> expression
-or a <code>[&quot;Continue&quot;]</code> expression, no more expressions are evaluated and the value
-of the <code>[&quot;Block&quot;]</code> is this expression.</p>
+<p>If one of the expression in the block is a <code>[&quot;Return&quot;]</code> expression, a
+<code>[&quot;Break&quot;]</code> expression or a <code>[&quot;Continue&quot;]</code> expression, no more expressions are
+evaluated and the value of the <code>[&quot;Block&quot;]</code> is this expression.</p>
 <p><code>[&quot;Block&quot;]</code> expressions can be nested as necessary.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Assign&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;c&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+ 
+ 
 <span class="hljs-comment">// ➔ 10</span>
 </code></pre>
-</div></div>
-<h3 class="visually-hidden" id="Return" tabindex="-1">Return</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Return</strong>&quot;, <em>value</em>]</p>
-<p>If evaluated as an argument to a <code>[&quot;Function&quot;]</code> expression, interupts the
-evaluation of the function. The value of the <code>[&quot;Function&quot;]</code> expression is
-<code>value</code>.</p>
-<p>The <code>[&quot;Return&quot;]</code> expression is useful when used with functions that have
-multiple exit points, conditional logic, loops, etc…</p>
-<p>Here’s an example of a function that return the sign of a number:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span>
-  <span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-punctuation">[</span>
-    <span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Return&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Less&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Return&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-number">0</span>
-  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-string">&quot;x&quot;</span>
-<span class="hljs-punctuation">]</span>
-</code></pre>
-<div class='read-more'><a href="/compute-engine/reference/functions/">Read more about
-<strong>functions</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 </div></div>
 <h2 id="conditional-control-structure" tabindex="-1">Conditional Control Structure</h2>
 <h3 class="visually-hidden" id="If" tabindex="-1">If</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>If</strong>&quot;, <em>condition</em>, <em>expr-1</em>]</p>
@@ -2501,21 +2484,38 @@ the previous and current values are compared with <code>Equal</code>.</p>
 <div class='read-more'><a href="/compute-engine/reference/collections/">Read more about
 operations on collection such as <code>Map</code> and <code>Fold</code> which are functional
 programming constructs that can be used to replace loops. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h2 id="break-and-continue" tabindex="-1">Break and Continue</h2>
+<h2 id="controlling-the-flow-of-execution" tabindex="-1">Controlling the Flow of Execution</h2>
+<p><strong>To exit a function</strong>, use <code>Return</code>.</p>
 <p><strong>To control the flow of a loop expression</strong>, use <code>Break</code> and <code>Continue</code>.</p>
+<h3 class="visually-hidden" id="Return" tabindex="-1">Return</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Return</strong>&quot;, <em>value</em>]</p>
+<p>Interupts the evaluation of a <code>[&quot;Function&quot;]</code> expression. The value of the
+<code>[&quot;Function&quot;]</code> expression is <code>value</code>.</p>
+<p>The <code>[&quot;Return&quot;]</code> expression is useful when used with functions that have
+multiple exit points, conditional logic, loops, etc…</p>
+<p>Here’s a contrived example of a function that returns the sign of a number:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-string">&quot;Function&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">[</span>
+    <span class="hljs-string">&quot;Block&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Greater&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Return&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;If&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Less&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Return&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">-1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-number">0</span>
+  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-string">&quot;x&quot;</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<div class='read-more'><a href="/compute-engine/reference/functions/">Read more about
+<strong>functions</strong>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+</div></div>
 <h3 class="visually-hidden" id="Break" tabindex="-1">Break</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Break</strong>&quot; ]</p>
-<p class="signature">[&quot;<strong>Break</strong>&quot;, <em>expr</em>]</p>
-<p>When in a block, exit the block immediately. The value of the <code>[&quot;Block&quot;]</code>
-expression is the <code>[&quot;Break&quot;]</code> expression.</p>
+<p class="signature">[&quot;<strong>Break</strong>&quot;, <em>value</em>]</p>
 <p>When in a loop exit the loop immediately. The final value of the loop is
-<code>expr</code>or <code>Nothing</code> if not provided.</p>
+<code>value</code>or <code>Nothing</code> if not provided.</p>
 </div></div>
 <h3 class="visually-hidden" id="Continue" tabindex="-1">Continue</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Continue</strong>&quot; ]</p>
-<p class="signature">[&quot;<strong>Continue</strong>&quot;, <em>expr</em>]</p>
+<p class="signature">[&quot;<strong>Continue</strong>&quot;, <em>value</em>]</p>
 <p>When in a loop, skip to the next iteration of the loop. The value of the
-iteration is <code>expr</code>or <code>Nothing</code> if not provided.</p>
-<p>When in a block, exit the block immediately, and return the <code>[&quot;Continue&quot;]</code>
-expression as the value of the block.</p>
+iteration is <code>value</code> or <code>Nothing</code> if not provided.</p>
 </div></div>
 
 
@@ -2528,14 +2528,14 @@ expression as the value of the block.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 12, 2023">
+        <meta itemprop="datePublished" content="October 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2557,7 +2557,7 @@ expression as the value of the block.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#overview">Overview</a></li><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li><li><a href="#Return">Return</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#break-and-continue">Break and Continue</a><ol><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
+        <ol><li><a href="#overview">Overview</a></li><li><a href="#sequential-control-structure">Sequential Control Structure</a><ol><li><a href="#Block">Block</a></li></ol></li><li><a href="#conditional-control-structure">Conditional Control Structure</a><ol><li><a href="#If">If</a></li><li><a href="#Which">Which</a></li></ol></li><li><a href="#loops">Loops</a><ol><li><a href="#Loop">Loop</a></li><li><a href="#FixedPoint">FixedPoint</a></li></ol></li><li><a href="#controlling-the-flow-of-execution">Controlling the Flow of Execution</a><ol><li><a href="#Return">Return</a></li><li><a href="#Break">Break</a></li><li><a href="#Continue">Continue</a></li></ol></li></ol>
       </div>
     
                             

@@ -2331,6 +2331,59 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.18.0" tabindex="-1">0.18.0</h2>
+<p><strong>Release Date:</strong> 2023-10-16</p>
+<h3 id="new-features" tabindex="-1">New Features</h3>
+<ul>
+<li>Expanded LaTeX dictionary with <code>\max</code>, <code>\min</code>, <code>\sup</code>, <code>\inf</code> and <code>\lim</code>
+functions</li>
+<li>Added <code>Supremum</code> and <code>Infimum</code> functions</li>
+<li>Compilation of <code>Block</code> expressions, local variables, return statements and
+conditionals <code>If</code>.</li>
+<li>Added numerical evaluation of limits with <code>Limit</code> functions and <code>NLimit</code>
+functions, using a Richardson Extrapolation.</li>
+</ul>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">info</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\lim_{x\\to0} \\frac{\\sin x}{x}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">json</span>);
+<span class="hljs-comment">// -&gt; 1</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">info</span>(
+  ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;NLimit&quot;</span>, [<span class="hljs-string">&quot;Divide&quot;</span>, [<span class="hljs-string">&quot;Sin&quot;</span>, <span class="hljs-string">&quot;_&quot;</span>], <span class="hljs-string">&quot;_&quot;</span>], <span class="hljs-number">0</span>]).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">json</span>
+);
+<span class="hljs-comment">// -&gt; 1</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">info</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\lim_{x\\to \\infty} \\cos \\frac{1}{x}&quot;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-property">json</span>);
+<span class="hljs-comment">// -&gt; 1</span>
+</code></pre>
+<ul>
+<li>
+<p>Added <code>Assign</code> and <code>Declare</code> functions to assign values to symbols and declare
+symbols with a domain.</p>
+</li>
+<li>
+<p><code>Block</code> evaluations with local variables work now. For example:</p>
+</li>
+</ul>
+<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Block&quot;</span>, [<span class="hljs-string">&quot;Assign&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">5</span>], [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>]]).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">json</span>;
+<span class="hljs-comment">// -&gt; 10</span>
+</code></pre>
+<ul>
+<li>
+<p>When decimal numbers are parsed they are interpreted as inexact numbers by
+default, i.e. “1.2” -&gt; <code>{num: &quot;1.2&quot;}</code>. To force the number to be interpreted
+as a rational number, set <code>ce.latexOptions.parseNumbers = &quot;rational&quot;</code>. In that
+case, “1.2” -&gt; <code>[&quot;Rational&quot;, 12, 10]</code>, an exact number.</p>
+<p>While regular decimals are considered “inexact” numbers (i.e. they are assumed
+to be an approximation), rationals are assumed to be exact. In most cases, the
+safest thing to do is to consider decimal numbers as inexact to avoid
+introducing errors in calculations. If you know that the decimal numbers you
+parse are exact, you can use this option to consider them as exact numbers.</p>
+</li>
+</ul>
+<h3 id="improvements" tabindex="-1">Improvements</h3>
+<ul>
+<li>LaTeX parser: empty superscripts are now ignored, e.g. <code>4^{}</code> is interpreted
+as <code>4</code>.</li>
+</ul>
 <h2 id="0.17.0" tabindex="-1">0.17.0</h2>
 <p><strong>Release Date:</strong> 2023-10-12</p>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
@@ -2350,13 +2403,13 @@ arguments, instead of 1 or more arguments.</li>
 determined by the context in which it is used, or by the <code>ce.assume()</code> method.
 In some circumstances, the domain of a symbol can be <code>undefined</code>.</li>
 </ul>
-<h3 id="new-features" tabindex="-1">New Features</h3>
+<h3 id="new-features-1" tabindex="-1">New Features</h3>
 <ul>
 <li>Symbolic derivatives of expressions can be calculated using the <code>D</code> function.
 For example, <code>ce.box([&quot;D&quot;, ce.parse(&quot;x^2 + 3x + 1&quot;), &quot;x&quot;]).evaluate().latex</code>
 returns <code>&quot;2x + 3&quot;</code>.</li>
 </ul>
-<h3 id="improvements" tabindex="-1">Improvements</h3>
+<h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
 <li>Some frequently used expressions are now available as predefined constants,
 for example <code>ce.Pi</code>, <code>ce.True</code> and <code>ce.Numbers</code>.</li>
@@ -2383,7 +2436,7 @@ with them. The <code>expr.freeVariables</code> property now return the identifie
 in the expression that are defined outside of the local scope and are not
 arguments of the function, if a function.</li>
 </ul>
-<h3 id="new-features-1" tabindex="-1">New Features</h3>
+<h3 id="new-features-2" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>Domain Inference</strong> when the domain of a symbol is not set explicitly (for
@@ -2468,7 +2521,7 @@ vectors, matrixes and more.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;First&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">33</span><span class="hljs-punctuation">,</span> <span class="hljs-number">45</span><span class="hljs-punctuation">,</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-number">89</span><span class="hljs-punctuation">,</span> <span class="hljs-number">65</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; 33</span>
 </code></pre>
-<h3 id="improvements-1" tabindex="-1">Improvements</h3>
+<h3 id="improvements-2" tabindex="-1">Improvements</h3>
 <ul>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
 significantly rewritten with help from an AI-powered writing assistant.</li>
@@ -2480,7 +2533,7 @@ significantly rewritten with help from an AI-powered writing assistant.</li>
 </ul>
 <h2 id="0.15.0" tabindex="-1">0.15.0</h2>
 <p><strong>Release Date:</strong> 2023-09-14</p>
-<h3 id="improvements-2" tabindex="-1">Improvements</h3>
+<h3 id="improvements-3" tabindex="-1">Improvements</h3>
 <ul>
 <li>The <code>ce.serialize()</code> function now takes an optional <code>canonical</code> argument. Set
 it to <code>false</code> to prevent some transformations that are done to produce more
@@ -2511,7 +2564,7 @@ former replaces the <code>trigger</code> property. The latter is new. An entry w
 robust. They can be modified directly or one of their properties can be
 modified.</li>
 </ul>
-<h3 id="improvements-3" tabindex="-1">Improvements</h3>
+<h3 id="improvements-4" tabindex="-1">Improvements</h3>
 <ul>
 <li>
 <p>Added more functions and symbols supported by <code>expr.compile()</code>:</p>
@@ -2590,7 +2643,7 @@ that both forms will be recognized.</p>
 </ul>
 <h2 id="0.13.0" tabindex="-1">0.13.0</h2>
 <p><strong>Release Date:</strong> 2023-09-09</p>
-<h3 id="new-features-2" tabindex="-1">New Features</h3>
+<h3 id="new-features-3" tabindex="-1">New Features</h3>
 <ul>
 <li>Some expressions can be compiled to Javascript. This is useful to evaluate an
 expression many times, for example in a loop. The compiled expression is
@@ -2607,7 +2660,7 @@ https://cortexjs.io/compute-engine/guides/compiling</li>
 </ul>
 <h2 id="0.12.7" tabindex="-1">0.12.7</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h3 id="improvements-4" tabindex="-1">Improvements</h3>
+<h3 id="improvements-5" tabindex="-1">Improvements</h3>
 <ul>
 <li>Made customization of the LaTeX dictionary simpler. The <code>ce.latexDictionary</code>
 property can be used to access and modify the dictionary. The documentation at
@@ -2646,7 +2699,7 @@ returned by <code>expr.numericValue</code>.</li>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
 </ul>
-<h3 id="improvements-5" tabindex="-1">Improvements</h3>
+<h3 id="improvements-6" tabindex="-1">Improvements</h3>
 <ul>
 <li>Rewrote the rational computation engine to use JavaScript <code>bigint</code> instead of
 <code>Decimal</code> instances. Performance improvements of up to 100x.</li>
@@ -2677,7 +2730,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
 </ul>
-<h3 id="improvements-6" tabindex="-1">Improvements</h3>
+<h3 id="improvements-7" tabindex="-1">Improvements</h3>
 <ul>
 <li>When a constant should be held or substituted with its value can now be more
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
@@ -2704,7 +2757,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
 </ul>
-<h3 id="improvements-7" tabindex="-1">Improvements</h3>
+<h3 id="improvements-8" tabindex="-1">Improvements</h3>
 <ul>
 <li>More accurate calculations of some trig functions when using bignums.</li>
 <li>Improved performance when changing a value with <code>ce.set()</code>. Up to 10x faster
@@ -2724,7 +2777,7 @@ can be used if a non-canonical expression is desired.</li>
 etc… have been replaced with a single <code>numericValue</code> property.</li>
 <li><code>parseUnknownSymbol</code> is now <code>parseUnknownIdentifier</code></li>
 </ul>
-<h3 id="improvements-8" tabindex="-1">Improvements</h3>
+<h3 id="improvements-9" tabindex="-1">Improvements</h3>
 <ul>
 <li>
 <p>Support angles in degrees with <code>30\degree</code>, <code>30^\circ</code> and <code>\ang{30}</code>.</p>
@@ -2923,7 +2976,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.6.0" tabindex="-1">0.6.0</h2>
 <p><strong>Release Date:</strong> 2022-04-18</p>
-<h3 id="improvements-9" tabindex="-1">Improvements</h3>
+<h3 id="improvements-10" tabindex="-1">Improvements</h3>
 <ul>
 <li>Parse more cases of tabular environments</li>
 <li>Handle simplify and evaluate of inert functions by default</li>
@@ -2936,7 +2989,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.5.0" tabindex="-1">0.5.0</h2>
 <p><strong>Release Date:</strong> 2022-04-05</p>
-<h3 id="improvements-10" tabindex="-1">Improvements</h3>
+<h3 id="improvements-11" tabindex="-1">Improvements</h3>
 <ul>
 <li>Correctly parse tabular content (for example in
 <code>\begin{pmatrix}...\end{pmatrix}</code></li>
@@ -2950,7 +3003,7 @@ round-tripping</li>
 </ul>
 <h2 id="0.4.4" tabindex="-1">0.4.4</h2>
 <p><strong>Release Date</strong>: 2022-03-27</p>
-<h3 id="improvements-11" tabindex="-1">Improvements</h3>
+<h3 id="improvements-12" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added option to specify custom LaTeX dictionaries in <code>ComputeEngine</code>
 constructor</li>
@@ -3104,7 +3157,7 @@ such as <code>Equal</code>:</p>
 </table>
 <h2 id="0.3.0" tabindex="-1">0.3.0</h2>
 <p><strong>Release Date</strong>: 2021-06-18</p>
-<h3 id="improvements-12" tabindex="-1">Improvements</h3>
+<h3 id="improvements-13" tabindex="-1">Improvements</h3>
 <ul>
 <li>In LaTeX, parse <code>\operatorname{foo}</code> as the MathJSON symbol <code>&quot;foo&quot;</code>.</li>
 </ul>
@@ -3119,14 +3172,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 12, 2023">
+        <meta itemprop="datePublished" content="October 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-12">October 12, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
