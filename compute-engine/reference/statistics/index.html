@@ -2483,8 +2483,6 @@ numbers, the result is a number. Otherwise it is a simplified <em>collection</em
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sum&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 65</span>
 </code></pre>
-<pre><code>
-<p></code></pre></p>
 </div></div>
 <h3 class="visually-hidden" id="Product" tabindex="-1">Product</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Product</strong>&quot;, <em>collection</em>]</p>
 <p>Evaluate to a product of all the elements in <code>collection</code>.</p>
@@ -2493,6 +2491,7 @@ simplified <em>collection</em>.</p>
 <div class='latex'><div class="source">\prod x_{i}</div><div class="display">\[ \prod x_{i} \]</div></div>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ 385</span>
+ 
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Product&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">11</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 55, &quot;x&quot;]</span>
 </code></pre>
@@ -2514,14 +2513,12 @@ of normally distributed events.</p>
 </div></div>
 <h3 class="visually-hidden" id="Erfc" tabindex="-1">Erfc</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Erfc</strong>&quot;, <em>z:complex</em>]</p>
 <p>Evaluate to the <strong>complementary error function</strong> of a complex number.</p>
-<p>It is defined as \( \operatorname {erf} \left(\operatorname {erf} ^{-1}x\right)
-= x \).</p>
+<p>It is defined as \( \operatorname{erfc} z = 1 - \operatorname {erf} z \).</p>
 </div></div>
 <h3 class="visually-hidden" id="ErfInv" tabindex="-1">ErfInv</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>ErfInv</strong>&quot;, <em>x:real</em>]</p>
-<p>Evaluate to the <strong>inverse error function</strong> of a complex number.</p>
-<p><code>x</code> is a real number between -1 and 1.</p>
-<p>It is defined as \( operatorname {erf} \left(\operatorname {erf}
-^{-1}x\right)=x \).</p>
+<p>Evaluate to the <strong>inverse error function</strong> of a real number \( -1 &lt; x &lt; 1 \)</p>
+<p>It is defined as \( \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
+= x \).</p>
 </div></div>
 
 
@@ -2534,14 +2531,14 @@ of normally distributed events.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

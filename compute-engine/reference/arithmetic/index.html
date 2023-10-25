@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li><li><a href="#Numerator">Numerator</a></li><li><a href="#Denominator">Denominator</a></li><li><a href="#NumeratorDenominator">NumeratorDenominator</a></li></ol></li></ol>
       </div>
       
                               
@@ -2688,9 +2688,41 @@ equal to the smallest real number.</p>
 </div></div>
 <h3 class="visually-hidden" id="Rational" tabindex="-1">Rational</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>n</em>]</p>
 <p>Evaluate to a rational approximating the value of the number <code>n</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0.42</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Rational&quot;, 21, 50]</span>
+</code></pre>
 <br>
 <p class="signature">[&quot;<strong>Rational</strong>&quot;, <em>numerator</em>, <em>denominator</em>]</p>
 <p>Represent a rational number equal to <code>numerator</code>over <code>denominator</code>.</p>
+</div></div>
+<h3 class="visually-hidden" id="Numerator" tabindex="-1">Numerator</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Numerator</strong>&quot;, <em>expr</em>]</p>
+<p>Return the numerator of <code>expr</code>.</p>
+<p>Note that <code>expr</code> may be a non-canonical form.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Numerator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 4</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Denominator" tabindex="-1">Denominator</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Denominator</strong>&quot;, <em>expr</em>]</p>
+<p>Return the denominator of <code>expr</code>.</p>
+<p>Note that <code>expr</code> may be a non-canonical form.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Denominator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 5</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="NumeratorDenominator" tabindex="-1">NumeratorDenominator</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>NumeratorDenominator</strong>&quot;, <em>expr</em>]</p>
+<p>Return the numerator and denominator of <code>expr</code> as a sequence.</p>
+<p>Note that <code>expr</code> may be a non-canonical form.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NumeratorDenominator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Sequence&quot;, 4, 5]</span>
+</code></pre>
+<p>The sequence can be used with another function, for example GCD to
+check if the fraction is in its canonical form:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;GCD&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NumeratorDenominator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 1</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;GCD&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NumeratorDenominator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Rational&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">8</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ 2</span>
+</code></pre>
 </div></div>
 
 
@@ -2703,14 +2735,14 @@ equal to the smallest real number.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2732,7 +2764,7 @@ equal to the smallest real number.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li></ol></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#functions">Functions</a><ol><li><a href="#transcendental-functions">Transcendental Functions</a></li><li><a href="#rounding">Rounding</a></li><li><a href="#other-functions">Other Functions</a></li><li><a href="#BaseForm">BaseForm</a></li><li><a href="#Clamp">Clamp</a></li><li><a href="#Limit">Limit</a></li><li><a href="#NLimit">NLimit</a></li><li><a href="#Max">Max</a></li><li><a href="#Min">Min</a></li><li><a href="#Rational">Rational</a></li><li><a href="#Numerator">Numerator</a></li><li><a href="#Denominator">Denominator</a></li><li><a href="#NumeratorDenominator">NumeratorDenominator</a></li></ol></li></ol>
       </div>
     
                             

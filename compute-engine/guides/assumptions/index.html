@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#multivariate-assumptions">Multivariate Assumptions</a></li><li><a href="#defining-new-assumptions">Defining New Assumptions</a></li><li><a href="#using-assumptions-to-declare-symbols">Using Assumptions to Declare Symbols</a></li><li><a href="#testing-assumptions">Testing Assumptions</a></li><li><a href="#default-assumptions">Default Assumptions</a></li><li><a href="#forgetting-assumptions">Forgetting Assumptions</a></li><li><a href="#scoped-assumptions">Scoped Assumptions</a></li></ol>
+        <ol><li><a href="#multivariate-assumptions">Multivariate Assumptions</a></li><li><a href="#defining-new-assumptions">Defining New Assumptions</a></li><li><a href="#default-assumptions">Default Assumptions</a></li><li><a href="#verifyinf-assumptions">Verifyinf Assumptions</a></li><li><a href="#forgetting-assumptions">Forgetting Assumptions</a></li><li><a href="#scoped-assumptions">Scoped Assumptions</a></li></ol>
       </div>
       
                               
@@ -2371,10 +2371,27 @@
 
 
 
-<p>The Cortex Compute Engine has a robust system to specify properties and
-relationships between symbols.</p>
-<p>These assumptions are used to select algorithms, to validate some
-simplifications and to optimize computations.</p>
+<p>Assumptions are statements about symbols that are assumed to be true. For
+example, the assumption that \(x\) is a positive real number is used to simplify
+\|x|\) to \(x\).</p>
+<p>When declaring a symbol, it is possible to specify its domain. For example, the
+symbol \(x\) can be declared to be a real number:</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>);
+</code></pre>
+<p>However, assumptions can be used to describe more complex properties of symbols.
+For example, the assumption that \(x\) is positive is used to simplify
+\(\sqrt{x^2}\) to \(x\).</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Greater&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>]);
+</code></pre>
+<p>Assumptions can also describe the relationship between two symbols, for example
+that \(x\) is greater than \(y\):</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Greater&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;y&quot;</span>]);
+</code></pre>
+<p>This knowledge base is used by the Compute Engine to simplify
+expressions.</p>
+<div class='read-more'><a href="/compute-engine/guides/simplify/"> Read more about
+<strong>Simplifying Expressions</strong> <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
+<p>In general, assumptions are not used when evaluating expressions.</p>
 <section id='defining-new-assumptions'>
 <h2 id="defining-new-assumptions" tabindex="-1">Defining New Assumptions</h2>
 <p><strong>To make an assumption about a symbol</strong>, use the <code>ce.assume()</code> function.</p>
@@ -2384,6 +2401,10 @@ simplifications and to optimize computations.</p>
 <span class="hljs-comment">// or:</span>
 
 ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
+</code></pre>
+<p>In this case, this would be equivalent to declaring a domain for the symbol
+\(\beta\):</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;Beta&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>);
 </code></pre>
 <p>The head of the proposition can be one of the following:</p>
 <div class=symbols-table>
@@ -2433,16 +2454,10 @@ ce.<span class="hljs-title function_">assume</span>([<span class="hljs-string">&
 </code></pre>
 <section id='multivariate-assumptions'>
 <h3 id="multivariate-assumptions" tabindex="-1">Multivariate Assumptions</h3>
-<p>Assumptions are frequently describing the property of a symbol. However, it is
-also possible to describe relationships betwen multiple symbols.</p>
+<p>Assumptions frequently describe the property of a symbol. However, it is
+also possible to describe relationships betwen symbols.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assume</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;xy + 1 = 0&#x27;</span>))<span class="hljs-string">&#x27;
 </span></code></pre>
-</section>
-<section id='using-assumptions-to-declare-symbols'>
-<h3 id="using-assumptions-to-declare-symbols" tabindex="-1">Using Assumptions to Declare Symbols</h3>
-<p>Before a symbol can be used in an expression, the symbol must be known by the
-Compute Engine. The definition of a symbol can be used for this purpose, but an
-assumption that defines a domain for the symbol is sufficient.</p>
 </section>
 <section id='default-assumptions'>
 <h3 id="default-assumptions" tabindex="-1">Default Assumptions</h3>
@@ -2491,20 +2506,14 @@ when creating a Compute Engine instance:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>({ <span class="hljs-attr">assumptions</span>: <span class="hljs-literal">null</span> });
 </code></pre>
 </section>
-</section>
 <section id='testing-assumptions'>
-<h2 id="testing-assumptions" tabindex="-1">Testing Assumptions</h2>
-<p><strong>To test if a particular assumption is valid</strong>, call the <code>ce.is()</code> function.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
+<h2 id="verifyinf-assumptions" tabindex="-1">Verifyinf Assumptions</h2>
+<p><strong>To test if a particular assumption is valid</strong>, call the <code>ce.verify()</code> function.</p>
+<pre><code class="language-js">ce.<span class="hljs-title function_">verify</span>([<span class="hljs-string">&quot;Element&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>]);
 </code></pre>
-<p>As a shorthand, you can pass a symbol as a first argument and a domain as a
-second.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;RealNumbers&quot;</span>); <span class="hljs-comment">// same as ce.is([&quot;Element&quot;, &quot;x&quot;, &#x27;RealNumbers])</span>
-ce.<span class="hljs-title function_">is</span>(<span class="hljs-string">&quot;x&quot;</span>, [<span class="hljs-string">&quot;Range&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">5</span>]);
-</code></pre>
-<p>The function <code>ce.is()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
+<p>The function <code>ce.verify()</code> return <code>true</code> if the assumption is true, <code>false</code> if it is
 not, and <code>undefined</code> if it cannot be determined.</p>
-<p>While <code>ce.is()</code> is appropriate to get boolean answers, more complex queries can
+<p>While <code>ce.verify()</code> is appropriate to get boolean answers, more complex queries can
 also be made.</p>
 <p><strong>To query the assumptions knowledge base</strong> call the <code>ce.ask()</code> function.</p>
 <p>The argument of <code>ask()</code> can be a pattern, and it returns an array of matches as
@@ -2574,14 +2583,14 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2603,7 +2612,7 @@ ce.<span class="hljs-title function_">is</span>([<span class="hljs-string">&quot
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#multivariate-assumptions">Multivariate Assumptions</a></li><li><a href="#defining-new-assumptions">Defining New Assumptions</a></li><li><a href="#using-assumptions-to-declare-symbols">Using Assumptions to Declare Symbols</a></li><li><a href="#testing-assumptions">Testing Assumptions</a></li><li><a href="#default-assumptions">Default Assumptions</a></li><li><a href="#forgetting-assumptions">Forgetting Assumptions</a></li><li><a href="#scoped-assumptions">Scoped Assumptions</a></li></ol>
+        <ol><li><a href="#multivariate-assumptions">Multivariate Assumptions</a></li><li><a href="#defining-new-assumptions">Defining New Assumptions</a></li><li><a href="#default-assumptions">Default Assumptions</a></li><li><a href="#verifyinf-assumptions">Verifyinf Assumptions</a></li><li><a href="#forgetting-assumptions">Forgetting Assumptions</a></li><li><a href="#scoped-assumptions">Scoped Assumptions</a></li></ol>
       </div>
     
                             

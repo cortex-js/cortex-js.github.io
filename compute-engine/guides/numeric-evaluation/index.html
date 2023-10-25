@@ -2391,19 +2391,18 @@ a machine number, a <code>Decimal</code> object or a <code>Complex</code> object
 <p><strong>To check if the <code>numericValue</code> is a <code>Complex</code></strong> use
 <code>ce.isComplex(expr.N().numericValue)</code>.</p>
 <p><strong>To access a JavaScript machine number approximation of the result</strong> use
-<code>valueOf()</code>. If <code>numericValue</code> is a machine number, a <code>Decimal</code> object, or a
-rational, <code>valueOf()</code> will return a machine number approximation. Otherwise it
-returns a string serialization of the MathJSON representation of the expression.</p>
-<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;11 + \\sqrt{x}&#x27;</span>).<span class="hljs-title function_">N</span>().<span class="hljs-title function_">valueOf</span>());
+<code>expr.value</code>. If <code>numericValue</code> is a machine number, a <code>Decimal</code> object, or a
+rational, <code>expr.value</code> will return a machine number approximation.</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;11 + \\sqrt{x}&#x27;</span>).<span class="hljs-property">value</span>);
 <span class="hljs-comment">// ➔ &quot;[&quot;Add&quot;,11,[&quot;Sqrt&quot;,&quot;x&quot;]]&quot;</span>
-<span class="hljs-comment">// Note: if the result is not a number, valueOf() returns a string</span>
+<span class="hljs-comment">// Note: if the result is not a number, value returns a string</span>
 <span class="hljs-comment">// representation of the expression</span>
 
 <span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\sqrt{5} + 7^3&#x27;</span>).<span class="hljs-title function_">N</span>();
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-title function_">valueOf</span>());
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">value</span>);
 <span class="hljs-comment">// ➔ 345.2360679774998</span>
-<span class="hljs-comment">// If the result is a number, valueOf() returns a machine number approximation</span>
+<span class="hljs-comment">// If the result is a number, value returns a machine number approximation</span>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">latex</span>);
 <span class="hljs-comment">// ➔ &quot;345.236\,067\,977\,499\,8,&quot;</span>
@@ -2446,7 +2445,7 @@ variables in the current scope.</p>
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
   ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&#x27;x&#x27;</span>, x);
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.N().valueOf()}</span>`</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.value}</span>`</span>);
 }
 </code></pre>
 <p>You can also use <code>expr.subs()</code>, but this will create a brand new expression on
@@ -2454,7 +2453,7 @@ each iteration, and will be much slower.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;3x^2+4x+2&#x27;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> x = <span class="hljs-number">0</span>; x &lt; <span class="hljs-number">1</span>; x += <span class="hljs-number">0.01</span>) {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({ x: x }).N().valueOf()}</span>`</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`f(<span class="hljs-subst">${x}</span>) = <span class="hljs-subst">${expr.subs({ x: x }).value}</span>`</span>);
 }
 </code></pre>
 <p><strong>To reset a variable to be unbound to a value</strong> use <code>ce.assign()</code></p>
@@ -2727,14 +2726,14 @@ evaluations for their numeric functions:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

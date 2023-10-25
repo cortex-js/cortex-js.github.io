@@ -2480,6 +2480,14 @@ numerator and denominator is 1, and the denominator is positive.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
 </code></pre>
+<p>You can check if a non-canonical expression is a reduced (canonical) rational
+number by checking the GCD of the numerator and denominator:</p>
+<pre><code class="language-json">const input = ce.parse(<span class="hljs-string">&quot;\\frac{30}{50}&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>canonical<span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">}</span>);
+console.info(ce.box(
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;GCD&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NumeratorDenominator&quot;</span><span class="hljs-punctuation">,</span> input<span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+).evaluate().value === <span class="hljs-number">1</span>);
+<span class="hljs-comment">// ➔ false</span>
+</code></pre>
 <p>The canonical form of an addition or mulipication will have its arguments
 ordered in a canonical way.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2+x+\\pi+\\sqrt2+1&quot;</span>);
@@ -2589,9 +2597,9 @@ imaginary parts.</li>
 <li><code>Array.isArray(expr.numericValue)</code>: the expression is a rational as a tuple of
 two JavaScript <code>number</code> or two JavaScript <code>bigint</code>.</li>
 </ul>
-<p><strong>To access a numerical approximation of an expression if available</strong>, use
-<code>expr.N().valueOf()</code>. The result is a JavaScript number approximation of the
-value.</p>
+<p><strong>To access a the value of an expression as a JavaScript primitive</strong>, use
+<code>expr.value</code>. The result is a JavaScript primitive, such as a number, string or
+boolean.</p>
 <section id=errors>
 <h2 id="errors" tabindex="-1">Errors</h2>
 <p>Sometimes, things go wrong.</p>
@@ -2785,14 +2793,14 @@ property.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

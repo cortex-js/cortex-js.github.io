@@ -2362,7 +2362,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Head">Head</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
       
                               
@@ -2451,24 +2451,46 @@ in the predicate.</p>
 <li>a membership expression: <code>[&quot;Assume&quot;, [&quot;Element&quot;, &quot;x&quot;, &quot;Integers&quot;]]</code></li>
 </ul>
 </div></div>
-<h2 id="inspecting-an-expression" tabindex="-1">Inspecting an Expression</h2>
-<p>The following functions can be used to obtain information about an expression.</p>
+<h2 id="structural-operations" tabindex="-1">Structural Operations</h2>
+<p>The following functions can be applied to non-canonical expressions.
+The do not depend on the canonical form, but reflect the structure of the
+expression.</p>
 <h3 class="visually-hidden" id="About" tabindex="-1">About</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>About</strong>&quot;, <em>identifier</em>]</p>
 <p>Evaluate to a dictionary expression containing information about an identifier
 such as its domain, its attributes, its value, etc…</p>
-</div></div>
-<h3 class="visually-hidden" id="Domain" tabindex="-1">Domain</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Domain</strong>&quot;, <em>expression</em>]</p>
-<p>Evaluate to the domain of <em>expression</em></p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Domain&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2.4531</span><span class="hljs-punctuation">]</span>
- 
-<span class="hljs-comment">// ➔ &quot;RealNumbers&quot;</span>
-</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Head" tabindex="-1">Head</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Head</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to the head of <em>expression</em></p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Head&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
  
 <span class="hljs-comment">// ➔ &quot;Add&quot;</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Tail" tabindex="-1">Tail</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Tail</strong>&quot;, <em>expression</em>]</p>
+<p>Evaluate to a sequence of the arguments of <em>expression</em>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tail&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Sequence&quot;, 2, 3]</span>
+</code></pre>
+<p><code>Tail</code> can be used to change the head of an expression, for example:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tail&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// ➔ [&quot;Multiply&quot;, 2, 3]</span>
+</code></pre>
+</div></div>
+<h3 class="visually-hidden" id="Hold" tabindex="-1">Hold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Hold</strong>&quot;, <em>expression</em>]</p>
+<p>Tag an expression that should be kept in an unevaluated form</p>
+</div></div>
+<h3 class="visually-hidden" id="Identity" tabindex="-1">Identity</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Identity</strong>&quot;, <em>expression</em>]</p>
+<p>Evaluate to its argument</p>
+<p>In the mathematical sense, this is an operator (a function that takes a function
+as an argument and returns a function).</p>
+</div></div>
+<h2 id="inspecting-an-expression" tabindex="-1">Inspecting an Expression</h2>
+<p>The following functions can be used to obtain information about an expression.</p>
+<h3 class="visually-hidden" id="Domain" tabindex="-1">Domain</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Domain</strong>&quot;, <em>expression</em>]</p>
+<p>Evaluate to the domain of <em>expression</em></p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Domain&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2.4531</span><span class="hljs-punctuation">]</span>
+ 
+<span class="hljs-comment">// ➔ &quot;RealNumbers&quot;</span>
 </code></pre>
 </div></div>
 <h2 id="transforming-an-expression" tabindex="-1">Transforming an Expression</h2>
@@ -2496,14 +2518,6 @@ error, a reference to an unknown identifier or some other problem.</p>
 expression.</p>
 <p>The <em>context</em> is an optional expression that provides additional information
 about the error.</p>
-</div></div>
-<h3 class="visually-hidden" id="Hold" tabindex="-1">Hold</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Hold</strong>&quot;, <em>expression</em>]</p>
-<p>Tag an expression that should be kept in an unevaluated form</p>
-</div></div>
-<h3 class="visually-hidden" id="Identity" tabindex="-1">Identity</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Identity</strong>&quot;, <em>expression</em>]</p>
-<p>Evaluate to its argument</p>
-<p>In the mathematical sense, this is an operator (a function that takes a function
-as an argument and returns a function).</p>
 </div></div>
 <h3 class="visually-hidden" id="InverseFunction" tabindex="-1">InverseFunction</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>InverseFunction</strong>&quot;, <em>symbol</em>]</p>
 <p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code>.</p>
@@ -2616,14 +2630,14 @@ corresponding to the LaTeX string.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2645,7 +2659,7 @@ corresponding to the LaTeX string.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#About">About</a></li><li><a href="#Domain">Domain</a></li><li><a href="#Head">Head</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
     
                             

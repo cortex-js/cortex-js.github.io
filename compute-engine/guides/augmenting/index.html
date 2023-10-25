@@ -2482,7 +2482,7 @@ ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&q
 <span class="hljs-comment">// Functions</span>
 ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;$$ 2x + 3 $$&quot;</span>);
 ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;double&quot;</span>, [<span class="hljs-string">&quot;Function&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">2</span>], <span class="hljs-string">&quot;x&quot;</span>]);
-ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;halve&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() / <span class="hljs-number">2</span>));
+ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;halve&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-property">value</span> / <span class="hljs-number">2</span>));
 </code></pre>
 <p>Note that when assigning an expression to a symbol, the expression is not
 evaluated. It is used to define a function</p>
@@ -2551,7 +2551,7 @@ for it. You can do this by adding a <code>evaluate</code> handler to the definit
 <pre><code class="language-js">ce.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;double&quot;</span>, {
   <span class="hljs-attr">signature</span>: {
     <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;Functions&quot;</span>,
-    <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">2</span>),
+    <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-property">value</span> * <span class="hljs-number">2</span>),
   },
 });
 </code></pre>
@@ -2577,7 +2577,7 @@ declared, a new function definition is created, if the value is a function.</p>
 <p>Using <code>ce.assign()</code> gives you more flexibility than <code>ce.declare()</code>: the “value”
 of the function can be a JavaScript function, a MathJSON expression or a LaTeX
 expression.</p>
-<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() * <span class="hljs-number">5</span>)};
+<pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">number</span>(args[<span class="hljs-number">0</span>].<span class="hljs-property">value</span> * <span class="hljs-number">5</span>)};
 </code></pre>
 <p>The value can also be a MathJSON expression:</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&quot;f(x)&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">5</span>]);
@@ -2626,7 +2626,7 @@ identifiers, not LaTeX commands. For example, if you have a symbol <code>α</cod
   <span class="hljs-title class_">Smallfrac</span>: {
     <span class="hljs-attr">signature</span>: {
       <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;NumericFunctions&quot;</span>,
-      <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">box</span>(args[<span class="hljs-number">0</span>].<span class="hljs-title function_">valueOf</span>() / args[<span class="hljs-number">1</span>].<span class="hljs-title function_">valueOf</span>()),
+      <span class="hljs-attr">evaluate</span>: <span class="hljs-function">(<span class="hljs-params">ce, args</span>) =&gt;</span> ce.<span class="hljs-title function_">box</span>(args[<span class="hljs-number">0</span>].<span class="hljs-property">value</span> / args[<span class="hljs-number">1</span>].<span class="hljs-property">value</span>),
     },
   },
 });
@@ -2660,14 +2660,14 @@ ce.<span class="hljs-title function_">assign</span>(<span class="hljs-string">&q
         
 
 
-        <meta itemprop="datePublished" content="October 16, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-16">October 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
