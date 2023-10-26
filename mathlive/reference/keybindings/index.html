@@ -2338,7 +2338,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#keybindings">Keybindings</a><ol><li><a href="#special-keys">Special Keys</a></li><li><a href="#editing">Editing</a></li><li><a href="#math-symbols">Math Symbols</a></li><li><a href="#matrix-editing">Matrix Editing</a></li></ol></li><li><a href="#inline-shortcuts">Inline Shortcuts</a><ol><li><a href="#letter-like-symbols">Letter-Like Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#other-operators">Other Operators</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#units">Units</a></li><li><a href="#arrows">Arrows</a></li><li><a href="#greek-letters">Greek Letters</a></li><li><a href="#miscelaneous">Miscelaneous</a></li></ol></li></ol>
+        <ol><li><a href="#keybindings">Keybindings</a><ol><li><a href="#editing">Editing</a></li><li><a href="#math-symbols">Math Symbols</a></li><li><a href="#matrix-editing">Matrix Editing</a></li></ol></li><li><a href="#inline-shortcuts">Inline Shortcuts</a><ol><li><a href="#letter-like-symbols">Letter-Like Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#other-operators">Other Operators</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#units">Units</a></li><li><a href="#arrows">Arrows</a></li><li><a href="#greek-letters">Greek Letters</a></li><li><a href="#miscelaneous">Miscelaneous</a></li></ol></li></ol>
       </div>
       
                               
@@ -2371,6 +2371,13 @@
   table td code {
     border: none;
     background: none;
+  }
+
+  #special-keys {
+    border-radius: 8px;
+    margin-top: 2rem;
+    border: var(--ui-border);
+    padding: 1rem;
   }
 
   #special-keys-table {
@@ -2451,14 +2458,13 @@
   padding: 0;
   padding-bottom: 8px;
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.2;
   text-align: center;
   padding-top: 8px;
-  align-items: baseline;
+  align-items: center;
 }
-
 
 
 .keybindings-table tr td aside {
@@ -2471,6 +2477,7 @@
   flex-flow: column;
   border-radius: 8px;
   padding: 8px;
+  min-height: 4em;
   background: var(--callout-background);
   color: var(--text-color);
   align-items: center;
@@ -2495,6 +2502,9 @@ table tr td:first-child {
   align-items: center;
 }
 
+.keybindings-table kbd {
+  user-select: none;
+}
 
 
 .inlineshortcut-table table {
@@ -2612,22 +2622,182 @@ div[data-tooltip]:hover::after {
   display: flex;
 }
 
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  display: none;
+  /* opacity: 0;
+  width: 0;
+  height: 0; */
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 34px;
+  background-color: var(--ui-surface);
+  transition: .2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--ui-handle);
+  transition: .2s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:focus-visible + .slider {
+  outline: 5px auto #0c6abe;
+  outline-offset: -2px;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.settings-row {
+  border-radius: 8px;
+  border: var(--ui-border);
+  padding: 1rem;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.page__content label p {
+  margin: 0;
+  padding: 0;
+  opacity: .6;
+}
+
+.page__content label p:has(strong) {
+  opacity: 1;
+}
+
+#special-keys {
+  display: none;
+}
+
+body.apple #special-keys {
+  display: block;
+}
+
+.if-apple {
+  display: none;
+}
+
+body.apple .if-apple {
+  display: inherit;
+}
+
+.if-glyphs, .if-not-glyphs {
+  display: none;
+}
+
+body.glyphs .if-glyphs {
+  display: inherit;
+}
+
+body:not(.glyphs) .if-not-glyphs {
+  display: inherit;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.5em;
+  font-variant: small-caps;
+}
+
 
 </style>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const platform = navigator['userAgentData']?.platform ?? navigator.platform;
+    const isApple = /^mac/i.test(platform) || /iphone|ipod|ipad/i.test(navigator.userAgent);
+
+    const appleSwitch = document.getElementById('apple');
+
+    if (isApple) {
+      appleSwitch.checked = true;
+      document.body.classList.add('apple', 'glyphs');
+    }
+
+    appleSwitch.addEventListener('click', (e) => {
+      if (e.target.checked) 
+        document.body.classList.add('apple', 'glyphs');
+       else 
+        document.body.classList.remove('apple', 'glyphs');
+    });
+
+  function replaceGlyphs(root) {
+    // Recurse over all the children of the node
+    root.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const html = text.replace(/⌘|⌃|⇧|⌥|⤒|⤓|⇞|⇟|⇥|⌫|⌦|⏎|⌤|⇥/g, (match) => {
+          const glyph = match;
+          const caption = {'⌘': 'Ctrl', '⌃': 'Ctrl', '⇧': 'Shift', '⌥': 'Alt', '⤒': "Home", '⤓': 'End', "⇞": 'Page Up', '⇟': "Page Down", '⌫': 'Backspace', '⌦': 'Del', '⏎': 'Return', '⌤': 'Enter', '⇥': 'Tab'}[glyph];
+          if (!caption) return glyph;
+          return `<span class="if-glyphs">${glyph}</span><span class="if-not-glyphs">${caption}</span>`;
+        });
+        const span = document.createElement('span');
+        span.innerHTML = html;
+        node.replaceWith(span);
+      } else {
+        replaceGlyphs(node);
+      }
+    });
+  }
+
+    document.querySelectorAll('.keybindings-table').forEach((table) => 
+      table.querySelectorAll('td').forEach((td) => replaceGlyphs(td))
+    );
+
+  });
+
+</script>
 <h2 id="keybindings" tabindex="-1">Keybindings</h2>
 <p>Commands to edit and modify a formula can be invoked by pressing some key
 combinations.</p>
 <p class="notice--info">The keybinding below are applicable to a US QWERTY keyboard. Some of the
 keybindings may not be available with other keyboard layouts.</p>
-<div class='read-more'><a href="/mathlive/reference/shortcuts/">
+<div class='read-more'><a href="/mathlive/guides/shortcuts/">
 Read more about definining your own <strong>keybindings</strong> and <strong>shortcuts</strong>.
 <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
-<h3 id="special-keys" tabindex="-1">Special Keys</h3>
+<div class="settings-row">
+<label for="apple"><p><strong>Shortcuts for macOS and iOS</strong></p><p>Display shortcuts using the ⌘, ⌥, ⌃, ⇧ keys</p></label>
+<label class="switch">
+  <input id="apple" type="checkbox">
+  <span class="slider"></span>
+</label>
+</div>
+<section id="special-keys">
 <div id='special-keys-table'>
   <div> <kbd>⇧</kbd><span class="label"><kbd>Shift</kbd></div> 
-   <div> <kbd>⌃</kbd><span class="label"><kbd>Ctrl</kbd> or <kbd>Control</kbd></span></div>
-   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd> or <kbd>Alt</kbd></span></div>
-   <div> <kbd>⌘</kbd><span class="label">macOS: <kbd>Command</kbd><br>Windows:<kbd>Ctrl</kbd></span></div>
+   <div> <kbd>⌃</kbd><span class="label"><kbd>Control</kbd></span></div>
+   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd></span></div>
+   <div> <kbd>⌘</kbd><span class="label"><kbd>Command</kbd></span></div>
 </div>
 <div id='special-keys-table'>
    <div> <kbd>⤒</kbd><span class="label"><kbd>Home</kbd></span></div> 
@@ -2642,6 +2812,7 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
    <div> <kbd>⌤</kbd><span class="label"><kbd>Enter</kbd></span></div>
    <div> <kbd>⇥</kbd><span class="label"><kbd>Tab</kbd></span></div>
 </div>
+</section>
 <h3 id="editing" tabindex="-1">Editing</h3>
 <div class="keybindings-table">
 <table>
@@ -2653,42 +2824,42 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 </thead>
 <tbody>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td><span class="if-apple"> <kbd>⌃</kbd>+<kbd>B</kbd> </span></td>
 <td><kbd>⇠</kbd></td>
 <td>move backward</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>F</kbd> </span></td>
 <td><kbd>⇢</kbd></td>
 <td>move forward</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>P</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>P</kbd> </span></td>
 <td><kbd>⇡</kbd></td>
 <td>move up</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>N</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>N</kbd> </span></td>
 <td><kbd>⇣</kbd></td>
 <td>move down</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⇠</kbd></td>
 <td>extend selection backward</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⇢</kbd></td>
 <td>extend selection forward</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd> </span></td>
 <td><kbd>⇧</kbd>+<kbd>⇡</kbd></td>
 <td>extend selection upward</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd> </span></td>
 <td><kbd>⇧</kbd>+<kbd>⇣</kbd></td>
 <td>extend selection downward</td>
 </tr>
@@ -2701,19 +2872,19 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 <td>move to previous placeholder</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>H</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>H</kbd></span></td>
 <td><kbd>⌥</kbd>+<kbd>⌦</kbd></td>
 <td><kbd>⌫</kbd></td>
 <td>delete backward</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>D</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>D</kbd></span></td>
 <td><kbd>⌥</kbd>+<kbd>⌫</kbd></td>
 <td><kbd>⌦</kbd></td>
 <td>delete forward</td>
 </tr>
 <tr>
-<td><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td><span class="if-apple"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span></td>
 <td><kbd>⌥</kbd>+<kbd>⇠</kbd></td>
 <td>move to previous word</td>
 </tr>
@@ -2723,7 +2894,7 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 <td>move to next word</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇠</kbd></td>
 <td>extend selection to previous word</td>
 </tr>
@@ -2759,25 +2930,25 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 <td>move before parent</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>A</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>A</kbd></span></td>
 <td><kbd>⤒</kbd></td>
 <td><kbd>⌘</kbd>+<kbd>⇠</kbd></td>
 <td>move to mathfield start</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⤒</kbd></td>
 <td><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd></td>
 <td>extend selection to mathfield start</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>E</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>E</kbd></span></td>
 <td><kbd>⤓</kbd></td>
 <td><kbd>⌘</kbd>+<kbd>⇢</kbd></td>
 <td>move to mathfield end</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⤓</kbd></td>
 <td><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇢</kbd></td>
 <td>extend selection to mathfield end</td>
@@ -2796,11 +2967,11 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 </tr>
 <tr>
 <td><kbd>esc</kbd></td>
-<td>complete</td>
+<td>finish</td>
 </tr>
 <tr>
 <td><kbd>⇧</kbd>+<kbd>esc</kbd></td>
-<td>complete (“reject”)</td>
+<td>reject</td>
 </tr>
 <tr>
 <td><kbd>⇥</kbd></td>
@@ -2813,23 +2984,23 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 </tr>
 <tr>
 <td><kbd>⌃</kbd>+<kbd>A</kbd></td>
-<td><kbd>⌘</kbd>+<kbd>A</kbd></td>
+<td><span class="if-apple"><kbd>⌘</kbd>+<kbd>A</kbd></span></td>
 <td>select all</td>
 </tr>
 <tr>
 <td><kbd>⌃</kbd>+<kbd>Z</kbd></td>
-<td><kbd>⌘</kbd>+<kbd>Z</kbd></td>
+<td><span class="if-apple"><kbd>⌘</kbd>+<kbd>Z</kbd></span></td>
 <td>undo</td>
 </tr>
 <tr>
-<td><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd></span></td>
 <td><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd></td>
 <td><kbd>⌃</kbd>+<kbd>Y</kbd></td>
-<td><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd></td>
+<td><span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd></span></td>
 <td>redo</td>
 </tr>
 <tr>
-<td><kbd>⌃</kbd>+<kbd>L</kbd></td>
+<td><span class="if-apple"><kbd>⌃</kbd>+<kbd>L</kbd></span></td>
 <td>scroll into view</td>
 </tr>
 <tr>
@@ -2858,11 +3029,11 @@ Read more about definining your own <strong>keybindings</strong> and <strong>sho
 </tr>
 <tr>
 <td><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd></td>
-<td>speak(“parent”)</td>
+<td>speak parent</td>
 </tr>
 <tr>
 <td><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd></td>
-<td>speak(“all”)</td>
+<td>speak all</td>
 </tr>
 </tbody>
 </table>
@@ -3980,14 +4151,14 @@ are supported.</p>
         
 
 
-        <meta itemprop="datePublished" content="April 08, 2023">
+        <meta itemprop="datePublished" content="October 25, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-04-08">April 08, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -4009,7 +4180,7 @@ are supported.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#keybindings">Keybindings</a><ol><li><a href="#special-keys">Special Keys</a></li><li><a href="#editing">Editing</a></li><li><a href="#math-symbols">Math Symbols</a></li><li><a href="#matrix-editing">Matrix Editing</a></li></ol></li><li><a href="#inline-shortcuts">Inline Shortcuts</a><ol><li><a href="#letter-like-symbols">Letter-Like Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#other-operators">Other Operators</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#units">Units</a></li><li><a href="#arrows">Arrows</a></li><li><a href="#greek-letters">Greek Letters</a></li><li><a href="#miscelaneous">Miscelaneous</a></li></ol></li></ol>
+        <ol><li><a href="#keybindings">Keybindings</a><ol><li><a href="#editing">Editing</a></li><li><a href="#math-symbols">Math Symbols</a></li><li><a href="#matrix-editing">Matrix Editing</a></li></ol></li><li><a href="#inline-shortcuts">Inline Shortcuts</a><ol><li><a href="#letter-like-symbols">Letter-Like Symbols</a></li><li><a href="#functions">Functions</a></li><li><a href="#relational-operators">Relational Operators</a></li><li><a href="#other-operators">Other Operators</a></li><li><a href="#delimiters">Delimiters</a></li><li><a href="#units">Units</a></li><li><a href="#arrows">Arrows</a></li><li><a href="#greek-letters">Greek Letters</a></li><li><a href="#miscelaneous">Miscelaneous</a></li></ol></li></ol>
       </div>
     
                             
