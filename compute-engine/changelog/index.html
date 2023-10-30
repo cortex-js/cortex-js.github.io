@@ -2331,16 +2331,72 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.20.0" tabindex="-1">0.20.0</h2>
+<p><strong>Release Date:</strong> 2023-10-30</p>
+<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<ul>
+<li>
+<p><strong>Architectural changes</strong>: the invisible operator is used to represent the
+multiplication of two adjacent symbols, i.e. <code>2x</code>. It was previously handled
+during parsing, but it is now handled during canonicalization. This allows
+more complex syntactic structures to be handled correctly, for example
+<code>f(x) := 2x</code>: previously, the left-hand-side argument would have been parsed
+as a function application, while in this case it should be interpreted as a
+function definition.</p>
+<p>A new <code>InvisibleOperator</code> function has been added to support this.</p>
+<p>The <code>applyInvisibleOperator</code> parsing option has been removed. To support
+custom invisible operators, use the <code>InvisibleOperator</code> function.</p>
+</li>
+</ul>
+<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
+<ul>
+<li><strong>#25</strong> Correctly parse chained relational operators, i.e. <code>a &lt; b &lt;= c</code></li>
+<li><strong>#126</strong> Logic operators only accepted up to two arguments.</li>
+<li><strong>#127</strong> Correctly compile <code>Log</code> with bases other than 10.</li>
+<li>Correctly parse numbers with repeating patterns but no fractional digits, i.e.
+<code>0.(1234)</code></li>
+<li>Correctly parse <code>|1+|a|+2|</code></li>
+</ul>
+<h3 id="new-features-and-improvements" tabindex="-1">New Features and Improvements</h3>
+<ul>
+<li>Function assignment can now be done with this syntax: <code>f(x) := 2x+1</code>. This
+syntax is equivalent to <code>f := x -&gt; 2x+1</code>.</li>
+<li>Implement the <code>Mod</code> and <code>Congruent</code> function.</li>
+<li>Correctly parse <code>11 \bmod 5</code> (<code>Mod</code>) and <code>26\equiv 11 \pmod5</code> (<code>Congruent</code>)</li>
+<li>Better handle empty argument lists, i.e. <code>f()</code></li>
+<li>When a function is used before being declared, infer that the symbol is a
+function, e.g. <code>f(12)</code> will infer that <code>f</code> is a function (and not a variable
+<code>f</code> multiplied by 12)</li>
+<li>When a constant is followed by some parentheses, don’t assume this is a
+function application, e.g. <code>\pi(3+n)</code> is now parsed as
+<code>[&quot;Multiply&quot;, &quot;Pi&quot;, [&quot;Add&quot;, 3, &quot;n&quot;]]</code> instead of <code>[&quot;Pi&quot;, [&quot;Add&quot;, 3, &quot;n&quot;]]</code></li>
+<li>Improved parsing of nested lists, sequences and sets.</li>
+<li>Improved error messages when syntax errors are encountered during LaTeX
+parsing.</li>
+<li>When parsing with the canonical option set to false, preserve more closely the
+original LaTeX syntax.</li>
+<li>When parsing text strings, convert some LaTeX commands to Unicode, including
+spacing commands. As a result, <code>ce.parse(&quot;\\text{dead\;beef}_{16}&quot;)</code> correctly
+gets evaluated to 3,735,928,559.</li>
+</ul>
+<h2 id="0.19.1" tabindex="-1">0.19.1</h2>
+<p><strong>Release Date:</strong> 2023-10-26</p>
+<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
+<ul>
+<li>Assigning a function to an indentifier works correctly now, i.e.</li>
+</ul>
+<pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\operatorname{f} := x \\mapsto 2x&quot;</span>).<span class="hljs-title function_">evaluate</span>();
+</code></pre>
 <h2 id="0.19.0" tabindex="-1">0.19.0</h2>
 <p><strong>Release Date:</strong> 2023-10-25</p>
-<h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>domain</code> property of the function definition <code>signature</code> is deprecated and
 replaced with the <code>params</code>, <code>optParams</code>, <code>restParam</code> and <code>result</code> properties
 instead. The <code>domain</code> property is still supported for backward compatibility,
 but will be removed in a future version.</li>
 </ul>
-<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When invoking a declared function in a numeric operation, correctly infer the
 result type.</li>
@@ -2433,7 +2489,7 @@ This is a more succinct version of <code>expr.N().valueOf()</code>.</li>
 </ul>
 <h2 id="0.18.1" tabindex="-1">0.18.1</h2>
 <p><strong>Release Date:</strong> 2023-10-16</p>
-<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Parsing of whole numbers while in <code>rational</code> mode would return incorrect
 results.</li>
@@ -2503,7 +2559,7 @@ as <code>4</code>.</li>
 </ul>
 <h2 id="0.17.0" tabindex="-1">0.17.0</h2>
 <p><strong>Release Date:</strong> 2023-10-12</p>
-<h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>Nothing</code> domain has been renamed to <code>NothingDomain</code></li>
 <li>The <code>Functions</code>, <code>Maybe</code>, <code>Sequence</code>, <code>Dictionary</code>, <code>List</code> and <code>Tuple</code> domain
@@ -2540,7 +2596,7 @@ rather than using a new scope for each invocation.</li>
 </ul>
 <h2 id="0.16.0" tabindex="-1">0.16.0</h2>
 <p><strong>Release Date:</strong> 2023-09-29</p>
-<h3 id="breaking-changes-2" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The methods <code>ce.let()</code> and <code>ce.set()</code> have been renamed to <code>ce.declare()</code> and
 <code>ce.assign()</code> respectively.</li>
@@ -2643,7 +2699,7 @@ vectors, matrixes and more.</p>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
 significantly rewritten with help from an AI-powered writing assistant.</li>
 </ul>
-<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>The LaTeX string returned in <code>[&quot;Error&quot;]</code> expression was incorrectly tagged as
 <code>Latex</code> instead of <code>LatexString</code>.</li>
@@ -2670,7 +2726,7 @@ https://cortexjs.io/compute-engine/reference/statistics/</li>
 </ul>
 <h2 id="0.14.0" tabindex="-1">0.14.0</h2>
 <p><strong>Release Date:</strong> 2023-09-13</p>
-<h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The entries in the LaTeX syntax dictionary can now have LaTeX triggers
 (<code>latexTrigger</code>) or triggers based on identifiers (<code>identifierTrigger</code>). The
@@ -2786,7 +2842,7 @@ has been updated.</li>
 </ul>
 <h2 id="0.12.6" tabindex="-1">0.12.6</h2>
 <p><strong>Release Date:</strong> 2023-09-08</p>
-<h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>New API for the <code>Parser</code> class.</li>
 </ul>
@@ -2811,7 +2867,7 @@ returned by <code>expr.numericValue</code>.</li>
 <p>Work around unpckg.com issue with libraries using BigInt.</p>
 <h2 id="0.12.0" tabindex="-1">0.12.0</h2>
 <p><strong>Release Date:</strong> 2022-11-27</p>
-<h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>expr.symbols</code> property return an array of <code>string</code>. Previously it
 returned an array of <code>BoxedExpression</code>.</li>
@@ -2826,7 +2882,7 @@ returned an array of <code>BoxedExpression</code>.</li>
 <li>Improved accuracy of some operations, for example
 <code>expr.parse(&quot;1e999 + 1&quot;).simplify()</code></li>
 </ul>
-<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When <code>ce.numericMode === &quot;auto&quot;</code>, square roots of negative numbers would
 return an expression instead of a complex number.</li>
@@ -2842,7 +2898,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 </ul>
 <h2 id="0.11.0" tabindex="-1">0.11.0</h2>
 <p><strong>Release Date:</strong> 2022-11-18</p>
-<h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The signature of <code>ce.defineSymbol()</code>, <code>ce.defineFunction()</code> and
 <code>ce.pushScope()</code> have changed</li>
@@ -2853,7 +2909,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
 specify at which stage the substitution should take place.</li>
 </ul>
-<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-6" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Some constants would return a value as bignum or complex even when the
 <code>numericMode</code> did not allow it.</li>
@@ -2864,12 +2920,12 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 </ul>
 <h2 id="0.10.0" tabindex="-1">0.10.0</h2>
 <p><strong>Release Date:</strong> 2022-11-17</p>
-<h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
 </ul>
-<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-7" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
@@ -2883,7 +2939,7 @@ when evaluating a simple polynomial in a loop.</li>
 </ul>
 <h2 id="0.9.0" tabindex="-1">0.9.0</h2>
 <p><strong>Release Date:</strong> 2022-11-15</p>
-<h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The head of a number expression is always <code>Number</code>. Use <code>expr.domain</code> to be
 get more specific info about what kind of number this is.</li>
@@ -3023,7 +3079,7 @@ rendered to LaTeX correctly, e.g. <code>V20_20</code>.</li>
 </ul>
 <h2 id="0.8.0" tabindex="-1">0.8.0</h2>
 <p><strong>Release Date:</strong> 2022-10-02</p>
-<h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
 <p>Corrected the implementation of <code>expr.toJSON()</code>, <code>expr.valueOf()</code> and added
@@ -3047,7 +3103,7 @@ affects <code>ce.numericMode</code> which now uses <code>bignum</code> instead o
 </ul>
 <h2 id="0.7.0" tabindex="-1">0.7.0</h2>
 <p><strong>Release Date:</strong> 2022-09-30</p>
-<h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
+<h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>ce.latexOptions.preserveLatex</code> default value is now <code>false</code></li>
 <li>The first argument of the <code>[&quot;Error&quot;]</code> expression (default value) has been
@@ -3289,14 +3345,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 25, 2023">
+        <meta itemprop="datePublished" content="October 30, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-30">October 30, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -2331,21 +2331,56 @@
 
 
 <h1 id="styling" tabindex="-1">Styling</h1>
-<p>The functions in this section represent a visual difference that is not usually
+<p>The functions in this section produce a visual difference that is not
 material to the interpretation of an expression such as text color and size or
 other typographic variations.</p>
-<h3 class="visually-hidden" id="Delimiter" tabindex="-1">Delimiter</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Delimiter</strong>&quot;, <em>expr</em>, <em>delim</em>]</p>
-<p>Visually group arithmetic expressions.</p>
-<p>When serializing to LaTeX, render <em>expr</em> wrapped in a delimiter.</p>
-<p><em>delim</em> is a string with the following format:</p>
-<ul>
-<li><code>_&quot;open&quot;_</code> <code>_&quot;close&quot;_</code> e.g. <code>[&quot;Delimiter&quot;, &quot;x&quot;, &quot;'()'&quot;]</code> renders as \( (x) \)</li>
-<li><code>_&quot;open&quot;_</code> <code>_&quot;close&quot;_</code> <code>_&quot;sep&quot;_</code> e.g. <code>[&quot;Delimiter&quot;, [&quot;List&quot;, 1, 2], &quot;'{},'&quot;]</code> renders as \\lbrace (1, 2\rbrace \)</li>
-</ul>
-<p>If <em>expr</em> is a <code>[&quot;List&quot;]</code> expression, serialize each element of the list, separated by <em>sep</em>.</p>
-<p>If no <em>sep</em> is provided, use a comma <code>,</code> as a separator.</p>
-<p>If no <em>open</em> and <em>close</em> strings are provided, use parentheses <code>(</code> and <code>)</code>.</p>
+<p>They are <strong>inert</strong> and the value of a <code>[&quot;Function&quot;, _expr_]</code> expression is <code>expr</code>.</p>
+<h3 class="visually-hidden" id="Delimiter" tabindex="-1">Delimiter</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Delimiter</strong>&quot;, <em>expr</em>]</p>
+<p class="signature">[&quot;<strong>Delimiter</strong>&quot;, <em>expr</em>, <em>delim</em>]</p>
+<p>Visually group expressions with an open delimiter, a close delimiter
+and separators between elements of the expression.</p>
+<p>When serializing to LaTeX, render <em>expr</em> wrapped in delimiters.</p>
 <p>The <code>Delimiter</code> function is <strong>inert</strong> and the value of a <code>[&quot;Delimiter&quot;, _expr_]</code> expression is <code>expr</code>.</p>
+<p><em>expr</em> is a function expression, usually a <code>[&quot;Sequence&quot;]</code>. It should
+not be a symbol or a number.</p>
+<p><em>delim</em> is an optional string:</p>
+<ul>
+<li>when it is a single character it is a separator</li>
+<li>when it is two characters, the first is the opening delimiter and the second is the closing delimiter</li>
+<li>when it is three characters, the first is the opening delimiter, the second is the separator, and the third is the closing delimiter</li>
+</ul>
+<p>The delimiters are rendered to LaTeX.</p>
+<p>The open and close delimiters are a single character, one of: <code>()[]{}&lt;&gt;|‖⌈⌉⌊⌋⌜⌝⌞⌟⎰⎱&quot;</code>. The open and close delimiters do not have to match.
+For example, <code>&quot;')]'&quot;</code> is a valid delimiter.</p>
+<p>If an open or close delimiter is <code>.</code>, it is ignored.</p>
+<p>The separator delimiter is also a single character, one of <code>,;.&amp;:|-</code> or <code>U+00B7</code> (middle dot), <code>U+2022</code> (bullet) or <code>U+2026</code> (ellipsis).</p>
+<p>If no <em>delim</em> is provided, a default delimiter is used based on
+the type of <em>expr</em>:</p>
+<ul>
+<li><code>[&quot;Sequence&quot;]</code> -&gt; <code>(,)</code></li>
+<li><code>[&quot;Tuple&quot;]</code>, <code>[&quot;Single&quot;]</code>, <code>[&quot;Pair&quot;]</code>, <code>[&quot;Triple&quot;]</code> -&gt; <code>(,)</code></li>
+<li><code>[&quot;List&quot;]</code> -&gt; <code>[,]</code></li>
+<li><code>[&quot;Set&quot;]</code> -&gt; <code>{,}</code></li>
+</ul>
+</div></div>
+<h3 class="visually-hidden" id="Matrix" tabindex="-1">Matrix</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Matrix</strong>&quot;, <em>matrix</em>]</p>
+<p class="signature">[&quot;<strong>Matrix</strong>&quot;, <em>matrix</em>, <em>delim</em>, <em>format</em>]</p>
+<p>The <code>Matrix</code> function is <strong>inert</strong> and the value of a <code>[&quot;Matrix&quot;, _matrix_]</code> expression is <code>matrix</code>.</p>
+<p><em>matrix</em> is a <code>[&quot;List&quot;]</code> of <code>[&quot;List&quot;]</code>s of expressions.</p>
+<p><em>delim</em> is an optional string indicating the delimiters to use. It can be
+any of the delimiters allowed by the <code>Delimiter</code> function. Note there is
+no separator delimiter for matrixes.</p>
+<p>If <em>delim</em> is not provided, the default is <code>&quot;()&quot;</code>.</p>
+<p><em>format</em> is an optional string indicating how to format the columns of the
+matrix. It can be any of the following:</p>
+<ul>
+<li><code>&quot;&lt;&quot;</code>: left aligned</li>
+<li><code>&quot;=&quot;</code>: centered</li>
+<li><code>&quot;&gt;&quot;</code>: right aligned</li>
+<li><code>&quot;|&quot;</code>: a solid vertial line</li>
+<li><code>&quot;:&quot;</code>: a dashed vertial line</li>
+</ul>
+<p>If <em>format</em> is not provided, the default is <code>&quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&quot;</code>.</p>
 </div></div>
 <h3 class="visually-hidden" id="Spacing" tabindex="-1">Spacing</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Spacing</strong>&quot;, <em>width</em>]</p>
 <p>When serializing to LaTeX,  <code>width</code>is the dimension of the spacing, in 1/18 em.</p>
@@ -2383,14 +2418,14 @@ other typographic variations.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 25, 2023">
+        <meta itemprop="datePublished" content="October 30, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-25">October 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-30">October 30, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
