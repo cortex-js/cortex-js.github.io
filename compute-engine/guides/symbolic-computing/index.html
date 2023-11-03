@@ -1546,6 +1546,32 @@
 
                 <li>
                   <a
+                    href="/compute-engine/reference/linear-algebra/"
+                    data-url="/compute-engine/guides/symbolic-computing/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Linear Algebra
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/compute-engine/reference/logic/"
                     data-url="/compute-engine/guides/symbolic-computing/"
                     class="">
@@ -2573,6 +2599,11 @@ const aPrime = ce.parse('\\frac{1}{10}', {canonical: false});
 const bPrime = ce.parse('\\frac{2}{20}', {canonical: false});
 console.log('Non-canonical isSame?', aPrime.isSame(bPrime));</pre>
 </code-playground>
+<p>In some cases you may want to compare two expressions with a weak form
+of canonicalization, for example to ignore the order of the arguments of a sum.</p>
+<p>You can achieve this by comparing the expressions in their canonical order:</p>
+<pre><code class="language-json">ce.box(<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>).isSame(<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>)
+</code></pre>
 <h3 id="mathematical-equality%3A-isequal()" tabindex="-1">Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
 problem.</p>
@@ -2692,14 +2723,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="October 30, 2023">
+        <meta itemprop="datePublished" content="November 02, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-30">October 30, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-02">November 02, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

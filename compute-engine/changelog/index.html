@@ -1500,6 +1500,32 @@
 
                 <li>
                   <a
+                    href="/compute-engine/reference/linear-algebra/"
+                    data-url="/compute-engine/changelog/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#reference"></use>
+                      </svg>
+                    
+                    Linear Algebra
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/compute-engine/reference/logic/"
                     data-url="/compute-engine/changelog/"
                     class="">
@@ -2331,6 +2357,59 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="0.21.0" tabindex="-1">0.21.0</h2>
+<p><strong>Release Date:</strong> 2023-11-02</p>
+<h3 id="new-features" tabindex="-1">New Features</h3>
+<ul>
+<li>
+<p><strong>#125</strong> Parse and serialize environemnts, i.e.
+<code>\begin{matrix} 1 &amp; 2 \\ 3 &amp; 4 \end{matrix}</code> will be parsed as
+<code>[&quot;Matrix&quot;, [&quot;List&quot;, [&quot;List&quot;, 1, 2], [&quot;List&quot;, 3, 4]]]</code>.</p>
+<p>A new section on <a href="/compute-engine/reference/linear-algebra/#formatting">Linear Algebra</a>
+has some details on the supported formats.</p>
+<p>The linear algebra operations are limited at the moment, but will be expanded
+in the future.</p>
+</li>
+<li>
+<p>Added <code>IsSame</code> function, which is the function expression corresponding to
+<code>expr.isSame()</code>.</p>
+</li>
+<li>
+<p>Added <code>CanonicalOrder</code> function, which sorts the arguments of commutative
+functions into canonical order. This is useful to compare two non-canonical
+expressions for equality.</p>
+</li>
+</ul>
+<pre><code class="language-js">ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;CanonicalOrder&quot;</span>, [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&quot;x&quot;</span>]]).<span class="hljs-title function_">isSame</span>(
+  ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;CanonicalOrder&quot;</span>, [<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-number">1</span>]])
+);
+<span class="hljs-comment">// -&gt; true</span>
+</code></pre>
+<h3 id="bug-fix" tabindex="-1">Bug Fix</h3>
+<ul>
+<li>When evaluating a sum (<code>\sum</code>) with a bound that is not a number, return the
+sum expression instead of an error.</li>
+</ul>
+<h2 id="0.20.2" tabindex="-1">0.20.2</h2>
+<p><strong>Release Date:</strong> 2023-10-31</p>
+<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
+<ul>
+<li>Fixed numerical evaluation of integrals and limits when parsed from LaTeX.</li>
+</ul>
+<pre><code class="language-json">console.info(ce.parse(&#x27;\\lim_<span class="hljs-punctuation">{</span>x \\to <span class="hljs-number">0</span><span class="hljs-punctuation">}</span> \\frac<span class="hljs-punctuation">{</span>\\sin(x)<span class="hljs-punctuation">}</span><span class="hljs-punctuation">{</span>x<span class="hljs-punctuation">}</span>&#x27;).value);
+<span class="hljs-comment">// -&gt; 1</span>
+
+console.info(ce.parse(&#x27;\\int_<span class="hljs-punctuation">{</span><span class="hljs-number">0</span><span class="hljs-punctuation">}</span>^<span class="hljs-punctuation">{</span><span class="hljs-number">2</span><span class="hljs-punctuation">}</span> x^<span class="hljs-number">2</span> dx&#x27;).value);
+<span class="hljs-comment">// -&gt; 2.6666666666666665</span>
+</code></pre>
+<h2 id="0.20.1" tabindex="-1">0.20.1</h2>
+<p><strong>Release Date:</strong> 2023-10-31</p>
+<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
+<ul>
+<li>Fixed evaluation of functions with multiple arguments</li>
+<li>Fixed compilation of some function assignments</li>
+<li>Improved serialization of function assignment</li>
+</ul>
 <h2 id="0.20.0" tabindex="-1">0.20.0</h2>
 <p><strong>Release Date:</strong> 2023-10-30</p>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
@@ -2348,7 +2427,7 @@ function definition.</p>
 custom invisible operators, use the <code>InvisibleOperator</code> function.</p>
 </li>
 </ul>
-<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li><strong>#25</strong> Correctly parse chained relational operators, i.e. <code>a &lt; b &lt;= c</code></li>
 <li><strong>#126</strong> Logic operators only accepted up to two arguments.</li>
@@ -2381,7 +2460,7 @@ gets evaluated to 3,735,928,559.</li>
 </ul>
 <h2 id="0.19.1" tabindex="-1">0.19.1</h2>
 <p><strong>Release Date:</strong> 2023-10-26</p>
-<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Assigning a function to an indentifier works correctly now, i.e.</li>
 </ul>
@@ -2396,7 +2475,7 @@ replaced with the <code>params</code>, <code>optParams</code>, <code>restParam</
 instead. The <code>domain</code> property is still supported for backward compatibility,
 but will be removed in a future version.</li>
 </ul>
-<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When invoking a declared function in a numeric operation, correctly infer the
 result type.</li>
@@ -2415,7 +2494,7 @@ return type.</p>
 The unit test case was incorrect and did not detect the problem. The unit test
 case has been fixed and the returned values are now correct.</li>
 </ul>
-<h3 id="new-features" tabindex="-1">New Features</h3>
+<h3 id="new-features-1" tabindex="-1">New Features</h3>
 <ul>
 <li>Implemented <code>Union</code> and <code>Intersection</code> of collections, for example:</li>
 </ul>
@@ -2489,7 +2568,7 @@ This is a more succinct version of <code>expr.N().valueOf()</code>.</li>
 </ul>
 <h2 id="0.18.1" tabindex="-1">0.18.1</h2>
 <p><strong>Release Date:</strong> 2023-10-16</p>
-<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Parsing of whole numbers while in <code>rational</code> mode would return incorrect
 results.</li>
@@ -2506,7 +2585,7 @@ while computing the Monte Carlo approximation.</li>
 </ul>
 <h2 id="0.18.0" tabindex="-1">0.18.0</h2>
 <p><strong>Release Date:</strong> 2023-10-16</p>
-<h3 id="new-features-1" tabindex="-1">New Features</h3>
+<h3 id="new-features-2" tabindex="-1">New Features</h3>
 <ul>
 <li>Expanded LaTeX dictionary with <code>\max</code>, <code>\min</code>, <code>\sup</code>, <code>\inf</code> and <code>\lim</code>
 functions</li>
@@ -2576,7 +2655,7 @@ arguments, instead of 1 or more arguments.</li>
 determined by the context in which it is used, or by the <code>ce.assume()</code> method.
 In some circumstances, the domain of a symbol can be <code>undefined</code>.</li>
 </ul>
-<h3 id="new-features-2" tabindex="-1">New Features</h3>
+<h3 id="new-features-3" tabindex="-1">New Features</h3>
 <ul>
 <li>Symbolic derivatives of expressions can be calculated using the <code>D</code> function.
 For example, <code>ce.box([&quot;D&quot;, ce.parse(&quot;x^2 + 3x + 1&quot;), &quot;x&quot;]).evaluate().latex</code>
@@ -2609,7 +2688,7 @@ with them. The <code>expr.freeVariables</code> property now return the identifie
 in the expression that are defined outside of the local scope and are not
 arguments of the function, if a function.</li>
 </ul>
-<h3 id="new-features-3" tabindex="-1">New Features</h3>
+<h3 id="new-features-4" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>Domain Inference</strong> when the domain of a symbol is not set explicitly (for
@@ -2699,7 +2778,7 @@ vectors, matrixes and more.</p>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
 significantly rewritten with help from an AI-powered writing assistant.</li>
 </ul>
-<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-6" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>The LaTeX string returned in <code>[&quot;Error&quot;]</code> expression was incorrectly tagged as
 <code>Latex</code> instead of <code>LatexString</code>.</li>
@@ -2816,7 +2895,7 @@ that both forms will be recognized.</p>
 </ul>
 <h2 id="0.13.0" tabindex="-1">0.13.0</h2>
 <p><strong>Release Date:</strong> 2023-09-09</p>
-<h3 id="new-features-4" tabindex="-1">New Features</h3>
+<h3 id="new-features-5" tabindex="-1">New Features</h3>
 <ul>
 <li>Some expressions can be compiled to Javascript. This is useful to evaluate an
 expression many times, for example in a loop. The compiled expression is
@@ -2882,7 +2961,7 @@ returned an array of <code>BoxedExpression</code>.</li>
 <li>Improved accuracy of some operations, for example
 <code>expr.parse(&quot;1e999 + 1&quot;).simplify()</code></li>
 </ul>
-<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-7" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When <code>ce.numericMode === &quot;auto&quot;</code>, square roots of negative numbers would
 return an expression instead of a complex number.</li>
@@ -2909,7 +2988,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
 specify at which stage the substitution should take place.</li>
 </ul>
-<h3 id="bug-fixes-6" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-8" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Some constants would return a value as bignum or complex even when the
 <code>numericMode</code> did not allow it.</li>
@@ -2925,7 +3004,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
 </ul>
-<h3 id="bug-fixes-7" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-9" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
@@ -3345,14 +3424,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="October 30, 2023">
+        <meta itemprop="datePublished" content="November 02, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-30">October 30, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-02">November 02, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
