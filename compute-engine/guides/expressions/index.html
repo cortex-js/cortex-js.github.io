@@ -2506,6 +2506,11 @@ numerator and denominator is 1, and the denominator is positive.</p>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, -3, 5]</span>
 </code></pre>
+<p>The canonical form of a rational with a denominator of 1 is an integer.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{17}{1}&quot;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ 17</span>
+</code></pre>
 <p>You can check if a non-canonical expression is a reduced (canonical) rational
 number by checking the GCD of the numerator and denominator:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> input = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{30}{50}&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>});
@@ -2514,7 +2519,7 @@ number by checking the GCD of the numerator and denominator:</p>
 ).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">value</span> === <span class="hljs-number">1</span>);
 <span class="hljs-comment">// ➔ false</span>
 </code></pre>
-<p>The canonical form of an addition or mulipication will have its arguments
+<p>The canonical form of an addition or multiplication will have its arguments
 ordered in a canonical way.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2+x+\\pi+\\sqrt2+1&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);

@@ -2419,8 +2419,8 @@ expressions.</p>
 expressions.</p>
 <p>The <code>ce.box()</code> and <code>ce.parse()</code> functions return a canonical expression by
 default, which is the desirable behavior in most cases.</p>
-<p><strong>To get a non-canonical version of an expression</strong> set the <code>canonical</code> option
-of <code>ce.parse()</code> or <code>ce.box()</code> to <code>false</code>.</p>
+<p><strong>To get a non-canonical version of an expression</strong> use
+of <code>ce.parse(s, {canonical: false})</code> or <code>ce.box(expr, {canonical: false})</code>.</p>
 <p>The non-canonical version will be closer to the literal LaTeX input, which may
 be desirable to compare a “raw” user input with an expected answer.</p>
 <pre><code class="language-js">ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;\\frac{30}{-50}&#x27;</span>);
@@ -2452,7 +2452,8 @@ ce.<span class="hljs-property">jsonSerializationOptions</span> = { <span class="
 </code></pre>
 <p>The canonical form of an expression is always the same when used with a given
 Compute Engine instance. However, do not rely on the canonical form as future
-versions of the Compute Engine could provide a different result.</p>
+versions of the Compute Engine could have a different definition of
+canonical form.</p>
 <p><strong>To check if an expression is canonical</strong> use <code>expr.isCanonical</code>.</p>
 <p><strong>To obtain the canonical representation of a non-canonical expression</strong>, use
 the <code>expr.canonical</code> property.</p>
