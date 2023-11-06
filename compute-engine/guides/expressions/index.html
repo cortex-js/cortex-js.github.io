@@ -2508,10 +2508,10 @@ numerator and denominator is 1, and the denominator is positive.</p>
 </code></pre>
 <p>You can check if a non-canonical expression is a reduced (canonical) rational
 number by checking the GCD of the numerator and denominator:</p>
-<pre><code class="language-json">const input = ce.parse(<span class="hljs-string">&quot;\\frac{30}{50}&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">{</span>canonical<span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">}</span>);
-console.info(ce.box(
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;GCD&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;NumeratorDenominator&quot;</span><span class="hljs-punctuation">,</span> input<span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
-).evaluate().value === <span class="hljs-number">1</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> input = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;\\frac{30}{50}&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>});
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">info</span>(ce.<span class="hljs-title function_">box</span>(
+  [<span class="hljs-string">&quot;GCD&quot;</span>, [<span class="hljs-string">&quot;NumeratorDenominator&quot;</span>, input]]
+).<span class="hljs-title function_">evaluate</span>().<span class="hljs-property">value</span> === <span class="hljs-number">1</span>);
 <span class="hljs-comment">// ➔ false</span>
 </code></pre>
 <p>The canonical form of an addition or mulipication will have its arguments
@@ -2817,14 +2817,14 @@ property.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 02, 2023">
+        <meta itemprop="datePublished" content="November 06, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-02">November 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-06">November 06, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

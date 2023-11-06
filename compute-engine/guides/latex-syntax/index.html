@@ -2870,8 +2870,6 @@ common math expressions.</p>
 are usually prefixed with a backslash, such as <code>\frac</code> or <code>\pm</code>. It will also
 reference MathJSON identifiers. MathJSON identifiers are usually capitalized,
 such as <code>Divide</code> or <code>PlusMinus</code> and are not prefixed with a backslash.</p>
-<p>The Compute Engine includes a default LaTeX dictionary to parse and serialize
-common math expressions.</p>
 <p><strong>To extend the LaTeX syntax</strong> update the <code>latexDictionary</code> property of the
 Compute Engine</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> ce = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComputeEngine</span>();
@@ -2900,43 +2898,89 @@ ce.<span class="hljs-property">latexDictionary</span> = [
 <span class="hljs-comment">// both arguments are integers.</span>
 <span class="hljs-comment">// ➔ [&quot;Rational&quot;, 1, 5]</span>
 </code></pre>
+<p>Do not modify the <code>ce.latexDictionary</code> array directly. Instead, create a new
+array that includes the entries from the default dictionary, and add your own
+entries. Later entries will override earlier ones, so you can replace or
+modify existing entries by providing a new definition for them.</p>
 <h3 id="latex-dictionary-entries" tabindex="-1">LaTeX Dictionary Entries</h3>
 <p>Each entry in the LaTeX dictionary is an object with the following properties:</p>
 <ul>
-<li><code>kind</code>: the kind of expression associated with this entry. Valid values are
-<code>prefix</code>, <code>postfix</code>, <code>infix</code>, <code>expression</code>, <code>function</code>, <code>symbol</code>,
-<code>environment</code> and <code>matchfix</code>. If not provided, the default is <code>expression</code>.
-The meaning of the values and how to use them is explained below.</li>
-<li><code>latexTrigger</code>: a sequence of LaTeX tokens that will trigger the entry. For
-example, <code>^{+}</code> or <code>\mathbb{D}</code>.</li>
-<li><code>identifierTrigger</code>: a string, usually wrapped in a LaTeX command, that will
-trigger the entry. For example, if <code>identifierTrigger</code> is <code>floor</code>, the LaTeX
-command <code>\mathrm{floor}</code> or <code>\operatorname{floor}</code> will trigger the entry.
-Only one of <code>latexTrigger</code> or <code>identifierTrigger</code> should be provided. If kind
-is <code>environment</code>, only <code>identifierTrigger</code> is valid. If kind is <code>matchfix</code>,
-both <code>openTrigger</code> and <code>closeTrigger</code> must be provided instead.</li>
-<li><code>parse</code>: a handler that will be invoked when the trigger is encountered in the
-LaTeX input. It will be passed a <code>parser</code> object that can be used to parse the
-input. The <code>parse</code> handler should return a MathJSON expression. The signature
-of the <code>parse</code> handler will vary depending on the <code>kind</code>. See below for more
-info about parsing.</li>
-<li><code>serialize</code>: a handler that will be invoked when the <code>expr.latex</code> property is
-read. It will be passed a <code>serializer</code> object that can be used to serialize
+<li>
+<p><code>kind</code></p>
+<p>The kind of expression associated with this entry.</p>
+<p>Valid values are <code>prefix</code>, <code>postfix</code>, <code>infix</code>, <code>expression</code>, <code>function</code>, <code>symbol</code>,
+<code>environment</code> and <code>matchfix</code>.</p>
+<p>If not provided, the default is <code>expression</code>.</p>
+<p>The meaning of the values and how to use them is explained below.</p>
+<p>Note that it is possible to provide multiple entries with the same <code>latexTrigger</code>
+or <code>identifierTrigger</code> but with different <code>kind</code> properties. For example, the
+<code>+</code> operator is both an <code>infix</code> (binary) and a <code>prefix</code> (unary) operator.</p>
+</li>
+<li>
+<p><code>latexTrigger</code></p>
+<p>A LaTeX fragment that will trigger the entry. For example, <code>^{+}</code> or <code>\mathbb{D}</code>.</p>
+</li>
+<li>
+<p><code>identifierTrigger</code></p>
+<p>A string, usually wrapped in a LaTeX command, that will trigger the entry.</p>
+<p>For example, if <code>identifierTrigger</code> is <code>floor</code>, the LaTeX
+command <code>\mathrm{floor}</code> or <code>\operatorname{floor}</code> will trigger the entry.</p>
+<p>Only one of <code>latexTrigger</code> or <code>identifierTrigger</code> should be provided.</p>
+<p>If <code>kind</code>  is <code>&quot;environment&quot;</code>, only <code>identifierTrigger</code> is valid, and it
+represents the name of the environment.</p>
+<p>If kind is <code>matchfix</code>, both <code>openTrigger</code> and <code>closeTrigger</code> must be provided instead.</p>
+</li>
+<li>
+<p><code>parse</code></p>
+<p>A handler that will be invoked when the trigger is encountered in the
+LaTeX input.</p>
+<p>It will be passed a <code>parser</code> object that can be used to parse the
+input.</p>
+<p>The <code>parse</code> handler is invoked when the preconditions for the entry are met.
+For example, an <code>infix</code> entry will only be invoked if the trigger is
+encountered in the LaTeX input and there is a left-hand side to the operator.</p>
+<p>The signature of the <code>parse</code> handler will vary depending on the <code>kind</code>.
+For example, for an entry of kind <code>infix</code> the left-hand side argument
+will be passed to the <code>parse</code> handler. See below for more info about parsing
+for each <code>kind</code>.</p>
+<p>The <code>parse</code> handler should return a MathJSON expression or <code>null</code> if the
+expression is not recognized. When <code>null</code> is returned, the Compute Engine
+Natural Parser will backtrack and attempt to find another handler that matches
+the current token. If there can be no ambiguity and the expression is not
+recognized, the <code>parse</code> handler should return an <code>[&quot;Error&quot;]</code> expression. In
+general, it is better to return <code>null</code> and let the Compute Engine Natural
+Parser attempt to find another handler that matches the current token.
+If none is found, an <code>[&quot;Error&quot;]</code> expression will be returned.</p>
+</li>
+<li>
+<p><code>serialize</code></p>
+<p>A handler that will be invoked when the <code>expr.latex</code> property is
+read. It will be passed a <code>Serializer</code> object that can be used to serialize
 the expression. The <code>serialize</code> handler should return a LaTeX string. See
-below for more info about serialization.</li>
-<li><code>name</code>: the name of the MathJSON identifier associated with this entry. If
-provided, a default <code>parse</code> handler will be used that is equivalent to:
-<code>parse: name</code>. The <code>name</code> property must be unique. However, multiple entries
+below for more info about serialization.</p>
+<p>If a <code>serialize</code> handler is provided, the <code>name</code> property must be provided as
+well.</p>
+</li>
+<li>
+<p><code>name</code></p>
+<p>The name of the MathJSON identifier associated with this entry.</p>
+<p>If provided, a default <code>parse</code> handler will be used that is equivalent to:
+<code>parse: name</code>.</p>
+<p>It is possible to have multiple definitions with the same triggers, but the
+<code>name</code> property must be unique. The record with the <code>name</code> property will be used
+to serialize the expression. A <code>serialize</code> handler is invalid if the <code>name</code>
+property is not provided.</p>
+<p>The <code>name</code> property must be unique. However, multiple entries
 can have different triggers that produce the same expression. This is useful
-for synonyms, such as <code>\operatorname{floor}</code> and <code>\lfloor</code>…<code>\rfloor</code>.</li>
+for synonyms, such as <code>\operatorname{floor}</code> and <code>\lfloor</code>…<code>\rfloor</code>.</p>
+</li>
 </ul>
 <h3 id="expressions" tabindex="-1">Expressions</h3>
 <p>The most general type of entry is one of kind <code>expression</code>. If no <code>kind</code>
 property is provided, the kind is assumed to be <code>expression</code>.</p>
 <p>For entries of kind <code>expression</code> the <code>parse</code> handler is invoked when the trigger
 is encountered in the LaTeX input. The <code>parse</code> handler is passed a <code>parser</code>
-object that can be used to parse the input. The <code>parse</code> handler should return a
-MathJSON expression.</p>
+object that can be used to parse the input.</p>
 <p>The kind <code>expression</code> is suitable for a simple symbol, for example a
 mathematical constant. It can also be used for more complex constructs, such as
 to parse a series of tokens representing an integral expression. In this case,
@@ -2947,10 +2991,11 @@ the parser will continue to look for another handler that matches the current
 token.</p>
 <h4 id="functions" tabindex="-1">Functions</h4>
 <p>The <code>function</code> kind is a special case of <code>expression</code> where the expression is a
-function, possibly using mutly-character identifiers, as in
-<code>\operatorname{concat}</code>. Unlike an <code>expression</code> entry, after the <code>parse</code> handler
-is invoked, the parser will look for a pair of parentheses to parse the
-arguments of the function and apply them to the function.</p>
+function, possibly using multi-character identifiers, as in
+<code>\operatorname{concat}</code>.</p>
+<p>Unlike an <code>expression</code> entry, after the <code>parse</code> handler is invoked, the
+parser will look for a pair of parentheses to parse the arguments of the
+function and apply them to the function.</p>
 <p>The parse handler should return the identifier corresponding to the function,
 such as <code>Concatenate</code>. As a shortcut, the <code>parse</code> handler can be provided as an
 Expression. For example:</p>
@@ -2961,8 +3006,7 @@ Expression. For example:</p>
 }
 </code></pre>
 <h4 id="operators%3A-prefix%2C-infix%2C-postfix" tabindex="-1">Operators: prefix, infix, postfix</h4>
-<p>The <code>prefix</code>, <code>infix</code> and <code>postfix</code> kinds are used for operators. The <code>parse</code>
-handler will be passed a <code>parser</code> object and the left-hand side of the operator.</p>
+<p>The <code>prefix</code>, <code>infix</code> and <code>postfix</code> kinds are used for operators.</p>
 <p>Entries for <code>prefix</code>, <code>infix</code> and <code>postfix</code> operators must include a
 <code>precedence</code> property. The <code>precedence</code> property is a number that indicates the
 precedence of the operator. The higher the number, the higher the precedence,
@@ -2973,8 +3017,6 @@ that is the more “binding” the operator is.</p>
 <p>In <code>1 + 2 * 3</code>, the <code>Multiply</code> operator has a <strong>higher</strong> precedence than the
 <code>Add</code> operator, so it is applied first.</p>
 <p>The precedence range is an integer from 0 to 1000.</p>
-<p>The larger the number, the higher the precedence, the more “binding” the
-operator is.</p>
 <p>Here are some rough ranges for the precedence:</p>
 <ul>
 <li>800: prefix and postfix operators: <code>\lnot</code> etc…
@@ -3009,12 +3051,10 @@ operator is.</p>
 <li>0: <code>,</code>, <code>;</code>, etc…</li>
 </ul>
 <p>The <code>infix</code> kind is used for binary operators (operators with a left-hand-side
-and right-hand-side). The <code>parse</code> handler will be passed a <code>parser</code> object and
-the left-hand side of the operator, for <code>postfix</code> and <code>infix</code> operators. The
-<code>parser</code> object can be used to parse the right-hand side of the expression. The
-<code>parse</code> handler should return a MathJSON expression or <code>null</code> if the operator is
-not recognized, or the left-hand side or right-hand side of the operator is not
-valid.</p>
+and right-hand-side).</p>
+<p>The <code>parse</code> handler will be passed a <code>parser</code> object and
+the left-hand side of the operator, for <code>postfix</code> and <code>infix</code> operators.</p>
+<p>The <code>parser</code> object can be used to parse the right-hand side of the expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;infix&quot;</span>,
   <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\oplus&#x27;</span>,
@@ -3024,9 +3064,8 @@ valid.</p>
   },
 }
 </code></pre>
-<p>The <code>prefix</code> kind is used for unary operators. The <code>parse</code> handler will be
-passed a <code>parser</code> object. The <code>parse</code> handler should return a MathJSON
-expression.</p>
+<p>The <code>prefix</code> kind is used for unary operators.</p>
+<p>The <code>parse</code> handler will be passed a <code>parser</code> object.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;prefix&quot;</span>,
   <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\neg&#x27;</span>,
@@ -3037,8 +3076,7 @@ expression.</p>
 }
 </code></pre>
 <p>The <code>postfix</code> kind is used for postfix operators. The <code>parse</code> handler will be
-passed a <code>parser</code> object and the left-hand side of the operator. The <code>parse</code>
-handler should return a MathJSON expression.</p>
+passed a <code>parser</code> object and the left-hand side of the operator.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;postfix&quot;</span>,
   <span class="hljs-attr">latexTrigger</span>: <span class="hljs-string">&#x27;\\!&#x27;</span>,
@@ -3048,11 +3086,12 @@ handler should return a MathJSON expression.</p>
 }
 </code></pre>
 <h4 id="environment" tabindex="-1">Environment</h4>
-<p>The <code>environment</code> kind is used for LaTeX environments. The <code>identifierTrigger</code>
-property in that case is the name of the environment. The <code>parse</code> handler will
-be passed a <code>parser</code> object. The <code>parseTabular()</code> method can be used to parse
-the rows and columns of the environment. It returns a two dimensional array of
-expressions. The <code>parse</code> handler should return a MathJSON expression.</p>
+<p>The <code>environment</code> kind is used for LaTeX environments.</p>
+<p>The `identifierTrigger property in that case is the name of the environment.</p>
+<p>The <code>parse</code> handler wil be passed a <code>parser</code> object. The <code>parseTabular()</code>
+method can be used to parse the rows and columns of the environment. It
+returns a two dimensional array of expressions.</p>
+<p>The <code>parse</code> handler should return a MathJSON expression.</p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;environment&quot;</span>,
   <span class="hljs-attr">identifierTrigger</span>: <span class="hljs-string">&quot;matrix&quot;</span>,
@@ -3064,7 +3103,8 @@ expressions. The <code>parse</code> handler should return a MathJSON expression.
 </code></pre>
 <h4 id="matchfix" tabindex="-1">Matchfix</h4>
 <p>The <code>matchfix</code> kind is used for LaTeX commands that are used to enclose an
-expression. The <code>openTrigger</code> and <code>closeTrigger</code> indicate the LaTeX commands
+expression.</p>
+<p>The <code>openTrigger</code> and <code>closeTrigger</code> indicate the LaTeX commands
 that enclose the expression. The <code>parse</code> handler is passed a <code>parser</code> object and
 the “body” (the expression between the open and close delimiters). The <code>parse</code>
 handler should return a MathJSON expression.</p>
@@ -3268,14 +3308,14 @@ mathfields in the document:</p>
         
 
 
-        <meta itemprop="datePublished" content="November 02, 2023">
+        <meta itemprop="datePublished" content="November 06, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-02">November 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-06">November 06, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

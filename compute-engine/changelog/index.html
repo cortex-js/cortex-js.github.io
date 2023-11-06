@@ -2357,16 +2357,27 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h3 id="new-features" tabindex="-1">New Features</h3>
+<ul>
+<li>Implemented some linear algebra functions: <code>Rank</code>, <code>Shape</code>,<code>Reshape</code>,
+<code>Flatten</code>, <code>Determinant</code>, <code>Trace</code>, <code>Transpose</code>, <code>ConjugateTranspose</code>,
+<code>Inverse</code>. See the
+<a href="https://cortexjs.io/compute-engine/reference/linear-algebra/">Linear Algebra</a>
+reference guide.</li>
+<li>Added a <code>expr.print()</code> method as a synonym for <code>console.log(expr.toString())</code>.</li>
+</ul>
 <h2 id="0.21.0" tabindex="-1">0.21.0</h2>
 <p><strong>Release Date:</strong> 2023-11-02</p>
-<h3 id="new-features" tabindex="-1">New Features</h3>
+<h3 id="new-features-1" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>#125</strong> Parse and serialize environemnts, i.e.
 <code>\begin{matrix} 1 &amp; 2 \\ 3 &amp; 4 \end{matrix}</code> will be parsed as
 <code>[&quot;Matrix&quot;, [&quot;List&quot;, [&quot;List&quot;, 1, 2], [&quot;List&quot;, 3, 4]]]</code>.</p>
-<p>A new section on <a href="/compute-engine/reference/linear-algebra/#formatting">Linear Algebra</a>
-has some details on the supported formats.</p>
+<p>A new section on
+<a href="/compute-engine/reference/linear-algebra/#formatting">Linear Algebra</a> has
+some details on the supported formats.</p>
 <p>The linear algebra operations are limited at the moment, but will be expanded
 in the future.</p>
 </li>
@@ -2494,7 +2505,7 @@ return type.</p>
 The unit test case was incorrect and did not detect the problem. The unit test
 case has been fixed and the returned values are now correct.</li>
 </ul>
-<h3 id="new-features-1" tabindex="-1">New Features</h3>
+<h3 id="new-features-2" tabindex="-1">New Features</h3>
 <ul>
 <li>Implemented <code>Union</code> and <code>Intersection</code> of collections, for example:</li>
 </ul>
@@ -2585,7 +2596,7 @@ while computing the Monte Carlo approximation.</li>
 </ul>
 <h2 id="0.18.0" tabindex="-1">0.18.0</h2>
 <p><strong>Release Date:</strong> 2023-10-16</p>
-<h3 id="new-features-2" tabindex="-1">New Features</h3>
+<h3 id="new-features-3" tabindex="-1">New Features</h3>
 <ul>
 <li>Expanded LaTeX dictionary with <code>\max</code>, <code>\min</code>, <code>\sup</code>, <code>\inf</code> and <code>\lim</code>
 functions</li>
@@ -2655,7 +2666,7 @@ arguments, instead of 1 or more arguments.</li>
 determined by the context in which it is used, or by the <code>ce.assume()</code> method.
 In some circumstances, the domain of a symbol can be <code>undefined</code>.</li>
 </ul>
-<h3 id="new-features-3" tabindex="-1">New Features</h3>
+<h3 id="new-features-4" tabindex="-1">New Features</h3>
 <ul>
 <li>Symbolic derivatives of expressions can be calculated using the <code>D</code> function.
 For example, <code>ce.box([&quot;D&quot;, ce.parse(&quot;x^2 + 3x + 1&quot;), &quot;x&quot;]).evaluate().latex</code>
@@ -2688,7 +2699,7 @@ with them. The <code>expr.freeVariables</code> property now return the identifie
 in the expression that are defined outside of the local scope and are not
 arguments of the function, if a function.</li>
 </ul>
-<h3 id="new-features-4" tabindex="-1">New Features</h3>
+<h3 id="new-features-5" tabindex="-1">New Features</h3>
 <ul>
 <li>
 <p><strong>Domain Inference</strong> when the domain of a symbol is not set explicitly (for
@@ -2895,7 +2906,7 @@ that both forms will be recognized.</p>
 </ul>
 <h2 id="0.13.0" tabindex="-1">0.13.0</h2>
 <p><strong>Release Date:</strong> 2023-09-09</p>
-<h3 id="new-features-5" tabindex="-1">New Features</h3>
+<h3 id="new-features-6" tabindex="-1">New Features</h3>
 <ul>
 <li>Some expressions can be compiled to Javascript. This is useful to evaluate an
 expression many times, for example in a loop. The compiled expression is
@@ -3424,14 +3435,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="November 02, 2023">
+        <meta itemprop="datePublished" content="November 06, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-02">November 02, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-06">November 06, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
