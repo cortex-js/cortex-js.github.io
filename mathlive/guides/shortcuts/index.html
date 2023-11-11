@@ -167,11 +167,15 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
                 <a href="https://discord.gg/yhmvVeJ4Hd" ><svg class="icon1quarterem" role="img"><title>Discord</title><use xlink:href="/assets/icons.svg#discord"></use></svg></a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" ><svg class="icon1quarterem" role="img"><title>ChatGPT Assistant</title><use xlink:href="/assets/icons.svg#openai"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2177,7 +2181,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discussion Forum
+                    Gitter Forum
                   </a>
                 </li>
               
@@ -2204,6 +2208,32 @@
                       </svg>
                     
                     Discord
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant"
+                    data-url="/mathlive/guides/shortcuts/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#openai"></use>
+                      </svg>
+                    
+                    ChatGPT Assistant
                   </a>
                 </li>
               
@@ -2425,7 +2455,7 @@ keyboard that triggers a command.</p>
 <p>For example, pressing the <kbd>Alt/Option/⌥</kbd> key and the <kbd>V</kbd> key at the
 same time will insert a square root. Pressing the <kbd>Control/Command/⌘</kbd>
 key and the <kbd>Z</kbd> key at the same time will undo the last command.</p>
-<p>MathLive has an extensive set of <a href="https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts">default key bindings</a>.</p>
+<p>MathLive has an extensive set of <a href="/mathlive/reference/keybindings">default key bindings</a>.</p>
 <p><strong>To override, customize or add to the list of supported key bindings</strong>, set
 the <code>keybindings</code> property on a mathfield element.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> mf = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;mf&#x27;</span>);
@@ -2452,25 +2482,25 @@ replaced with an implicit argument to the left of the caret. For example, for
 <li><code>#?</code>: replaced with a <code>\placeholder{}</code> expression</li>
 </ul>
 <h3 id="international-keyboards" tabindex="-1">International Keyboards</h3>
-<p>Correctly handling keyboard shortcuts while accounting for international
+<p>Correctly handling keyboard shortcuts while accounting for non-US
 keyboard layout is surprisingly difficult. MathLive uses some heuristics that
-may occasionally result in a surprising result.</p>
+may occasionally result in surprising results.</p>
 <p>This section details how MathLive uses keyboard events to determine which
 keyboard shortcut to activate.</p>
 <p>Let’s consider the keyboard shortcut <kbd>Control/⌘</kbd>+<kbd>Alt/Option</kbd>+<kbd>A</kbd></p>
-<p>When the user presses this key combination on a keyboard with a US keyboard
+<p>When this key combination is pressed on a keyboard with a US keyboard
 layout, the event received will have the properties <code>code = &quot;KeyA&quot;</code> and  <code>key = &quot;\u00e5&quot;</code>.</p>
 <p>On a French AZERTY keyboard layout, the event received will have <code>code = &quot;KeyQ&quot;</code> and  <code>key = &quot;\u00e6&quot;</code>.</p>
 <p>Why is the code <code>KeyQ</code> even though the user pressed the key labeled <code>A</code> on their
-AZERTY keyboard? On this keyboard layout, the Q and A keys are swapped compared
+AZERTY keyboard? On this keyboard layout, the <strong>Q</strong> and <strong>A</strong> keys are swapped compared
 to the US layout and the <code>code</code> property reflects the “physical” key pressed.</p>
 <p>This is not unusual. While some keys retain their positions, many keys are
 swapped around or altogether unique in some layouts, particularly for
 punctuations and symbols. The code property of the event does not
 represent the label of the key, but indicates the physical position of the key
 as if it was on a US keyboard, in this case “the key immediately to the right of
-the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
-French keyboard”.</p>
+the caps lock key, which is labeled <strong>Q</strong> on a US keyboard (but is labeled <strong>A</strong> on a
+French keyboard)”.</p>
 <p>What we want to know is that the user pressed a key labeled <kbd>A</kbd>. But none of the
 information in the event record tells us that. The value of the key field varies
 depending on the keyboard layout and the modifiers pressed.</p>
@@ -2633,14 +2663,14 @@ represent mathematical symbols and expressions.</p>
         
 
 
-        <meta itemprop="datePublished" content="October 04, 2023">
+        <meta itemprop="datePublished" content="November 09, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-09">November 09, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2719,7 +2749,7 @@ whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
     
     <li>
       <a href="/forum/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
       >
     </li>
      
@@ -2728,6 +2758,14 @@ whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
     <li>
       <a href="https://discord.gg/yhmvVeJ4Hd" rel="nofollow noopener noreferrer"
           ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#discord"></use></svg>Discord</a
+      >
+    </li>
+     
+     
+    
+    <li>
+      <a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#openai"></use></svg>AI Assistant</a
       >
     </li>
      

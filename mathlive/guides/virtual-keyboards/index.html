@@ -167,11 +167,15 @@
               </li>
               
               <li class="masthead__menu-item ">
-                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Discussion Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
+                <a href="/forum/" ><svg class="icon1quarterem" role="img"><title>Gitter Forum</title><use xlink:href="/assets/icons.svg#gitter"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
                 <a href="https://discord.gg/yhmvVeJ4Hd" ><svg class="icon1quarterem" role="img"><title>Discord</title><use xlink:href="/assets/icons.svg#discord"></use></svg></a>
+              </li>
+              
+              <li class="masthead__menu-item ">
+                <a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" ><svg class="icon1quarterem" role="img"><title>ChatGPT Assistant</title><use xlink:href="/assets/icons.svg#openai"></use></svg></a>
               </li>
               
               <li class="masthead__menu-item ">
@@ -2177,7 +2181,7 @@
                         <use xlink:href="/assets/icons.svg#gitter"></use>
                       </svg>
                     
-                    Discussion Forum
+                    Gitter Forum
                   </a>
                 </li>
               
@@ -2204,6 +2208,32 @@
                       </svg>
                     
                     Discord
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant"
+                    data-url="/mathlive/guides/virtual-keyboards/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#openai"></use>
+                      </svg>
+                    
+                    ChatGPT Assistant
                   </a>
                 </li>
               
@@ -2410,7 +2440,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#controlling-when-the-virtual-keyboard-is-displayed">Controlling when the Virtual Keyboard is Displayed</a></li><li><a href="#controlling-the-virtual-toggle-visibility">Controlling the Virtual Toggle Visibility</a></li><li><a href="#customizing-the-size-of-the-keyboard">Customizing the Size of the Keyboard</a></li><li><a href="#customizing-the-layouts">Customizing the Layouts</a></li><li><a href="#additional-layouts">Additional Layouts</a><ol><li><a href="#minimalist-layout">Minimalist Layout</a></li><li><a href="#compact-layout">Compact Layout</a></li><li><a href="#numeric-only-layout">Numeric Only Layout</a></li></ol></li><li><a href="#defining-custom-layouts">Defining Custom Layouts</a><ol><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-shortcuts">Keycap Shortcuts</a></li><li><a href="#advanced-keycaps">Advanced Keycaps</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#layer-styling">Layer Styling</a></li><li><a href="#multiple-layers">Multiple Layers</a></li><li><a href="#multiple-layouts">Multiple Layouts</a></li></ol></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li></ol></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-alphabetical-layout">Customizing the Alphabetical Layout</a><ol><li><a href="#qwertz-layout">QWERTZ Layout</a></li><li><a href="#azerty-layout">AZERTY Layout</a></li><li><a href="#dvorak-layout">DVORAK Layout</a></li></ol></li></ol>
+        <ol><li><a href="#controlling-when-the-virtual-keyboard-is-displayed">Controlling when the Virtual Keyboard is Displayed</a></li><li><a href="#controlling-the-virtual-toggle-visibility">Controlling the Virtual Toggle Visibility</a></li><li><a href="#customizing-the-layouts">Customizing the Layouts</a><ol><li><a href="#different-layouts-for-multiple-mathfields">Different Layouts for Multiple Mathfields</a></li></ol></li><li><a href="#additional-layouts">Additional Layouts</a><ol><li><a href="#minimalist-layout">Minimalist Layout</a></li><li><a href="#compact-layout">Compact Layout</a></li><li><a href="#numeric-only-layout">Numeric Only Layout</a></li></ol></li><li><a href="#defining-custom-layouts">Defining Custom Layouts</a><ol><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-shortcuts">Keycap Shortcuts</a></li><li><a href="#advanced-keycaps">Advanced Keycaps</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#layer-styling">Layer Styling</a></li><li><a href="#multiple-layers">Multiple Layers</a></li><li><a href="#multiple-layouts">Multiple Layouts</a></li></ol></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-size-of-the-keyboard">Customizing the Size of the Keyboard</a></li></ol></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-alphabetical-layout">Customizing the Alphabetical Layout</a><ol><li><a href="#qwertz-layout">QWERTZ Layout</a></li><li><a href="#azerty-layout">AZERTY Layout</a></li><li><a href="#dvorak-layout">DVORAK Layout</a></li></ol></li></ol>
       </div>
       
                               
@@ -2437,7 +2467,6 @@ other, not both).</p>
 <thead>
 <tr>
 <th style="text-align:left"><code>mathVirtualKeyboardPolicy</code></th>
-<th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
@@ -2473,88 +2502,13 @@ can be modified, that is when it’s not read-only or disabled.</p>
   }
 }
 </code></pre>
-<h2 id="customizing-the-size-of-the-keyboard" tabindex="-1">Customizing the Size of the Keyboard</h2>
-<p>By default the virtual keyboard is sized so that it can be used comfortably
-on touch-devices. Its size will adjust based on the available space in the
-viewport.</p>
-<p>However, you may want to have a more compact virtual keyboard to leave more
-room for the content. You can control the appearance of the virtual keyboard
-using some CSS variables. Set those variables in a rule that applies to
-the entire document, for example the <code>body</code> element selector.</p>
-<pre><code class="language-css"><span class="hljs-selector-tag">body</span> {
-  <span class="hljs-attr">--keycap-height</span>: <span class="hljs-number">24px</span>;
-  <span class="hljs-attr">--keycap-font-size</span>: <span class="hljs-number">16px</span>;
-  <span class="hljs-attr">--keycap-shift-font-size</span>: <span class="hljs-number">9px</span>;
-  <span class="hljs-attr">--keycap-small-font-size</span>: <span class="hljs-number">9px</span>;
-  <span class="hljs-attr">--keycap-extra-small-font-size</span>: <span class="hljs-number">9px</span>;
-  <span class="hljs-attr">--keyboard-toolbar-font-size</span>: <span class="hljs-number">16px</span>;
-  <span class="hljs-attr">--keycap-gap</span>: <span class="hljs-number">1px</span>;
-}
-</code></pre>
-<p>The following CSS variables can be used to adjust the layout:</p>
-<ul>
-<li>
-<p><code>--keycap-height</code></p>
-</li>
-<li>
-<p><code>--keycap-max-width</code></p>
-</li>
-<li>
-<p><code>--keycap-gap</code></p>
-</li>
-<li>
-<p><code>--keycap-font-size</code></p>
-</li>
-<li>
-<p><code>--keycap-shift-font-size</code></p>
-</li>
-<li>
-<p><code>--keycap-small-font-size</code></p>
-</li>
-<li>
-<p><code>--keycap-extra-small-font-size</code></p>
-</li>
-<li>
-<p><code>--keycap-secondary-border-bottom</code></p>
-</li>
-<li>
-<p><code>--keycap-secondary-border-bottom</code></p>
-</li>
-<li>
-<p><code>--keyboard-toolbar-font-size</code></p>
-</li>
-<li>
-<p><code>--keyboard-padding-horizontal</code></p>
-</li>
-<li>
-<p><code>--keyboard-padding-top</code></p>
-</li>
-<li>
-<p><code>--keyboard-padding-bottom</code></p>
-</li>
-<li>
-<p><code>--keyboard-row-padding-left</code></p>
-</li>
-<li>
-<p><code>--keyboard-row-padding-right</code></p>
-</li>
-<li>
-<p><code>--variant-keycap-length</code></p>
-</li>
-<li>
-<p><code>--variant-keycap-font-size</code></p>
-</li>
-<li>
-<p><code>--variant-keycap-aside-font-size</code></p>
-</li>
-</ul>
 <h2 id="customizing-the-layouts" tabindex="-1">Customizing the Layouts</h2>
 <p>The virtual keyboard panel displays multiple layouts which can be
 toggled using the layout switcher: <code>numeric</code>, <code>symbols</code>, <code>alphabetic</code>
 and <code>greek</code>.</p>
 <p><strong>To choose which layouts are listed in the layout switcher</strong>, use the
 <code>mathVirtualKeyboard.layouts</code> property.</p>
-<p>For example, to only show the numeric and symbols layouts, use:</p>
+<p>For example, to only show the <strong>numeric</strong> and <strong>symbols</strong> layouts, use:</p>
 <code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
@@ -2574,8 +2528,23 @@ document.querySelector('math-field').
   });</pre>
 </code-playground>
 <hr>
-<p>To revert to the default layouts, use:</p>
+<p><strong>To revert to the default layouts</strong>, use:</p>
 <pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = <span class="hljs-string">&quot;default&quot;</span>;
+</code></pre>
+<h3 id="different-layouts-for-multiple-mathfields" tabindex="-1">Different Layouts for Multiple Mathfields</h3>
+<p>There is a single instance of the virtual keyboard panel, shared by all
+mathfields. The layouts are shared by all mathfields as well.</p>
+<p><strong>To display a different set of layouts for a specific mathfield</strong>, change the
+<code>mathVirtualKeyboardLayouts</code> property of the mathfield when it is focused.</p>
+<pre><code class="language-js"><span class="hljs-comment">// Layout for mathfield mf1</span>
+mf1.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;focusin&quot;</span>, <span class="hljs-function">() =&gt;</span> {
+  mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [<span class="hljs-string">&quot;numeric&quot;</span>, <span class="hljs-string">&quot;symbols&quot;</span>];
+});
+
+<span class="hljs-comment">// Layout for mathfield mf2</span>
+mf2.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;focusin&quot;</span>, <span class="hljs-function">() =&gt;</span> {
+  mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [<span class="hljs-string">&quot;minimalist&quot;</span>];
+});
 </code></pre>
 <h2 id="additional-layouts" tabindex="-1">Additional Layouts</h2>
 <p>In addition to <code>numeric</code>, <code>symbols</code>, <code>alphabetic</code> and <code>greek</code>, the
@@ -2969,6 +2938,81 @@ value of the following CSS variables to a CSS color:</p>
 <li><code>--keyboard-border</code></li>
 <li><code>--keyboard-horizontal-rule</code></li>
 </ul>
+<h3 id="customizing-the-size-of-the-keyboard" tabindex="-1">Customizing the Size of the Keyboard</h3>
+<p>By default the virtual keyboard is sized so that it can be used comfortably
+on touch-devices. Its size will adjust based on the available space in its
+container, which is the viewport by default.</p>
+<p>However, you may want to have a more compact virtual keyboard to leave more
+room for the content. You can control the appearance of the virtual keyboard
+using some CSS variables. Set those variables in a rule that applies to
+the entire document, for example the <code>body</code> element selector.</p>
+<pre><code class="language-css"><span class="hljs-selector-tag">body</span> {
+  <span class="hljs-attr">--keycap-height</span>: <span class="hljs-number">24px</span>;
+  <span class="hljs-attr">--keycap-font-size</span>: <span class="hljs-number">16px</span>;
+  <span class="hljs-attr">--keycap-shift-font-size</span>: <span class="hljs-number">9px</span>;
+  <span class="hljs-attr">--keycap-small-font-size</span>: <span class="hljs-number">9px</span>;
+  <span class="hljs-attr">--keycap-extra-small-font-size</span>: <span class="hljs-number">9px</span>;
+  <span class="hljs-attr">--keyboard-toolbar-font-size</span>: <span class="hljs-number">16px</span>;
+  <span class="hljs-attr">--keycap-gap</span>: <span class="hljs-number">1px</span>;
+}
+</code></pre>
+<p>The following CSS variables can be used to adjust the layout:</p>
+<ul>
+<li>
+<p><code>--keycap-height</code></p>
+</li>
+<li>
+<p><code>--keycap-max-width</code></p>
+</li>
+<li>
+<p><code>--keycap-gap</code></p>
+</li>
+<li>
+<p><code>--keycap-font-size</code></p>
+</li>
+<li>
+<p><code>--keycap-shift-font-size</code></p>
+</li>
+<li>
+<p><code>--keycap-small-font-size</code></p>
+</li>
+<li>
+<p><code>--keycap-extra-small-font-size</code></p>
+</li>
+<li>
+<p><code>--keycap-secondary-border-bottom</code></p>
+</li>
+<li>
+<p><code>--keycap-secondary-border-bottom</code></p>
+</li>
+<li>
+<p><code>--keyboard-toolbar-font-size</code></p>
+</li>
+<li>
+<p><code>--keyboard-padding-horizontal</code></p>
+</li>
+<li>
+<p><code>--keyboard-padding-top</code></p>
+</li>
+<li>
+<p><code>--keyboard-padding-bottom</code></p>
+</li>
+<li>
+<p><code>--keyboard-row-padding-left</code></p>
+</li>
+<li>
+<p><code>--keyboard-row-padding-right</code></p>
+</li>
+<li>
+<p><code>--variant-keycap-length</code></p>
+</li>
+<li>
+<p><code>--variant-keycap-font-size</code></p>
+</li>
+<li>
+<p><code>--variant-keycap-aside-font-size</code></p>
+</li>
+</ul>
 <h2 id="preventing-input-from-the-physical-keyboard" tabindex="-1">Preventing Input from the Physical Keyboard</h2>
 <p><strong>To require the virtual keyboard to be used for input and ignore
 keys pressed on the physical keyboard</strong> listen and <code>preventDefault()</code> on <code>&quot;keydown&quot;</code>
@@ -3059,14 +3103,14 @@ document.querySelector('math-field').addEventListener('focus', () => {
         
 
 
-        <meta itemprop="datePublished" content="October 04, 2023">
+        <meta itemprop="datePublished" content="November 09, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-10-04">October 04, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-09">November 09, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -3088,7 +3132,7 @@ document.querySelector('math-field').addEventListener('focus', () => {
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#controlling-when-the-virtual-keyboard-is-displayed">Controlling when the Virtual Keyboard is Displayed</a></li><li><a href="#controlling-the-virtual-toggle-visibility">Controlling the Virtual Toggle Visibility</a></li><li><a href="#customizing-the-size-of-the-keyboard">Customizing the Size of the Keyboard</a></li><li><a href="#customizing-the-layouts">Customizing the Layouts</a></li><li><a href="#additional-layouts">Additional Layouts</a><ol><li><a href="#minimalist-layout">Minimalist Layout</a></li><li><a href="#compact-layout">Compact Layout</a></li><li><a href="#numeric-only-layout">Numeric Only Layout</a></li></ol></li><li><a href="#defining-custom-layouts">Defining Custom Layouts</a><ol><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-shortcuts">Keycap Shortcuts</a></li><li><a href="#advanced-keycaps">Advanced Keycaps</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#layer-styling">Layer Styling</a></li><li><a href="#multiple-layers">Multiple Layers</a></li><li><a href="#multiple-layouts">Multiple Layouts</a></li></ol></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li></ol></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-alphabetical-layout">Customizing the Alphabetical Layout</a><ol><li><a href="#qwertz-layout">QWERTZ Layout</a></li><li><a href="#azerty-layout">AZERTY Layout</a></li><li><a href="#dvorak-layout">DVORAK Layout</a></li></ol></li></ol>
+        <ol><li><a href="#controlling-when-the-virtual-keyboard-is-displayed">Controlling when the Virtual Keyboard is Displayed</a></li><li><a href="#controlling-the-virtual-toggle-visibility">Controlling the Virtual Toggle Visibility</a></li><li><a href="#customizing-the-layouts">Customizing the Layouts</a><ol><li><a href="#different-layouts-for-multiple-mathfields">Different Layouts for Multiple Mathfields</a></li></ol></li><li><a href="#additional-layouts">Additional Layouts</a><ol><li><a href="#minimalist-layout">Minimalist Layout</a></li><li><a href="#compact-layout">Compact Layout</a></li><li><a href="#numeric-only-layout">Numeric Only Layout</a></li></ol></li><li><a href="#defining-custom-layouts">Defining Custom Layouts</a><ol><li><a href="#placeholder-tokens">Placeholder Tokens</a></li><li><a href="#keycap-shortcuts">Keycap Shortcuts</a></li><li><a href="#advanced-keycaps">Advanced Keycaps</a></li><li><a href="#keycap-variants">Keycap Variants</a></li><li><a href="#layer-styling">Layer Styling</a></li><li><a href="#multiple-layers">Multiple Layers</a></li><li><a href="#multiple-layouts">Multiple Layouts</a></li></ol></li><li><a href="#customizing-the-appearance-of-the-virtual-keyboard">Customizing the Appearance of the Virtual Keyboard</a><ol><li><a href="#customizing-the-virtual-keyboard-stack-order">Customizing the Virtual Keyboard Stack Order</a></li><li><a href="#customizing-the-virtual-keyboard-colors">Customizing the Virtual Keyboard Colors</a></li><li><a href="#customizing-the-size-of-the-keyboard">Customizing the Size of the Keyboard</a></li></ol></li><li><a href="#preventing-input-from-the-physical-keyboard">Preventing Input from the Physical Keyboard</a></li><li><a href="#displaying-the-virtual-keyboard-in-a-custom-container">Displaying the Virtual Keyboard in a Custom Container</a></li><li><a href="#customizing-the-alphabetical-layout">Customizing the Alphabetical Layout</a><ol><li><a href="#qwertz-layout">QWERTZ Layout</a></li><li><a href="#azerty-layout">AZERTY Layout</a></li><li><a href="#dvorak-layout">DVORAK Layout</a></li></ol></li></ol>
       </div>
     
                             
@@ -3122,7 +3166,7 @@ document.querySelector('math-field').addEventListener('focus', () => {
     
     <li>
       <a href="/forum/" rel="nofollow noopener noreferrer"
-          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Discussion Forum</a
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#gitter"></use></svg>Gitter Forum</a
       >
     </li>
      
@@ -3131,6 +3175,14 @@ document.querySelector('math-field').addEventListener('focus', () => {
     <li>
       <a href="https://discord.gg/yhmvVeJ4Hd" rel="nofollow noopener noreferrer"
           ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#discord"></use></svg>Discord</a
+      >
+    </li>
+     
+     
+    
+    <li>
+      <a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" rel="nofollow noopener noreferrer"
+          ><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#openai"></use></svg>AI Assistant</a
       >
     </li>
      
