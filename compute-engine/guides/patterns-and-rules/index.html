@@ -7,9 +7,9 @@
 
 
 <title>
-    CortexJS
+    CortexJS - Scientific Computing and Math for the Web
 </title>
-<meta name="description" content="" />
+<meta name="description" content="CortexJS: Enhancing scientific computing with user-friendly MathLive for easy math input, MathJSON for web-native formats, and a versatile Compute Engine for symbolic and numerical math evaluations" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -21,7 +21,7 @@
 </script>
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS - Scientific Computing and Math for the Web Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -2418,7 +2418,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#wildcards">Wildcards</a></li><li><a href="#patterns">Patterns</a></li><li><a href="#matching-an-expression-to-a-pattern">Matching an Expression to a Pattern</a></li><li><a href="#substitution">Substitution</a></li><li><a href="#comparing">Comparing</a></li><li><a href="#applying-rewrite-rules">Applying Rewrite Rules</a></li></ol>
+        <ol><li><a href="#wildcards">Wildcards</a></li><li><a href="#patterns">Patterns</a></li><li><a href="#matching-an-expression-to-a-pattern">Matching an Expression to a Pattern</a></li><li><a href="#substitution">Substitution</a></li><li><a href="#matching-patterns">Matching Patterns</a></li><li><a href="#applying-rewrite-rules">Applying Rewrite Rules</a></li></ol>
       </div>
       
                               
@@ -2439,9 +2439,10 @@ corresponding position. It is useful to capture the arguments of a function.</p>
 <p>The <code>&quot;___&quot;</code> wildcard matches any sequence of 0 or more expressions in its
 corresponding position.</p>
 <p>A wildcard symbol may include a name which is used to <em>capture</em> the matching
-expression. When using a named wildcard, all instances of the named wildcard
-must match. In contrast, an un-named wildcard (a universal wildcard such as
-<code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple times to match different values.</p>
+expression, for example <code>_1</code> or <code>_a</code>. When using a named wildcard, all
+instances of the named wildcard must match. In contrast, an un-named wildcard
+(a universal wildcard such as <code>&quot;_&quot;</code> <code>&quot;__&quot;</code> or <code>&quot;___&quot;</code>) can be used multiple
+times to match different values.</p>
 </section>
 <section id="patterns">
 <h2 id="patterns" tabindex="-1">Patterns</h2>
@@ -2456,7 +2457,7 @@ that replacing the wildcards with those values match the expression. This set of
 values is called a <strong>substitution</strong>.</p>
 <p>For example, the pattern <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code> becomes the expression
 <code>[&quot;Add&quot;, 3, &quot;x&quot;]</code> by replacing the wildcard <code>&quot;_c&quot;</code> with <code>&quot;x&quot;</code>. The substitution
-is <code>{&quot;c&quot; : &quot;x&quot;}</code>.</p>
+is <code>{_c : &quot;x&quot;}</code>.</p>
 <p>On the other hand, the expression <code>[&quot;Divide&quot;, &quot;x&quot;, 2]</code> does not match the
 pattern <code>[&quot;Add&quot;, 3, &quot;_c&quot;]</code>: no substitution exists to transform the expression
 into the pattern by replacing the wildcards.</p>
@@ -2496,11 +2497,11 @@ match, it returns <code>null</code>.</p>
 <span class="hljs-comment">// ➔ null</span>
  
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>, <span class="hljs-string">&#x27;_a&#x27;</span>]).<span class="hljs-title function_">match</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-string">&quot;x&quot;</span>])));
-<span class="hljs-comment">// ➔ { &quot;a&quot;: &quot;x&quot; }</span>
+<span class="hljs-comment">// ➔ { _a: &quot;x&quot; }</span>
 </code></pre>
 <p>Wildcards can be used to capture the head of functions:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;_f&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&quot;x&quot;</span>]).<span class="hljs-title function_">match</span>(ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&quot;x&quot;</span>])));
-<span class="hljs-comment">// ➔ { &quot;f&quot;: &quot;Add&quot; }</span>
+<span class="hljs-comment">// ➔ { _f: &quot;Add&quot; }</span>
 </code></pre>
 </section>
 <section id="substitution">
@@ -2509,19 +2510,19 @@ match, it returns <code>null</code>.</p>
 from wildcard names to expressions.</p>
 <p>If there is no match, <code>match()</code> returns <code>null</code>.</p>
 <p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression
-it was derived from, use the <code>substitute()</code> function.</p>
+it was derived from, use the <code>subs()</code> function.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> expression = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&quot;x&quot;</span>]);
 <span class="hljs-keyword">const</span> pattern = ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-number">1</span>, <span class="hljs-string">&quot;_a&quot;</span>]);
  
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(pattern.<span class="hljs-title function_">match</span>(expression));
-<span class="hljs-comment">// ➔ { a: &quot;x&quot; }</span>
+<span class="hljs-comment">// ➔ { _a: &quot;x&quot; }</span>
  
-expression.<span class="hljs-title function_">subs</span>({ <span class="hljs-attr">a</span>: <span class="hljs-string">&quot;x&quot;</span> }).<span class="hljs-title function_">print</span>();
+expression.<span class="hljs-title function_">subs</span>({ <span class="hljs-attr">_a</span>: <span class="hljs-string">&quot;x&quot;</span> }).<span class="hljs-title function_">print</span>();
 <span class="hljs-comment">// ➔ [&quot;Add&quot;, 1, &quot;x&quot;]</span>
 </code></pre>
 </section>
-<section id="comparing">
-<h2 id="comparing" tabindex="-1">Comparing</h2>
+<section id="matching">
+<h2 id="matching-patterns" tabindex="-1">Matching Patterns</h2>
 <p><strong>To check if an expression matches a pattern</strong>, use the <code>pattern.match()</code>
 function.</p>
 <p>The function returns <code>null</code> if the two expressions do not match. It returns an
@@ -2587,14 +2588,14 @@ You can define your own rules and apply them using <code>expr.replace()</code>.<
         
 
 
-        <meta itemprop="datePublished" content="November 11, 2023">
+        <meta itemprop="datePublished" content="November 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-11">November 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-13">November 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2616,7 +2617,7 @@ You can define your own rules and apply them using <code>expr.replace()</code>.<
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#wildcards">Wildcards</a></li><li><a href="#patterns">Patterns</a></li><li><a href="#matching-an-expression-to-a-pattern">Matching an Expression to a Pattern</a></li><li><a href="#substitution">Substitution</a></li><li><a href="#comparing">Comparing</a></li><li><a href="#applying-rewrite-rules">Applying Rewrite Rules</a></li></ol>
+        <ol><li><a href="#wildcards">Wildcards</a></li><li><a href="#patterns">Patterns</a></li><li><a href="#matching-an-expression-to-a-pattern">Matching an Expression to a Pattern</a></li><li><a href="#substitution">Substitution</a></li><li><a href="#matching-patterns">Matching Patterns</a></li><li><a href="#applying-rewrite-rules">Applying Rewrite Rules</a></li></ol>
       </div>
     
                             

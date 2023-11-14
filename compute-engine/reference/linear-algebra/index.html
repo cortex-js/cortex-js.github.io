@@ -7,9 +7,9 @@
 
 
 <title>
-    CortexJS
+    CortexJS - Scientific Computing and Math for the Web
 </title>
-<meta name="description" content="" />
+<meta name="description" content="CortexJS: Enhancing scientific computing with user-friendly MathLive for easy math input, MathJSON for web-native formats, and a versatile Compute Engine for symbolic and numerical math evaluations" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -21,7 +21,7 @@
 </script>
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS - Scientific Computing and Math for the Web Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -2418,7 +2418,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#representing-vectors%2C-matrices-and-tensors">Representing Vectors, Matrices and Tensors</a></li><li><a href="#tensor-properties">Tensor Properties</a><ol><li><a href="#Shape">Shape</a></li><li><a href="#Rank">Rank</a></li></ol></li><li><a href="#Vector">Vector</a></li><li><a href="#accessing-the-content-of-tensors">Accessing the content of Tensors</a><ol><li><a href="#At">At</a></li><li><a href="#Axis">Axis</a></li></ol></li><li><a href="#Matrix">Matrix</a></li><li><a href="#transforming-matrixes-and-tensors">Transforming Matrixes and Tensors</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#ConjugateTranspose">ConjugateTranspose</a></li><li><a href="#Inverse">Inverse</a></li><li><a href="#PseudoInverse">PseudoInverse</a></li><li><a href="#Diagonal">Diagonal</a></li></ol></li><li><a href="#calculating-with-matrixes-and-tensors">Calculating with Matrixes and Tensors</a><ol><li><a href="#Determinant">Determinant</a></li><li><a href="#AdjugateMatrix">AdjugateMatrix</a></li><li><a href="#Trace">Trace</a></li></ol></li></ol>
+        <ol><li><a href="#representing-matrices">Representing Matrices</a></li><li><a href="#matrix-properties">Matrix Properties</a><ol><li><a href="#Shape">Shape</a></li><li><a href="#Rank">Rank</a></li></ol></li><li><a href="#Vector">Vector</a></li><li><a href="#accessing-the-content-of-tensors">Accessing the content of Tensors</a><ol><li><a href="#At">At</a></li></ol></li><li><a href="#Matrix">Matrix</a></li><li><a href="#transforming-matrixes">Transforming Matrixes</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#ConjugateTranspose">ConjugateTranspose</a></li><li><a href="#Inverse">Inverse</a></li><li><a href="#PseudoInverse">PseudoInverse</a></li><li><a href="#Diagonal">Diagonal</a></li></ol></li><li><a href="#calculating-with-matrixes">Calculating with Matrixes</a><ol><li><a href="#Determinant">Determinant</a></li><li><a href="#AdjugateMatrix">AdjugateMatrix</a></li><li><a href="#Trace">Trace</a></li></ol></li></ol>
       </div>
       
                               
@@ -2436,22 +2436,35 @@ Linear algebra is widely used in science and engineering.</p>
 <p>For example the matrix above is represented as the following list of lists:</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 </code></pre>
+<p>An <strong>axis</strong> is a dimension of a tensor. A vector has one axis, a matrix has two
+axes, a tensor (multi-dimensional matrix) has more than two axes.</p>
+<p>The <strong>shape</strong> of a tensor is the length of each of its axes. For example, a
+matrix with 3 rows and 4 columns has a shape of <code>(3, 4)</code>.</p>
+<p>The <strong>rank</strong> of a tensor is the number of axes of the tensor. For example, a
+matrix has a rank of 2. Note that rank is sometimes used with a different
+meaning. For example, the rank of a matrix can also be defined as the maximum
+number of linearly independent rows or columns of the matrix. In the Compute
+Engine, <strong>rank</strong> is always used with the meaning of the number of axes.</p>
 <p>In the Compute Engine, matrices are stored in <strong>row-major</strong> order. This means that
-the first element of the outer list is the first row of the matrix, the second element
+the first element of the outer axis is the first row of the matrix, the second element
 of the list is the second row of the matrix, etc.</p>
-<div class='read-more'><a href="/compute-engine/reference/collections/">Since vectors,
-matrixes and tensors are <code>List</code> collections, some <strong>collection operations</strong>
+<div class='read-more'><a href="/compute-engine/reference/collections/">Since
+matrixes are <code>List</code> collections, some <strong>collection operations</strong>
 can also be applied to them such as <code>At</code>, <code>Fold</code> and <code>Map</code>. <svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
 <p>An extension of linear algebra is <a href="https://en.wikipedia.org/wiki/Tensor_algebra">tensor algebra</a>
 which studies tensors, which are multidimensional arrays.</p>
 <p>For example, a grayscale image can be represented by a matrix of grayscale
 values. But a color image is represented by a rank 3 tensor, an array of RGB
-triplets. Tensors are represented as nested lists.</p>
-<p>The Compute Engine provides a number of functions for working with matrices
-and tensors.</p>
-<h3 id="representing-vectors%2C-matrices-and-tensors" tabindex="-1">Representing Vectors, Matrices and Tensors</h3>
-<p>Vectors, matrices and tensors are represented as lists of lists, that
-is expressions with the head <code>List</code>.</p>
+triplets. Tensors are also represented as nested lists.</p>
+<p>The Compute Engine provides a number of functions for working with matrices.</p>
+<h3 id="representing-matrices" tabindex="-1">Representing Matrices</h3>
+<p>Vectors (row vectors) are represented as lists, that is an expression with the
+head <code>List</code>.</p>
+<p>Matrixes are represented as lists of lists.</p>
+<p>Tensors (multi-dimensional matrixes) are represented as nested lists.</p>
+<p class="notice--info">Tensors are represented internally using an optimized format that is more
+efficient than nested lists. Because of this, some operations on tensors
+such as <code>Reshape</code> and <code>Transpose</code> can be done in O(1) time.</p>
 <p><code>Vector</code> is a convenience function that interprets a list of elements as a
 column vector.</p>
 <p><code>Matrix</code> is an optional “tag” inert function that is used to influence the visual
@@ -2547,10 +2560,10 @@ column, and <code>&gt;</code> indicates a right-aligned column.</p>
 <p>A character of <code>|</code> indicate a solid line between two
 columns and <code>:</code> indicate a dashed lines between two columns.</p>
 </div></div>
-<h2 id="tensor-properties" tabindex="-1">Tensor Properties</h2>
-<h3 class="visually-hidden" id="Shape" tabindex="-1">Shape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Shape</strong>&quot;, <em>tensor</em>]</p>
-<p>Returns the shape of a tensor, a tuple of the lengths of the
-tensor along each of its axis.</p>
+<h2 id="matrix-properties" tabindex="-1">Matrix Properties</h2>
+<h3 class="visually-hidden" id="Shape" tabindex="-1">Shape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Shape</strong>&quot;, <em>matrix</em>]</p>
+<p>Returns the shape of a matrix, a tuple of the lengths of the
+matrix along each of its axis.</p>
 <p>A list (or vector) has a single axis. A matrix has two axes. A tensor has more
 than two axes.</p>
 <p>For a scalar, <code>Shape</code> returns an empty tuple.</p>
@@ -2563,13 +2576,13 @@ than two axes.</p>
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Shape&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;Tuple&quot;, 2, 4]</span>
 </code></pre>
-<p><strong>Note:</strong> The shape of a tensor is also sometimes called “dimensions”.
+<p><strong>Note:</strong> The shape of a matrix is also sometimes called “dimensions”.
 However, this terminology is ambiguous because the word “dimension” is also
-used to refer to the length of a tensor along a specific axis.</p>
+used to refer to the length of a matrix along a specific axis.</p>
 </div></div>
-<h3 class="visually-hidden" id="Rank" tabindex="-1">Rank</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rank</strong>&quot;, <em>tensor</em>]</p>
-<p>Returns the number of axes of a tensor.</p>
-<p>A scalar (a number, for exmaple) has <strong>rank 0</strong>.</p>
+<h3 class="visually-hidden" id="Rank" tabindex="-1">Rank</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Rank</strong>&quot;, <em>matrix</em>]</p>
+<p>Returns the number of axes of a matrix.</p>
+<p>A scalar (a number, for example) has <strong>rank 0</strong>.</p>
 <p>A vector or list has <strong>rank 1</strong>.</p>
 <p>A matrix has <strong>rank 2</strong>, a tensor has <strong>rank 3</strong>, etc.</p>
 <p>The rank is the length of the shape of the tensor.</p>
@@ -2584,9 +2597,9 @@ used to refer to the length of a tensor along a specific axis.</p>
 </code></pre>
 </div></div>
 <h2 id="accessing-the-content-of-tensors" tabindex="-1">Accessing the content of Tensors</h2>
-<h3 class="visually-hidden" id="At" tabindex="-1">At</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>At</strong>&quot;, <em>tensor</em>, <em>index-1</em>, <em>index-2</em>, …]</p>
-<p>Returns the element of the tensor at the specified indexes.</p>
-<p><em>index-1</em>, … is a sequence of integers, one for each axis of the tensor.</p>
+<h3 class="visually-hidden" id="At" tabindex="-1">At</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>At</strong>&quot;, <em>matrix</em>, <em>index-1</em>, <em>index-2</em>, …]</p>
+<p>Returns the element of the matrix at the specified indexes.</p>
+<p><em>index-1</em>, … is a sequence of integers, one for each axis of the matrix.</p>
 <p>Indexes start at 1. Negative indexes count elements from the end. A negative
 index is equivalent to adding the length of the axis to the index. So <code>-1</code> is
 the last element of the axis, <code>-2</code> is the second to last element, etc.</p>
@@ -2606,32 +2619,25 @@ square brackets following a matrix.</p>
 <div class='latex'><div class="source">\mathbf{A}_{2,3}</div><div class="display">\[ \mathbf{A}_{2,3} \]</div></div>
 <div class='latex'><div class="source">\mathbf{A}\lbrack2,3\rbrack</div><div class="display">\[ \mathbf{A}\lbrack2,3\rbrack \]</div></div>
 </div></div>
-<h3 class="visually-hidden" id="Axis" tabindex="-1">Axis</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Axis</strong>&quot;, <em>tensor</em>, <em>axis</em>]</p>
-<p>Returns the specified axis of the tensor.</p>
-<p><em>axis</em> is an integer, starting at 1.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Axis&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span>
-<span class="hljs-comment">// ➔ [&quot;List&quot;, 1, 2, 3]</span>
-</code></pre>
-</div></div>
-<h2 id="transforming-matrixes-and-tensors" tabindex="-1">Transforming Matrixes and Tensors</h2>
-<h3 class="visually-hidden" id="Flatten" tabindex="-1">Flatten</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Flatten</strong>&quot;, <em>collection</em>]</p>
-<p>Returns a list of all the elements of the tensor or collection, recursively.</p>
-<p>Only elements with the same head as the collection are flattened.
-Tensors usually have a head of <code>List</code>, so only other <code>List</code> elements
-are flattened.</p>
-<p>For a matrix, it returns a list of all the elements in the matrix, in row-major
+<h2 id="transforming-matrixes" tabindex="-1">Transforming Matrixes</h2>
+<h3 class="visually-hidden" id="Flatten" tabindex="-1">Flatten</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Flatten</strong>&quot;, <em>matrix</em>]</p>
+<p>Returns a list of all the elements of the matrix, recursively, in row-major
 order.</p>
+<p>This function can also be applied to any collection.</p>
+<p>Only elements with the same head as the collection are flattened.
+Matrixes have a head of <code>List</code>, so only other <code>List</code> elements
+are flattened.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-number">18</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 5, 2, 10, 18, 1, 2, 3]</span>
 </code></pre>
-<p>This is similar to the APL <code>,</code> Ravel operator or <code>numpy.ravel</code>
+<p><code>Flatten</code> is similar to the APL <code>,</code> Ravel operator or <code>numpy.ravel</code>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ravel.html">Numpy</a>.</p>
 </div></div>
-<h3 class="visually-hidden" id="Reshape" tabindex="-1">Reshape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reshape</strong>&quot;, <em>tensor</em>, <em>shape</em>]</p>
-<p>Returns a tensor with the specified shape.</p>
-<p><em>tensor</em> can be a list, a matrix, a tensor or a collection.</p>
-<p><em>shape</em> is a tuple of integers, one for each axis of the tensor.</p>
-<p><code>Reshape</code> can be used to convert a list into a matrix.</p>
+<h3 class="visually-hidden" id="Reshape" tabindex="-1">Reshape</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Reshape</strong>&quot;, <em>matrix</em>, <em>shape</em>]</p>
+<p>Returns a matrix with the specified shape.</p>
+<p><em>matrix</em> can be a list, a matrix, a tensor or a collection.</p>
+<p><em>shape</em> is a tuple of integers, one for each axis of the result matrix.</p>
+<p><code>Reshape</code> can be used to convert a list or collection into a matrix.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Reshape&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Range&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">9</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Tuple&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, [&quot;List&quot;, 1, 2, 3], [&quot;List&quot;, 4, 5, 6], [&quot;List&quot;, 7, 8, 9]]</span>
 </code></pre>
@@ -2643,8 +2649,8 @@ order, that is the order of elements as returned by <code>Flatten</code>.</p>
 <p>If the result has fewer elements, the elements are dropped from the end of the
 element list. If the result has more elements, the lists of elements
 is filled cyclically.</p>
-<p>This is a behavior to APL, but other environment may behave differently.
-For example, by default Mathematic <code>ArrayReshape</code> will fill the missing elements
+<p>This is the same behavior as APL, but other environment may behave differently.
+For example, by default Mathematica <code>ArrayReshape</code> will fill the missing elements
 with zeros.</p>
 </div></div>
 <h3 class="visually-hidden" id="Transpose" tabindex="-1">Transpose</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Transpose</strong>&quot;, <em>matrix</em>]</p>
@@ -2665,8 +2671,8 @@ Also known as the Hermitian transpose.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;ConjugateTranspose&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-number">6</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, [&quot;List&quot;, 1, 4], [&quot;List&quot;, 2, 5], [&quot;List&quot;, 3, 6]]</span>
 </code></pre>
-<p class="signature">[&quot;<strong>ConjugateTranspose</strong>&quot;, <em>tensor</em>, <em>axis-1</em>, <em>axis-2</em>]</p>
-<p>Swap the two specified axes of the tensor. Note that axis
+<p class="signature">[&quot;<strong>ConjugateTranspose</strong>&quot;, <em>matrix</em>, <em>axis-1</em>, <em>axis-2</em>]</p>
+<p>Swap the two specified axes of the <em>matrix</em>. Note that axis
 indexes start at 1. In addition, all the (complex) elements
 of the tensor are conjugated.</p>
 </div></div>
@@ -2685,12 +2691,13 @@ of the tensor are conjugated.</p>
 </code></pre>
 </div></div>
 <h3 class="visually-hidden" id="Diagonal" tabindex="-1">Diagonal</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Diagonal</strong>&quot;, <em>matrix</em>]</p>
-<p>Returns the diagonal of the matrix.</p>
+<p>Returns the diagonal of the matrix, that is the list of all the elements
+on the diagonal of the matrix.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Diagonal&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// ➔ [&quot;List&quot;, 1, 4]</span>
 </code></pre>
 </div></div>
-<h2 id="calculating-with-matrixes-and-tensors" tabindex="-1">Calculating with Matrixes and Tensors</h2>
+<h2 id="calculating-with-matrixes" tabindex="-1">Calculating with Matrixes</h2>
 <h3 class="visually-hidden" id="Determinant" tabindex="-1">Determinant</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>Determinant</strong>&quot;, <em>matrix</em>]</p>
 <p>Returns the determinant of the matrix.</p>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Determinant&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;List&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">4</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
@@ -2730,14 +2737,14 @@ eigenvalues of the matrix.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 11, 2023">
+        <meta itemprop="datePublished" content="November 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-11">November 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-13">November 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2759,7 +2766,7 @@ eigenvalues of the matrix.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#representing-vectors%2C-matrices-and-tensors">Representing Vectors, Matrices and Tensors</a></li><li><a href="#tensor-properties">Tensor Properties</a><ol><li><a href="#Shape">Shape</a></li><li><a href="#Rank">Rank</a></li></ol></li><li><a href="#Vector">Vector</a></li><li><a href="#accessing-the-content-of-tensors">Accessing the content of Tensors</a><ol><li><a href="#At">At</a></li><li><a href="#Axis">Axis</a></li></ol></li><li><a href="#Matrix">Matrix</a></li><li><a href="#transforming-matrixes-and-tensors">Transforming Matrixes and Tensors</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#ConjugateTranspose">ConjugateTranspose</a></li><li><a href="#Inverse">Inverse</a></li><li><a href="#PseudoInverse">PseudoInverse</a></li><li><a href="#Diagonal">Diagonal</a></li></ol></li><li><a href="#calculating-with-matrixes-and-tensors">Calculating with Matrixes and Tensors</a><ol><li><a href="#Determinant">Determinant</a></li><li><a href="#AdjugateMatrix">AdjugateMatrix</a></li><li><a href="#Trace">Trace</a></li></ol></li></ol>
+        <ol><li><a href="#representing-matrices">Representing Matrices</a></li><li><a href="#matrix-properties">Matrix Properties</a><ol><li><a href="#Shape">Shape</a></li><li><a href="#Rank">Rank</a></li></ol></li><li><a href="#Vector">Vector</a></li><li><a href="#accessing-the-content-of-tensors">Accessing the content of Tensors</a><ol><li><a href="#At">At</a></li></ol></li><li><a href="#Matrix">Matrix</a></li><li><a href="#transforming-matrixes">Transforming Matrixes</a><ol><li><a href="#Flatten">Flatten</a></li><li><a href="#Reshape">Reshape</a></li><li><a href="#Transpose">Transpose</a></li><li><a href="#ConjugateTranspose">ConjugateTranspose</a></li><li><a href="#Inverse">Inverse</a></li><li><a href="#PseudoInverse">PseudoInverse</a></li><li><a href="#Diagonal">Diagonal</a></li></ol></li><li><a href="#calculating-with-matrixes">Calculating with Matrixes</a><ol><li><a href="#Determinant">Determinant</a></li><li><a href="#AdjugateMatrix">AdjugateMatrix</a></li><li><a href="#Trace">Trace</a></li></ol></li></ol>
       </div>
     
                             

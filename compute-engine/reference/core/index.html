@@ -7,9 +7,9 @@
 
 
 <title>
-    CortexJS
+    CortexJS - Scientific Computing and Math for the Web
 </title>
-<meta name="description" content="" />
+<meta name="description" content="CortexJS: Enhancing scientific computing with user-friendly MathLive for easy math input, MathJSON for web-native formats, and a versatile Compute Engine for symbolic and numerical math evaluations" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -21,7 +21,7 @@
 </script>
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS - Scientific Computing and Math for the Web Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -2418,7 +2418,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li><li><a href="#IsSame">IsSame</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#CanonicalOrder">CanonicalOrder</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li><li><a href="#IsSame">IsSame</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#CanonicalForm">CanonicalForm</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
       
                               
@@ -2560,7 +2560,7 @@ evaluate to <code>False</code>.</p>
 </code></pre>
 <p>To compare two expressions for mathematical equality, use <code>Equal</code>.</p>
 <p>To compare two expressions structurally, but ignoring the order of the arguments
-of commutative functions, use <a href="#CanonicalOrder"><code>CanonicalOrder</code></a>.</p>
+of commutative functions, use <a href="#CanonicalForm"><code>CanonicalForm</code></a>.</p>
 <p>See <a href="/compute-engine/guides/symbolic-computing/#comparing-expressions">Comparing Expressions</a> for other options to compare two expressions, such
 as the <code>Equal</code> function.</p>
 </div></div>
@@ -2576,11 +2576,19 @@ approximations, use <code>N</code>.</p>
 <p>The <code>Simplify</code> function applies a sequence of transformations to an expression
 in order to reduce, simplify and calculate its value.</p>
 </div></div>
-<h3 class="visually-hidden" id="CanonicalOrder" tabindex="-1">CanonicalOrder</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>CanonicalOrder</strong>&quot;, <em>expression</em>]</p>
-<p>If <em>expression</em> is a commutative function, sort the
-arguments according to the canonical order of the arguments of the function.</p>
+<h3 class="visually-hidden" id="CanonicalForm" tabindex="-1">CanonicalForm</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>CanonicalForm</strong>&quot;, <em>expression</em>]</p>
+<p class="signature">[&quot;<strong>CanonicalForm</strong>&quot;, <em>expression</em>, <em>form-1</em>, <em>form-2</em>, …]</p>
 <p>If <em>expression</em> is canonical, this function has no effect.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<p>If there are no <em>form-n</em> arguments, the expression is transformed to its
+canonical form.</p>
+<p>If some <em>form-n</em> arguments are provided, they indicate one or more
+canonical transformations to apply to the expression. The following
+canonical forms are supported:</p>
+<ul>
+<li><strong><code>Order</code></strong>: If <em>expression</em> is a commutative function, sort the
+arguments according to the canonical order of the arguments of the function.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Order&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
 </code></pre>
 <p>This can be useful to compare two non-canonical expressions for equality, for example:</p>
@@ -2591,18 +2599,80 @@ arguments according to the canonical order of the arguments of the function.</p>
 <span class="hljs-comment">// -&gt; False</span>
  
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;IsSame&quot;</span><span class="hljs-punctuation">,</span> 
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> 
-  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Order&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> 
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Order&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; True</span>
 </code></pre>
+<ul>
+<li><strong><code>Flatten</code></strong>: Simplify associative expressions, remove any
+unnecessary delimiters indicating the order of operations,
+flattens any <code>Sequence</code> expressions.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Delimiter&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span> 
+<span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
+ 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sequence&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
+</code></pre>
+<ul>
+<li>
+<p><strong><code>Number</code></strong>: Transform some number forms, for example <code>[&quot;Add&quot;, 2, [&quot;Multiply&quot;, 3, &quot;ImaginaryI&quot;]]</code>
+to <code>[&quot;Complex&quot;, 2, 3]</code>, simplify and normalize numerator and denominator of
+rational numbers, etc…</p>
+</li>
+<li>
+<p><strong><code>InvisibleOperator</code></strong>: Remove any invisible operators that may be
+contained in the expression and replace them with <code>Multiply</code> or function
+application, depending on the context</p>
+</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InvisibleOperator&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;2&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;InvisibleOperator&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Multiply&quot;, 2, &quot;x&quot;]</span>
+</code></pre>
+<ul>
+<li><strong><code>Multiply</code></strong>: If <em>expression</em> is a <code>Multiply</code> function, simplify it by
+combining the coefficients and the factors, transform product to a <code>Power</code>
+expression when possible.</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Multiply&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Multiply&quot;, 6, &quot;x&quot;]</span>
+</code></pre>
+<ul>
+<li>
+<p><strong><code>Add</code></strong>: If <em>expression</em> is an <code>Add</code> function, remove any <code>0</code>, transform
+sum into multiplication when possible. If <em>expression</em> is a <code>Subtract</code>
+transform it into an <code>Add</code>. If <em>expression</em> is a <code>Negate</code> transform it into
+a <code>Multiply</code> or negate number literals.</p>
+</li>
+<li>
+<p><strong><code>Power</code></strong>: Transform <code>Exp</code>, <code>Square</code>, <code>Sqrt</code>, <code>Root</code> function to a <code>Power</code>
+expression;</p>
+</li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Exp&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">]</span>
+ 
+```json example
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Power&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-comment">// -&gt; [&quot;Power&quot;, 8]</span>
+</code></pre>
+<p></p>
 <p>To compare the input from a mathfield with an expected
 answer, you could use:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">box</span>(
-    [<span class="hljs-string">&#x27;CanonicalOrder&#x27;</span>, ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})])
-    .<span class="hljs-title function_">isSame</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;1+x&quot;</span>)
+    [<span class="hljs-string">&quot;CanonicalForm&quot;</span>, ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})], <span class="hljs-string">&quot;Order&quot;</span>)
+    .<span class="hljs-title function_">isSame</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;1+x&quot;</span>))
 </code></pre>
 <p>Both <code>1+x</code> and <code>x+1</code> will return <strong>true</strong>, but <code>2-1+x</code> will return <strong>false</strong>.</p>
+<p><strong>Note</strong>: see also the options for the <code>canonical</code> option of <code>ce.parse()</code> and
+<code>ce.box()</code> which can also be used to specify a custom canonical form:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">box</span>(
+    ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: [<span class="hljs-string">&#x27;order&#x27;</span>]}))
+    .<span class="hljs-title function_">isSame</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;x+1&quot;</span>))
+</code></pre>
 </div></div>
 <h3 class="visually-hidden" id="N" tabindex="-1">N</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>N</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a numerical approximation of the expression.</p>
@@ -2732,14 +2802,14 @@ corresponding to the LaTeX string.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 11, 2023">
+        <meta itemprop="datePublished" content="November 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-11">November 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-13">November 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2761,7 +2831,7 @@ corresponding to the LaTeX string.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li><li><a href="#IsSame">IsSame</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#CanonicalOrder">CanonicalOrder</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
+        <ol><li><a href="#constants">Constants</a></li><li><a href="#declaring%2C-assigning-and-assuming">Declaring, Assigning and Assuming</a><ol><li><a href="#Declare">Declare</a></li><li><a href="#Assign">Assign</a></li><li><a href="#Assume">Assume</a></li></ol></li><li><a href="#structural-operations">Structural Operations</a><ol><li><a href="#About">About</a></li><li><a href="#Head">Head</a></li><li><a href="#Tail">Tail</a></li><li><a href="#Hold">Hold</a></li><li><a href="#Identity">Identity</a></li></ol></li><li><a href="#inspecting-an-expression">Inspecting an Expression</a><ol><li><a href="#Domain">Domain</a></li><li><a href="#IsSame">IsSame</a></li></ol></li><li><a href="#transforming-an-expression">Transforming an Expression</a><ol><li><a href="#Evaluate">Evaluate</a></li><li><a href="#Simplify">Simplify</a></li><li><a href="#CanonicalForm">CanonicalForm</a></li><li><a href="#N">N</a></li></ol></li><li><a href="#core-functions">Core Functions</a><ol><li><a href="#Error">Error</a></li><li><a href="#InverseFunction">InverseFunction</a></li><li><a href="#String">String</a></li><li><a href="#Symbol">Symbol</a></li></ol></li><li><a href="#parsing-and-serializing-latex">Parsing and Serializing Latex</a><ol><li><a href="#Parse">Parse</a></li><li><a href="#Latex">Latex</a></li><li><a href="#LatexString">LatexString</a></li></ol></li><li><a href="#superscripts-and-subscripts">Superscripts and Subscripts</a></li></ol>
       </div>
     
                             

@@ -7,9 +7,9 @@
 
 
 <title>
-    CortexJS
+    CortexJS - Scientific Computing and Math for the Web
 </title>
-<meta name="description" content="" />
+<meta name="description" content="CortexJS: Enhancing scientific computing with user-friendly MathLive for easy math input, MathJSON for web-native formats, and a versatile Compute Engine for symbolic and numerical math evaluations" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -21,7 +21,7 @@
 </script>
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS - Scientific Computing and Math for the Web Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -2573,6 +2573,58 @@ replaced with a complex number.</li>
 <li><code>Root</code>:  <code>[&quot;Root&quot;, &quot;x&quot;, 3]</code> \(\to\) <code>[&quot;Power&quot;, &quot;x&quot;, [&quot;Rational&quot;, 1, 3]]</code></li>
 <li><code>Subtract</code>: <code>[&quot;Subtract&quot;, &quot;a&quot;, &quot;b&quot;]</code> \(\to\) <code>[&quot;Add&quot;, [&quot;Negate&quot;, &quot;b&quot;], &quot;a&quot;]</code></li>
 </ul>
+<h2 id="custom-canonical-form" tabindex="-1">Custom Canonical Form</h2>
+<p>The full canonical form of an expression is not always the most convenient
+representation for a given application. For example, if you want to check
+the answers from a quizz, you may want to compare the user input with a
+canonical form that is closer to the user input.</p>
+<p>You can customize the canonical form of an expression by using the
+<a href="/compute-engine/reference/core/#CanonicalForm"><code>[&quot;CanonicalForm&quot;]</code></a> function or by specifying the form you want to use
+with the <code>canonical</code> option of <code>ce.box()</code> and <code>ce.parse()</code>.</p>
+<p><strong>To get the non-canonical form</strong>, use <code>ce.box(expr, { canonical: false })</code> or
+<code>ce.parse(s, { canonical: false })</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2(0+x\\times x-1)&quot;</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>});
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;InvisibleOperator&quot;, </span>
+<span class="hljs-comment">//      2,</span>
+<span class="hljs-comment">//      [&quot;Delimiter&quot;,</span>
+<span class="hljs-comment">//        [&quot;Sequence&quot;, [&quot;Add&quot;, 0, [&quot;Subtract&quot;, [&quot;Multiply&quot;,&quot;x&quot;,&quot;x&quot;],1]]]</span>
+<span class="hljs-comment">//      ]</span>
+<span class="hljs-comment">//   ]</span>
+</code></pre>
+<p><strong>To get the full canonical form</strong>, use <code>ce.box(expr, { canonical: true })</code> or
+<code>ce.parse(s, { canonical: true })</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2(0+x\\times x-1)&quot;</span>, 
+  {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">true</span>}
+);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(expr.<span class="hljs-property">json</span>);
+<span class="hljs-comment">// ➔ [&quot;Multiply&quot;, 2, [&quot;Subtract&quot;, [&quot;Square&quot;, &quot;x&quot;], 1]]</span>
+</code></pre>
+<p><strong>To order the arguments in a canonical order</strong>, use <code>ce.box(expr, { canonical: &quot;Order&quot; })</code> or <code>ce.parse(s, { canonical: &quot;Order&quot; })</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> expr = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;0+1+x+2+\\sqrt{5}&quot;</span>, 
+  {<span class="hljs-attr">canonical</span>: <span class="hljs-string">&quot;Order&quot;</span>}
+);
+expr.<span class="hljs-title function_">print</span>();
+<span class="hljs-comment">// ➔ [&quot;Add&quot;, [&quot;Sqrt&quot;, 5], &quot;x&quot;, 0, 1, 2]</span>
+</code></pre>
+<p>Note in particular that the <code>0</code> is preserved in the expression, which is not
+the case in the full canonical form.</p>
+<p>There are other forms that can be used to customize the canonical form of an
+expression. See the documentation of
+<a href="/compute-engine/reference/core/#CanonicalForm"><code>[&quot;CanonicalForm&quot;]</code></a> for more details.</p>
+<p>For example:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> latex = <span class="hljs-string">&quot;2(0+x\\times x-1)&quot;</span>;
+ce.<span class="hljs-title function_">parse</span>(latex, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>}).<span class="hljs-title function_">print</span>();
+<span class="hljs-comment">// -&gt; [&quot;InvisibleOperator&quot;,2,[&quot;Delimiter&quot;,[&quot;Sequence&quot;,[&quot;Add&quot;,0,[&quot;Subtract&quot;,[&quot;Multiply&quot;,&quot;x&quot;,&quot;x&quot;],1]]]]]</span>
+ 
+ce.<span class="hljs-title function_">parse</span>(latex, {<span class="hljs-attr">canonical</span>: [<span class="hljs-string">&quot;InvisibleOperator&quot;</span>]}).<span class="hljs-title function_">print</span>();
+<span class="hljs-comment">// -&gt; [&quot;Multiply&quot;,2,[&quot;Add&quot;,0,[&quot;Subtract&quot;,[&quot;Multiply&quot;,&quot;x&quot;,&quot;x&quot;],1]]]</span>
+ 
+ce.<span class="hljs-title function_">parse</span>(latex, 
+  {<span class="hljs-attr">canonical</span>: [<span class="hljs-string">&quot;InvisibleOperator&quot;</span>, <span class="hljs-string">&quot;Add&quot;</span>, <span class="hljs-string">&quot;Order&quot;</span>, ]}
+);
+<span class="hljs-comment">// -&gt; [&quot;Multiply&quot;,2,[&quot;Subtract&quot;,[&quot;Multiply&quot;,&quot;x&quot;,&quot;x&quot;],1]]</span>
+</code></pre>
 
 
 
@@ -2584,14 +2636,14 @@ replaced with a complex number.</li>
         
 
 
-        <meta itemprop="datePublished" content="November 11, 2023">
+        <meta itemprop="datePublished" content="November 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-11">November 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-13">November 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

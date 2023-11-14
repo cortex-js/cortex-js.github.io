@@ -7,9 +7,9 @@
 
 
 <title>
-    CortexJS
+    CortexJS - Scientific Computing and Math for the Web
 </title>
-<meta name="description" content="" />
+<meta name="description" content="CortexJS: Enhancing scientific computing with user-friendly MathLive for easy math input, MathJSON for web-native formats, and a versatile Compute Engine for symbolic and numerical math evaluations" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {
@@ -21,7 +21,7 @@
 </script>
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CortexJS - Scientific Computing and Math for the Web Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -2632,7 +2632,9 @@ console.log('Non-canonical isSame?', aPrime.isSame(bPrime));</pre>
 <p>In some cases you may want to compare two expressions with a weak form
 of canonicalization, for example to ignore the order of the arguments of a sum.</p>
 <p>You can achieve this by comparing the expressions in their canonical order:</p>
-<pre><code class="language-json">ce.box(<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>).isSame(<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalOrder&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>)
+<pre><code class="language-json">ce.box(<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Order&quot;</span><span class="hljs-punctuation">]</span>).isSame(
+  <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Order&quot;</span><span class="hljs-punctuation">]</span>
+)
 </code></pre>
 <h3 id="mathematical-equality%3A-isequal()" tabindex="-1">Mathematical Equality: <code>isEqual()</code></h3>
 <p>It turns out that comparing two arbitrary mathematical expressions is a complex
@@ -2753,14 +2755,14 @@ elements in an expression or apply conditional rewriting rules to an expression.
         
 
 
-        <meta itemprop="datePublished" content="November 11, 2023">
+        <meta itemprop="datePublished" content="November 13, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-11">November 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-13">November 13, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
