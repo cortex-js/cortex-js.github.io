@@ -2578,7 +2578,7 @@ in order to reduce, simplify and calculate its value.</p>
 </div></div>
 <h3 class="visually-hidden" id="CanonicalForm" tabindex="-1">CanonicalForm</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>CanonicalForm</strong>&quot;, <em>expression</em>]</p>
 <p class="signature">[&quot;<strong>CanonicalForm</strong>&quot;, <em>expression</em>, <em>form-1</em>, <em>form-2</em>, …]</p>
-<p>If <em>expression</em> is canonical, this function has no effect.</p>
+<p>If <em>expression</em> is already canonical, this function has no effect.</p>
 <p>If there are no <em>form-n</em> arguments, the expression is transformed to its
 canonical form.</p>
 <p>If some <em>form-n</em> arguments are provided, they indicate one or more
@@ -2612,7 +2612,7 @@ flattens any <code>Sequence</code> expressions.</li>
 <pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span>
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
  
-<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Delimiter&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span> 
+<span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Delimiter&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sequence&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span> 
 <span class="hljs-comment">// -&gt; [&quot;Add&quot;, 1, 2, 3]</span>
  
 <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;CanonicalForm&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Add&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Sequence&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-number">3</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Flatten&quot;</span><span class="hljs-punctuation">]</span>
@@ -2662,21 +2662,19 @@ expression;</p>
 <p></p>
 <p>To compare the input from a mathfield with an expected
 answer, you could use:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">box</span>(
-    [<span class="hljs-string">&quot;CanonicalForm&quot;</span>, ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-literal">false</span>})], <span class="hljs-string">&quot;Order&quot;</span>)
+<pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-string">&quot;Order&quot;</span>})
     .<span class="hljs-title function_">isSame</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;1+x&quot;</span>))
 </code></pre>
 <p>Both <code>1+x</code> and <code>x+1</code> will return <strong>true</strong>, but <code>2-1+x</code> will return <strong>false</strong>.</p>
 <p><strong>Note</strong>: see also the options for the <code>canonical</code> option of <code>ce.parse()</code> and
 <code>ce.box()</code> which can also be used to specify a custom canonical form:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">box</span>(
-    ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: [<span class="hljs-string">&#x27;order&#x27;</span>]}))
+<pre><code class="language-js"><span class="hljs-keyword">const</span> correct = ce.<span class="hljs-title function_">parse</span>(mf.<span class="hljs-property">value</span>, {<span class="hljs-attr">canonical</span>: <span class="hljs-string">&quot;Order&quot;</span>})
     .<span class="hljs-title function_">isSame</span>(ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;x+1&quot;</span>))
 </code></pre>
 </div></div>
 <h3 class="visually-hidden" id="N" tabindex="-1">N</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>N</strong>&quot;, <em>expression</em>]</p>
 <p>Evaluate to a numerical approximation of the expression.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;N&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;N&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Pi&quot;</span><span class="hljs-punctuation">]</span>
  
 <span class="hljs-comment">// ➔ 3.141592653589793</span>
 </code></pre>
@@ -2694,7 +2692,7 @@ about the error.</p>
 <h3 class="visually-hidden" id="InverseFunction" tabindex="-1">InverseFunction</h3><div class="defs"><div class="def"><p class="signature">[&quot;<strong>InverseFunction</strong>&quot;, <em>symbol</em>]</p>
 <p>Evaluate to the inverse function of its argument for example <code>Arcsin</code> for <code>Sin</code>.</p>
 <div class='latex'><div class="source">\sin^{-1}(x)</div><div class="display">\[ \sin^{-1}(x) \]</div></div>
-<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">]</span>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;InverseFunction&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Sin&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;x&quot;</span><span class="hljs-punctuation">]</span>
 </code></pre>
 <p>In the mathematical sense, this is an operator (a function that takes a function
 as an argument and returns a function).</p>
