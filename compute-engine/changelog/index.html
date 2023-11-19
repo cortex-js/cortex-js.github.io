@@ -2413,6 +2413,15 @@
 
 
 <h1 id="cortexjs-compute-engine-changelog" tabindex="-1">CortexJS Compute Engine Changelog</h1>
+<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="bug-fixes" tabindex="-1">Bug Fixes</h2>
+<ul>
+<li>The expression <code>\frac5 7</code> is now parsed correctly as <code>\frac{5}{7}</code> instead of
+<code>\frac{5}{}7</code>.</li>
+<li>Do not sugar non-canonical expression. Previously,
+<code>ce.parse('\frac{1}{2}', {canonical: false})</code> would return <code>Half</code> instead of
+<code>['Divide', '1', '2']</code>.</li>
+</ul>
 <h2 id="0.22.0" tabindex="-1">0.22.0</h2>
 <p><strong>Release Date:</strong> 2023-11-13</p>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
@@ -2508,7 +2517,7 @@ sum expression instead of an error.</li>
 </ul>
 <h2 id="0.20.2" tabindex="-1">0.20.2</h2>
 <p><strong>Release Date:</strong> 2023-10-31</p>
-<h3 id="bug-fixes" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Fixed numerical evaluation of integrals and limits when parsed from LaTeX.</li>
 </ul>
@@ -2520,7 +2529,7 @@ console.info(ce.parse(&#x27;\\int_<span class="hljs-punctuation">{</span><span c
 </code></pre>
 <h2 id="0.20.1" tabindex="-1">0.20.1</h2>
 <p><strong>Release Date:</strong> 2023-10-31</p>
-<h3 id="bug-fixes-1" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Fixed evaluation of functions with multiple arguments</li>
 <li>Fixed compilation of some function assignments</li>
@@ -2543,7 +2552,7 @@ function definition.</p>
 custom invisible operators, use the <code>InvisibleOperator</code> function.</p>
 </li>
 </ul>
-<h3 id="bug-fixes-2" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li><strong>#25</strong> Correctly parse chained relational operators, i.e. <code>a &lt; b &lt;= c</code></li>
 <li><strong>#126</strong> Logic operators only accepted up to two arguments.</li>
@@ -2576,7 +2585,7 @@ gets evaluated to 3,735,928,559.</li>
 </ul>
 <h2 id="0.19.1" tabindex="-1">0.19.1</h2>
 <p><strong>Release Date:</strong> 2023-10-26</p>
-<h3 id="bug-fixes-3" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Assigning a function to an indentifier works correctly now, i.e.</li>
 </ul>
@@ -2591,7 +2600,7 @@ replaced with the <code>params</code>, <code>optParams</code>, <code>restParam</
 instead. The <code>domain</code> property is still supported for backward compatibility,
 but will be removed in a future version.</li>
 </ul>
-<h3 id="bug-fixes-4" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When invoking a declared function in a numeric operation, correctly infer the
 result type.</li>
@@ -2684,7 +2693,7 @@ This is a more succinct version of <code>expr.N().valueOf()</code>.</li>
 </ul>
 <h2 id="0.18.1" tabindex="-1">0.18.1</h2>
 <p><strong>Release Date:</strong> 2023-10-16</p>
-<h3 id="bug-fixes-5" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-6" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Parsing of whole numbers while in <code>rational</code> mode would return incorrect
 results.</li>
@@ -2894,7 +2903,7 @@ vectors, matrixes and more.</p>
 <li>The documentation at https://cortexjs.io/compute-engine/ has been
 significantly rewritten with help from an AI-powered writing assistant.</li>
 </ul>
-<h3 id="bug-fixes-6" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-7" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>The LaTeX string returned in <code>[&quot;Error&quot;]</code> expression was incorrectly tagged as
 <code>Latex</code> instead of <code>LatexString</code>.</li>
@@ -3077,7 +3086,7 @@ returned an array of <code>BoxedExpression</code>.</li>
 <li>Improved accuracy of some operations, for example
 <code>expr.parse(&quot;1e999 + 1&quot;).simplify()</code></li>
 </ul>
-<h3 id="bug-fixes-7" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-8" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>When <code>ce.numericMode === &quot;auto&quot;</code>, square roots of negative numbers would
 return an expression instead of a complex number.</li>
@@ -3104,7 +3113,7 @@ degree 1 last, i.e. “ax^2+ bx+ c” instead of “x + ax^2 + bx”.</li>
 precisely controlled. The <code>hold</code> symbol attribute is now <code>holdUntil</code> and can
 specify at which stage the substitution should take place.</li>
 </ul>
-<h3 id="bug-fixes-8" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-9" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Some constants would return a value as bignum or complex even when the
 <code>numericMode</code> did not allow it.</li>
@@ -3120,7 +3129,7 @@ Changes can be made with <code>ce.assume()</code>, <code>ce.set()</code> or <cod
 <li><code>expr.isLiteral</code> has been removed. Use <code>expr.numericValue !== null</code> and
 <code>expr.string !== null</code> instead.</li>
 </ul>
-<h3 id="bug-fixes-9" tabindex="-1">Bug Fixes</h3>
+<h3 id="bug-fixes-10" tabindex="-1">Bug Fixes</h3>
 <ul>
 <li>Calling <code>ce.forget()</code> would not affect expressions that previously referenced
 the symbol.</li>
@@ -3540,14 +3549,14 @@ such as <code>Equal</code>:</p>
         
 
 
-        <meta itemprop="datePublished" content="November 16, 2023">
+        <meta itemprop="datePublished" content="November 18, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-16">November 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-18">November 18, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
