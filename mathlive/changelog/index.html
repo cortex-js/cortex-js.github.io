@@ -676,6 +676,32 @@
 
                 <li>
                   <a
+                    href="/mathlive/guides/menus/"
+                    data-url="/mathlive/changelog/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Menus
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/mathlive/guides/virtual-keyboards/"
                     data-url="/mathlive/changelog/"
                     class="">
@@ -2413,13 +2439,34 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.97.0-(2023-11-20)" tabindex="-1">0.97.0 (2023-11-20)</h2>
 <h3 id="new-features" tabindex="-1">New Features</h3>
 <ul>
-<li>A menu is available when right-clicking on a mathfield or when clicking
-the menu glyph next to the virtual keyboard glyph. The menu allows
-toggling the virtual keyboard, changing the mathfield mode (math, text)
-and inserting and editing matrixes.</li>
+<li>
+<p><strong>Context Menu</strong>
+Right-clicking on a mathfield or clicking the menu icon next to the
+virtual keyboard icon will bring up a context menu.</p>
+<p>The keyboard shortcut <kbd>ALT</kbd>+<kbd>SPACE</kbd> will also bring up
+the context menu. This keyboard shortcut previously toggled the virtual
+keyboard. This keyboard shortcut to toggle the virtual keyboard is now
+<kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>SPACE</kbd>.</p>
+<p>The menu includes commands to:</p>
+<ul>
+<li>insert and edit matrixes</li>
+<li>evaluate, simplify and solve equations</li>
+<li>change the variant of a symbol (blackboard, fraktur, etc…)</li>
+<li>change the style (italic, bold, etc…) of the selection</li>
+<li>change the color and background color</li>
+<li>insert text</li>
+<li>copy LaTeX, MathML or  MathASCII to the clipboard</li>
+<li>toggle the virtual keyboard</li>
+</ul>
+<p>The content of the menu may change in future versions, and feedback is
+welcome.</p>
+<p>The menu can be customized by setting the <code>mf.menuItems</code> property of the
+mathfield. The value of this property is an array of menu items.
+See <a href="https://cortexjs.io/mathlive/guides/menus/">the documentation</a> for details.</p>
+</li>
 </ul>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
@@ -7603,14 +7650,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="November 18, 2023">
+        <meta itemprop="datePublished" content="November 20, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-18">November 18, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

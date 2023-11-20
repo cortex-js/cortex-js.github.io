@@ -712,6 +712,32 @@
 
                 <li>
                   <a
+                    href="/mathlive/guides/menus/"
+                    data-url="/mathlive/guides/react/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Menus
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/mathlive/guides/virtual-keyboards/"
                     data-url="/mathlive/guides/react/"
                     class="">
@@ -2470,8 +2496,42 @@
 }
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">App</span>;
-
 </code></pre>
+<h2 id="using-mathlive-with-react-and-typescript" tabindex="-1">Using MathLive with React and TypeScript</h2>
+<p><strong>To use a mathfield with React and TypeScript</strong>, you need to add TypeScript definitions for MathLive.</p>
+<pre><code class="language-jsx">declare <span class="hljs-variable language_">global</span> {
+  namespace <span class="hljs-variable constant_">JSX</span> {
+    interface <span class="hljs-title class_">IntrinsicElements</span> {
+      <span class="hljs-string">&#x27;math-field&#x27;</span>: <span class="hljs-title class_">React</span>.<span class="hljs-property">DetailedHTMLProps</span>&lt;<span class="hljs-title class_">React</span>.<span class="hljs-property">HTMLAttributes</span>&lt;<span class="hljs-title class_">MathfieldElement</span>&gt;, <span class="hljs-title class_">MathfieldElement</span>&gt;;
+    }
+  }
+}
+
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;./App.css&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;//unpkg.com/mathlive&quot;</span>;
+<span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;react&quot;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> [value, setValue] = useState&lt;string&gt;(<span class="hljs-string">&quot;&quot;</span>);
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;App&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> 
+        <span class="hljs-attr">onInput</span>=<span class="hljs-string">{</span>
+          (<span class="hljs-attr">evt:</span> <span class="hljs-attr">React.ChangeEvent</span>&lt;<span class="hljs-attr">HTMLElement</span>&gt;</span>) =&gt; 
+            setValue(evt.target.value)
+        }
+      &gt;
+        {value}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Value: {value}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  );
+}
+
+export default App;
+</span></code></pre>
 <h2 id="theory-of-operations" tabindex="-1">Theory of Operations</h2>
 <p>A MathLive mathfield behaves as a regular DOM element:</p>
 <ul>
@@ -2492,7 +2552,8 @@ etc…). See <a href="https://cortexjs.io/docs/mathlive/#(MathfieldElement%3Acla
 <span class="hljs-keyword">import</span> { useState, useEffect, useRef } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;react&quot;</span>;
 
 <span class="hljs-keyword">function</span> <span class="hljs-title function_">App</span>(<span class="hljs-params"></span>) {
-  <span class="hljs-comment">// Get a ref to the mathfield element (see `ref={mf}` in the markup below)</span>
+  <span class="hljs-comment">// Get a ref to the mathfield element </span>
+  <span class="hljs-comment">// (see `ref={mf}` in the markup below)</span>
   <span class="hljs-keyword">const</span> mf = <span class="hljs-title function_">useRef</span>();
 
   <span class="hljs-comment">// Customize the mathfield when it is created</span>
@@ -2523,7 +2584,6 @@ etc…). See <a href="https://cortexjs.io/docs/mathlive/#(MathfieldElement%3Acla
 }
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title class_">App</span>;
-
 </code></pre>
 <div class='read-more'><a href="https://github.com/arnog/react-mathlive"> A ready-to-run
 example project is available on <strong>GitHub</strong><svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -2538,14 +2598,14 @@ example project is available on <strong>GitHub</strong><svg class="svg-chevron">
         
 
 
-        <meta itemprop="datePublished" content="July 21, 2023">
+        <meta itemprop="datePublished" content="November 20, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-07-21">July 21, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

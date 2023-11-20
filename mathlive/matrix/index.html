@@ -676,6 +676,32 @@
 
                 <li>
                   <a
+                    href="/mathlive/guides/menus/"
+                    data-url="/mathlive/matrix/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Menus
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
                     href="/mathlive/guides/virtual-keyboards/"
                     data-url="/mathlive/matrix/"
                     class="">
@@ -2420,7 +2446,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#matrix-variants">Matrix Variants</a></li><li><a href="#creating-a-matrix">Creating a Matrix</a><ol><li><a href="#using-keyboard-shortcuts">Using Keyboard Shortcuts</a></li><li><a href="#using-the-matrix-popover">Using the Matrix Popover</a></li></ol></li><li><a href="#spacing">Spacing</a><ol><li><a href="#changing-the-spacing-of-an-individual-row">Changing the spacing of an individual row</a></li><li><a href="#changing-the-spacing-of-all-rows">Changing the spacing of all rows</a></li></ol></li></ol>
+        <ol><li><a href="#creating-a-matrix">Creating a Matrix</a><ol><li><a href="#using-keyboard-shortcuts">Using Keyboard Shortcuts</a></li><li><a href="#using-the-context-menu">Using the Context Menu</a></li></ol></li><li><a href="#matrix-borders">Matrix Borders</a></li><li><a href="#changing-the-shape-of-a-matrix">Changing the Shape of a Matrix</a></li><li><a href="#spacing">Spacing</a><ol><li><a href="#changing-the-spacing-of-an-individual-row">Changing the spacing of an individual row</a></li><li><a href="#changing-the-spacing-of-all-rows">Changing the spacing of all rows</a></li></ol></li></ol>
       </div>
       
                               
@@ -2429,10 +2455,32 @@
 
 
 
-<p class="xl">Matrices are a useful way to represent and manipulate linear transformations. They are also used to represent systems of linear equations and many
+<p class="xl">A matrix is a useful way to represent and manipulate linear transformations. They are also used to represent systems of linear equations and many
 other mathematical structures.</p>
 <p>MathLive can display and edit matrices in a variety of ways.</p>
-<h2 id="matrix-variants" tabindex="-1">Matrix Variants</h2>
+<h2 id="creating-a-matrix" tabindex="-1">Creating a Matrix</h2>
+<p>There are several methods to create a matrix in a mathfield.</p>
+<h3 id="using-keyboard-shortcuts" tabindex="-1">Using Keyboard Shortcuts</h3>
+<p><strong>To create a matrix using the keyboard:</strong></p>
+<ol>
+<li>Type a parenthesis, square bracket, or curly brace.</li>
+<li>Type the first element of the matrix.</li>
+<li>Type the <kbd>ALT/OPTION</kbd>+<kbd>TAB</kbd> key to move to the next column: this will automatically
+transform the expression into a matrix</li>
+<li>Type the <kbd>ALT/OPTION</kbd>+<kbd>RETURN</kbd> key to move to the next row.</li>
+</ol>
+<h3 id="using-the-context-menu" tabindex="-1">Using the Context Menu</h3>
+<p>The MathLive context menu provides a convenient way to create a matrix.</p>
+<p><strong>To access the context menu</strong> right click (or <kbd>CTRL</kbd>+click) on the
+mathfield. The menu is also available by typing <kbd>ALT</kbd>+<kbd>SPACE</kbd>,
+or by tapping on the menu button in the mathfield.</p>
+<p><strong>To insert a matrix using the context menu</strong> select the <strong>Insert Matrix</strong>
+menu item,  then select the number of rows and columsn of the matrix.</p>
+<h2 id="matrix-borders" tabindex="-1">Matrix Borders</h2>
+<p>The borders of a matrix are parentheses by default. They can
+be changed to square brackets, curly braces, vertical bars, or none.</p>
+<p><strong>To change the border of a matrix</strong> right click (or <kbd>CTRL</kbd>+click) on the
+matrix, then select the desired border from the <strong>Matrix Border</strong> menu item.</p>
 <p>In LaTeX, matrices are represented using the <code>\begin{}...\end{}</code> syntax. The argument to the <code>begin</code> command determines the type of matrix and is called
 the <strong>environment</strong>.</p>
 <p>Inside the environment, the matrix is specified using the <code>&amp;</code> character to separate columns and the <code>\\</code> character to separate rows.</p>
@@ -2551,26 +2599,10 @@ the <strong>environment</strong>.</p>
   c & d
 \end{array}
  \]</div></div>
-<h2 id="creating-a-matrix" tabindex="-1">Creating a Matrix</h2>
-<p>There are several methods to create a matrix in a mathfield.</p>
-<h3 id="using-keyboard-shortcuts" tabindex="-1">Using Keyboard Shortcuts</h3>
-<p><strong>To create a matrix using the keyboard</strong></p>
-<ol>
-<li>Type a parenthesis, square bracket, or curly brace.</li>
-<li>Type the first element of the matrix.</li>
-<li>Type the <code>TAB</code> key to move to the next cell (this will automatically
-transform the expression into a matrix)</li>
-<li>Type the <code>RETURN</code> key to move to the next row.</li>
-</ol>
-<h3 id="using-the-matrix-popover" tabindex="-1">Using the Matrix Popover</h3>
-<p><strong>To create a matrix using the matrix popover</strong></p>
-<p>The policy defining when the matrix popover is displayed is controlled by the
-<code>environmentPopoverPolicy</code> option. The default value is <code>auto</code>, which means
-that the popover will be displayed when the cursor is inside a matrix. Set it to <code>&quot;off&quot;</code> to disable the popover.</p>
-<pre><code class="language-json">mf.environmentPopoverPolicy = <span class="hljs-string">&quot;auto&quot;</span>
-</code></pre>
-<p>The matrix popover can be opened by typing the <code>TAB</code> key when the cursor is
-inside a matrix.</p>
+<h2 id="changing-the-shape-of-a-matrix" tabindex="-1">Changing the Shape of a Matrix</h2>
+<p><strong>To add or remove rows or columns</strong> right click (or <kbd>CTRL</kbd>+click) on the
+matrix, then select the desired action from the menu. Rows and columns
+get added or removed relative to the cell the cursor is in.</p>
 <h2 id="spacing" tabindex="-1">Spacing</h2>
 <h3 id="changing-the-spacing-of-an-individual-row" tabindex="-1">Changing the spacing of an individual row</h3>
 <p>The spacing between rows can be adjusted by setting an
@@ -2642,14 +2674,14 @@ using <code>\renewcommand</code> might be handy, for example when rendering stat
         
 
 
-        <meta itemprop="datePublished" content="November 15, 2023">
+        <meta itemprop="datePublished" content="November 20, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-15">November 15, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2671,7 +2703,7 @@ using <code>\renewcommand</code> might be handy, for example when rendering stat
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#matrix-variants">Matrix Variants</a></li><li><a href="#creating-a-matrix">Creating a Matrix</a><ol><li><a href="#using-keyboard-shortcuts">Using Keyboard Shortcuts</a></li><li><a href="#using-the-matrix-popover">Using the Matrix Popover</a></li></ol></li><li><a href="#spacing">Spacing</a><ol><li><a href="#changing-the-spacing-of-an-individual-row">Changing the spacing of an individual row</a></li><li><a href="#changing-the-spacing-of-all-rows">Changing the spacing of all rows</a></li></ol></li></ol>
+        <ol><li><a href="#creating-a-matrix">Creating a Matrix</a><ol><li><a href="#using-keyboard-shortcuts">Using Keyboard Shortcuts</a></li><li><a href="#using-the-context-menu">Using the Context Menu</a></li></ol></li><li><a href="#matrix-borders">Matrix Borders</a></li><li><a href="#changing-the-shape-of-a-matrix">Changing the Shape of a Matrix</a></li><li><a href="#spacing">Spacing</a><ol><li><a href="#changing-the-spacing-of-an-individual-row">Changing the spacing of an individual row</a></li><li><a href="#changing-the-spacing-of-all-rows">Changing the spacing of all rows</a></li></ol></li></ol>
       </div>
     
                             
