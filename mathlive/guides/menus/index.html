@@ -2508,7 +2508,7 @@ operations on a mathfield.</p>
 <li>Right-click on the mathfield</li>
 <li>Long press on a mathfield, for example when using a touch device</li>
 <li>Tap on the menu button in the mathfield</li>
-<li>Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd> or <kbd>MENU<kbd> key
+<li>Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key
 on a keyboard</li>
 </ul>
 <p>The default menu has a set of commands that are useful for most
@@ -2520,15 +2520,16 @@ as needed.</p>
 Evaluate, Simplify and Solve), you can filter the menu items by id:</p>
 <pre><code class="language-js">mf.<span class="hljs-property">menuItems</span> = mf.<span class="hljs-property">menuItems</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> !item.<span class="hljs-property">id</span>.<span class="hljs-title function_">startWith</span>(<span class="hljs-string">&#x27;ce-&#x27;</span>);
 </code></pre>
-<p>Do not modify the value of the elements of <code>mf.menuItems</code> directly or the menu
-will not be updated as expected, i.e. do not do <code class="notice--warning">mf.menuItems[0].visible = false</code></p>
+<p class="notice--warning"><strong>CAUTION:</strong> Do not modify the value of the elements of <code>mf.menuItems</code> directly or the menu
+will not be updated as expected, i.e. do not do <code>mf.menuItems[0].visible = false</code>.</p>
 <h2 id="replacing-the-menu" tabindex="-1">Replacing the Menu</h2>
-<p>To replace the menu with your own, set the <code>mf.menu</code> property.</p>
-<p>The <code>menu</code> property is an array of menu items. Each menu item is an object
+<p><strong>To replace the context menu with your own</strong>, set the <code>mf.menuItems</code> property.</p>
+<p>The <code>menuItems</code> property is an array of menu items.</p>
+<p>Each menu item is an object
 with the following properties:</p>
 <ul>
 <li><code>type</code>: one of <code>&quot;command&quot;</code>, <code>&quot;divider&quot;</code>, <code>&quot;submenu&quot;</code>, <code>&quot;checkbox&quot;</code>, <code>&quot;radio&quot;</code>. The default is <code>&quot;command&quot;</code>.</li>
-<li><code>label</code>: The label to display for the menu item. This can be a string literal or a function that returns a string. If a function is provided, it will be called to update the label whenever the menu is displayed and if the keyboard modifiers change. The value of the string is interpreted as HTML markup.</li>
+<li><code>label</code>: The label to display for the menu item. This can be a string literal or a function that returns a string. If a function is provided, it will be called to update the label whenever the menu is displayed or when the keyboard modifiers change. The value of the string is interpreted as HTML markup.</li>
 <li><code>ariaLabel</code> and <code>ariaDetails</code>: If provided, these will be used to set
 the <code>aria-label</code> and <code>aria-details</code> attributes of the menu item. They
 can also be a string or a function that returns a string.</li>
@@ -2543,66 +2544,82 @@ display when the menu item is selected.</li>
 <li><code>onMenuSelect</code>: A function handler that is called when the menu item is
 selected.</li>
 </ul>
-<pre><code class="language-js">mf. menu = [
-    {
-        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Copy&#x27;</span>,
-        <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;copy&#x27;</span>,
-        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> {
-            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Copy&#x27;</span>);
-        }
-    },
-    {
-        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Paste&#x27;</span>,
-        <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;paste&#x27;</span>,
-        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> {
-            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Paste&#x27;</span>);
-        }
-    },
-    {
-        <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;divider&#x27;</span>
-    },
-    {
-        <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;submenu&#x27;</span>,
-        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu&#x27;</span>,
-        <span class="hljs-attr">submenu</span>: [
-            {
-                <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 1&#x27;</span>,
-                <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;submenu1&#x27;</span>,
-                <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> {
-                    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 1&#x27;</span>);
-                }
-            },
-            {
-                <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 2&#x27;</span>,
-                <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;submenu2&#x27;</span>,
-                <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> {
-                    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 2&#x27;</span>);
-                }
-            }
-        ]
-    },
+<pre><code class="language-js">mf. menuItems = [
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Copy&#x27;</span>,
+    <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Copy&#x27;</span>)
+  },
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Paste&#x27;</span>,
+    <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Paste&#x27;</span>);
+  },
+  {
+    <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;divider&#x27;</span>
+  },
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu&#x27;</span>,
+    <span class="hljs-attr">submenu</span>: [
+      {
+        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 1&#x27;</span>,
+        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 1&#x27;</span>);
+      },
+      {
+        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 2&#x27;</span>,
+        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 2&#x27;</span>);
+      }
+    ]
+  },
 ];
 </code></pre>
 <h2 id="listening-to-menu-events" tabindex="-1">Listening to Menu Events</h2>
-<p>When a menu item is selected, the mathfield will fire a <code>menu-select</code>
-custom event.</p>
-<p>The <code>detail</code> property of the event will contain the following properties:</p>
+<p>When a menu item is selected, a <code>menu-select</code>
+custom event is dispatched.</p>
+<p>The <code>detail</code> property of the event contains the following properties:</p>
 <ul>
 <li><code>id</code>: The id of the menu item that was selected.</li>
 <li><code>label</code>: The label of the menu item that was selected.</li>
-<li><code>data</code>: An arbitrary data payload associated with the menu item, if any.</li>
-<li><code>modifiers</code>: An object containing the state of the modifier keys when the</li>
-<li>menu item was selected. The following properties are defined:
+<li><code>data</code>: The data payload associated with the menu item, if any.</li>
+<li><code>modifiers</code>: An object containing the state of the modifier keys when the
+menu item was selected. The following properties are defined:
 <ul>
-<li><code>altKey</code>: <code>true</code> if the alt key was pressed when the menu item was selected.</li>
-<li><code>ctrlKey</code>: <code>true</code> if the ctrl key was pressed when the menu item was selected.</li>
-<li><code>metaKey</code>: <code>true</code> if the meta key was pressed when the menu item was selected.</li>
-<li><code>shiftKey</code>: <code>true</code> if the shift key was pressed when the menu item was selected.</li>
+<li><code>altKey</code></li>
+<li><code>ctrlKey</code></li>
+<li><code>metaKey</code></li>
+<li><code>shiftKey</code></li>
 </ul>
 </li>
 </ul>
-<pre><code class="language-javascript">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;menu-select&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Menu item selected:&#x27;</span>, event.<span class="hljs-property">detail</span>);
+<p>The example above can be rewritten to use the <code>menu-select</code> event instead of the <code>onMenuSelect</code> handler. Note that in
+this case, the menu items have an <code>id</code> property, which is used to identify the menu item that was selected.</p>
+<pre><code class="language-javascript">mf. menuItems = [
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Copy&#x27;</span>,
+    <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;copy&#x27;</span>
+  },
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Paste&#x27;</span>,
+    <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;paste&#x27;</span>
+  },
+  {
+    <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;divider&#x27;</span>
+  },
+  {
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu&#x27;</span>,
+    <span class="hljs-attr">submenu</span>: [
+      {
+        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 1&#x27;</span>,
+        <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;submenu-1&#x27;</span>
+      },
+      {
+        <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 2&#x27;</span>,
+        <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;submenu-2&#x27;</span>
+      }
+    ]
+  },
+];
+
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;menu-select&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Menu item selected:&#x27;</span>, event.<span class="hljs-property">detail</span>.<span class="hljs-property">id</span>);
 });
 </code></pre>
 
