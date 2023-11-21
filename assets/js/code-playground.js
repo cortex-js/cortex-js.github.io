@@ -438,6 +438,8 @@ TEMPLATE.innerHTML = `
     padding: 8px;
     color: var(--text-color);
     background: var(--ui-background);
+    position: relative;
+    z-index: 1;
     }
 @media (prefers-color-scheme: dark) {
   :root {
