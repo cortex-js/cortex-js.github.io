@@ -2492,7 +2492,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li></ol>
+        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-visibility-ot-the-menu">Controling the Visibility ot the Menu</a></li></ol>
       </div>
       
                               
@@ -2506,13 +2506,17 @@ operations on a mathfield.</p>
 <p><strong>To display the context menu:</strong></p>
 <ul>
 <li>Right-click on the mathfield</li>
-<li>Long press on a mathfield, for example when using a touch device</li>
+<li>Long press on a mathfield</li>
 <li>Tap on the menu button in the mathfield</li>
 <li>Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key
 on a keyboard</li>
 </ul>
-<p>The default menu has a set of commands that are useful for most
-applications, but you can customize the menu to add or remove commands
+<p>The context menu is fully accessible. It can be navigated using the
+keyboard, and the menu items are announced by screen readers.</p>
+<p><strong>To navigate the context menu, use the arrow keys</strong></p>
+<p>An item can also be selected by typing some of the letters of its label.</p>
+<p>The default context menu has a set of commands that are useful for most
+applications, but you can customize the menu by adding or removing commands
 as needed.</p>
 <h2 id="filtering-menu-items" tabindex="-1">Filtering Menu Items</h2>
 <p>The menu can be filtered to only display a subset of the available commands.</p>
@@ -2525,8 +2529,7 @@ will not be updated as expected, i.e. do not do <code>mf.menuItems[0].visible = 
 <h2 id="replacing-the-menu" tabindex="-1">Replacing the Menu</h2>
 <p><strong>To replace the context menu with your own</strong>, set the <code>mf.menuItems</code> property.</p>
 <p>The <code>menuItems</code> property is an array of menu items.</p>
-<p>Each menu item is an object
-with the following properties:</p>
+<p>Each menu item is an object with the following properties:</p>
 <ul>
 <li><code>type</code>: one of <code>&quot;command&quot;</code>, <code>&quot;divider&quot;</code>, <code>&quot;submenu&quot;</code>, <code>&quot;checkbox&quot;</code>, <code>&quot;radio&quot;</code>. The default is <code>&quot;command&quot;</code>.</li>
 <li><code>label</code>: The label to display for the menu item. This can be a string literal or a function that returns a string. If a function is provided, it will be called to update the label whenever the menu is displayed or when the keyboard modifiers change. The value of the string is interpreted as HTML markup.</li>
@@ -2622,6 +2625,18 @@ mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Menu item selected:&#x27;</span>, event.<span class="hljs-property">detail</span>.<span class="hljs-property">id</span>);
 });
 </code></pre>
+<h2 id="controling-the-visibility-ot-the-menu" tabindex="-1">Controling the Visibility ot the Menu</h2>
+<p><strong>To hide the menu toggle button</strong> use the following CSS:</p>
+<pre><code class="language-css">math-field<span class="hljs-selector-pseudo">::part</span>(<span class="hljs-selector-tag">menu</span>-toggle) {
+  <span class="hljs-attribute">display</span>: none;
+}
+</code></pre>
+<p>When the menu button is hidden, the context menu is still accessible
+with keyboard shortcut, right-click on long press.</p>
+<p><strong>To prevent the menu from being displayed</strong> in any case, set the
+<code>mf.menuItems</code> to an empty array:</p>
+<pre><code class="language-javascript">mf.<span class="hljs-property">menuItems</span> = [];
+</code></pre>
 
 
 
@@ -2662,7 +2677,7 @@ mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li></ol>
+        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-visibility-ot-the-menu">Controling the Visibility ot the Menu</a></li></ol>
       </div>
     
                             
