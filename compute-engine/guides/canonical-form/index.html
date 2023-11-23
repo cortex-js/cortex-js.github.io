@@ -2602,30 +2602,46 @@ transformations it applies.</p>
 <p>Below is a list of some of the transformations applied to obtain the canonical
 form:</p>
 <ul>
-<li>Idempotency: \( f(f(x)) \to f(x) \)</li>
-<li>Involution: \( f(f(x)) \to x \)</li>
-<li>Associativity: \( f(a, f(b, c)) \to f(a, b, c) \)</li>
-<li><strong>Literals</strong>
+<li><strong>Literal Numbers</strong>
 <ul>
 <li>Rationals are reduced, e.g. \( \frac{6}{4} \to \frac{3}{2}\)</li>
 <li>The denominator of rationals is made positive, e.g. \(\frac{5}{-11}
 \to \frac{-5}{11}\)</li>
-<li>A rational with a denominator of 1 is replaced with a number, e.g.
+<li>A rational with a denominator of 1 is replaced with the numerator, e.g.
 \(\frac{19}{1} \to 19\)</li>
-<li>Complex numbers with no imaginary component are replaced with a real number</li>
+<li>Complex numbers with no imaginary component are replaced with the real component</li>
 </ul>
 </li>
 <li><code>Add</code>
 <ul>
-<li>Arguments are sorted</li>
+<li>Literal 0 is removed</li>
 <li>Sum of a literal and the product of a literal with the imaginary unit are
 replaced with a complex number.</li>
+<li>Associativity is applied</li>
+<li>Arguments are sorted</li>
 </ul>
 </li>
-<li><code>Multiply</code>: Arguments are sorted</li>
-<li><code>Negate</code>: <code>[&quot;Negate&quot;, 3]</code> \(\to\) <code>-3</code></li>
+<li><code>Multiply</code>
+<ul>
+<li>Literal 1 is removed</li>
+<li>Product of a literal and the imaginary unit are replaced with a complex
+number.</li>
+<li>Literal -1 multiplied by an expression is replaced with the negation of the
+expression.</li>
+<li>Signs are simplified: (-x)(-y) -&gt; xy</li>
+<li>Associativity is applied</li>
+<li>Arguments are sorted</li>
+</ul>
+</li>
+<li><code>Negate</code>
+<ul>
+<li>Literal numbers are negated</li>
+<li>Negate of a negation is removed</li>
+</ul>
+</li>
 <li><code>Power</code>
 <ul>
+<li>\(x^n)^m \to x^{nm}\)</li>
 <li>\(x^{\tilde\infty} \to \operatorname{NaN}\)</li>
 <li>\(x^0 \to 1\)</li>
 <li>\(x^1 \to x\)</li>
@@ -2641,7 +2657,18 @@ replaced with a complex number.</li>
 <li><code>Square</code>: <code>[&quot;Power&quot;, &quot;x&quot;, 2]</code> \(\to\) <code>[&quot;Square&quot;, &quot;x&quot;]</code></li>
 <li><code>Sqrt</code>: <code>[&quot;Sqrt&quot;, &quot;x&quot;]</code> \(\to\)<code>[&quot;Power&quot;, &quot;x&quot;, &quot;Half&quot;]</code></li>
 <li><code>Root</code>:  <code>[&quot;Root&quot;, &quot;x&quot;, 3]</code> \(\to\) <code>[&quot;Power&quot;, &quot;x&quot;, [&quot;Rational&quot;, 1, 3]]</code></li>
-<li><code>Subtract</code>: <code>[&quot;Subtract&quot;, &quot;a&quot;, &quot;b&quot;]</code> \(\to\) <code>[&quot;Add&quot;, [&quot;Negate&quot;, &quot;b&quot;], &quot;a&quot;]</code></li>
+<li><code>Subtract</code>
+<ul>
+<li>Replaced with addition, e.g. <code>[&quot;Subtract&quot;, &quot;a&quot;, &quot;b&quot;]</code> \(\to\) <code>[&quot;Add&quot;, [&quot;Negate&quot;, &quot;b&quot;], &quot;a&quot;]</code></li>
+</ul>
+</li>
+<li>Other functions:
+<ul>
+<li>Simplified if idempotent: \( f(f(x)) \to f(x) \)</li>
+<li>Simplified if an involution: \( f(f(x)) \to x \)</li>
+<li>Simplified if associative: \( f(a, f(b, c)) \to f(a, b, c) \)</li>
+</ul>
+</li>
 </ul>
 <h2 id="custom-canonical-form" tabindex="-1">Custom Canonical Form</h2>
 <p>The full canonical form of an expression is not always the most convenient
@@ -2710,14 +2737,14 @@ ce.<span class="hljs-title function_">parse</span>(latex,
         
 
 
-        <meta itemprop="datePublished" content="November 20, 2023">
+        <meta itemprop="datePublished" content="November 23, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-23">November 23, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
