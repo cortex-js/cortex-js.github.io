@@ -2529,9 +2529,12 @@
 
 
 <h1 id="tutorial-a-simple-quizz" tabindex="-1"><em>Tutorial</em> A Simple Quizz</h1>
-<p class="xl">In this tutorial, we’ll create a web-based quiz application that allows students to practice simplifying mathematical expressions into polynomials. We’ll use two powerful tools: <strong>MathLive</strong> for math input and <strong>CortexJS Compute Engine</strong> for evaluating mathematical expressions.</p>
+<p class="xl">In this tutorial, we’ll create a web-based quiz application that allows
+students to practice simplifying mathematical expressions into polynomials.
+We’ll use two powerful tools: <strong>MathLive</strong> for math input and
+<strong>CortexJS Compute Engine</strong> for evaluating mathematical expressions.</p>
 <h2 id="step-1%3A-setting-up-your-project" tabindex="-1">Step 1: Setting Up Your Project</h2>
-<p>In this tutorial, we’ll use HTML, CSS, and JavaScript.</p>
+<p>In this tutorial, we’ll use HTML and JavaScript.</p>
 <p>Let’s start by setting up our HTML file.</p>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
@@ -2544,6 +2547,9 @@
 <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
     <span class="hljs-comment">&lt;!-- Interactive elements will be added here --&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+    <span class="hljs-comment">// JavaScript code will be added here</span>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 </code></pre>
 <p>We’re loading the MathLive and ComputeEngine library from a the “unpkg” CDN.
@@ -2552,7 +2558,7 @@ You can also download the libraries and host them locally.</p>
 make sure to load both of them.</p>
 <h2 id="step-2%3A-creating-the-quiz-interface" tabindex="-1">Step 2: Creating the Quiz Interface</h2>
 <p>Our quiz will have a simple interface: a question area, an input field for the answer, a submission button, and a feedback section.</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;question&quot;</span>&gt;</span>Simplify the expression: (x+1)(2x -1)<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Simplify the expression: (x+1)(2x -1)<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;answer&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;submitAnswer&quot;</span>&gt;</span>Check Answer<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;feedback&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
@@ -2567,11 +2573,11 @@ answerButton.<span class="hljs-title function_">addEventListener</span>(<span cl
   <span class="hljs-keyword">const</span> studentInput = mathfield.<span class="hljs-property">value</span>;
   <span class="hljs-keyword">const</span> expectedAnswer = <span class="hljs-string">&quot;2x^2+x-1&quot;</span>;
 
-  <span class="hljs-keyword">const</span> feedback = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>);
-  <span class="hljs-keyword">if</span> (studentInput === expectedAnswer) 
-    feedback.<span class="hljs-property">textContent</span> = <span class="hljs-string">&#x27;Correct! 😃&#x27;</span>;
-  <span class="hljs-keyword">else</span> 
-    feedback.<span class="hljs-property">textContent</span> = <span class="hljs-string">&#x27;Try again. 😞&#x27;</span>;
+  <span class="hljs-comment">// Compare the expressions as strings</span>
+  <span class="hljs-keyword">const</span> feedback = studentInput === expectedAnswer ?
+     <span class="hljs-string">&#x27;Correct! 😃&#x27;</span> : <span class="hljs-string">&#x27;Try again. 😞&#x27;</span>;
+
+  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = feedback;
 });
 </code></pre>
 <p>To read the content of the math input field, we can use the <code>value</code> property of the <code>&lt;math-field&gt;</code> element. This property returns a LaTeX string representation of
@@ -2594,10 +2600,11 @@ answerButton.<span class="hljs-title function_">addEventListener</span>(<span cl
     <span class="hljs-keyword">const</span> ce = <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>;
     <span class="hljs-keyword">const</span> expectedAnswer = ce.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&quot;2x^2+x-1&quot;</span>);
 
-    <span class="hljs-keyword">if</span> (studentInput.<span class="hljs-title function_">isSame</span>(expectedAnswer)) 
-        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = <span class="hljs-string">&#x27;Correct!&#x27;</span>;
-    <span class="hljs-keyword">else</span> 
-        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = <span class="hljs-string">&#x27;Try again.&#x27;</span>;
+  <span class="hljs-comment">// Compare the expressions using `isSame()`</span>
+  <span class="hljs-keyword">const</span> feedback = studentInput.<span class="hljs-title function_">isSame</span>(expectedAnswer) ?
+     <span class="hljs-string">&#x27;Correct! 😃&#x27;</span> : <span class="hljs-string">&#x27;Try again. 😞&#x27;</span>;
+
+  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = feedback;
 });
 </code></pre>
 <p>Using the <code>isSame()</code> method, we can compare the student’s input with the expected answer. This method returns <code>true</code> if the two expressions are equivalent, and <code>false</code> otherwise.</p>
@@ -2606,11 +2613,11 @@ expressions. For example, it will consider <code>2x</code> and <code>2\timesx</c
 <p>Once we have an expression, there are many operations we can perform on it. For example, we can simplify it, expand it. We can also evaluate it for a given value of <code>x</code>.</p>
 <p>The Compute Engine provides many operations that can be performed on expressions,
 including calculus, statistical operations and linear algebra.</p>
-<h2 id="step-5%3A-enhancing-the-quiz-experience" tabindex="-1">Step 5: Enhancing the Quiz Experience</h2>
+<h2 id="step-5%3A-displaying-static-math" tabindex="-1">Step 5: Displaying Static Math</h2>
 <p>In our example so far, we display the question in plain text. This is not very user-friendly. Instead, we can use MathLive to display the question in a more readable format.</p>
 <p>First, we’ll modify the HTML to indicate that a portion of the question
 should be rendered as math by surrounding it with <code>$$</code> delimiters.</p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;question&quot;</span>&gt;</span>Simplify the expression: $$ (x+1)(2x -1) $$<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Simplify the expression: $$ (x+1)(2x-1) $$<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 </code></pre>
 <p>Then we’ll call the <code>renderMathInElement()</code> function to render the math in the question.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> question = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;question&#x27;</span>);
@@ -2618,8 +2625,110 @@ should be rendered as math by surrounding it with <code>$$</code> delimiters.</p
 </code></pre>
 <p>If we had a lot of math in our quiz, we could call <code>renderMathInDocument()</code>
 to render all the math in the page.</p>
+<h2 id="step-6%3A-generating-random-questions" tabindex="-1">Step 6: Generating Random Questions</h2>
+<p>To keep the quiz interesting, we can generate random questions.</p>
+<p>We’ll create a function that generates a random quadratic expression.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">generateRandomExpression</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> ce = <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>;
+  <span class="hljs-keyword">const</span> a = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) + <span class="hljs-number">1</span>;
+  <span class="hljs-keyword">const</span> b = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) ;
+  <span class="hljs-keyword">const</span> c = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) + <span class="hljs-number">1</span>;
+  <span class="hljs-keyword">const</span> d = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) ;
+  <span class="hljs-comment">// (ax+b)(cx+d)</span>
+  <span class="hljs-keyword">return</span> ce.<span class="hljs-title function_">mul</span>(
+      ce.<span class="hljs-title function_">add</span>(ce.<span class="hljs-title function_">mul</span>(a, <span class="hljs-string">&#x27;x&#x27;</span>), b),
+      ce.<span class="hljs-title function_">add</span>(ce.<span class="hljs-title function_">mul</span>(c, <span class="hljs-string">&#x27;x&#x27;</span>), d),
+  );
+}
+</code></pre>
+<p>The <code>ce.add()</code> and <code>ce.mul()</code> functions create a sum and a product, respectively.
+They are a short and convenient way to create a MathJSON expression.
+They are equivalent to the following:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">return</span> ce.<span class="hljs-title function_">box</span>([<span class="hljs-string">&quot;Multiply&quot;</span>, 
+  [<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, a, <span class="hljs-string">&quot;x&quot;</span>], b], 
+  [<span class="hljs-string">&quot;Add&quot;</span>, [<span class="hljs-string">&quot;Multiply&quot;</span>, c, <span class="hljs-string">&quot;x&quot;</span>], d]]).evaluate();
+</code></pre>
+<p>The <code>ce.box()</code> function creates a MathJSON expression from a MathJSON array.</p>
+<p>Then we’ll modify the HTML to use this function to generate the question.</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Simplify the expression: <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;question&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</code></pre>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> question = <span class="hljs-title function_">generateRandomExpression</span>();
+<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;question&#x27;</span>).<span class="hljs-property">htmlContent</span> = 
+  <span class="hljs-title function_">convertLatexToMarkup</span>(question.<span class="hljs-property">latex</span>);
+</code></pre>
+<p>Here we’re using <code>convertLatexToMarkup()</code> to convert the LaTeX representation
+of the expression into HTML markup. It’s a more direct way to render static
+math in the page.</p>
+<p>Finally, we’ll modify the event handler for the button to use the generated
+question.</p>
+<p>We use <code>simplify()</code> to simplify the product of two terms into a polynomial and
+compare it with the student’s input, since we expect the student to have
+simplified the expression.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> answerButton = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;submitAnswer&#x27;</span>);
+answerButton.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">const</span> studentInput = mathfield.<span class="hljs-property">expression</span>;
+  <span class="hljs-keyword">const</span> expectedAnswer = question.<span class="hljs-title function_">simplify</span>();
+
+  <span class="hljs-comment">// Compare the expressions using `isSame()`</span>
+  <span class="hljs-keyword">const</span> feedback = studentInput.<span class="hljs-title function_">isSame</span>(expectedAnswer) ?
+     <span class="hljs-string">&#x27;Correct! 😃&#x27;</span> : <span class="hljs-string">&#x27;Try again. 😞&#x27;</span>;
+
+  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = feedback;
+});
+</code></pre>
 <h2 id="conclusion" tabindex="-1">Conclusion</h2>
-<p>We’ve just scratched the surface of what’s possible with MathLive and CortexJS Compute Engine. This simple quiz application demonstrates the potential for creating interactive educational tools. Explore further to see how you can enhance and adapt this application to suit various educational needs.</p>
+<p>Here’s the complete code for our quiz application:</p>
+<pre><code class="language-html"><span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Math Quiz<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Include MathLive and CortexJS Compute Engine --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/mathlive&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//unpkg.com/@cortex-js/compute-engine&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Simplify the expression: <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;question&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">math-field</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;answer&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">math-field</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;submitAnswer&quot;</span>&gt;</span>Check Answer<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;feedback&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">generateRandomExpression</span>(<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">const</span> ce = <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>;
+      <span class="hljs-keyword">const</span> a = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) + <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">const</span> b = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) ;
+      <span class="hljs-keyword">const</span> c = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) + <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">const</span> d = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">10</span>) ;
+      <span class="hljs-comment">// (ax+b)(cx+d)</span>
+      <span class="hljs-keyword">return</span> ce.<span class="hljs-title function_">mul</span>(
+          ce.<span class="hljs-title function_">add</span>(ce.<span class="hljs-title function_">mul</span>(a, <span class="hljs-string">&#x27;x&#x27;</span>), b),
+          ce.<span class="hljs-title function_">add</span>(ce.<span class="hljs-title function_">mul</span>(c, <span class="hljs-string">&#x27;x&#x27;</span>), d),
+      );
+  }
+
+  <span class="hljs-keyword">const</span> question = <span class="hljs-title function_">generateRandomExpression</span>();
+  <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;question&#x27;</span>).<span class="hljs-property">htmlContent</span> = 
+    <span class="hljs-title function_">convertLatexToMarkup</span>(question.<span class="hljs-property">latex</span>);
+  
+  <span class="hljs-keyword">const</span> answerButton = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;submitAnswer&#x27;</span>);
+  answerButton.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+      <span class="hljs-keyword">const</span> studentInput = mathfield.<span class="hljs-property">expression</span>;
+      <span class="hljs-keyword">const</span> expectedAnswer = question.<span class="hljs-title function_">simplify</span>();
+
+      <span class="hljs-comment">// Compare the expressions using `isSame()`</span>
+      <span class="hljs-keyword">const</span> feedback = studentInput.<span class="hljs-title function_">isSame</span>(expectedAnswer) ?
+          <span class="hljs-string">&#x27;Correct! 😃&#x27;</span> : <span class="hljs-string">&#x27;Try again. 😞&#x27;</span>;
+
+      <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = feedback;
+  });
+
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>We’ve just scratched the surface of what’s possible with MathLive and CortexJS
+Compute Engine. This simple quiz application demonstrates the potential for
+creating interactive educational tools. Explore further to see how you can
+enhance and adapt this application to suit various educational needs.</p>
 
 
 
