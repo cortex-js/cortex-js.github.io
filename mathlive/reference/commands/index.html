@@ -173,6 +173,50 @@
     
       <li class="nav__section">
         
+          <button class="nav__sub-title nav__sub-title_toggle">Tutorials
+            
+              <span class="nav__sub-title_expand"><svg class="icon1em"><use xlink:href="/assets/icons.svg#plus"></use></svg></span>
+              <span class="nav__sub-title_collapse"><svg class="icon1em"><use xlink:href="/assets/icons.svg#minus"></use></svg></span>
+            
+          </button>
+        
+
+
+        
+          <ul>
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/tutorials/simple-quiz/"
+                    data-url="/mathlive/reference/commands/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#tutorial"></use>
+                      </svg>
+                    
+                    Simple Quizz
+                  </a>
+                </li>
+              
+            
+          </ul>
+        
+      </li>
+    
+      <li class="nav__section">
+        
           <button class="nav__sub-title nav__sub-title_toggle">MathLive
             
               <span class="nav__sub-title_expand"><svg class="icon1em"><use xlink:href="/assets/icons.svg#plus"></use></svg></span>
@@ -494,7 +538,7 @@
 
                 <li>
                   <a
-                    href="/mathlive/guides/fill-in-the-blank/"
+                    href="/mathlive/guides/customizing/"
                     data-url="/mathlive/reference/commands/"
                     class="">
                     
@@ -502,7 +546,7 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Fill-in-the-Blank
+                    Customize
                   </a>
                 </li>
               
@@ -520,7 +564,7 @@
 
                 <li>
                   <a
-                    href="/mathlive/guides/customizing/"
+                    href="/mathlive/guides/menu/"
                     data-url="/mathlive/reference/commands/"
                     class="">
                     
@@ -528,7 +572,85 @@
                         <use xlink:href="/assets/icons.svg#guide"></use>
                       </svg>
                     
-                    Customize the Mathfield
+                    Menu
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/mathlive/guides/virtual-keyboards/"
+                    data-url="/mathlive/reference/commands/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Virtual Keyboard
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/mathlive/guides/shortcuts/"
+                    data-url="/mathlive/reference/commands/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Shortcuts
+                  </a>
+                </li>
+              
+            
+              
+              
+                
+                  
+                
+
+                
+                
+                  
+                
+
+                <li>
+                  <a
+                    href="/mathlive/guides/fill-in-the-blank/"
+                    data-url="/mathlive/reference/commands/"
+                    class="">
+                    
+                      <svg class="nav__icon">
+                        <use xlink:href="/assets/icons.svg#guide"></use>
+                      </svg>
+                    
+                    Fill-in-the-Blank
                   </a>
                 </li>
               
@@ -598,32 +720,6 @@
 
                 <li>
                   <a
-                    href="/mathlive/guides/shortcuts/"
-                    data-url="/mathlive/reference/commands/"
-                    class="">
-                    
-                      <svg class="nav__icon">
-                        <use xlink:href="/assets/icons.svg#guide"></use>
-                      </svg>
-                    
-                    Shortcuts
-                  </a>
-                </li>
-              
-            
-              
-              
-                
-                  
-                
-
-                
-                
-                  
-                
-
-                <li>
-                  <a
                     href="/mathlive/guides/speech/"
                     data-url="/mathlive/reference/commands/"
                     class="">
@@ -659,58 +755,6 @@
                       </svg>
                     
                     Display Static Math
-                  </a>
-                </li>
-              
-            
-              
-              
-                
-                  
-                
-
-                
-                
-                  
-                
-
-                <li>
-                  <a
-                    href="/mathlive/guides/menus/"
-                    data-url="/mathlive/reference/commands/"
-                    class="">
-                    
-                      <svg class="nav__icon">
-                        <use xlink:href="/assets/icons.svg#guide"></use>
-                      </svg>
-                    
-                    Menus
-                  </a>
-                </li>
-              
-            
-              
-              
-                
-                  
-                
-
-                
-                
-                  
-                
-
-                <li>
-                  <a
-                    href="/mathlive/guides/virtual-keyboards/"
-                    data-url="/mathlive/reference/commands/"
-                    class="">
-                    
-                      <svg class="nav__icon">
-                        <use xlink:href="/assets/icons.svg#guide"></use>
-                      </svg>
-                    
-                    Customize the Virtual Keyboard
                   </a>
                 </li>
               
@@ -4734,10 +4778,9 @@ argument. This applies to all the other <code>matrix</code> environments.</p>
 </div>
 <h4 id="smallmatrix" tabindex="-1"><code>smallmatrix</code></h4>
 <p>A matrix typeset in a way that may be suitable on the same line as text.</p>
-<div class='latex'><div class="source"></div><div class="display">\[  \]</div></div>
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
-<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix}a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d}<span class="hljs-keyword">\end</span>{smallmatrix}
+<pre><code class="language-tex"><span class="hljs-keyword">\begin</span>{smallmatrix} a <span class="hljs-built_in">&amp;</span> b <span class="hljs-keyword">\\</span> c <span class="hljs-built_in">&amp;</span> <span class="hljs-keyword">\frac</span>{1}{d} <span class="hljs-keyword">\end</span>{smallmatrix}
 </code></pre>
 </div>
 <h3 id="other-environments" tabindex="-1">Other Environments</h3>
@@ -5024,14 +5067,14 @@ document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / C
         
 
 
-        <meta itemprop="datePublished" content="November 20, 2023">
+        <meta itemprop="datePublished" content="November 25, 2023">
                 
 
         <p><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#code-branch"/></svg><strong>Version </strong> <span id="version"></span></p>
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-25">November 25, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
