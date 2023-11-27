@@ -2613,17 +2613,18 @@ in a more robust way.</p>
   <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;feedback&#x27;</span>).<span class="hljs-property">textContent</span> = feedback;
 }
 </code></pre>
-<p>The method <code>ce.parse()</code> returns a boxed expression, a
-JavaScript object that represents a mathematical expression. It can be
-evaluated, simplified, expanded, etc. The <code>ce.parse()</code> function creates a boxed
-expression from a LaTeX string.</p>
-<p>Using the <code>isSame()</code> method, we can compare the student’s input with the expected answer. This method returns <code>true</code> if the two expressions are equivalent, and <code>false</code> otherwise.</p>
-<p>This method compares the two expressions not as strings, but as mathematical
-expressions. For example, it will consider <code>2x</code> and <code>2\timesx</code> to be equivalent.</p>
-<p>The Compute Engine provides many operations that can be performed on expressions,
-including calculus, statistical operations and linear algebra.</p>
+<p>The method <code>ce.parse()</code> returns a <strong>boxed expression</strong> from a LaTeX string. A
+boxed expression is a JavaScript object that represents a mathematical
+expression.</p>
+<p>The Compute Engine provides many operations that can be performed on
+boxed expressions, including calculus, statistical operations and linear algebra.</p>
 <p>For example, we can simplify an expression, expand it or evaluate it for a
 given value of <code>x</code>.</p>
+<p>Using the <code>isSame()</code> method, we can compare the student’s input with the
+expected answer. This method returns <code>true</code> if the two expressions are
+structurally equivalent, and <code>false</code> otherwise.</p>
+<p>This method compares the two expressions not as strings, but as mathematical
+expressions. For example, it will consider <code>2x</code> or <code>2\timesx</code> to be the same.</p>
 <h2 id="step-5%3A-listening-for-keyboard-events" tabindex="-1">Step 5: Listening for Keyboard Events</h2>
 <p>We can make our quiz more user-friendly by allowing students to validate their
 answer by pressing the <kbd>Enter</kbd> key.</p>
@@ -2634,9 +2635,13 @@ answerField.<span class="hljs-title function_">addEventListener</span>(<span cla
   <span class="hljs-keyword">if</span> (event.<span class="hljs-property">data</span> === <span class="hljs-string">&#x27;insertLineBreak&#x27;</span>) <span class="hljs-title function_">checkAnswer</span>()
 });
 </code></pre>
+<p>Note that we could also use the <code>keypress</code> event, but the <code>input</code> event is
+will work both when using a physical keyboard and when using the virtual
+keyboard.</p>
 <h2 id="step-6%3A-displaying-static-math" tabindex="-1">Step 6: Displaying Static Math</h2>
 <p>In our example so far, we display the question in plain text. We can
-display it as LaTeX instead.</p>
+display it as LaTeX instead. It doesn’t make much of a difference in this
+case, but it can be useful when we want to display more complex math.</p>
 <p>First, we’ll modify the HTML to indicate that a portion of the question
 should be rendered as math by surrounding it with <code>$$</code> delimiters.</p>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Simplify the expression: $$ (x+1)(2x-1) $$<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
@@ -2660,7 +2665,8 @@ questionSpan.<span class="hljs-property">htmlContent</span> =
 of the expression into HTML markup. It’s a more direct way to render static
 math in the page.</p>
 <h2 id="step-7%3A-generating-random-questions" tabindex="-1">Step 7: Generating Random Questions</h2>
-<p>To keep the quiz interesting, we can generate random questions.</p>
+<p>So far our quiz always asks the same question. To keep it interesting, we can
+generate random questions.</p>
 <p>We’ll create a function that generates a product of two random terms.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">generateRandomQuestion</span>(<span class="hljs-params"></span>) {
   <span class="hljs-keyword">const</span> ce = <span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>;
@@ -2691,7 +2697,7 @@ They are equivalent to the following:</p>
 </code></pre>
 <p>Since we expect the student to have simplified the expression,
 we use <code>simplify()</code> to simplify the product of two terms into a polynomial and
-compare it with the student’s input,</p>
+compare it with the student’s input.</p>
 <h2 id="conclusion" tabindex="-1">Conclusion</h2>
 <p>Here’s the complete code for our quiz application:</p>
 <pre><code class="language-html"><span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span>
