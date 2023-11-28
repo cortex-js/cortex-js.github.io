@@ -2697,26 +2697,26 @@ and as the content inserted when the keycap is pressed.</p>
 <h3 id="placeholder-tokens" tabindex="-1">Placeholder Tokens</h3>
 <p>You’ll notice from the example above that the LaTeX fragments defining the
 keycap can contain some special placeholder tokens:</p>
-<div class='symbols-table'>
+<div class='symbols-table' style='--first-col-width:5ch'>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Token</th>
+<th style="text-align:right">Token</th>
 <th style="text-align:left"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>#@</code></td>
+<td style="text-align:right"><code>#@</code></td>
 <td style="text-align:left">Replaced with the selection, if there is one. If there is no selection, replaced with an implicit argument to the left of the caret. For example, for <code>12+34</code>, if the caret is at the end, <code>#@</code> would be replaced with <code>34</code>.</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>#0</code></td>
-<td style="text-align:left">replaced with the selection if there is one, a <code>\placeholder{}</code> command otherwise</td>
+<td style="text-align:right"><code>#0</code></td>
+<td style="text-align:left">Replaced with the selection if there is one, a <code>\placeholder{}</code> command otherwise</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>#?</code></td>
-<td style="text-align:left">replaced with a <code>\placeholder{}</code> command</td>
+<td style="text-align:right"><code>#?</code></td>
+<td style="text-align:left">Replaced with a <code>\placeholder{}</code> command</td>
 </tr>
 </tbody>
 </table>
@@ -2785,24 +2785,27 @@ Learn more about the available commands
   <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Basic&#x27;</span>,
   <span class="hljs-attr">rows</span>: [
     [
-      <span class="hljs-string">&#x27;[7]&#x27;</span>, <span class="hljs-string">&#x27;[8]&#x27;</span>, <span class="hljs-string">&#x27;[9]&#x27;</span>, <span class="hljs-string">&#x27;[+]&#x27;</span>, {<span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
+      <span class="hljs-string">&#x27;[7]&#x27;</span>, <span class="hljs-string">&#x27;[8]&#x27;</span>, <span class="hljs-string">&#x27;[9]&#x27;</span>, <span class="hljs-string">&#x27;[+]&#x27;</span>, 
+      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
       { <span class="hljs-attr">class</span>: <span class="hljs-string">&#x27;small&#x27;</span>, <span class="hljs-attr">latex</span>: <span class="hljs-string">&#x27;\\frac{#@}{#0}&#x27;</span> },
       <span class="hljs-string">&#x27;\\varnothing&#x27;</span>, <span class="hljs-string">&#x27;\\infty&#x27;</span>, <span class="hljs-string">&#x27;\\in&#x27;</span>, <span class="hljs-string">&#x27;\\notin&#x27;</span>,
       <span class="hljs-string">&#x27;[separator]&#x27;</span>,
     ],
     [
-      <span class="hljs-string">&#x27;[4]&#x27;</span>, <span class="hljs-string">&#x27;[5]&#x27;</span>, <span class="hljs-string">&#x27;[6]&#x27;</span>, <span class="hljs-string">&#x27;[-]&#x27;</span>, {<span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
+      <span class="hljs-string">&#x27;[4]&#x27;</span>, <span class="hljs-string">&#x27;[5]&#x27;</span>, <span class="hljs-string">&#x27;[6]&#x27;</span>, <span class="hljs-string">&#x27;[-]&#x27;</span>, 
+      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
       <span class="hljs-string">&#x27;[(]&#x27;</span>, <span class="hljs-string">&#x27;[)]&#x27;</span>, <span class="hljs-string">&#x27;\\lt&#x27;</span>, <span class="hljs-string">&#x27;\\le&#x27;</span>, <span class="hljs-string">&#x27;\\hat{=}&#x27;</span>, <span class="hljs-string">&#x27;[separator]&#x27;</span>,
     ],
     [
-      <span class="hljs-string">&#x27;[1]&#x27;</span>, <span class="hljs-string">&#x27;[2]&#x27;</span>, <span class="hljs-string">&#x27;[3]&#x27;</span>, <span class="hljs-string">&#x27;\\cdot&#x27;</span>, {<span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
+      <span class="hljs-string">&#x27;[1]&#x27;</span>, <span class="hljs-string">&#x27;[2]&#x27;</span>, <span class="hljs-string">&#x27;[3]&#x27;</span>, <span class="hljs-string">&#x27;\\cdot&#x27;</span>, 
+      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
       <span class="hljs-string">&#x27;[&#x27;</span>, <span class="hljs-string">&#x27;]&#x27;</span>, <span class="hljs-string">&#x27;\\gt&#x27;</span>, <span class="hljs-string">&#x27;\\ge&#x27;</span>,
 
       { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[backspace]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">2</span> },
     ],
     [
-      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[0]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">2</span> },
-      <span class="hljs-string">&#x27;[.]&#x27;</span>, <span class="hljs-string">&#x27;\\colon&#x27;</span>, {<span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
+      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[0]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">2</span> }, <span class="hljs-string">&#x27;[.]&#x27;</span>, <span class="hljs-string">&#x27;\\colon&#x27;</span>, 
+      { <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;[separator]&#x27;</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">0.5</span> },
       <span class="hljs-string">&#x27;\\lbrace&#x27;</span>, <span class="hljs-string">&#x27;\\rbrace&#x27;</span>, <span class="hljs-string">&#x27;=&#x27;</span>, <span class="hljs-string">&#x27;\\ne&#x27;</span>, <span class="hljs-string">&#x27;[left]&#x27;</span>, <span class="hljs-string">&#x27;[right]&#x27;</span>,
     ],
   ],
@@ -2830,16 +2833,13 @@ label and insert it when the key is pressed.</p>
 a definition for them using the <code>style</code> property. Note that in that case
 you can’t use the <code>rows</code> shortcut, you must provide the full definition
 of the layers.</p>
-<p>Also, note that you may need to use the <code>!important</code> modifier to override
-the default styling.</p>
 <pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-property">layouts</span> = [
   {
-    <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;minimal&#x27;</span>,
-    <span class="hljs-attr">tooltip</span>: <span class="hljs-string">&#x27;Only the essential&#x27;</span>,
+    <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;minimal&quot;</span>,
+    <span class="hljs-attr">tooltip</span>: <span class="hljs-string">&quot;Only the essential&quot;</span>,
     <span class="hljs-attr">layers</span>: [
       {
-        <span class="hljs-attr">style</span>:
-          <span class="hljs-string">&#x27;.digit { background: blue !important; color: white !important }&#x27;</span>,
+        <span class="hljs-attr">style</span>: <span class="hljs-string">&quot;.digit { background: blue; color: white }&quot;</span>,
         <span class="hljs-attr">rows</span>: [
           [
             <span class="hljs-string">&#x27;+&#x27;</span>,
@@ -2869,7 +2869,7 @@ the default styling.</p>
       },
     ],
   },
-  <span class="hljs-string">&#x27;alphabetic&#x27;</span>,
+  <span class="hljs-string">&quot;alphabetic&quot;</span>,
 ];
 </code></pre>
 <h3 id="multiple-layers" tabindex="-1">Multiple Layers</h3>
@@ -3114,8 +3114,11 @@ the entire document, for example the <code>body</code> element selector.</p>
 keys pressed on the physical keyboard</strong> listen and <code>preventDefault()</code> on <code>&quot;keydown&quot;</code>
 events during the capture phase, and show the virtual keyboard when the mathfield
 is focused.</p>
-<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;keydown&quot;</span>, <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span>  evt.<span class="hljs-title function_">preventDefault</span>(), {<span class="hljs-attr">capture</span>: <span class="hljs-literal">true</span>});
-mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;focus&quot;</span>, <span class="hljs-function">() =&gt;</span>  mathVirtualKeyboard.<span class="hljs-title function_">show</span>());
+<pre><code class="language-js">mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;keydown&quot;</span>, <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span>  
+  evt.<span class="hljs-title function_">preventDefault</span>(), { <span class="hljs-attr">capture</span>: <span class="hljs-literal">true</span> });
+
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;focus&quot;</span>, <span class="hljs-function">() =&gt;</span> 
+  mathVirtualKeyboard.<span class="hljs-title function_">show</span>());
 </code></pre>
 <h2 id="displaying-the-virtual-keyboard-in-a-custom-container" tabindex="-1">Displaying the Virtual Keyboard in a Custom Container</h2>
 <p>By default the virtual keyboard is inserted at the end of the document’s <code>body</code>
@@ -3144,7 +3147,8 @@ to the <code>&quot;geometrychange&quot;</code> event on the <code>mathVirtualKey
 <p>For example, to adjust the height of the container element to make room
 for the virtual keyboard panel:</p>
 <pre><code class="language-js">mathVirtualKeyboard.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;geometrychange&quot;</span>, <span class="hljs-function">() =&gt;</span> {
-  container.<span class="hljs-property">style</span>.<span class="hljs-property">height</span> = mathVirtualKeyboard.<span class="hljs-property">boundingRect</span>.<span class="hljs-property">height</span> + <span class="hljs-string">&quot;px&quot;</span>;
+  container.<span class="hljs-property">style</span>.<span class="hljs-property">height</span> = 
+    mathVirtualKeyboard.<span class="hljs-property">boundingRect</span>.<span class="hljs-property">height</span> + <span class="hljs-string">&quot;px&quot;</span>;
 });
 </code></pre>
 <h2 id="customizing-the-alphabetical-layout" tabindex="-1">Customizing the Alphabetical Layout</h2>
@@ -3217,14 +3221,14 @@ document.querySelector('math-field').addEventListener('focus', () => {
         
 
 
-        <meta itemprop="datePublished" content="November 20, 2023">
+        <meta itemprop="datePublished" content="November 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-28">November 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

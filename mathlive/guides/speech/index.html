@@ -2526,8 +2526,8 @@
 <h2 id="using-speech-output-in-mathlive" tabindex="-1">Using Speech Output in MathLive</h2>
 <p><strong>To speak the formula or a portion of it</strong>, use these keyboard shortcuts:</p>
 <ul>
-<li><strong>alt/⌥ + ctrl + ⇡</strong>: speak the entire formula</li>
-<li><strong>alt/⌥ + ctrl + ⇣</strong>: speak the selection</li>
+<li><kbd>alt/⌥</kbd> + <kbd>ctrl</kbd> + <kbd>⇡</kbd>: speak the entire formula</li>
+<li><kbd>alt/⌥</kbd> + <kbd>ctrl</kbd> + <kbd>⇣</kbd>: speak the selection</li>
 </ul>
 <p><strong>To programatically trigger speech output</strong>, use:</p>
 <pre><code class="language-js">mf.<span class="hljs-title function_">executeCommand</span>(<span class="hljs-string">&#x27;speak&#x27;</span>);
@@ -2602,7 +2602,9 @@ You can download it on <a href="https://github.com/zorkow/speech-rule-engine">Gi
 <p>For example:</p>
 <pre><code class="language-javascript"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">textToSpeechRulesOptions</span> = {
     <span class="hljs-attr">domain</span>: <span class="hljs-string">&#x27;mathspeak&#x27;</span>, <span class="hljs-comment">// &#x27;mathspeak&#x27; or &#x27;chromevox&#x27;</span>
-    <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
+    <span class="hljs-attr">ruleset</span>: <span class="hljs-string">&#x27;mathspeak-brief&#x27;</span>,   <span class="hljs-comment">// &#x27;mathspeak-default&#x27;, </span>
+    <span class="hljs-comment">// &#x27;mathspeak-brief&#x27;, &#x27;mathspeak-sbrief&#x27;, &#x27;chromevox-short&#x27;, </span>
+    <span class="hljs-comment">// &#x27;chromevox-default&#x27; or &#x27;chromevox-alternative&#x27;</span>
 };
 </code></pre>
 <h3 id="text-to-speech-engine" tabindex="-1">Text-to-Speech Engine</h3>
@@ -2656,14 +2658,14 @@ This may be as simple as adding this:</li>
         
 
 
-        <meta itemprop="datePublished" content="September 29, 2023">
+        <meta itemprop="datePublished" content="November 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-09-29">September 29, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-28">November 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

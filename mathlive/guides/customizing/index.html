@@ -2536,7 +2536,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#mathlive-parts">MathLive Parts</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#mathlive-parts">MathLive Parts</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
       
                               
@@ -2579,7 +2579,7 @@ Although CSS styles are “invisible” to custom components, CSS variables are
 <p>Alternatively you can set these CSS variables programatically:</p>
 <pre><code class="language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-title function_">setProperty</span>(<span class="hljs-string">&quot;--smart-fence-color&quot;</span>, <span class="hljs-string">&quot;red&quot;</span>);
 </code></pre>
-<div class='symbols-table' style='--first-col-width:25ex'>
+<div class='symbols-table' style='--first-col-width:25ch'>
 <table>
 <thead>
 <tr>
@@ -2659,33 +2659,12 @@ math-field {
 with some CSS variables associated with a selector that applies to the
 virtual keyboard panel container.</p>
 <p>Read more about <a href="https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance">customizing the virtual keyboard appearance</a></p>
-<h2 id="focus-ring" tabindex="-1">Focus Ring</h2>
-<p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
-<!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-    <pre slot="html">&lt;style&gt;
-  math-field:focus-within {
-    outline: 4px solid #d7170b;
-    border-radius: 4px;
-    background: rgba(251,	187,	182, .1);
-  }
-&lt;/style&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</pre>
-</code-playground>
-<!-- htmlmin:ignore -->
-<p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
-with a keyboard. However, you can change the appearance of the outline,
-for example to indicate an error condition. If you remove the outline on the
-mathfield, make sure to replace it with another indicator, for example
-by displaying an outline on an enclosing element. </p>
 <h2 id="mathlive-parts" tabindex="-1">MathLive Parts</h2>
 <p>Because the mathfield is a custom element with a shadow DOM, it is not possible
 to style its children using CSS selectors.</p>
 <p>However, there are a few parts that can be used to style the
 content of the mathfield using the <code>::part()</code> pseudo-element.</p>
-<div class='symbols-table' style='--first-col-width:25ex'>
+<div class='symbols-table' style='--first-col-width:22ch'>
 <table>
 <thead>
 <tr>
@@ -2699,12 +2678,16 @@ content of the mathfield using the <code>::part()</code> pseudo-element.</p>
 <td style="text-align:left">The virtual keyboard toggle button</td>
 </tr>
 <tr>
+<td style="text-align:left"><code>menu-toggle</code></td>
+<td style="text-align:left">The menu toggle button</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>content</code></td>
 <td style="text-align:left">The math formula</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>container</code></td>
-<td style="text-align:left">The element containing the formula and keyboard toggle</td>
+<td style="text-align:left">The element containing the formula, the keyboard toggle and the menu toggle</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>keyboard-sink</code></td>
@@ -2722,15 +2705,25 @@ content of the mathfield using the <code>::part()</code> pseudo-element.</p>
 math-field<span class="hljs-selector-pseudo">::part</span>(<span class="hljs-attribute">content</span>) {
   <span class="hljs-attribute">text-align</span>: right;
 }
+
 <span class="hljs-comment">/* Right align the virtual keyboard toggle */</span>
 math-field<span class="hljs-selector-pseudo">::part</span>(container) {
   <span class="hljs-attribute">flex-flow</span>: row-reverse;
 }
+
 <span class="hljs-comment">/* Hide the virtual keyboard toggle */</span>
 math-field<span class="hljs-selector-pseudo">::part</span>(virtual-keyboard-toggle) {
   <span class="hljs-attribute">display</span>: none;
 }
+
+<span class="hljs-comment">/* Hide the menu toggle */</span>
+math-field<span class="hljs-selector-pseudo">::part</span>(<span class="hljs-selector-tag">menu</span>-toggle) {
+  <span class="hljs-attribute">display</span>: none;
+}
 </code></pre>
+<p><strong>Note</strong> When the menu toggle is hidden, the menu can still be opened by
+right-clicking on the mathfield. You can <a href="/mathlive/guides/menu/">customize the menu</a> to change
+this behavior.</p>
 <h2 id="display-options" tabindex="-1">Display Options</h2>
 <p>The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:</p>
@@ -2916,6 +2909,27 @@ letters and lowercase greek letters, but not uppercase greek letters.</p>
 <p>The French typographical convention is to only italicize lowercase roman letters.</p>
 <p>The default letter shape style is <code>auto</code>: if the system locale is “french”,
 the <code>french</code> style is used, otherwise <code>tex</code> is used.</p>
+<h2 id="focus-ring" tabindex="-1">Focus Ring</h2>
+<p><strong>To change the appearance of the focus ring</strong>, use the <code>:focus-within</code> pseudo-element.</p>
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" >
+    <pre slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
+</code-playground>
+<!-- htmlmin:ignore -->
+<p class="notice--warning"><strong>Caution</strong> Removing outlines in CSS creates issues for people navigating the web
+with a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element. </p>
 <section id='editing-options'>
 <h2 id="editing-options" tabindex="-1">Editing Options</h2>
 <p>The editing behavior of a mathfield can be customized by setting some
@@ -3129,14 +3143,14 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
         
 
 
-        <meta itemprop="datePublished" content="November 20, 2023">
+        <meta itemprop="datePublished" content="November 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-28">November 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -3158,7 +3172,7 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#mathlive-parts">MathLive Parts</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
+        <ol><li><a href="#styling">Styling</a></li><li><a href="#css-variables">CSS Variables</a></li><li><a href="#mathlive-parts">MathLive Parts</a></li><li><a href="#display-options">Display Options</a><ol><li><a href="#color">Color</a></li><li><a href="#size">Size</a></li><li><a href="#math-layout">Math Layout</a></li><li><a href="#letter-shape-style">Letter Shape Style</a></li></ol></li><li><a href="#focus-ring">Focus Ring</a></li><li><a href="#editing-options">Editing Options</a></li><li><a href="#handling-the-space-bar">Handling the Space Bar</a></li><li><a href="#turning-off-the-latex-mode">Turning off the LaTeX mode</a></li><li><a href="#localization">Localization</a><ol><li><a href="#decimal-marker">Decimal Marker</a></li><li><a href="#fraction-navigation-order">Fraction Navigation Order</a></li></ol></li><li><a href="#fonts">Fonts</a></li></ol>
       </div>
     
                             

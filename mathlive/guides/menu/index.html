@@ -2536,7 +2536,7 @@
 
       
         <div class="toc__menu" >
-        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-visibility-ot-the-menu">Controling the Visibility ot the Menu</a></li></ol>
+        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-menu-visibility">Controling the Menu Visibility</a></li></ol>
       </div>
       
                               
@@ -2551,7 +2551,7 @@ operations on a mathfield.</p>
 <ul>
 <li>Right-click on the mathfield</li>
 <li>Long press on a mathfield</li>
-<li>Tap on the menu button in the mathfield</li>
+<li>Tap on the menu toggle (hamburger icon) in the mathfield</li>
 <li>Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key
 on a keyboard</li>
 </ul>
@@ -2598,7 +2598,7 @@ selected.</li>
   },
   {
     <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Paste&#x27;</span>,
-    <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Paste&#x27;</span>);
+    <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Paste&#x27;</span>)
   },
   {
     <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;divider&#x27;</span>
@@ -2608,11 +2608,11 @@ selected.</li>
     <span class="hljs-attr">submenu</span>: [
       {
         <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 1&#x27;</span>,
-        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 1&#x27;</span>);
+        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 1&#x27;</span>)
       },
       {
         <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;Submenu 2&#x27;</span>,
-        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 2&#x27;</span>);
+        <span class="hljs-attr">onMenuSelect</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Submenu 2&#x27;</span>)
       }
     ]
   },
@@ -2665,20 +2665,20 @@ this case, the menu items have an <code>id</code> property, which is used to ide
   },
 ];
 
-mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;menu-select&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Menu item selected:&#x27;</span>, event.<span class="hljs-property">detail</span>.<span class="hljs-property">id</span>);
-});
+mf.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;menu-select&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> 
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Menu item selected:&#x27;</span>, event.<span class="hljs-property">detail</span>.<span class="hljs-property">id</span>)
+);
 </code></pre>
-<h2 id="controling-the-visibility-ot-the-menu" tabindex="-1">Controling the Visibility ot the Menu</h2>
+<h2 id="controling-the-menu-visibility" tabindex="-1">Controling the Menu Visibility</h2>
 <p><strong>To hide the menu toggle button</strong> use the following CSS:</p>
 <pre><code class="language-css">math-field<span class="hljs-selector-pseudo">::part</span>(<span class="hljs-selector-tag">menu</span>-toggle) {
   <span class="hljs-attribute">display</span>: none;
 }
 </code></pre>
-<p>Even if the menu toggle button is hidden, the context menu is still accessible
+<p>Even when the menu toggle button is hidden, the context menu is still accessible
 with keyboard shortcut, right-click or long press.</p>
 <p><strong>To prevent the menu from being displayed</strong>, set the
-<code>mf.menuItems</code> to an empty array:</p>
+<code>mf.menuItems</code> property to an empty array:</p>
 <pre><code class="language-javascript">mf.<span class="hljs-property">menuItems</span> = [];
 </code></pre>
 
@@ -2692,14 +2692,14 @@ with keyboard shortcut, right-click or long press.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 25, 2023">
+        <meta itemprop="datePublished" content="November 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-25">November 25, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-28">November 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
@@ -2721,7 +2721,7 @@ with keyboard shortcut, right-click or long press.</p>
   
     
       <div class="toc__menu" >
-        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-visibility-ot-the-menu">Controling the Visibility ot the Menu</a></li></ol>
+        <ol><li><a href="#filtering-menu-items">Filtering Menu Items</a></li><li><a href="#replacing-the-menu">Replacing the Menu</a></li><li><a href="#listening-to-menu-events">Listening to Menu Events</a></li><li><a href="#controling-the-menu-visibility">Controling the Menu Visibility</a></li></ol>
       </div>
     
                             
