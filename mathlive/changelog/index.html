@@ -2483,7 +2483,7 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.97.3-(2023-11-28)" tabindex="-1">0.97.3 (2023-11-28)</h2>
 <h2 id="improvements" tabindex="-1">Improvements</h2>
 <ul>
 <li>The <code>mode-change</code> event is now dispatched more consistently when the mode
@@ -2493,14 +2493,20 @@ it remains in LaTeX mode. Previously, it would switch to math mode when
 losing focus.</li>
 <li>Changing the <code>user-select</code> CSS property before inserting the mathfield
 in the DOM would not always be respected.</li>
-<li>Use the Popover API when available, which should ensure menus are displayed on top of other elements.</li>
-<li>Added support for accented characters in the virtual keyboard (press and hold a vowel on an alphabetic keyboard to get accented variants), including a modified AZERTY layout (shift+digits to get common accented characters).</li>
+<li>Use the DOM Popover API when available, which should ensure menus are
+displayed on top of other elements more consistently.</li>
+<li>Added support for accented characters in the virtual keyboard (press and
+hold a vowel on an alphabetic keyboard to get accented variants),
+including a modified AZERTY layout (<kbd>SHIFT</kbd>+digits to get common
+accented characters).</li>
+<li>Improved rendering of the menu for CJK and LTR languages.</li>
 </ul>
 <h3 id="bugs-fixed" tabindex="-1">Bugs Fixed</h3>
 <ul>
-<li>If there were multiple mathfield elements on the page, only
-the last one would display tooltips.</li>
-<li><strong>#2184</strong> Pressing the <kbd>TAB</kbd> key when in a prompt (fill-in-the-blank) would not move to the next prompt</li>
+<li>If there were multiple mathfield elements on the page, only the last one
+would display tooltips.</li>
+<li><strong>#2184</strong> Pressing the <kbd>TAB</kbd> key when in a prompt (fill-in-the-blank)
+would not move to the next prompt</li>
 <li><strong>#2183</strong> The MathML serialization of factorial was incorrect.</li>
 <li><strong>#2181</strong> The MathML serialization of limits was incorrect.</li>
 </ul>
