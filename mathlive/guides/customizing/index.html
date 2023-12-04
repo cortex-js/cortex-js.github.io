@@ -2660,8 +2660,8 @@ with some CSS variables associated with a selector that applies to the
 virtual keyboard panel container.</p>
 <p>Read more about <a href="https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance">customizing the virtual keyboard appearance</a></p>
 <h2 id="mathlive-parts" tabindex="-1">MathLive Parts</h2>
-<p>Because the mathfield is a custom element with a shadow DOM, it is not possible
-to style its children using CSS selectors.</p>
+<p>Because the mathfield is a custom element with a shadow DOM, its content
+is not directly accessible to CSS rules outside of the shadow DOM.</p>
 <p>However, there are a few parts that can be used to style the
 content of the mathfield using the <code>::part()</code> pseudo-element.</p>
 <div class='symbols-table' style='--first-col-width:22ch'>
@@ -2692,6 +2692,10 @@ content of the mathfield using the <code>::part()</code> pseudo-element.</p>
 <tr>
 <td style="text-align:left"><code>keyboard-sink</code></td>
 <td style="text-align:left">The hidden element capturing the physical keyboard input</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>placeholder</code></td>
+<td style="text-align:left">The element containing the placeholder attribute when the mathfield is empty</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>prompt</code></td>
@@ -3143,14 +3147,14 @@ including using custom asset pipelines and bundlers, in the <strong>integration 
         
 
 
-        <meta itemprop="datePublished" content="November 28, 2023">
+        <meta itemprop="datePublished" content="November 30, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-28">November 28, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-30">November 30, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
