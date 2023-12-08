@@ -662,7 +662,7 @@ class CodePlaygroundElement extends HTMLElement {
         if (!this.id)
             this.id = randomId();
         this.moduleMap = (_a = window['moduleMap']) !== null && _a !== void 0 ? _a : {};
-        this.attachShadow({ mode: 'open' });
+        this.attachShadow({ mode: 'open', delegatesFocus: true });
         this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
         const container = document.createElement('div');
         this.containerId = randomId();
