@@ -2520,7 +2520,7 @@
 property.</p>
 <p>In the playground below, the <strong>LaTeX</strong> input field is editable and is reflected
 in the mathfield, and vice-versa.</p>
-<p class="notice--info">Note that we use the <code>suppressChangeNotifications</code> option when
+<p class="notice--info">Note that we use the <code>silenceNotifications</code> option when
 changing the content of the mathfield, to prevent an <code>&quot;input&quot;</code> event from being
 triggered and creating an infinite loop.</p>
 <code-playground layout="stack">
@@ -2538,7 +2538,7 @@ latex.value = mf.value;
 latex.addEventListener("input", (ev) => 
     mf.setValue(
       ev.target.value, 
-      {suppressChangeNotifications: true}
+      {silenceNotifications: true}
     )
 );
   </pre>
@@ -2949,14 +2949,14 @@ property to <code>&quot;auto&quot;</code>.</p>
         
 
 
-        <meta itemprop="datePublished" content="November 20, 2023">
+        <meta itemprop="datePublished" content="December 11, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-11-20">November 20, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-11">December 11, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
