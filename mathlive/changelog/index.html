@@ -2456,8 +2456,46 @@
 <h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
 <h2 id="isues-resolved" tabindex="-1">Isues Resolved</h2>
 <ul>
-<li><strong>#2000</strong>, <strong>#2063</strong> A mathfield with multiple lines now generate correct LaTeX
-using the <code>\displaylines</code> command.</li>
+<li>
+<p><strong>#2214</strong> When typing Unicode characters such as <code>²</code> or <code>ℂ</code>, correctly interpret them
+as their LaTeX equivalent. This also affects parsing of the <code>value</code> property.</p>
+</li>
+<li>
+<p><strong>#2000</strong>, <strong>#2063</strong> A mathfield with multiple lines now generate correct LaTeX
+using the <code>\displaylines</code> command.</p>
+</li>
+<li>
+<p>When typing a superscript after <code>f</code>, <code>g</code> or some other function, correctly
+interpret the superscript as an exponent, not as a function argument.</p>
+</li>
+<li>
+<p>When a superscript or subscript is attached to a function, correctly position
+a following <code>\left...\right</code> command closer to the function.</p>
+</li>
+<li>
+<p><strong>#787</strong>, <strong>#1869</strong> The <code>f</code>, <code>g</code> and <code>h</code> symbols are no longer hardcoded as
+symbols representing functions.</p>
+<p>Whether a symbol is considered a function affects the layout of a formula,
+specifically the amount of space between the symbol and a subsequent delimiter
+such as a parenthesis.</p>
+<p>Now whether a symbol should be treated as a function is determined by the
+<code>MathfieldElement.isFunction</code> hook.</p>
+<p>By the default, this hook uses the <code>MathfieldElement.computeEngine</code> to
+determine if the domain of a symbol is a function.</p>
+<p>This can be customized by setting the <code>isFunction</code> property of the
+mathfield or by declaring a symbol as a function using the <code>declare()</code>
+method of the compute engine. For example:</p>
+<pre><code class="language-js"><span class="hljs-title class_">MathfieldElement</span>.<span class="hljs-property">computeEngine</span>.<span class="hljs-title function_">declare</span>(<span class="hljs-string">&quot;f&quot;</span>, <span class="hljs-string">&quot;Functions&quot;</span>);
+</code></pre>
+<p>In addition, a new <code>isImplicitFunction</code> hook has been added which
+can be used to indicate which symbols or commands are expected
+to be followed by an implicit argument. For example, the <code>\sin</code> function
+can be followed by an implicit argument without parentheses, as in
+<code>\sin \frac{\pi}{2}</code>. This affects the editing behavior when typing a <code>/</code>
+after the function. If an implicit function, the <code>/</code> will be interpreted as
+an argument to the function, otherwise it will be interpreted as a fraction
+with the function as the numerator.</p>
+</li>
 </ul>
 <h2 id="0.98.3-(2023-12-07)" tabindex="-1">0.98.3 (2023-12-07)</h2>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
@@ -7826,14 +7864,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="December 11, 2023">
+        <meta itemprop="datePublished" content="December 16, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-11">December 11, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-16">December 16, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
