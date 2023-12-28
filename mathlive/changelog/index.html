@@ -2453,9 +2453,17 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.98.5-(2023-12-27)" tabindex="-1">0.98.5 (2023-12-27)</h2>
 <h2 id="isues-resolved" tabindex="-1">Isues Resolved</h2>
 <ul>
+<li>
+<p>When a font size command is inside a <code>\left...\right</code> command, apply the
+font size to the content of the command. As a result <code>\frac34 + \left( \scriptstyle \frac12 \right)</code> will now render as expected.</p>
+</li>
+<li>
+<p><strong>#2214</strong> Typing the <code>^</code> key on a German Linux or Windows keyboard now inserts
+a <code>^</code> character.</p>
+</li>
 <li>
 <p><strong>#2214</strong> When typing Unicode characters such as <code>²</code> or <code>ℂ</code>, correctly interpret them
 as their LaTeX equivalent. This also affects parsing of the <code>value</code> property.</p>
@@ -2495,6 +2503,18 @@ can be followed by an implicit argument without parentheses, as in
 after the function. If an implicit function, the <code>/</code> will be interpreted as
 an argument to the function, otherwise it will be interpreted as a fraction
 with the function as the numerator.</p>
+</li>
+<li>
+<p>The “phi” keycap in the virtual keyboard was incorrectly displaying
+the <code>\varphi</code> symbol. It now displays the <code>\phi</code> symbol.</p>
+</li>
+<li>
+<p><strong>#2227</strong> Updating the content of the mathfield with <code>mf.innerText</code>
+will now correctly update the value of the mathfield.</p>
+</li>
+<li>
+<p><strong>#2225</strong> For consistency with <code>&lt;textarea&gt;</code>, when setting the
+value change the selection to be at the end of the mathfield.</p>
 </li>
 </ul>
 <h2 id="0.98.3-(2023-12-07)" tabindex="-1">0.98.3 (2023-12-07)</h2>
@@ -7864,14 +7884,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="December 16, 2023">
+        <meta itemprop="datePublished" content="December 28, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-16">December 16, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-28">December 28, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
