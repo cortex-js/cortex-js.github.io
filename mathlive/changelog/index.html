@@ -2463,24 +2463,25 @@
 font size to the content of the command. As a result <code>\frac34 + \left( \scriptstyle \frac12 \right)</code> will now render as expected.</p>
 </li>
 <li>
-<p><strong>#2214</strong> Typing the <code>^</code> key on a German Linux or Windows keyboard now inserts
-a <code>^</code> character.</p>
+<p><strong>#2214</strong> When using Linux or Windows with a German keyboard layout, typing
+the <code>^</code> key will now switch to superscript.</p>
 </li>
 <li>
-<p><strong>#2214</strong> When typing Unicode characters such as <code>²</code> or <code>ℂ</code>, correctly interpret them
-as their LaTeX equivalent. This also affects parsing of the <code>value</code> property.</p>
+<p><strong>#2214</strong> When typing Unicode characters such as <code>²</code> or <code>ℂ</code>, correctly
+interpret them as their LaTeX equivalent. This also affects parsing of the
+<code>value</code> property.</p>
 </li>
 <li>
 <p><strong>#2000</strong>, <strong>#2063</strong> A mathfield with multiple lines now generate correct LaTeX
 using the <code>\displaylines</code> command.</p>
 </li>
 <li>
-<p>When typing a superscript after <code>f</code>, <code>g</code> or some other function, correctly
-interpret the superscript as an exponent, not as a function argument.</p>
-</li>
-<li>
 <p>When a superscript or subscript is attached to a function, correctly position
 a following <code>\left...\right</code> command closer to the function.</p>
+</li>
+<li>
+<p>When typing a superscript after <code>f</code>, <code>g</code> or some other function, correctly
+interpret the superscript as an exponent, not as a function argument.</p>
 </li>
 <li>
 <p><strong>#787</strong>, <strong>#1869</strong> The <code>f</code>, <code>g</code> and <code>h</code> symbols are no longer hardcoded as
@@ -2522,31 +2523,49 @@ value change the selection to be at the end of the mathfield.</p>
 <h2 id="0.98.3-2023-12-07" tabindex="-1">0.98.3 <em>2023-12-07</em></h2>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
-<li>Improved contrast calculation for the checkmarks over color swatches, now
-using APCA.</li>
-<li>In some situations, the virtual keyboard would not be displayed when
+<li>
+<p>Improved contrast calculation for the checkmarks over color swatches, now
+using APCA.</p>
+</li>
+<li>
+<p>In some situations, the virtual keyboard would not be displayed when
 the mathfield was focused and the <code>mathVirtualKeyboardPolicy</code> was set
-to <code>&quot;auto&quot;</code>.</li>
+to <code>&quot;auto&quot;</code>.</p>
+</li>
 </ul>
 <h2 id="0.98.2-2023-12-06" tabindex="-1">0.98.2 <em>2023-12-06</em></h2>
 <h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
-<li>In some rare cases, the menu was not positioned correctly or would not
-display at all.</li>
-<li>When dynamically changing the layout of the mathfield, for example
+<li>
+<p>In some rare cases, the menu was not positioned correctly or would not
+display at all.</p>
+</li>
+<li>
+<p>When dynamically changing the layout of the mathfield, for example
 when using a font-size attribute based on viewport units, correctly
-redraw the selection</li>
-<li>Selection while dragging would stop after a few milliseconds</li>
-<li>The “contains highlight” indicator is no longer displayed when the mathfield
-is not focused or when the indicator is outside of a prompt.</li>
-<li><strong>#2194</strong> Ignore long press events when the pointer is a mouse.</li>
+redraw the selection</p>
+</li>
+<li>
+<p>Selection while dragging would stop after a few milliseconds</p>
+</li>
+<li>
+<p>The “contains highlight” indicator is no longer displayed when the mathfield
+is not focused or when the indicator is outside of a prompt.</p>
+</li>
+<li>
+<p><strong>#2194</strong> Ignore long press events when the pointer is a mouse.</p>
+</li>
 </ul>
 <h3 id="issues-resolved" tabindex="-1">Issues Resolved</h3>
 <ul>
-<li><strong>#2195</strong> If the mathfield had a variable width the selection
-would not be displayed correctly.</li>
-<li><strong>#2190</strong> Under some circumstances, commands selected from the menu
-could be executed twice.</li>
+<li>
+<p><strong>#2195</strong> If the mathfield had a variable width the selection
+would not be displayed correctly.</p>
+</li>
+<li>
+<p><strong>#2190</strong> Under some circumstances, commands selected from the menu
+could be executed twice.</p>
+</li>
 </ul>
 <h2 id="0.98.1-2023-12-05" tabindex="-1">0.98.1 <em>2023-12-05</em></h2>
 <h3 id="new-features" tabindex="-1">New Features</h3>
@@ -2555,8 +2574,12 @@ could be executed twice.</li>
 </ul>
 <h3 id="issues-resolved-1" tabindex="-1">Issues Resolved</h3>
 <ul>
-<li>Correctly position the menu when the document has been scrolled.</li>
-<li>When serializing, do not generate a <code>\text</code> command around a <code>\texttt</code> command.</li>
+<li>
+<p>Correctly position the menu when the document has been scrolled.</p>
+</li>
+<li>
+<p>When serializing, do not generate a <code>\text</code> command around a <code>\texttt</code> command.</p>
+</li>
 </ul>
 <h3 id="improvements-2" tabindex="-1">Improvements</h3>
 <ul>
@@ -2565,10 +2588,14 @@ could be executed twice.</li>
 <h2 id="0.98.0-2023-12-03" tabindex="-1">0.98.0 <em>2023-12-03</em></h2>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
 <ul>
-<li>The <code>setPromptContent()</code> method has been renamed to <code>setPromptValue()</code> for
-consistency with the <code>getPromptValue()</code> method.</li>
-<li>The <code>stripPromptContent()</code> method has been removed. Its functionality can
-be achieved with:</li>
+<li>
+<p>The <code>mf.setPromptContent()</code> method has been renamed to <code>mf.setPromptValue()</code> for
+consistency with the <code>mf.getPromptValue()</code> method.</p>
+</li>
+<li>
+<p>The <code>mf.stripPromptContent()</code> method has been removed. Its functionality can
+be achieved with:</p>
+</li>
 </ul>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> prompts = mf.<span class="hljs-title function_">getPrompts</span>();
 <span class="hljs-keyword">const</span> values = prompts.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> mf.<span class="hljs-title function_">getPromptValue</span>(id));
@@ -2616,13 +2643,19 @@ format, but does not include the placeholders (for “fill-in-the-blanks”).</p
 </ul>
 <h3 id="issues-resolved-2" tabindex="-1">Issues Resolved</h3>
 <ul>
-<li><strong>#2169</strong> Changing the selection programatically will
-now correctly update the mathfield.</li>
-<li><strong>#2189</strong> If the decimal separator is set to <code>,</code>, the virtual keyboard
-will now correctly display the decimal separator as a comma.</li>
-<li><strong>#2139</strong> On some keyboard layouts, <kbd>ALT</kbd>+<kbd>/</kbd> would
+<li>
+<p><strong>#2169</strong> Changing the selection programatically will
+now correctly update the mathfield.</p>
+</li>
+<li>
+<p><strong>#2189</strong> If the decimal separator is set to <code>,</code>, the virtual keyboard
+will now correctly display the decimal separator as a comma.</p>
+</li>
+<li>
+<p><strong>#2139</strong> On some keyboard layouts, <kbd>ALT</kbd>+<kbd>/</kbd> would
 insert a <code>\/</code> command, which is not standard. Now, the simple <code>/</code> is
-inserted.</li>
+inserted.</p>
+</li>
 </ul>
 <h2 id="0.97.4-2023-11-29" tabindex="-1">0.97.4 <em>2023-11-29</em></h2>
 <h3 id="issues-resolved-3" tabindex="-1">Issues Resolved</h3>
@@ -2638,29 +2671,49 @@ current style if no selection.</li>
 <h2 id="0.97.3-2023-11-28" tabindex="-1">0.97.3 <em>2023-11-28</em></h2>
 <h3 id="improvements-5" tabindex="-1">Improvements</h3>
 <ul>
-<li>The <code>mode-change</code> event is now dispatched more consistently when the mode
-changes.</li>
-<li>When the mathfield loses focus, if some of the content is in LaTeX mode,
+<li>
+<p>The <code>mode-change</code> event is now dispatched more consistently when the mode
+changes.</p>
+</li>
+<li>
+<p>When the mathfield loses focus, if some of the content is in LaTeX mode,
 it remains in LaTeX mode. Previously, it would switch to math mode when
-losing focus.</li>
-<li>Changing the <code>user-select</code> CSS property before inserting the mathfield
-in the DOM would not always be respected.</li>
-<li>Use the DOM Popover API when available, which should ensure menus are
-displayed on top of other elements more consistently.</li>
-<li>Added support for accented characters in the virtual keyboard (press and
+losing focus.</p>
+</li>
+<li>
+<p>Changing the <code>user-select</code> CSS property before inserting the mathfield
+in the DOM would not always be respected.</p>
+</li>
+<li>
+<p>Use the DOM Popover API when available, which should ensure menus are
+displayed on top of other elements more consistently.</p>
+</li>
+<li>
+<p>Added support for accented characters in the virtual keyboard (press and
 hold a vowel on an alphabetic keyboard to get accented variants),
 including a modified AZERTY layout (<kbd>SHIFT</kbd>+digits to get common
-accented characters).</li>
-<li>Improved rendering of the menu for CJK and LTR languages.</li>
+accented characters).</p>
+</li>
+<li>
+<p>Improved rendering of the menu for CJK and LTR languages.</p>
+</li>
 </ul>
 <h3 id="issues-resolved-4" tabindex="-1">Issues Resolved</h3>
 <ul>
-<li>If there were multiple mathfield elements on the page, only the last one
-would display tooltips.</li>
-<li><strong>#2184</strong> Pressing the <kbd>TAB</kbd> key when in a prompt (fill-in-the-blank)
-would not move to the next prompt</li>
-<li><strong>#2183</strong> The MathML serialization of factorial was incorrect.</li>
-<li><strong>#2181</strong> The MathML serialization of limits was incorrect.</li>
+<li>
+<p>If there were multiple mathfield elements on the page, only the last one
+would display tooltips.</p>
+</li>
+<li>
+<p><strong>#2184</strong> Pressing the <kbd>TAB</kbd> key when in a prompt (fill-in-the-blank)
+would not move to the next prompt</p>
+</li>
+<li>
+<p><strong>#2183</strong> The MathML serialization of factorial was incorrect.</p>
+</li>
+<li>
+<p><strong>#2181</strong> The MathML serialization of limits was incorrect.</p>
+</li>
 </ul>
 <h2 id="0.97.2-2023-11-21" tabindex="-1">0.97.2 <em>2023-11-21</em></h2>
 <h3 id="issues-resolved-5" tabindex="-1">Issues Resolved</h3>
@@ -2670,10 +2723,16 @@ would not move to the next prompt</li>
 <h2 id="0.97.1-2023-11-20" tabindex="-1">0.97.1 <em>2023-11-20</em></h2>
 <h3 id="issues-resolved-6" tabindex="-1">Issues Resolved</h3>
 <ul>
-<li><strong>#2180</strong> Allow the context menu to get turned off by setting <code>mf.menuItems = []</code></li>
-<li>Fixed a layout issue with the positioning of the context menu in some
-cases.</li>
-<li>Improved dark mode appearance of context menu</li>
+<li>
+<p><strong>#2180</strong> Allow the context menu to get turned off by setting <code>mf.menuItems = []</code></p>
+</li>
+<li>
+<p>Fixed a layout issue with the positioning of the context menu in some
+cases.</p>
+</li>
+<li>
+<p>Improved dark mode appearance of context menu</p>
+</li>
 </ul>
 <h2 id="0.97.0-2023-11-20" tabindex="-1">0.97.0 <em>2023-11-20</em></h2>
 <h3 id="new-features-2" tabindex="-1">New Features</h3>
@@ -2751,7 +2810,8 @@ in a matrix.</li>
 <ul>
 <li><strong>#2159</strong> Runtime error in sandboxed mode when in an iframe from different
 origin</li>
-<li><strong>#2175</strong> Addressed some rendering issues with Safar where a fraction inside a <code>\left...\right</code> was vertically offset.</li>
+<li><strong>#2175</strong> Addressed some rendering issues with Safar where a fraction inside
+a <code>\left...\right</code> was vertically offset.</li>
 <li><strong>#2176</strong> Using the <code>[hide-keyboard]</code> virtual keycap would cause a runtime error.</li>
 <li><strong>#2161</strong> When the virtual keyboard is hidden, a <code>geometrychange</code> event is
 dispatched.</li>
@@ -7886,14 +7946,14 @@ correct LaTeX code to be generated.</li>
         
 
 
-        <meta itemprop="datePublished" content="December 28, 2023">
+        <meta itemprop="datePublished" content="December 29, 2023">
                 
 
         
 
 
         
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-28">December 28, 2023</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> Updated</strong> <time datetime="2023-12-29">December 29, 2023</time></p>
         
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>
