@@ -70,7 +70,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700;900&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" crossorigin> -->
   </head>
 
-  <body class="layout--single">
+  <body class="layout--changelog">
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
       <defs>
           <symbol id="svg-chevron" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path fill="currentColor" d="m4.81347656 13.1269531c.22558594 0 .41015625-.0820312.56738282-.2324219l5.31835942-5.19531245c.1845703-.19140625.2802734-.38964844.2802734-.63574219 0-.23925781-.0888672-.45117187-.2802734-.62890625l-5.31835942-5.20214843c-.15722657-.15039063-.34179688-.23242188-.56738282-.23242188-.45800781 0-.81347656.35546875-.81347656.80664062 0 .21875.09570312.43066407.24609375.58789063l4.79199219 4.67578125-4.79199219 4.6621094c-.15722656.1640625-.24609375.3623047-.24609375.5878906 0 .4511719.35546875.8066406.81347656.8066406z"></path></symbol>
@@ -139,6 +139,7 @@
 
 
     <div class="initial-content">
+
 
 
 
@@ -2453,8 +2454,9 @@
 
 
 <h1 id="mathlive-changelog" tabindex="-1">MathLive Changelog</h1>
-<h2 id="0.98.5-(2023-12-27)" tabindex="-1">0.98.5 (2023-12-27)</h2>
-<h2 id="isues-resolved" tabindex="-1">Isues Resolved</h2>
+<h2 id="%5Bunreleased%5D" tabindex="-1">[Unreleased]</h2>
+<h2 id="0.98.5-2023-12-27" tabindex="-1">0.98.5 <em>2023-12-27</em></h2>
+<h3 id="isues-resolved" tabindex="-1">Isues Resolved</h3>
 <ul>
 <li>
 <p>When a font size command is inside a <code>\left...\right</code> command, apply the
@@ -2517,7 +2519,7 @@ will now correctly update the value of the mathfield.</p>
 value change the selection to be at the end of the mathfield.</p>
 </li>
 </ul>
-<h2 id="0.98.3-(2023-12-07)" tabindex="-1">0.98.3 (2023-12-07)</h2>
+<h2 id="0.98.3-2023-12-07" tabindex="-1">0.98.3 <em>2023-12-07</em></h2>
 <h3 id="improvements" tabindex="-1">Improvements</h3>
 <ul>
 <li>Improved contrast calculation for the checkmarks over color swatches, now
@@ -2526,7 +2528,7 @@ using APCA.</li>
 the mathfield was focused and the <code>mathVirtualKeyboardPolicy</code> was set
 to <code>&quot;auto&quot;</code>.</li>
 </ul>
-<h2 id="0.98.2-(2023-12-06)" tabindex="-1">0.98.2 (2023-12-06)</h2>
+<h2 id="0.98.2-2023-12-06" tabindex="-1">0.98.2 <em>2023-12-06</em></h2>
 <h3 id="improvements-1" tabindex="-1">Improvements</h3>
 <ul>
 <li>In some rare cases, the menu was not positioned correctly or would not
@@ -2546,7 +2548,7 @@ would not be displayed correctly.</li>
 <li><strong>#2190</strong> Under some circumstances, commands selected from the menu
 could be executed twice.</li>
 </ul>
-<h2 id="0.98.1-(2023-12-05)" tabindex="-1">0.98.1 (2023-12-05)</h2>
+<h2 id="0.98.1-2023-12-05" tabindex="-1">0.98.1 <em>2023-12-05</em></h2>
 <h3 id="new-features" tabindex="-1">New Features</h3>
 <ul>
 <li>Added <code>mf.showMenu()</code> method to programmatically show the context menu.</li>
@@ -2560,7 +2562,7 @@ could be executed twice.</li>
 <ul>
 <li>Keyboard navigate submenus with a grid layout</li>
 </ul>
-<h2 id="0.98.0-(2023-12-03)" tabindex="-1">0.98.0 (2023-12-03)</h2>
+<h2 id="0.98.0-2023-12-03" tabindex="-1">0.98.0 <em>2023-12-03</em></h2>
 <h3 id="breaking-changes" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>setPromptContent()</code> method has been renamed to <code>setPromptValue()</code> for
@@ -2622,7 +2624,7 @@ will now correctly display the decimal separator as a comma.</li>
 insert a <code>\/</code> command, which is not standard. Now, the simple <code>/</code> is
 inserted.</li>
 </ul>
-<h2 id="0.97.4-(2023-11-29)" tabindex="-1">0.97.4 (2023-11-29)</h2>
+<h2 id="0.97.4-2023-11-29" tabindex="-1">0.97.4 <em>2023-11-29</em></h2>
 <h3 id="issues-resolved-3" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>When a global <code>.row</code> class was defined, it would be applied to the virtual
@@ -2633,7 +2635,7 @@ keyboard rows, resulting in incorrect layout.</li>
 <li>Added <code>mf.queryStyle()</code> method to query the style of a selection or the
 current style if no selection.</li>
 </ul>
-<h2 id="0.97.3-(2023-11-28)" tabindex="-1">0.97.3 (2023-11-28)</h2>
+<h2 id="0.97.3-2023-11-28" tabindex="-1">0.97.3 <em>2023-11-28</em></h2>
 <h3 id="improvements-5" tabindex="-1">Improvements</h3>
 <ul>
 <li>The <code>mode-change</code> event is now dispatched more consistently when the mode
@@ -2660,12 +2662,12 @@ would not move to the next prompt</li>
 <li><strong>#2183</strong> The MathML serialization of factorial was incorrect.</li>
 <li><strong>#2181</strong> The MathML serialization of limits was incorrect.</li>
 </ul>
-<h2 id="0.97.2-(2023-11-21)" tabindex="-1">0.97.2 (2023-11-21)</h2>
+<h2 id="0.97.2-2023-11-21" tabindex="-1">0.97.2 <em>2023-11-21</em></h2>
 <h3 id="issues-resolved-5" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Keybindings for German Linux keyboard layout were not working correctly.</li>
 </ul>
-<h2 id="0.97.1-(2023-11-20)" tabindex="-1">0.97.1 (2023-11-20)</h2>
+<h2 id="0.97.1-2023-11-20" tabindex="-1">0.97.1 <em>2023-11-20</em></h2>
 <h3 id="issues-resolved-6" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#2180</strong> Allow the context menu to get turned off by setting <code>mf.menuItems = []</code></li>
@@ -2673,7 +2675,7 @@ would not move to the next prompt</li>
 cases.</li>
 <li>Improved dark mode appearance of context menu</li>
 </ul>
-<h2 id="0.97.0-(2023-11-20)" tabindex="-1">0.97.0 (2023-11-20)</h2>
+<h2 id="0.97.0-2023-11-20" tabindex="-1">0.97.0 <em>2023-11-20</em></h2>
 <h3 id="new-features-2" tabindex="-1">New Features</h3>
 <ul>
 <li>
@@ -2713,7 +2715,7 @@ only appears after a delay.</li>
 Macros that used an argument that was not a literal group
 were not parsed correctly.</li>
 </ul>
-<h2 id="0.96.2-(2023-11-16)" tabindex="-1">0.96.2 (2023-11-16)</h2>
+<h2 id="0.96.2-2023-11-16" tabindex="-1">0.96.2 <em>2023-11-16</em></h2>
 <h3 id="issues-resolved-8" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>The vertical alignment of formulas containing some fractions was incorrect
@@ -2734,7 +2736,7 @@ including <code>\mapsfrom</code>.</li>
 <li><strong>#2102</strong> The mathfield element now respects the <code>user-select</code> CSS property.
 If it is set to <code>none</code>, the mathfield will not be selectable.</li>
 </ul>
-<h2 id="0.96.1-(2023-11-15)" tabindex="-1">0.96.1 (2023-11-15)</h2>
+<h2 id="0.96.1-2023-11-15" tabindex="-1">0.96.1 <em>2023-11-15</em></h2>
 <h3 id="improvements-8" tabindex="-1">Improvements</h3>
 <ul>
 <li>Simplified the syntax to modify registers. Use <code>mf.registers.arraystretch = 1.5</code>
@@ -2754,7 +2756,7 @@ origin</li>
 <li><strong>#2161</strong> When the virtual keyboard is hidden, a <code>geometrychange</code> event is
 dispatched.</li>
 </ul>
-<h2 id="0.96.0-(2023-11-14)" tabindex="-1">0.96.0 (2023-11-14)</h2>
+<h2 id="0.96.0-2023-11-14" tabindex="-1">0.96.0 <em>2023-11-14</em></h2>
 <h3 id="breaking-changes-1" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The function <code>serializeMathJsonToLatex()</code> has been renamed to <code>convertMathJsonToLatex()</code> for consistency.</li>
@@ -2800,7 +2802,7 @@ now inserts a new line (similar to what shift+enter does on a physical keyboard)
 <li>Avoid runtime error if the mathfield gets deleted during a selection change
 event.</li>
 </ul>
-<h2 id="0.95.5-(2023-08-18)" tabindex="-1">0.95.5 (2023-08-18)</h2>
+<h2 id="0.95.5-2023-08-18" tabindex="-1">0.95.5 <em>2023-08-18</em></h2>
 <h3 id="issues-resolved-11" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#2091</strong> The variant panel for the <code>7</code> key was the variant panel for <code>4</code>.</li>
@@ -2827,7 +2829,7 @@ on the element.</li>
 keyboard is now a singleton, accessible as <code>window.mathVirtualKeyboard</code>.</li>
 <li>When a <code>command</code> attribute is associated with a keycap, a <code>math-virtual-keyboard-command</code> event is dispatched when the keycap is pressed.</li>
 </ul>
-<h2 id="0.95.4-(2023-08-11)" tabindex="-1">0.95.4 (2023-08-11)</h2>
+<h2 id="0.95.4-2023-08-11" tabindex="-1">0.95.4 <em>2023-08-11</em></h2>
 <h3 id="issues-resolved-12" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#2090</strong> A runtime error could occur when adding a superscript inside a square root</li>
@@ -2839,14 +2841,14 @@ keyboard is now a singleton, accessible as <code>window.mathVirtualKeyboard</cod
 <li><strong>#2082</strong> The shortcut for <code>\int</code> was triggered with <code>sint</code>. Note that in case of similar conflicts, pressing the spacebar will prevent the shorcuts from taking effect, i.e. “sin t”.</li>
 <li></li>
 </ul>
-<h2 id="0.95.2-(2023-08-09)" tabindex="-1">0.95.2 (2023-08-09)</h2>
+<h2 id="0.95.2-2023-08-09" tabindex="-1">0.95.2 <em>2023-08-09</em></h2>
 <h3 id="improvements-12" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added <code>if-math-mode</code> and <code>if-text-mode</code> classes to conditionally show
 virtual keyboard keys.</li>
 <li><strong>#2086</strong> When navigation a root with an index, the index is now navigater first.</li>
 </ul>
-<h2 id="0.95.1-(2023-07-25)" tabindex="-1">0.95.1 (2023-07-25)</h2>
+<h2 id="0.95.1-2023-07-25" tabindex="-1">0.95.1 <em>2023-07-25</em></h2>
 <h3 id="improvements-13" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#2064</strong>, <strong>#2065</strong> Improved behavior of virtual keyboard shift key,
@@ -2860,7 +2862,7 @@ keyboard, in some situations the virtual keyboard would lock up.</li>
 <li><strong>#2067</strong> When setting up the virtual keyboard policy to <code>&quot;sandboxed&quot;</code> in
 a cross domain iframe, a runtime error would occur.</li>
 </ul>
-<h2 id="0.95.0-(2023-07-04)" tabindex="-1">0.95.0 (2023-07-04)</h2>
+<h2 id="0.95.0-2023-07-04" tabindex="-1">0.95.0 <em>2023-07-04</em></h2>
 <h3 id="improvements-14" tabindex="-1">Improvements</h3>
 <ul>
 <li>Improved behavior when pressing the tab key</li>
@@ -2886,17 +2888,17 @@ caret would be hidden from view.</li>
 <li><strong>#2000</strong>, <strong>#2016</strong> Correctly handle when the root is not a group, i.e.
 when it’s a multi-line array.</li>
 </ul>
-<h2 id="0.94.8-(2023-06-15)" tabindex="-1">0.94.8 (2023-06-15)</h2>
-<h2 id="improvements-15" tabindex="-1">Improvements</h2>
+<h2 id="0.94.8-2023-06-15" tabindex="-1">0.94.8 <em>2023-06-15</em></h2>
+<h3 id="improvements-15" tabindex="-1">Improvements</h3>
 <ul>
 <li>On RTL system, do not flip the direction of the virtual keyboard keycaps rows</li>
 </ul>
-<h2 id="0.94.7-(2023-06-08)" tabindex="-1">0.94.7 (2023-06-08)</h2>
-<h2 id="improvements-16" tabindex="-1">Improvements</h2>
+<h2 id="0.94.7-2023-06-08" tabindex="-1">0.94.7 <em>2023-06-08</em></h2>
+<h3 id="improvements-16" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#1989</strong> Temporarily add back support for iOS versions older than 16.3.</li>
 </ul>
-<h2 id="0.94.6-(2023-05-25)" tabindex="-1">0.94.6 (2023-05-25)</h2>
+<h2 id="0.94.6-2023-05-25" tabindex="-1">0.94.6 <em>2023-05-25</em></h2>
 <h3 id="issues-resolved-15" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Only display seletion when the mathfield is focused</li>
@@ -2908,20 +2910,20 @@ when it’s a multi-line array.</li>
 <li>Pressing the tab key will move to the “next group” in the mathfield, if
 possible.</li>
 </ul>
-<h2 id="0.94.5-(2023-05-24)" tabindex="-1">0.94.5 (2023-05-24)</h2>
+<h2 id="0.94.5-2023-05-24" tabindex="-1">0.94.5 <em>2023-05-24</em></h2>
 <h3 id="issues-resolved-16" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>The selection in read only mathfield was no longer visible.</li>
 </ul>
-<h2 id="0.94.3-(2023-05-22)" tabindex="-1">0.94.3 (2023-05-22)</h2>
-<h2 id="improvements-17" tabindex="-1">Improvements</h2>
+<h2 id="0.94.3-2023-05-22" tabindex="-1">0.94.3 <em>2023-05-22</em></h2>
+<h3 id="improvements-17" tabindex="-1">Improvements</h3>
 <ul>
 <li>The <code>mathVirtualKeyboard.layouts</code> property was a frozen array (an array
 that cannot be modified) but that wasn’t clear. Now, a runtime error is
 produced if an attempt is made to modify the array. If using Typescript,
 a compile-time error is also generated.</li>
 </ul>
-<h2 id="issues-resolved-17" tabindex="-1">Issues Resolved</h2>
+<h3 id="issues-resolved-17" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1979</strong> Vectors were displayed with an offset</li>
 <li><strong>#1978</strong> Pasting or inserting some content could result in a runtime error</li>
@@ -2934,35 +2936,35 @@ which is not allowed to access the top window by cross-origin policy. In
 this situation the virtual keyboard is not available, but input via physical
 keyboard will work.</li>
 </ul>
-<h2 id="0.94.2-(2023-05-22)" tabindex="-1">0.94.2 (2023-05-22)</h2>
-<h2 id="issues-resolved-18" tabindex="-1">Issues Resolved</h2>
+<h2 id="0.94.2-2023-05-22" tabindex="-1">0.94.2 <em>2023-05-22</em></h2>
+<h3 id="issues-resolved-18" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1976</strong> Toggling the virtual keyboard several times would eventually not
 display the virtual keyboard.</li>
 <li>Only apply smartFence in math mode (not in text or LaTeX mode).</li>
 <li><strong>#1975</strong> When inserting a square root, do not insert an index by default</li>
 </ul>
-<h2 id="0.94.1-(2023-05-21)" tabindex="-1">0.94.1 (2023-05-21)</h2>
-<h2 id="improvements-18" tabindex="-1">Improvements</h2>
+<h2 id="0.94.1-2023-05-21" tabindex="-1">0.94.1 <em>2023-05-21</em></h2>
+<h3 id="improvements-18" tabindex="-1">Improvements</h3>
 <ul>
 <li>Use constructable stylesheets. This results in improved performance and a
 reduction of memory consuption by 2/3 in a page with 1,000 mathfields.</li>
 <li>Improved MathML serialization (<strong>#1870</strong>, <strong>#1803</strong>, <strong>#1933</strong>, <strong>#1648</strong>, <strong>#737</strong>, <strong>#150</strong>, variants: blackboard, fraktur, bold, etc…).</li>
 </ul>
-<h2 id="issues-resolved-19" tabindex="-1">Issues Resolved</h2>
+<h3 id="issues-resolved-19" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1963</strong> Typing a “/” after a digit containing a french decimal (<code>,</code>) did
 not include the digits before the decimal.</li>
 </ul>
-<h2 id="0.94.0-(2023-05-18)" tabindex="-1">0.94.0 (2023-05-18)</h2>
-<h2 id="new-features-3" tabindex="-1">New Features</h2>
+<h2 id="0.94.0-2023-05-18" tabindex="-1">0.94.0 <em>2023-05-18</em></h2>
+<h3 id="new-features-3" tabindex="-1">New Features</h3>
 <ul>
 <li>Added support for <code>\raise</code>, <code>\lower</code> and <code>\raisebox</code> commands. Those commands
 were necessary to render some chemical bonds.</li>
 <li>Pressing <code>(</code>, <code>[</code> or <code>{</code> with a selection will enclose the selection with
 this delimiter.</li>
 </ul>
-<h2 id="improvements-19" tabindex="-1">Improvements</h2>
+<h3 id="improvements-19" tabindex="-1">Improvements</h3>
 <ul>
 <li>Improved parsing/serialization/rendering of content with a mix of text and math.</li>
 <li>Various rendering improvements, mostly of edge cases.</li>
@@ -2978,7 +2980,7 @@ permission.</li>
 are now displayed when used with a static formula.</li>
 <li>Improvements to smart fence behavior, including better undoability.</li>
 </ul>
-<h2 id="issues-resolved-20" tabindex="-1">Issues Resolved</h2>
+<h3 id="issues-resolved-20" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Selection display was incorrect when the equation included a colored
 background.</li>
@@ -2992,8 +2994,8 @@ This strips any color/background-color/font sizing commands from the ouput.</li>
 <li>The caret is no longer displayed twice when placed after <code>\cos^2</code> (operators
 with a superscript).</li>
 </ul>
-<h2 id="0.93.0-(2023-05-08)" tabindex="-1">0.93.0 (2023-05-08)</h2>
-<h2 id="new-features-4" tabindex="-1">New Features</h2>
+<h2 id="0.93.0-2023-05-08" tabindex="-1">0.93.0 <em>2023-05-08</em></h2>
+<h3 id="new-features-4" tabindex="-1">New Features</h3>
 <ul>
 <li>Support for <code>\the</code> command. For example, <code>\the\year</code>. Its argument can
 be a literal or a register, preceded by an optional factor literal.</li>
@@ -3010,7 +3012,7 @@ which allows the <code>math-field</code> to use its default sizing logic.</li>
 <li>If no mathfield is focused the virtual keyboard will dispatch a <code>keydown</code>/<code>keyup</code>
 event pair. Add an event listener to the keyboard to receive those events.</li>
 </ul>
-<h2 id="improvements-20" tabindex="-1">Improvements</h2>
+<h3 id="improvements-20" tabindex="-1">Improvements</h3>
 <ul>
 <li>Improved performance of creation and destruction of mathfields by 50%.</li>
 <li>Fixed memory and listener leaks. After creating, inserting in the DOM, then
@@ -3022,7 +3024,7 @@ operation for undo/redo purposes.</li>
 <li>Importing the Compute Engine and MathLive in the same projec should no
 longer trigger a conflict.</li>
 </ul>
-<h2 id="issues-resolved-21" tabindex="-1">Issues Resolved</h2>
+<h3 id="issues-resolved-21" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1646</strong> <strong>mhchem</strong>: states of aggregation is now rendered correctly. Added
 support for the <code>\mskip</code> command</li>
@@ -3038,15 +3040,15 @@ then regains focus (when switching tabs, for example).</li>
 <li>At certain sizes, the <code>\left...\right</code> command did not display the visual
 indicator that the caret was inside the argument of the command.</li>
 </ul>
-<h2 id="0.92.1-(2023-04-19)" tabindex="-1">0.92.1 (2023-04-19)</h2>
-<h2 id="improvements-21" tabindex="-1">Improvements</h2>
+<h2 id="0.92.1-2023-04-19" tabindex="-1">0.92.1 <em>2023-04-19</em></h2>
+<h3 id="improvements-21" tabindex="-1">Improvements</h3>
 <ul>
 <li>Replaced the <code>(x)</code> ASCIIMath inline shortcut with <code>(*)</code></li>
 <li>Correctly parse empty sub/superscripts, i.e. <code>x^{}</code></li>
 <li>Fixed serialization of macros (regression)</li>
 </ul>
-<h2 id="0.92.0-(2023-04-18)" tabindex="-1">0.92.0 (2023-04-18)</h2>
-<h2 id="improvements-22" tabindex="-1">Improvements</h2>
+<h2 id="0.92.0-2023-04-18" tabindex="-1">0.92.0 <em>2023-04-18</em></h2>
+<h3 id="improvements-22" tabindex="-1">Improvements</h3>
 <ul>
 <li>In LaTeX, <code>\not{\in}</code>, <code>\not{}\in</code> and <code>\not\in</code> all render differently.
 Previously they were all rendered as <code>\not\in</code>. They now render as in LaTeX.</li>
@@ -3102,13 +3104,13 @@ formula.</li>
 handle atoms that should be treated as a unit, for example <code>\dot{\vec{v}}</code>.
 In general, various edge cases were not handled correctly.</li>
 </ul>
-<h2 id="0.91.2-(2023-04-06)" tabindex="-1">0.91.2 (2023-04-06)</h2>
+<h2 id="0.91.2-2023-04-06" tabindex="-1">0.91.2 <em>2023-04-06</em></h2>
 <h3 id="issues-resolved-23" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Update editing toolbar when virtual keyboard is made visible</li>
 <li><strong>#1919</strong> Correctly position the popover panel above or below the mathfield based on the space available. Allow for more suggestions to be displayed, and include a scrollbar when necessary.</li>
 </ul>
-<h2 id="0.91.1-(2023-04-05)" tabindex="-1">0.91.1 (2023-04-05)</h2>
+<h2 id="0.91.1-2023-04-05" tabindex="-1">0.91.1 <em>2023-04-05</em></h2>
 <h3 id="issues-resolved-24" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>The context menu that appears on long press on ChromeOS has been disabled as
@@ -3116,7 +3118,7 @@ it interfered with long press for variant keys</li>
 <li>When showing the virtual keyboard if the virtual keyboard obscures the
 mathfield, adjust the position of the mathfield to be visible</li>
 </ul>
-<h2 id="0.91.0-(2023-04-04)" tabindex="-1">0.91.0 (2023-04-04)</h2>
+<h2 id="0.91.0-2023-04-04" tabindex="-1">0.91.0 <em>2023-04-04</em></h2>
 <p>In this release the UI of the virtual keyboards has been significantly updated.
 This includes new virtual keyboards as well as updated layout for existing
 virtual keyboards and support for shift key modifier for many keycaps.</p>
@@ -3188,18 +3190,18 @@ virtual keyboard no longer triggers the contextual menu.</li>
 <li>The variants keycap work on iOS devices</li>
 <li>The keyboard is correctly offset from the bottom on iOS devices</li>
 </ul>
-<h2 id="0.90.11-(2023-03-31)" tabindex="-1">0.90.11 (2023-03-31)</h2>
+<h2 id="0.90.11-2023-03-31" tabindex="-1">0.90.11 <em>2023-03-31</em></h2>
 <h3 id="issues-resolveded" tabindex="-1">Issues Resolveded</h3>
 <ul>
 <li>The up and down arrow did not move the cursor, when in a fraction for example.</li>
 </ul>
-<h2 id="0.90.9-(2023-03-28)" tabindex="-1">0.90.9 (2023-03-28)</h2>
+<h2 id="0.90.9-2023-03-28" tabindex="-1">0.90.9 <em>2023-03-28</em></h2>
 <h3 id="issues-resolveded-1" tabindex="-1">Issues Resolveded</h3>
 <ul>
 <li><strong>#1890</strong> Attempt to fix a remaining Typescript declaration issue when using
 MathLive without the Compute Engine</li>
 </ul>
-<h2 id="0.90.8-(2023-03-27)" tabindex="-1">0.90.8 (2023-03-27)</h2>
+<h2 id="0.90.8-2023-03-27" tabindex="-1">0.90.8 <em>2023-03-27</em></h2>
 <h3 id="issues-resolved-26" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1830</strong> The keybinding to toggle text mode (alt+&quot;) could not be used on some
@@ -3221,13 +3223,13 @@ embedded iframes. To use the previous, more secure, policy, set the
 <code>originValidator</code> property of the <code>mathVirtualKeyboard</code> and any mathfield to
 <code>&quot;same-origin&quot;</code>.</li>
 </ul>
-<h2 id="0.90.7-(2023-03-24)" tabindex="-1">0.90.7 (2023-03-24)</h2>
+<h2 id="0.90.7-2023-03-24" tabindex="-1">0.90.7 <em>2023-03-24</em></h2>
 <h3 id="issues-resolveded-2" tabindex="-1">Issues Resolveded</h3>
 <ul>
 <li><strong>#1861</strong> In Firefox, an apparently focused mathfield would not always accept
 keyboard input.</li>
 </ul>
-<h2 id="0.90.6-(2023-03-23)" tabindex="-1">0.90.6 (2023-03-23)</h2>
+<h2 id="0.90.6-2023-03-23" tabindex="-1">0.90.6 <em>2023-03-23</em></h2>
 <h3 id="issues-resolved-27" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1881</strong>, <strong>#1883</strong> Fixed issues with TypeScript declarations of public
@@ -3237,7 +3239,7 @@ interface</li>
 <li>In some cases, using <code>mf.insert()</code> to replace a selection would do nothing</li>
 <li>Some mathfield properties (for example <code>mf.macros</code>) were missing.</li>
 </ul>
-<h2 id="0.90.0-(2023-03-19)" tabindex="-1">0.90.0 (2023-03-19)</h2>
+<h2 id="0.90.0-2023-03-19" tabindex="-1">0.90.0 <em>2023-03-19</em></h2>
 <h3 id="breaking-changes-3" tabindex="-1">Breaking Changes</h3>
 <p>This release contains several breaking changes. As much as possible I try to
 avoid introducing breaking changes, but there was an accumulation of issues that
@@ -3709,13 +3711,13 @@ caused the expression to be incorrectly balanced</li>
 <li><strong>#1048</strong> Virtual keyboard inside a custom container is now displayed
 correctly.</li>
 </ul>
-<h2 id="0.89.4-(2023-02-27)" tabindex="-1">0.89.4 (2023-02-27)</h2>
+<h2 id="0.89.4-2023-02-27" tabindex="-1">0.89.4 <em>2023-02-27</em></h2>
 <h3 id="issues-resolved-29" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fix an issue where the virtual keyboard would not activate when not using a
 shared virtual keyboard.</li>
 </ul>
-<h2 id="0.89.3-(2023-02-27)" tabindex="-1">0.89.3 (2023-02-27)</h2>
+<h2 id="0.89.3-2023-02-27" tabindex="-1">0.89.3 <em>2023-02-27</em></h2>
 <h3 id="issues-resolved-30" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1723</strong> The Ctrl-X/C/V keyboard shortcuts did not trigger when using a
@@ -3742,7 +3744,7 @@ a content editable <code>&lt;span&gt;</code>.</li>
 property as the <code>data</code> property of <code>&quot;input&quot;</code> and <code>&quot;beforeinput&quot;</code> events.
 WebKit/Safari erroneously strip the <code>inputType</code> property.</li>
 </ul>
-<h2 id="0.89.2-(2023-02-17)" tabindex="-1">0.89.2 (2023-02-17)</h2>
+<h2 id="0.89.2-2023-02-17" tabindex="-1">0.89.2 <em>2023-02-17</em></h2>
 <h3 id="improvements-27" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#1833</strong> MathLive 0.87.0 dropped support for UMD. It turns out, there are
@@ -3769,7 +3771,7 @@ rather than relying on the bundler.</li>
 </ul>
 </li>
 </ul>
-<h2 id="0.89.0-(2023-02-12)" tabindex="-1">0.89.0 (2023-02-12)</h2>
+<h2 id="0.89.0-2023-02-12" tabindex="-1">0.89.0 <em>2023-02-12</em></h2>
 <h3 id="improvements-28" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#1150</strong> Deleting the empty numerator or denominator of a fraction now
@@ -3782,7 +3784,7 @@ Contribution from @androettop. Thanks, Pablo!</li>
 <ul>
 <li><strong>#1802</strong> MathML markup for expressions like <code>a(b)^2</code> was invalid.</li>
 </ul>
-<h2 id="0.87.1-(2023-01-26)" tabindex="-1">0.87.1 (2023-01-26)</h2>
+<h2 id="0.87.1-2023-01-26" tabindex="-1">0.87.1 <em>2023-01-26</em></h2>
 <h3 id="improvements-29" tabindex="-1">Improvements</h3>
 <ul>
 <li>Better MathML serialization of <code>\operatorname{}</code> and <code>\mathrm{}</code></li>
@@ -3803,7 +3805,7 @@ dispatch an <code>&quot;input&quot;</code> event with an <code>inputType</code> 
 the user pressed the <strong>RETURN</strong> or <strong>ENTER</strong> key. Also dispatch a <code>focusin</code>
 and <code>focusout</code> event when applicable.</li>
 </ul>
-<h2 id="0.87.0-(2023-01-20)" tabindex="-1">0.87.0 (2023-01-20)</h2>
+<h2 id="0.87.0-2023-01-20" tabindex="-1">0.87.0 <em>2023-01-20</em></h2>
 <h3 id="improvements-30" tabindex="-1">Improvements</h3>
 <ul>
 <li>Removed dependency on <code>jsdom</code> for server-side rendering.</li>
@@ -3820,7 +3822,7 @@ symbol</li>
 <li>The MathML serialization for superscripts and subscripts was invalid in some
 cases.</li>
 </ul>
-<h2 id="0.86.1-(2023-01-18)" tabindex="-1">0.86.1 (2023-01-18)</h2>
+<h2 id="0.86.1-2023-01-18" tabindex="-1">0.86.1 <em>2023-01-18</em></h2>
 <h3 id="issues-resolved-34" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1773</strong>, <strong>#1542</strong>: better handling of interaction with the virtual keyboard
@@ -3838,7 +3840,7 @@ invalid.</li>
 some cases if the <code>z-index</code> of the expression they decorated had certain
 values.</li>
 </ul>
-<h2 id="0.86.0-(2022-12-02)" tabindex="-1">0.86.0 (2022-12-02)</h2>
+<h2 id="0.86.0-2022-12-02" tabindex="-1">0.86.0 <em>2022-12-02</em></h2>
 <h3 id="breaking-changes-4" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The Compute Engine has been split from MathLive to reduce the package size and
@@ -3873,11 +3875,11 @@ default, rather than extensible arrows.</li>
 <li>Fill-in-the-blank (placeholder) nested mathfields now line up with the
 baseline. They also inherit the font-size of their parent container.</li>
 </ul>
-<h2 id="0.85.1-(2022-11-18)" tabindex="-1">0.85.1 (2022-11-18)</h2>
+<h2 id="0.85.1-2022-11-18" tabindex="-1">0.85.1 <em>2022-11-18</em></h2>
 <ul>
 <li>Updated to Compute Engine 0.11.0</li>
 </ul>
-<h2 id="0.85.0-(2022-11-15)" tabindex="-1">0.85.0 (2022-11-15)</h2>
+<h2 id="0.85.0-2022-11-15" tabindex="-1">0.85.0 <em>2022-11-15</em></h2>
 <h3 id="new-features-6" tabindex="-1">New Features</h3>
 <ul>
 <li>Added support for <code>\mathtip{math}{tip}</code> and <code>\texttip{math}{tip}</code> commands.
@@ -3908,7 +3910,7 @@ debugging or to report issues.</li>
 <li><strong>#1715</strong>, <strong>#1716</strong>: fill-in-the-blank placeholders inside a <code>&lt;math-field&gt;</code>
 did not inherit the options from their parent container.</li>
 </ul>
-<h2 id="0.84.0-(2022-10-19)" tabindex="-1">0.84.0 (2022-10-19)</h2>
+<h2 id="0.84.0-2022-10-19" tabindex="-1">0.84.0 <em>2022-10-19</em></h2>
 <h3 id="new-features-7" tabindex="-1">New Features</h3>
 <ul>
 <li>When using <code>renderMathInElement</code> or <code>renderMathInDocument</code> to render math
@@ -3930,7 +3932,7 @@ the value of a mathfield to a MathJSON expression.</li>
 Allow <code>null</code> as a value for <code>fontsDirectory</code> and <code>soundDirectory</code> to prevent
 any attempt to resolve these values.</li>
 </ul>
-<h2 id="0.83.0-(2022-10-02)" tabindex="-1">0.83.0 (2022-10-02)</h2>
+<h2 id="0.83.0-2022-10-02" tabindex="-1">0.83.0 <em>2022-10-02</em></h2>
 <h3 id="improvements-34" tabindex="-1">Improvements</h3>
 <ul>
 <li>
@@ -3985,12 +3987,12 @@ than by its index in the subexpression. Contributed by @manstie</p>
 <li>The caret after an environment without fences (e.g. <code>matrix</code>, <code>aligned</code>, etc)
 would not be displayed.</li>
 </ul>
-<h2 id="0.82.0-(2022-09-30)" tabindex="-1">0.82.0 (2022-09-30)</h2>
+<h2 id="0.82.0-2022-09-30" tabindex="-1">0.82.0 <em>2022-09-30</em></h2>
 <h3 id="improvements-35" tabindex="-1">Improvements</h3>
 <ul>
 <li>Update Compute Engine to 0.7.0</li>
 </ul>
-<h2 id="0.81.0-(2022-09-28)" tabindex="-1">0.81.0 (2022-09-28)</h2>
+<h2 id="0.81.0-2022-09-28" tabindex="-1">0.81.0 <em>2022-09-28</em></h2>
 <h3 id="improvements-36" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#1639</strong> When navigating with the keyboard from a cell in a matrix to another
@@ -4005,7 +4007,7 @@ you!</li>
 superscript moves immediately out of the superscript if the input is a single
 digit. Works well for, e.g. <code>x^2</code> but is less desirable with <code>\sum</code>.</li>
 </ul>
-<h2 id="0.80.0-(2022-09-27)" tabindex="-1">0.80.0 (2022-09-27)</h2>
+<h2 id="0.80.0-2022-09-27" tabindex="-1">0.80.0 <em>2022-09-27</em></h2>
 <h3 id="issues-resolved-39" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1540</strong> When changing the <code>readonly</code> or <code>disabled</code> attribute of a mathfield,
@@ -4055,7 +4057,7 @@ coordinate, use <code>mf.offsetFromPoint()</code>.</li>
 <li><strong>#1641</strong> Support for the <code>\mathchoice</code> command.</li>
 <li><strong>#1643</strong> Support for the <code>\kern</code>, <code>\mkern</code> and <code>\mspace</code> command.</li>
 </ul>
-<h2 id="0.79.0-(2022-09-06)" tabindex="-1">0.79.0 (2022-09-06)</h2>
+<h2 id="0.79.0-2022-09-06" tabindex="-1">0.79.0 <em>2022-09-06</em></h2>
 <h3 id="breaking-changes-5" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>onMulticharSymbol</code> handler has been renamed to <code>onInlineShortcut</code></li>
@@ -4103,7 +4105,7 @@ name is also applicable in math mode.</li>
 <li><strong>#1605</strong> In some cases, clicking on the space between two atoms would not
 position the caret.</li>
 </ul>
-<h2 id="0.78.2-(2022-08-18)" tabindex="-1">0.78.2 (2022-08-18)</h2>
+<h2 id="0.78.2-2022-08-18" tabindex="-1">0.78.2 <em>2022-08-18</em></h2>
 <h3 id="features" tabindex="-1">Features</h3>
 <ul>
 <li><strong>#1580</strong> Added support for infix commands <code>\brace</code> and <code>\brack</code>. These
@@ -4124,7 +4126,7 @@ keyboard input being incorrect</p>
 <p>The <code>\ce</code> command would not render chemical equations (regression).</p>
 </li>
 </ul>
-<h2 id="0.78.1-(2022-08-12)" tabindex="-1">0.78.1 (2022-08-12)</h2>
+<h2 id="0.78.1-2022-08-12" tabindex="-1">0.78.1 <em>2022-08-12</em></h2>
 <h3 id="issues-resolved-41" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>
@@ -4136,7 +4138,7 @@ recognized, for example when following a binary operator.</p>
 special mapping, e.g. “°”.</p>
 </li>
 </ul>
-<h2 id="0.78.0-(2022-08-11)" tabindex="-1">0.78.0 (2022-08-11)</h2>
+<h2 id="0.78.0-2022-08-11" tabindex="-1">0.78.0 <em>2022-08-11</em></h2>
 <h3 id="breaking-changes-6" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
@@ -4223,7 +4225,7 @@ stylesheet would leak in the <code>&lt;header&gt;</code> of the document</li>
 <li><strong>#1561</strong> Last atom in group (atom with <code>skipBoundary</code> property) was skipped
 when moving forward</li>
 </ul>
-<h2 id="0.77.0-(2022-07-05)" tabindex="-1">0.77.0 (2022-07-05)</h2>
+<h2 id="0.77.0-2022-07-05" tabindex="-1">0.77.0 <em>2022-07-05</em></h2>
 <h3 id="improvements-39" tabindex="-1">Improvements</h3>
 <ul>
 <li>Changed the key on the bottom right of the virtual keyboard from
@@ -4243,13 +4245,13 @@ wrong custom keyboard for example).</li>
 <code>document.activeElement</code> still being set to the mathfield.</li>
 <li><strong>#1544</strong> Allow physical keyboard input to be turned off.</li>
 </ul>
-<h2 id="0.76.1-(2022-06-29)" tabindex="-1">0.76.1 (2022-06-29)</h2>
+<h2 id="0.76.1-2022-06-29" tabindex="-1">0.76.1 <em>2022-06-29</em></h2>
 <h3 id="issues-resolved-44" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1521</strong> <strong>Regression</strong> In some cases a vertical scrollbar unexpectedly
 appeared in the mathfield</li>
 </ul>
-<h2 id="0.76.0-(2022-06-28)" tabindex="-1">0.76.0 (2022-06-28)</h2>
+<h2 id="0.76.0-2022-06-28" tabindex="-1">0.76.0 <em>2022-06-28</em></h2>
 <h3 id="improvements-40" tabindex="-1">Improvements</h3>
 <ul>
 <li>In the second argument of the <code>\colorbox</code> command, use <code>\ensuremath</code> when
@@ -4304,7 +4306,7 @@ functions would revert to their default implementation</li>
 an error to the console. Long press on the backspace key is now a shortcut to
 clear the entire mathfield.</li>
 </ul>
-<h2 id="0.75.0-(2022-06-21)" tabindex="-1">0.75.0 (2022-06-21)</h2>
+<h2 id="0.75.0-2022-06-21" tabindex="-1">0.75.0 <em>2022-06-21</em></h2>
 <h3 id="features-3" tabindex="-1">Features</h3>
 <ul>
 <li><strong>#970</strong> It is now possible to vertically scroll the content of the mathfield.</li>
@@ -4343,7 +4345,7 @@ The MathML and ASCIIMath serialization of <code>\ne</code> were incorrect.</li>
 <li><strong>#1513</strong> Using the virtual keyboard to apply underline or overline to the
 selection resulted in a placeholder being inserted instead.</li>
 </ul>
-<h2 id="0.74.0-(2022-06-06)" tabindex="-1">0.74.0 (2022-06-06)</h2>
+<h2 id="0.74.0-2022-06-06" tabindex="-1">0.74.0 <em>2022-06-06</em></h2>
 <h3 id="improvements-42" tabindex="-1">Improvements</h3>
 <ul>
 <li>
@@ -4370,7 +4372,7 @@ two mathfields).</p>
 <ul>
 <li><strong>#1477</strong> Undo/redo did not generate an <code>input</code> event</li>
 </ul>
-<h2 id="0.73.7-(2022-05-29)" tabindex="-1">0.73.7 (2022-05-29)</h2>
+<h2 id="0.73.7-2022-05-29" tabindex="-1">0.73.7 <em>2022-05-29</em></h2>
 <h3 id="improvements-43" tabindex="-1">Improvements</h3>
 <ul>
 <li>Preferably use serialized atoms for clipboard copy/paste operations. This
@@ -4385,7 +4387,7 @@ indicator.</li>
 <li><strong>#1475</strong> Copying a formula containing a matrix could render the mathfield
 unresponsive</li>
 </ul>
-<h2 id="0.73.6-(2022-05-28)" tabindex="-1">0.73.6 (2022-05-28)</h2>
+<h2 id="0.73.6-2022-05-28" tabindex="-1">0.73.6 <em>2022-05-28</em></h2>
 <h3 id="issues-resolved-49" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1466</strong> In LaTeX mode, doing a Select All (cmd+A), then delete would put the
@@ -4394,7 +4396,7 @@ mathfield in an inconsistent state</li>
 followed by an auto-complete suggestion would render the mathfield
 unresponsive</li>
 </ul>
-<h2 id="0.73.4-(2022-05-27)" tabindex="-1">0.73.4 (2022-05-27)</h2>
+<h2 id="0.73.4-2022-05-27" tabindex="-1">0.73.4 <em>2022-05-27</em></h2>
 <h3 id="issues-resolved-50" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Correctly export the Typescript declaration for some static functions.</li>
@@ -4410,14 +4412,14 @@ than <code>\\(</code> and <code>\\[</code>))</li>
 <li><strong>#1443</strong> On mobile, prevent the focus from changing while the alternate key
 panel is up</li>
 </ul>
-<h2 id="0.73.1-(2022-05-24)" tabindex="-1">0.73.1 (2022-05-24)</h2>
+<h2 id="0.73.1-2022-05-24" tabindex="-1">0.73.1 <em>2022-05-24</em></h2>
 <h3 id="issues-resolved-51" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Using macros without arguments (e.g. <code>\RR</code>) could result in incorrect LaTeX</li>
 <li>The virtual keyboard could become invisible when re-focusing a mathfield</li>
 <li>Typing a <code>,</code> (comma) would be rendered as a <code>.</code> (dot)</li>
 </ul>
-<h2 id="0.73.0-(2022-05-23)" tabindex="-1">0.73.0 (2022-05-23)</h2>
+<h2 id="0.73.0-2022-05-23" tabindex="-1">0.73.0 <em>2022-05-23</em></h2>
 <h3 id="breaking-changes-7" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
@@ -4537,7 +4539,7 @@ inserting a fraction.</li>
 <li><strong>#1462</strong> When copying and pasting an expression that could not be parsed with
 the Compute Engine, the resulting pasted content was displayed as an error.</li>
 </ul>
-<h2 id="0.72.2-(2022-04-30)" tabindex="-1">0.72.2 (2022-04-30)</h2>
+<h2 id="0.72.2-2022-04-30" tabindex="-1">0.72.2 <em>2022-04-30</em></h2>
 <h3 id="issues-resolved-53" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1427</strong> An issue introduced in the previous release: the serialization to
@@ -4556,7 +4558,7 @@ now only done once, and with a <code>HEAD</code> request to avoid the download. 
 result, getting the MathLive library ready, especially when using a CDN and a
 slow network, is an order of magnitude faster.</li>
 </ul>
-<h2 id="0.72.0-(2022-04-18)" tabindex="-1">0.72.0 (2022-04-18)</h2>
+<h2 id="0.72.0-2022-04-18" tabindex="-1">0.72.0 <em>2022-04-18</em></h2>
 <h3 id="issues-resolved-54" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1017</strong> Display tooltip over buttons of virtual keyboard button bar</li>
@@ -4585,7 +4587,7 @@ cases</li>
 <li>Use more standard <code>\mathbb{N}</code>, etc… for <code>NN</code> shortcut</li>
 <li>Improved display of command popover when editing raw LaTeX</li>
 </ul>
-<h2 id="0.71.0-(2022-04-12)" tabindex="-1">0.71.0 (2022-04-12)</h2>
+<h2 id="0.71.0-2022-04-12" tabindex="-1">0.71.0 <em>2022-04-12</em></h2>
 <h3 id="breaking-changes-8" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Removed the <code>find</code> and <code>replace</code> methods. These methods were difficult to use,
@@ -4618,7 +4620,7 @@ children</li>
 <li><strong>#1387</strong> A matrix with an empty cell would result in error messages in the
 console in some cases</li>
 </ul>
-<h2 id="0.70.0-(2022-04-05)" tabindex="-1">0.70.0 (2022-04-05)</h2>
+<h2 id="0.70.0-2022-04-05" tabindex="-1">0.70.0 <em>2022-04-05</em></h2>
 <h3 id="features-4" tabindex="-1">Features</h3>
 <ul>
 <li>Uses new version of Compute Engine for serialization to MathJSON and parsing
@@ -4648,7 +4650,7 @@ between columns</li>
 <li>Improved visual appearance when using dark mode. Also, added more CSS
 variables to customize the appearance of the mathfield.</li>
 </ul>
-<h2 id="0.69.10-(2022-02-23)" tabindex="-1">0.69.10 (2022-02-23)</h2>
+<h2 id="0.69.10-2022-02-23" tabindex="-1">0.69.10 <em>2022-02-23</em></h2>
 <h3 id="features-5" tabindex="-1">Features</h3>
 <ul>
 <li>Support for the <code>\htmlStyle</code> command (feature contributed by @neokazemi)</li>
@@ -4664,7 +4666,7 @@ contributed by @LuisMesa)</li>
 <li><strong>#1357</strong> Alternate (shifted) layers described in the virtual keyboard defined
 with an object literal would not trigger.</li>
 </ul>
-<h2 id="0.69.9-(2022-01-06)" tabindex="-1">0.69.9 (2022-01-06)</h2>
+<h2 id="0.69.9-2022-01-06" tabindex="-1">0.69.9 <em>2022-01-06</em></h2>
 <h3 id="features-6" tabindex="-1">Features</h3>
 <ul>
 <li>Support for Vue 3.x</li>
@@ -4677,7 +4679,7 @@ inserting characters in LaTeX mode may result in unresponsive input.</li>
 applied to the keyboard, resulting in some elements overlaping the virtual
 keyboard in some situations.</li>
 </ul>
-<h2 id="0.69.8-(2021-11-08)" tabindex="-1">0.69.8 (2021-11-08)</h2>
+<h2 id="0.69.8-2021-11-08" tabindex="-1">0.69.8 <em>2021-11-08</em></h2>
 <h3 id="issues-resolved-59" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#1146</strong> When the pointer was over a mathfield, using the scrollwheel or
@@ -4698,12 +4700,12 @@ necessary</li>
 <li>Use <code>serve-http</code> instead of <code>http-serve</code> for improved Linux compatibility
 (contributed by @AceGentile)</li>
 </ul>
-<h2 id="0.69.7-(2021-09-13)" tabindex="-1">0.69.7 (2021-09-13)</h2>
+<h2 id="0.69.7-2021-09-13" tabindex="-1">0.69.7 <em>2021-09-13</em></h2>
 <h3 id="new-feature" tabindex="-1">New Feature</h3>
 <ul>
 <li><strong>#1138</strong> <strong>PR#163</strong> “Fill in the blank”</li>
 </ul>
-<h2 id="0.69.6-(2021-08-31)" tabindex="-1">0.69.6 (2021-08-31)</h2>
+<h2 id="0.69.6-2021-08-31" tabindex="-1">0.69.6 <em>2021-08-31</em></h2>
 <h3 id="improvements-49" tabindex="-1">Improvements</h3>
 <ul>
 <li>
@@ -4732,7 +4734,7 @@ the keyboard</li>
 <li><strong>#1117</strong> and <strong>#1118</strong> Replacing a subset of a mathfield with a pattern that
 contains the target led to an infinite loop</li>
 </ul>
-<h2 id="0.69.5-(2021-08-05)" tabindex="-1">0.69.5 (2021-08-05)</h2>
+<h2 id="0.69.5-2021-08-05" tabindex="-1">0.69.5 <em>2021-08-05</em></h2>
 <h3 id="improvements-50" tabindex="-1">Improvements</h3>
 <ul>
 <li>
@@ -4746,7 +4748,7 @@ current math style, rather than forcing display style.</p>
 <p>Updated localization strings</p>
 </li>
 </ul>
-<h2 id="0.69.4-(2021-06-22)" tabindex="-1">0.69.4 (2021-06-22)</h2>
+<h2 id="0.69.4-2021-06-22" tabindex="-1">0.69.4 <em>2021-06-22</em></h2>
 <h3 id="improvements-51" tabindex="-1">Improvements</h3>
 <ul>
 <li>Updated to ComputeEngine 0.4.2 for better parsing of LaTeX.</li>
@@ -4757,7 +4759,7 @@ which result in subsequent attempts at pasting the content into a mathfield to
 fail.</li>
 <li>Updated various localizations (contributed by @physedo).</li>
 </ul>
-<h2 id="0.69.3-(2021-06-10)" tabindex="-1">0.69.3 (2021-06-10)</h2>
+<h2 id="0.69.3-2021-06-10" tabindex="-1">0.69.3 <em>2021-06-10</em></h2>
 <h3 id="improvements-52" tabindex="-1">Improvements</h3>
 <ul>
 <li>Added localization for Irish (contributed by @physedo).</li>
@@ -4769,12 +4771,12 @@ subscript first: <code>\int_0^{\infty}</code> instead of <code>\int^{\infty}_0</
 <li>In some page layouts, the virtual keyboard could be displayed at an incorrect
 location, or scroll with the page.</li>
 </ul>
-<h2 id="0.69.1-(2021-06-09)" tabindex="-1">0.69.1 (2021-06-09)</h2>
+<h2 id="0.69.1-2021-06-09" tabindex="-1">0.69.1 <em>2021-06-09</em></h2>
 <h3 id="improvements-53" tabindex="-1">Improvements</h3>
 <ul>
 <li>Attempt to fix installation of the npm package on some Windows configurations</li>
 </ul>
-<h2 id="0.69.0-(2021-06-09)" tabindex="-1">0.69.0 (2021-06-09)</h2>
+<h2 id="0.69.0-2021-06-09" tabindex="-1">0.69.0 <em>2021-06-09</em></h2>
 <h3 id="breaking-changes-9" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
@@ -4882,7 +4884,7 @@ container with <code>overflow: scroll</code>, the dimensions of the viewport wou
 incorrectly affected.</li>
 <li><strong>#974</strong> With non-US keyboard layout, always map the “/” key to a fraction.</li>
 </ul>
-<h2 id="0.68.1-(2021-06-02)" tabindex="-1">0.68.1 (2021-06-02)</h2>
+<h2 id="0.68.1-2021-06-02" tabindex="-1">0.68.1 <em>2021-06-02</em></h2>
 <h3 id="improvements-55" tabindex="-1">Improvements</h3>
 <ul>
 <li>
@@ -4904,7 +4906,7 @@ not use MathJSON as a submodule but as a regular npm dependency, and builds
 correctly even in non-git environments.</li>
 <li><strong>#968</strong> navigating with arrow keys cannot navigate past a macro</li>
 </ul>
-<h2 id="0.68.0-(2021-05-31)" tabindex="-1">0.68.0 (2021-05-31)</h2>
+<h2 id="0.68.0-2021-05-31" tabindex="-1">0.68.0 <em>2021-05-31</em></h2>
 <h3 id="breaking-changes-10" tabindex="-1">Breaking Changes</h3>
 <p><strong>#500</strong> MathJSON support. The legacy MASTON/JSON format has been removed.<br>
 The MathJSON format is now integrated into MathLive 🚀 🎆 🥳</p>
@@ -4966,7 +4968,7 @@ LaTeX (e.g. “e”).</li>
 <li>In MathML serialization, <code>2^3</code> was not serializing the superscript (<strong>#951</strong> )
 and subscripts were not serialized for various constructs( <strong>#534</strong>).</li>
 </ul>
-<h2 id="0.67.0-(2021-05-21)" tabindex="-1">0.67.0 (2021-05-21)</h2>
+<h2 id="0.67.0-2021-05-21" tabindex="-1">0.67.0 <em>2021-05-21</em></h2>
 <h3 id="new-features-13" tabindex="-1">New Features</h3>
 <ul>
 <li>Added <code>\overarc</code>, <code>\underarc</code>, <code>\overparen</code> and <code>\underparen</code> commands.</li>
@@ -4989,7 +4991,7 @@ that contains the value.</li>
 <li>If the mathlive module was loaded before the <code>&lt;math-field&gt;</code> element was parsed
 in the document, the attributes of the mathfield would be ignored.</li>
 </ul>
-<h2 id="0.66.1-(2021-05-21)" tabindex="-1">0.66.1 (2021-05-21)</h2>
+<h2 id="0.66.1-2021-05-21" tabindex="-1">0.66.1 <em>2021-05-21</em></h2>
 <h3 id="issues-resolved-66" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Revert improvements where the <code>display</code> property of the mathfield would change
@@ -5002,7 +5004,7 @@ would not be applied to the selection.</li>
 font size 1 (tiny).</li>
 <li>Macro packages were incorrectly parsed</li>
 </ul>
-<h2 id="0.66.0-(2021-05-20)" tabindex="-1">0.66.0 (2021-05-20)</h2>
+<h2 id="0.66.0-2021-05-20" tabindex="-1">0.66.0 <em>2021-05-20</em></h2>
 <h3 id="breaking-changes-11" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>horizontalSpacingScale</code> option is deprecated. It will be removed in an
@@ -5143,7 +5145,7 @@ yet, even if the output format is not specified.</li>
 <li>Color specified with the <code>rgb()</code> function would not render correctly if the
 arguments contained some spaces, e.g.<code>rgb ( 255 , 255 , 255 )</code>.</li>
 </ul>
-<h2 id="0.65.0-(2021-05-14)" tabindex="-1">0.65.0 (2021-05-14)</h2>
+<h2 id="0.65.0-2021-05-14" tabindex="-1">0.65.0 <em>2021-05-14</em></h2>
 <h3 id="breaking-changes-12" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The <code>substituteTextArea</code> option has been removed. This option was in fact not
@@ -5174,7 +5176,7 @@ on the page.</li>
 fraction of a pixel when moving the caret.</li>
 <li>In LaTeX mode with nested expressions, the edited LaTeX was incorrect.</li>
 </ul>
-<h2 id="0.64.0-(2021-05-09)" tabindex="-1">0.64.0 (2021-05-09)</h2>
+<h2 id="0.64.0-2021-05-09" tabindex="-1">0.64.0 <em>2021-05-09</em></h2>
 <h3 id="breaking-changes-13" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
@@ -5360,7 +5362,7 @@ example in <code>\sqrt[\placeholder{}}{x}</code></li>
 <li>Rules (e.g. from <code>\rule{}{}</code>) were not clickable and did not appear selected.</li>
 <li>Correctly roundtrip <code>\char</code> command when using <code>latex-expanded</code> format.</li>
 </ul>
-<h2 id="0.63.1-(2021-04-24)" tabindex="-1">0.63.1 (2021-04-24)</h2>
+<h2 id="0.63.1-2021-04-24" tabindex="-1">0.63.1 <em>2021-04-24</em></h2>
 <h3 id="issues-resolved-70" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>On the UK QWERTY keyboard, pressing the <code>\</code> key did not switch to LaTeX mode.
@@ -5369,7 +5371,7 @@ keyboard and distinct from the <code>\</code> on any other keyboard. Its officia
 <code>IntlBackslash</code>, while the other, visually identical <code>\</code> key, is the
 <code>Backslash</code> key.</li>
 </ul>
-<h2 id="0.63.0-(2021-04-24)" tabindex="-1">0.63.0 (2021-04-24)</h2>
+<h2 id="0.63.0-2021-04-24" tabindex="-1">0.63.0 <em>2021-04-24</em></h2>
 <h3 id="new-features-17" tabindex="-1">New Features</h3>
 <ul>
 <li><strong>#788</strong> Added <code>virtualKeyboardState</code> property to indicate if the virtual
@@ -5388,7 +5390,7 @@ trigger the key action.</li>
 when using a CDN to load MathLive.</li>
 <li>Correctly focus the mathfield when the virtual keyboard is invoked.</li>
 </ul>
-<h2 id="0.62.0-(2021-04-23)" tabindex="-1">0.62.0 (2021-04-23)</h2>
+<h2 id="0.62.0-2021-04-23" tabindex="-1">0.62.0 <em>2021-04-23</em></h2>
 <h3 id="improvements-60" tabindex="-1">Improvements</h3>
 <ul>
 <li><strong>#794</strong> When a keycap on the virtual keyboard with associated alternate keys
@@ -5408,7 +5410,7 @@ dropping some styling.</li>
 <li><strong>#910</strong> Fixed an issue introduced in 0.61.0 where some content would not get
 rendered when calling <code>renderMathInElement()</code> or <code>renderMathInDocument()</code>.</li>
 </ul>
-<h2 id="0.61.0-(2021-04-22)" tabindex="-1">0.61.0 (2021-04-22)</h2>
+<h2 id="0.61.0-2021-04-22" tabindex="-1">0.61.0 <em>2021-04-22</em></h2>
 <h3 id="breaking-changes-14" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>
@@ -5507,7 +5509,7 @@ unlike <code>\overbrace</code>).</li>
 <li>The <code>cases</code> environment should be in inline mode (<code>textstyle</code>) by default.</li>
 <li>Fixed keyboard navigation of <code>\overbrace</code>, <code>\underbrace</code>, etc…</li>
 </ul>
-<h2 id="0.60.1-(2021-04-13)" tabindex="-1">0.60.1 (2021-04-13)</h2>
+<h2 id="0.60.1-2021-04-13" tabindex="-1">0.60.1 <em>2021-04-13</em></h2>
 <h3 id="new-features-19" tabindex="-1">New Features</h3>
 <ul>
 <li><strong>#793</strong>. Added ‘%’ inline shortcut</li>
@@ -5524,7 +5526,7 @@ field when typing a character in the middle of the formula</li>
 <li>When changing options with <code>setOptions()</code> avoid changing the selection unless
 necessary (react-mathlive issue #4).</li>
 </ul>
-<h2 id="0.60.0-(2021-04-12)" tabindex="-1">0.60.0 (2021-04-12)</h2>
+<h2 id="0.60.0-2021-04-12" tabindex="-1">0.60.0 <em>2021-04-12</em></h2>
 <h3 id="breaking-change" tabindex="-1">Breaking Change</h3>
 <ul>
 <li>
@@ -5753,13 +5755,13 @@ their respective classes.</p>
 validation.</p>
 </li>
 </ul>
-<h2 id="0.59.0-(2020-11-04)" tabindex="-1">0.59.0 (2020-11-04)</h2>
+<h2 id="0.59.0-2020-11-04" tabindex="-1">0.59.0 <em>2020-11-04</em></h2>
 <h3 id="issues-resolved-76" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>#685</strong> Virtual keyboard event listeners were not properly released when the
 mathfield was removed from the DOM</li>
 </ul>
-<h2 id="0.58.0-(2020-10-11)" tabindex="-1">0.58.0 (2020-10-11)</h2>
+<h2 id="0.58.0-2020-10-11" tabindex="-1">0.58.0 <em>2020-10-11</em></h2>
 <h3 id="new-features-21" tabindex="-1">New Features</h3>
 <ul>
 <li>
@@ -5831,7 +5833,7 @@ devices)</li>
 as if they had an invisible boundary, resulting in the cursor being positioned
 incorrectly when navigating with the keyboard.</li>
 </ul>
-<h2 id="0.57.0-(2020-10-09)" tabindex="-1">0.57.0 (2020-10-09)</h2>
+<h2 id="0.57.0-2020-10-09" tabindex="-1">0.57.0 <em>2020-10-09</em></h2>
 <h3 id="major-new-feature" tabindex="-1">Major New Feature</h3>
 <p>This release introduce two major new features which will require code changes.
 For now, the older API remains supported but it will be dropped in an upcoming
@@ -6090,14 +6092,14 @@ a shadow DOM</li>
 <li>Thanks to <code>@stefnotch</code> for contributing several of the improvements in this
 release</li>
 </ul>
-<h2 id="0.56.0-(2020-08-22)" tabindex="-1">0.56.0 (2020-08-22)</h2>
+<h2 id="0.56.0-2020-08-22" tabindex="-1">0.56.0 <em>2020-08-22</em></h2>
 <h3 id="new-features-23" tabindex="-1">New Features</h3>
 <ul>
 <li>Added support for <code>\phantom</code>, <code>\vphantom</code>, <code>\hphantom</code> and <code>\smash[]</code></li>
 <li><strong>#182</strong> Added support for the mhchem package, with the commands <code>\ce</code> and
 <code>\pu</code>, to display chemical equations</li>
 </ul>
-<h2 id="0.55.0-(2020-08-17)" tabindex="-1">0.55.0 (2020-08-17)</h2>
+<h2 id="0.55.0-2020-08-17" tabindex="-1">0.55.0 <em>2020-08-17</em></h2>
 <h3 id="new-features-24" tabindex="-1">New Features</h3>
 <ul>
 <li>
@@ -6141,7 +6143,7 @@ configurations:</p>
 - <code>import</code> and local file</p>
 </li>
 </ul>
-<h2 id="0.54.0-(2020-06-24)" tabindex="-1">0.54.0 (2020-06-24)</h2>
+<h2 id="0.54.0-2020-06-24" tabindex="-1">0.54.0 <em>2020-06-24</em></h2>
 <h3 id="issues-resolved-80" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>
@@ -6162,7 +6164,7 @@ listeners. The warning has been silenced with extreme prejudice.</p>
 <p><strong>#503</strong> Dynamic styles were not applied inside of shadow DOM</p>
 </li>
 </ul>
-<h2 id="0.53.3-(2020-06-24)" tabindex="-1">0.53.3 (2020-06-24)</h2>
+<h2 id="0.53.3-2020-06-24" tabindex="-1">0.53.3 <em>2020-06-24</em></h2>
 <h3 id="issues-resolved-81" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>
@@ -6220,7 +6222,7 @@ formulas using large symbols such as integrals or large parentheses).</p>
 </ul>
 <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;dist/mathlive-fonts.css&quot;</span> /&gt;</span>
 </code></pre>
-<h2 id="0.53.2-(2020-06-10)" tabindex="-1">0.53.2 (2020-06-10)</h2>
+<h2 id="0.53.2-2020-06-10" tabindex="-1">0.53.2 <em>2020-06-10</em></h2>
 <h3 id="issues-resolved-82" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Adjusted height of square root (there was some extra blank space above)</li>
@@ -6229,14 +6231,14 @@ should only apply in the math mode)</li>
 <li><strong>#492</strong> Typing “/” to insert as fraction when some items were selected would
 result in an erroneous output.</li>
 </ul>
-<h2 id="0.53.1-(2020-06-01)" tabindex="-1">0.53.1 (2020-06-01)</h2>
+<h2 id="0.53.1-2020-06-01" tabindex="-1">0.53.1 <em>2020-06-01</em></h2>
 <h3 id="issues-resolved-83" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>In the virtual keyboard, use <code>\scriptstyle</code> to display small symbols</li>
 <li>Better vertical alignment of extensible arrows</li>
 <li>Don’t display a double caret after a <code>\leftright</code></li>
 </ul>
-<h2 id="0.53.0-(2020-05-31)" tabindex="-1">0.53.0 (2020-05-31)</h2>
+<h2 id="0.53.0-2020-05-31" tabindex="-1">0.53.0 <em>2020-05-31</em></h2>
 <h3 id="breaking-change-%2F-new-feature" tabindex="-1">Breaking Change / New Feature</h3>
 <ul>
 <li>
@@ -6328,7 +6330,7 @@ inserted) was incorrect.</p>
 ‘math’ mode.</p>
 </li>
 </ul>
-<h2 id="0.52-(2020-05-23)" tabindex="-1">0.52 (2020-05-23)</h2>
+<h2 id="0.52-2020-05-23" tabindex="-1">0.52 <em>2020-05-23</em></h2>
 <h3 id="new-feature-2" tabindex="-1">New Feature</h3>
 <ul>
 <li>
@@ -6368,7 +6370,7 @@ appropriately given the state of the undo stack.</p>
 below a minimal threshold.</p>
 </li>
 </ul>
-<h2 id="0.51.0-(2020-05-19)" tabindex="-1">0.51.0 (2020-05-19)</h2>
+<h2 id="0.51.0-2020-05-19" tabindex="-1">0.51.0 <em>2020-05-19</em></h2>
 <h3 id="new-features-25" tabindex="-1">New Features</h3>
 <ul>
 <li>
@@ -6422,7 +6424,7 @@ in text mode as well</p>
 mode did not switch not math mode and remained in command mode.</p>
 </li>
 </ul>
-<h2 id="0.50.8-(2020-05-13)" tabindex="-1">0.50.8 (2020-05-13)</h2>
+<h2 id="0.50.8-2020-05-13" tabindex="-1">0.50.8 <em>2020-05-13</em></h2>
 <h3 id="improvements-66" tabindex="-1">Improvements</h3>
 <ul>
 <li>The Symbols keyboard is now a top-level keyboard. Previously it was accessible
@@ -6461,15 +6463,15 @@ do nothing. The problem affected any inline shortcut or key that included a
 focused (fix contributed by (https://github.com/beneater)</p>
 </li>
 </ul>
-<h2 id="0.50.7-(2020-05-11)" tabindex="-1">0.50.7 (2020-05-11)</h2>
+<h2 id="0.50.7-2020-05-11" tabindex="-1">0.50.7 <em>2020-05-11</em></h2>
 <ul>
 <li><strong>Fix #448</strong>: Fix an issue where the “^” keyboard shortcut would not work</li>
 </ul>
-<h2 id="0.50.6-(2020-05-11)" tabindex="-1">0.50.6 (2020-05-11)</h2>
+<h2 id="0.50.6-2020-05-11" tabindex="-1">0.50.6 <em>2020-05-11</em></h2>
 <ul>
 <li>Fix date stamping of declaration files</li>
 </ul>
-<h2 id="0.50.5-(2020-05-10)" tabindex="-1">0.50.5 (2020-05-10)</h2>
+<h2 id="0.50.5-2020-05-10" tabindex="-1">0.50.5 <em>2020-05-10</em></h2>
 <ul>
 <li><strong>Fix #311</strong> Before making a build, check the correct version of node and npm
 are installed</li>
@@ -6477,7 +6479,7 @@ are installed</li>
 <li>Do not update /dist on each push</li>
 <li>When using a UMD module, do not export ‘default’</li>
 </ul>
-<h2 id="0.50.4-(2020-05-09)" tabindex="-1">0.50.4 (2020-05-09)</h2>
+<h2 id="0.50.4-2020-05-09" tabindex="-1">0.50.4 <em>2020-05-09</em></h2>
 <h3 id="issues-resolved-88" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li><strong>Fix #444</strong> The “x^2” key in the virtual keyboard did not work as expected.</li>
@@ -6487,12 +6489,12 @@ are installed</li>
 <li>Updated the build system to automatically add the lastest entry from the
 CHANGELOG to the GitHub release note.</li>
 </ul>
-<h2 id="0.50.3-(2020-05-08)" tabindex="-1">0.50.3 (2020-05-08)</h2>
+<h2 id="0.50.3-2020-05-08" tabindex="-1">0.50.3 <em>2020-05-08</em></h2>
 <h3 id="new-features-26" tabindex="-1">New Features</h3>
 <ul>
 <li>Added a <code>MathLive.version</code> string</li>
 </ul>
-<h2 id="0.50.2-(2020-05-07)" tabindex="-1">0.50.2 (2020-05-07)</h2>
+<h2 id="0.50.2-2020-05-07" tabindex="-1">0.50.2 <em>2020-05-07</em></h2>
 <h3 id="issues-resolved-89" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fixed an issue with rendering of MathML</li>
@@ -6508,7 +6510,7 @@ more errors.</li>
 listeners.</li>
 </ul>
 <h3 id="new-feature-3" tabindex="-1">New Feature</h3>
-<h2 id="0.50.1-(2020-05-06)" tabindex="-1">0.50.1 (2020-05-06)</h2>
+<h2 id="0.50.1-2020-05-06" tabindex="-1">0.50.1 <em>2020-05-06</em></h2>
 <h3 id="new-feature-4" tabindex="-1">New Feature</h3>
 <ul>
 <li>
@@ -6930,7 +6932,7 @@ default shortcuts, use:</li>
   },
 });
 </code></pre>
-<h2 id="0.35.0-(2020-03-24)" tabindex="-1">0.35.0 (2020-03-24)</h2>
+<h2 id="0.35.0-2020-03-24" tabindex="-1">0.35.0 <em>2020-03-24</em></h2>
 <h3 id="new-features-28" tabindex="-1">New Features</h3>
 <ul>
 <li>
@@ -7058,7 +7060,7 @@ removal of popover is on the roadmap.</p>
 remaining modules.</p>
 </li>
 </ul>
-<h2 id="0.34.0-(2020-02-05)" tabindex="-1">0.34.0 (2020-02-05)</h2>
+<h2 id="0.34.0-2020-02-05" tabindex="-1">0.34.0 <em>2020-02-05</em></h2>
 <h3 id="issues-resolved-93" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fix #364: Some expressions containing placeholders, when inserted, would not
@@ -7097,7 +7099,7 @@ element of the body of a ‘surd’ or the first element after the ‘surd’.</
 can be selected (so it can be copied), but it cannot be modified by the user.
 Progammatic modification is still possible.</li>
 </ul>
-<h2 id="0.33-(2019-12-19)" tabindex="-1">0.33 (2019-12-19)</h2>
+<h2 id="0.33-2019-12-19" tabindex="-1">0.33 <em>2019-12-19</em></h2>
 <h3 id="issues-resolved-94" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fix #313. Text mode content is not output in MathML, speech and MathJSON
@@ -7105,22 +7107,22 @@ Progammatic modification is still possible.</li>
 <li>Fix #275: Selection improvements (use centerpoint to calculate nearest atom)
 and make delimiters selection eligible.</li>
 </ul>
-<h2 id="0.32.3-(2019-10-29)" tabindex="-1">0.32.3 (2019-10-29)</h2>
+<h2 id="0.32.3-2019-10-29" tabindex="-1">0.32.3 <em>2019-10-29</em></h2>
 <h3 id="issues-resolved-95" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fix #286 <code>\mathbb{}</code>s are missing in the LaTeX output</li>
 </ul>
-<h2 id="0.32.2-(2019-09-24)" tabindex="-1">0.32.2 (2019-09-24)</h2>
+<h2 id="0.32.2-2019-09-24" tabindex="-1">0.32.2 <em>2019-09-24</em></h2>
 <h3 id="issues-resolved-96" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fixed an issue where some keys in the virtual keyboard would be unresponsive</li>
 </ul>
-<h2 id="0.30.1-(2019-07-30)" tabindex="-1">0.30.1 (2019-07-30)</h2>
+<h2 id="0.30.1-2019-07-30" tabindex="-1">0.30.1 <em>2019-07-30</em></h2>
 <h3 id="features-%2F-improvements-1" tabindex="-1">Features / Improvements</h3>
 <ul>
 <li>Added Typescript type definition</li>
 </ul>
-<h2 id="0.30-(2019-07-18)" tabindex="-1">0.30 (2019-07-18)</h2>
+<h2 id="0.30-2019-07-18" tabindex="-1">0.30 <em>2019-07-18</em></h2>
 <h3 id="non-backward-compatible-changes" tabindex="-1">Non-backward compatible changes</h3>
 <ul>
 <li>#157: Public APIs that don’t start with <code>$</code> have been removed. If your code
@@ -7152,7 +7154,7 @@ contributed by @NSoiffer</li>
 <li>#202: use numeric character references instead of named entities in MathML
 output</li>
 </ul>
-<h2 id="0.29.1-(2019-05-19)" tabindex="-1">0.29.1 (2019-05-19)</h2>
+<h2 id="0.29.1-2019-05-19" tabindex="-1">0.29.1 <em>2019-05-19</em></h2>
 <h3 id="issues-resolved-98" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>#201: the popover button was not responsive</li>
@@ -7164,7 +7166,7 @@ the non-existent <code>\mathup</code> command. The correct command is <code>\ups
 <li>Fixed issues with enclose layout</li>
 <li>Avoid triggering spurious notifications while inserting an inline shortcut</li>
 </ul>
-<h2 id="0.29-(2019-05-09)" tabindex="-1">0.29 (2019-05-09)</h2>
+<h2 id="0.29-2019-05-09" tabindex="-1">0.29 <em>2019-05-09</em></h2>
 <h3 id="major-new-features" tabindex="-1">Major New Features</h3>
 <ul>
 <li>Scrollable mathfield. The mathfield now behaves like a text area: the content
@@ -7215,7 +7217,7 @@ will result in the “$” being in math mode.</li>
 <li>Fixed #177: custom localization strings are now handled correctly.</li>
 <li>Fixed some issues toggling style when selection is empty.</li>
 </ul>
-<h2 id="0.28-(2019-04-22)" tabindex="-1">0.28 (2019-04-22)</h2>
+<h2 id="0.28-2019-04-22" tabindex="-1">0.28 <em>2019-04-22</em></h2>
 <p>This release contains some small Issues Resolved and improvements.</p>
 <ul>
 <li>Reduced Node version required (for dev builds) to Node LTS</li>
@@ -7241,7 +7243,7 @@ largest is <code>size10</code>).</li>
 of debugging (some features, such as using JavaScript native modules, require
 a local server)</li>
 </ul>
-<h2 id="0.27-(2019-04-08)" tabindex="-1">0.27 (2019-04-08)</h2>
+<h2 id="0.27-2019-04-08" tabindex="-1">0.27 <em>2019-04-08</em></h2>
 <h3 id="breaking-changes-15" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>The syntax that MathJSON/MASTON can recognized has been significantly
@@ -7480,7 +7482,7 @@ combined.</li>
 <li>#118. Improved navigating out of inferior limits</li>
 <li>Improve visual blinking when selecting with the mouse to the left</li>
 </ul>
-<h2 id="0.26-(2019-02-04)" tabindex="-1">0.26 (2019-02-04)</h2>
+<h2 id="0.26-2019-02-04" tabindex="-1">0.26 <em>2019-02-04</em></h2>
 <h3 id="breaking-changes-16" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Public method now start with <code>$</code>. This convention is also used, for example,
@@ -7525,7 +7527,7 @@ code more resilient to invalid paths.</li>
 of sounds and some other resources.</li>
 <li>Moved some modules to classes.</li>
 </ul>
-<h2 id="0.25-(2018-12-29)" tabindex="-1">0.25 (2018-12-29)</h2>
+<h2 id="0.25-2018-12-29" tabindex="-1">0.25 <em>2018-12-29</em></h2>
 <h3 id="major-new-features-3" tabindex="-1">Major New Features</h3>
 <ul>
 <li>A Vue.js wrapper and example is available in <code>examples/vue</code></li>
@@ -7535,7 +7537,7 @@ of sounds and some other resources.</li>
 <li>#104 - Numeric keypard “/” was ignored.</li>
 <li>#91 - Handling of ‘~’ as an operator and a shortcut.</li>
 </ul>
-<h2 id="0.24-(2018-12-16)" tabindex="-1">0.24 (2018-12-16)</h2>
+<h2 id="0.24-2018-12-16" tabindex="-1">0.24 <em>2018-12-16</em></h2>
 <h3 id="breaking-changes-17" tabindex="-1">Breaking Changes</h3>
 <ul>
 <li>Several handlers had some inconsistent signatures, or in some cases passed
@@ -7629,7 +7631,7 @@ some users.</li>
 <li>Fix issue #114. Incorrect selection when shift-select at the end.</li>
 <li>Fix issue #78. Cross-out positioning issue</li>
 </ul>
-<h2 id="0.22-(2018-04-11)" tabindex="-1">0.22 (2018-04-11)</h2>
+<h2 id="0.22-2018-04-11" tabindex="-1">0.22 <em>2018-04-11</em></h2>
 <h3 id="major-new-features-5" tabindex="-1">Major New Features</h3>
 <ul>
 <li>Support for styling in the virtual keyboard UI: the text and highlight color
@@ -7686,7 +7688,7 @@ fractions and <code>\overset</code></li>
 <li>Moved operator precedence and canonical names from Definitions to MASTON.</li>
 <li>Improved rendering performance by eliminating hotspots through profiling.</li>
 </ul>
-<h2 id="0.21-(2018-03-30)" tabindex="-1">0.21 (2018-03-30)</h2>
+<h2 id="0.21-2018-03-30" tabindex="-1">0.21 <em>2018-03-30</em></h2>
 <h3 id="major-new-features-6" tabindex="-1">Major New Features</h3>
 <ul>
 <li>Basic support for LaTeX macros. Macros can be defined with
@@ -7731,7 +7733,7 @@ navigated into the expression</li>
 <li>Refactored the Popover code into <code>Popover.js</code></li>
 <li>Moved some content from <code>Definitions.js</code> and into <code>Popover.js</code></li>
 </ul>
-<h2 id="0.20-(2018-03-24)" tabindex="-1">0.20 (2018-03-24)</h2>
+<h2 id="0.20-2018-03-24" tabindex="-1">0.20 <em>2018-03-24</em></h2>
 <h3 id="major-new-features-7" tabindex="-1">Major New Features</h3>
 <ul>
 <li>Virtual keyboards with multi-touch support</li>
@@ -7747,7 +7749,7 @@ to four more columns of keys can be displayed.</li>
 <li>MASTON: improved parsing of numbers</li>
 <li>Handle Unicode pseudo-superscript characters as exponents</li>
 </ul>
-<h2 id="0.19-(2018-03-19)" tabindex="-1">0.19 (2018-03-19)</h2>
+<h2 id="0.19-2018-03-19" tabindex="-1">0.19 <em>2018-03-19</em></h2>
 <h3 id="major-new-features-8" tabindex="-1">Major New Features</h3>
 <ul>
 <li>MASTON: first implementation</li>
@@ -7792,7 +7794,7 @@ Popover panel</li>
 spans.</li>
 <li>Updated fonts from KaTeX</li>
 </ul>
-<h2 id="0.18-(2018-03-04)" tabindex="-1">0.18 (2018-03-04)</h2>
+<h2 id="0.18-2018-03-04" tabindex="-1">0.18 <em>2018-03-04</em></h2>
 <h3 id="issues-resolved-106" tabindex="-1">Issues Resolved</h3>
 <ul>
 <li>Fixed issue where <code>\underset</code> annotation was not selectable</li>
@@ -7802,7 +7804,7 @@ spans.</li>
 <li>Reverted back to WebPack 3</li>
 <li>Simplified CSS and streamlined markup for <code>vlist</code> spans.</li>
 </ul>
-<h2 id="0.0.17-(2018-02-27)" tabindex="-1">0.0.17 (2018-02-27)</h2>
+<h2 id="0.0.17-2018-02-27" tabindex="-1">0.0.17 <em>2018-02-27</em></h2>
 <h3 id="new-features-30" tabindex="-1">New Features</h3>
 <ul>
 <li>Improved accessibility support (major contribution from Neil Soiffer)</li>
@@ -7824,7 +7826,7 @@ before, specify a font-size property on the parent element with a value of
 <li>Improved handling of undo.</li>
 <li>New implementation of \enclose notations.</li>
 </ul>
-<h2 id="0.0.16-(2017-09-13)" tabindex="-1">0.0.16 (2017-09-13)</h2>
+<h2 id="0.0.16-2017-09-13" tabindex="-1">0.0.16 <em>2017-09-13</em></h2>
 <h3 id="deprecated-features" tabindex="-1">Deprecated Features</h3>
 <ul>
 <li><code>MathField.write()</code> has been deprecated. Use <code>MathField.insert()</code> instead.</li>
@@ -7839,7 +7841,7 @@ selection.</li>
 <li>Perform a snapshot with the undo manager when invoking <code>MathField.insert()</code>.</li>
 <li>Documentation improvements.</li>
 </ul>
-<h2 id="0.0.15-(2017-07-01)" tabindex="-1">0.0.15 (2017-07-01)</h2>
+<h2 id="0.0.15-2017-07-01" tabindex="-1">0.0.15 <em>2017-07-01</em></h2>
 <h3 id="new-features-32" tabindex="-1">New Features</h3>
 <ul>
 <li>Properly exported public API, including <code>renderMathInDocument()</code> and
