@@ -438,8 +438,6 @@ TEMPLATE.innerHTML = `
     padding: 8px;
     color: var(--text-color);
     background: var(--ui-background);
-    position: relative;
-    z-index: 1;
     }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -662,7 +660,7 @@ class CodePlaygroundElement extends HTMLElement {
         if (!this.id)
             this.id = randomId();
         this.moduleMap = (_a = window['moduleMap']) !== null && _a !== void 0 ? _a : {};
-        this.attachShadow({ mode: 'open', delegatesFocus: true });
+        this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
         const container = document.createElement('div');
         this.containerId = randomId();
