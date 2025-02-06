@@ -1233,7 +1233,7 @@ class CodePlaygroundElement extends HTMLElement {
             `const output${jsID} = playground${jsID}.querySelector("div.result > div.output");` +
             '(async function() {try {\n' +
             script +
-            `} catch(err) { console${jsID}.catch(err) }}());`);
+            `\n} catch(err) { /** Jan 21 */ console${jsID}.catch(err) }}());`);
     }
     //
     // Property/attributes
