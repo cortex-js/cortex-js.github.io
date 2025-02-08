@@ -1,4 +1,4 @@
-/* 0.103.0 */import type { Keys } from './types-utils';
+/* 0.104.0 */import type { Keys } from './types-utils';
 import type { InsertOptions, ParseMode, Style, TabularEnvironment } from './core-types';
 import type { Mathfield, Model } from './mathfield';
 /**
@@ -328,7 +328,7 @@ export interface Commands {
 }
 /**  @category Editing Commands */
 export type Selector = Keys<Commands>;
-/* 0.103.0 */export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
+/* 0.104.0 */export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
 /** @internal  */
 export type ArgumentType = ParseMode | ('bbox' | 'colspec' | 'delim' | 'value' | 'rest' | 'string' | 'balanced-string' | 'expression' | 'auto');
 /** @internal  */
@@ -706,7 +706,7 @@ export type Selection = {
     ranges: Range[];
     direction?: 'forward' | 'backward' | 'none';
 };
-/* 0.103.0 */import type { Selector } from './commands';
+/* 0.104.0 */import type { Selector } from './commands';
 import type { Expression, LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
 import type { InsertStyleHook, Mathfield } from './mathfield';
 import type { InlineShortcutDefinitions, Keybinding, MathfieldOptions } from './options';
@@ -2098,7 +2098,7 @@ declare global {
         MathfieldElement: typeof MathfieldElement;
     }
 }
-/* 0.103.0 */import type { Selector } from './commands';
+/* 0.104.0 */import type { Selector } from './commands';
 import type { ApplyStyleOptions, InsertOptions, Offset, OutputFormat, Style, Range, Selection } from './core-types';
 export type InsertStyleHook = (sender: Mathfield, at: Offset, info: {
     before: Offset;
@@ -2132,7 +2132,7 @@ export interface Mathfield {
 export interface Model {
     readonly mathfield: Mathfield;
 }
-/* 0.103.0 *//**
+/* 0.104.0 *//**
  * Server-side rendering exports.
  *
  * These functions do not require a DOM environment and can
@@ -2239,7 +2239,7 @@ export declare function convertLatexToAsciiMath(latex: string, parseMode?: Parse
  * @category Conversion
  */
 export declare function convertAsciiMathToLatex(ascii: string): string;
-/* 0.103.0 *//**
+/* 0.104.0 *//**
  *
  * Importing this package in a web page will make the `<math-field>` custom
  * element available. Use it as a drop-in replacement for `<textarea>` or
@@ -2261,7 +2261,7 @@ export declare function convertAsciiMathToLatex(ascii: string): string;
  * ```
  *
  * @packageDocumentation Mathfield API Reference
- * @version 0.103.0
+ * @version 0.104.0
  *
  */
 import type { VirtualKeyboardInterface } from './virtual-keyboard';
@@ -2283,7 +2283,7 @@ declare global {
         mathVirtualKeyboard: VirtualKeyboardInterface & EventTarget;
     }
 }
-/* 0.103.0 */import type { Mathfield, InsertStyleHook } from './mathfield';
+/* 0.104.0 */import type { Mathfield, InsertStyleHook } from './mathfield';
 import type { Selector } from './commands';
 import type { ParseMode, MacroDictionary, Registers, Range } from './core-types';
 /**
@@ -2678,7 +2678,7 @@ export type StaticRenderOptions = Partial<LayoutOptions> & {
         };
     };
 };
-/* 0.103.0 *//**
+/* 0.104.0 *//**
  * @internal
  */
 type Filter<T, Cond, U extends keyof T = keyof T> = {
@@ -2689,13 +2689,13 @@ type Filter<T, Cond, U extends keyof T = keyof T> = {
  */
 export type Keys<T> = Filter<T, (...args: any[]) => any> & string;
 export {};
-/* 0.103.0 */export type KeyboardModifiers = {
+/* 0.104.0 */export type KeyboardModifiers = {
     alt: boolean;
     control: boolean;
     shift: boolean;
     meta: boolean;
 };
-/* 0.103.0 */import type { KeyboardModifiers } from './ui-events-types';
+/* 0.104.0 */import type { KeyboardModifiers } from './ui-events-types';
 /**
  * The type of a menu item:
  * - `command`: a command that can be selected and executed
@@ -2806,7 +2806,7 @@ export declare function isDivider(item: MenuItem): item is MenuItemDivider;
 export declare function isHeading(item: MenuItem): item is MenuItemHeading;
 /** Declaration of a menu item */
 export type MenuItem<T = unknown> = MenuItemDivider | MenuItemHeading | MenuItemSubmenu | MenuItemCommand<T>;
-/* 0.103.0 */import type { Selector } from './commands';
+/* 0.104.0 */import type { Selector } from './commands';
 import type { ParseMode, Style } from './core-types';
 import type { OriginValidator } from './options';
 /**
