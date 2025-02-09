@@ -765,8 +765,7 @@ import { OneOf } from '../common/one-of';
 import { BoxedExpression, FunctionDefinition, SemiBoxedExpression, SymbolDefinition } from './boxed-expression/public';
 import { LatexDictionaryEntry, LatexString, ParseLatexOptions } from './latex-syntax/public';
 import { IndexedLatexDictionary } from './latex-syntax/dictionary/definitions';
-import { BigNum, IBigNum } from './numerics/bignum';
-import { Rational } from './numerics/rationals';
+import { BigNum, IBigNum, Rational } from './numerics/types';
 import { ExactNumericValueData, NumericValue, NumericValueData } from './numeric-value/public';
 import { Type, TypeString } from '../common/type/types';
 import { BoxedType } from '../common/type/boxed-type';
@@ -1606,14 +1605,14 @@ import { Decimal } from 'decimal.js';
 import { Expression, MathJsonIdentifier, MathJsonNumber } from '../math-json/types';
 import type { LibraryCategory, LatexDictionaryEntry, LatexString, ParseLatexOptions } from './latex-syntax/public';
 import { SymbolDefinition, FunctionDefinition } from './public';
-import { Rational } from './numerics/rationals';
+import type { Rational } from './numerics/types';
 import { type IndexedLatexDictionary } from './latex-syntax/dictionary/definitions';
 import { BoxedExpression, SemiBoxedExpression } from './boxed-expression/public';
 import './boxed-expression/serialize';
 import { ExactNumericValueData, NumericValue, NumericValueData } from './numeric-value/public';
 import { Type, TypeString } from '../common/type/types';
 import { OneOf } from '../common/one-of';
-import { BigNum } from './numerics/bignum';
+import { BigNum } from './numerics/types';
 import { BoxedType } from '../common/type/boxed-type';
 import type { AngularUnit, AssignValue, AssumeResult, BoxedFunctionDefinition, BoxedRule, BoxedRuleSet, BoxedSubstitution, BoxedSymbolDefinition, CanonicalOptions, ComputeEngineStats, EvaluateOptions, ExpressionMapInterface, IComputeEngine, IdentifierDefinitions, Metadata, Rule, RuntimeScope, Scope } from './types';
 export type * from '../common/type/types';
@@ -2371,18 +2370,6 @@ export declare const CONTROL_STRUCTURES_LIBRARY: IdentifierDefinitions[];
 export declare const SETS_LIBRARY: IdentifierDefinitions;
 /* 0.28.0 */import type { IdentifierDefinitions } from '../types';
 export declare const TRIGONOMETRY_LIBRARY: IdentifierDefinitions[];
-/* 0.28.0 */import Decimal from 'decimal.js';
-export type BigNum = Decimal;
-export interface IBigNum {
-    readonly _BIGNUM_NAN: BigNum;
-    readonly _BIGNUM_ZERO: BigNum;
-    readonly _BIGNUM_ONE: BigNum;
-    readonly _BIGNUM_TWO: BigNum;
-    readonly _BIGNUM_HALF: BigNum;
-    readonly _BIGNUM_PI: BigNum;
-    readonly _BIGNUM_NEGATIVE_ONE: BigNum;
-    bignum(value: string | number | bigint | BigNum): BigNum;
-}
 /* 0.28.0 */export declare function gcd(a: bigint, b: bigint): bigint;
 export declare function lcm(a: bigint, b: bigint): bigint;
 /** Return `[factor, root]` such that
@@ -2401,8 +2388,34 @@ export declare function reducedInteger(n: bigint): bigint | number;
  * @returns A generator that can be iterated for intermediate values, with the final value returned when the computation completes.
  */
 export declare function factorial(n: bigint): Generator<bigint, bigint>;
+/* 0.28.0 */import Decimal from 'decimal.js';
+type IsInteger<N extends number> = `${N}` extends `${string}.${string}` ? never : `${N}` extends `-${string}.${string}` ? never : number;
+/** A `SmallInteger` is an integer < 1e6  */
+export type SmallInteger = IsInteger<number>;
+/**
+ * A rational number is a number that can be expressed as the quotient or fraction p/q of two integers,
+ * a numerator p and a non-zero denominator q.
+ *
+ * A rational can either be represented as a pair of small integers or
+ * a pair of big integers.
+ *
+ * @category Boxed Expression
+ */
+export type Rational = [SmallInteger, SmallInteger] | [bigint, bigint];
+export type BigNum = Decimal;
+export interface IBigNum {
+    readonly _BIGNUM_NAN: BigNum;
+    readonly _BIGNUM_ZERO: BigNum;
+    readonly _BIGNUM_ONE: BigNum;
+    readonly _BIGNUM_TWO: BigNum;
+    readonly _BIGNUM_HALF: BigNum;
+    readonly _BIGNUM_PI: BigNum;
+    readonly _BIGNUM_NEGATIVE_ONE: BigNum;
+    bignum(value: string | number | bigint | BigNum): BigNum;
+}
+export {};
 /* 0.28.0 */import type { IComputeEngine } from '../types';
-import { BigNum } from './bignum';
+import type { BigNum } from './types';
 export declare function gammaln(z: number): number;
 export declare function gamma(z: number): number;
 /**
@@ -2437,7 +2450,7 @@ export declare function isPrime(n: number): boolean | undefined;
 export declare function isPrimeBigint(n: bigint): boolean | undefined;
 export declare function bigPrimeFactors(d: bigint): Map<bigint, number>;
 /* 0.28.0 */import { BigNumFactory } from '../numeric-value/big-numeric-value';
-import { BigNum } from './bignum';
+import type { BigNum } from './types';
 export declare function mean(values: Iterable<number>): number;
 export declare function bigMean(bignum: BigNumFactory, values: Iterable<BigNum>): BigNum;
 export declare function median(values: Iterable<number>): number;
@@ -2585,9 +2598,6 @@ export declare const MACHINE_PRECISION_BITS = 53;
 export declare const MACHINE_PRECISION: number;
 export declare const DEFAULT_TOLERANCE = 1e-10;
 export declare const SMALL_INTEGER = 1000000;
-type IsInteger<N extends number> = `${N}` extends `${string}.${string}` ? never : `${N}` extends `-${string}.${string}` ? never : number;
-/** A `SmallInteger` is an integer < 1e6  */
-export type SmallInteger = IsInteger<number>;
 /** The largest number of digits of a bigint */
 export declare const MAX_BIGINT_DIGITS = 1024;
 export declare const MAX_ITERATION = 1000000;
@@ -2635,8 +2645,7 @@ export declare function centeredDiff8thOrder(f: (number: any) => number, x: numb
  * @returns
  */
 export declare function limit(f: (x: number) => number, x: number, dir?: number): number;
-export {};
-/* 0.28.0 */import { BigNum, IBigNum } from './bignum';
+/* 0.28.0 */import type { BigNum, IBigNum } from './types';
 export declare function gcd(a: BigNum, b: BigNum): BigNum;
 export declare function lcm(a: BigNum, b: BigNum): BigNum;
 export declare function factorial2(ce: IBigNum, n: BigNum): BigNum;
@@ -2645,11 +2654,7 @@ export declare function factorial2(ce: IBigNum, n: BigNum): BigNum;
  * for machine numbers,return true.
  */
 export declare function isInMachineRange(d: BigNum): boolean;
-/* 0.28.0 */import { SmallInteger } from './numeric';
-/**
- * @category Boxed Expression
- */
-export type Rational = [SmallInteger, SmallInteger] | [bigint, bigint];
+/* 0.28.0 */import { Rational, SmallInteger } from './types';
 export declare function isRational(x: any | null): x is Rational;
 export declare function isMachineRational(x: any | null): x is [SmallInteger, SmallInteger];
 export declare function isBigRational(x: any | null): x is [bigint, bigint];
@@ -2710,15 +2715,14 @@ export declare function bigint(a: Decimal | number | bigint | string): bigint | 
  */
 export { OneOf } from '../common/one-of';
 export { LatexString, SerializeLatexOptions, NumberSerializationFormat, DelimiterScale, NumberFormat, } from './latex-syntax/public';
-export * from './numerics/bignum';
-export * from './numerics/rationals';
-export { SmallInteger } from './numerics/numeric';
 export * from './numeric-value/public';
 export * from '../common/type/boxed-type';
 export * from './tensor/tensors';
 export * from './boxed-expression/tensor-fields';
 export * from './types';
 export * from './boxed-expression/public';
+export * from './numerics/types';
+export * from '../common/one-of';
 /* 0.28.0 */import type { Expression } from '../../math-json/types';
 import type { SimplifyOptions, ReplaceOptions, PatternMatchOptions } from '../public';
 import type { BoxedExpression } from './public';
@@ -3095,7 +3099,7 @@ export declare function canonicalNegate(expr: BoxedExpression): BoxedExpression;
 export declare function negate(expr: BoxedExpression): BoxedExpression;
 export declare function negateProduct(ce: IComputeEngine, args: ReadonlyArray<BoxedExpression>): BoxedExpression;
 /* 0.28.0 */import type { BoxedExpression } from '../public';
-import type { Rational } from '../numerics/rationals';
+import type { Rational } from '../numerics/types';
 export declare function asRadical(expr: BoxedExpression): Rational | null;
 export declare function canonicalPower(a: BoxedExpression, b: BoxedExpression): BoxedExpression;
 export declare function canonicalRoot(a: BoxedExpression, b: BoxedExpression | number): BoxedExpression;
@@ -3236,7 +3240,7 @@ export declare function domainToType(expr: BoxedExpression): Type;
 import { Expression, MathJsonIdentifier } from '../../math-json/types';
 import type { BoxedExpression, JsonSerializationOptions, PatternMatchOptions, SimplifyOptions } from './public';
 import type { NumericValue } from '../numeric-value/public';
-import type { SmallInteger } from '../numerics/numeric';
+import type { SmallInteger } from '../numerics/types';
 import type { LatexString, SerializeLatexOptions } from '../latex-syntax/public';
 import { AsciiMathOptions } from './ascii-math';
 /**
@@ -3572,7 +3576,7 @@ export declare function matchAnyRules(expr: BoxedExpression, rules: BoxedRuleSet
 /* 0.28.0 */import type { Expression, MathJsonNumber, MathJsonString, MathJsonSymbol, MathJsonFunction, MathJsonIdentifier } from '../../math-json';
 import type { SerializeLatexOptions, LatexString } from '../latex-syntax/public';
 import { NumericValue } from '../numeric-value/public';
-import { BigNum } from '../numerics/bignum';
+import type { BigNum } from '../numerics/types';
 import { Type, TypeString } from '../../common/type/types';
 import { AbstractTensor } from '../tensor/tensors';
 import { JSSource } from '../compile';
@@ -3682,9 +3686,9 @@ import type { BoxedBaseDefinition, BoxedFunctionDefinition, BoxedRule, BoxedRule
 /**
  * :::info[THEORY OF OPERATIONS]
  *
- * The `BoxedExpression` interface includes most of the member functions
- * applicable to any kind of expression, for example `get symbol()` or
- * `get ops()`.
+ * The `BoxedExpression` interface includes the methods and properties
+ * applicable to any kind of expression, for example `expr.symbol` or
+ * `expr.ops`.
  *
  * When a member function is not applicable to this `BoxedExpression`,
  * for example `get symbol()` on a `BoxedNumber`, it returns `null`.
@@ -3693,7 +3697,7 @@ import type { BoxedBaseDefinition, BoxedFunctionDefinition, BoxedRule, BoxedRule
  * having to check what kind of instance they are before manipulating them.
  * :::
  *
- * To get a boxed expression from a LaTeX string use `ce.parse()`, or to
+ * To get a boxed expression from a LaTeX string use `ce.parse()`, and to
  * get a boxed expression from a MathJSON expression use `ce.box()`.
  *
  * @category Boxed Expression
@@ -5151,7 +5155,7 @@ export declare function addType(args: ReadonlyArray<BoxedExpression>): Type | Bo
 export declare function add(...xs: ReadonlyArray<BoxedExpression>): BoxedExpression;
 export declare function addN(...xs: ReadonlyArray<BoxedExpression>): BoxedExpression;
 /* 0.28.0 */import Decimal from 'decimal.js';
-import type { Rational } from '../numerics/rationals';
+import type { Rational } from '../numerics/types';
 import type { BoxedExpression } from './public';
 export declare function asRational(expr: BoxedExpression): Rational | undefined;
 export declare function asBigint(expr: BoxedExpression | undefined): bigint | null;
@@ -5479,8 +5483,7 @@ export declare function expandAll(expr: BoxedExpression): BoxedExpression | null
 import { Decimal } from 'decimal.js';
 import type { BoxedExpression, PatternMatchOptions, ReplaceOptions, SimplifyOptions } from '../public';
 import type { Expression, MathJsonNumber } from '../../math-json';
-import { SmallInteger } from '../numerics/numeric';
-import { Rational } from '../numerics/rationals';
+import type { Rational, SmallInteger } from '../numerics/types';
 import { ExactNumericValueData, NumericValue, NumericValueData } from '../numeric-value/public';
 import { _BoxedExpression } from './abstract-boxed-expression';
 import { BoxedType } from '../../common/type/boxed-type';
@@ -5569,7 +5572,7 @@ export declare class BoxedNumber extends _BoxedExpression {
 }
 export declare function canonicalNumber(ce: IComputeEngine, value: number | bigint | string | Decimal | Complex | Rational | NumericValue | MathJsonNumber): number | NumericValue;
 /* 0.28.0 */import type { BoxedExpression } from '../public';
-import { Rational } from '../numerics/rationals';
+import type { Rational } from '../numerics/types';
 import { NumericValue } from '../numeric-value/public';
 import type { IComputeEngine } from '../types';
 /**
@@ -5804,7 +5807,7 @@ import type { Type, TypeString } from '../../common/type/types';
 import type { BoxedExpression, SimplifyOptions, PatternMatchOptions, ReplaceOptions } from './public';
 import { NumericValue } from '../numeric-value/public';
 import { _BoxedExpression } from './abstract-boxed-expression';
-import { BigNum } from '../numerics/bignum';
+import type { BigNum } from '../numerics/types';
 import type { OneOf } from '../../common/one-of';
 import { BoxedType } from '../../common/type/boxed-type';
 import type { RuntimeScope, BoxedSymbolDefinition, BoxedFunctionDefinition, IComputeEngine, Metadata, CanonicalOptions, BoxedBaseDefinition, BoxedSubstitution, EvaluateOptions, Rule, BoxedRule, BoxedRuleSet, Substitution, Sign } from '../types';
@@ -6089,7 +6092,7 @@ export declare function differentiate(expr: BoxedExpression, v: string): BoxedEx
 /* 0.28.0 */import Decimal from 'decimal.js';
 import { NumericValue, NumericValueData } from './public';
 import type { Expression } from '../../math-json/types';
-import { SmallInteger } from '../numerics/numeric';
+import type { SmallInteger } from '../numerics/types';
 import { NumericType } from '../../common/type/types';
 import { BigNumFactory } from './big-numeric-value';
 export declare class MachineNumericValue extends NumericValue {
@@ -6170,8 +6173,7 @@ export declare class MachineNumericValue extends NumericValue {
  *
  */
 import Decimal from 'decimal.js';
-import { SmallInteger } from '../numerics/numeric';
-import { Rational } from '../numerics/rationals';
+import type { Rational, SmallInteger } from '../numerics/types';
 import { NumericType } from '../../common/type/types';
 /** The value is equal to `(decimal * rational * sqrt(radical)) + im * i` */
 export type ExactNumericValueData = {
@@ -6258,7 +6260,7 @@ export declare abstract class NumericValue {
 import { NumericValue, NumericValueData } from './public';
 import { ExactNumericValue } from './exact-numeric-value';
 import { Expression } from '../../math-json/types';
-import { SmallInteger } from '../numerics/numeric';
+import { SmallInteger } from '../numerics/types';
 import { NumericType } from '../../common/type/types';
 export type BigNumFactory = (value: Decimal.Value) => Decimal;
 export declare class BigNumericValue extends NumericValue {
@@ -6314,8 +6316,7 @@ export declare class BigNumericValue extends NumericValue {
     gte(other: number | NumericValue): boolean | undefined;
 }
 /* 0.28.0 */import Decimal from 'decimal.js';
-import { SmallInteger } from '../numerics/numeric';
-import { Rational } from '../numerics/rationals';
+import { Rational, SmallInteger } from '../numerics/types';
 import { ExactNumericValueData, NumericValue, NumericValueFactory } from './public';
 import { Expression } from '../../math-json/types';
 import { BigNumFactory } from './big-numeric-value';

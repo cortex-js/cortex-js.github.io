@@ -556,6 +556,62 @@ MathfieldElement.fractionNavigationOrder = "denominator-numerator";
 ```
 
 
+## Sounds and Haptic Feedback
+
+The mathfield provides some audio feedback when a key is pressed on the virtual 
+keyboard or when an action cannot be performed, for example when trying to
+delete when the mathfield is empty (the "plonk" sound).
+
+The files for the sounds played by the mathfield should be located in a 
+directory named `sounds` next to the mathfield library. If your bundler or 
+asset management system require a different configuration you can specify 
+where the sounds can be located using the `MathfieldElement.soundsDirectory` 
+property.
+
+```js
+MathfieldElement.soundsDirectory = 
+  "https://unpkg.com/mathlive/dist/sounds/";
+```
+
+Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
+property.
+
+```js
+MathfieldElement.keypressSound = {
+  spacebar: null,
+  return: "./sounds/return.mp3",
+  delete: null,
+  default: null,
+}
+```
+
+### Playing "Plonk" Sound
+
+**To play the "plonk" sound** when an action cannot be performed, use `MathfieldElement.playSound('plonk')`.
+
+```js
+MathfieldElement.playSound('plonk');
+```
+
+
+### Disabling Sounds
+
+**To turn off the sounds** set the `MathfieldElement.soundsDirectory` property to `null`.
+
+```js
+MathfieldElement.soundsDirectory = null;
+```
+
+### Haptic Feedback
+
+When a key on the virtual keyboard is pressed, a small vibration is triggered
+on devices that support it. This can be turned off by setting the
+`MathfieldElement.keypressVibration` property to `false`.
+
+```js
+MathfieldElement.keypressVibration = false;
+```
+
 ## Fonts
 
 The content of the mathfield is displayed using a family of high-quality 
@@ -17371,6 +17427,14 @@ and `greek`.
 For example, to only show the **numeric** and **symbols** layouts, use:
 
 ```live show-line-numbers
+:::style
+      math-field {
+        border: 1px solid var(--neutral-400);
+        background: var(--neutral-200);
+        border-radius: 8px;
+        padding: 8px;
+      }
+
 :::html
 <math-field>x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</math-field>
 
@@ -20783,7 +20847,7 @@ simplest way to use mathfields is by loading the library from a CDN.
 
 In this section we'll discuss other options for adding a mathfield to a web page.
 
-## Using Mathfields with JavaScript Modules
+## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
 such as `renderMathInDocument()`.
@@ -20836,7 +20900,7 @@ keyboard shortcuts, use custom macros and more.
 The section below discuss additional options to load the library for more
 complex configurations.
 
-<h2 id='npm'>Using NPM</h2>
+## Using NPM
 
 If you need...
 
@@ -20872,7 +20936,7 @@ Make sure the contents of the `/fonts/` and `/sounds/` folder are copied to
 your build output directory.
 :::
 
-## Using `<script>` Tags
+## Using a `<script>` Tag
 
 If you need to support browsers that don't support JavaScript modules, you
 can use a `<script>` tag to load a UMD version of the library.
@@ -20909,7 +20973,7 @@ The version of the library currently loaded can be obtained with:
 console.log(MathfieldElement.version);
 ```
 
-<h2 id='files'>Library Files</h2>
+## Library Files
 
 If you need to incorporate the library files directly into your project
 (for example if you are building a standalone application), you can obtain
@@ -20934,7 +20998,7 @@ and may be useful for debugging.
 | `dist/mathlive-static.css`  | A stylesheet which can be used when the MathLive library is not loaded to display markup that has been rendered by the MathLive library previously. Rarely needed.                                                  |
 | `dist/types`                | The TypeScript declaration files. Not needed at runtime.                                                                                                                                                            |
 
-<h2 id='fonts-folder'> Controlling the Location of the <kbd>fonts</kbd> Folder</h2>
+Controlling the Location of the `fonts` Folder
 
 In order to display mathfields correctly a set of specialized math fonts must
 be available. These fonts are provided as part of the library in a directory called `fonts`.
@@ -20964,7 +21028,7 @@ path from the JavaScript directory to the fonts directory is `../assets/mathlive
 The `MathfieldElement.soundsDirectory` property can similarly be set to point
 to the sound file assets.
 
-<h2 id='asset-pipeline'>Integrating with a Bundler or an Asset Pipeline</h2>
+## Integrating with a Bundler or an Asset Pipeline
 
 In some cases, simply pointing MathLive to the directory where the fonts can
 be located might not be enough. For example, some bundlers, such as WebPack,
@@ -21034,7 +21098,7 @@ Learn more about the attributes, properties, methods and events <kbd>ENTER</kbd>
 Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 </ReadMore>
 
-<h2 id='static-render'>Displaying Non-Editable Formulas</h2>
+## Displaying Non-Editable Formulas
 
 While MathLive is primarily a math editor, the same engine that renders
 an interactive math formula can also render "static" formulas in a web page,
@@ -21871,7 +21935,7 @@ Read more about the supported **LaTeX commands**.<Icon name="chevron-right-bold"
 Learn more about MathJSON and try a demo of the **Compute Engine**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
-<h2 id="shortcuts">Keyboard Shortcuts</h2>
+## Keyboard Shortcuts
 
 
 <div className="shortcuts">
@@ -22438,10 +22502,10 @@ div.figure {
   ```live
   :::style
       math-field {
-      border: 1px solid var(--neutral-400);
-      background: var(--neutral-200);
-      border-radius: 8px;
-      padding: 8px;
+        border: 1px solid var(--neutral-400);
+        background: var(--neutral-200);
+        border-radius: 8px;
+        padding: 8px;
       }
     @media (pointer: coarse) {
         math-field {
@@ -22456,10 +22520,10 @@ div.figure {
             inset 4px 4px 16px rgb(0 0 0 / 10%),
             inset 2px 2px 8px rgb(0 0 0 / 60%);
 
-        --smart-fence-color: white;
-        --caret-color: var(--blue-400);
-        --selection-background-color: var(--blue-300);
-        --contains-highlight-background-color: var(--blue-900);
+          --smart-fence-color: white;
+          --caret-color: var(--blue-400);
+          --selection-background-color: var(--blue-300);
+          --contains-highlight-background-color: var(--blue-900);
         }
         math-field:focus {
           outline: 4px solid rgb(255 255 255 / 25%);
@@ -22670,10 +22734,13 @@ whenAvailable("DOMPurify", () => {
 (Note that this example is moot, as the `htmlData` command already sanitizes its input.)
 
 
-## Restricting Commands That Modify the DOM
+## Restricting Commands That Could Modify the DOM
 
 
-Some commands modify the DOM and pose a higher risk of XSS attacks. For instance, `\htmlData{}{}` and `\href{}{}` allow the insertion of HTML attributes. While both commands sanitize their input to prevent harmful attributes, you may want to disable them for added security.
+Some commands modify the DOM and pose a higher risk of XSS attacks. 
+For instance, `\htmlData{}{}` and `\href{}{}` allow the insertion of HTML 
+attributes. While both commands sanitize their input to prevent harmful 
+attributes, you may want to disable or restrict them for added security.
 
 
 ### Disabling Commands
