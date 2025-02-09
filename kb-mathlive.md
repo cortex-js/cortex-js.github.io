@@ -17427,14 +17427,6 @@ and `greek`.
 For example, to only show the **numeric** and **symbols** layouts, use:
 
 ```live show-line-numbers
-:::style
-      math-field {
-        border: 1px solid var(--neutral-400);
-        background: var(--neutral-200);
-        border-radius: 8px;
-        padding: 8px;
-      }
-
 :::html
 <math-field>x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</math-field>
 
