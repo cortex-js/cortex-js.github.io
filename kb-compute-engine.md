@@ -16509,19 +16509,28 @@ description: MathJSON is a lightweight data interchange format for mathematical 
 hide_title: true
 sidebar_class_name: "sdk-icon"
 ---
-
 import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
 import {BrowserOnly} from '@docusaurus/BrowserOnly';
 
+export function setupComputeEngine() {
+  if (window.ce !== undefined) return;
+  // If we're not ready, try again in 50ms
+  if (!("ComputeEngine" in window)) {
+    setTimeout(setupComputeEngine, 50);
+    return;
+  }
+  window.ce = new ComputeEngine.ComputeEngine();
+}
 export function MathJSONOutput({children}) {
   const [value, setValue] = useState(children);
   const [json, setJson] = useState({});
+  useEffect(setupComputeEngine, []);
   // We need to use useEffect so that the MathfieldElement is available
   // when this code runs (in the client).
   useEffect(() => {
-    setJson(window.MathfieldElement.computeEngine.parse(value).json);
+    setJson(window.ce?.parse(value).json);
   }, [value]);
   return<>
     <Mathfield 
@@ -16531,6 +16540,7 @@ export function MathJSONOutput({children}) {
     <ConsoleMarkup value={json}/>
   </>;
 }
+
 
 <HeroImage path="/img/hero/math-json.jpg" >
 # MathJSON
