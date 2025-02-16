@@ -1,4 +1,4 @@
-/* 0.104.0 */import type { Keys } from './types-utils';
+import type { Keys } from './types-utils';
 import type { InsertOptions, ParseMode, Style, TabularEnvironment } from './core-types';
 import type { Mathfield, Model } from './mathfield';
 /**
@@ -328,7 +328,7 @@ export interface Commands {
 }
 /**  @category Editing Commands */
 export type Selector = Keys<Commands>;
-/* 0.104.0 */export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
+export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
 /** @internal  */
 export type ArgumentType = ParseMode | ('bbox' | 'colspec' | 'delim' | 'value' | 'rest' | 'string' | 'balanced-string' | 'expression' | 'auto');
 /** @internal  */
@@ -446,15 +446,18 @@ export interface Style {
 /**
  * **See Also**
  * * {@linkcode MacroDictionary}
- * * {@link //mathfield/guides/macros/}
+ * * [Macros guide](//mathfield/guides/macros/)
  *
  * @category Macros
  */
 export type MacroDefinition = {
     /** Definition of the macro as a LaTeX expression */
     def: string;
+    /** Number of arguments (`#1`, etc...) in the macro definition */
     args?: number;
+    /** If `false` elements inside the macro can be selected */
     captureSelection?: boolean;
+    /** If `false`, even if `expandMacro` is true, do not expand. */
     expand?: boolean;
 };
 /** @category Macros */
@@ -706,7 +709,7 @@ export type Selection = {
     ranges: Range[];
     direction?: 'forward' | 'backward' | 'none';
 };
-/* 0.104.0 */import type { Selector } from './commands';
+import type { Selector } from './commands';
 import type { Expression, LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
 import type { InsertStyleHook, Mathfield } from './mathfield';
 import type { InlineShortcutDefinitions, Keybinding, MathfieldOptions } from './options';
@@ -900,28 +903,23 @@ export interface MathfieldElementAttributes {
     'virtual-keyboard-target-origin': string;
 }
 /**
- * The `MathfieldElement` class represent a DOM element that displays
- * math equations.
+ * @category Web Component
+ * @keywords zindex, events, attribute, attributes, property, properties, parts, variables, css, mathfield, mathfieldelement
+ *
+ * The `MathfieldElement` class is a DOM element that provides a math input
+ * field.
  *
  * It is a subclass of the standard
  * [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement)
- * class and as such inherits all of its properties and methods.
+ * class and as such inherits all of its properties and methods, such
+ * as `style`, `tabIndex`, `addEventListener()`, `getAttribute()`, etc...
  *
- * It inherits many useful properties and methods from `HTMLElement` such
- * as `style`, `tabIndex`, `addEventListener()`, `getAttribute()`,  etc...
- *
- * It is typically used to render a single equation.
- *
- * To render multiple equations, use multiple instances of `MathfieldElement`.
- *
- * The `MathfieldElement` class provides special properties and methods to
+ * The `MathfieldElement` class provides additional properties and methods to
  * control the display and behavior of `<math-field>` elements.
  *
- *
- * You will usually instantiate a `MathfieldElement` using the
- * `<math-field>` tag in HTML. However, if necessary you can also create
- * it programmatically using `new MathfieldElement()`.
- *
+ * **To instantiate a `MathfieldElement`** use the `<math-field>` tag in HTML.
+ * You can also instantiate a `MathfieldElement` programmatically using
+ * `new MathfieldElement()`.
  *
  * ```javascript
  * // 1. Create a new MathfieldElement
@@ -929,15 +927,19 @@ export interface MathfieldElementAttributes {
  *
  * // 2. Attach it to the DOM
  * document.body.appendChild(mf);
+ *
+ * // 3. Modifying options after construction
+ * mf.addEventListener("mount"), () => {
+ *  mf.smartFence = true;
+ * });
  * ```
  *
- * // Modifying options after construction
- * mf.smartFence = true;
- * ```
+ * Read more about customizing the appearance and behavior of the mathfield in
+ * the [Customizing the Mathfield](mathfield/guides/customizing/) guide.
  *
  * #### MathfieldElement CSS Variables
  *
- * To customize the appearance of the mathfield, declare the following CSS
+ * **To customize the appearance of the mathfield**, declare the following CSS
  * variables (custom properties) in a ruleset that applies to the mathfield.
  *
  * ```css
@@ -951,18 +953,8 @@ export interface MathfieldElementAttributes {
  * ```js
  * document.body.style.setProperty("--hue", "10");
  * ```
- * <div className='symbols-table' style={{"--first-col-width":"25ex"}}>
  *
- * | CSS Variable | Usage |
- * |:---|:---|
- * | `--hue` | Hue of the highlight color and the caret |
- * | `--contains-highlight-background-color` | Backround property for items that contain the caret |
- * | `--primary-color` | Primary accent color, used for example in the virtual keyboard |
- * | `--text-font-family` | The font stack used in text mode |
- * | `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
- * | `--smart-fence-color` | Color of a smart fence (default is current color) |
- *
- * </div>
+ * Read more about the [CSS variables](mathfield/guides/customizing/#css-variables) available for customization.
  *
  * You can customize the appearance and zindex of the virtual keyboard panel
  * with some CSS variables associated with a selector that applies to the
@@ -972,13 +964,14 @@ export interface MathfieldElementAttributes {
  *
  * #### MathfieldElement CSS Parts
  *
- * To style the virtual keyboard toggle, use the `virtual-keyboard-toggle` CSS
- * part. To use it, define a CSS rule with a `::part()` selector
- * for example:
+ * In addition to the CSS variables, the mathfield exposes [CSS
+ * parts that can be used to style the mathfield](https://cortexjs.io/mathfield/guides/customizing/#mathfield-parts)
+ *
+ * For example, to hide the menu button:
  *
  * ```css
- * math-field::part(virtual-keyboard-toggle) {
- *  color: red;
+ * math-field::part(menu-toggle) {
+ *  display: none;
  * }
  * ```
  *
@@ -997,19 +990,20 @@ export interface MathfieldElementAttributes {
  * The property can also be changed directly on the `MathfieldElement` object:
  *
  * ```javascript
- *  getElementById('mf').value = "\\sin x";
- *  getElementById('mf').letterShapeStyle = "text";
+ *  mf.value = "\\sin x";
+ *  mf.letterShapeStyle = "text";
  * ```
  *
  * The values of attributes and properties are reflected, which means you can
  * change one or the other, for example:
  *
  * ```javascript
- * getElementById('mf').setAttribute('letter-shape-style',  'french');
- * console.log(getElementById('mf').letterShapeStyle);
+ * mf.setAttribute('letter-shape-style',  'french');
+ * console.log(mf.letterShapeStyle);
  * // Result: "french"
- * getElementById('mf').letterShapeStyle ='tex;
- * console.log(getElementById('mf').getAttribute('letter-shape-style');
+ *
+ * mf.letterShapeStyle ='tex;
+ * console.log(mf.getAttribute('letter-shape-style');
  * // Result: 'tex'
  * ```
  *
@@ -1056,7 +1050,7 @@ export interface MathfieldElementAttributes {
  *
  * #### MathfieldElement Events
  *
- * Listen to these events by using `addEventListener()`. For events with
+ * Listen to these events by using `mf.addEventListener()`. For events with
  * additional arguments, the arguments are available in `event.detail`.
  *
  * <div className='symbols-table' style={{"--first-col-width":"27ex"}}>
@@ -1082,9 +1076,6 @@ export interface MathfieldElementAttributes {
  *
  * </div>
  *
- * @category Web Component
- * @keywords zindex, events, attribute, attributes, property, properties, parts, variables, css, mathfield, mathfieldelement
-
  */
 export declare class MathfieldElement extends HTMLElement implements Mathfield {
     static version: string;
@@ -1185,7 +1176,11 @@ export declare class MathfieldElement extends HTMLElement implements Mathfield {
      *     well.
      *
      * The value of the properties should be either a string, the name of an
-     * audio file in the `soundsDirectory` directory or `null` to suppress the sound.
+     * audio file in the `soundsDirectory` directory or `null` to suppress
+     * the sound.
+     *
+     * If the `soundsDirectory` is `null`, no sound will be played.
+     *
      * @category Virtual Keyboard
      */
     static get keypressSound(): Readonly<{
@@ -1210,7 +1205,10 @@ export declare class MathfieldElement extends HTMLElement implements Mathfield {
      *
      * The property is either:
      * - a string, the name of an audio file in the `soundsDirectory` directory
-     * - null to turn off the sound
+     * - `null` to turn off the sound
+     *
+     * If the `soundsDirectory` is `null`, no sound will be played.
+     *
      */
     static get plonkSound(): string | null;
     static set plonkSound(value: string | null);
@@ -2098,7 +2096,7 @@ declare global {
         MathfieldElement: typeof MathfieldElement;
     }
 }
-/* 0.104.0 */import type { Selector } from './commands';
+import type { Selector } from './commands';
 import type { ApplyStyleOptions, InsertOptions, Offset, OutputFormat, Style, Range, Selection } from './core-types';
 export type InsertStyleHook = (sender: Mathfield, at: Offset, info: {
     before: Offset;
@@ -2132,7 +2130,7 @@ export interface Mathfield {
 export interface Model {
     readonly mathfield: Mathfield;
 }
-/* 0.104.0 *//**
+/**
  * Server-side rendering exports.
  *
  * These functions do not require a DOM environment and can
@@ -2239,7 +2237,7 @@ export declare function convertLatexToAsciiMath(latex: string, parseMode?: Parse
  * @category Conversion
  */
 export declare function convertAsciiMathToLatex(ascii: string): string;
-/* 0.104.0 *//**
+/**
  *
  * Importing this package in a web page will make the `<math-field>` custom
  * element available. Use it as a drop-in replacement for `<textarea>` or
@@ -2261,7 +2259,7 @@ export declare function convertAsciiMathToLatex(ascii: string): string;
  * ```
  *
  * @packageDocumentation Mathfield API Reference
- * @version 0.104.0
+ * @version {{SDK_VERSION}}
  *
  */
 import type { VirtualKeyboardInterface } from './virtual-keyboard';
@@ -2283,7 +2281,7 @@ declare global {
         mathVirtualKeyboard: VirtualKeyboardInterface & EventTarget;
     }
 }
-/* 0.104.0 */import type { Mathfield, InsertStyleHook } from './mathfield';
+import type { Mathfield, InsertStyleHook } from './mathfield';
 import type { Selector } from './commands';
 import type { ParseMode, MacroDictionary, Registers, Range } from './core-types';
 /**
@@ -2678,7 +2676,7 @@ export type StaticRenderOptions = Partial<LayoutOptions> & {
         };
     };
 };
-/* 0.104.0 *//**
+/**
  * @internal
  */
 type Filter<T, Cond, U extends keyof T = keyof T> = {
@@ -2689,13 +2687,13 @@ type Filter<T, Cond, U extends keyof T = keyof T> = {
  */
 export type Keys<T> = Filter<T, (...args: any[]) => any> & string;
 export {};
-/* 0.104.0 */export type KeyboardModifiers = {
+export type KeyboardModifiers = {
     alt: boolean;
     control: boolean;
     shift: boolean;
     meta: boolean;
 };
-/* 0.104.0 */import type { KeyboardModifiers } from './ui-events-types';
+import type { KeyboardModifiers } from './ui-events-types';
 /**
  * The type of a menu item:
  * - `command`: a command that can be selected and executed
@@ -2806,7 +2804,7 @@ export declare function isDivider(item: MenuItem): item is MenuItemDivider;
 export declare function isHeading(item: MenuItem): item is MenuItemHeading;
 /** Declaration of a menu item */
 export type MenuItem<T = unknown> = MenuItemDivider | MenuItemHeading | MenuItemSubmenu | MenuItemCommand<T>;
-/* 0.104.0 */import type { Selector } from './commands';
+import type { Selector } from './commands';
 import type { ParseMode, Style } from './core-types';
 import type { OriginValidator } from './options';
 /**
