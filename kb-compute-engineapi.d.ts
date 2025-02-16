@@ -407,6 +407,7 @@ export declare function functionResult(type: Readonly<Type> | undefined): Type |
 export declare function collectionElementType(type: Readonly<Type>): Type | undefined;
 export declare function isValidType(t: any): t is Readonly<Type>;
 /* 0.28.0 */import type { Type, TypeString } from './types';
+/** @category Type */
 export declare class BoxedType {
     static unknown: BoxedType;
     type: Type;
@@ -460,8 +461,7 @@ export declare const terminal: Terminal;
  */
 export declare const wrapAnsiString: (string: string, width: number | undefined) => string[];
 export {};
-/* 0.28.0 *//** @module "common" */
-/** @category Error Handling */
+/* 0.28.0 *//** @category Error Handling */
 export type RuntimeSignalCode = 'timeout' | 'out-of-memory' | 'recursion-depth-exceeded' | 'iteration-limit-exceeded';
 /** @category Error Handling */
 export type SignalCode = RuntimeSignalCode | ('invalid-name' | 'expected-predicate' | 'expected-symbol' | 'operator-requires-one-operand' | 'postfix-operator-requires-one-operand' | 'prefix-operator-requires-one-operand' | 'unbalanced-symbols' | 'expected-argument' | 'unexpected-command' | 'cyclic-definition' | 'invalid-supersets' | 'expected-supersets' | 'unknown-domain' | 'duplicate-wikidata' | 'invalid-dictionary-entry' | 'syntax-error');
@@ -581,6 +581,7 @@ export declare function fuzzyStringMatch(invalidWord: string, validWords: string
     infer Head,
     ...infer Rem
 ] ? MergeTypes<Rem, Res & Head> : Res;
+/** @internal  */
 export type OneOf<TypesArray extends any[], Res = never, AllProperties = MergeTypes<TypesArray>> = TypesArray extends [infer Head, ...infer Rem] ? OneOf<Rem, Res | OnlyFirst<Head, AllProperties>, AllProperties> : Res;
 type OnlyFirst<F, S> = F & {
     [Key in keyof Omit<S, keyof F>]?: never;
@@ -810,6 +811,7 @@ export interface ComputeEngineStats {
     expressions: null | Set<BoxedExpression>;
     highwaterMark: number;
 }
+/** @category Numerics */
 export type Sign = 
 /** The expression is equal to 0 */
 'zero'
@@ -1231,6 +1233,7 @@ export type RuntimeScope = Scope & {
  * @category Boxed Expression
  */
 export type CanonicalForm = 'InvisibleOperator' | 'Number' | 'Multiply' | 'Add' | 'Power' | 'Divide' | 'Flatten' | 'Order';
+/** @category Boxed Expression */
 export type CanonicalOptions = boolean | CanonicalForm | CanonicalForm[];
 /**
  * Metadata that can be associated with a `BoxedExpression`
@@ -1248,13 +1251,13 @@ export type Metadata = {
  * A substitution can also be considered a more constrained version of a
  * rule whose `match` is always a symbol.
 
-* @category Boxed Expression
+* @category Pattern Matching
  */
 export type Substitution<T = SemiBoxedExpression> = {
     [symbol: string]: T;
 };
 /**
- * @category Boxed Expression
+ * @category Pattern Matching
  *
  */
 export type BoxedSubstitution = Substitution<BoxedExpression>;
@@ -1650,7 +1653,7 @@ export * from '../common/type/subtype';
  * @category Compute Engine
  *
  */
-export declare class XYZComputeEngine implements IComputeEngine {
+export declare class ComputeEngine implements IComputeEngine {
     readonly True: BoxedExpression;
     readonly False: BoxedExpression;
     readonly Pi: BoxedExpression;
@@ -2391,7 +2394,9 @@ export declare function reducedInteger(n: bigint): bigint | number;
 export declare function factorial(n: bigint): Generator<bigint, bigint>;
 /* 0.28.0 */import Decimal from 'decimal.js';
 type IsInteger<N extends number> = `${N}` extends `${string}.${string}` ? never : `${N}` extends `-${string}.${string}` ? never : number;
-/** A `SmallInteger` is an integer < 1e6  */
+/** A `SmallInteger` is an integer < 1e6
+ * @category Numerics
+ */
 export type SmallInteger = IsInteger<number>;
 /**
  * A rational number is a number that can be expressed as the quotient or fraction p/q of two integers,
@@ -2400,10 +2405,12 @@ export type SmallInteger = IsInteger<number>;
  * A rational can either be represented as a pair of small integers or
  * a pair of big integers.
  *
- * @category Boxed Expression
+ * @category Numerics
  */
 export type Rational = [SmallInteger, SmallInteger] | [bigint, bigint];
+/** @category Numerics */
 export type BigNum = Decimal;
+/** @category Numerics */
 export interface IBigNum {
     readonly _BIGNUM_NAN: BigNum;
     readonly _BIGNUM_ZERO: BigNum;
@@ -2700,22 +2707,8 @@ export declare function rationalize(x: number): [n: number, d: number] | number;
 export declare function reduceRationalSquareRoot(n: Rational): [factor: Rational, root: number | bigint];
 /* 0.28.0 */import Decimal from 'decimal.js';
 export declare function bigint(a: Decimal | number | bigint | string): bigint | null;
-/* 0.28.0 *//**
- *
- * The Compute Engine is a symbolic computation engine that can be used to
- * manipulate and evaluate mathematical expressions.
- *
- * Use an instance of {@linkcode ComputeEngine} to create boxed expressions
- * with {@linkcode ComputeEngine.parse} and {@linkcode ComputeEngine.box}.
- *
- * Use a {@linkcode BoxedExpression} object to manipulate and evaluate
- * mathematical expressions.
- *
- * @module "compute-engine"
- *
- */
-export { OneOf } from '../common/one-of';
-export { LatexString, SerializeLatexOptions, NumberSerializationFormat, DelimiterScale, NumberFormat, } from './latex-syntax/public';
+/* 0.28.0 */export type { OneOf } from '../common/one-of';
+export type { LatexString, SerializeLatexOptions, NumberSerializationFormat, DelimiterScale, NumberFormat, } from './latex-syntax/public';
 export * from './numeric-value/public';
 export * from '../common/type/boxed-type';
 export * from './tensor/tensors';
@@ -4775,17 +4768,19 @@ export type SemiBoxedExpression = number | bigint | string | BigNum | MathJsonNu
  *  @category Definitions
  *
  */
-export type EqHandlers = {
+export interface EqHandlers {
     eq: (a: BoxedExpression, b: BoxedExpression) => boolean | undefined;
     neq: (a: BoxedExpression, b: BoxedExpression) => boolean | undefined;
-};
+}
 /** @category Definitions */
 export type Hold = 'none' | 'all' | 'first' | 'rest' | 'last' | 'most';
+/** @category Rules */
 export declare function isRuleStep(x: any): x is RuleStep;
+/** @category Rules */
 export declare function isBoxedRule(x: any): x is BoxedRule;
 /** Options for `BoxedExpression.simplify()`
  *
- * @category Compute Engine
+ * @category Boxed Expression
  */
 export type SimplifyOptions = {
     /**
@@ -4802,11 +4797,10 @@ export type SimplifyOptions = {
     costFunction?: (expr: BoxedExpression) => number;
 };
 /** @category Compute Engine */
-export type ArrayValue = boolean | number | string | BigNum | BoxedExpression | undefined;
 /**
  * Options to control the serialization to MathJSON when using `BoxedExpression.toMathJson()`.
  *
- * @category Compute Engine
+ * @category Serialization
  */
 export type JsonSerializationOptions = {
     /** If true, the serialization applies some transformations to make
@@ -5768,13 +5762,17 @@ export declare function makeCanonicalSymbol(ce: IComputeEngine, name: string): B
 /* 0.28.0 */import type { BoxedExpression } from '../public';
 import { DataTypeMap, TensorDataType, TensorField } from './tensor-fields';
 import type { IComputeEngine } from '../types';
+/** @category Tensors */
 export interface TensorData<DT extends keyof DataTypeMap = 'float64'> {
     dtype: DT;
     shape: number[];
     data: DataTypeMap[DT][];
 }
+/** @internal */
 export type NestedArray<T> = NestedArray_<T>[];
+/** @internal */
 export type NestedArray_<T> = T | NestedArray_<T>[];
+/** @category Tensors */
 export declare abstract class AbstractTensor<DT extends keyof DataTypeMap> implements TensorData<DT> {
     private ce;
     /**
@@ -5863,6 +5861,7 @@ export declare abstract class AbstractTensor<DT extends keyof DataTypeMap> imple
     power(rhs: AbstractTensor<DT> | DataTypeMap[DT]): AbstractTensor<DT>;
     equals(rhs: AbstractTensor<DT>): boolean;
 }
+/** @category Tensors */
 export declare function makeTensor<T extends TensorDataType>(ce: IComputeEngine, data: TensorData<T> | {
     operator: string;
     ops: BoxedExpression[];
@@ -5871,6 +5870,7 @@ export declare function makeTensor<T extends TensorDataType>(ce: IComputeEngine,
 }): AbstractTensor<T>;
 /* 0.28.0 */import { Complex } from 'complex-esm';
 import type { BoxedExpression, IComputeEngine } from '../types';
+/** @category Tensors */
 export type DataTypeMap = {
     float64: number;
     float32: number;
@@ -5882,8 +5882,11 @@ export type DataTypeMap = {
     string: string;
     expression: BoxedExpression;
 };
+/** @category Tensors */
 export type TensorDataType = keyof DataTypeMap;
+/** @category Tensors */
 export declare function makeTensorField<DT extends keyof DataTypeMap>(ce: IComputeEngine, dtype: DT): TensorField<DataTypeMap[DT]>;
+/** @category Tensors */
 export interface TensorField<T extends number | Complex | BoxedExpression | boolean | string = number> {
     readonly one: T;
     readonly zero: T;
@@ -5921,6 +5924,7 @@ export interface TensorField<T extends number | Complex | BoxedExpression | bool
     pow(rhs: T, n: number): T;
     conjugate(x: T): T;
 }
+/** @category Tensors */
 export declare class TensorFieldNumber implements TensorField<number> {
     private ce;
     one: number;
@@ -5959,6 +5963,7 @@ export declare class TensorFieldNumber implements TensorField<number> {
     pow(lhs: number, rhs: number): number;
     conjugate(x: number): number;
 }
+/** @category Tensors */
 export declare class TensorFieldExpression implements TensorField<BoxedExpression> {
     one: BoxedExpression;
     zero: BoxedExpression;
@@ -5997,6 +6002,7 @@ export declare class TensorFieldExpression implements TensorField<BoxedExpressio
     pow(lhs: BoxedExpression, rhs: number): BoxedExpression;
     conjugate(x: BoxedExpression): BoxedExpression;
 }
+/** @category Tensors */
 export declare class TensorFieldComplex implements TensorField<Complex> {
     one: Complex;
     zero: Complex;
@@ -6035,7 +6041,15 @@ export declare class TensorFieldComplex implements TensorField<Complex> {
     pow(lhs: Complex, rhs: number): Complex;
     conjugate(z: Complex): Complex;
 }
+/**
+ * @category Tensors
+ * @internal
+ */
 export declare function getSupertype(t1: TensorDataType | undefined, t2: TensorDataType): TensorDataType;
+/**
+ * @category Tensors
+ * @internal
+ */
 export declare function getExpressionDatatype(expr: BoxedExpression): TensorDataType;
 /* 0.28.0 */import type { BoxedExpression } from '../public';
 /**
@@ -6175,16 +6189,20 @@ export declare class MachineNumericValue extends NumericValue {
 import Decimal from 'decimal.js';
 import type { Rational, SmallInteger } from '../numerics/types';
 import { NumericType } from '../../common/type/types';
-/** The value is equal to `(decimal * rational * sqrt(radical)) + im * i` */
+/** The value is equal to `(decimal * rational * sqrt(radical)) + im * i`
+ * @category Numerics */
 export type ExactNumericValueData = {
     rational?: Rational;
     radical?: number;
 };
+/** @category Numerics */
 export type NumericValueData = {
     re?: Decimal | number;
     im?: number;
 };
+/** @category Numerics */
 export type NumericValueFactory = (data: number | Decimal | NumericValueData) => NumericValue;
+/** @category Numerics */
 export declare abstract class NumericValue {
     abstract get type(): NumericType;
     /** True if numeric value is the product of a rational and the square root of an integer.
@@ -7318,6 +7336,7 @@ export declare function isEnvironmentEntry(entry: LatexDictionaryEntry): entry i
 export type LatexDictionary = ReadonlyArray<Partial<LatexDictionaryEntry>>;
 /**
  * These options control how numbers are parsed and serialized.
+ * @category Serialization
  */
 export type NumberFormat = {
     positiveInfinity: LatexString;
@@ -7375,6 +7394,7 @@ export type NumberFormat = {
     truncationMarker: LatexString;
     repeatingDecimal: 'auto' | 'vinculum' | 'dots' | 'parentheses' | 'arc' | 'none';
 };
+/** @category Serialization */
 export type NumberSerializationFormat = NumberFormat & {
     /**
      * The maximum number of significant digits in serialized numbers.
@@ -7825,11 +7845,10 @@ export declare function parseIdentifier(parser: Parser): MathJsonIdentifier | nu
 /* 0.28.0 */export * from './compute-engine/public';
 export * from './math-json/types';
 export declare const version = "0.28.0";
-export { XYZComputeEngine as ComputeEngine } from './compute-engine/compute-engine';
+export { ComputeEngine as ComputeEngine } from './compute-engine/compute-engine';
 export { terminal } from './common/terminal';
 export { highlightCodeSpan, highlightCodeBlock, } from './common/syntax-highlighter';
-/* 0.28.0 *//** @module "math-json" */
-/** @category MathJSON */
+/* 0.28.0 *//** @category MathJSON */
 export type MathJsonAttributes = {
     /** A human readable string to annotate this expression, since JSON does not
      * allow comments in its encoding */
@@ -7928,6 +7947,9 @@ export type MathJsonString = {
 export type MathJsonFunction = {
     fn: [MathJsonIdentifier, ...Expression[]];
 } & MathJsonAttributes;
+/**
+ * @category MathJSON
+ */
 export type ExpressionObject = MathJsonNumber | MathJsonString | MathJsonSymbol | MathJsonFunction;
 /**
  * A MathJSON expression is a recursive data structure.
