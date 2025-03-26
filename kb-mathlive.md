@@ -3101,7 +3101,7 @@ $ npm install --save-dev mathlive
 
 ## Create a Svelte Wrapper Component
 
-```svelte title="/src/lib/MathLive.svelte"
+```jsx title="/src/lib/MathLive.svelte"
 <script lang="ts">
   import "mathlive";
   import type { MathfieldElement, MathfieldElementAttributes } from "mathlive";
@@ -3142,7 +3142,7 @@ declare namespace svelteHTML {
 
 ## Usage
 
-```svelte
+```jsx
 <script>
   import MathField from "$lib/MathField.svelte";
 </script>
@@ -3152,7 +3152,7 @@ declare namespace svelteHTML {
 
 ## Customization
 
-```svelte
+```jsx
 <script>
   import MathField from "$lib/MathField.svelte";
   let value = $state("1");
@@ -3174,17 +3174,10 @@ declare namespace svelteHTML {
 
 <p>Current LaTeX: {value}</p>
 
-<button
-  onclick={() => {
-    value = "1 + 1";
-  }}
->reset to default</button>
+<button onclick={() => {value = "1 + 1";}}>
+  reset to default
+</button>
 ```
-
-<ReadMore path="https://github.com/arnog/svelte-mathlive" >
-A ready-to-run example project is available on **GitHub**<Icon name="chevron-right-bold" />
-</ReadMore>
-
 ---
 date: Last Modified
 title: Keybindings and Inline Shortcuts
