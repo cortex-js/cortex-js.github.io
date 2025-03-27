@@ -570,7 +570,7 @@ property.
 
 ```js
 MathfieldElement.soundsDirectory = 
-  "https://unpkg.com/mathlive/dist/sounds/";
+  "https://unpkg.com/mathlive/sounds/";
 ```
 
 Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
@@ -636,7 +636,7 @@ property.
 
 :::js
 await window.customElements.whenDefined("math-field");
-MathfieldElement.fontsDirectory = "https://unpkg.com/mathlive/dist/fonts/";
+MathfieldElement.fontsDirectory = "https://unpkg.com/mathlive/fonts/";
 
 
 :::html
@@ -5201,7 +5201,7 @@ We also need to load a CSS stylesheet to render the math. We can use the
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+  href="https://unpkg.com/mathlive/mathlive-static.css"
 />
 ```
 
@@ -5284,7 +5284,7 @@ Here's the complete code for our quiz application:
     <title>Math Quiz</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+      href="https://unpkg.com/mathlive/mathlive-static.css"
     />
     <style>
       math-field {
@@ -8017,7 +8017,7 @@ formula once the markup has been generated.
 <head>
   <link
     rel="stylesheet"
-    href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+    href="https://unpkg.com/mathlive/mathlive-static.css"
   />
 </head>
 <html>
