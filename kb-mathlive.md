@@ -1676,9 +1676,7 @@ import MemberCard from '@site/src/components/MemberCard';
 
 <a name="readmemd"></a>
 
-<MemberCard>
-
-# Mathfield
+# Mathfield API Reference
 
 ## Mathfield
 
@@ -1706,14 +1704,14 @@ const mf = new MathfieldElement();
 // 2. Attach it to the DOM
 document.body.appendChild(mf);
 
-// 3. Modifying options after construction
+// 3. Modifying options after the mathfield has been attached to the DOM
 mf.addEventListener("mount"), () => {
  mf.smartFence = true;
 });
 ```
 
 Read more about customizing the appearance and behavior of the mathfield in
-the [Customizing the Mathfield](./mathfield/guides/customizing/) guide.
+the [Customizing the Mathfield](/mathfield/guides/customizing/) guide.
 
 #### MathfieldElement CSS Variables
 
@@ -1743,49 +1741,48 @@ Read more about [customizing the virtual keyboard appearance](#custom-appearance
 #### MathfieldElement CSS Parts
 
 In addition to the CSS variables, the mathfield exposes [CSS
-parts that can be used to style the mathfield](https://cortexjs.io/mathfield/guides/customizing/#mathfield-parts)
+parts that can be used to style the mathfield](#mathfield-parts).
 
 For example, to hide the menu button:
 
 ```css
 math-field::part(menu-toggle) {
- display: none;
+   display: none;
 }
 ```
 
 #### MathfieldElement Attributes
 
-An attribute is a key-value pair set as part of the tag:
+An attribute is a key-value pair set as part of the `<math-field>` tag:
 
 ```html
 <math-field letter-shape-style="tex"></math-field>
 ```
 
 The supported attributes are listed in the table below with their
-corresponding property.
-
-The property can also be changed directly on the `MathfieldElement` object:
+corresponding property, which can be changed directly on the
+`MathfieldElement` object:
 
 ```javascript
  mf.value = "\\sin x";
- mf.letterShapeStyle = "text";
+ mf.letterShapeStyle = "tex";
 ```
 
 The values of attributes and properties are reflected, which means you can
 change one or the other, for example:
 
 ```javascript
-mf.setAttribute('letter-shape-style',  'french');
+mf.setAttribute("letter-shape-style",  "french");
 console.log(mf.letterShapeStyle);
 // Result: "french"
 
-mf.letterShapeStyle ='tex;
-console.log(mf.getAttribute('letter-shape-style');
-// Result: 'tex'
+mf.letterShapeStyle ="tex";
+console.log(mf.getAttribute("letter-shape-style");
+// Result: "tex"
 ```
 
 An exception is the `value` property, which is not reflected on the `value`
-attribute: for consistency with other DOM elements, the `value` attribute
+attribute. For consistency with other DOM elements, the `value` attribute
 remains at its initial value.
 
 <div className='symbols-table' style={{"--first-col-width":"32ex"}}>
@@ -1811,10 +1808,10 @@ remains at its initial value.
 
 </div>
 
-See the corresponding property for more details about these options.
+See [more details about these attributes](#mathfieldelementattributes).
 
-In addition, the following [global attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes)
-can also be used:
+In addition, the following DOM elements [global attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes)
+are supported:
 - `class`
 - `data-*`
 - `hidden`
@@ -1825,7 +1822,7 @@ can also be used:
 
 #### MathfieldElement Events
 
-Listen to these events by using `mf.addEventListener()`. For events with
+**To listen to these events** use `mf.addEventListener()`. For events with
 additional arguments, the arguments are available in `event.detail`.
 
 <div className='symbols-table' style={{"--first-col-width":"27ex"}}>
@@ -3278,7 +3275,7 @@ This optional function will be called before a string of HTML is
 injected in the DOM, allowing that string to be sanitized
 according to a policy defined by the host.
 
-Consider using this option if you are displaying untrusted content. Read more about [Security Considerations](mathfield/guides/security/)
+Consider using this option if you are displaying untrusted content. Read more about [Security Considerations](/mathfield/guides/security/)
 
 </MemberCard>
 
@@ -3287,7 +3284,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.0';
+static version: string = '{{SDK_VERSION}}';
 ```
 
 </MemberCard>
@@ -4220,6 +4217,9 @@ type Offset = number;
 Position of the caret/insertion point from the beginning of the formula.
 The first position is 0. The last valid offset is `mf.lastOffset`.
 
+**See Also**
+* [`Range`](#range-1)
+
 </MemberCard>
 
 <MemberCard>
@@ -4230,8 +4230,7 @@ The first position is 0. The last valid offset is `mf.lastOffset`.
 type Range = [Offset, Offset];
 ```
 
-A pair of offsets (boundary points) that can be used to denote a fragment
-of an expression.
+A pair of offsets (boundary points) that denote a fragment of a formula.
 
 A range is said to be **collapsed** when `start` and `end` are equal.
 
@@ -4244,7 +4243,7 @@ end \>= 0,  start \< lastOffset, end \< lastOffset. All the methods return
 a normalized range.
 
 **See Also**
-* [`Selection`](#selection-1)
+* [`Offset`](#offset)
 
 </MemberCard>
 
@@ -4252,23 +4251,26 @@ a normalized range.
 
 ### Selection
 
-A selection is a set of ranges (to support discontinuous selection, for
+A **selection** is a set of ranges (to support discontinuous selection, for
 example when selecting a column in a matrix).
 
 If there is a single range and that range is collapsed, the selection is
 collapsed.
 
-A selection can also have a direction. While many operations are insensitive
-to the direction, a few are. For example, when selecting a fragment of an
-expression from left to right, the direction of this range will be "forward".
+A selection can also have a **direction**. While many operations are
+insensitive to the direction, a few are. For example, when selecting a
+fragment of a formula from left to right, the direction of this range will
+be `"forward"`.
+
 Pressing the left arrow key will sets the insertion at the start of the
 range.
 
 Conversely, if the selection is made from right to left, the direction is
-"backward" and pressing the left arrow key will set the insertion point at
+`"backward"` and pressing the left arrow key will set the insertion point at
 the end of the range.
 
 **See Also**
+* [`Offset`](#offset)
 * [`Range`](#range-1)
 
 <MemberCard>
@@ -5983,6 +5985,438 @@ to a key combination that can be generated on any keyboard.
 
 </MemberCard>
 
+## Menu
+
+<MemberCard>
+
+### DynamicValue\<T\>
+
+```ts
+type DynamicValue<T> = T | (modifiers) => T;
+```
+
+#### Type declaration
+
+• T
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItem\<T\>
+
+```ts
+type MenuItem<T> = 
+  | MenuItemDivider
+  | MenuItemHeading
+  | MenuItemSubmenu
+| MenuItemCommand<T>;
+```
+
+Declaration of a menu item
+
+#### Type declaration
+
+• T = `unknown`
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemCommand\<T\>
+
+<MemberCard>
+
+##### MenuItemCommand.ariaLabel?
+
+```ts
+optional ariaLabel: DynamicValue<string>;
+```
+
+An accessible text string that describes the item.
+Usually not necessary, as the `label` is used for this,
+however if the menu item is for example a color swatch,
+the `ariaLabel` can be used to describe the color.
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.checked?
+
+```ts
+optional checked: DynamicValue<boolean | "mixed">;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.class?
+
+```ts
+optional class: DynamicValue<string>;
+```
+
+A CSS class applied to the item
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.data?
+
+```ts
+optional data: T;
+```
+
+This data payload is passed to the `onMenuSelect()` hook and with the `menu-select` event
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.enabled?
+
+```ts
+optional enabled: DynamicValue<boolean>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.id?
+
+```ts
+optional id: string;
+```
+
+This id string is passed to the `onMenuSelect()` hook and with the `menu-select` event
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.keyboardShortcut?
+
+```ts
+optional keyboardShortcut: string;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.label?
+
+```ts
+optional label: DynamicValue<string>;
+```
+
+A string of HTML markup used to describe the item
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.onMenuSelect()?
+
+```ts
+optional onMenuSelect: (_) => void;
+```
+
+When this menu item is selected, a `menu-select` event is dispatched
+and this hook is called.
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.tooltip?
+
+```ts
+optional tooltip: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.type?
+
+```ts
+optional type: "command";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemCommand.visible?
+
+```ts
+optional visible: DynamicValue<boolean>;
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemDivider
+
+A divider is a visual separator between menu items.
+It is not selectable.
+
+<MemberCard>
+
+##### MenuItemDivider.type
+
+```ts
+type: "divider";
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemHeading
+
+A heading is a menu item that is not selectable and used to group menu
+items.
+
+If following items (until next divider or heading) are not visible, the
+heading is not visible either.
+
+<MemberCard>
+
+##### MenuItemHeading.ariaLabel?
+
+```ts
+optional ariaLabel: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemHeading.class?
+
+```ts
+optional class: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemHeading.label?
+
+```ts
+optional label: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemHeading.tooltip?
+
+```ts
+optional tooltip: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemHeading.type
+
+```ts
+type: "heading";
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemProps\<T\>
+
+These props are passed to the `menu-select` event and `onMenuSelect` hook
+- `id`: the `id` associated with the menu item.
+- `data`: the `data` payload associated with the menu item
+- `modifiers`: the keyboard modifiers that were pressed when the menu item was selected
+
+<MemberCard>
+
+##### MenuItemProps.data?
+
+```ts
+optional data: T;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemProps.id?
+
+```ts
+optional id: string;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemProps.modifiers?
+
+```ts
+optional modifiers: KeyboardModifiers;
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemSubmenu
+
+<MemberCard>
+
+##### MenuItemSubmenu.ariaLabel?
+
+```ts
+optional ariaLabel: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.class?
+
+```ts
+optional class: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.columnCount?
+
+```ts
+optional columnCount: number;
+```
+
+If the menu is arranged in a custom grid, this is the number of columns.
+
+This property is used for keyboard navigation with the arrow keys.
+
+**Default**: 1.
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.enabled?
+
+```ts
+optional enabled: DynamicValue<boolean>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.label?
+
+```ts
+optional label: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.submenu
+
+```ts
+submenu: Readonly<MenuItem[]>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.submenuClass?
+
+```ts
+optional submenuClass: string;
+```
+
+The class applied to the submenu container.
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.tooltip?
+
+```ts
+optional tooltip: DynamicValue<string>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.type?
+
+```ts
+optional type: "submenu";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MenuItemSubmenu.visible?
+
+```ts
+optional visible: DynamicValue<boolean>;
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+### MenuItemType
+
+```ts
+type MenuItemType = "command" | "divider" | "heading" | "submenu";
+```
+
+The type of a menu item:
+- `command`: a command that can be selected and executed
+- `divider`: a visual separator
+- `heading`: a heading, not selectable. If following items
+  (until next divider or heading) are not visible, the heading is not
+  visible either.
+- `submenu`: a submenu
+
+</MemberCard>
+
 ## Virtual Keyboard
 
 ### NormalizedVirtualKeyboardLayer
@@ -7610,7 +8044,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.0`
+Current version: `{{SDK_VERSION}}`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -7619,8 +8053,6 @@ The version string of the SDK using the [semver](https://semver.org/) convention
 * **`MAJOR`** is incremented for incompatible API changes
 * **`MINOR`** is incremented for new features
 * **`PATCH`** is incremented for bug fixes
-
-</MemberCard>
 
 </MemberCard>
 ---
@@ -8918,16 +9350,16 @@ operations on a mathfield.
 
 **To display the context menu:**
 - Right-click on the mathfield
-- Long press on a mathfield 
+- Long press on the mathfield 
 - Tap on the menu toggle (hamburger icon) in the mathfield
-- Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key 
-  on a keyboard
+- Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, 
+  <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key on a physical keyboard
 
 
 The context menu is fully accessible. It can be navigated using the
 keyboard, and the menu items are announced by screen readers.
 
-**To navigate the context menu, use the arrow keys**
+**To navigate the context menu**, use the arrow keys.
 
 An item can also be selected by typing some of the letters of its label.
 
@@ -8941,7 +9373,7 @@ as needed.
 
 The menu can be filtered to only display a subset of the available commands.
 
-For example, to ommit all commands related to the Compute Engine (such as
+For example, to omit all commands related to the Compute Engine (such as
 Evaluate, Simplify and Solve), you can filter the menu items by id:
 
 ```js example
@@ -8963,14 +9395,19 @@ For example, **do not** use `mf.menuItems[0].visible = false`.
 The `menuItems` property is an array of menu items. 
 
 Each menu item is an object with the following properties:
-- `type`: one of `"command"`, `"divider"`, `"submenu"`, `"checkbox"`, `"radio"`. The default is `"command"`.
-- `label`: The label to display for the menu item. This can be a string literal or a function that returns a string. If a function is provided, it will be called to update the label whenever the menu is displayed or when the keyboard modifiers change. The value of the string is interpreted as HTML markup.
+- `type`: one of `"command"`, `"divider"`, `"submenu"`, `"checkbox"`, `"radio"`. 
+  The default is `"command"`.
+- `label`: The label to display for the menu item. This can be a string 
+  literal or a function that returns a string. If a function is provided, it 
+  will be called to update the label whenever the menu is displayed or when the 
+  keyboard modifiers change. The value of the string is interpreted as HTML markup.
 - `ariaLabel` and `ariaDetails`: If provided, these will be used to set
-  the `aria-label` and `aria-details` attributes of the menu item. They 
-  can also be a string or a function that returns a string.
+  the `aria-label` and `aria-details` attributes of the menu item, which can 
+  be used by screen readers. Like the `label` property they can be either a 
+  string literal or a function that returns a string.
 - `visible`, `enabled`, `checked` are status flags that can be set to
   `true` or `false` to control the visibility, enabled state and checked
-  state of the menu item. They can also be a function that returns a boolean.
+  state of the menu item.
 - `id`: A unique identifier for the menu item. This is the value that will
   be passed to the `menu-select` event when the menu item is selected.
 - `data`: An arbitrary data payload associated with the menu item, if any.
@@ -9008,10 +9445,32 @@ mf. menuItems = [
 ];
 ```
 
+## Adding a menu item
+
+**To add a menu item that replaces the selection with a cancel symbol**,
+use the following code:
+
+```js
+mf.menuItems = [
+  {
+    label: "Cancel",
+    visible: () =>
+      mf.isSelectionEditable && !mf.selectionIsCollapsed,
+    onMenuSelect: () => mf.insert("\\cancel{#@}"),
+  },
+  ...mf.menuItems,
+];
+```
+
+The `visible` handler checks that the selection is editable and not collapsed.
+The `onMenuSelect` handler inserts the cancel symbol at the current selection.
+The `#@` token is replaced with the current selection.
+
+
 ## Listening to Menu Events
 
-When a menu item is selected, a `menu-select` 
-custom event is dispatched.
+When a menu item is selected, its `onMenuSelect` handler is invoked and 
+a `menu-select`  custom event is dispatched.
 
 The `detail` property of the event contains the following properties:
 - `id`: The id of the menu item that was selected.
@@ -9024,8 +9483,9 @@ The `detail` property of the event contains the following properties:
     - `metaKey`
     - `shiftKey`
 
-The example above can be rewritten to use the `menu-select` event instead of the `onMenuSelect` handler. Note that in
-this case, the menu items have an `id` property, which is used to identify the menu item that was selected.
+The example above which use `onMenuSelect` can be rewritten to use the 
+`menu-select` event instead. Note that in this case, the menu items have an
+ `id` property, which is used to identify the menu item that was selected.
 
 ```javascript example
 mf. menuItems = [
