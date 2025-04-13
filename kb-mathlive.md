@@ -9371,18 +9371,23 @@ as needed.
 
 ## Filtering Menu Items
 
-The menu can be filtered to only display a subset of the available commands.
+**To select which menu items are displayed**, use the `filter()` method on 
+the `mf.menuItems` property.
 
 For example, to omit all commands related to the Compute Engine (such as
-Evaluate, Simplify and Solve), you can filter the menu items by id:
+**Evaluate**, **Simplify** and **Solve**), you can filter the menu items by 
+their id:
 
 ```js example
 mf.menuItems = mf.menuItems.filter(item => !item.id.startWith('ce-'));
 ```
 
 :::warning
-Do not modify the value of the elements of `mf.menuItems` directly or the menu 
-will not be updated as expected. 
+The `mf.menuItems` property is a read-only property. It returns a copy of the
+original array of menu items.
+
+Do not modify the value of the elements of `mf.menuItems` directly. This will
+result in a runtime error.
 
 For example, **do not** use `mf.menuItems[0].visible = false`.
 :::
@@ -9445,10 +9450,10 @@ mf. menuItems = [
 ];
 ```
 
-## Adding a menu item
+## Adding a Menu Item
 
-**To add a menu item that replaces the selection with a cancel symbol**,
-use the following code:
+**To add a menu item**, use the spread operator (`...`) to create a new array
+of menu items, and add the new menu item to the copy of the original array.:
 
 ```js
 mf.menuItems = [
@@ -9462,9 +9467,71 @@ mf.menuItems = [
 ];
 ```
 
+In this example, a new menu item for a **Cancel** command is added at the 
+beginning of the menu.
+
 The `visible` handler checks that the selection is editable and not collapsed.
-The `onMenuSelect` handler inserts the cancel symbol at the current selection.
-The `#@` token is replaced with the current selection.
+
+The `onMenuSelect` handler replaces the selection with a `\cancel{}` command.
+The `#@` token is replaced with the current selection, effectively wrapping
+the selection in a `\cancel{}` command.
+
+**To add a menu item at a specific position**, use the `findIndex()` method
+to find the index of the menu item you want to insert relative to.
+
+```js
+const isNonEmptySelection = () => mf.getValue(mf.selection).length > 0;
+const getCancelArgument = () => {
+  const selection = mf.getValue(mf.selection);
+  // Is the selection a \cancel{...} command?
+  const match = selection.match(/^\\cancel{([^}]*)}$/);
+  return match ? match[1] : '';
+};
+
+const menuItems = mf.menuItems;
+
+// Find the index of the "Cut" menu item
+const index = menuItems.findIndex(item => item.id === 'cut');
+mf.menuItems = [
+  // Add the new menu item before the "Cut" menu item
+  ...menuItems.slice(0, index),
+
+  // Add the new commands
+  { type: 'divider' },
+  {
+    label: "Cancel",
+    visible: () =>
+      mf.isSelectionEditable && isNonEmptySelection() && !getCancelArgument(),
+    onMenuSelect: () => 
+      mf.insert("\\cancel{#@}", { selectionMode: 'item' }),
+  },
+  {
+    label: "Uncancel",
+    visible: () => mf.isSelectionEditable && getCancelArgument(),
+    onMenuSelect: () => 
+      mf.insert(getCancelArgument(), { selectionMode: 'item' }),
+  },
+  { type: 'divider' },
+
+  // Add the rest of the menu items after the "Cut" menu item
+  ...menuItems.slice(index)
+];
+```
+
+In this example, new menu items are added after the **Cut** menu item.
+We make a new array of menu items by slicing the original array into two parts:
+- The first part is the menu items before the **Cut** item.
+- The second part is the menu items after the **Cut** item.
+The new menu items are added in between the two parts.
+
+We add a divider before and after the new menu items, which can be useful
+to group related menu items together.
+
+We add two new menu items: **Cancel** and **Uncancel**. The **Cancel** item is
+only visible when the selection is editable, not empty and not already
+a cancel command. The **Uncancel** item is only visible when the selection
+is editable and is a cancel command. At most one of the two commands will 
+be visible, allowing the user to either cancel or uncancel the selection.
 
 
 ## Listening to Menu Events
@@ -9472,7 +9539,12 @@ The `#@` token is replaced with the current selection.
 When a menu item is selected, its `onMenuSelect` handler is invoked and 
 a `menu-select`  custom event is dispatched.
 
-The `detail` property of the event contains the following properties:
+It is generally simpler to provide a `onMenuSelect` handler for each
+menu item, but you can also listen to the `menu-select` event to handle
+all menu item selections in a single event handler.
+
+
+The `detail` property of the `menu-select` event contains the following properties:
 - `id`: The id of the menu item that was selected.
 - `label`: The label of the menu item that was selected.
 - `data`: The data payload associated with the menu item, if any.
@@ -9532,7 +9604,7 @@ math-field::part(menu-toggle) {
 ```
 
 Even when the menu toggle button is hidden, the context menu is still accessible
-with keyboard shortcut, right-click or long press.
+with a keyboard shortcut, right-click or long press.
 
 **To prevent the menu from being displayed**, set the
 `mf.menuItems` property to an empty array:
