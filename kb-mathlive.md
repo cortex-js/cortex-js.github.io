@@ -3284,7 +3284,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '{{SDK_VERSION}}';
+static version: string = '0.105.0';
 ```
 
 </MemberCard>
@@ -4019,8 +4019,7 @@ If `true`, provide audio and haptic feedback
 optional focus: boolean;
 ```
 
-If `true`, the mathfield will be focused after
-the insertion
+If `true`, the mathfield will be focused after the insertion
 
 </MemberCard>
 
@@ -4036,8 +4035,8 @@ The format of the input string:
 
 | | |
 |:------------|:------------|
-|`"auto"`| The string is LaTeX fragment or command) (default)|
-|`"latex"`| The string is a LaTeX fragment|
+|`"auto"`     | The string is a LaTeX fragment or command (default)|
+|`"latex"`    | The string is a LaTeX fragment|
 
 </MemberCard>
 
@@ -4071,8 +4070,7 @@ If `"auto"` or omitted, the current mode is used
 optional scrollIntoView: boolean;
 ```
 
-If `true`, scroll the mathfield into view after insertion such that the
-insertion point is visible
+If `true`, scroll the mathfield into view after insertion such that the insertion point is visible
 
 </MemberCard>
 
@@ -4084,15 +4082,14 @@ insertion point is visible
 optional selectionMode: "placeholder" | "after" | "before" | "item";
 ```
 
-Describes where the selection
-will be after the insertion:
+Describes where the selection will be after the insertion:
 
 | | |
 | :---------- | :---------- |
 |`"placeholder"`| The selection will be the first available placeholder in the text that has been inserted (default)|
-|`"after"`| The selection will be an insertion point after the inserted text|
-|`"before"`| The selection will be an insertion point before the inserted text|
-|`"item"`| The inserted text will be selected|
+|`"after"`      | The selection will be an insertion point after the inserted text|
+|`"before"`     | The selection will be an insertion point before the inserted text|
+|`"item"`       | The inserted text will be selected|
 
 </MemberCard>
 
@@ -4104,6 +4101,8 @@ will be after the insertion:
 optional silenceNotifications: boolean;
 ```
 
+If `true`, silence notifications during insertion
+
 </MemberCard>
 
 <MemberCard>
@@ -4113,6 +4112,8 @@ optional silenceNotifications: boolean;
 ```ts
 optional style: Style;
 ```
+
+The style applied to the inserted content
 
 </MemberCard>
 
@@ -8044,7 +8045,7 @@ const version: {
 };
 ```
 
-Current version: `{{SDK_VERSION}}`
+Current version: `0.105.0`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -15482,6 +15483,7 @@ hide_title: true
 ---
 
 
+
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" className="svg-settings">
   <defs>
     <linearGradient id="orange-gradient">
@@ -15512,6 +15514,8 @@ hide_title: true
     </linearGradient>
   </defs>
 </svg>
+
+
 
 
 
@@ -15968,12 +15972,19 @@ div.figure {
 
 `}</style>
 
+<HeroImage path="/img/hand-slugs.jpg" >
+# Mathfield
+</HeroImage>
+
+
 <div className="intro-copy">
   <p className="p1"><kbd>&lt;math-field&gt;</kbd></p>
   <p className="p2">The Math Editor for the Web</p>
   <hr/>
   <p className="p3">A flexible, powerful, and accessible way to write math on the web.</p>
   <hr/>
+
+
 
 <div>
   ```live

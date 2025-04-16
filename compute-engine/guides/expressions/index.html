@@ -8,8 +8,8 @@
 <link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
 <script>!function(){var e,o;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"//unpkg.com/mathlive?module","compute-engine":"//unpkg.com/@cortex-js/compute-engine?module"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://unpkg.com/mathlive/mathlive.min.js","https://unpkg.com/@ui-js/code-playground/dist/code-playground.js@module"]).forEach(((t,m)=>{const n=t.endsWith("@module"),c="script"+function(e,o=0){let t=3735928559^o,m=1103547991^o;for(let o=0;o<e.length;o++){const n=e.charCodeAt(o);t=Math.imul(t^n,2654435761),m=Math.imul(m^n,1597334677)}return t=Math.imul(t^t>>>16,2246822507),t^=Math.imul(m^m>>>13,3266489909),m=Math.imul(m^m>>>16,2246822507),m^=Math.imul(t^t>>>13,3266489909),4294967296*(2097151&m)+(t>>>0)}(t=t.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");n&&(d.type="module"),d.id=c,d.src=t,d.async=!1,o&&m===e.length-1&&(d.onload=o),document.head.appendChild(d)}))}()</script>
 <link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.6c2021c2.css">
-<script src="/assets/js/runtime~main.9f8610c4.js" defer="defer"></script>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.f0f4b271.css">
+<script src="/assets/js/runtime~main.3957003d.js" defer="defer"></script>
 <script src="/assets/js/main.14941f83.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -155,7 +155,9 @@ or string use the following boolean expressions:</p>
 <div class="symbols-table first-column-header"><table><thead><tr><th style="text-align:left">Kind</th><th style="text-align:left">Boolean Expression</th></tr></thead><tbody><tr><td style="text-align:left"><strong>Number</strong></td><td style="text-align:left"><code>expr.isNumberLiteral</code></td></tr><tr><td style="text-align:left"><strong>Symbol</strong></td><td style="text-align:left"><code>expr.symbol !== null</code></td></tr><tr><td style="text-align:left"><strong>Function</strong></td><td style="text-align:left"><code>expr.isFunctionExpression</code></td></tr><tr><td style="text-align:left"><strong>String</strong></td><td style="text-align:left"><code>expr.string !== null</code></td></tr></tbody></table></div>
 <p><strong>To access a the value of an expression as a JavaScript primitive</strong>, use
 <code>expr.value</code>. The result is a JavaScript primitive, such as a number, string or
-boolean.</p>
+boolean. When converting to a number, the result may have lost precision if the
+original expression had more than 15 digits of precision. Note that <code>expr.value</code>
+is equivalent to <code>expr.valueOf()</code>.</p>
 <p><strong>To access the value of an expression as a JavaScript number</strong>, use
 <code>expr.re</code>. The result is the real part of the number, as a JavaScript number,
 or <code>NaN</code> if the expression is not a number. Use <code>expr.im</code> to get the imaginary part.</p>

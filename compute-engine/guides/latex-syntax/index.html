@@ -8,8 +8,8 @@
 <link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
 <script>!function(){var e,o;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"//unpkg.com/mathlive?module","compute-engine":"//unpkg.com/@cortex-js/compute-engine?module"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://unpkg.com/mathlive/mathlive.min.js","https://unpkg.com/@ui-js/code-playground/dist/code-playground.js@module"]).forEach(((t,m)=>{const n=t.endsWith("@module"),c="script"+function(e,o=0){let t=3735928559^o,m=1103547991^o;for(let o=0;o<e.length;o++){const n=e.charCodeAt(o);t=Math.imul(t^n,2654435761),m=Math.imul(m^n,1597334677)}return t=Math.imul(t^t>>>16,2246822507),t^=Math.imul(m^m>>>13,3266489909),m=Math.imul(m^m>>>16,2246822507),m^=Math.imul(t^t>>>13,3266489909),4294967296*(2097151&m)+(t>>>0)}(t=t.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");n&&(d.type="module"),d.id=c,d.src=t,d.async=!1,o&&m===e.length-1&&(d.onload=o),document.head.appendChild(d)}))}()</script>
 <link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.6c2021c2.css">
-<script src="/assets/js/runtime~main.9f8610c4.js" defer="defer"></script>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.f0f4b271.css">
+<script src="/assets/js/runtime~main.3957003d.js" defer="defer"></script>
 <script src="/assets/js/main.14941f83.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -293,10 +293,24 @@ Compute Engine</p>
 <!-- -->// both arguments are integers.
 <!-- -->// ➔ [&quot;Rational&quot;, 1, 5]
 </div></code-playground>
-<div class="theme-admonition theme-admonition-caution admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</div><div class="admonitionContent_BuS1"><p>Do not modify the <code>ce.latexDictionary</code> array directly. Instead, create a new
-array that includes the entries from the default dictionary, and add your own
+<p><strong>To override an existing entry</strong>, create a new array that includes the
+default entries and add your own entry at the end of the array.</p>
+<p>Entries at the end of the array will override earlier entries. When parsing
+an expression, the first entry (starting at the bottom) whose trigger
+matches is selected.</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">ce.latexDictionary = [</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  ...ce.latexDictionary,</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  // The entry below will override the default entry for the `\times` command</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  {</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    latexTrigger: [&#x27;\\times&#x27;],</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    name: &#x27;CrossProduct&#x27;,</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    kind: &#x27;infix&#x27;,</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    associativity: &#x27;none&#x27;</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    precedence: 390,</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  },</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">];</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="theme-admonition theme-admonition-caution admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</div><div class="admonitionContent_BuS1"><p>Do not modify the <code>ce.latexDictionary</code> array, or the entries in the array,
+directly. Instead, create a new array that includes the entries from the <br>
+<!-- -->default dictionary, and add your own
 entries. Later entries will override earlier ones, so you can replace or
 modify existing entries by providing a new definition for them.</p></div></div>
+<p>The <code>precedence</code> property is used to determine the order of operations when parsing
+expressions, but it does not impact whether an entry is used for parsing. Only the
+<code>latexTrigger</code> or <code>identifierTrigger</code> properties are used to determine if an entry
+is used for parsing.</p>
+<p>Note that <code>latexTrigger</code> can be an array of tokens. However, the tokens
+are not interpreted as alternatives. The array is treated as a sequence of tokens
+that must be matched in order.</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="latex-dictionary-entries">LaTeX Dictionary Entries<a href="#latex-dictionary-entries" class="hash-link" aria-label="Direct link to LaTeX Dictionary Entries" title="Direct link to LaTeX Dictionary Entries">​</a></h3>
 <p>Each entry in the LaTeX dictionary is an object with the following properties:</p>
 <ul>

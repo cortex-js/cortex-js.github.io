@@ -12244,6 +12244,13 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### Breaking Changes
+
+- The `expr.value` property is now equivalent to `expr.valueOf()`. It was
+  previously equivalent to `expr.N().valueOf()`, however the implicit evaluation
+  of the expression produced some unexpected results, for example when the
+  expression was not pure.
+
 ### New Features and Improvements
 
 - Added a rule to solve the equation `a^x + b = 0`
@@ -15334,7 +15341,7 @@ export function MathJSONOutput({children}) {
 }
 
 
-<HeroImage path="/img/hero/math-json.jpg" >
+<HeroImage path="/img/hand-cube.jpg" >
 # MathJSON
 </HeroImage>
 
@@ -17799,13 +17806,12 @@ console.log('isEqual?', a.isEqual(b));
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.value === rhs.value`                | Equivalent to `lhs.N().isEqual(rhs.N())` |
 | `lhs.isSame(rhs)`                        | Structural equality                    |
 | `lhs.isEqual(rhs)`                       | Mathematical equality                  |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
-| `lhs.is(rhs)`                            | Synonym for `isSame()`                 |
-| `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `isEqual()`                |
-| `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `isSame()`                 |
+| `lhs.is(rhs)`                            | Synonym for `lhs.isSame(rhs)`, but the argument of `is()` can be a boolean or number.                 |
+| `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
+| `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
 
 </div>
 
@@ -18564,12 +18570,45 @@ console.log(ce.parse('\\smoll{1}{5}').json);
 // both arguments are integers.
 // ➔ ["Rational", 1, 5]
 ```
+
+
+**To override an existing entry**, create a new array that includes the
+default entries and add your own entry at the end of the array.
+
+Entries at the end of the array will override earlier entries. When parsing
+an expression, the first entry (starting at the bottom) whose trigger
+matches is selected.
+
+```
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  // The entry below will override the default entry for the `\times` command
+  {
+    latexTrigger: ['\\times'],
+    name: 'CrossProduct',
+    kind: 'infix',
+    associativity: 'none'
+    precedence: 390,
+  },
+];
+```
+
 :::caution
-Do not modify the `ce.latexDictionary` array directly. Instead, create a new
-array that includes the entries from the default dictionary, and add your own
+Do not modify the `ce.latexDictionary` array, or the entries in the array, 
+directly. Instead, create a new array that includes the entries from the \
+default dictionary, and add your own
 entries. Later entries will override earlier ones, so you can replace or
 modify existing entries by providing a new definition for them.
 :::
+
+The `precedence` property is used to determine the order of operations when parsing
+expressions, but it does not impact whether an entry is used for parsing. Only the 
+`latexTrigger` or `identifierTrigger` properties are used to determine if an entry
+is used for parsing.
+
+Note that `latexTrigger` can be an array of tokens. However, the tokens
+are not interpreted as alternatives. The array is treated as a sequence of tokens
+that must be matched in order.
 
 ### LaTeX Dictionary Entries
 
@@ -19420,11 +19459,6 @@ console.log(expr.N().value);
 // ➔ 0.5833333333333334
 ```
 
-Unlike the `.re` property, the `.value` property can also return a `boolean`,
-a `string`, depending on the value of the expression.
-
-
-
 The `value` property of a boxed expression can be used in JavaScript
 expressions.
 
@@ -19433,11 +19467,17 @@ const expr = ce.parse('1/3 + 1/4');
 console.log(expr.N().value + 1);
 ```
 
+
+Unlike the `.re` property, the `.value` property can also return a `boolean`
+or a `string`, depending on the value of the expression.
+
+
+
 **To get a boxed number from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
 const boxed = ce.box(1.5);
-console.log(boxed.N().value);
+console.log(boxed.value);
 ```
 
 
@@ -19560,7 +19600,7 @@ of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
 ```live
-const expr = ce.parse('3x^2+4x+2');
+const expr = ce.parse("3x^2+4x+2");
 
 for (let x = 0; x < 1; x += 0.01) {
   ce.assign('x', x);
@@ -19572,7 +19612,7 @@ You can also use `expr.subs()`, but this will create a brand new expression on
 each iteration, and will be much slower.
 
 ```live
-const expr = ce.parse('3x^2+4x+2');
+const expr = ce.parse("3x^2+4x+2");
 
 for (let x = 0; x < 1; x += 0.01) {
   console.log(`f(${x}) = ${expr.subs({ x }).evaluate()}`);
@@ -19584,16 +19624,16 @@ for (let x = 0; x < 1; x += 0.01) {
 ```live
 ce.assign("x", null);
 
-console.log(ce.parse('3x^2+4x+2').N());
+console.log(ce.parse("3x^2+4x+2").N());
 // ➔ "3x^2+4x+c"
 ```
 
 **To change the value of a variable** set its `value` property:
 
 ```ts
-ce.symbol('x').value = 5;
+ce.symbol("x").value = 5;
 
-ce.symbol('x').value = undefined;
+ce.symbol("x").value = undefined;
 ```
 
 
@@ -20603,7 +20643,7 @@ description: The Compute Engine is a JavaScript/TypeScript library for symbolic 
 sidebar_class_name: "compass-icon"
 ---
 
-<HeroImage path="/img/hero/compute-engine.jpg" >
+<HeroImage path="/img/hand-gears.jpg" >
 # Compute Engine
 </HeroImage>
 
@@ -21380,7 +21420,11 @@ or string use the following boolean expressions:
 
 **To access a the value of an expression as a JavaScript primitive**, use
 `expr.value`. The result is a JavaScript primitive, such as a number, string or
-boolean.
+boolean. When converting to a number, the result may have lost precision if the
+original expression had more than 15 digits of precision. Note that `expr.value`
+is equivalent to `expr.valueOf()`.
+
+
 
 **To access the value of an expression as a JavaScript number**, use
 `expr.re`. The result is the real part of the number, as a JavaScript number, 
