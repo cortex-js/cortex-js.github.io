@@ -570,7 +570,7 @@ property.
 
 ```js
 MathfieldElement.soundsDirectory = 
-  "https://unpkg.com/mathlive/sounds/";
+  "https://cdn.jsdelivr.net/npm/mathlive/sounds/";
 ```
 
 Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
@@ -636,7 +636,7 @@ property.
 
 :::js
 await window.customElements.whenDefined("math-field");
-MathfieldElement.fontsDirectory = "https://unpkg.com/mathlive/fonts/";
+MathfieldElement.fontsDirectory = "https://cdn.jsdelivr.net/npm/mathlive/fonts/";
 
 
 :::html
@@ -1907,7 +1907,7 @@ If the Compute Engine library is available, return a boxed MathJSON expression r
 
 To load the Compute Engine library, use:
 ```js
-import 'https://unpkg.com/@cortex-js/compute-engine?module';
+import 'https://esm.run/@cortex-js/compute-engine';
 ```
 
 </MemberCard>
@@ -1948,7 +1948,7 @@ The format of the result. If using `math-json`
 the Compute Engine library must be loaded, for example with:
 
 ```js
-import "https://unpkg.com/@cortex-js/compute-engine?module";
+import "https://esm.run/@cortex-js/compute-engine";
 ```
 
 **Default:** `"latex"`
@@ -3284,7 +3284,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.0';
+static version: string = '0.105.2';
 ```
 
 </MemberCard>
@@ -3359,7 +3359,7 @@ set static fontsDirectory(value: string): void
 A URL fragment pointing to the directory containing the fonts
 necessary to render a formula.
 
-These fonts are available in the `/dist/fonts` directory of the SDK.
+These fonts are available in the `/fonts` directory of the npm package.
 
 Customize this value to reflect where you have copied these fonts,
 or to use the CDN version.
@@ -4199,7 +4199,7 @@ type OutputFormat =
   To use the`"math-json"` format the Compute Engine library must be loaded. Use for example:
 
 ```js
-import "https://unpkg.com/@cortex-js/compute-engine?module";
+import "https://esm.run/@cortex-js/compute-engine";
 ```
   *
 
@@ -7701,7 +7701,10 @@ To render a specific element, use [`renderMathInElement()`](#rendermathinelement
 #### Example
 
 ```ts
-import { renderMathInDocument } from 'https://unpkg.com/mathlive?module';
+import { renderMathInDocument } from 'https://esm.run/mathlive';
+// Alternatively, you can use the **unpkg** CDN to load the library
+// import { renderMathInDocument } from 'https://unpkg.com/mathlive?module';
+
 renderMathInDocument();
 ```
 
@@ -7732,7 +7735,7 @@ the ID of an element.
 #### Example
 
 ```ts
-import { renderMathInElement } from 'https://unpkg.com/mathlive?module';
+import { renderMathInElement } from 'https://esm.run/mathlive';
 renderMathInElement("formula");
 ```
 
@@ -7908,7 +7911,16 @@ to the `<head>` of the document:
 ```html
 <link
  rel="stylesheet"
- href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+ href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
+/>
+```
+
+or
+
+```html
+<link
+ rel="stylesheet"
+ href="https://unpkg.com/mathlive/mathlive-static.css"
 />
 ```
 
@@ -8045,7 +8057,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.0`
+Current version: `0.105.2`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8068,7 +8080,7 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.105.1 _2025-04-18_
 
 ### Resolved Issues
 
@@ -8076,7 +8088,6 @@ import ChangeLog from '@site/src/components/ChangeLog';
   displayed correctly.
 - **#2567** Avoid potential race condition when changing the focus of the
   mathfield.
-- Additional Italian localized strings.
 - **#2638**, **#2479** Fragments that were styled with some color were not
   rendered correctly when the mathfield was not focused.
 - **#2669** If a page had multiple mathfields, when using the suggestion
@@ -8945,7 +8956,7 @@ end of your document, or in a `DOMContentLoaded` event handler.
 ```html
 <script defer type="module">
   window.addEventListener('DOMContentLoaded', () => 
-    import('//unpkg.com/mathlive?module').then((mathlive) => 
+    import('https://esm.run/mathlive').then((mathlive) => 
       mathlive.renderMathInDocument()
     )
   );
@@ -10006,8 +10017,17 @@ Let's add an editable mathfield to a web page.
 **1. Load the Mathfield library from a CDN with a `<script>` tag.**
 
 ```html
-<script defer src="//unpkg.com/mathlive"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 ```
+
+
+Alternatively, you can use the **unpkg** CDN to load the module:
+
+```html
+<script defer src="https://unpkg.com/mathlive"></script>
+```
+
+
 
 **2. Add a `<math-field>` tag.** The content of this tag is the initial value 
 of the mathfield, as a LaTeX expression.
@@ -10059,7 +10079,7 @@ Here's a complete web page using a `<math-field>` in vanilla HTML:
 <head>
   <meta charset="utf-8" />
   <title>untitled</title>
-  <script defer src="//unpkg.com/mathlive"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
 
 <body>
@@ -10081,7 +10101,7 @@ Here's a complete web page using a `<math-field>` in vanilla HTML:
 **To use mathfields in a React project**, use a `<math-field>` tag with JSX:
 
 ```js
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export View = () => {
@@ -10413,7 +10433,7 @@ The [MathJSON](/math-json) format is a lightweight mathematical notation interch
 The Compute Engine is a JavaScript library that can perform
 mathematical operations on MathJSON expressions.
 
-**To use the Compute Engine**, import the Compute Engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` 
+**To use the Compute Engine**, import the Compute Engine library, e.g. `import "https://esm.run/@cortex-js/compute-engine"` 
 
 
 If the Compute Engine has been loaded in the page, mathfields will automatically
@@ -11524,8 +11544,8 @@ Let's start by setting up our HTML file.
 </body>
 <script type="module">
   // Import the Mathfield and Compute Engine libraries
-  import "//unpkg.com/mathlive?module";
-  import "//unpkg.com/@cortex-js/compute-engine";
+  import "https://esm.run/mathlive";
+  import "https://esm.run/@cortex-js/compute-engine";
   
   // JavaScript code will be added here
 
@@ -11534,7 +11554,7 @@ Let's start by setting up our HTML file.
 ```
 
 For convenience, we're loading the MathLive and ComputeEngine library from 
-the **unpkg** CDN. You can also download the libraries and host them locally.
+the **jsdelivr** CDN. You can also download the libraries and host them locally.
 
 Since we want to use the Compute Engine, we'll need to load its library as well.
 We could use MathLive without the Compute Engine, but we'll need it to evaluate
@@ -11730,7 +11750,7 @@ We also need to load a CSS stylesheet to render the math. We can use the
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/mathlive/mathlive-static.css"
+  href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
 />
 ```
 
@@ -11758,7 +11778,7 @@ math in the page.
 Note that we need to modify our `import` statement to import the `convertLatexToMarkup()` function.
 
 ```javascript
-import { renderMathInElement, convertLatexToMarkup } from "//unpkg.com/mathlive?module";
+import { renderMathInElement, convertLatexToMarkup } from "https://esm.run/mathlive";
 ```
 
 
@@ -11813,7 +11833,7 @@ Here's the complete code for our quiz application:
     <title>Math Quiz</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/mathlive/mathlive-static.css"
+      href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
     />
     <style>
       math-field {
@@ -11854,8 +11874,8 @@ Here's the complete code for our quiz application:
     <div id="feedback"></div>
 </body>
 <script type="module">
-  import { convertLatexToMarkup } from "//unpkg.com/mathlive?module";
-  import "//unpkg.com/@cortex-js/compute-engine";
+  import { convertLatexToMarkup } from "https://esm.run/mathlive";
+  import "https://esm.run/@cortex-js/compute-engine";
   const ce = MathfieldElement.computeEngine;
   const question = generateRandomQuestion();
   const expectedAnswer = question.simplify();
@@ -11921,7 +11941,7 @@ A mathfield behaves as a regular DOM element:
 **To use a mathfield with React**, import the MathLive library and use a `<math-field>` tag.
 
 ```jsx
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export default function App() {
@@ -11957,7 +11977,7 @@ declare global {
 }
 
 
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export default function App({children}) {
@@ -12006,7 +12026,7 @@ etc...). See [MathfieldElement](/docs/mathfield/#(MathfieldElement%3Aclass)).
 
 ```jsx
 import "./App.css";
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState, useEffect, useRef } from "react";
 
 export default function App({children}) {
@@ -14282,16 +14302,12 @@ to use mathfield APIs in your project.
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a
-   CDN URL for MathLive, such as `//unpkg.com/mathlive?module`. If your
+   CDN URL for MathLive, such as `https://esm.run/mathlive`. If your
    target browser supports it, you can also use the `import()` function for a
    dynamic import.
 
-:::info[Note]
-The `?module` suffix indicates to the CDN we need the ESM (module) version of
-MathLive, not the UMD version.
-:::
 
-1. Invoke a mathfield API, such as `renderMathInDocument()`.
+3. Invoke a mathfield API, such as `renderMathInDocument()`.
 
 With this setup one or more stylesheets will be dynamically inserted in
 the page, as needed, for example when a mathfield is created. The required 
@@ -14304,7 +14320,7 @@ fonts will be automatically downloaded from the CDN as well.
     <p>$$\frac{\pi}{2}$$</p>
     <script type="module">
       window.addEventListener("DOMContentLoaded", () =>
-        import("//unpkg.com/mathlive?module").then((mathlive) =>
+        import("https://esm.run/mathlive").then((mathlive) =>
           mathlive.renderMathInDocument(),
         ),
       );
@@ -14375,7 +14391,7 @@ A few things to note:
 <html>
   <body>
     <p>$$\frac{\pi}{2}$$</p>
-    <script src="https://unpkg.com/mathlive"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
     <script>
       window.addEventListener("DOMContentLoaded", () =>
         MathLive.renderMathInDocument(),
@@ -14397,7 +14413,7 @@ console.log(MathfieldElement.version);
 
 If you need to incorporate the library files directly into your project
 (for example if you are building a standalone application), you can obtain
-those files either from npm (see above) or from a CDN, for example [https://unpkg.com/mathlive/](https://unpkg.com/mathlive/)
+those files directly from npm (see above).
 
 The `.mjs` suffix indicates ESM/module versions. The `.min` tag
 indicates a "minified" version. The ones without `.min` are more legible
@@ -14543,7 +14559,7 @@ formula once the markup has been generated.
 <head>
   <link
     rel="stylesheet"
-    href="https://unpkg.com/mathlive/mathlive-static.css"
+    href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
   />
 </head>
 <html>
@@ -14551,7 +14567,7 @@ formula once the markup has been generated.
     <div id="formula"></div>
     <script type="module">
       window.addEventListener("DOMContentLoaded", () =>
-        import("https://unpkg.com/mathlive?module").then((mathlive) => {
+        import("https://esm.run/mathlive").then((mathlive) => {
           document.getElementById("formula").innerHTML =
             mathlive.convertLatexToMarkup(
               `\\xrightarrow[\\Delta]{\\text{abcd}}`,
