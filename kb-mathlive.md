@@ -2303,7 +2303,7 @@ set minFontScale(value: number): void
 ```
 
 Set the minimum relative font size for nested superscripts and fractions. The value
-should be a number between `0` and `1`. The size is in releative `em` units relative to the
+should be a number between `0` and `1`. The size is in relative `em` units relative to the
 font size of the `math-field` element. Specifying a value of `0` allows the `math-field`
 to use its default sizing logic.
 
@@ -3284,7 +3284,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.2';
+static version: string = '0.105.3';
 ```
 
 </MemberCard>
@@ -8057,7 +8057,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.2`
+Current version: `0.105.3`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8082,10 +8082,25 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### New Features
+
+- Export to **typst** format. Use `mf.getValue("typst")` to get the value of the
+  mathfield in typst format.
+
+### Resolved Issues
+
+- The commands `\iff`, `\Coloneqq` and `\hArr` did not render correctly.
+
+## 0.105.3 _2025-05-14_
+
 ### Resolved Issues
 
 - Using the kebab version of commands (for example `"select-all"` instead of
   `"SelectAll"`) would incorrectly result in a runtime error.
+
+- Using a padding with an `\enclose` command would not render the padding
+  correctly. To specify some padding, use
+  `\enclose{updiagonalstrike downdiagonalstrike}[padding="10px", 6px solid rgba(205, 0, 11, .4)]{42}`.
 
 ## 0.105.1 _2025-04-18_
 
@@ -13615,7 +13630,7 @@ and `Magenta`. Those names are case-sensitive.
 
 Mathfields support some commands from the [MathJax HTML extension](http://docs.mathjax.org/en/latest/input/tex/extensions/html.html).
 
-#### `\class`
+#### `\class{className}{expression}`
 
 <Latex value="\class{custom-CSS-class}{x+1}"/>
 
@@ -13635,7 +13650,7 @@ stylesheet defined with a `<style>` tag inside the `<math-field>` element.
 </math-field>
 ```
 
-#### `\cssId`
+#### `\cssId{id}{expression}`
 
 Apply an element ID to the expression. The element can then be styled using CSS.
 
@@ -13654,7 +13669,7 @@ Apply an element ID to the expression. The element can then be styled using CSS.
 <Latex value="\cssId{custom-CSS-class}{\text{Don Knuth}}"/>
 
 
-#### `\htmlData`
+#### `\htmlData{key=value,...}{content}`
 
 The argument of this command is a comma-delimited list of key/value pairs, e.g. 
 `\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
@@ -13663,23 +13678,35 @@ The argument of this command is a comma-delimited list of key/value pairs, e.g.
 <Latex value="\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }"/>
  
 
+ #### `\href{url}{content}`
+
+
+The first argument is a URL, the second argument is the content to display, in math mode.
+
+```html example
+<math-field>
+  \href{https://cortexjs.io}{\text{CortexJS website}}
+</math-field>
+```
+
+
 ### Other Extensions
 
-#### `\error`
+#### `\error{content}`
 
 The argument of this command is a string that will be rendered with a red
 background and a red underline.
 
 <Latex value="\text{Don \error{\text{Knuht}}}"/>
 
-#### `\texttip`
+#### `\texttip{expression}{hover text}`
 
 The first argument is a math expression to display, the second argument is the text to
 display on hover.
 
 <Latex value="\texttip{e^{i\pi}-1=0}{The most beautiful equation}"/>
 
-#### `\mathtip`
+#### `\mathtip{expression}{hover text}`
 
 The first argument is a math expression to display, the second argument is the 
 a math expression to display on hover.

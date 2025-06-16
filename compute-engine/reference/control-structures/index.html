@@ -9,7 +9,7 @@
 <script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground/dist/code-playground.min.js@module"]).forEach(((o,n)=>{const m=o.endsWith("@module"),d="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(d))return;const i=document.createElement("script");m&&(i.type="module"),i.id=d,i.src=o,i.async=!1,t&&n===e.length-1&&(i.onload=t),document.head.appendChild(i)}))}()</script>
 <link rel="preconnect" href="https://rsms.me/">
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.6601237f.css">
-<script src="/assets/js/runtime~main.ea3d653c.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.6cb99537.js" defer="defer"></script>
 <script src="/assets/js/main.904899a8.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -60,9 +60,9 @@ in JavaScript. It is somewhat similar to a <code>Do[...]</code> in Mathematica.<
 <em>max-iterations</em>)</p><p>Assumes <code>body</code>is an expression using an implicit argument <code>_</code>.</p><p>Apply <code>body</code>to <code>initial-value</code>, then apply <code>body</code>to the result until the result
 no longer changes.</p><p>To determine if a fixed point has been reached and the loop should terminate,
 the previous and current values are compared with <code>Equal</code>.</p><p>Inside <code>body</code>, use a <code>[&quot;Break&quot;]</code> expression to exit the loop immediately or
-<code>Return</code> to exit the enclosing <code>[&quot;Function&quot;]</code> expression.</p><div class="readMore_KWn8"><a href="/compute-engine/reference/collections/#Fold"><p>See also the <strong><code>Fold</code> function</strong> which operates on a collection</p></a></div></div>
+<code>Return</code> to exit the enclosing <code>[&quot;Function&quot;]</code> expression.</p><div class="readMore_KWn8"><a href="/compute-engine/reference/collections/#reduce"><p>See also the <strong><code>Reduce</code> function</strong> which operates on a collection</p></a></div></div>
 <div class="readMore_KWn8"><a href="/compute-engine/reference/statistics/"><p>Read more about the <code>Product</code> and <code>Sum</code> functions which are specialized version of loops.</p></a></div>
-<div class="readMore_KWn8"><a href="/compute-engine/reference/collections/"><p>Read more about operations on collection such as <code>Map</code> and <code>Fold</code> which are functional
+<div class="readMore_KWn8"><a href="/compute-engine/reference/collections/"><p>Read more about operations on collection such as <code>Map</code> and <code>Reduce</code> which are functional
 programming constructs that can be used to replace loops.</p></a></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="controlling-the-flow-of-execution">Controlling the Flow of Execution<a href="#controlling-the-flow-of-execution" class="hash-link" aria-label="Direct link to Controlling the Flow of Execution" title="Direct link to Controlling the Flow of Execution">​</a></h2>
 <p><strong>To exit a function</strong>, use <code>Return</code>.</p>
