@@ -14009,7 +14009,7 @@ account for those notations.
 The Compute Engine includes a standard library of functions and symbols which
 can be extended with custom libraries.
 
-<ReadMore path="/compute-engine/guides/standard-library/">
+<ReadMore path="/compute-engine/standard-library/">
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -16067,7 +16067,7 @@ title: Custom Functions and Symbols
 slug: /compute-engine/guides/augmenting/
 ---
 
-The [MathJSON Standard Library](/compute-engine/guides/standard-library/) is a
+The [MathJSON Standard Library](/compute-engine/standard-library/) is a
 collection of definitions for **symbols** such as `Pi`, `Add`,
 `Sin`, `Power`, `List`, etc...
 
@@ -18560,7 +18560,7 @@ value is smaller than the tolerance will be considered equal to 0.
 ## Numeric Functions
 
 The topics below from the
-[MathJSON Standard Library](/compute-engine/guides/standard-library/) can provide numeric
+[MathJSON Standard Library](/compute-engine/standard-library/) can provide numeric
 evaluations for their numeric functions:
 
 <div className="symbols-table" style={{"--first-col-width":"16ch"}}>
@@ -19943,7 +19943,7 @@ function is a method of the `BoxedExpression` class.
 
 
 
-<ReadMore path="/compute-engine/guides/standard-library/" >
+<ReadMore path="/compute-engine/standard-library/" >
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 
