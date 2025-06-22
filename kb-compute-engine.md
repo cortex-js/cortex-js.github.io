@@ -235,6 +235,9 @@ slug: /compute-engine/reference/complex/
 
 ## Functions
 
+<div style={{visibility:"hidden"}}>
+### Real
+</div>
 <FunctionDefinition name="Real">
 
 <Signature name="Real">_z_</Signature>
@@ -250,6 +253,9 @@ Evaluate to the real part of a complex number.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Imaginary
+</div>
 <FunctionDefinition name="Imaginary">
 
 <Signature name="Imaginary">_z_</Signature>
@@ -269,6 +275,9 @@ imaginary part is zero.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Conjugate
+</div>
 <FunctionDefinition name="Conjugate">
 
 <Signature name="Conjugate">_z_</Signature>
@@ -289,6 +298,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Abs
+</div>
 <FunctionDefinition name="Abs">
 
 <Signature name="Abs">_z_</Signature>
@@ -313,6 +325,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Arg
+</div>
 <FunctionDefinition name="Arg">
 
 <Signature name="Arg">_z_</Signature>
@@ -336,6 +351,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### AbsArg
+</div>
 <FunctionDefinition name="AbsArg">
 
 <Signature name="AbsArg">_z_</Signature>
@@ -356,6 +374,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### ComplexRoots
+</div>
 <FunctionDefinition name="ComplexRoots">
 
 <Signature name="ComplexRoots">_z_, _n_</Signature>
@@ -10226,6 +10247,9 @@ An `["Assume"]` expression is used to assert a predicate about an expression. It
 used to provide additional information to the system, for example to indicate
 that a variable is positive.
 
+<div style={{visibility:"hidden"}}>
+### Declare
+</div>
 <FunctionDefinition name="Declare">
 
 <Signature name="Declare">_symbol_, _type__</Signature>
@@ -10252,6 +10276,9 @@ since it changes the state of the Compute Engine.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Assign
+</div>
 <FunctionDefinition name="Assign">
 
 <Signature name="Assign">_symbol_, _value_</Signature>
@@ -10277,6 +10304,9 @@ This is equivalent to `=` in may programming languages.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Assume
+</div>
 <FunctionDefinition name="Assume">
 
 <Signature name="Assume">_predicate_</Signature>
@@ -10306,6 +10336,9 @@ The following functions can be applied to non-canonical expressions.
 The do not depend on the canonical form, but reflect the structure of the
 expression.
 
+<div style={{visibility:"hidden"}}>
+### About
+</div>
 <FunctionDefinition name="About">
 
 <Signature name="About">_symbol__</Signature>
@@ -10316,6 +10349,9 @@ such as its type, its attributes, its value, etc...
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Head
+</div>
 <FunctionDefinition name="Head">
 
 <Signature name="Head">_expression_</Signature>
@@ -10330,6 +10366,9 @@ Evaluate to the head of _expression_
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Tail
+</div>
 <FunctionDefinition name="Tail">
 
 <Signature name="Tail">_expression_</Signature>
@@ -10353,6 +10392,9 @@ Evaluate to a sequence of the arguments of _expression_.
 
 
 
+<div style={{visibility:"hidden"}}>
+### Hold
+</div>
 <FunctionDefinition name="Hold">
 
 <Signature name="Hold">_expression_</Signature>
@@ -10361,6 +10403,9 @@ Tag an expression that should be kept in an unevaluated form
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Identity
+</div>
 <FunctionDefinition name="Identity">
 
 <Signature name="Identity">_expression_</Signature>
@@ -10379,6 +10424,9 @@ as an argument and returns a function).
 The following functions can be used to obtain information about an expression.
 
 
+<div style={{visibility:"hidden"}}>
+### Domain
+</div>
 <FunctionDefinition name="Domain">
 
 <Signature name="Domain">_expression_</Signature>
@@ -10394,6 +10442,9 @@ Evaluate to the domain of _expression_
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### IsSame
+</div>
 <FunctionDefinition name="IsSame">
 
 <Signature name="IsSame">_expression1_, _expression2_</Signature>
@@ -10420,6 +10471,9 @@ as the `Equal` function.
 
 ## Transforming an Expression
 
+<div style={{visibility:"hidden"}}>
+### Evaluate
+</div>
 <FunctionDefinition name="Evaluate">
 
 <Signature name="Evaluate">_expression_</Signature>
@@ -10434,6 +10488,9 @@ Read more about [exact calculations and approximate calculations](/compute-engin
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Expand
+</div>
 <FunctionDefinition name="Expand">
 
 <Signature name="Expand">_expression_</Signature>
@@ -10452,6 +10509,9 @@ For example: `a(b + c) = ab + ac`
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### ExpandAll
+</div>
 <FunctionDefinition name="ExpandAll">
 
 <Signature name="ExpandAll">_expression_</Signature>
@@ -10466,6 +10526,9 @@ Expand an expression, recursively.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Factor
+</div>
 <FunctionDefinition name="Factor">
 
 <Signature name="Factor">_expression_</Signature>
@@ -10480,6 +10543,9 @@ Factor an expression.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Together
+</div>
 <FunctionDefinition name="Together">
 
 <Signature name="Together">_expression_</Signature>
@@ -10494,6 +10560,9 @@ Combine the terms of a sum of fractions into a single fraction.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Simplify
+</div>
 <FunctionDefinition name="Simplify">
 
 <Signature name="Simplify">_expression_</Signature>
@@ -10504,6 +10573,9 @@ in order to reduce, simplify and calculate its value.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### CanonicalForm
+</div>
 <FunctionDefinition name="CanonicalForm">
 
 <Signature name="CanonicalForm">_expression_</Signature>
@@ -10624,6 +10696,9 @@ const correct = ce.parse(mf.value, {canonical: "Order"})
 
 
 
+<div style={{visibility:"hidden"}}>
+### N
+</div>
 <FunctionDefinition name="N">
 
 <Signature name="N">_expression_</Signature>
@@ -10641,6 +10716,9 @@ Evaluate to a numerical approximation of the expression.
 
 ## Core Functions
 
+<div style={{visibility:"hidden"}}>
+### Error
+</div>
 <FunctionDefinition name="Error">
 
 <Signature name="Error">_error-code_, _context_</Signature>
@@ -10656,6 +10734,9 @@ about the error.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### InverseFunction
+</div>
 <FunctionDefinition name="InverseFunction">
 
 <Signature name="InverseFunction">_symbol_</Signature>
@@ -10673,6 +10754,9 @@ as an argument and returns a function).
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### String
+</div>
 <FunctionDefinition name="String">
 
 <Signature name="String">_expression_</Signature>
@@ -10688,6 +10772,9 @@ strings
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Symbol
+</div>
 <FunctionDefinition name="Symbol">
 
 <Signature name="Symbol">_expression_</Signature>
@@ -10712,6 +10799,9 @@ use `Declare`.
 
 ## Parsing and Serializing Latex
 
+<div style={{visibility:"hidden"}}>
+### Parse
+</div>
 <FunctionDefinition name="Parse">
 
 <Signature name="Parse">_string_</Signature>
@@ -10727,6 +10817,9 @@ corresponding to the LaTeX string.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Latex
+</div>
 <FunctionDefinition name="Latex">
 
 <Signature name="Latex">_expression_</Signature>
@@ -10734,6 +10827,9 @@ corresponding to the LaTeX string.
 Evaluate to a `LatexString` which is the expression serialized to LaTeX
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### LatexString
+</div>
 <FunctionDefinition name="LatexString">
 
 <Signature name="LatexString">_string_</Signature>
@@ -10825,6 +10921,15 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
 
 - Numeric approximations of integrals is several order of magnitude faster.
 
+- Added **Number Theory** functions: `Totient`, `Sigma0`, `Sigma1`,
+  `SigmaMinus1`, `IsPerfect`, `Eulerian`, `Stirling`, `NPartition`,
+  `IsTriangular`, `IsSquare`, `IsOctahedral`, `IsCenteredSquare`, `IsHappy`,
+  `IsAbundant`.
+
+- Added **Combinatorics** functions: `Choose`, `Fibonacci`, `Binomial`,
+  `CartesianProduct`, `PowerSet`, `Permutations`, `Combinations`, `Multinomial`,
+  `Subfactorial` and `BellNumber`.
+
 - The `symbol` type can be refined to match a specific symbol. For example
   `symbol<True>`. The type `expression` can be refined to match expressions with
   a specific operator, for example `expression<Add>` is a type that matches
@@ -10851,27 +10956,27 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
 - The Power canonical-form is less aggressive - only carrying-out ops. as listed
   in doc. - is much more careful in its consideration of operand types &
   values... (for example, typically, exponents are required to be _numbers_:
-  e.g. `x^1` will simplify, but `x^y` (where y===0), or `x^{1+0}`, will not)
+  e.g. `x^1` will simplify, but `x^y` (where `y===0`), or `x^{1+0}`, will not)
 
 ### Issues Resolved
 
 - Ensure expression LaTeX serialization is based on MathJSON generated with
-  matching 'pretty' formatting (or not), therefore resulting in LaTeX with less
-  prettification, where `prettify == false` (#daef87f)
+  matching "pretty" formatting (or not), therefore resulting in LaTeX with less
+  prettification, where `prettify === false` (#daef87f)
 
-- Symbols declare with a `constant` flag are now not marked as 'inferred'
+- Symbols declare with a `constant` flag are now not marked as "inferred"
 
-- Some BoxedSymbols properties now more consistently return 'undefined', instead
-  of a 'boolean' (i.e. because the symbol is non-bound)
+- Some `BoxedSymbols` properties now more consistently return `undefined`,
+  instead of a `boolean` (i.e. because the symbol is non-bound)
 
 - Some `expr.root()` computations
 
 - Canonical-forms
   - Fixes the `Number` form
-  - Forms (at least, 'Number', 'Power') do not mistakenly _fully_ canonicalize
+  - Forms (at least, `Number`, `Power`) do not mistakenly _fully_ canonicalize
     operands
   - This (partial canonicalization) now substitutes symbols (constants) with a
-    `holdUntil` value of _never_ during/prior-to canonicalization (i.e. just
+    `holdUntil` value of `"never"` during/prior-to canonicalization (i.e. just
     like for full canonicalization)
 
 ## 0.29.1 _2025-03-31_
@@ -14989,7 +15094,7 @@ Symbolic **indefinite integral** of a function $$ f $$ with respect to a variabl
 ```
 
 
-<Signature name="Integrate" return="function">_f_: function, ..._limits_:tuple</Signature>
+<Signature name="Integrate" returns="function">_f_: function, ..._limits_:tuple</Signature>
 
 A **definite integral** of a function $$ f $$. The function is evaluated
 symbolically as: 
@@ -15531,7 +15636,7 @@ triplets. Tensors are also represented as nested lists.
 
 The Compute Engine provides a number of functions for working with matrices.
 
-### Representing Matrices
+## Representing Matrices
 
 Vectors (row vectors) are represented as lists, that is an expression with the 
 head `List`.
@@ -15564,6 +15669,9 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 `\`.
 
 
+<div style={{visibility:"hidden"}}>
+### Vector
+</div>
 <FunctionDefinition name="Vector">
 
 <Signature name="Vector">_x-1_, ..._x-2_</Signature>
@@ -15591,6 +15699,9 @@ A row vector can be represented with a simple list or a tuple.
 
 
 
+<div style={{visibility:"hidden"}}>
+### Matrix
+</div>
 <FunctionDefinition name="Matrix">
 
 <Signature name="Matrix">_matrix_</Signature>
@@ -15645,6 +15756,9 @@ columns and `:` indicate a dashed lines between two columns.
 ## Matrix Properties
 
 
+<div style={{visibility:"hidden"}}>
+### Shape
+</div>
 <FunctionDefinition name="Shape">
 
 <Signature name="Shape">_matrix_</Signature>
@@ -15674,6 +15788,9 @@ used to refer to the length of a matrix along a specific axis.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Rank
+</div>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_matrix_</Signature>
@@ -15704,6 +15821,9 @@ The rank is the length of the shape of the tensor.
 
 ## Accessing the content of Tensors
 
+<div style={{visibility:"hidden"}}>
+### At
+</div>
 <FunctionDefinition name="At">
 
 <Signature name="At">_matrix_, _index-1_, _index-2_, ...</Signature>
@@ -15748,6 +15868,9 @@ square brackets following a matrix.
 
 ## Transforming Matrixes
 
+<div style={{visibility:"hidden"}}>
+### Flatten
+</div>
 <FunctionDefinition name="Flatten">
 
 <Signature name="Flatten">_matrix_</Signature>
@@ -15772,6 +15895,9 @@ are flattened.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Reshape
+</div>
 <FunctionDefinition name="Reshape">
 
 <Signature name="Reshape">_matrix_, _shape_</Signature>
@@ -15808,6 +15934,9 @@ with zeros.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Transpose
+</div>
 <FunctionDefinition name="Transpose">
 
 <Signature name="Transpose">_matrix_</Signature>
@@ -15829,6 +15958,9 @@ indexes start at 1.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### ConjugateTranspose
+</div>
 <FunctionDefinition name="ConjugateTranspose">
 
 <Signature name="ConjugateTranspose">_matrix_</Signature>
@@ -15853,6 +15985,9 @@ of the tensor are conjugated.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Inverse
+</div>
 <FunctionDefinition name="Inverse">
 
 <Signature name="Inverse">_matrix_</Signature>
@@ -15868,6 +16003,9 @@ Returns the inverse of the matrix.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PseudoInverse
+</div>
 <FunctionDefinition name="PseudoInverse">
 
 <Signature name="PseudoInverse">_matrix_</Signature>
@@ -15883,6 +16021,9 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 
 </FunctionDefinition>
   
+<div style={{visibility:"hidden"}}>
+### Diagonal
+</div>
 <FunctionDefinition name="Diagonal">
 
 <Signature name="Diagonal">_matrix_</Signature>
@@ -15900,6 +16041,9 @@ on the diagonal of the matrix.
 ## Calculating with Matrixes
 
 
+<div style={{visibility:"hidden"}}>
+### Determinant
+</div>
 <FunctionDefinition name="Determinant">
 
 <Signature name="Determinant">_matrix_</Signature>
@@ -15915,6 +16059,9 @@ Returns the determinant of the matrix.
 
 
 
+<div style={{visibility:"hidden"}}>
+### AdjugateMatrix
+</div>
 <FunctionDefinition name="AdjugateMatrix">
 
 <Signature name="AdjugateMatrix">_matrix_</Signature>
@@ -15938,6 +16085,9 @@ the element.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Trace
+</div>
 <FunctionDefinition name="Trace">
 
 <Signature name="Trace">_matrix_</Signature>
@@ -18665,7 +18815,9 @@ The Compute Engine uses a type system to ensure that operations are
 performed on the correct types of values. 
 
 A type is represented by a **type expression**, which is a string with 
-a specific syntax. For example:
+a specific syntax. 
+
+For example:
 
 - `"integer"`
 - `"boolean"`
@@ -18703,7 +18855,10 @@ ce.parse("n").type;
 // ➔ "integer"
 ```
 
+
 ## Type Hierarchy
+
+
 
 The type system is based on the concept of **subtyping**, which allows for
 a hierarchy of types, where a type can be a subtype of another type. This
@@ -18733,7 +18888,8 @@ any
         └── collection
             ├── tuple
             ├── set
-            ├── map
+            ├── dictionary
+                └── record
             └── list
                 └── tensor
                     ├── vector
@@ -18743,11 +18899,45 @@ any
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
 non-finite distinction for the numeric types.
 
+This hierarchy allows the Compute Engine to reason about compatibility and subtyping relationships between expressions.
+
 The `unknown` type is a placeholder for an expression whose type has not yet 
 been determined, typically during type inference or partial evaluation. It is 
 compatible with all types, and all types are compatible with it. It serves as 
 a wildcard in type matching and can be replaced or refined as more information 
 becomes available.
+
+<div style={{visibility:"hidden"}}>
+<a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
+</div>
+
+:::info **Naming Constraints for Elements and Arguments**
+
+Element names (used in tuples, records, dictionaries) and function argument names must:
+
+- start with a letter or underscore
+- contain only letters, digits, or underscores
+
+If a name does not follow these rules, it must be enclosed in backticks.
+
+For example:
+
+``tuple<`1st`: integer, `2nd`: integer, `3rd`: integer>``
+
+``record<`durée`: number, vitesse: number>``
+
+``(`直径`: number) -> number``
+
+
+The backticks are not part of the name, they are used to escape the name.
+
+In the unlikely event that the name contains a backtick, it must be escaped with a backslash:
+
+``record<`name\`with\`backticks`: integer>``
+
+Element names are stored and compared using Unicode Normalization Form C (NFC).
+:::
+
 
 ## Primitive Types
 
@@ -18764,24 +18954,28 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `never`       | The type that has no values; the empty type or **bottom type**                                             |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
-| `expression`       | A symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
-| `symbol`        | A named object, for example a constant or variable in an expression such as `x` or `alpha` |
-| `function`        | A function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
-| `value`        | A constant value, such as `1`, `True`, `'hello'` or `Pi`: a `scalar` or a `collection` |
-| `collection`    | A collection of values: a `list`, a `set`, a `tuple`, or a `map` |
-| `scalar`        | A single value: a `boolean`, a `string`, or a `number` |
-| `boolean`       | The symbol `True` or `False`|
-| `string`        | A string of Unicode characters    |
-| `number`        | A numeric value |
+| `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
+| `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
+| `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
+| `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
+| `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
+| `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
+| `boolean`       | The type of the symbol `True` or `False`|
+| `string`        | The type of a string of Unicode characters    |
+| `number`        | The type of a numeric value |
 
 </div>
 
-<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
-
 ### Comparison of Special Types
 
+This table summarizes how each special type behaves when assigning values: whether a value of one type can be assigned to or from another.
+
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
+
+
 | Type     | Description                                       | Assignable To | Assignable From |
-|----------|---------------------------------------------------|----------------|------------------|
+|----------|:--------------------------------------------------|:---------------|:-----------------|
 | `any`    | All possible values                               | ✓              | ✓                |
 | `unknown`| Undetermined type, placeholder for inference      | ✓              | ✓                |
 | `never`  | No values at all (bottom type)                    | ✓              | ✗                |
@@ -18793,7 +18987,7 @@ The Compute Engine supports the following primitive types:
 
 ### Numeric Types
 
-The type `number` represent all numeric values, including `NaN`. 
+The type `number` represents all numeric values, including `NaN`. 
 
 More specific types of numeric values are represented by subtypes of `number`. 
 
@@ -18840,10 +19034,11 @@ Read more about the **sets** included in the Standard Library <Icon name="chevro
 
 ## Collection Types
 
-A **collection type** is the type of an object that contains multiple values.
+A collection type represents an expression that contains multiple values, such as a list, a set, or a dictionary.
 
-The Compute Engine supports the following collection types: `set`, `tuple`, \
-`list` (including `vector`, `matrix` and `tensor`),  `map` and `collection`.
+The Compute Engine supports the following collection types: `set`, `tuple`,
+`list` (including `vector`, `matrix` and `tensor`), `record`, `dictionary` and 
+`collection`.
 
 ### Set
 
@@ -18853,7 +19048,7 @@ The type of a set is represented by the type expression `set<T>`, where `T`
 is the type of the elements of the set.
 
 ```js
-ce.parse("\\{1, 2, 3\\}").type
+ce.parse("\\{5, 7, 9\\}").type
 // ➔ "set<finite_integer>"
 ```
 
@@ -18866,25 +19061,25 @@ The type of a tuple is represented by the type expression `tuple<T1, T2, ...>`,
 where `T1`, `T2`, ... are the types of the elements of the tuple.
 
 ```js
-ce.parse("(1, 2, 3)").type
+ce.parse("(7, 5, 7)").type
 // ➔ "tuple<finite_integer, finite_integer, finite_integer>"
 ```
 
-The elements of a tuple can be named: `tuple<x: integer, y: integer>`. If
-an element is named, all elements must be named and the names must be unique.
+The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
 
+If an element is named, all elements must be named and the names must be unique
+when compared in Unicode Normalization Form C (NFC).
 
-The name of the elements of a tuple must use the letters `a` to `z` or `A` to
- `Z`, the digits `0` to `9` or the underscore `_` and must start with a letter 
- or an underscore.
-
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on element names.)
 
 For two tuples to be compatible, each element must have the same type and the names must match.
 
 ```js
-ce.parse("(x: 1, y: 2)").type.matches("tuple<x: integer, y: integer>");
+ce.parse("(x: 1, y: 2)")
+  .type.matches("tuple<x: integer, y: integer>");
 // ➔ true
-ce.parse("(x: 1, y: 2)").type.matches("tuple<a: integer, b: integer>");
+ce.parse("(x: 1, y: 2)")
+  .type.matches("tuple<a: integer, b: integer>");
 // ➔ false
 ```
 
@@ -18897,35 +19092,35 @@ matrices, and sequences.
 The type of a list is represented by the type expression `list<T>`, where `T` is the type of the elements of the list.
 
 ```js
-ce.parse("[1, 2, 3]").type.toString();
+ce.parse("\\[1, 2, 3\\]").type.toString();
 // ➔ "list<number>"
 ```
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
 
 ```js
-ce.parse("[1, 2, 3]").matches("list");
+ce.parse("\\[1, 2, 3\\]").matches("list");
 // ➔ true
 ```
 
 The shorthand **`vector`** is a list of numbers, equivalent to `list<number>`.
 
 ```js
-ce.parse("[1, 2, 3]").matches("vector");
+ce.parse("\\[1, 2, 3\\]").matches("vector");
 // ➔ true
 ```
 
 A **`vector<n>`** is a list of `n` numbers.
 
-```js 
-ce.parse("[1, 2, 3]").type.matches("vector<3>");
+```js
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<3>");
 // ➔ true
 ```
 
 A **`vector<T^n>`** is a list of `n` elements of type `T`.
 
 ```js
-ce.parse("[1, 2, 3]").type.matches("vector<integer^3>");
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<integer^3>");
 // ➔ true
 ```
 
@@ -18944,52 +19139,73 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 
 
 
-### Map
+### Dictionary and Record
 
-A **map** is a collection of key-value pairs, used to represent a dictionary, 
-also known as an associative array, a hash table or a record.
+The **dictionary** and **record** types represent a collection of key-value pairs, 
+where each key is a string and each value can be any type.
 
-The keys of a map must use the letters `a` to `z` or `A` to `Z`, the digits 
-`0` to `9` or the underscore `_`. Keys containing other characters must be 
-enclosed in backticks.
+A **record** is a special case of a dictionary where the keys are fixed, 
+while a **dictionary** can have keys that are dynamically added or removed at runtime.
 
-Keys must be unique within a map, but they are not ordered.
+A **record** is used to represent objects and structured data with a fixed set of properties.
+A **dictionary** is well suited to represent data such as hash tables or caches.
 
-The type of a map is represented by the type expression `map<T>`, indicating
-a map of elements of type `T`, or by the type expression
-`map<K1: T1, K2: T2, ...>`, where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
+**Keys** must be unique (when compared in NFC form) within a dictionary or record. Keys are not ordered.
 
-For example: `map<red: integer, green: integer, blue: integer>` is a map that
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on key names.)
+
+
+The type of a **dictionary** is represented by the type expression `dictionary<T>`
+where `T` is the type of the values.
+
+The type of a **record** is represented by the type expression `record<K1: T1, K2: T2, ...>`, 
+where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
+
+For example: `record<red: integer, green: integer, blue: integer>` is a record that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
-For a map `A` to be compatible with a map `B`, the keys of `A` must be a
-subset of the keys of `B` and the values of `A` must be compatible with the
-values of `B`.
+**Compatibility:**
+- A record of type `record<K1: T1, K2: T2, ...>` is compatible with a record of type
+  `record<K1: T1, K2: T2, ..., K3: T3, ...>` if:
+  - The keys of the first record are a subset of the keys of the second.
+  - The values of the first record are compatible with the values of the second.
+  - The order of the keys does not matter.
+- A record is compatible with a dictionary `dictionary<T>` if each value type `T1`, `T2`, ... is compatible with `T`.
+
 
 ```js
-ce.type("map<red: integer, green: integer>")
-  .matches("map<red: integer, green: integer>");
+ce.type("record<red: integer, green: integer>")
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 
-ce.type("map<red: integer, green: integer>")
-  .matches("map<red: integer, green: integer, blue: integer>");
+ce.type("record<red: integer, green: integer>")
+  .matches("record<red: integer, green: integer, blue: integer>");
 // ➔ false
 
-ce.type("map<red: integer, green: integer, blue: integer>")
-  .matches("map<red: integer, green: integer>");
+ce.type("record<red: integer, green: integer, blue: integer>")
+  .matches("dictionary<integer>");
 // ➔ true
 ```
 
 
-The type `map<T>` matches any map with values of type `T`.
 
-The type `map` matches any map.
+The `record` type is compatible with any record, and the `dictionary` type is compatible with both records and dictionaries.
+
+```js
+ce.type("record<red: integer, green: integer>")
+  .matches("record");
+// ➔ true
+
+ce.type("record<red: integer, green: integer>")
+  .matches("dictionary");
+// ➔ true
+```
 
 
 ### Collection
 
 The type `collection` represent any collection of values, such as a `list`, 
-a `set`, a `tuple`, or a `map`.
+a `set`, a `tuple`, a `record` or a `dictionary`.
 
 The type `collection<T>` is a collection of values of type `T`.
 
@@ -19008,31 +19224,42 @@ type of the output value, or return type, of the function literal.
 
 ### Return Types
 
+If the function does not return a value, the function signature is `(T) -> nothing`.
+
 If the function never returns, the function signature is `(T) -> never`.
 
-If the function does not return a value, the function signature is `(T) -> nothing`.
+
 
 ### Arguments
 
 If there is a single input argument, the parentheses can be omitted: `T1 -> T2`.
+
 For example, `real -> integer` is the type of functions that map real numbers to integers.
 
-If there are no input arguments, use `() -> T`, for example `() -> integer` is 
+If there are no input arguments, use `() -> T`.
+
+For example `() -> integer` is 
 the type of functions that return an integer and have no input arguments.
 
-If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`,
-for example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
+If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`.
+
+For example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
 
 ### Named Arguments
 
 Optionally, the input arguments can be named, for example: `(x: integer, y: integer) -> integer`.
 
-The name of the argument must use the letters `a` to `z` and `A` to `Z`, the digits `0` to `9` or the underscore `_`
-and must start with a letter or an underscore.
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on argument names.)
+
+If a named argument is used, the input arguments must be enclosed in parentheses, even if there is only one argument.
+
+For example, `(x: integer) -> integer` is a function that takes a single named argument `x` of type `integer` and returns an `integer`.
+
+
 
 ### Optional Argument
 
-An optional argument is indicated by a question mark after the type.
+An optional argument is indicated by a question mark after its type.
 
 For example `(integer, integer?) -> integer` indicates a function literal accepting 
 one or two integers as input and returning an integer.
@@ -19040,7 +19267,8 @@ one or two integers as input and returning an integer.
 If there are any optional arguments, they must be at the end of the argument list.
 
 ```js
-ce.type("(integer, integer?) -> number").matches("(integer) -> number");
+ce.type("(integer, integer?) -> number")
+  .matches("integer -> number");
 // ➔ true
 ```
 
@@ -19049,7 +19277,7 @@ ce.type("(integer, integer?) -> number").matches("(integer) -> number");
 ### Rest Argument
 
 A function signature can include a variable number of arguments, also known as 
-a rest argument, indicated by an ellipsis `...` before the type of the last argument.
+a **rest argument**, indicated by an ellipsis `...` before the type of the last argument.
 
 For example `(string, ...integer) -> integer` is a function that accepts a 
 string as a first argument followed by any number of integers and returns an integer.
@@ -19058,20 +19286,23 @@ To indicate that the function accepts a variable number of arguments of any
 type, use `...any`.
 
 ```js
-ce.type("(integer, ...integer) -> number").matches("(integer, integer) -> number");
+ce.type("(integer, ...integer) -> number")
+  .matches("(integer, integer) -> number");
 // ➔ true
 ```
 
+If a signature has a rest argument, it must be the last argument in the list, 
+and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal, it is a shorthand for `(...any) -> unknown`.
+The type `function` matches any function literal. It is a shorthand for `(...any) -> unknown`.
 
 ## Value Type
 
 A **value type** is a type that represents a single value. 
 
-A value can be:
+The value can be:
 - a boolean: `true` or `false`
 - a number, such as `42`, `-3.14`, or `6.022e23`
 - a string, such as `"yellow"`, 
@@ -19086,11 +19317,13 @@ can be one of multiple values, for example:
 
 ## Other Constructed Types
 
-Types can be combined to form new types using the following operations:
+Types can be combined to form new types using a **union**, an **intersection**, or a **negation**.
 
 ### Union
 
 A **union** is the type of values that are in either of two types.
+
+Unions are useful when a value may be one of several possible types.
 
 The type of a union is represented by the type expression `T1 | T2`, where `T1` and `T2` are the types of the values.
 
@@ -19100,14 +19333,19 @@ For example, `number | boolean` is the type of values that are numbers or boolea
 
 An **intersection** is the type of values that are in both of two types.
 
+Intersections are useful when a value must satisfy multiple type constraints at once.
+They can be used to model values that meet several structural or semantic requirements.
+
 The type of an intersection is represented by the type expression `T1 & T2`, where `T1` and `T2` are the types of the values.
 
-For example, `map<length: integer> & map<size: integer>` is the type of values 
-that are dictionaries with both a `length` and a `size` key.
+For example, `record<length: integer> & record<size: integer>` is the type of values 
+that are records with both a `length` and a `size` key.
 
 ### Negation
 
-A **negation** is the type of values that are not of a given type.
+A **negation** represents values that are excluded from a given type.
+
+This can be useful for excluding special cases such as `0`, `NaN`, or `Infinity`.
 
 A type negation is represented by the type expression `!T`, where `T` is a type.
 
@@ -19122,10 +19360,10 @@ The type `integer & !0` is the type of values that are integers but not `0`.
 
 ## Matching Types
 
+Two types can be evaluated for **compatibility**. 
 
-Two types can be evaluated for their **compatibility**. A type `A` is 
-compatible with a type `B` (or matches it) if all values of type `A` are also 
-values of type `B`. In other words, if `A` is a non-strict subtype of `B`.
+A type `A` matches type `B` if all values of `A` are also values of `B`, that is, if `A` is a subtype of `B`.
+Matching is used for type checking and for validating function arguments.
 
 **To check if two types are compatible**, use the `type.matches()` method.
 
@@ -19158,24 +19396,51 @@ ce.parse("3.14").type.matches("real");
 
 ### Compatibility of Complex Types
 
-#### Maps
+When checking compatibility of complex types, both structure and element types must be considered.
 
-Maps are compatible if they have the same keys and the values are compatible.
+Compatibility of complex types follows specific rules depending on the type of structure, such as records, tuples, or lists.
+
+#### Records
+
+Records are compatible if they have the same keys and the values are compatible.
 
 ```js
-ce.parse("{red: 1, green: 2}").type
-  .matches("map<red: integer, green: integer>");
+ce.parse("\\{red: 1, green: 2\\}").type
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 ```
 
-**Width subtyping** is supported for maps, meaning that a map with more keys is
-compatible with a map with fewer keys.
+**Width subtyping** is supported for records, meaning that a record with more keys is
+compatible with a record with fewer keys.
 
 ```js
-ce.parse("{red: 1, green: 2, blue: 3}").type
-  .matches("map<red: integer, green: integer>");
+ce.parse("\\{red: 1, green: 2, blue: 3\\}").type
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 ```
+
+
+#### Dictionaries
+Dictionaries are compatible if the values are compatible.
+
+```js
+ce.parse("\\{red: 1, green: 2\\}").type 
+  .matches("dictionary<integer>");
+// ➔ true
+```
+
+Records are compatible with dictionaries if all the values of the record are compatible with the dictionary's value type.
+
+```js
+ce.parse("\\{red: 104, green: 2, blue: 37\\}").type
+  .matches("dictionary<integer>");
+// ➔ true
+ce.parse("\\{user: \"Bob\", age: 24\\}").type
+  .matches("dictionary<integer>");
+// ➔ false
+```
+
+
 
 #### Tuples
 
@@ -19205,7 +19470,7 @@ ce.parse("(x: 1, y: 2)").type
 Lists are compatible if they have the same length and the elements are compatible.
 
 ```js
-ce.parse("[1, 2, 3]").type
+ce.parse("\\[1, 2, 3\\]").type
   .matches("list<finite_integer>");
 // ➔ true
 ```
@@ -19260,6 +19525,8 @@ console.info(ce.box(3.14).isInteger)
 ## Defining New Types
 
 **To define new types** use the `ce.declareType()` function.
+This enables defining domain-specific types that can improve type checking and clarity.
+Custom types help document intent and improve code maintainability.
 
 For example, to defines a new type `point` that is a tuple of two 
 integers, `x` and `y`:
@@ -19287,7 +19554,10 @@ To make a type structural, use the `ce.declareType()` function with the
 regardless of their names.
 
 ```js
-ce.declareType("pointData", "tuple<x: integer, y: integer>", { alias: true });
+ce.declareType(
+    "pointData", "tuple<x: integer, y: integer>", 
+    { alias: true }
+);
 ```
 
 ```js
@@ -19300,14 +19570,18 @@ ce.type("tuple<x: integer, y: integer>")
 
 A recursive type is a type that refers to itself in its definition.
 
+In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
+
 For example, a binary tree can be defined as a tuple of a value and two subtrees:
 
 ```js
-ce.declareType("tree", "tuple<value: integer, left: tree, right: tree>");
+ce.declareType(
+  "tree", 
+  "tuple<value: integer, left: type tree, right: type tree>"
+);
 ```
 
 A set of types can be mutually recursive, meaning that they can refer to each other in their definitions.
-In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
 
 For example, a definition of a JSON value could be:
 
@@ -19320,13 +19594,14 @@ ce.declareType("json", `
   | type json_array
   | type json_object
 `);
-ce.declareType("json_object", "map<json>");
+ce.declareType("json_object", "dictionary<json>");
 ce.declareType("json_array", "list<json>");
 ```
 
-When using `type json_array` or `type json_object`, the type is not yet defined, but it will be
-defined later in the code. This allows you to use the type before declaring it,
-but it is not necessary to use the `type` keyword if the type is already defined.
+When using `type json_array` or `type json_object`, the type is not yet defined, 
+but it will be defined later in the code. This allows you to use the type
+before declaring it. If the referenced type is already defined, the `type` keyword is optional.
+
 
 ---
 title: Arithmetic
@@ -19518,6 +19793,8 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
 
 ### Other Functions
+
+
 
 <FunctionDefinition name="BaseForm">
 
@@ -19753,6 +20030,258 @@ See below for additonal relational operators: `Congruent`, etc...
 
 </div>
 ---
+title: Combinatorics
+slug: /compute-engine/reference/combinatorics/
+---
+
+# Combinatorics
+
+Combinatorics functions in the Compute Engine provide essential tools for counting and enumerating discrete structures. These functions enable computation of binomial and multinomial coefficients, generation of permutations and combinations, construction of Cartesian products and power sets, and calculation of special combinatorial numbers such as derangements and Bell numbers. These utilities are fundamental for combinatorial analysis and discrete mathematics.
+
+---
+
+## Functions
+
+<div style={{visibility:"hidden"}}>
+### Choose
+</div>
+<FunctionDefinition name="Choose">
+<Signature name="Choose" returns="number">n: number, m: number</Signature>
+Computes the <b>binomial coefficient</b>, often read as “n choose m,” representing the number of ways to select <b>m</b> elements from a set of <b>n</b> elements without regard to order. 
+
+This function answers the question: "How many different groups of size $m$ can be formed from $n$ distinct items?" It is a fundamental concept in combinatorics used in probability and statistics.
+
+For example, to compute the number of ways to choose 2 items from 5:  
+Step 1: Calculate factorials: $$5! = 120, 2! = 2, (5-2)! = 3! = 6$$  
+Step 2: Apply formula: $$5! / (2! \times 3!) = 120 / (2 \times 6) = 10$$  
+So, there are 10 different ways to choose 2 items from 5.
+
+The function returns <code>NaN</code> if <code>n &lt; 0</code>, <code>m &lt; 0</code>, or <code>m &gt; n</code>.
+
+```json
+["Choose", 5, 2]
+```
+
+See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient)
+
+<Latex>{`
+\\mathrm{Choose}(n, m) = \\binom{n}{m} = \\frac{n!}{m!(n-m)!}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Fibonacci
+</div>
+<FunctionDefinition name="Fibonacci">
+<Signature name="Fibonacci" returns="integer">n: integer</Signature>
+Returns the <b>n<sup>th</sup> Fibonacci number</b>, a sequence defined by the sum of the two preceding numbers starting with 0 and 1. 
+
+For negative indices, the function returns <code>-Fibonacci(-n)</code>, following the standard extension of Fibonacci numbers to negative integers.
+
+The Fibonacci sequence models many natural phenomena and appears in computer algorithms and mathematics. It starts as 0, 1, 1, 2, 3, 5, 8, ...
+
+For example, to find the 7th Fibonacci number:  
+Step 1: Start with $$F(0) = 0, F(1) = 1$$  
+Step 2: Compute subsequent terms: $$F(2) = 1, F(3) = 2, F(4) = 3, F(5) = 5, F(6) = 8, F(7) = 13$$  
+Hence, the 7th Fibonacci number is 13.
+
+```json
+["Fibonacci", 7]
+// -> 13
+```
+
+See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number)
+
+<Latex>{`
+\\mathrm{Fibonacci}(n) = \\begin{cases} 0, & n = 0 \\\\ 1, & n = 1 \\\\ \\mathrm{Fibonacci}(n-1) + \\mathrm{Fibonacci}(n-2), & n > 1 \\\\ -\\mathrm{Fibonacci}(-n), & n < 0\\end{cases}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Binomial
+</div>
+<FunctionDefinition name="Binomial">
+<Signature name="Binomial" returns="integer">n: integer, k: integer</Signature>
+Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>.
+
+This function is similar to <code>Choose</code> but specialized for integer inputs and returns integer results. It is widely used in combinatorics, probability, and algebra.
+
+Example: To find the number of ways to choose 2 elements from 6:  
+Calculate $$ \binom{6}{2} = \frac{6!}{2!4!} = \frac{720}{2 \times 24} = 15 $$.
+
+```json
+["Binomial", 6, 2]
+```
+
+See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficent)
+
+<Latex>{`
+\\mathrm{Binomial}(n, k) = \\binom{n}{k} = \\frac{n!}{k!(n-k)!}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### CartesianProduct
+</div>
+<FunctionDefinition name="CartesianProduct">
+<Signature name="CartesianProduct" returns="set">set₁: set, set₂: set, ...</Signature>
+Returns the <b>Cartesian product</b> of one or more input sets, producing all ordered tuples where each element is drawn from the corresponding input set.
+
+This function answers: "What are all possible combinations of elements where you pick one from each set?"
+
+Example: Given sets $$A = \{1, 2\}$$ and $$B = \{a, b\}$$, the Cartesian product $$ A \times B $$ is:  
+$$\{ (1, a), (1, b), (2, a), (2, b) \}$$
+
+```json
+["CartesianProduct", {"set": [1, 2]}, {"set": ["a", "b"]}]
+```
+
+See also: [Cartesian product - Wikipedia](https://en.wikipedia.org/wiki/Cartesian_product)
+
+<Latex>{`
+A \\times B = \\{ (a, b) \\mid a \\in A, b \\in B \\}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### PowerSet
+</div>
+<FunctionDefinition name="PowerSet">
+<Signature name="PowerSet" returns="set">set: set</Signature>
+Computes the <b>power set</b> of the given set, which is the set of all subsets including the empty set and the set itself.
+
+This function helps enumerate every possible subset, useful in combinatorics, logic, and computer science.
+
+Example: For the set $$ \{ a, b \} $$, the power set is:  $$ \{ \{\}, \{a\}, \{b\}, \{a, b\} \} $$
+
+```json
+["PowerSet", ["Set", a, b]]
+// -> ["Set", ["EmptySet"], ["Set", a], ["Set", b], ["Set", a, b]]
+```
+
+See also: [Power set - Wikipedia](https://en.wikipedia.org/wiki/Power_set)
+
+<Latex>{`
+\\mathcal{P}(A) = \\{ S \\mid S \\subseteq A \\}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Permutations
+</div>
+<FunctionDefinition name="Permutations">
+<Signature name="Permutations" returns="list&lt;list&gt;">collection: list, k?: integer</Signature>
+Generates all <b>permutations</b> of the input collection of length <code>k</code>. If <code>k</code> is omitted, permutations of the full length of the collection are returned.
+
+Permutations represent all possible ordered arrangements of elements.
+
+Example: For collection $$[1, 2, 3]$$ and $$k=2$$, permutations include: $$[1,2], [1,3], [2,1], [2,3], [3,1], [3,2]$$.
+
+```json
+["Permutations", ["List", 1, 2, 3], 2]
+// -> ["List", 
+//      ["List", 1, 2], 
+//      ["List", 1, 3], 
+//      ["List", 2, 1], 
+//      ["List", 2, 3], 
+//      ["List", 3, 1], 
+//      ["List", 3, 2]
+// ]
+```
+
+See also: [Permutation - Wikipedia](https://en.wikipedia.org/wiki/Permutation)
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Combinations
+</div>
+<FunctionDefinition name="Combinations">
+<Signature name="Combinations" returns="list&lt;list&gt;">collection: list, k: integer</Signature>
+Returns all <b>k-element combinations</b> (unordered subsets) of the input collection.
+
+Combinations represent subsets where order does not matter.
+
+Example: For collection $$[1, 2, 3]$$ and $$k=2$$, combinations are: $$[1,2], [1,3], [2,3]$$.
+
+```json
+["Combinations", ["List", 1, 2, 3], 2]
+// -> [["List", 1, 2], ["List", 1, 3], ["List", 2, 3]]
+```
+
+See also: [Combination - Wikipedia](https://en.wikipedia.org/wiki/Combination)
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Multinomial
+</div>
+<FunctionDefinition name="Multinomial">
+<Signature name="Multinomial" returns="integer">k₁: integer, k₂: integer, ...</Signature>
+Calculates the <b>multinomial coefficient</b> for the given group sizes, representing the number of ways to partition a set of $$ n = k_1 + k_2 + \cdots $$ elements into groups of sizes $$ k_1, k_2, \ldots $$.
+
+This extends the binomial coefficient to multiple groups and is useful in probability and combinatorics.
+
+Example: For groups of sizes 2 and 1 (total 3 elements), the multinomial coefficient is:  
+$$\frac{3!}{2!1!} = \frac{6}{2} = 3$$.
+
+```json
+["Multinomial", 2, 1]
+```
+
+See also: [Multinomial theorem - Wikipedia](https://en.wikipedia.org/wiki/Multinomial_theorem)
+
+<Latex>{`
+\\mathrm{Multinomial}(k_1, \\ldots, k_m) = \\frac{(k_1 + \\cdots + k_m)!}{k_1! \\cdots k_m!}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Subfactorial
+</div>
+<FunctionDefinition name="Subfactorial">
+<Signature name="Subfactorial" returns="integer">n: integer</Signature>
+Returns the number of <b>derangements</b> of <code>n</code> elements, i.e., permutations with no fixed points where no element appears in its original position.
+
+Derangements are important in problems like the "hat-check problem" in probability.
+
+Example: For n=4, the number of derangements is:  
+$$ !4 = 4! \times \left(1 - \frac{1}{1!} + \frac{1}{2!} - \frac{1}{3!} + \frac{1}{4!}\right) = 9 $$.
+
+```json
+["Subfactorial", 4]
+```
+
+See also: [Derangement - Wikipedia](https://en.wikipedia.org/wiki/Derangement)
+
+<Latex>{`
+!n = n! \\sum_{k=0}^n \\frac{(-1)^k}{k!}
+`}</Latex>
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### BellNumber
+</div>
+<FunctionDefinition name="BellNumber">
+<Signature name="BellNumber" returns="integer">n: integer</Signature>
+Computes the <b>Bell number</b> $$ B(n) $$, which counts the number of ways to partition a set of <code>n</code> elements into any number of non-empty, disjoint subsets.
+
+Bell numbers appear in combinatorics and partition theory.
+
+Example: For $$n=3$$, the Bell number is 5, representing the partitions:  
+$$\{ \{1,2,3\}, \{1,2\},\{3\}, \{1,3\},\{2\}, \{2,3\},\{1\}, \{1\},\{2\},\{3\} }.$$
+
+```json
+["BellNumber", 3]
+// -> 5
+```
+
+See also: [Bell number - Wikipedia](https://en.wikipedia.org/wiki/Bell_number)
+
+<Latex>{`
+B(n) = \\sum_{k=0}^{n-1} \\binom{n-1}{k} B(k), \\quad B(0) = 1
+`}</Latex>
+</FunctionDefinition>---
 title: Introduction - Compute Engine
 sidebar_label: Introduction
 hide_title: true
@@ -19961,6 +20490,303 @@ LaTeX to MathJSON.
 Read more about **Parsing and Serializing LaTeX**<Icon name="chevron-right-bold" />
 </ReadMore>
 ---
+title: Number Theory
+slug: /compute-engine/reference/number-theory/
+---
+
+# Number Theory
+
+The functions in this section provide tools for number-theoretic computations:  
+divisor functions, partitions, polygonal numbers, perfect/happy numbers, and special combinatorial counts (Eulerian, Stirling).
+
+
+## Function Definitions
+
+<div style={{visibility:"hidden"}}>
+### Totient
+</div>
+
+<FunctionDefinition name="Totient">
+<Signature name="Totient" returns="integer">n: integer</Signature>
+Returns Euler’s <b>totient function</b> $φ(n)$: the number of integers $1 ≤ k ≤ n$ that are coprime to $n$.
+
+This function counts how many integers up to $n$ share no common factors with $n$ other than 1. For example, for $n=9$, the integers coprime to 9 are 1, 2, 4, 5, 7, and 8, so $φ(9) = 6$.
+
+See also: [Euler's totient function - Wikipedia](https://en.wikipedia.org/wiki/Euler%27s_totient_function)
+
+```json
+["Totient", 9]
+// ➔ 6
+```
+
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### Sigma0
+</div>
+
+<FunctionDefinition name="Sigma0">
+<Signature name="Sigma0" returns="integer">n: integer</Signature>
+Returns the number of positive divisors of $n$.
+
+This function counts how many positive integers divide $n$ without a remainder. For example, for $n=6$, the divisors are 1, 2, 3, and 6, so the count is 4.
+
+See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_function)
+
+```json
+["Sigma0", 6]
+// ➔ 4
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### Sigma1
+</div>
+
+<FunctionDefinition name="Sigma1">
+<Signature name="Sigma1" returns="integer">n: integer</Signature>
+Returns the sum of positive divisors of $n$.
+
+This function sums all positive divisors of $n$. For example, for $n=6$, the divisors are 1, 2, 3, and 6, and their sum is 12.
+
+See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_function)
+
+```json
+["Sigma1", 6]
+// ➔ 12
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### SigmaMinus1
+</div>
+
+<FunctionDefinition name="SigmaMinus1">
+<Signature name="SigmaMinus1" returns="number">n: integer</Signature>
+Returns the sum of reciprocals of the positive divisors of $n$.
+
+This function sums the reciprocals of all positive divisors of $n$. For example, for $n=6$, the divisors are 1, 2, 3, and 6, and the sum of reciprocals is 1 + 1/2 + 1/3 + 1/6 = 2.333...
+
+See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_function)
+
+```json
+["SigmaMinus1", 6]
+// ➔ 2.333...
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### Eulerian
+</div>
+
+<FunctionDefinition name="Eulerian">
+<Signature name="Eulerian" returns="integer">n: integer, m: integer</Signature>
+Returns the <b>Eulerian number</b> A(n, m), counting permutations of {1..n} with exactly m ascents.
+
+Eulerian numbers count the permutations of the numbers 1 through $n$ that have exactly $m$ ascents (positions where the next number is greater than the previous one). For example, for $n=4$ and $m=2$, there are 11 such permutations.
+
+See also: [Eulerian number - Wikipedia](https://en.wikipedia.org/wiki/Eulerian_number)
+
+```json
+["Eulerian", 4, 2]
+// ➔ 11
+```
+
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### Stirling
+</div>
+
+<FunctionDefinition name="Stirling">
+<Signature name="Stirling" returns="integer">n: integer, m: integer</Signature>
+Returns the <b>Stirling number of the second kind</b> $S(n, m)$, counting the number of ways to partition $n$ elements into $m$ non-empty subsets.
+
+Stirling numbers of the second kind count how many ways to split a set of $n$ objects into $m$ groups, none empty. For example, with $n=5$ and $m=2$, there are 15 ways.
+
+See also: [Stirling number of the second kind - Wikipedia](https://en.wikipedia.org/wiki/Stirling_numbers_of_the_second_kind)
+
+```json
+["Stirling", 5, 2]
+// ➔ 15
+```
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### NPartition
+</div>
+
+<FunctionDefinition name="NPartition">
+<Signature name="NPartition" returns="integer">n: integer</Signature>
+Returns the number of integer partitions of $n$.
+
+This function counts how many ways $n$ can be expressed as a sum of positive integers, disregarding order. For example, 5 can be partitioned into 7 distinct sums: 5, 4+1, 3+2, 3+1+1, 2+2+1, 2+1+1+1, and 1+1+1+1+1.
+
+See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory))
+
+```json
+["NPartition", 5]
+// ➔ 7
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsTriangular
+</div>
+
+<FunctionDefinition name="IsTriangular">
+<Signature name="IsTriangular" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a triangular number.
+
+Triangular numbers count objects arranged in an equilateral triangle. The $k$th triangular number is $k(k+1)/2$. For example, 15 is triangular because $5 \times 6 / 2 = 15$.
+
+See also: [Triangular number - Wikipedia](https://en.wikipedia.org/wiki/Triangular_number)
+
+```json
+["IsTriangular", 15]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsSquare
+</div>
+
+<FunctionDefinition name="IsSquare">
+<Signature name="IsSquare" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a perfect square.
+
+A perfect square is an integer that is the square of another integer. For example, 16 is a perfect square since $4^2 = 16$.
+
+See also: [Square number - Wikipedia](https://en.wikipedia.org/wiki/Square_number)
+
+```json
+["IsSquare", 16]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsPentagonal
+</div>
+
+<FunctionDefinition name="IsPentagonal">
+<Signature name="IsPentagonal" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a pentagonal number.
+
+Pentagonal numbers represent dots forming a pentagon. The $k$th pentagonal number is given by $k(3k-1)/2$. For example, 22 is pentagonal because it matches the formula for some integer $k$.
+
+See also: [Pentagonal number - Wikipedia](https://en.wikipedia.org/wiki/Pentagonal_number)
+
+```json
+["IsPentagonal", 22]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsOctahedral
+</div>
+
+<FunctionDefinition name="IsOctahedral">
+<Signature name="IsOctahedral" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is an octahedral number.
+
+Octahedral numbers count objects arranged in an octahedron shape. The $k$th octahedral number is given by $k(2k^2 + 1)/3$. For example, 19 is not octahedral.
+
+See also: [Octahedral number - Wikipedia](https://en.wikipedia.org/wiki/Octahedral_number)
+
+```json
+["IsOctahedral", 19]
+// ➔ "False"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsCenteredSquare
+</div>
+
+<FunctionDefinition name="IsCenteredSquare">
+<Signature name="IsCenteredSquare" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a centered square number.
+
+Centered square numbers count dots arranged in a square with a dot in the center. The $k$th centered square number is $(2k+1)^2$. For example, 25 is centered square as it equals $5^2$.
+
+See also: [Centered square number - OEIS A001844](https://oeis.org/A001844)
+
+```json
+["IsCenteredSquare", 25]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsPerfect
+</div>
+
+<FunctionDefinition name="IsPerfect">
+<Signature name="IsPerfect" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a perfect number.
+
+A perfect number is one that equals the sum of its positive divisors excluding itself. For example, 28 is perfect since 1 + 2 + 4 + 7 + 14 = 28.
+
+See also: [Perfect number - Wikipedia](https://en.wikipedia.org/wiki/Perfect_number)
+
+```json
+["IsPerfect", 28]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsHappy
+</div>
+
+<FunctionDefinition name="IsHappy">
+<Signature name="IsHappy" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is a happy number.
+
+A happy number is defined by iterating the sum of the squares of its digits; if this process eventually reaches 1, the number is happy. For example, 19 is happy because: 1²+9²=82; 8²+2²=68; 6²+8²=100; 1²+0²+0²=1.
+
+See also: [Happy number - Wikipedia](https://en.wikipedia.org/wiki/Happy_number)
+
+```json
+["IsHappy", 19]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### IsAbundant
+</div>
+
+<FunctionDefinition name="IsAbundant">
+<Signature name="IsAbundant" returns="boolean">n: integer</Signature>
+Returns `"True"` if $n$ is an abundant number.
+
+An abundant number is one where the sum of its proper divisors exceeds the number itself. For example, 12 is abundant since 1 + 2 + 3 + 4 + 6 = 16 > 12.
+
+See also: [Abundant number - Wikipedia](https://en.wikipedia.org/wiki/Abundant_number)
+
+```json
+["IsAbundant", 12]
+```
+</FunctionDefinition>
+---
 title: Statistics
 slug: /compute-engine/reference/statistics/
 ---
@@ -19977,6 +20803,9 @@ following forms:
 ## Functions
 
 
+<div style={{visibility:"hidden"}}>
+### Mean
+</div>
 <FunctionDefinition name="Mean">
 
 <Signature name="Mean">_collection_</Signature>
@@ -20000,6 +20829,9 @@ $$x_i$$ is the $$i$$-th number in the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Median
+</div>
 <FunctionDefinition name="Median">
 
 <Signature name="Median">_collection_</Signature>
@@ -20019,6 +20851,9 @@ the average of the two middle elements.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Mode
+</div>
 <FunctionDefinition name="Mode">
 
 <Signature name="Mode">_collection_</Signature>
@@ -20031,8 +20866,16 @@ numbers can have more than one mode. If there are two modes, the list is called
 modes, the list is called **trimodal**. If there are more than three modes, the
 list is called **multimodal**.
 
+```json example
+["Mode", ["List", 1, 2, 2, 3, 4, 4, 5, 5]]
+// 2
+```
+
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Variance
+</div>
 <FunctionDefinition name="Variance">
 
 <Signature name="Variance">_collection_</Signature>
@@ -20052,6 +20895,29 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PopulationVariance
+</div>
+<FunctionDefinition name="PopulationVariance">
+
+<Signature name="PopulationVariance">_collection_</Signature>
+
+Evaluate to the **population variance** of a _collection_ of numbers.
+
+The population variance is the variance calculated by dividing the sum of squared
+differences from the mean by the number of elements in the population.
+
+The formula for the population variance is
+
+$$\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^2$$
+
+where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### StandardDeviation
+</div>
 <FunctionDefinition name="StandardDeviation">
 
 <Signature name="StandardDeviation">_collection_</Signature>
@@ -20071,6 +20937,28 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PopulationStandardDeviation
+</div>
+<FunctionDefinition name="PopulationStandardDeviation">
+
+<Signature name="PopulationStandardDeviation">_collection_</Signature>
+
+Evaluate to the **population standard deviation** of a _collection_ of numbers.
+
+The population standard deviation is the square root of the population variance.
+
+The formula for the population standard deviation is
+
+$$\sqrt{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^2}$$
+
+where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Skewness
+</div>
 <FunctionDefinition name="Skewness">
 
 <Signature name="Skewness">_collection_</Signature>
@@ -20089,6 +20977,9 @@ standard deviation of the _collection_.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Kurtosis
+</div>
 <FunctionDefinition name="Kurtosis">
 
 <Signature name="Kurtosis">_collection_</Signature>
@@ -20108,6 +20999,9 @@ deviation of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Quantile
+</div>
 <FunctionDefinition name="Quantile">
 
 <Signature name="Quantile">_collection_, _q:number_</Signature>
@@ -20122,6 +21016,9 @@ So, $$\operatorname{median} = \operatorname{quantile}(0.5)$$.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Quartiles
+</div>
 <FunctionDefinition name="Quartiles">
 
 <Signature name="Quartiles">_collection_</Signature>
@@ -20131,8 +21028,16 @@ Evaluate to the **quartiles** of a _collection_ of numbers.
 The quartiles are the three points that divide a _collection_ of numbers into
 four equal groups, each group comprising a quarter of the _collection_.
 
+```json example
+["Quartiles", ["List", 1, 2, 3, 4, 5, 6, 7, 8]]
+// [2.5, 4.5, 6.5]
+```
+
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### InterquartileRange
+</div>
 <FunctionDefinition name="InterquartileRange">
 
 <Signature name="InterquartileRange">_collection_</Signature>
@@ -20144,48 +21049,105 @@ first quartile.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Histogram
+</div>
+<FunctionDefinition name="Histogram">
 
-<FunctionDefinition name="Erf">
+<Signature name="Histogram">_collection_, _bins:number_</Signature>
 
-<Signature name="Erf">_z:complex_</Signature>
+Evaluate to the **histogram** of a _collection_ of numbers.
 
-Evaluate to the **error function** of a complex number.
+The histogram groups the data into a specified number of bins and counts the
+number of elements in each bin.
 
-The error function is an odd function ( $$ \operatorname{erf} -z = -
-\operatorname{erf} z$$ ) that is used in statistics to calculate probabilities
-of normally distributed events.
-
-The formula for the error function of a complex number is:
-
-$$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
-
-where $$z$$ is a complex number.
-
-</FunctionDefinition>
-
-<FunctionDefinition name="Erfc">
-
-<Signature name="Erfc">_z:complex_</Signature>
-
-Evaluate to the **complementary error function** of a complex number.
-
-It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
-
+```json example
+["Histogram", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
+// [2, 2, 5]
+```
 
 </FunctionDefinition>
 
-<FunctionDefinition name="ErfInv">
+<div style={{visibility:"hidden"}}>
+### BinCounts
+</div>
+<FunctionDefinition name="BinCounts">
 
-<Signature name="ErfInv">_x:real_</Signature>
+<Signature name="BinCounts">_collection_, _bins:number_</Signature>
 
-Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+Evaluate to the **bin counts** of a _collection_ of numbers.
 
-It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
-= x $$.
+Bin counts are the counts of the number of elements in each bin for a given
+number of bins.
 
+```json example
+["BinCounts", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
+// [2, 2, 5]
+```
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### SlidingWindow
+</div>
+<FunctionDefinition name="SlidingWindow">
+
+<Signature name="SlidingWindow">_collection_, _windowSize:number_</Signature>
+
+Evaluate to the **sliding windows** of a _collection_ of numbers.
+
+A sliding window is a moving subset of the data of a specified window size.
+
+```json example
+["SlidingWindow", ["List", 1, 2, 3, 4, 5], 3]
+// [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+```
+
+</FunctionDefinition>
+
+
+<div style={{visibility:"hidden"}}>
+### Sample
+</div>
+<FunctionDefinition name="Sample">
+
+<Signature name="Sample">_collection_, _size:number_</Signature>
+
+Evaluate to a **random sample** of a specified size from a _collection_ of numbers.
+
+Sampling is done without replacement unless otherwise specified.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Rank
+</div>
+<FunctionDefinition name="Rank">
+
+<Signature name="Rank">_collection_</Signature>
+
+Evaluate to the **rank** of each element in a _collection_ of numbers.
+
+The rank is the position of each element in the sorted order of the collection.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Argsort
+</div>
+<FunctionDefinition name="Argsort">
+
+<Signature name="Argsort">_collection_</Signature>
+
+Evaluate to the **indices that would sort** a _collection_ of numbers.
+
+This returns a list of indices that sorts the collection.
+
+</FunctionDefinition>
+
+
+<ReadMore path="/compute-engine/reference/special-functions/" > See also Special Functions for
+the <strong>Error Functions</strong> </ReadMore>
 ---
 title: Expressions
 slug: /compute-engine/guides/expressions/
@@ -20680,34 +21642,162 @@ into one unit. Each element in a collection is a
 
 ## Introduction
 
-Collections are **immutable**. They cannot be modified. Operations on
-collections produce new collections.
+Collections are **immutable**: they cannot be modified in place.  
+Operations on collections produce new collections.
 
-There are several types of collections in the Compute Engine:
-- **Lists**: ordered collections of elements, which are also used to represent
-  **vectors** and **matrices**. Elements in a list are accessed by their
-  index, which starts at 1.
-- **Sets**: unordered collections of unique elements. The elements in a set are
-  not accessed by index, they are enumerated. A set can contain an infinite number
-  of elements.
-- **Tuples**: ordered collections of elements, but with a fixed number of elements that have a specific type and an optional name.
-- **Records**: unordered collections of key-value pairs.
-- **Ranges** and **Linear Spaces (linspaces)**: ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
+The most common collection types are:
+- [**List**](#list): ordered collection of elements (duplicates allowed)
+- [**Set**](#set): unordered collection of unique elements
+- [**Tuple**](#tuple): ordered, fixed-size collection with optional names
+- [**Dictionary**](#dictionary): unordered key-value pairs with string keys
+- [**Record**](#record): structured data with a fixed set of known string keys
 
+You can use collections to represent mathematical vectors, matrices, sequences, mappings, or records — in both finite and infinite forms.
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
-See also the **Linear Algebra** section for operations on vectors, matrices and tensors.<Icon name="chevron-right-bold" />
+See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
 </ReadMore>
+
+
+
+### Core Properties of Collections
+
+All collections share these basic properties:
+- Their elements can be **enumerated**
+- They can check whether an element is a **member** of the collection
+- The number of elements can be **counted**
+
+**Note:** Depending on the type of collection, counting and membership checking can be an expensive operation, for example, for lazy infinite collections.
+
+
+### Finite and Infinite Collections
+
+Collections may be:
+- **Finite**: containing a definite number of elements.
+- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
+
+Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
+
+
+### Lazy and Strict Collections
+
+Collections can be:
+- **Strict**: elements are fully evaluated when the collection is created.
+- **Lazy**: elements are evaluated only as they are accessed.
+
+Lazy collections are useful when working with infinite sequences or with expensive computations.
+
+You can convert a lazy collection to a strict collection using `ListFrom` or `SetFrom`.  
+These functions enumerate all elements (if finite) and produce a strict result.
+
+```json example
+["ListFrom", ["Range", 1, 10]]
+// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+### Why Lazy Infinite Collections?
+
+Lazy infinite collections provide a natural way to model mathematical sequences, iterative processes, or cyclic patterns — with minimal memory use.  
+Common examples include:
+- Natural numbers (`Range`)
+- Cyclic patterns (`Cycle`)
+- Iterative computations (`Iterate`)
+
+
+### Ordered and Unordered Collections
+
+Collections fall into two broad categories:
+- **Ordered collections** (such as `List` and `Tuple`)  
+  → Elements can be accessed by an **index**.  
+    The first element has index `1`, the second has index `2`, etc.  
+    Negative indexes count from the end: index `-1` is the last element.
+- **Unordered collections** (such as `Set`, `Record`)  
+  → Elements cannot be accessed by index. They can be enumerated or looked up by key.
+
+
+### Types
+
+- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
+- The type `ordered collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
+
+
+
+### Summary of Collection Types
+
+| Collection Type | Ordered? | Unique Elements? | Fixed Size? | Lazy Possible? | Example |
+| --------------- | -------- | ---------------- | ----------- | -------------- | ------- |
+| **List**        | Yes      | No               | No          | Yes            | `["List", 1, 2, 3]` |
+| **Set**         | No       | Yes              | No          | Yes            | `["Set", 1, 2, 3]` |
+| **Tuple**       | Yes      | No               | Yes         | No             | `["Tuple", "x", "y"]` |
+| **Dictionary**  | Keys unordered | Keys unique | No          | No             | `["Dictionary", ["Tuple", "a", 1], ["Tuple", "b", 2]]` |
+| **Record**      | Keys unordered | Keys unique | Yes         | No             | `["Record", ["Tuple", "name", "Alice"], ["Tuple", "age", 30]]` |
+
+*Note:*  
+Collections like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections** that behave like infinite Lists, unless a strict conversion or truncation (e.g. with `Take()`) is used.
+
+---
+
+
+### Ordered Collections
+
+The elements of some collections can be accessed by their **index**, a
+number that indicates the position of the element in the collection. 
+
+Collections that can be accessed by index are called **ordered collections**. 
+
+The first element has index `1`, the second element has index `2`, and so on. The last
+element has index equal to the length of the collection.
+
+Negative indexes can also be used to access elements from the end of the
+collection. 
+
+The last element has index `-1`, the second to last element has index `-2`,
+and so on. This is useful for accessing elements without knowing the length of the
+collection.
+
+```json example
+["At", ["List", 2, 5, 7, 11], 3]
+// ➔ 7
+
+["At", ["List", 2, 5, 7, 11], -3]
+// ➔ 5
+```
+
+
+
+Some of the collections in the Compute Engine include:
+- [**List**](#list): ordered collections of elements, which are also used to represent
+  **vectors** and **matrices**. Elements in a list are accessed by their
+  index, which starts at 1. Type: `list<T>` where `T` is the type of the elements.
+- [**Set**](#set): unordered collections of unique elements. The elements in a set are
+  not accessed by index, they are enumerated. A set can contain an infinite number
+  of elements. Type : `set<T>` where `T` is the type of the elements.
+- [**Tuple**](#tuple): ordered collections of elements, but with a fixed number 
+  of elements that have a specific type and an optional name. Type : `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
+- [**Dictionary**](#dictionary): unordered collections of key-value pairs, 
+    where each key is unique. Type: `dictionary<V>` where `V` is the type of the values, the keys are strings.
+- [**Record**](#record): unordered collections of key-value pairs. Unlike dictionaries, records are used to represent structured data with a fixed set of keys, and the keys are known at compile time. 
+  Type: `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values.
+
+Some functions evaluate to a lazy collection. This is useful for creating
+infinite collections or for collections that are expensive to compute. Examples of lazy collections include:
+
+- [**Range**](#range) and [**Linspace**](#linspace): ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
+- [**Cycle**](#cycle): infinite collections that repeat a finite collection.
+- [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
+- [**Repeat**](#repeat): infinite collections that repeat a single value.
+- [**Fill**](#fill): collections of a specified size, where each element is computed by a function or set to a specific value.
+
+The type `collection` is used to represent any collection, whether it is ordered or unordered, finite or infinite.
+The type `ordered collection` is used to represent collections that can be accessed by index, such as `List`, `Tuple`, and `Dictionary`.
+
 
 
 ### Operations on Collections
 
-Operations creating new collections:
-- [**List**](#list), [**Range**](#range), [**Linspace**](#linspace), [**Set**](#set): create a new collection from some values.
-- [**Fill**](#fill), [**Repeat**](#repeat), [**Cycle**](#cycle), [**Iterate**](#iterate): create a new collection from a function or a value.
-
 Operations on ordered and unordered collections:
-- [**Length**](#length), [**IsEmpty**](#isempty): check the size of a collection.
+- [**Filter**](#filter), [**Map**](#map), and [**Reduce**](#reduce): operations that create new collections by applying a function to each element of an existing collection.
+- [**Length**](#length), [**IsEmpty**](#isempty): check the number of elements of a collection.
 - [**Filter**](#filter), [**Map**](#map), [**Reduce**](#reduce): apply a function to each element of a collection.
 - [**Join**](#join), [**Zip**](#zip): combine multiple collections into one.
 - [**Tally**](#tally): count the number of occurrences of each element in a collection.
@@ -20722,26 +21812,16 @@ Operations on ordered collections:
 - [**Unique**](#unique): remove duplicates from a collection.
 - [**RotateLeft**](#rotateleft), [**RotateRight**](#rotateright): rotate a collection to the left or right.
 
+<ReadMore path="/compute-engine/reference/linear-algebra/" >
+See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
+</ReadMore>
 
-### Indexing Collections
-
-Ordered collections (lists, tuples, ranges and linspaces) are indexed starting from 1. Negative indexes count from the end of
-the collection. For example, `-1` is the last element, `-2` is the second to last
-element, etc.
-
-```json example
-["At", ["List", 2, 5, 7, 11], -2]
-// ➔ 7
-
-["At", ["Range", 2, 10], -1]
-// ➔ ["List", 10]
-```
 
 
 
 ## Creating Collections
 
-This section contains functions that create new collections from some values.
+This section contains functions that create new collections from some elements.
 
 <div style={{visibility:"hidden"}}>
 ### List
@@ -20751,7 +21831,7 @@ This section contains functions that create new collections from some values.
 
 <Signature name="List" returns="list">..._element_:any</Signature>
 
-A `List` is an **ordered**, **indexable** collection of elements. An element in
+A `List` is an **ordered** collection of elements. An element in
 a list may be repeated.
 
 <Latex value="\lbrack 42, 3.14, x, y \rbrack"/>
@@ -20813,6 +21893,65 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 
 </FunctionDefinition>
 
+
+<div style={{visibility:"hidden"}}>
+### Set
+</div>
+
+<FunctionDefinition name="Set">
+
+<Signature name="Set" returns="set">..._elements_:any</Signature>
+
+An **unordered** collection of unique elements.
+
+<Latex value="\lbrace 12, 15, 17 \rbrace"/>
+
+```json example
+["Set", 12, 15, 17]
+```
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Fill
+</div>
+
+<FunctionDefinition name="Fill">
+
+<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
+
+<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
+
+Create a list of the specified dimensions.
+
+If a `value` is provided, the elements of the list are all set to that value.
+
+If a `function` is provided, the elements of the list are computed by applying
+the function to the index of the element.
+
+If `dimensions` is a number, a list of that length is created.
+
+```json example
+["Fill", 3, 0]
+// ➔ ["List", 0, 0, 0]
+```
+
+If dimension is a tuple, a matrix of the specified dimensions is created.
+
+```json example
+["Fill", ["Tuple", 2, 3], 0]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+```
+
+If a `function` is specified, it is applied to the index of the element to
+compute the value of the element.
+
+```json example
+["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
+// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
+```
+
+</FunctionDefinition>
 
 <div style={{visibility:"hidden"}}>
 ### Range
@@ -20916,64 +22055,7 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
-### Set
-</div>
 
-<FunctionDefinition name="Set">
-
-<Signature name="Set" returns="set">..._elements_:any</Signature>
-
-An **unordered** collection of unique elements.
-
-<Latex value="\lbrace 12, 15, 17 \rbrace"/>
-
-```json example
-["Set", 12, 15, 17]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Fill
-</div>
-
-<FunctionDefinition name="Fill">
-
-<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
-
-<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
-
-Create a list of the specified dimensions.
-
-If a `value` is provided, the elements of the list are all set to that value.
-
-If a `function` is provided, the elements of the list are computed by applying
-the function to the index of the element.
-
-If `dimensions` is a number, a list of that length is created.
-
-```json example
-["Fill", 3, 0]
-// ➔ ["List", 0, 0, 0]
-```
-
-If dimension is a tuple, a matrix of the specified dimensions is created.
-
-```json example
-["Fill", ["Tuple", 2, 3], 0]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
-```
-
-If a `function` is specified, it is applied to the index of the element to
-compute the value of the element.
-
-```json example
-["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
-// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
-```
-
-</FunctionDefinition>
 
 <div style={{visibility:"hidden"}}>
 ### Repeat
@@ -21195,8 +22277,6 @@ the string.
 ### IsEmpty
 </div>
 
-
-
 <FunctionDefinition name="IsEmpty">
 
 <Signature name="IsEmpty">_collection_</Signature>
@@ -21213,11 +22293,95 @@ Returns the symbol `True` if the collection is empty.
 ["IsEmpty", "x"]
 // ➔ "True"
 
-
 ["IsEmpty", {str: "Hello"]
 // ➔ "False"
 ```
 
+</FunctionDefinition>
+
+<FunctionDefinition name="Contains">
+<Signature name="Contains">_collection_, _value_</Signature>
+
+Returns `True` if the collection contains the given value, `False` otherwise.
+
+```json example
+["Contains", ["List", 5, 2, 10, 18], 10]
+// ➔ "True"
+["Contains", ["List", 5, 2, 10, 18], 42]
+// ➔ "False"
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="IndexWhere">
+<Signature name="IndexWhere">_collection_, _predicate_:function</Signature>
+
+Returns the 1-based index of the first element in the collection that satisfies the predicate, or 0 if not found.
+
+```json example
+["IndexWhere", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+// ➔ 3
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="Find">
+<Signature name="Find">_collection_, _predicate_:function</Signature>
+
+Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
+
+```json example
+["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+// ➔ 10
+["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 100]]]
+// ➔ "Nothing"
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="CountIf">
+<Signature name="CountIf">_collection_, _predicate_:function</Signature>
+
+Returns the number of elements in the collection that satisfy the predicate.
+
+```json example
+["CountIf", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+// ➔ 2
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="Position">
+<Signature name="Position">_collection_, _predicate_:function</Signature>
+
+Returns a list of indexes of elements in the collection that satisfy the predicate.
+
+```json example
+["Position", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+// ➔ ["List", 3, 4]
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="Exists">
+<Signature name="Exists">_collection_, _predicate_:function</Signature>
+
+Returns `True` if any element of the collection satisfies the predicate, `False` otherwise.
+
+```json example
+["Exists", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 15]]]
+// ➔ "True"
+["Exists", ["List", 5, 2, 10], ["Function", ["Greater", "_", 15]]]
+// ➔ "False"
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="ForAll">
+<Signature name="ForAll">_collection_, _predicate_:function</Signature>
+
+Returns `True` if all elements of the collection satisfy the predicate, `False` otherwise.
+
+```json example
+["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 0]]]
+// ➔ "True"
+["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+// ➔ "False"
+```
 </FunctionDefinition>
 
 <div style={{visibility:"hidden"}}>
@@ -21362,7 +22526,6 @@ Evaluate to a tuple of two lists:
 ### Zip
 </div>
 
-
 <FunctionDefinition name="Zip">
 
 <Signature name="Zip">_collection-1_, _collection-2_, ...</Signature>
@@ -21378,6 +22541,42 @@ The length of the resulting collection is the length of the shortest collection.
 // ➔ ["List", ["Tuple", 1, 4], ["Tuple", 2, 5], ["Tuple", 3, 6]]
 ```
 
+</FunctionDefinition>
+
+<FunctionDefinition name="Partition">
+<Signature name="Partition">_collection_, _count_:integer</Signature>
+<Signature name="Partition">_collection_, _predicate_:function</Signature>
+
+Partitions a collection into groups. If an integer is given, splits into that many groups. If a predicate function is given, splits into two groups: elements for which the predicate is true, and those for which it is false.
+
+```json example
+["Partition", ["List", 1, 2, 3, 4, 5, 6], 2]
+// ➔ ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+["Partition", ["List", 1, 2, 3, 4, 5, 6], ["Function", ["Even", "_"]]]
+// ➔ ["List", ["List", 2, 4, 6], ["List", 1, 3, 5]]
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="Chunk">
+<Signature name="Chunk">_collection_, _count_:integer</Signature>
+
+Splits the collection into `count` nearly equal-sized chunks.
+
+```json example
+["Chunk", ["List", 1, 2, 3, 4, 5], 2]
+// ➔ ["List", ["List", 1, 2, 3], ["List", 4, 5]]
+```
+</FunctionDefinition>
+
+<FunctionDefinition name="GroupBy">
+<Signature name="GroupBy">_collection_, _function_:function</Signature>
+
+Partitions the collection into groups according to the value of the grouping function applied to each element. Returns a dictionary mapping group keys to lists of elements.
+
+```json example
+["GroupBy", ["List", 1, 2, 3, 4], ["Function", ["Even", "_"]]]
+// ➔ ["Dictionary", ["Tuple", "True", ["List", 2, 4]], ["Tuple", "False", ["List", 1, 3]]]
+```
 </FunctionDefinition>
 
 
@@ -22135,6 +23334,48 @@ title: Special Functions
 slug: /compute-engine/reference/special-functions/
 ---
 
+
+<FunctionDefinition name="Erf">
+
+<Signature name="Erf">_z:complex_</Signature>
+
+Evaluate to the **error function** of a complex number.
+
+The error function is an odd function ( $$ \operatorname{erf} -z = -
+\operatorname{erf} z$$ ) that is used in statistics to calculate probabilities
+of normally distributed events.
+
+The formula for the error function of a complex number is:
+
+$$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
+
+where $$z$$ is a complex number.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Erfc">
+
+<Signature name="Erfc">_z:complex_</Signature>
+
+Evaluate to the **complementary error function** of a complex number.
+
+It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
+
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ErfInv">
+
+<Signature name="ErfInv">_x:real_</Signature>
+
+Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+
+It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
+= x $$.
+
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Factorial">
 
 <Signature name="Factorial">_n_</Signature>
@@ -22216,5 +23457,3 @@ Mathematica.
 </FunctionDefinition>
 
 
-<ReadMore path="/compute-engine/reference/statistics/" > See also Statistics for
-the <strong>Error Functions</strong> </ReadMore>
