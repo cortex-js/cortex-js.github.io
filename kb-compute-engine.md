@@ -235,9 +235,9 @@ slug: /compute-engine/reference/complex/
 
 ## Functions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Real
-</div>
+</nav>
 <FunctionDefinition name="Real">
 
 <Signature name="Real">_z_</Signature>
@@ -253,9 +253,9 @@ Evaluate to the real part of a complex number.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Imaginary
-</div>
+</nav>
 <FunctionDefinition name="Imaginary">
 
 <Signature name="Imaginary">_z_</Signature>
@@ -275,9 +275,9 @@ imaginary part is zero.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Conjugate
-</div>
+</nav>
 <FunctionDefinition name="Conjugate">
 
 <Signature name="Conjugate">_z_</Signature>
@@ -298,9 +298,9 @@ $$
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Abs
-</div>
+</nav>
 <FunctionDefinition name="Abs">
 
 <Signature name="Abs">_z_</Signature>
@@ -325,9 +325,9 @@ $$
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Arg
-</div>
+</nav>
 <FunctionDefinition name="Arg">
 
 <Signature name="Arg">_z_</Signature>
@@ -351,9 +351,9 @@ $$
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### AbsArg
-</div>
+</nav>
 <FunctionDefinition name="AbsArg">
 
 <Signature name="AbsArg">_z_</Signature>
@@ -374,9 +374,9 @@ $$
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### ComplexRoots
-</div>
+</nav>
 <FunctionDefinition name="ComplexRoots">
 
 <Signature name="ComplexRoots">_z_, _n_</Signature>
@@ -10247,9 +10247,9 @@ An `["Assume"]` expression is used to assert a predicate about an expression. It
 used to provide additional information to the system, for example to indicate
 that a variable is positive.
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Declare
-</div>
+</nav>
 <FunctionDefinition name="Declare">
 
 <Signature name="Declare">_symbol_, _type__</Signature>
@@ -10276,9 +10276,9 @@ since it changes the state of the Compute Engine.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Assign
-</div>
+</nav>
 <FunctionDefinition name="Assign">
 
 <Signature name="Assign">_symbol_, _value_</Signature>
@@ -10304,9 +10304,9 @@ This is equivalent to `=` in may programming languages.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Assume
-</div>
+</nav>
 <FunctionDefinition name="Assume">
 
 <Signature name="Assume">_predicate_</Signature>
@@ -10336,9 +10336,9 @@ The following functions can be applied to non-canonical expressions.
 The do not depend on the canonical form, but reflect the structure of the
 expression.
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### About
-</div>
+</nav>
 <FunctionDefinition name="About">
 
 <Signature name="About">_symbol__</Signature>
@@ -10349,9 +10349,9 @@ such as its type, its attributes, its value, etc...
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Head
-</div>
+</nav>
 <FunctionDefinition name="Head">
 
 <Signature name="Head">_expression_</Signature>
@@ -10366,9 +10366,9 @@ Evaluate to the head of _expression_
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Tail
-</div>
+</nav>
 <FunctionDefinition name="Tail">
 
 <Signature name="Tail">_expression_</Signature>
@@ -10392,9 +10392,9 @@ Evaluate to a sequence of the arguments of _expression_.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Hold
-</div>
+</nav>
 <FunctionDefinition name="Hold">
 
 <Signature name="Hold">_expression_</Signature>
@@ -10403,9 +10403,9 @@ Tag an expression that should be kept in an unevaluated form
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Identity
-</div>
+</nav>
 <FunctionDefinition name="Identity">
 
 <Signature name="Identity">_expression_</Signature>
@@ -10424,9 +10424,9 @@ as an argument and returns a function).
 The following functions can be used to obtain information about an expression.
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Domain
-</div>
+</nav>
 <FunctionDefinition name="Domain">
 
 <Signature name="Domain">_expression_</Signature>
@@ -10442,9 +10442,9 @@ Evaluate to the domain of _expression_
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsSame
-</div>
+</nav>
 <FunctionDefinition name="IsSame">
 
 <Signature name="IsSame">_expression1_, _expression2_</Signature>
@@ -10471,9 +10471,9 @@ as the `Equal` function.
 
 ## Transforming an Expression
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Evaluate
-</div>
+</nav>
 <FunctionDefinition name="Evaluate">
 
 <Signature name="Evaluate">_expression_</Signature>
@@ -10488,9 +10488,9 @@ Read more about [exact calculations and approximate calculations](/compute-engin
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Expand
-</div>
+</nav>
 <FunctionDefinition name="Expand">
 
 <Signature name="Expand">_expression_</Signature>
@@ -10509,9 +10509,9 @@ For example: `a(b + c) = ab + ac`
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### ExpandAll
-</div>
+</nav>
 <FunctionDefinition name="ExpandAll">
 
 <Signature name="ExpandAll">_expression_</Signature>
@@ -10526,9 +10526,9 @@ Expand an expression, recursively.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Factor
-</div>
+</nav>
 <FunctionDefinition name="Factor">
 
 <Signature name="Factor">_expression_</Signature>
@@ -10543,9 +10543,9 @@ Factor an expression.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Together
-</div>
+</nav>
 <FunctionDefinition name="Together">
 
 <Signature name="Together">_expression_</Signature>
@@ -10560,9 +10560,9 @@ Combine the terms of a sum of fractions into a single fraction.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Simplify
-</div>
+</nav>
 <FunctionDefinition name="Simplify">
 
 <Signature name="Simplify">_expression_</Signature>
@@ -10573,9 +10573,9 @@ in order to reduce, simplify and calculate its value.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### CanonicalForm
-</div>
+</nav>
 <FunctionDefinition name="CanonicalForm">
 
 <Signature name="CanonicalForm">_expression_</Signature>
@@ -10696,9 +10696,9 @@ const correct = ce.parse(mf.value, {canonical: "Order"})
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### N
-</div>
+</nav>
 <FunctionDefinition name="N">
 
 <Signature name="N">_expression_</Signature>
@@ -10716,9 +10716,9 @@ Evaluate to a numerical approximation of the expression.
 
 ## Core Functions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Error
-</div>
+</nav>
 <FunctionDefinition name="Error">
 
 <Signature name="Error">_error-code_, _context_</Signature>
@@ -10734,9 +10734,9 @@ about the error.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### InverseFunction
-</div>
+</nav>
 <FunctionDefinition name="InverseFunction">
 
 <Signature name="InverseFunction">_symbol_</Signature>
@@ -10754,9 +10754,9 @@ as an argument and returns a function).
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### String
-</div>
+</nav>
 <FunctionDefinition name="String">
 
 <Signature name="String">_expression_</Signature>
@@ -10772,9 +10772,9 @@ strings
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Symbol
-</div>
+</nav>
 <FunctionDefinition name="Symbol">
 
 <Signature name="Symbol">_expression_</Signature>
@@ -10799,9 +10799,9 @@ use `Declare`.
 
 ## Parsing and Serializing Latex
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Parse
-</div>
+</nav>
 <FunctionDefinition name="Parse">
 
 <Signature name="Parse">_string_</Signature>
@@ -10817,9 +10817,9 @@ corresponding to the LaTeX string.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Latex
-</div>
+</nav>
 <FunctionDefinition name="Latex">
 
 <Signature name="Latex">_expression_</Signature>
@@ -10827,9 +10827,9 @@ corresponding to the LaTeX string.
 Evaluate to a `LatexString` which is the expression serialized to LaTeX
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### LatexString
-</div>
+</nav>
 <FunctionDefinition name="LatexString">
 
 <Signature name="LatexString">_string_</Signature>
@@ -15669,9 +15669,9 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 `\`.
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Vector
-</div>
+</nav>
 <FunctionDefinition name="Vector">
 
 <Signature name="Vector">_x-1_, ..._x-2_</Signature>
@@ -15699,9 +15699,9 @@ A row vector can be represented with a simple list or a tuple.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Matrix
-</div>
+</nav>
 <FunctionDefinition name="Matrix">
 
 <Signature name="Matrix">_matrix_</Signature>
@@ -15756,9 +15756,9 @@ columns and `:` indicate a dashed lines between two columns.
 ## Matrix Properties
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Shape
-</div>
+</nav>
 <FunctionDefinition name="Shape">
 
 <Signature name="Shape">_matrix_</Signature>
@@ -15788,9 +15788,9 @@ used to refer to the length of a matrix along a specific axis.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Rank
-</div>
+</nav>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_matrix_</Signature>
@@ -15821,9 +15821,9 @@ The rank is the length of the shape of the tensor.
 
 ## Accessing the content of Tensors
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### At
-</div>
+</nav>
 <FunctionDefinition name="At">
 
 <Signature name="At">_matrix_, _index-1_, _index-2_, ...</Signature>
@@ -15868,9 +15868,9 @@ square brackets following a matrix.
 
 ## Transforming Matrixes
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Flatten
-</div>
+</nav>
 <FunctionDefinition name="Flatten">
 
 <Signature name="Flatten">_matrix_</Signature>
@@ -15895,9 +15895,9 @@ are flattened.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Reshape
-</div>
+</nav>
 <FunctionDefinition name="Reshape">
 
 <Signature name="Reshape">_matrix_, _shape_</Signature>
@@ -15934,9 +15934,9 @@ with zeros.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Transpose
-</div>
+</nav>
 <FunctionDefinition name="Transpose">
 
 <Signature name="Transpose">_matrix_</Signature>
@@ -15958,9 +15958,9 @@ indexes start at 1.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### ConjugateTranspose
-</div>
+</nav>
 <FunctionDefinition name="ConjugateTranspose">
 
 <Signature name="ConjugateTranspose">_matrix_</Signature>
@@ -15985,9 +15985,9 @@ of the tensor are conjugated.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Inverse
-</div>
+</nav>
 <FunctionDefinition name="Inverse">
 
 <Signature name="Inverse">_matrix_</Signature>
@@ -16003,9 +16003,9 @@ Returns the inverse of the matrix.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PseudoInverse
-</div>
+</nav>
 <FunctionDefinition name="PseudoInverse">
 
 <Signature name="PseudoInverse">_matrix_</Signature>
@@ -16021,9 +16021,9 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 
 </FunctionDefinition>
   
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Diagonal
-</div>
+</nav>
 <FunctionDefinition name="Diagonal">
 
 <Signature name="Diagonal">_matrix_</Signature>
@@ -16041,9 +16041,9 @@ on the diagonal of the matrix.
 ## Calculating with Matrixes
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Determinant
-</div>
+</nav>
 <FunctionDefinition name="Determinant">
 
 <Signature name="Determinant">_matrix_</Signature>
@@ -16059,9 +16059,9 @@ Returns the determinant of the matrix.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### AdjugateMatrix
-</div>
+</nav>
 <FunctionDefinition name="AdjugateMatrix">
 
 <Signature name="AdjugateMatrix">_matrix_</Signature>
@@ -16085,9 +16085,9 @@ the element.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Trace
-</div>
+</nav>
 <FunctionDefinition name="Trace">
 
 <Signature name="Trace">_matrix_</Signature>
@@ -20042,9 +20042,9 @@ Combinatorics functions in the Compute Engine provide essential tools for counti
 
 ## Functions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Choose
-</div>
+</nav>
 <FunctionDefinition name="Choose">
 <Signature name="Choose" returns="number">n: number, m: number</Signature>
 Computes the <b>binomial coefficient</b>, often read as “n choose m,” representing the number of ways to select <b>m</b> elements from a set of <b>n</b> elements without regard to order. 
@@ -20069,9 +20069,9 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Fibonacci
-</div>
+</nav>
 <FunctionDefinition name="Fibonacci">
 <Signature name="Fibonacci" returns="integer">n: integer</Signature>
 Returns the <b>n<sup>th</sup> Fibonacci number</b>, a sequence defined by the sum of the two preceding numbers starting with 0 and 1. 
@@ -20097,9 +20097,9 @@ See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Binomial
-</div>
+</nav>
 <FunctionDefinition name="Binomial">
 <Signature name="Binomial" returns="integer">n: integer, k: integer</Signature>
 Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>.
@@ -20120,9 +20120,9 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### CartesianProduct
-</div>
+</nav>
 <FunctionDefinition name="CartesianProduct">
 <Signature name="CartesianProduct" returns="set">set₁: set, set₂: set, ...</Signature>
 Returns the <b>Cartesian product</b> of one or more input sets, producing all ordered tuples where each element is drawn from the corresponding input set.
@@ -20143,9 +20143,9 @@ A \\times B = \\{ (a, b) \\mid a \\in A, b \\in B \\}
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PowerSet
-</div>
+</nav>
 <FunctionDefinition name="PowerSet">
 <Signature name="PowerSet" returns="set">set: set</Signature>
 Computes the <b>power set</b> of the given set, which is the set of all subsets including the empty set and the set itself.
@@ -20166,9 +20166,9 @@ See also: [Power set - Wikipedia](https://en.wikipedia.org/wiki/Power_set)
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Permutations
-</div>
+</nav>
 <FunctionDefinition name="Permutations">
 <Signature name="Permutations" returns="list&lt;list&gt;">collection: list, k?: integer</Signature>
 Generates all <b>permutations</b> of the input collection of length <code>k</code>. If <code>k</code> is omitted, permutations of the full length of the collection are returned.
@@ -20193,9 +20193,9 @@ See also: [Permutation - Wikipedia](https://en.wikipedia.org/wiki/Permutation)
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Combinations
-</div>
+</nav>
 <FunctionDefinition name="Combinations">
 <Signature name="Combinations" returns="list&lt;list&gt;">collection: list, k: integer</Signature>
 Returns all <b>k-element combinations</b> (unordered subsets) of the input collection.
@@ -20213,9 +20213,9 @@ See also: [Combination - Wikipedia](https://en.wikipedia.org/wiki/Combination)
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Multinomial
-</div>
+</nav>
 <FunctionDefinition name="Multinomial">
 <Signature name="Multinomial" returns="integer">k₁: integer, k₂: integer, ...</Signature>
 Calculates the <b>multinomial coefficient</b> for the given group sizes, representing the number of ways to partition a set of $$ n = k_1 + k_2 + \cdots $$ elements into groups of sizes $$ k_1, k_2, \ldots $$.
@@ -20236,9 +20236,9 @@ See also: [Multinomial theorem - Wikipedia](https://en.wikipedia.org/wiki/Multin
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Subfactorial
-</div>
+</nav>
 <FunctionDefinition name="Subfactorial">
 <Signature name="Subfactorial" returns="integer">n: integer</Signature>
 Returns the number of <b>derangements</b> of <code>n</code> elements, i.e., permutations with no fixed points where no element appears in its original position.
@@ -20259,9 +20259,9 @@ See also: [Derangement - Wikipedia](https://en.wikipedia.org/wiki/Derangement)
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### BellNumber
-</div>
+</nav>
 <FunctionDefinition name="BellNumber">
 <Signature name="BellNumber" returns="integer">n: integer</Signature>
 Computes the <b>Bell number</b> $$ B(n) $$, which counts the number of ways to partition a set of <code>n</code> elements into any number of non-empty, disjoint subsets.
@@ -20502,9 +20502,9 @@ divisor functions, partitions, polygonal numbers, perfect/happy numbers, and spe
 
 ## Function Definitions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Totient
-</div>
+</nav>
 
 <FunctionDefinition name="Totient">
 <Signature name="Totient" returns="integer">n: integer</Signature>
@@ -20522,9 +20522,9 @@ See also: [Euler's totient function - Wikipedia](https://en.wikipedia.org/wiki/E
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sigma0
-</div>
+</nav>
 
 <FunctionDefinition name="Sigma0">
 <Signature name="Sigma0" returns="integer">n: integer</Signature>
@@ -20541,9 +20541,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sigma1
-</div>
+</nav>
 
 <FunctionDefinition name="Sigma1">
 <Signature name="Sigma1" returns="integer">n: integer</Signature>
@@ -20560,9 +20560,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### SigmaMinus1
-</div>
+</nav>
 
 <FunctionDefinition name="SigmaMinus1">
 <Signature name="SigmaMinus1" returns="number">n: integer</Signature>
@@ -20579,9 +20579,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Eulerian
-</div>
+</nav>
 
 <FunctionDefinition name="Eulerian">
 <Signature name="Eulerian" returns="integer">n: integer, m: integer</Signature>
@@ -20599,9 +20599,9 @@ See also: [Eulerian number - Wikipedia](https://en.wikipedia.org/wiki/Eulerian_n
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Stirling
-</div>
+</nav>
 
 <FunctionDefinition name="Stirling">
 <Signature name="Stirling" returns="integer">n: integer, m: integer</Signature>
@@ -20618,9 +20618,9 @@ See also: [Stirling number of the second kind - Wikipedia](https://en.wikipedia.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### NPartition
-</div>
+</nav>
 
 <FunctionDefinition name="NPartition">
 <Signature name="NPartition" returns="integer">n: integer</Signature>
@@ -20637,9 +20637,9 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsTriangular
-</div>
+</nav>
 
 <FunctionDefinition name="IsTriangular">
 <Signature name="IsTriangular" returns="boolean">n: integer</Signature>
@@ -20656,9 +20656,9 @@ See also: [Triangular number - Wikipedia](https://en.wikipedia.org/wiki/Triangul
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsSquare
-</div>
+</nav>
 
 <FunctionDefinition name="IsSquare">
 <Signature name="IsSquare" returns="boolean">n: integer</Signature>
@@ -20675,9 +20675,9 @@ See also: [Square number - Wikipedia](https://en.wikipedia.org/wiki/Square_numbe
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsPentagonal
-</div>
+</nav>
 
 <FunctionDefinition name="IsPentagonal">
 <Signature name="IsPentagonal" returns="boolean">n: integer</Signature>
@@ -20694,9 +20694,9 @@ See also: [Pentagonal number - Wikipedia](https://en.wikipedia.org/wiki/Pentagon
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsOctahedral
-</div>
+</nav>
 
 <FunctionDefinition name="IsOctahedral">
 <Signature name="IsOctahedral" returns="boolean">n: integer</Signature>
@@ -20713,9 +20713,9 @@ See also: [Octahedral number - Wikipedia](https://en.wikipedia.org/wiki/Octahedr
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsCenteredSquare
-</div>
+</nav>
 
 <FunctionDefinition name="IsCenteredSquare">
 <Signature name="IsCenteredSquare" returns="boolean">n: integer</Signature>
@@ -20732,9 +20732,9 @@ See also: [Centered square number - OEIS A001844](https://oeis.org/A001844)
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsPerfect
-</div>
+</nav>
 
 <FunctionDefinition name="IsPerfect">
 <Signature name="IsPerfect" returns="boolean">n: integer</Signature>
@@ -20751,9 +20751,9 @@ See also: [Perfect number - Wikipedia](https://en.wikipedia.org/wiki/Perfect_num
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsHappy
-</div>
+</nav>
 
 <FunctionDefinition name="IsHappy">
 <Signature name="IsHappy" returns="boolean">n: integer</Signature>
@@ -20770,9 +20770,9 @@ See also: [Happy number - Wikipedia](https://en.wikipedia.org/wiki/Happy_number)
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsAbundant
-</div>
+</nav>
 
 <FunctionDefinition name="IsAbundant">
 <Signature name="IsAbundant" returns="boolean">n: integer</Signature>
@@ -20803,9 +20803,9 @@ following forms:
 ## Functions
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Mean
-</div>
+</nav>
 <FunctionDefinition name="Mean">
 
 <Signature name="Mean">_collection_</Signature>
@@ -20829,9 +20829,9 @@ $$x_i$$ is the $$i$$-th number in the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Median
-</div>
+</nav>
 <FunctionDefinition name="Median">
 
 <Signature name="Median">_collection_</Signature>
@@ -20851,9 +20851,9 @@ the average of the two middle elements.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Mode
-</div>
+</nav>
 <FunctionDefinition name="Mode">
 
 <Signature name="Mode">_collection_</Signature>
@@ -20873,9 +20873,9 @@ list is called **multimodal**.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Variance
-</div>
+</nav>
 <FunctionDefinition name="Variance">
 
 <Signature name="Variance">_collection_</Signature>
@@ -20895,9 +20895,9 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PopulationVariance
-</div>
+</nav>
 <FunctionDefinition name="PopulationVariance">
 
 <Signature name="PopulationVariance">_collection_</Signature>
@@ -20915,9 +20915,9 @@ where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### StandardDeviation
-</div>
+</nav>
 <FunctionDefinition name="StandardDeviation">
 
 <Signature name="StandardDeviation">_collection_</Signature>
@@ -20937,9 +20937,9 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PopulationStandardDeviation
-</div>
+</nav>
 <FunctionDefinition name="PopulationStandardDeviation">
 
 <Signature name="PopulationStandardDeviation">_collection_</Signature>
@@ -20956,9 +20956,9 @@ where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Skewness
-</div>
+</nav>
 <FunctionDefinition name="Skewness">
 
 <Signature name="Skewness">_collection_</Signature>
@@ -20977,9 +20977,9 @@ standard deviation of the _collection_.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Kurtosis
-</div>
+</nav>
 <FunctionDefinition name="Kurtosis">
 
 <Signature name="Kurtosis">_collection_</Signature>
@@ -20999,9 +20999,9 @@ deviation of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Quantile
-</div>
+</nav>
 <FunctionDefinition name="Quantile">
 
 <Signature name="Quantile">_collection_, _q:number_</Signature>
@@ -21016,9 +21016,9 @@ So, $$\operatorname{median} = \operatorname{quantile}(0.5)$$.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Quartiles
-</div>
+</nav>
 <FunctionDefinition name="Quartiles">
 
 <Signature name="Quartiles">_collection_</Signature>
@@ -21035,9 +21035,9 @@ four equal groups, each group comprising a quarter of the _collection_.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### InterquartileRange
-</div>
+</nav>
 <FunctionDefinition name="InterquartileRange">
 
 <Signature name="InterquartileRange">_collection_</Signature>
@@ -21049,9 +21049,9 @@ first quartile.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Histogram
-</div>
+</nav>
 <FunctionDefinition name="Histogram">
 
 <Signature name="Histogram">_collection_, _bins:number_</Signature>
@@ -21068,9 +21068,9 @@ number of elements in each bin.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### BinCounts
-</div>
+</nav>
 <FunctionDefinition name="BinCounts">
 
 <Signature name="BinCounts">_collection_, _bins:number_</Signature>
@@ -21087,9 +21087,9 @@ number of bins.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### SlidingWindow
-</div>
+</nav>
 <FunctionDefinition name="SlidingWindow">
 
 <Signature name="SlidingWindow">_collection_, _windowSize:number_</Signature>
@@ -21106,9 +21106,9 @@ A sliding window is a moving subset of the data of a specified window size.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sample
-</div>
+</nav>
 <FunctionDefinition name="Sample">
 
 <Signature name="Sample">_collection_, _size:number_</Signature>
@@ -21119,9 +21119,9 @@ Sampling is done without replacement unless otherwise specified.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Rank
-</div>
+</nav>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_collection_</Signature>
@@ -21132,9 +21132,9 @@ The rank is the position of each element in the sorted order of the collection.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Argsort
-</div>
+</nav>
 <FunctionDefinition name="Argsort">
 
 <Signature name="Argsort">_collection_</Signature>
@@ -21642,114 +21642,42 @@ into one unit. Each element in a collection is a
 
 ## Introduction
 
+The most common kind of collection are:
+- [**List**](#list)`:list`: ordered collection of elements (duplicates allowed)
+- [**Set**](#set)`:set`: unordered collection of unique elements
+- [**Tuple**](#tuple)`:tuple`: ordered, fixed-size collection with optional names
+- [**Record**](#record)`:record`: structured data with a fixed set of known string keys
+- [**Dictionary**](#dictionary)`:dictionary`: unordered key-value pairs with string keys
+
 Collections are **immutable**: they cannot be modified in place.  
-Operations on collections produce new collections.
+Instead, operations on collections produce new collections.
 
-The most common collection types are:
-- [**List**](#list): ordered collection of elements (duplicates allowed)
-- [**Set**](#set): unordered collection of unique elements
-- [**Tuple**](#tuple): ordered, fixed-size collection with optional names
-- [**Dictionary**](#dictionary): unordered key-value pairs with string keys
-- [**Record**](#record): structured data with a fixed set of known string keys
 
-You can use collections to represent mathematical vectors, matrices, sequences, mappings, or records — in both finite and infinite forms.
+
+Collections can be used to represent vectors, matrices, sets,
+mappings, or records — in both finite and infinite forms.
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
-See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
+See also the **Linear Algebra** section for operations on vectors, matrices, 
+tensors which are a special kind of collection (lists of lists of numbers).<Icon name="chevron-right-bold" />
 </ReadMore>
 
-
-
-### Core Properties of Collections
-
-All collections share these basic properties:
-- Their elements can be **enumerated**
-- They can check whether an element is a **member** of the collection
-- The number of elements can be **counted**
-
-**Note:** Depending on the type of collection, counting and membership checking can be an expensive operation, for example, for lazy infinite collections.
-
-
-### Finite and Infinite Collections
-
-Collections may be:
-- **Finite**: containing a definite number of elements.
-- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
-
-Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
-
-
-### Lazy and Strict Collections
-
-Collections can be:
-- **Strict**: elements are fully evaluated when the collection is created.
-- **Lazy**: elements are evaluated only as they are accessed.
-
-Lazy collections are useful when working with infinite sequences or with expensive computations.
-
-You can convert a lazy collection to a strict collection using `ListFrom` or `SetFrom`.  
-These functions enumerate all elements (if finite) and produce a strict result.
-
-```json example
-["ListFrom", ["Range", 1, 10]]
-// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-```
-
-### Why Lazy Infinite Collections?
-
-Lazy infinite collections provide a natural way to model mathematical sequences, iterative processes, or cyclic patterns — with minimal memory use.  
-Common examples include:
-- Natural numbers (`Range`)
-- Cyclic patterns (`Cycle`)
-- Iterative computations (`Iterate`)
 
 
 ### Ordered and Unordered Collections
 
 Collections fall into two broad categories:
 - **Ordered collections** (such as `List` and `Tuple`)  
-  → Elements can be accessed by an **index**.  
-    The first element has index `1`, the second has index `2`, etc.  
-    Negative indexes count from the end: index `-1` is the last element.
-- **Unordered collections** (such as `Set`, `Record`)  
+  → Elements can be accessed by an **index**, an integer that indicates the position of the element in the collection.
+- **Unordered collections** (such as `Set` and `Record`)  
   → Elements cannot be accessed by index. They can be enumerated or looked up by key.
 
 
-### Types
+The first element of an ordered collection has index `1`, the second element 
+has index `2`, and so on. The last element has index equal to the length of the collection.
 
-- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
-- The type `ordered collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
-
-
-
-### Summary of Collection Types
-
-| Collection Type | Ordered? | Unique Elements? | Fixed Size? | Lazy Possible? | Example |
-| --------------- | -------- | ---------------- | ----------- | -------------- | ------- |
-| **List**        | Yes      | No               | No          | Yes            | `["List", 1, 2, 3]` |
-| **Set**         | No       | Yes              | No          | Yes            | `["Set", 1, 2, 3]` |
-| **Tuple**       | Yes      | No               | Yes         | No             | `["Tuple", "x", "y"]` |
-| **Dictionary**  | Keys unordered | Keys unique | No          | No             | `["Dictionary", ["Tuple", "a", 1], ["Tuple", "b", 2]]` |
-| **Record**      | Keys unordered | Keys unique | Yes         | No             | `["Record", ["Tuple", "name", "Alice"], ["Tuple", "age", 30]]` |
-
-*Note:*  
-Collections like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections** that behave like infinite Lists, unless a strict conversion or truncation (e.g. with `Take()`) is used.
-
----
-
-
-### Ordered Collections
-
-The elements of some collections can be accessed by their **index**, a
-number that indicates the position of the element in the collection. 
-
-Collections that can be accessed by index are called **ordered collections**. 
-
-The first element has index `1`, the second element has index `2`, and so on. The last
-element has index equal to the length of the collection.
-
-Negative indexes can also be used to access elements from the end of the
-collection. 
+**Negative indexes** can also be used to access elements from the end of the
+collection, if the collection is finite.
 
 The last element has index `-1`, the second to last element has index `-2`,
 and so on. This is useful for accessing elements without knowing the length of the
@@ -21764,6 +21692,62 @@ collection.
 ```
 
 
+### Finite and Infinite Collections
+
+Collections may be:
+- **Finite**: containing a definite number of elements.
+- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
+
+Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
+
+### Lazy and Eager Collections
+
+Collections can be:
+- **Eager**: elements are fully evaluated when the collection is created.
+- **Lazy**: elements are evaluated only as they are accessed.
+
+Lazy collections are useful when working with with expensive computations
+and necessary when working with infinite collections.
+
+Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
+
+You can convert a lazy collection to an eager collection using [`ListFrom`](#listfrom) 
+or [`SetFrom`](#setfrom). These functions enumerate all elements of a finite 
+collection and produce a matching eager collection.
+
+```json example
+["ListFrom", ["Range", 1, 10]]
+// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+Lazy infinite collections provide a natural way to model mathematical 
+sequences, iterative processes, or cyclic patterns, with minimal memory use.
+
+Common examples include:
+- Natural numbers (`Range`)
+- Cyclic patterns (`Cycle`)
+- Iterative computations (`Iterate`)
+
+
+### Core Properties of Collections
+
+All collections share these basic properties:
+- Their elements can be **enumerated**
+- Their elements can be **counted**
+- They can check whether an element is a **member** of the collection
+- They can check if another collection is a **subset** of the collection
+
+**Note:** Depending on the type of collection, counting and membership checking 
+can be an expensive operation. See the information on specific collection types for details.
+
+In addition, ordered collections support:
+- **Index-based access**: elements can be accessed by their index.
+- **Finding elements**: elements can be searched for by a predicate and 
+  their index can be returned.
+
+
+
+#### Eager Collections
 
 Some of the collections in the Compute Engine include:
 - [**List**](#list): ordered collections of elements, which are also used to represent
@@ -21779,17 +21763,22 @@ Some of the collections in the Compute Engine include:
 - [**Record**](#record): unordered collections of key-value pairs. Unlike dictionaries, records are used to represent structured data with a fixed set of keys, and the keys are known at compile time. 
   Type: `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values.
 
-Some functions evaluate to a lazy collection. This is useful for creating
-infinite collections or for collections that are expensive to compute. Examples of lazy collections include:
+#### Lazy Collections
 
+Some functions evaluate to a lazy collection. This is useful for creating
+infinite collections or for collections that are expensive to compute. 
+
+Examples of function evaluating to a lazy collection include:
 - [**Range**](#range) and [**Linspace**](#linspace): ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
 - [**Fill**](#fill): collections of a specified size, where each element is computed by a function or set to a specific value.
 
-The type `collection` is used to represent any collection, whether it is ordered or unordered, finite or infinite.
-The type `ordered collection` is used to represent collections that can be accessed by index, such as `List`, `Tuple`, and `Dictionary`.
+### Types
+
+- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
+- The type `ordered_collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
 
 
 
@@ -21819,17 +21808,43 @@ See also the **Linear Algebra** section for operations on vectors, matrices, ten
 
 
 
-## Creating Collections
+## Creating Eager Collections
 
-This section contains functions that create new collections from some elements.
+This section contains functions that create eager collections from some elements.
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
+### Sequence
+</nav>
+
+<FunctionDefinition name="Sequence">
+<Signature name="Sequence" returns="collection">..._elements_:any</Signature>
+
+A sequence is a collection of elements. When a sequence is used where an element
+is expected, the elements of the sequence are spliced into the expression.
+
+```json example
+["List", 1, ["Sequence", 2, 3], 4]
+// ➔ ["List", 1, 2, 3, 4]
+```
+
+The `Nothing` symbol is a synonym for the empty sequence `["Sequence"]`.
+When the `Nothing` symbol is used in a context where an element is expected, it is ignored.
+
+
+```json example
+["List", 1, "Nothing", 2]
+// ➔ ["List", 1, 2]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### List
-</div>
+</nav>
 
 <FunctionDefinition name="List">
 
-<Signature name="List" returns="list">..._element_:any</Signature>
+<Signature name="List" returns="list">..._elements_:any</Signature>
 
 A `List` is an **ordered** collection of elements. An element in
 a list may be repeated.
@@ -21839,6 +21854,9 @@ a list may be repeated.
 ```json example
 ["List", 42, 3.14, "x", "y"]
 ```
+
+The type of a list is `list<T>`, where `T` is the type of the elements in the list.
+The type `list` is a shorthand for `list<any>`, meaning the list can contain elements of any type.
 
 The visual presentation of a `List` expression can be customized using the
 `Delimiter` function.
@@ -21894,9 +21912,9 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Set
-</div>
+</nav>
 
 <FunctionDefinition name="Set">
 
@@ -21910,52 +21928,31 @@ An **unordered** collection of unique elements.
 ["Set", 12, 15, 17]
 ```
 
-</FunctionDefinition>
+The type of a set is `set<T>`, where `T` is the type of the elements in the set.
+The type `set` is a shorthand for `set<any>`, meaning the set can contain elements of any type.
 
-<div style={{visibility:"hidden"}}>
-### Fill
-</div>
-
-<FunctionDefinition name="Fill">
-
-<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
-
-<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
-
-Create a list of the specified dimensions.
-
-If a `value` is provided, the elements of the list are all set to that value.
-
-If a `function` is provided, the elements of the list are computed by applying
-the function to the index of the element.
-
-If `dimensions` is a number, a list of that length is created.
+If the same element is repeated, it is included only once in the set. The 
+elements are compared using the `IsSame` function.
 
 ```json example
-["Fill", 3, 0]
-// ➔ ["List", 0, 0, 0]
+["Set", 12, 15, 17, 12, 15]
+// ➔ ["Set", 12, 15, 17]
 ```
 
-If dimension is a tuple, a matrix of the specified dimensions is created.
+The elements in a set are not ordered, so the order of the elements in the set may not be the same as the order in which they were added. When enumerating a set, the elements are returned in an arbitrary order,
+and two successive enumerations may return the elements in a different order.
 
-```json example
-["Fill", ["Tuple", 2, 3], 0]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
-```
-
-If a `function` is specified, it is applied to the index of the element to
-compute the value of the element.
-
-```json example
-["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
-// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
-```
+The elements in a set are counted in constant time.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+
+## Creating Lazy Collections
+
+
+<nav className="hidden">
 ### Range
-</div>
+</nav>
 
 <FunctionDefinition name="Range">
 
@@ -21997,9 +21994,9 @@ negative.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Linspace
-</div>
+</nav>
 
 <FunctionDefinition name="Linspace">
 
@@ -22056,10 +22053,51 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 
 
+<nav className="hidden">
+### Fill
+</nav>
 
-<div style={{visibility:"hidden"}}>
+<FunctionDefinition name="Fill">
+
+<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
+
+<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
+
+Create a list of the specified dimensions.
+
+If a `value` is provided, the elements of the list are all set to that value.
+
+If a `function` is provided, the elements of the list are computed by applying
+the function to the index of the element.
+
+If `dimensions` is a number, a list of that length is created.
+
+```json example
+["Fill", 3, 0]
+// ➔ ["List", 0, 0, 0]
+```
+
+If dimension is a tuple, a matrix of the specified dimensions is created.
+
+```json example
+["Fill", ["Tuple", 2, 3], 0]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+```
+
+If a `function` is specified, it is applied to the index of the element to
+compute the value of the element.
+
+```json example
+["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
+// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### Repeat
-</div>
+</nav>
 
 
 <FunctionDefinition name="Repeat">
@@ -22080,6 +22118,11 @@ A list of the same element repeated `count` times.
 **Note:** `["Repeat", n]` is equivalent to `["Cycle", ["List", n]]`.
 
 </FunctionDefinition>
+
+<nav className="hidden">
+### Cycle
+</nav>
+
 
 <FunctionDefinition name="Cycle">
 
@@ -22105,11 +22148,9 @@ Use `Take` to get a finite number of elements.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Iterate
-</div>
-
-
+</nav>
 
 <FunctionDefinition name="Iterate">
 
@@ -22139,21 +22180,22 @@ Use `Take` to get a finite number of elements.
 </FunctionDefinition>
 
 
-## Operating On Collections
+## Accessing Elements of Collections
 
-The section contains functions whose argument is a collection, but whose return
-value is not a collection.
+Elements of ordered collections can be accessed using their index.
 
-<div style={{visibility:"hidden"}}>
+Indexes start at `1` for the first element. Negative indexes can be used to access elements from the end of the collection, with `-1` being the last element.
+
+<nav className="hidden">
 ### At
-</div>
+</nav>
 
 
 <FunctionDefinition name="At">
 
-<Signature name="At">_collection_, _index_</Signature>
+<Signature name="At">_xs_: ordered_collection, _index_: integer</Signature>
 
-<Signature name="At">_collection_, _index1_, _index2_, ...</Signature>
+<Signature name="At">_xs_: ordered_collection, ..._indexes_: integer</Signature>
 
 Returns the element at the specified index.
 
@@ -22173,37 +22215,17 @@ If the collection is nested, the indexes are applied in order.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
-### Filter
-</div>
-
-
-
-<FunctionDefinition name="Filter">
-
-<Signature name="Filter">_collection_, _function_</Signature>
-
-Returns a collection where _function_ is applied to each element of the
-collection. Only the elements for which the function returns `"True"` are kept.
-
-```json example
-["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
-// ➔ ["List", 5, 2]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### First
-</div>
+</nav>
 
 <FunctionDefinition name="First">
 
-<Signature name="First">_collection_</Signature>
+<Signature name="First">_xs_: ordered_collection</Signature>
 
 Return the first element of the collection.
 
-It's equivalent to `["Take", _collection_, 1]`.
+It's equivalent to `["At", _collection_, 1]`.
 
 ```json example
 ["First", ["List", 5, 2, 10, 18]]
@@ -22215,14 +22237,32 @@ It's equivalent to `["Take", _collection_, 1]`.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Second
+</nav>
 
-<div style={{visibility:"hidden"}}>
+<FunctionDefinition name="Second">
+
+<Signature name="Second">_xs_: ordered_collection</Signature>
+
+Return the second element of the collection.
+
+```json example
+["Second", ["Tuple", "x", "y"]]
+// ➔ "y"
+```
+
+</FunctionDefinition>
+
+
+
+<nav className="hidden">
 ### Last
-</div>
+</nav>
 
 <FunctionDefinition name="Last">
 
-<Signature name="Last">_collection_</Signature>
+<Signature name="Last">_xs_: ordered_collection</Signature>
 
 Return the last element of the collection.
 
@@ -22231,27 +22271,228 @@ Return the last element of the collection.
 // ➔ 18
 ```
 
-<Signature name="Last">_collection_, _n_</Signature>
+</FunctionDefinition>
 
-Return the last _n_ elements of the collection.
+<nav className="hidden">
+### Most
+</nav>
+
+<FunctionDefinition name="Most">
+
+<Signature name="Most">_xs_: ordered_collection</Signature>
+
+Return everything but the last element of the collection.
+
+It's equivalent to `["Drop", _xs_, -1]`.
 
 ```json example
-["Last", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18]
+["Most", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 5, 2, 10]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Rest
+</nav>
+
+<FunctionDefinition name="Rest">
+
+<Signature name="Rest">_xs_: ordered_collection</Signature>
+
+Return everything but the first element of the collection.
+
+It's equivalent to `["Drop", _xs_, 1]`.
+
+```json example
+["Rest", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 2, 10, 18]
 ```
 
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
+### Take
+</nav>
+
+<FunctionDefinition name="Take">
+
+<Signature name="Take" returns="collection">_xs_: ordered_collection, _n_: integer</Signature>
+
+Return a list of the first `n` elements of `xs`. The collection _xs_ must be ordered.
+
+If `n` is negative, it returns the last `n` elements.
+
+```json example
+["Take", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 5, 2]
+
+["Take", ["List", 5, 2, 10, 18], -2]
+// ➔ ["List", 18, 10]
+```
+
+See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
+
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Drop
+</nav>
+
+<FunctionDefinition name="Drop">
+<Signature name="Drop" returns="collection">_xs_:collection, _n_:integer</Signature>
+
+Return a list without the first `n` elements.
+
+If `n` is negative, it returns a list without the last `n` elements.
+
+```json example
+["Drop", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 18]
+
+["Drop", ["List", 5, 2, 10, 18], -2]
+// ➔ ["List", 5, 2]
+```
+
+See [**Take**](#take) for a function that returns the first `n` elements.
+
+
+</FunctionDefinition>
+
+
+## Changing the Order of Elements
+
+
+<nav className="hidden">
+### Reverse
+</nav>
+
+<FunctionDefinition name="Reverse">
+
+<Signature name="Reverse">_xs_: ordered_collection</Signature>
+
+Return the collection in reverse order.
+
+```json example
+["Reverse", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 18, 10, 2, 5]
+```
+
+It's equivalent to `["Extract", _xs_, ["Tuple", -1, 1]]`.
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### RotateLeft
+</nav>
+
+<FunctionDefinition name="RotateLeft">
+
+<Signature name="RotateLeft">_xs_: ordered_collection, _count_: integer</Signature>
+
+Returns a collection where the elements are rotated to the left by the specified
+count.
+
+```json example
+["RotateLeft", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 18, 5, 2]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### RotateRight
+</nav>
+
+<FunctionDefinition name="RotateRight">
+
+<Signature name="RotateRight">_xs_: ordered_collection, _count_: integer</Signature>
+
+Returns a collection where the elements are rotated to the right by the
+specified count.
+
+```json example
+["RotateRight", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 18, 5, 2]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Shuffle
+</nav>
+
+<FunctionDefinition name="Shuffle">
+
+<Signature name="Shuffle" returns="list">_xs_: ordered_collection</Signature>
+
+Return the collection in random order.
+
+```json example
+["Shuffle", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 10, 18, 5, 5]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Sort
+</nav>
+
+<FunctionDefinition name="Sort">
+
+<Signature name="Sort">_xs_: ordered_collection</Signature>
+
+<Signature name="Sort">_xs_: ordered_collection, _order-function_: function</Signature>
+
+Return the collection in sorted order.
+
+```json example
+["Sort", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 2, 5, 10, 18]
+```
+
+</FunctionDefinition>
+
+
+## Operating On Collections
+
+
+<nav className="hidden">
+### Filter
+</nav>
+
+
+
+<FunctionDefinition name="Filter">
+
+<Signature name="Filter" returns="collection">_xs_: collection, _pred_: function</Signature>
+
+Returns a collection where _pred_ is applied to each element of the
+collection. Only the elements for which the predicate returns `"True"` are kept.
+
+```json example
+["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
+// ➔ ["List", 5, 2]
+```
+
+</FunctionDefinition>
+
+
+
+<nav className="hidden">
 ### Length
-</div>
+</nav>
 
 
 
 <FunctionDefinition name="Length">
 
-<Signature name="Length">_collection_</Signature>
+<Signature name="Length" returns="integer">_xs_: collection</Signature>
 
 Returns the number of elements in the collection.
 
@@ -22273,15 +22514,15 @@ the string.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsEmpty
-</div>
+</nav>
 
 <FunctionDefinition name="IsEmpty">
 
-<Signature name="IsEmpty">_collection_</Signature>
+<Signature name="IsEmpty" returns="boolean">_xs_: collection</Signature>
 
-Returns the symbol `True` if the collection is empty.
+Returns the symbol `True` if the collection has no elements.
 
 ```json example
 ["IsEmpty", ["List", 5, 2, 10, 18]]
@@ -22293,38 +22534,40 @@ Returns the symbol `True` if the collection is empty.
 ["IsEmpty", "x"]
 // ➔ "True"
 
-["IsEmpty", {str: "Hello"]
+["IsEmpty", {str: "Hello"}]
 // ➔ "False"
 ```
 
 </FunctionDefinition>
 
 <FunctionDefinition name="Contains">
-<Signature name="Contains">_collection_, _value_</Signature>
+<Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise.
+Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function.
+
 
 ```json example
 ["Contains", ["List", 5, 2, 10, 18], 10]
 // ➔ "True"
+
 ["Contains", ["List", 5, 2, 10, 18], 42]
 // ➔ "False"
 ```
 </FunctionDefinition>
 
 <FunctionDefinition name="IndexWhere">
-<Signature name="IndexWhere">_collection_, _predicate_:function</Signature>
+<Signature name="IndexWhere" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the 1-based index of the first element in the collection that satisfies the predicate, or 0 if not found.
 
 ```json example
-["IndexWhere", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+["IndexWhere", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 3
 ```
 </FunctionDefinition>
 
 <FunctionDefinition name="Find">
-<Signature name="Find">_collection_, _predicate_:function</Signature>
+<Signature name="Find">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
 
@@ -22337,12 +22580,12 @@ Returns the first element in the collection that satisfies the predicate, or `No
 </FunctionDefinition>
 
 <FunctionDefinition name="CountIf">
-<Signature name="CountIf">_collection_, _predicate_:function</Signature>
+<Signature name="CountIf" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the number of elements in the collection that satisfy the predicate.
 
 ```json example
-["CountIf", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+["CountIf", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
 // ➔ 2
 ```
 </FunctionDefinition>
@@ -22384,9 +22627,9 @@ Returns `True` if all elements of the collection satisfy the predicate, `False` 
 ```
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Map
-</div>
+</nav>
 
 
 <FunctionDefinition name="Map">
@@ -22409,9 +22652,9 @@ Returns a collection where _f_ is applied to each element of _xs_.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Reduce
-</div>
+</nav>
 
 <FunctionDefinition name="Reduce">
 
@@ -22481,28 +22724,11 @@ To get the values in sorted order, use `Extract`:
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
-### Second
-</div>
-
-<FunctionDefinition name="Second">
-
-<Signature name="Second">_collection_</Signature>
-
-Return the second element of the collection.
-
-```json example
-["Second", ["Tuple", "x", "y"]]
-// ➔ "y"
-```
-
-</FunctionDefinition>
 
 
-
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Tally
-</div>
+</nav>
 
 
 <FunctionDefinition name="Tally">
@@ -22522,9 +22748,9 @@ Evaluate to a tuple of two lists:
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Zip
-</div>
+</nav>
 
 <FunctionDefinition name="Zip">
 
@@ -22589,34 +22815,11 @@ a collection made of a subset of the elements of the input.
 Collections are immutable. These functions do not modify the input collection, but
 return a new collection.
 
-<div style={{visibility:"hidden"}}>
-### Drop
-</div>
-
-<FunctionDefinition name="Drop">
-<Signature name="Drop" returns="collection">_xs_:collection, _n_:integer</Signature>
-
-Return a list without the first `n` elements.
-
-If `n` is negative, it returns a list without the last `n` elements.
-
-```json example
-["Drop", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18]
-
-["Drop", ["List", 5, 2], -2]
-// ➔ ["List", 5, 2]
-```
-
-See [**Take**](#take) for a function that returns the first `n` elements.
 
 
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Exclude
-</div>
+</nav>
 
 <FunctionDefinition name="Exclude">
 
@@ -22662,9 +22865,9 @@ once.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Extract
-</div>
+</nav>
 
 <FunctionDefinition name="Extract">
 
@@ -22731,9 +22934,9 @@ An index can be repeated to extract the same element multiple times.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Join
-</div>
+</nav>
 
 <FunctionDefinition name="Join">
 
@@ -22762,170 +22965,17 @@ elements of the collections.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
-### Most
-</div>
-
-<FunctionDefinition name="Most">
-
-<Signature name="Most">_collection_</Signature>
-
-Return everything but the last element of the collection.
-
-It's equivalent to `["Drop", _collection_, -1]`.
-
-```json example
-["Most", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 5, 2, 10]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Rest
-</div>
-
-<FunctionDefinition name="Rest">
-
-<Signature name="Rest">_collection_</Signature>
-
-Return everything but the first element of the collection.
-
-It's equivalent to `["Drop", _collection_, 1]`.
-
-```json example
-["Rest", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 10, 18]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Reverse
-</div>
-
-<FunctionDefinition name="Reverse">
-
-<Signature name="Reverse">_collection_</Signature>
-
-Return the collection in reverse order.
-
-```json example
-["Reverse", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 18, 10, 2, 5]
-```
-
-It's equivalent to `["Extract", _collection_, ["Tuple", -1, 1]]`.
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### RotateLeft
-</div>
-
-<FunctionDefinition name="RotateLeft">
-
-<Signature name="RotateLeft">_collection_, _count_</Signature>
-
-Returns a collection where the elements are rotated to the left by the specified
-count.
-
-```json example
-["RotateLeft", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18, 5, 2]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### RotateRight
-</div>
-
-<FunctionDefinition name="RotateRight">
-
-<Signature name="RotateRight">_collection_, _count_</Signature>
-
-Returns a collection where the elements are rotated to the right by the
-specified count.
-
-```json example
-["RotateRight", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18, 5, 2]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Shuffle
-</div>
-
-<FunctionDefinition name="Shuffle">
-
-<Signature name="Shuffle" returns="list">_xs_:collection</Signature>
-
-Return the collection in random order.
-
-```json example
-["Shuffle", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 10, 18, 5, 5]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Sort
-</div>
-
-<FunctionDefinition name="Sort">
-
-<Signature name="Sort">_collection_</Signature>
-
-<Signature name="Sort">_collection_, _order-function_</Signature>
-
-Return the collection in sorted order.
-
-```json example
-["Sort", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 5, 10, 18]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Take
-</div>
-
-<FunctionDefinition name="Take">
-
-<Signature name="Take" returns="collection">_xs_:collection, _n_:integer</Signature>
-
-Return a list of the first `n` elements of `xs`. The collection _xs_ must be ordered.
-
-If `n` is negative, it returns the last `n` elements.
-
-```json example
-["Take", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 5, 2]
-
-["Take", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List", 18, 10]
-```
-
-See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
-
-
-</FunctionDefinition>
 
 
 
 
-<div style={{visibility:"hidden"}}>
+
+
+
+
+<nav className="hidden">
 ### Unique
-</div>
+</nav>
 
 
 <FunctionDefinition name="Unique">
@@ -22940,6 +22990,61 @@ This is equivalent to the first element of the result of `Tally`:
 ```json example
 ["Unique", ["List", 5, 2, 10, 18, 5, 2, 5]]
 // ➔ ["List", 5, 2, 10, 18]
+```
+
+</FunctionDefinition>
+
+## Converting Lazy Collections to Eager Collections
+
+<nav className="hidden">
+### ListFrom
+### SetFrom
+### TupleFrom
+</nav>
+
+
+<FunctionDefinition>
+
+<Signature name="ListFrom" returns="list">_xs_: collection</Signature>
+<Signature name="SetFrom" returns="set">_xs_: collection</Signature>
+<Signature name="TupleFrom" returns="tuple">_xs_: collection</Signature>
+
+Returns an eager list, set or tuple containing the elements of the collection `xs`.
+
+The collection `xs` should be a finite collection.
+
+```json example
+["ListFrom", ["Range", 1, 3]]
+// ➔ ["List", 1, 2, 3]
+
+["SetFrom", ["Range", 1, 3]]
+// ➔ ["Set", 1, 2, 3]
+
+["TupleFrom", ["Range", 1, 3]]
+// ➔ ["Tuple", 1, 2, 3]
+```
+</FunctionDefinition>
+
+<nav className="hidden">
+### RecordFrom
+### MapFrom
+</nav>
+
+<FunctionDefinition>
+<Signature name="RecordFrom" returns="record">_xs_: collection</Signature>
+<Signature name="MapFrom" returns="map">_xs_: collection</Signature>
+
+Returns a record or map containing the elements of the collection `xs`.
+
+The collection `xs` should be a finite collection of key-value pairs, each key being
+a string.
+
+```json example
+["RecordFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
+// ➔ ["Record", ["Tuple", "a", 1], ["Tuple", "b", 2]]
+
+["MapFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
+// ➔ ["Map", ["Tuple", "a", 1], ["Tuple", "b", 2]]
 ```
 
 </FunctionDefinition>
