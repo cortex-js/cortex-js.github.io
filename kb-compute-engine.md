@@ -15286,6 +15286,7 @@ the documentation.
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
+| [Strings](/compute-engine/reference/strings/)                       | ...                                     |
 | [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Style`...                                                 |
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
@@ -18808,7 +18809,8 @@ slug: /compute-engine/guides/types/
 ---
 
 <Intro>
-In the Compute Engine, the **type** of an expression is the set of the possible values of that expression.
+In the Compute Engine, the **type** of an expression is the set of the 
+possible values of that expression.
 </Intro>
 
 The Compute Engine uses a type system to ensure that operations are 
@@ -18817,20 +18819,23 @@ performed on the correct types of values.
 A type is represented by a **type expression**, which is a string with 
 a specific syntax. 
 
+A type expression is either a **primitive type** represented by an identifier
+such as `"integer"` or `"boolean"` or a **constructed type**.
+
+
 For example:
 
 - `"integer"`
 - `"boolean"`
 - `"matrix<3x3>"`
 - `"integer & !0"`
-- `"integer -> integer"`
+- `"(integer, integer) -> number"`
+- `"(distance: integer+) -> tuple<x: integer, y: integer>"`
 
-A type expression is either a **primitive type** represented by an identifier
-such as `"integer"` or `"boolean"` or a **constructed type**.
 
 **To check the type of an expression**, use the `expr.type` property.
 
-```live
+```js live
 console.log(ce.parse("3.14").type);
 ```
 
@@ -18858,12 +18863,13 @@ ce.parse("n").type;
 
 ## Type Hierarchy
 
-
-
 The type system is based on the concept of **subtyping**, which allows for
 a hierarchy of types, where a type can be a subtype of another type. This
 allows for more flexible and expressive type definitions, as well as
 better error checking and type inference.
+
+Type A is a **subtype** of type B if all values of type A are also values of type B.
+It is also said that type A **matches** type B.
 
 
 ```plaintext
@@ -18884,16 +18890,17 @@ any
         │         ├── imaginary
         │         └── real
         │             └── rational
-        │                 └── integer
+        │                 └─ integer
         └── collection
-            ├── tuple
             ├── set
             ├── dictionary
-                └── record
-            └── list
-                └── tensor
-                    ├── vector
-                    └── matrix
+            |   └─ record
+            └── indexed_collection
+                ├── tuple
+                └── list
+                    ├─ vector
+                    ├─ matrix
+                    └─ tensor
 ```
 
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
@@ -18931,11 +18938,13 @@ For example:
 
 The backticks are not part of the name, they are used to escape the name.
 
-In the unlikely event that the name contains a backtick, it must be escaped with a backslash:
+In the unlikely event that the name contains a backtick or backslash, it must be escaped with a backslash:
 
-``record<`name\`with\`backticks`: integer>``
+``record<`name\`with\`backticks\\and\\backslash`: integer>``
 
-Element names are stored and compared using Unicode Normalization Form C (NFC).
+The backtick syntax is used instead of quotes to clearly distinguish identifiers from string values, following conventions from languages such as Swift and Kotlin
+
+Element and argument names are stored and compared using Unicode Normalization Form C (NFC).
 :::
 
 
@@ -18959,28 +18968,11 @@ The Compute Engine supports the following primitive types:
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
+| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `list`, a `vector`, a `matrix` or a `tensor` |
 | `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
 | `boolean`       | The type of the symbol `True` or `False`|
 | `string`        | The type of a string of Unicode characters    |
 | `number`        | The type of a numeric value |
-
-</div>
-
-### Comparison of Special Types
-
-This table summarizes how each special type behaves when assigning values: whether a value of one type can be assigned to or from another.
-
-
-<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
-
-
-| Type     | Description                                       | Assignable To | Assignable From |
-|----------|:--------------------------------------------------|:---------------|:-----------------|
-| `any`    | All possible values                               | ✓              | ✓                |
-| `unknown`| Undetermined type, placeholder for inference      | ✓              | ✓                |
-| `never`  | No values at all (bottom type)                    | ✓              | ✗                |
-| `nothing`| Singleton unit type (`Nothing`)                   | ✓              | Only `Nothing`   |
-| `error`  | Invalid or ill-formed expression                  | ✗              | ✗                |
 
 </div>
 
@@ -19013,6 +19005,26 @@ Some numeric types have a variant that excludes non-finite values, such as
 
 </div>
 
+Numeric types can be constrained to a specific range within a lower and upper 
+bound
+
+For example `real< -1.0..1.0 >` is the type of real numbers between $-1.0$ and $1.0$, inclusive.
+
+An non-finite endpoint can be represented by the symbol `-oo` or `+oo` or
+by omitting the endpoint.
+
+For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
+and is equivalent to `real< -oo..1.0 >`.
+
+To represent an open interval, use a negation value type to exclude the endpoints.
+For example `real<0..> & !0` is the type of real numbers greater than $0$.
+
+When using integers, you can adjust the endpoint instead, so for example 
+`integer<1..>` is the type of integers greater than or equal to $1$, which 
+is equivalent to `integer<0..> & !0`.
+
+Note that `complex` and `imaginary` types do not support ranges, as they are not ordered types.
+
 Here is the type of various numeric values:
 
 | Value               | Type                |
@@ -19037,12 +19049,11 @@ Read more about the **sets** included in the Standard Library <Icon name="chevro
 A collection type represents an expression that contains multiple values, such as a list, a set, or a dictionary.
 
 The Compute Engine supports the following collection types: `set`, `tuple`,
-`list` (including `vector`, `matrix` and `tensor`), `record`, `dictionary` and 
-`collection`.
+`list` (including `vector`, `matrix` and `tensor`), `record` and `dictionary`.
 
 ### Set
 
-A **set** is an unordered collection of unique values.
+A **set** is a non-indexed collection of unique values.
 
 The type of a set is represented by the type expression `set<T>`, where `T` 
 is the type of the elements of the set.
@@ -19052,9 +19063,11 @@ ce.parse("\\{5, 7, 9\\}").type
 // ➔ "set<finite_integer>"
 ```
 
+A set can have an infinite number of elements.
+
 ### Tuple
 
-A **tuple** is an ordered collection of values, representing a fixed 
+A **tuple** is an indexed collection of values, representing a fixed 
 number of elements.
 
 The type of a tuple is represented by the type expression `tuple<T1, T2, ...>`, 
@@ -19072,6 +19085,9 @@ when compared in Unicode Normalization Form C (NFC).
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on element names.)
 
+The elements of a tuple can be accessed with a one-based index or by name.
+
+
 For two tuples to be compatible, each element must have the same type and the names must match.
 
 ```js
@@ -19086,8 +19102,10 @@ ce.parse("(x: 1, y: 2)")
 
 ### List, Vector, Matrix and Tensor
 
-A **list** is an ordered collection of values, used to represent vectors, 
+A **list** is an indexed collection of values, used to represent vectors, 
 matrices, and sequences.
+
+The first element of a list is at index 1, the second element is at index 2, and so on.
 
 The type of a list is represented by the type expression `list<T>`, where `T` is the type of the elements of the list.
 
@@ -19145,12 +19163,12 @@ The **dictionary** and **record** types represent a collection of key-value pair
 where each key is a string and each value can be any type.
 
 A **record** is a special case of a dictionary where the keys are fixed, 
-while a **dictionary** can have keys that are dynamically added or removed at runtime.
+while a **dictionary** can have keys that are not defined in advance.
 
 A **record** is used to represent objects and structured data with a fixed set of properties.
-A **dictionary** is well suited to represent data such as hash tables or caches.
+A **dictionary** is well suited to represent hash tables or caches.
 
-**Keys** must be unique (when compared in NFC form) within a dictionary or record. Keys are not ordered.
+**Keys** must be unique when compared in NFC form within a dictionary or record. Keys are not ordered.
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on key names.)
 
@@ -19183,13 +19201,17 @@ ce.type("record<red: integer, green: integer>")
 // ➔ false
 
 ce.type("record<red: integer, green: integer, blue: integer>")
+  .matches("record<red: integer, green: integer>");
+// ➔ true
+
+ce.type("record<red: integer, green: integer, blue: integer>")
   .matches("dictionary<integer>");
 // ➔ true
 ```
 
 
-
-The `record` type is compatible with any record, and the `dictionary` type is compatible with both records and dictionaries.
+The `record` type is compatible with any record, and the `dictionary` type 
+is compatible with both records and dictionaries.
 
 ```js
 ce.type("record<red: integer, green: integer>")
@@ -19209,10 +19231,9 @@ a `set`, a `tuple`, a `record` or a `dictionary`.
 
 The type `collection<T>` is a collection of values of type `T`.
 
-The collection type is an abstract type that is not directly instantiated. It 
-can be used to check if an expression is a collection of values, without
-specifying the exact type of the collection.
-
+The type `indexed_collection<T>` is an indexed collection of values of type `T`,
+such as a `list`, a `tuple`, or a `matrix`. It is a subtype of 
+`collection<T>`.
 
 ## Function Signature
 
@@ -19226,22 +19247,19 @@ type of the output value, or return type, of the function literal.
 
 If the function does not return a value, the function signature is `(T) -> nothing`.
 
-If the function never returns, the function signature is `(T) -> never`.
+A function that never returns, has a signature of `(T) -> never`.
 
 
 
 ### Arguments
 
-If there is a single input argument, the parentheses can be omitted: `T1 -> T2`.
+The arguments of a function are a sequence of comma-separated types surrounded 
+by parentheses, for example `(T1, T2, ...) -> T3`.
 
-For example, `real -> integer` is the type of functions that map real numbers to integers.
+If there are no input arguments, the signature is `() -> T`.
 
-If there are no input arguments, use `() -> T`.
-
-For example `() -> integer` is 
-the type of functions that return an integer and have no input arguments.
-
-If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`.
+For example `() -> integer` is the type of functions that return an integer 
+and have no input arguments.
 
 For example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
 
@@ -19251,15 +19269,15 @@ Optionally, the input arguments can be named, for example: `(x: integer, y: inte
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on argument names.)
 
-If a named argument is used, the input arguments must be enclosed in parentheses, even if there is only one argument.
-
 For example, `(x: integer) -> integer` is a function that takes a single named argument `x` of type `integer` and returns an `integer`.
 
 
 
-### Optional Argument
+### Optional Arguments
 
-An optional argument is indicated by a question mark after its type.
+A function signature can include **optional arguments**, which are arguments 
+that may or may not be provided when calling the function. An optional 
+argument is indicated by a question mark immediately after its type.
 
 For example `(integer, integer?) -> integer` indicates a function literal accepting 
 one or two integers as input and returning an integer.
@@ -19268,35 +19286,40 @@ If there are any optional arguments, they must be at the end of the argument lis
 
 ```js
 ce.type("(integer, integer?) -> number")
-  .matches("integer -> number");
+  .matches("(integer) -> number");
 // ➔ true
 ```
 
 
 
-### Rest Argument
+### Variadic Arguments
 
 A function signature can include a variable number of arguments, also known as 
-a **rest argument**, indicated by an ellipsis `...` before the type of the last argument.
+**variadic arguments**. 
 
-For example `(string, ...integer) -> integer` is a function that accepts a 
-string as a first argument followed by any number of integers and returns an integer.
+Variadic arguments are indicated by a `+` or `*` 
+immediately after the type of the last argument. The `+` prefix indicates that
+the function accepts one or more arguments of that type, while the `*` prefix
+indicates that the function accepts zero or more arguments of that type.
+
+For example `(string, integer+) -> integer` is a function that accepts a 
+string as a first argument followed by one or more integers and returns an integer.
 
 To indicate that the function accepts a variable number of arguments of any 
-type, use `...any`.
+type, use `any+` or `any*`.
 
 ```js
-ce.type("(integer, ...integer) -> number")
-  .matches("(integer, integer) -> number");
+ce.type("(integer, integer) -> number")
+  .matches("(integer, integer+) -> number");
 // ➔ true
 ```
 
-If a signature has a rest argument, it must be the last argument in the list, 
+If a signature has a variadic argument, it must be the last argument in the list, 
 and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal. It is a shorthand for `(...any) -> unknown`.
+The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
 
 ## Value Type
 
@@ -19311,7 +19334,7 @@ Value types can be used in conjunction with a union to represent a type that
 can be one of multiple values, for example:
 
 - `0 | 1` is the type of values that are either `0` or `1`.
-- `integer | false` is the type of values that are integers or `False`.
+- `integer | nothing` is the type of values that are integers or `Nothing`.
 - `"red" | "green" | "blue"` is the type of values that are either of the strings `"red"`, `"green"` or `"blue"`.
 
 
@@ -19338,8 +19361,11 @@ They can be used to model values that meet several structural or semantic requir
 
 The type of an intersection is represented by the type expression `T1 & T2`, where `T1` and `T2` are the types of the values.
 
+Intersections are most useful for extending or combining record types.
+
 For example, `record<length: integer> & record<size: integer>` is the type of values 
-that are records with both a `length` and a `size` key.
+that are records with both a `length` and a `size` key, that is `record<length: integer, size: integer>`.
+
 
 ### Negation
 
@@ -19477,11 +19503,14 @@ ce.parse("\\[1, 2, 3\\]").type
 
 #### Function Literals
 
-Function literals are compatible if the input types are compatible and the output types are compatible.
+Function literals are compatible if the input types are compatible and the 
+output types are compatible, specifically the output type is covariant and the 
+input types are contravariant.
+
 
 ```js
-ce.type("integer -> integer")
-  .matches("number -> number");
+ce.type("(integer) -> integer")
+  .matches("(number) -> number");
 // ➔ true
 ```
 
@@ -19489,8 +19518,8 @@ The name of the arguments of a function signature is not taken into account when
 checking for compatibility.
 
 ```js
-ce.type("x: integer -> integer")
-  .matches("integer -> integer");
+ce.type("(x: integer) -> integer")
+  .matches("(integer) -> integer");
 // ➔ true
 ```
 
@@ -19599,7 +19628,7 @@ ce.declareType("json_array", "list<json>");
 ```
 
 When using `type json_array` or `type json_object`, the type is not yet defined, 
-but it will be defined later in the code. This allows you to use the type
+but it will be defined later in the code. Using the `type` keyword allows you to use the type
 before declaring it. If the referenced type is already defined, the `type` keyword is optional.
 
 
@@ -19796,35 +19825,6 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
 
 
-<FunctionDefinition name="BaseForm">
-
-<Signature name="BaseForm">_value:integer_</Signature>
-
-<Signature name="BaseForm">_value:integer_, _base_</Signature>
-
-Format an _integer_ in a specific _base_, such as hexadecimal or binary.
-
-If no _base_ is specified, use base-10.
-
-The sign of _integer_ is ignored.
-
-- _value_ should be an integer.
-- _base_ should be an integer from 2 to 36.
-
-```json example
-["Latex", ["BaseForm", 42, 16]]
-
-// ➔ (\text(2a))_{16}
-```
-
-```cortex
-Latex(BaseForm(42, 16))
-// ➔ (\text(2a))_{16}
-String(BaseForm(42, 16))
-// ➔ "'0x2a'"
-```
-
-</FunctionDefinition>
 
 <FunctionDefinition name="Clamp">
 
@@ -21629,6 +21629,52 @@ console.log(ce.parse("x@2").json);
 // ➔ ["Sequence", "x", ["Error", ["ErrorCode", "'unexpected-token'", "'@'"], ["Latex", "'@2'"]]]
 ```
 ---
+title: Strings
+slug: /compute-engine/reference/strings/
+---
+
+A string is a sequence of characters such as `"Hello, World!"` or `"42"`.
+
+In the Compute Engine, strings are composed of encoding-independent Unicode
+characters and provide access to those characters through a variety of Unicode
+representations.
+
+<nav className="hidden">
+### BaseForm
+</nav>
+
+
+
+<FunctionDefinition name="BaseForm">
+
+<Signature name="BaseForm" returns="string">_value:integer_</Signature>
+
+<Signature name="BaseForm" returns="string">_value_:integer, _base_</Signature>
+
+Format an _integer_ in a specific _base_, such as hexadecimal or binary.
+
+If no _base_ is specified, use base-10.
+
+The sign of _integer_ is ignored.
+
+- _value_ should be an integer.
+- _base_ should be an integer from 2 to 36.
+
+```json example
+["Latex", ["BaseForm", 42, 16]]
+
+// ➔ (\text(2a))_{16}
+```
+
+```cortex
+Latex(BaseForm(42, 16))
+// ➔ (\text(2a))_{16}
+String(BaseForm(42, 16))
+// ➔ "'0x2a'"
+```
+
+</FunctionDefinition>
+---
 title: Collections
 slug: /compute-engine/reference/collections/
 date: Last Modified
@@ -21862,14 +21908,16 @@ The visual presentation of a `List` expression can be customized using the
 `Delimiter` function.
 
 ```js example
-ce.box(["List", 5, 2, 10, 18]).latex;
+const xs = ce.box(["List", 5, 2, 10, 18]);
+
+xs.latex
 // ➔ "\lbrack 5, 2, 10, 18 \rbrack"
 
-ce.box(["Delimiter", ["List", 5, 2, 10, 18], "<;>"]).latex;
+ce.box(["Delimiter", xs, "<;>"]).latex;
 // ➔ "\langle5; 2; 10; 18\rangle"
 ```
 
-A **vector** is represented as a `List` of numbers.
+A **vector** is represented using a `List` of numbers.
 
 <Latex value="\lbrack 1, 2, 3 \rbrack"/>
 
@@ -21929,6 +21977,7 @@ An **unordered** collection of unique elements.
 ```
 
 The type of a set is `set<T>`, where `T` is the type of the elements in the set.
+
 The type `set` is a shorthand for `set<any>`, meaning the set can contain elements of any type.
 
 If the same element is repeated, it is included only once in the set. The 
@@ -21939,8 +21988,9 @@ elements are compared using the `IsSame` function.
 // ➔ ["Set", 12, 15, 17]
 ```
 
-The elements in a set are not ordered, so the order of the elements in the set may not be the same as the order in which they were added. When enumerating a set, the elements are returned in an arbitrary order,
-and two successive enumerations may return the elements in a different order.
+The elements in a set are not ordered. When enumerating a set, the elements are
+returned in an arbitrary order, and two successive enumerations may return the
+elements in a different order.
 
 The elements in a set are counted in constant time.
 
@@ -21956,11 +22006,11 @@ The elements in a set are counted in constant time.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="collection<integer>">_upper_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_upper_:integer</Signature>
 
-<Signature name="Range" returns="collection<integer>">_lower_:integer, _upper_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer</Signature>
 
-<Signature name="Range" returns="collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -22000,13 +22050,13 @@ negative.
 
 <FunctionDefinition name="Linspace">
 
-<Signature name="Linspace" returns="collection<real>">_upper_:real</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_upper_:real</Signature>
 
-<Signature name="Linspace" returns="collection<real>">_lower_:real, _upper_:real</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real</Signature>
 
-<Signature name="Linspace" returns="collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
 
-Short for "linearly spaced", from the [MATLAB function of the same
+`Linspace` is short for "linearly spaced", from the [MATLAB function of the same
 name](https://mathworks.com/help/matlab/ref/linspace.html).
 
 A sequence of numbers evenly spaced between `lower` and `upper`. Similar to `Range` but the number of elements in the collection is specified with `count` instead of a `step` value.
@@ -22059,18 +22109,18 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 <FunctionDefinition name="Fill">
 
-<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
+<Signature name="Fill" returns="ordered_collection">_dimensions_, _value_:any</Signature>
 
-<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
+<Signature name="Fill" returns="ordered_collection">_dimensions_, _f_:function</Signature>
 
-Create a list of the specified dimensions.
+Create an ordered collection of the specified dimensions.
 
-If a `value` is provided, the elements of the list are all set to that value.
+If a `value` is provided, the elements of the collection are all set to that value.
 
-If a `function` is provided, the elements of the list are computed by applying
+If a `function` is provided, the elements of the collection are computed by applying
 the function to the index of the element.
 
-If `dimensions` is a number, a list of that length is created.
+If `dimensions` is a number, a collection with that many elements is created.
 
 ```json example
 ["Fill", 3, 0]
@@ -22088,7 +22138,10 @@ If a `function` is specified, it is applied to the index of the element to
 compute the value of the element.
 
 ```json example
-["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
+["Fill", 
+  ["Tuple", 2, 3], 
+  ["Function", ["Add", "i", "j"], "i", "j"]
+]
 // ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
 ```
 
@@ -22102,20 +22155,22 @@ compute the value of the element.
 
 <FunctionDefinition name="Repeat">
 
-<Signature name="Repeat" returns="list">_value_: any</Signature>
+<Signature name="Repeat" returns="ordered_collection">_value_: any</Signature>
 
-An infinite list of the same element.
+An infinite collection of the same element.
 
-<Signature name="Repeat" returns="list">_value_: any, _count_: integer?</Signature>
+<Signature name="Repeat" returns="ordered_collection">_value_: any, _count_: integer?</Signature>
 
-A list of the same element repeated `count` times.
+A collection of the same element repeated `count` times.
 
 ```json example
 ["Repeat", 42, 5]
+// ➔ ["List", 42, 42, 42, 42, 42]
 ```
 
+**Note:** `["Repeat", n]` is equivalent to `["Cycle", ["List", n]]`. See 
+[`Cycle`](#cycle) for more information.
 
-**Note:** `["Repeat", n]` is equivalent to `["Cycle", ["List", n]]`.
 
 </FunctionDefinition>
 
@@ -22126,7 +22181,7 @@ A list of the same element repeated `count` times.
 
 <FunctionDefinition name="Cycle">
 
-<Signature name="Cycle" returns="list">_seed_:collection</Signature>
+<Signature name="Cycle" returns="ordered_collection">_seed_:collection</Signature>
 
 A collection that repeats the elements of the `seed` collection. The `seed`
 collection must be finite.
@@ -22154,9 +22209,9 @@ Use `Take` to get a finite number of elements.
 
 <FunctionDefinition name="Iterate">
 
-<Signature name="Iterate" returns="list">_f_:function</Signature>
+<Signature name="Iterate" returns="ordered_collection">_f_:function</Signature>
 
-<Signature name="Iterate"  returns="list">_f_:function, _initial_:any</Signature>
+<Signature name="Iterate"  returns="ordered_collection">_f_:function, _initial_:any</Signature>
 
 An infinite collection of the results of applying `f` to the initial
 value.
@@ -22164,16 +22219,14 @@ value.
 If the `initial` value is not specified, it is assumed to be `0`
 
 ```json example
-["Iterate", ["Function", ["Multiply", "_", 2]], 1]
-
-
+["Iterate", ["Multiply", "_", 2], 1]
 // ➔ ["List", 1, 2, 4, 8, 16, ...]
 ```
 
 Use `Take` to get a finite number of elements.
 
 ```json example
-["Take", ["Iterate", ["Function", ["Add", "_", 2]], 7], 5]
+["Take", ["Iterate", ["Add", "_", 2]], 7], 5]
 // ➔ ["List", 7, 9, 11, 13, 15]
 ```
 
@@ -22184,7 +22237,7 @@ Use `Take` to get a finite number of elements.
 
 Elements of ordered collections can be accessed using their index.
 
-Indexes start at `1` for the first element. Negative indexes can be used to access elements from the end of the collection, with `-1` being the last element.
+Indexes start at `1` for the first element. Negative indexes access elements from the end of the collection, with `-1` being the last element.
 
 <nav className="hidden">
 ### At
@@ -22195,12 +22248,8 @@ Indexes start at `1` for the first element. Negative indexes can be used to acce
 
 <Signature name="At">_xs_: ordered_collection, _index_: integer</Signature>
 
-<Signature name="At">_xs_: ordered_collection, ..._indexes_: integer</Signature>
 
 Returns the element at the specified index.
-
-If the collection is nested, the indexes are applied in order.
-
 
 ```json example
 ["At", ["List", 5, 2, 10, 18], 2]
@@ -22208,7 +22257,13 @@ If the collection is nested, the indexes are applied in order.
 
 ["At", ["List", 5, 2, 10, 18], -2]
 // ➔ 10
+```
 
+<Signature name="At">_xs_: ordered_collection, ..._indexes_: integer</Signature>
+
+If the collection is nested, the indexes are applied in order.
+
+```json example
 ["At", ["List", ["List", 1, 2], ["List", 3, 4]], 2, 1]
 // ➔ 3
 ```
@@ -22225,8 +22280,6 @@ If the collection is nested, the indexes are applied in order.
 
 Return the first element of the collection.
 
-It's equivalent to `["At", _collection_, 1]`.
-
 ```json example
 ["First", ["List", 5, 2, 10, 18]]
 // ➔ 5
@@ -22234,6 +22287,8 @@ It's equivalent to `["At", _collection_, 1]`.
 ["First", ["Tuple", "x", "y"]]
 // ➔ "x"
 ```
+
+It's equivalent to `["At", xs, 1]`.
 
 </FunctionDefinition>
 
@@ -22251,6 +22306,8 @@ Return the second element of the collection.
 ["Second", ["Tuple", "x", "y"]]
 // ➔ "y"
 ```
+
+It's equivalent to `["At", xs, 2]`.
 
 </FunctionDefinition>
 
@@ -22271,6 +22328,8 @@ Return the last element of the collection.
 // ➔ 18
 ```
 
+It's equivalent to `["At", xs, -1]`.
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -22279,16 +22338,17 @@ Return the last element of the collection.
 
 <FunctionDefinition name="Most">
 
-<Signature name="Most">_xs_: ordered_collection</Signature>
+<Signature name="Most" returns="ordered_collection">_xs_: ordered_collection</Signature>
 
 Return everything but the last element of the collection.
-
-It's equivalent to `["Drop", _xs_, -1]`.
 
 ```json example
 ["Most", ["List", 5, 2, 10, 18]]
 // ➔ ["List", 5, 2, 10]
 ```
+
+It's equivalent to `["Drop", xs, -1]`.
+
 
 </FunctionDefinition>
 
@@ -22298,16 +22358,17 @@ It's equivalent to `["Drop", _xs_, -1]`.
 
 <FunctionDefinition name="Rest">
 
-<Signature name="Rest">_xs_: ordered_collection</Signature>
+<Signature name="Rest" returns="ordered_collection">_xs_: ordered_collection</Signature>
 
 Return everything but the first element of the collection.
 
-It's equivalent to `["Drop", _xs_, 1]`.
 
 ```json example
 ["Rest", ["List", 5, 2, 10, 18]]
 // ➔ ["List", 2, 10, 18]
 ```
+
+It's equivalent to `["Drop", xs, 1]`.
 
 </FunctionDefinition>
 
@@ -22318,9 +22379,9 @@ It's equivalent to `["Drop", _xs_, 1]`.
 
 <FunctionDefinition name="Take">
 
-<Signature name="Take" returns="collection">_xs_: ordered_collection, _n_: integer</Signature>
+<Signature name="Take" returns="ordered_collection">_xs_: ordered_collection, _n_: integer</Signature>
 
-Return a list of the first `n` elements of `xs`. The collection _xs_ must be ordered.
+Return a list of the first `n` elements of `xs`. The collection `xs` must be ordered.
 
 If `n` is negative, it returns the last `n` elements.
 
@@ -22333,7 +22394,6 @@ If `n` is negative, it returns the last `n` elements.
 ```
 
 See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
-
 
 </FunctionDefinition>
 
@@ -22380,10 +22440,108 @@ Return the collection in reverse order.
 // ➔ ["List", 18, 10, 2, 5]
 ```
 
-It's equivalent to `["Extract", _xs_, ["Tuple", -1, 1]]`.
+It's equivalent to `["Extract", xs, ["Tuple", -1, 1]]`.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Extract
+</nav>
+
+<FunctionDefinition name="Extract">
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _index_:integer</Signature>
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, ..._indexes_:integer</Signature>
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _range_:tuple&lt;integer, integer&gt;</Signature>
+
+Returns a list of the elements at the specified indexes.
+
+`Extract` always return an ordered collection, even if the result is a single element. If no
+elements match, an empty collection is returned.
+
+```json example
+["Extract", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10]
+
+["Extract", ["List", 5, 2, 10, 18], -2, 1]
+// ➔ ["List", 10, 5]
+
+
+["Extract", ["List", 5, 2, 10, 18], 17]
+// ➔ ["List"]
+```
+
+When using a range, it is specified as a `Tuple`.
+
+```json example
+// Elements 2 to 3
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", 2, 4]]
+// ➔ ["List", 2, 10, 18]
+
+// From start to end, every other element
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", 1, -1, 2]]
+// ➔ ["List", 5, 10]
+```
+
+The elements are returned in the order in which they're specified. Using
+negative indexes (or ranges) reverses the order of the elements.
+
+```json example
+// From last to first = reverse
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", -1, 1]]
+// ➔ ["List", 18, 10, 2, 5]
+
+// From last to first = reverse
+["Extract", ""desserts"", ["Tuple", -1, 1]]
+// ➔ ""stressed""
+```
+
+An index can be repeated to extract the same element multiple times.
+
+```json example
+["Extract", ["List", 5, 2, 10, 18], 3, 3, 1]
+// ➔ ["List", 10, 10, 5]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Exclude
+</nav>
+
+<FunctionDefinition name="Exclude">
+
+<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection,, _index_:integer</Signature>
+
+<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection, _indexes_:tuple&lt;integer&gt;</Signature>
+
+`Exclude` is the opposite of `Extract`. It returns a list of the elements that
+are not at the specified indexes.
+
+The order of the elements is preserved.
+
+
+```json example
+["Exclude", ["List", 5, 2, 10, 18], 3]
+// ➔ ["List", 5, 2, 18]
+
+["Exclude", ["List", 5, 2, 10, 18], -2, 1]
+// ➔ ["List", 2, 18]
+```
+
+
+An index may be repeated, but the corresponding element will only be dropped
+once.
+
+```json example
+["Exclude", ["List", 5, 2, 10, 18], 3, 3, 1]
+// ➔ ["List", 2, 18]
+```
+
+</FunctionDefinition>
 
 <nav className="hidden">
 ### RotateLeft
@@ -22391,7 +22549,7 @@ It's equivalent to `["Extract", _xs_, ["Tuple", -1, 1]]`.
 
 <FunctionDefinition name="RotateLeft">
 
-<Signature name="RotateLeft">_xs_: ordered_collection, _count_: integer</Signature>
+<Signature name="RotateLeft" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the left by the specified
 count.
@@ -22409,7 +22567,7 @@ count.
 
 <FunctionDefinition name="RotateRight">
 
-<Signature name="RotateRight">_xs_: ordered_collection, _count_: integer</Signature>
+<Signature name="RotateRight" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the right by the
 specified count.
@@ -22428,7 +22586,7 @@ specified count.
 
 <FunctionDefinition name="Shuffle">
 
-<Signature name="Shuffle" returns="list">_xs_: ordered_collection</Signature>
+<Signature name="Shuffle" returns="ordered_collection">_xs_: ordered_collection</Signature>
 
 Return the collection in random order.
 
@@ -22445,14 +22603,46 @@ Return the collection in random order.
 
 <FunctionDefinition name="Sort">
 
-<Signature name="Sort">_xs_: ordered_collection</Signature>
+<Signature name="Sort" returns="ordered_collection">_xs_: collection</Signature>
 
-<Signature name="Sort">_xs_: ordered_collection, _order-function_: function</Signature>
+<Signature name="Sort" returns="ordered_collection">_xs_: collection, _order-function_: function</Signature>
 
 Return the collection in sorted order.
 
 ```json example
-["Sort", ["List", 5, 2, 10, 18]]
+["Sort", ["Set", 18, 5, 2, 10]]
+// ➔ ["List", 2, 5, 10, 18]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Ordering
+</nav>
+
+<FunctionDefinition name="Ordering">
+
+<Signature name="Ordering" returns="ordered_collection">_collection_</Signature>
+
+<Signature name="Ordering" returns="ordered_collection">_collection_, _order-function_</Signature>
+
+Return the indexes of the collection in sorted order.
+
+```json example
+["Ordering", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 2, 1, 3, 4]
+```
+
+To get the values in sorted order, use `Extract`:
+
+```json example
+["Assign", "xs", ["List", 5, 2, 10, 18]]
+["Extract", "xs", ["Ordering", "xs"]]
+// ➔ ["List", 2, 5, 10, 18]
+
+// Same as Sort:
+["Sort", "xs"]
 // ➔ ["List", 2, 5, 10, 18]
 ```
 
@@ -22462,25 +22652,6 @@ Return the collection in sorted order.
 ## Operating On Collections
 
 
-<nav className="hidden">
-### Filter
-</nav>
-
-
-
-<FunctionDefinition name="Filter">
-
-<Signature name="Filter" returns="collection">_xs_: collection, _pred_: function</Signature>
-
-Returns a collection where _pred_ is applied to each element of the
-collection. Only the elements for which the predicate returns `"True"` are kept.
-
-```json example
-["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
-// ➔ ["List", 5, 2]
-```
-
-</FunctionDefinition>
 
 
 
@@ -22504,13 +22675,6 @@ rows.
 // ➔ 4
 ```
 
-When the collection is a string, `Length` returns the number of characters in
-the string.
-
-```json example
-["Length", { "str": "Hello" }]
-// ➔ 5
-```
 
 </FunctionDefinition>
 
@@ -22628,6 +22792,25 @@ Returns `True` if all elements of the collection satisfy the predicate, `False` 
 </FunctionDefinition>
 
 <nav className="hidden">
+### Filter
+</nav>
+
+<FunctionDefinition name="Filter">
+
+<Signature name="Filter" returns="collection">_xs_: collection, _pred_: function</Signature>
+
+Returns a collection where _pred_ is applied to each element of the
+collection. Only the elements for which the predicate returns `"True"` are kept.
+
+```json example
+["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
+// ➔ ["List", 5, 2]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### Map
 </nav>
 
@@ -22659,7 +22842,7 @@ Returns a collection where _f_ is applied to each element of _xs_.
 <FunctionDefinition name="Reduce">
 
 
-<Signature name="Reduce" returns="value">_xs_:collection, _fn_:function, _initial_:value?</Signature>
+<Signature name="Reduce" returns="value">_xs_:ordered_collection, _fn_:function, _initial_:value?</Signature>
 
 Returns a value by applying the reducing function _fn_ to each element
 of the collection.
@@ -22697,32 +22880,6 @@ See also the **`FixedPoint` function** which operates without a collection.<Icon
 
 
 
-<FunctionDefinition name="Ordering">
-
-<Signature name="Ordering">_collection_</Signature>
-
-<Signature name="Ordering">_collection_, _order-function_</Signature>
-
-Return the indexes of the collection in sorted order.
-
-```json example
-["Ordering", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 1, 3, 4]
-```
-
-To get the values in sorted order, use `Extract`:
-
-```json example
-["Assign", "l", ["List", 5, 2, 10, 18]]
-["Extract", "l", ["Ordering", "l"]]
-// ➔ ["List", 2, 5, 10, 18]
-
-// Same as Sort:
-["Sort", "l"]
-// ➔ ["List", 2, 5, 10, 18]
-```
-
-</FunctionDefinition>
 
 
 
@@ -22754,7 +22911,7 @@ Evaluate to a tuple of two lists:
 
 <FunctionDefinition name="Zip">
 
-<Signature name="Zip">_collection-1_, _collection-2_, ...</Signature>
+<Signature name="Zip" return="ordered_collection">..._xss_: ordered_collection</Signature>
 
 Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
@@ -22817,121 +22974,6 @@ return a new collection.
 
 
 
-<nav className="hidden">
-### Exclude
-</nav>
-
-<FunctionDefinition name="Exclude">
-
-<Signature name="Exclude" returns="collection">_xs_:collection,, _index_:integer</Signature>
-
-<Signature name="Exclude" returns="collection">_xs_:collection, _indexes_:collection&lt;integer&gt;</Signature>
-
-`Exclude` is the opposite of `Extract`. It returns a list of the elements that
-are not at the specified index.
-
-The order of the elements is preserved.
-
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 5, 10, 18]
-
-["Exclude", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 2, 18]
-```
-
-When `indexes` is a list, it is used to specify the indexes of the elements to
-be dropped.
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], ["List", 2, 3]]
-// ➔ ["List", 5, 2]
-
-["Exclude", ["List", 5, 2, 10, 18], ["List", -2, 1]]
-// ➔ ["List", 2, 18]
-```
-
-
-An index may be repeated, but the corresponding element will only be dropped
-once.
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], ["List", 3, 3, 1]]
-// ➔ ["List", 2, 18]
-```
-
-</FunctionDefinition>
-
-
-
-<nav className="hidden">
-### Extract
-</nav>
-
-<FunctionDefinition name="Extract">
-
-<Signature name="Extract">_collection_, _index_</Signature>
-
-<Signature name="Extract">_collection_, _index1_, _index2_</Signature>
-
-<Signature name="Extract">_collection_, _range_</Signature>
-
-Returns a list of the elements at the specified indexes.
-
-`Extract` is a flexible function that can be used to extract a single element, a
-range of elements, or a list of elements.
-
-`Extract` always return a list, even if the result is a single element. If no
-elements match, an empty list is returned.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10]
-
-["Extract", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 10, 5]
-
-
-["Extract", ["List", 5, 2, 10, 18], 17]
-// ➔ ["List"]
-```
-
-When using a range, it is specified as a [`Range`](#Range) expression.
-
-```json example
-// Elements 2 to 3
-["Extract", ["List", 5, 2, 10, 18], ["Range", 2, 4]]
-// ➔ ["List", 2, 10, 18]
-
-// From start to end, every other element
-["Extract", ["List", 5, 2, 10, 18], ["Range", 1, -1, 2]]
-// ➔ ["List", 5, 10]
-```
-
-The elements are returned in the order in which they're specified. Using
-negative indexes (or ranges) reverses the order of the elements.
-
-```json example
-// From last to first = reverse
-["Extract", ["List", 5, 2, 10, 18], ["Range", -1, 1]]
-// ➔ ["List", 18, 10, 2, 5]
-
-// From last to first = reverse
-["Extract", ""desserts"", ["Range", -1, 1]]
-// ➔ ""stressed""
-```
-
-An index can be repeated to extract the same element multiple times.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 3, 3, 1]
-// ➔ ["List", 10, 10, 5]
-```
-
-</FunctionDefinition>
-
-
 
 
 <nav className="hidden">
@@ -22940,8 +22982,8 @@ An index can be repeated to extract the same element multiple times.
 
 <FunctionDefinition name="Join">
 
-<Signature name="Join" returns="list">...collections:collection</Signature>
-<Signature name="Join" returns="set">...sets:set</Signature>
+<Signature name="Join" returns="list">...collection</Signature>
+<Signature name="Join" returns="set">...set</Signature>
 
 If the collections are of different types, the result is a `List` 
 containing the elements of the first collection followed
