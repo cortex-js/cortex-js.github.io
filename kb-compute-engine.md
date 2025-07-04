@@ -10902,7 +10902,13 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features and Improvements
 
-- Antiderivatives are now computed symbolically:
+- The bindings of symbols and function expressions is now consistently done
+  during canonicalization.
+
+- It was previously not possible to change the type of an identifier from a
+  function to a value or vice versa. This is now possible.
+
+- **Antiderivatives** are now computed symbolically:
 
 ```js
 ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).evaluate().print();
@@ -10938,11 +10944,45 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
   integers between 0 and 10. The type `real<1..>` matches real numbers greater
   than 1 and `rational<..0>` matches non-positive rational numbers.
 
-- The bindings of symbols and function expressions is now consistently done
-  during canonicalization.
+- Numeric types can now be constrtained with a lower and upper bound. For
+  example, `real<0..10>` is a type that matches real numbers between 0 and 10.
+  The type `integer<1..>` matches integers greater than or equal to 1.
 
-- It was previously not possible to change the type of an identifier from a
-  function to a value or vice versa. This is now possible.
+- Collections that can be indexed (`list`, `tuple`) are now a subtype of
+  `indexed_collection`.
+
+- The `map` type has been replaced with `dictionary` for collections of
+  arbitrary key-value pairs and `record` for collections of structured key-value
+  pairs.
+
+- Support for structural typing has been added. To define a structural type, use
+  `ce.declareType()` with the `alias` flag, for example:
+
+  ```js
+  ce.declareType(
+    "point", "tuple<x: integer, y: integer>",
+    { alias: true }
+  );
+  ```
+
+- Recursive types are now supported by using the `type` keyword to forward
+  reference types. For example, to define a type for a binary tree:
+
+  ```js
+  ce.declareType(
+    "binary_tree",
+    "tuple<value: integer, left: type binary_tree?, right: type binary_tree?>",
+  );
+  ```
+
+- The syntax for variadic arguments has changeed. To indicate a variadic
+  argument, use a `+` or `*` after the type, for example:
+
+  ```js
+  ce.declare('f', '(number+) -> number');
+  ```
+
+  Use `+` for a non-empty list of arguments and `*` for a possibly empty list.
 
 - Added a rule to solve the equation `a^x + b = 0`
 
@@ -19551,6 +19591,75 @@ console.info(ce.box(3.14).isInteger)
 ```
 
 
+## Type Inference
+
+When  an explicit type is not provided for a symbol, the Compute Engine will
+attempt to **infer** the type of the symbol based on the context in which it is used.
+This process is known as **type inference**.
+
+When assigning a value to an undeclared symbol, the type of the value is
+used to infer the type of the symbol.
+
+If the symbol is a constant, the type is used exactly as the type of the symbol.
+If the symbol is a variable, the type of the value may be widened to a more general 
+type:
+
+<div className="symbols-table" style={{"--first-col-width":"18ch"}}>
+
+
+| Value Type         | Inferred Symbol Type |
+|:--------------------|:----------------------|
+| `complex`  <br/> `imaginary` <br/> `non_finite_number` <br/> `finite_number`          | `number`            |
+| `integer` <br/> `finite_integer`           | `integer`             |
+| `real` <br/> `finite_real` <br/> `rational` <br/> `finite_rational`          | `real`            |
+
+</div>
+
+Examples:
+
+<div className="symbols-table" style={{"--first-col-width":"8ch"}}>
+
+| Value               | Value Type | Inferred Symbol Type |
+|:--------------------|:--------------------------|:--------------------------|
+| 34                  | `finite_integer` | `integer`                |
+| 3.14                | `finite_real` | `real`                   |
+| 4i                   | `imaginary` | `number`                   |
+| 1/2                  | `finite_rational` | `real`                   |
+</div>
+
+```js
+ce.assign("n", 34);
+ce.box("n").type;
+// ➔ "integer"
+```
+
+When a symbol is used in a function expression, the expected type of the
+arguments is used to infer the type of the symbol.
+
+```js
+ce.declare("n", "unknown");
+ce.declare("f", "(number) -> number");
+ce.box(["f", "n"]);
+ce.box("n").type;
+// ➔ "number"
+```
+
+A type that has been inferred can be refined later, for example by
+assigning a value of a more specific type to the symbol or by using the
+symbol in a context that requires a more specific type.
+
+Continuing the example above:
+
+```js
+ce.declare("g", "(integer) -> number");
+ce.box(["g", "n"]);
+ce.box("n").type;
+// ➔ "integer": "n" has been narrowed 
+//    from "number" to "integer"
+```
+
+
+
 ## Defining New Types
 
 **To define new types** use the `ce.declareType()` function.
@@ -19561,7 +19670,10 @@ For example, to defines a new type `point` that is a tuple of two
 integers, `x` and `y`:
 
 ```js
-ce.declareType("point", "tuple<x: integer, y: integer>");
+ce.declareType(
+  "point",
+  "tuple<x: integer, y: integer>"
+);
 ```
 
 The type is defined in the current lexical scope.
@@ -19569,7 +19681,7 @@ The type is defined in the current lexical scope.
 
 ### Nominal vs Structural Types
 
-By default, types are nominal, meaning that to be compatible, they must have 
+By default, types are nominal, meaning that to be compatible two types must have 
 the same name and not just the same structure.
 
 ```js
@@ -19578,7 +19690,7 @@ ce.type("tuple<x: integer, y: integer>")
 // ➔ false
 ```
 
-To make a type structural, use the `ce.declareType()` function with the
+**To make a type structural**, use the `ce.declareType()` function with the
 `alias` option. Two structural types are compatible if they have the same structure,
 regardless of their names.
 
@@ -19599,7 +19711,7 @@ ce.type("tuple<x: integer, y: integer>")
 
 A recursive type is a type that refers to itself in its definition.
 
-In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
+**To use a type before declaring it**, preface it with the `type` keyword in the type expression.
 
 For example, a binary tree can be defined as a tuple of a value and two subtrees:
 
@@ -21633,11 +21745,210 @@ title: Strings
 slug: /compute-engine/reference/strings/
 ---
 
-A string is a sequence of characters such as `"Hello, World!"` or `"42"`.
+A string is a sequence of characters such as <span style={{fontSize: "1.2rem"}}>`"Hello, 🌍!"`</span> or <span style={{fontSize: "1.2rem"}}>`"Simplify(👨‍🚀 + ⚡️) → 👨‍🎤"`.</span>
+
 
 In the Compute Engine, strings are composed of encoding-independent Unicode
 characters and provide access to those characters through a variety of Unicode
 representations.
+
+In the Compute Engine, strings are **not treated as collections**. This is 
+because the concept of a "character" is inherently ambiguous: a single 
+user-perceived character (a **grapheme cluster**) may consist of multiple 
+Unicode scalars, and those scalars may in turn be represented differently 
+in various encodings. To avoid confusion and ensure consistent behavior, 
+strings must be explicitly converted to a sequence of **grapheme clusters** or 
+**Unicode scalars** when individual elements need to be accessed.
+
+
+<nav className="hidden">
+### String
+</nav>
+
+<FunctionDefinition name="String">
+
+<Signature name="String" returns="string">any*</Signature>
+
+A string created by joining its arguments. The arguments are converted to their default string representation.
+
+
+```json example
+["String", "Hello", ", ", "🌍", "!"]
+// ➔ "Hello, 🌍!" 
+
+["String", 42, " is the answer"]
+// ➔ "42 is the answer"  
+
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### StringFrom
+</nav>
+
+<FunctionDefinition name="StringFrom">
+
+<Signature name="StringFrom" returns="string">any, _format_:string?</Signature>
+
+Convert the argument to a string, using the specified _format_.
+
+| _format_ | Description |
+| :--- | :--- |
+| `utf-8` | The argument is a list of UTF-8 code points |
+| `utf-16` | The argument is a list of UTF-16 code points |
+| `unicode-scalars` | The argument is a list of Unicode scalars (same as UTF-32) |
+
+For example: 
+
+```json example
+["StringFrom", [240, 159, 148, 159], "utf-8"]
+// ➔ "Hello"
+
+["StringFrom", [55357, 56607], "utf-16"]
+// ➔ "\u0048\u0065\u006c\u006c\u006f"
+
+["StringFrom", [128287], "unicode-scalars"]
+// ➔ "🔟"
+
+["StringFrom", [127467, 127479], "unicode-scalars"]
+// ➔ "🇫🇷"
+
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Utf8
+</nav>
+
+<FunctionDefinition name="Utf8">
+<Signature name="Utf8" returns="list<integer>">string</Signature>
+
+Return a list of UTF-8 code points for the given _string_.
+
+**Note:** The values returned are UTF-8 bytes, not Unicode scalar values.
+
+```json example
+["Utf8", "Hello"]
+// ➔ [72, 101, 108, 108, 111]  
+
+["Utf8", "👩‍🎓"]
+// ➔ [240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Utf16
+</nav>
+
+<FunctionDefinition name="Utf16">
+<Signature name="Utf16" returns="list<integer>">string</Signature>
+
+Return a list of utf-16 code points for the given _string_.
+
+**Note:** The values returned are UTF-16 code units, not Unicode scalar values.
+
+```json example
+["Utf16", "Hello"]
+// ➔ [72, 101, 108, 108, 111]  
+
+["Utf16", "👩‍🎓"]
+// ➔ [55357, 56489, 8205, 55356, 57235]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### UnicodeScalars
+</nav>
+
+<FunctionDefinition name="UnicodeScalars">
+<Signature name="UnicodeScalars" returns="list<integer>">string</Signature>
+
+A **Unicode scalar** is any valid Unicode code point, represented as a number 
+between `U+0000` and `U+10FFFF`, excluding the surrogate range 
+(`U+D800` to `U+DFFF`). In other words, Unicode scalars correspond exactly to UTF-32 code units.
+
+
+This function returns the sequence of Unicode scalars (code points) that make 
+up the string. Note that some characters perceived as a single visual unit 
+(grapheme clusters) may consist of multiple scalars. For example, the emoji 
+<span style={{fontSize: "1.2em"}}>👩‍🚀</span> is a single grapheme but is composed of several scalars.
+
+```json example
+["UnicodeScalars", "Hello"]
+// ➔ [72, 101, 108, 108, 111]  
+
+["UnicodeScalars", "👩‍🎓"]
+// ➔ [128105, 8205, 127891]
+```
+
+</FunctionDefinition>
+
+
+
+<nav className="hidden">
+### GraphemeClusters
+</nav>
+
+<FunctionDefinition name="GraphemeClusters">
+<Signature name="GraphemeClusters" returns="list<string>">string</Signature>
+
+ A **grapheme cluster** is the smallest unit of text that a reader perceives 
+as a single character. It may consist of one or more **Unicode scalars** 
+(code points). 
+
+For example, the character **é** can be a single scalar (`U+00E9`) or a 
+sequence of scalars (**e** `U+0065` + **combining acute** `U+0301`), 
+but both form a single grapheme cluster. 
+
+Here, **NFC** (Normalization Form C) refers to the precomposed form of characters, while **NFD** (Normalization Form D) refers to the decomposed form where combining marks are used.
+
+Similarly, complex emojis (<span style={{fontSize: "1.2rem"}}>👩‍🚀</span>, <span style={{fontSize: "1.2rem"}}>🇫🇷</span>)
+are grapheme clusters composed of multiple scalars.
+
+The exact definition of grapheme clusters is determined by the Unicode Standard 
+([UAX #29](https://unicode.org/reports/tr29/)) and may evolve over time as new 
+characters, scripts, or emoji sequences are introduced. In contrast, Unicode 
+scalars and their UTF-8, UTF-16, or UTF-32 encodings are fixed and stable across Unicode versions.
+
+
+The table below illustrates the difference between grapheme clusters and Unicode scalars:
+
+| String        | Grapheme Clusters  | Unicode Scalars (Code Points)      |
+|:-------------|:--------------------|:------------------------------------|
+| <span style={{fontSize: "1.3rem"}}>`é`</span> (NFC)     | <span style={{fontSize: "1.3rem"}}>`["é"]`</span>              | `[233]`                              |
+| <span style={{fontSize: "1.3rem"}}>`é`</span> (NFD)    | <span style={{fontSize: "1.3rem"}}>`["é"]`</span>              | `[101, 769]`                         |
+| <span style={{fontSize: "1.3rem"}}>`👩‍🎓`</span>         | <span style={{fontSize: "1.3rem"}}>`["👩‍🎓"]`</span>           | `[128105, 8205, 127891]`             |
+
+In contrast, a Unicode scalar is a single code point in the Unicode standard,
+ corresponding to a UTF-32 value. Grapheme clusters are built from one or more scalars.
+
+This function splits a string into grapheme clusters, not scalars.
+
+```json example
+["GraphemeClusters", "Hello"]
+// ➔ ["H", "e", "l", "l", "o"]
+
+["GraphemeClusters", "👩‍🎓"]
+// ➔ ["👩‍🎓"]
+
+["UnicodeScalars", "👩‍🎓"]
+// ➔ [128105, 8205, 127891]
+```
+
+For more details on how grapheme cluster boundaries are determined, 
+see [Unicode® Standard Annex #29](https://unicode.org/reports/tr29/).
+
+</FunctionDefinition>
+
+
 
 <nav className="hidden">
 ### BaseForm
@@ -21647,9 +21958,9 @@ representations.
 
 <FunctionDefinition name="BaseForm">
 
-<Signature name="BaseForm" returns="string">_value:integer_</Signature>
+<Signature name="BaseForm" returns="string">_value_:integer</Signature>
 
-<Signature name="BaseForm" returns="string">_value_:integer, _base_</Signature>
+<Signature name="BaseForm" returns="string">_value_:integer, _base_:integer</Signature>
 
 Format an _integer_ in a specific _base_, such as hexadecimal or binary.
 
