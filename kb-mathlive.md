@@ -9727,7 +9727,7 @@ declare namespace svelteHTML {
     "smart-mode": true
     // ...
     // see here for the full list of API's
-    // https://cortexjs.io/mathfield/api/
+    // https://mathlive.io/mathfield/api/
   }
 </script>
 
@@ -13686,7 +13686,7 @@ The first argument is a URL, the second argument is the content to display, in m
 
 ```html example
 <math-field>
-  \href{https://cortexjs.io}{\text{CortexJS website}}
+  \href{https://mathlive.io}{\text{CortexJS website}}
 </math-field>
 ```
 
