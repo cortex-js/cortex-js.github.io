@@ -13236,6 +13236,7 @@ import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import CodePlayground from '@site/src/components/CodePlayground';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
+import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function ToggleButton ({toggle, className, style}) {
 return <button 
@@ -13352,15 +13353,17 @@ n^2+1 & n \\geq 2
 
 return (
     <div className="example-cells">{
-      examples.map((x, i) => 
-        <div 
-          key={x.label ?? x.latex ?? x.json}
-          className={clsx("example-cell", {"active": i === index} )} 
-          onClick={() => onSelect(x, i)}
-        >
-          {x.label ? x.label: `$$${x.latex}$$`}
-        </div>
-      )
+      examples.map((x, i) => {
+        return (
+          <div 
+            key={x.label ?? x.latex ?? x.json}
+            className={clsx("example-cell", {"active": i === index} )} 
+            onClick={() => onSelect(x, i)}
+          >
+            {x.label ? x.label: `$$${x.latex}$$`}
+          </div>
+        );
+      })
     }
     </div>
   );
@@ -13425,14 +13428,23 @@ console.info(await expr.evaluateAsync());
       }
     }  
 
-    setValue(code);
+    if (!('ComputeEngine' in window)) {
+      setValue(`// 😕 The Compute Engine could not be loaded.
+// Check your network connection or try again later.`);
+    } else {
+      setValue(code);
+    }
     setIndex(exampleIndex);
   };
 
   return (
     <div className="flex flex-col items-center">
-      <ExampleSelector onSelect={handleSelect} index={index}/>
-      <CodePlayground js={value} />
+      <ErrorBoundary>
+        <ExampleSelector onSelect={handleSelect} index={index}/>
+        <ErrorBoundary>
+          <CodePlayground js={value} />
+        </ErrorBoundary>
+      </ErrorBoundary>
     </div>
   );
 }
@@ -13576,7 +13588,6 @@ button.toggle svg {
 
 
 <ComputeEngineDemo/>
-
 ---
 title: Evaluation of Expressions
 slug: /compute-engine/guides/evaluate/
@@ -14064,6 +14075,7 @@ import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
 import {BrowserOnly} from '@docusaurus/BrowserOnly';
+import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function setupComputeEngine() {
   if (window.ce !== undefined) return;
@@ -14072,10 +14084,6 @@ export function setupComputeEngine() {
     setTimeout(setupComputeEngine, 50);
     return;
   }
-  const [value, setValue] = useState(children);
-  const [json, setJson] = useState({});
-  window.ce = new ComputeEngine.ComputeEngine();
-  setJson(window.ce?.parse(value).json);
 }
 export function MathJSONOutput({children}) {
   const [value, setValue] = useState(children);
@@ -14084,8 +14092,20 @@ export function MathJSONOutput({children}) {
   // We need to use useEffect so that the MathfieldElement is available
   // when this code runs (in the client).
   useEffect(() => {
-    setupComputeEngine();
-    setJson(window.ce?.parse(value).json);
+    let cancelled = false;
+
+    const tryParse = () => {
+      if (window.ce) {
+        const result = window.ce.parse(value);
+        setJson(result?.json ?? {});
+      } else if (!cancelled) {
+        setTimeout(tryParse, 50);
+      }
+    };
+
+    tryParse();
+
+    return () => { cancelled = true; };
   }, [value]);
   return<>
     <Mathfield 
@@ -14128,7 +14148,9 @@ MathJSON can be transformed from (parsing) and to (serialization) other formats.
 
 :::info[Demo]
 Type an expression in the mathfield below to see its MathJSON representation.
-<MathJSONOutput>{`e^{i\\pi}+1=0`}</MathJSONOutput>
+<ErrorBoundary>
+  <MathJSONOutput>{`e^{i\\pi}+1=0`}</MathJSONOutput>
+</ErrorBoundary>
 :::
 
 
@@ -14845,6 +14867,7 @@ Library.
 <ReadMore path="/compute-compute-engine/guides/augmenting/">
 Read more about **Adding New Definitions**<Icon name="chevron-right-bold" />
 </ReadMore>
+
 ---
 title: Calculus
 slug: /compute-engine/reference/calculus/
@@ -19056,7 +19079,7 @@ by omitting the endpoint.
 For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
 and is equivalent to `real< -oo..1.0 >`.
 
-To represent an open interval, use a negation value type to exclude the endpoints.
+To represent an open interval, use a negation and a literal type to exclude the endpoints.
 For example `real<0..> & !0` is the type of real numbers greater than $0$.
 
 When using integers, you can adjust the endpoint instead, so for example 
@@ -19228,7 +19251,7 @@ contains three elements with keys `red`, `green` and `blue`, and values of type 
   - The keys of the first record are a subset of the keys of the second.
   - The values of the first record are compatible with the values of the second.
   - The order of the keys does not matter.
-- A record is compatible with a dictionary `dictionary<T>` if each value type `T1`, `T2`, ... is compatible with `T`.
+- A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
 
 
 ```js
@@ -19361,21 +19384,21 @@ and it cannot be combined with optional arguments.
 
 The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
 
-## Value Type
+## Literal Type
 
-A **value type** is a type that represents a single value. 
+A **literal type** is a type that represents a single value. 
 
 The value can be:
 - a boolean: `true` or `false`
 - a number, such as `42`, `-3.14`, or `6.022e23`
 - a string, such as `"yellow"`, 
 
-Value types can be used in conjunction with a union to represent a type that 
+Literal types can be used in conjunction with a union to represent a type that 
 can be one of multiple values, for example:
 
 - `0 | 1` is the type of values that are either `0` or `1`.
-- `integer | nothing` is the type of values that are integers or `Nothing`.
-- `"red" | "green" | "blue"` is the type of values that are either of the strings `"red"`, `"green"` or `"blue"`.
+- `"red" | "green" | "blue"` is the type of values that are either of the 
+  strings `"red"`, `"green"` or `"blue"`.
 
 
 ## Other Constructed Types
@@ -19495,7 +19518,8 @@ ce.parse("\\{red: 1, green: 2\\}").type
 // ➔ true
 ```
 
-Records are compatible with dictionaries if all the values of the record are compatible with the dictionary's value type.
+Records are compatible with dictionaries if all the values of the record are 
+compatible with the dictionary's value type.
 
 ```js
 ce.parse("\\{red: 104, green: 2, blue: 37\\}").type
