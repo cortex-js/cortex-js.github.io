@@ -4,7 +4,7 @@
   <ShortName>MathLive</ShortName>
   <Description>Search MathLive</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://mathlive.io/img/logo.svg</Image>
+  <Image width="16" height="16" type="image/x-icon">https://mathlive.io/img/logo.webp</Image>
   <Url type="text/html" method="get" template="https://mathlive.io/search?q={searchTerms}"/>
   <Url type="application/opensearchdescription+xml" rel="self" template="https://mathlive.io/opensearch.xml" />
   <moz:SearchForm>https://mathlive.io/</moz:SearchForm>
