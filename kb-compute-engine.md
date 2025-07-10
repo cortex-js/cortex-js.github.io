@@ -14154,7 +14154,7 @@ Type an expression in the mathfield below to see its MathJSON representation.
 :::
 
 
-The **Cortex Compute Engine** library provides an implementation in
+The **Compute Engine** library provides an implementation in
 JavaScript/TypeScript of utilities that parse LaTeX to MathJSON, serialize
 MathJSON to LaTeX, and provide a collection of functions for symbolic
 manipulation and numeric evaluations of MathJSON expressions.
@@ -14183,10 +14183,22 @@ Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold"
 MathJSON is not intended to be suitable as a visual representation of arbitrary
 mathematical notations, and as such is not a replacement for LaTeX or MathML.
 
+
+
 ## Structure of a MathJSON Expression
 
 A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 **functions** and **dictionaries**.
+
+:::note[Note on Similarity to S-expressions]
+MathJSON shares similarities with **S-expressions** (symbolic expressions) used 
+in languages like **Lisp** and **Scheme**. Both represent data and code using 
+nested lists, where the first element typically indicates the operator or 
+function and the following elements are its arguments. For example, the 
+MathJSON expression `["Add", 1, "x"]` is analogous to the Lisp expression 
+`(+ 1 x)`. This structure provides a natural and extensible way to represent 
+mathematical expressions as data.
+:::
 
 **Number**
 

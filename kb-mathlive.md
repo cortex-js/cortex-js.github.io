@@ -396,18 +396,19 @@ The editing behavior of a mathfield can be customized by setting some
 properties on the mathfield, or the equivalent attributes on the 
 `<math-field>` tag.
 
-* `defaultMode`: 
+* [`defaultMode`](/mathfield/api/#mathfieldelementdefaultmode): the default mode of the mathfield.
+  This can be one of:
   * `"inline-math"`: use inline math mode
   * `"math"`: use the display math mode
   * `"text"`: use the text mode  | 
-* `removeExtraneousParentheses`: automatically remove extra parentheses around
+* [`removeExtraneousParentheses`](/mathfield/api/#mathfieldelementremoveextraneousparentheses): automatically remove extra parentheses around
 a numerator or denominator
-* `scriptDepth`: maximum levels of subscript or superscript. Set it to 0 to 
+* [`scriptDepth`](/mathfield/api/#mathfieldelementscriptdepth): maximum levels of subscript or superscript. Set it to 0 to 
 prevent the input of superscript and subscripts
-* `smartFence`: automatically convert parentheses to `\left...\right` markup.
-* `smartMode`: switch to text mode when text input is detected, for example 
+* [`smartFence`](/mathfield/api/#mathfieldelementsmartfence): automatically convert parentheses to `\left...\right` markup.
+* [`smartMode`](/mathfield/api/#mathfieldelementsmartmode): switch to text mode when text input is detected, for example 
 when typing "if x > 0"
-* `smartSuperscript`: automatically move out of a superscript when a digit is typed
+* [`smartSuperscript`](/mathfield/api/#mathfieldelementsmartsuperscript): automatically move out of a superscript when a digit is typed
 
 These properties can also be passed as an argument to [`new MathfieldElement()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) when programmatically creating mathfield elements.
 
@@ -422,11 +423,6 @@ in the mathfield.
 </math-field>
 
 ```
-<br/>
-
-<ReadMore path= "/mathfield/?q=EditingOptions">
-See `EditingOptions` for more details about these and other available options<Icon name="chevron-right-bold" />
-</ReadMore>
 
 
 
@@ -442,10 +438,10 @@ relational, binary or unary operators, etc...
 By default, pressing the spacebar when in math mode does not insert anything.
 
 **To insert a LaTeX command when the spacebar is pressed**, set the value of the 
-`mathModeSpace` property to that command:
+[`MathfieldElement.mathModeSpace`](/mathfield/api/#mathfieldelementmathmodespace) property to that command:
 
 ```js
-mf.mathModeSpace = '\\:';
+MathfieldElement.mathModeSpace = '\\:';
 ```
 
 
@@ -480,7 +476,7 @@ The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.
 
 The language to use is detected automatically, but it can be overridden by
-using the `MathfieldElement.locale` static property. Setting this property
+using the [`MathfieldElement.locale`](/mathfield/api/#mathfieldelementlocale) static property. Setting this property
 will affect all mathfield elements on the page.
 
 ```live
@@ -504,7 +500,7 @@ The world is
 between using a dot `.` or a comma `,` as a decimal marker.
 
 **To change the marker used with decimal numbers** set the 
-`MathfieldElement.decimalSeparator` property to `","` or `"."`.
+[`MathfieldElement.decimalSeparator`](/mathfield/api/#mathfieldelementdecimalseparator) property to `","` or `"."`.
 
 When set to `","`, pressing the <kbd>,</kbd> key on a physical keyboard will insert a 
 `{,}` LaTeX string, if in math mode and if before a digit. 
@@ -533,7 +529,7 @@ When using the arrow keys on the keyboard to navigate a fraction, the order in
 which the numerator and navigator are traversed can be customized.
 
 **To change the keyboard navigation order of fractions** set the 
-`MathfieldElement.fractionNavigationOrder` property.
+[`MathfieldElement.fractionNavigationOrder`](/mathfield/api/#mathfieldelementfractionnavigationorder) property.
 
 The possible values are:
 - `"numerator-denominator"`: first the elements in the numerator, then
@@ -565,7 +561,7 @@ delete when the mathfield is empty (the "plonk" sound).
 The files for the sounds played by the mathfield should be located in a 
 directory named `sounds` next to the mathfield library. If your bundler or 
 asset management system require a different configuration you can specify 
-where the sounds can be located using the `MathfieldElement.soundsDirectory` 
+where the sounds can be located using the [`MathfieldElement.soundsDirectory`](/mathfield/api/#mathfieldelementsoundsdirectory)
 property.
 
 ```js
@@ -573,7 +569,7 @@ MathfieldElement.soundsDirectory =
   "https://cdn.jsdelivr.net/npm/mathlive/sounds/";
 ```
 
-Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
+Specific sounds can be disabeld or customized with the [`MathfieldElement.keypressSound`](/mathfield/api/#mathfieldelementkeypresssound)
 property.
 
 ```js
@@ -596,7 +592,7 @@ MathfieldElement.playSound('plonk');
 
 ### Disabling Sounds
 
-**To turn off the sounds** set the `MathfieldElement.soundsDirectory` property to `null`.
+**To turn off the sounds** set the [`MathfieldElement.soundsDirectory`](/mathfield/api/#mathfieldelementsoundsdirectory) property to `null`.
 
 ```js
 MathfieldElement.soundsDirectory = null;
@@ -606,7 +602,7 @@ MathfieldElement.soundsDirectory = null;
 
 When a key on the virtual keyboard is pressed, a small vibration is triggered
 on devices that support it. This can be turned off by setting the
-`MathfieldElement.keypressVibration` property to `false`.
+[`MathfieldElement.keypressVibration`](/mathfield/api/#mathfieldelementkeypressvibration) property to `false`.
 
 ```js
 MathfieldElement.keypressVibration = false;
@@ -621,7 +617,7 @@ will not display correctly using another font.
 By default, the directory containing the fonts is located next to the file 
 containing the mathlive library. If your bundler or asset management system 
 require a different configuration you can specify where the fonts can be 
-located using the [`MathfieldElement.fontsDirectory`](mathfield/?q=fontsDirectory) 
+located using the [`MathfieldElement.fontsDirectory`](/mathfield/api/#mathfieldelementfontsdirectory) 
 property.
 
 ```live
@@ -8923,28 +8919,28 @@ as follows:
 import * from 'mathlive/ssr';
 ```
 
-**To convert LaTeX to HTML**, use the [`convertLatexToMarkup()`](/docs/mathfield/?q=convertLatexToMarkup) function.
+**To convert LaTeX to HTML**, use the [`convertLatexToMarkup()`](/mathfield/api/#q=convertLatexToMarkup) function.
 
 ```javascript
 import { convertLatexToMarkup } from 'mathlive';
 console.log(convertLatexToMarkup('x^2 + y^2 = z^2'));
 ```
 
-**To convert LaTeX to MathML**, use the [`latexToMathML()`](/docs/mathfield/?q=latexToMathML) function.
+**To convert LaTeX to MathML**, use the [`latexToMathML()`](/mathfield/api/#q=latexToMathML) function.
 
 ```javascript
 import { convertLatexToMathMl } from 'mathlive';
 console.log(convertLatexToMathMl('x^2 + y^2 = z^2'));
 ```
 
-**To convert LaTeX to spoken text**, use the [`convertLatexToSpeakableText()`](/docs/mathfield/?q=convertLatexToSpeakableText) function.
+**To convert LaTeX to spoken text**, use the [`convertLatexToSpeakableText()`](/mathfield/api/#q=convertLatexToSpeakableText) function.
 
 ```javascript
 import { convertLatexToSpeakableText } from 'mathlive';
 console.log(convertLatexToSpeakableText('x^2 + y^2 = z^2'));
 ```
 
-**To convert LaTeX to AsciiMath**, use the [`convertLatexToAsciiMath()`](/docs/mathfield/?q=convertLatexToAsciiMath) function.
+**To convert LaTeX to AsciiMath**, use the [`convertLatexToAsciiMath()`](/mathfield/api/#q=convertLatexToAsciiMath) function.
 
 ```javascript
 import { convertLatexToAsciiMath } from 'mathlive';
@@ -8954,14 +8950,14 @@ console.log(convertLatexToAsciiMath('x^2 + y^2 = z^2'));
 
 ## Converting From Various Formats to LaTeX
 
-**To convert MathJson to LaTeX**, use the [`convertMathJsonToLatex()`](/docs/mathfield/?q=convertMathJsonToLatex) function.
+**To convert MathJson to LaTeX**, use the [`convertMathJsonToLatex()`](/mathfield/api/#convertmathjsontolatex) function.
 
 ```javascript
 import { convertMathJsonToLatex } from 'mathlive';
 console.log(convertMathJsonToLatex(["Add", "x", "y"]));
 ```
 
-**To convert AsciiMath to LaTeX**, use the [`convertAsciiMathToLatex()`](/docs/mathfield/?q=convertAsciiMathToLatex) function.
+**To convert AsciiMath to LaTeX**, use the [`convertAsciiMathToLatex()`](/mathfield/api/#q=convertAsciiMathToLatex) function.
 
 ```javascript
 import { asciiMathToLatex } from 'mathlive';
@@ -8973,7 +8969,7 @@ console.log(convertAsciiMathToLatex('x^2 + y^2 = z^2'));
 ## Rendering Static Math Formulas
 
 **To render math contained in a document as a static (non-editable) formula**, 
-call [`renderMathInDocument()`](/docs/mathfield/?q=renderMathInDocument) at the 
+call [`renderMathInDocument()`](/mathfield/api/#q=renderMathInDocument) at the 
 end of your document, or in a `DOMContentLoaded` event handler.
 
 ```html
@@ -9031,7 +9027,7 @@ used.
 The following DOM elements are ignored for conversion: `<noscript>`,
 `<style>`, `<textarea>`, `<pre>`, `<code>`, `<annotation>` and `<annotation-xml>`.
 
-If you dynamically generate content, call [`renderMathInElement(element)`](/docs/mathfield/?q=renderMathInElement) to
+If you dynamically generate content, call [`renderMathInElement(element)`](/mathfield/api/#q=renderMathInElement) to
 render your element after the page has been loaded. This is a recursive call
 that will be applied to `element` and all its children.
 
@@ -14325,7 +14321,7 @@ In this section we'll discuss other options for adding a mathfield to a web page
 ## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
-such as `renderMathInDocument()`.
+such as [`renderMathInDocument()`](/api/#rendermathindocument).
 
 **To access those functions**, import them from the MathLive module.
 
@@ -14493,7 +14489,7 @@ In the example above, if the MathLive library is in a `/js/` directory and the
 MathLive fonts are in a `/assets/mathlive-fonts/` directory, then the relative
 path from the JavaScript directory to the fonts directory is `../assets/mathlive-fonts`.
 
-The `MathfieldElement.soundsDirectory` property can similarly be set to point
+The [`MathfieldElement.soundsDirectory`](/mathfield/api/#mathfieldelementsoundsdirectory) property can similarly be set to point
 to the sound file assets.
 
 ## Integrating with a Bundler or an Asset Pipeline

@@ -8,9 +8,9 @@
 <link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
 <script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),d="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(d))return;const i=document.createElement("script");m&&(i.type="module"),i.id=d,i.src=o,i.async=!1,t&&n===e.length-1&&(i.onload=t),document.head.appendChild(i)})}()</script>
 <link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.1f8913d2.css">
-<script src="/assets/js/runtime~main.330ddc6a.js" defer="defer"></script>
-<script src="/assets/js/main.9d56c40a.js" defer="defer"></script>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.2c676183.css">
+<script src="/assets/js/runtime~main.1dd590ca.js" defer="defer"></script>
+<script src="/assets/js/main.ff8f5de1.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -189,29 +189,28 @@ the <code>french</code> style is used, otherwise <code>tex</code> is used.</p>
 properties on the mathfield, or the equivalent attributes on the
 <code>&lt;math-field&gt;</code> tag.</p>
 <ul>
-<li><code>defaultMode</code>:<!-- -->
+<li><a href="/mathfield/api/#mathfieldelementdefaultmode"><code>defaultMode</code></a>: the default mode of the mathfield.
+This can be one of:<!-- -->
 <ul>
 <li><code>&quot;inline-math&quot;</code>: use inline math mode</li>
 <li><code>&quot;math&quot;</code>: use the display math mode</li>
 <li><code>&quot;text&quot;</code>: use the text mode  |</li>
 </ul>
 </li>
-<li><code>removeExtraneousParentheses</code>: automatically remove extra parentheses around
+<li><a href="/mathfield/api/#mathfieldelementremoveextraneousparentheses"><code>removeExtraneousParentheses</code></a>: automatically remove extra parentheses around
 a numerator or denominator</li>
-<li><code>scriptDepth</code>: maximum levels of subscript or superscript. Set it to 0 to
+<li><a href="/mathfield/api/#mathfieldelementscriptdepth"><code>scriptDepth</code></a>: maximum levels of subscript or superscript. Set it to 0 to
 prevent the input of superscript and subscripts</li>
-<li><code>smartFence</code>: automatically convert parentheses to <code>\left...\right</code> markup.</li>
-<li><code>smartMode</code>: switch to text mode when text input is detected, for example
+<li><a href="/mathfield/api/#mathfieldelementsmartfence"><code>smartFence</code></a>: automatically convert parentheses to <code>\left...\right</code> markup.</li>
+<li><a href="/mathfield/api/#mathfieldelementsmartmode"><code>smartMode</code></a>: switch to text mode when text input is detected, for example
 when typing &quot;if x &gt; 0&quot;</li>
-<li><code>smartSuperscript</code>: automatically move out of a superscript when a digit is typed</li>
+<li><a href="/mathfield/api/#mathfieldelementsmartsuperscript"><code>smartSuperscript</code></a>: automatically move out of a superscript when a digit is typed</li>
 </ul>
 <p>These properties can also be passed as an argument to <a href="/docs/mathfield/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor"><code>new MathfieldElement()</code></a> when programmatically creating mathfield elements.</p>
 <p>In the interactive code playground below, try some of these options. For example,
 in line 1 add the attribute <code>smart-mode=false</code>, then type some parentheses
 in the mathfield.</p>
 <div class="language-line codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-line codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">:::html</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">&lt;math-field smart-mode&gt;</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">&lt;/math-field&gt;</span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></span></code></pre></div></div>
-<br>
-<div class="readMore_KWn8"><a href="/mathfield/?q=EditingOptions"><p>See <code>EditingOptions</code> for more details about these and other available options<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="handling-the-space-bar">Handling the Space Bar<a href="#handling-the-space-bar" class="hash-link" aria-label="Direct link to Handling the Space Bar" title="Direct link to Handling the Space Bar">​</a></h3>
 <p>In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
@@ -220,8 +219,8 @@ relational, binary or unary operators, etc...</p>
 <code>\qquad</code>, <code>\!</code>, <code>\,</code> (thin space), <code>\:</code> (medium space), <code>\;</code> (thick space), <code>\enskip</code> or <code>\enspace</code>.</p>
 <p>By default, pressing the spacebar when in math mode does not insert anything.</p>
 <p><strong>To insert a LaTeX command when the spacebar is pressed</strong>, set the value of the
-<code>mathModeSpace</code> property to that command:</p>
-<div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">mf</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">mathModeSpace </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;\\:&#x27;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
+<a href="/mathfield/api/#mathfieldelementmathmodespace"><code>MathfieldElement.mathModeSpace</code></a> property to that command:</p>
+<div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">mathModeSpace </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;\\:&#x27;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="turning-off-the-latex-mode">Turning off the LaTeX mode<a href="#turning-off-the-latex-mode" class="hash-link" aria-label="Direct link to Turning off the LaTeX mode" title="Direct link to Turning off the LaTeX mode">​</a></h3>
 <p>Pressing the <kbd>\</kbd> (backslash) or <kbd>ESC</kbd> key switches to the LaTeX mode where it
 is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
@@ -234,7 +233,7 @@ and call `preventDefault().</p>
 <p>The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.</p>
 <p>The language to use is detected automatically, but it can be overridden by
-using the <code>MathfieldElement.locale</code> static property. Setting this property
+using the <a href="/mathfield/api/#mathfieldelementlocale"><code>MathfieldElement.locale</code></a> static property. Setting this property
 will affect all mathfield elements on the page.</p>
 <code-playground><div slot="html">&lt;math-field id=formula&gt;
 <!-- -->    <!-- -->x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -251,7 +250,7 @@ will affect all mathfield elements on the page.</p>
 <a href="https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg" target="_blank" rel="noopener noreferrer">about evenly split</a>
 between using a dot <code>.</code> or a comma <code>,</code> as a decimal marker.</p>
 <p><strong>To change the marker used with decimal numbers</strong> set the
-<code>MathfieldElement.decimalSeparator</code> property to <code>&quot;,&quot;</code> or <code>&quot;.&quot;</code>.</p>
+<a href="/mathfield/api/#mathfieldelementdecimalseparator"><code>MathfieldElement.decimalSeparator</code></a> property to <code>&quot;,&quot;</code> or <code>&quot;.&quot;</code>.</p>
 <p>When set to <code>&quot;,&quot;</code>, pressing the <kbd>,</kbd> key on a physical keyboard will insert a
 <code>{,}</code> LaTeX string, if in math mode and if before a digit.</p>
 <p>The LaTeX sequence <code>{,}</code> is traditionally used to correctly typeset the comma
@@ -269,7 +268,7 @@ keycap is  labeled <code>,</code> instead and contextually inserts a <code>{,}</
 <p>When using the arrow keys on the keyboard to navigate a fraction, the order in
 which the numerator and navigator are traversed can be customized.</p>
 <p><strong>To change the keyboard navigation order of fractions</strong> set the
-<code>MathfieldElement.fractionNavigationOrder</code> property.</p>
+<a href="/mathfield/api/#mathfieldelementfractionnavigationorder"><code>MathfieldElement.fractionNavigationOrder</code></a> property.</p>
 <p>The possible values are:</p>
 <ul>
 <li><code>&quot;numerator-denominator&quot;</code>: first the elements in the numerator, then
@@ -293,22 +292,22 @@ delete when the mathfield is empty (the &quot;plonk&quot; sound).</p>
 <p>The files for the sounds played by the mathfield should be located in a
 directory named <code>sounds</code> next to the mathfield library. If your bundler or
 asset management system require a different configuration you can specify
-where the sounds can be located using the <code>MathfieldElement.soundsDirectory</code>
+where the sounds can be located using the <a href="/mathfield/api/#mathfieldelementsoundsdirectory"><code>MathfieldElement.soundsDirectory</code></a>
 property.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">soundsDirectory </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token string" style="color:var(--base-0b)">&quot;https://cdn.jsdelivr.net/npm/mathlive/sounds/&quot;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
-<p>Specific sounds can be disabeld or customized with the <code>MathfieldElement.keypressSound</code>
+<p>Specific sounds can be disabeld or customized with the <a href="/mathfield/api/#mathfieldelementkeypresssound"><code>MathfieldElement.keypressSound</code></a>
 property.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">keypressSound </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token literal-property property" style="color:var(--base-0c)">spacebar</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">null</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token keyword" style="color:var(--base-0e)">return</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;./sounds/return.mp3&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token keyword" style="color:var(--base-0e)">delete</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">null</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token keyword" style="color:var(--base-0e)">default</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">null</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><br></span></code></pre></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="playing-plonk-sound">Playing &quot;Plonk&quot; Sound<a href="#playing-plonk-sound" class="hash-link" aria-label="Direct link to Playing &quot;Plonk&quot; Sound" title="Direct link to Playing &quot;Plonk&quot; Sound">​</a></h3>
 <p><strong>To play the &quot;plonk&quot; sound</strong> when an action cannot be performed, use <code>MathfieldElement.playSound(&#x27;plonk&#x27;)</code>.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">playSound</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token string" style="color:var(--base-0b)">&#x27;plonk&#x27;</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="disabling-sounds">Disabling Sounds<a href="#disabling-sounds" class="hash-link" aria-label="Direct link to Disabling Sounds" title="Direct link to Disabling Sounds">​</a></h3>
-<p><strong>To turn off the sounds</strong> set the <code>MathfieldElement.soundsDirectory</code> property to <code>null</code>.</p>
+<p><strong>To turn off the sounds</strong> set the <a href="/mathfield/api/#mathfieldelementsoundsdirectory"><code>MathfieldElement.soundsDirectory</code></a> property to <code>null</code>.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">soundsDirectory </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">null</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="haptic-feedback">Haptic Feedback<a href="#haptic-feedback" class="hash-link" aria-label="Direct link to Haptic Feedback" title="Direct link to Haptic Feedback">​</a></h3>
 <p>When a key on the virtual keyboard is pressed, a small vibration is triggered
 on devices that support it. This can be turned off by setting the
-<code>MathfieldElement.keypressVibration</code> property to <code>false</code>.</p>
+<a href="/mathfield/api/#mathfieldelementkeypressvibration"><code>MathfieldElement.keypressVibration</code></a> property to <code>false</code>.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:var(--console-color)"><span class="token plain">MathfieldElement</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">keypressVibration </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token boolean" style="color:var(--base-09)">false</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></span></code></pre></div></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="fonts">Fonts<a href="#fonts" class="hash-link" aria-label="Direct link to Fonts" title="Direct link to Fonts">​</a></h2>
 <p>The content of the mathfield is displayed using a family of high-quality
@@ -317,7 +316,7 @@ will not display correctly using another font.</p>
 <p>By default, the directory containing the fonts is located next to the file
 containing the mathlive library. If your bundler or asset management system
 require a different configuration you can specify where the fonts can be
-located using the <a href="/mathfield/guides/customizing/mathfield/?q=fontsDirectory"><code>MathfieldElement.fontsDirectory</code></a>
+located using the <a href="/mathfield/api/#mathfieldelementfontsdirectory"><code>MathfieldElement.fontsDirectory</code></a>
 property.</p>
 <code-playground><div slot="style">.output:focus-within {
 <!-- -->  <!-- -->outline: Highlight auto 1px;
