@@ -1376,6 +1376,7 @@ Read more about definining your own **keybindings** and **shortcuts**.
 <Keybinding value="/">$$\frac{}{}$$</Keybinding>
 <Keybinding value="⌃+2">$$\sqrt{}$$</Keybinding>
 <Keybinding value="⌥+V">$$\sqrt{}$$</Keybinding>
+<Keybinding value="⌥+⇧+V">$$\sqrt[n]{}$$</Keybinding>
 <Keybinding value="⌥+P">$$\pi$$</Keybinding>
 <Keybinding value="⌥+O">$$\emptyset$$</Keybinding>
 <Keybinding value="⌥+D">$$\differentialD$$</Keybinding>
@@ -3280,7 +3281,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.3';
+static version: string = '0.106.0';
 ```
 
 </MemberCard>
@@ -4168,6 +4169,7 @@ type OutputFormat =
   | "latex-expanded"
   | "latex-unstyled"
   | "latex-without-placeholders"
+  | "typst"
   | "math-json"
   | "math-ml"
   | "plain-text"
@@ -7564,8 +7566,8 @@ Note that this affects some keybindings, but not general text input.
 type StaticRenderOptions = Partial<LayoutOptions> & {
   asciiMath: {
      delimiters: {
-        display: string[];
-        inline: string[];
+        display: [string, string][];
+        inline: [string, string][];
        };
     };
   ignoreClass: string;
@@ -7929,7 +7931,7 @@ with a mode token such as `$$` or `\(`.
 
 ##### options?
 
-`Partial`\<`LayoutOptions`\>
+`Partial`\<[`LayoutOptions`](#layoutoptions)\>
 
 </MemberCard>
 
@@ -8045,6 +8047,94 @@ type Expression =
 
 <MemberCard>
 
+### LayoutOptions
+
+<MemberCard>
+
+##### LayoutOptions.backgroundColorMap()
+
+```ts
+backgroundColorMap: (name) => string | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.colorMap()
+
+```ts
+colorMap: (name) => string | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.defaultMode
+
+```ts
+defaultMode: "inline-math" | "math" | "text";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.letterShapeStyle
+
+```ts
+letterShapeStyle: "auto" | "tex" | "iso" | "french" | "upright";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.macros
+
+```ts
+macros: MacroDictionary;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.maxMatrixCols
+
+```ts
+maxMatrixCols: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.minFontScale
+
+```ts
+minFontScale: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.registers
+
+```ts
+registers: Registers;
+```
+
+LaTeX global registers override.
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
 ### version
 
 ```ts
@@ -8053,7 +8143,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.3`
+Current version: `0.106.0`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8078,15 +8168,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+## 0.106.0 _2025-07-11_
+
 ### New Features
 
 - Export to **typst** format. Use `mf.getValue("typst")` to get the value of the
   mathfield in typst format.
+- **#2731** The keybinding `alt+shift+V` now inserts a n<sup>th</sup> root. The
+  existing `alt+V` keybinding continues to insert a square root.
 
 ### Resolved Issues
 
 - The commands `\iff`, `\Coloneqq` and `\hArr` did not render correctly.
 - Improved rendering in dark mode.
+- **#2727** Improved rendering of annotations.
 
 ## 0.105.3 _2025-05-14_
 
