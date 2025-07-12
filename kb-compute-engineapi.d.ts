@@ -435,6 +435,7 @@ export declare class BoxedType {
     static finite_integer: BoxedType;
     static finite_real: BoxedType;
     static string: BoxedType;
+    static dictionary: BoxedType;
     static setNumber: BoxedType;
     static setComplex: BoxedType;
     static setImaginary: BoxedType;
@@ -589,9 +590,6 @@ export declare function stringToCodepoints(string: string): number[];
 export declare function splitGraphemes(string: string): string | string[];
 /** Given an invalid word, return the best match amongst validWords */
 export declare function fuzzyStringMatch(invalidWord: string, validWords: string[]): string | null;
-export declare class JSON5 {
-    static parse(input: string): any;
-}
 type MergeTypes<TypesArray extends any[], Res = {}> = TypesArray extends [
     infer Head,
     ...infer Rem
@@ -3642,6 +3640,7 @@ export declare function assume(proposition: BoxedExpression): AssumeResult;
 import type { SymbolDefinitions } from '../global-types';
 export declare const COMPLEX_LIBRARY: SymbolDefinitions[];
 import type { BoxedExpression, ComputeEngine, SymbolDefinitions } from '../global-types';
+import { BoxedDictionary } from '../boxed-expression/boxed-dictionary';
 export declare const DEFAULT_LINSPACE_COUNT = 50;
 export declare const COLLECTIONS_LIBRARY: SymbolDefinitions;
 /**
@@ -3667,7 +3666,7 @@ export declare function rangeLast(r: [lower: number, upper: number, step: number
  */
 export declare function reduceCollection<T>(collection: BoxedExpression, fn: (acc: T, next: BoxedExpression) => T | null, initial: T): Generator<T | undefined>;
 export declare function fromRange(start: number, end: number): number[];
-export declare function canonicalDictionary(engine: ComputeEngine, record: BoxedExpression): BoxedExpression;
+export declare function canonicalDictionary(engine: ComputeEngine, dictionary: BoxedExpression): BoxedDictionary;
 export declare function sortedIndices(expr: BoxedExpression, fn?: BoxedExpression | undefined): number[] | undefined;
 import type { SymbolDefinitions } from '../global-types';
 export declare const POLYNOMIALS_LIBRARY: SymbolDefinitions[];
@@ -4262,6 +4261,46 @@ export declare class BoxedFunction extends _BoxedExpression {
     subsetOf(rhs: BoxedExpression, strict: boolean): boolean;
     _computeValue(options?: Partial<EvaluateOptions>): () => BoxedExpression;
     _computeValueAsync(options?: Partial<EvaluateOptions>): () => Promise<BoxedExpression>;
+}
+import type { BoxedExpression, PatternMatchOptions, BoxedSubstitution, ComputeEngine, Metadata, SemiBoxedExpression } from '../global-types';
+import { _BoxedExpression } from './abstract-boxed-expression';
+import { BoxedType } from '../../common/type/boxed-type';
+import { Expression } from '../../math-json/types';
+export interface DictionaryInterface {
+    get(key: string): BoxedExpression | undefined;
+    has(key: string): boolean;
+    get keys(): string[];
+    get entries(): [string, BoxedExpression][];
+    get values(): BoxedExpression[];
+}
+export declare function isDictionary(expr: BoxedExpression | null | undefined): expr is BoxedDictionary;
+/**
+ * BoxedDictionary
+ *
+ */
+export declare class BoxedDictionary extends _BoxedExpression implements DictionaryInterface {
+    [Symbol.toStringTag]: string;
+    private readonly _keyValues;
+    constructor(ce: ComputeEngine, keyValues: Record<string, SemiBoxedExpression>, options?: {
+        metadata?: Metadata;
+        canonical?: boolean;
+    });
+    get json(): Expression;
+    get hash(): number;
+    get operator(): string;
+    get type(): BoxedType;
+    get isPure(): boolean;
+    get isCanonical(): boolean;
+    set isCanonical(_va: boolean);
+    get value(): BoxedExpression;
+    get complexity(): number;
+    get isCollection(): boolean;
+    get(key: string): BoxedExpression | undefined;
+    has(key: string): boolean;
+    get keys(): string[];
+    get entries(): [string, BoxedExpression][];
+    get values(): BoxedExpression[];
+    match(pattern: BoxedExpression, _options?: PatternMatchOptions): BoxedSubstitution | null;
 }
 import type { Expression } from '../../math-json/types';
 import type { ComputeEngine, BoxedExpression, JsonSerializationOptions } from '../global-types';
@@ -5034,10 +5073,23 @@ export declare function asRational(expr: BoxedExpression): Rational | undefined;
 export declare function asBigint(x: Complex | Decimal | SemiBoxedExpression | undefined): bigint | null;
 export declare function asBignum(expr: BoxedExpression | undefined): Decimal | null;
 /**
+ * Validate if the expression is a small integer.
+ * A small integer is an integer between -SMALL_INTEGER and SMALL_INTEGER (inclusive).
+ * Returns null if the expression is not a small integer.
+ *
+ * Unlike `toInteger()` this functions fails if the expression is not an
+ * integer. `toInteger()` will round the value to the nearest integer.
+ */
+export declare function asSmallInteger(expr: number | BoxedExpression | undefined): number | null;
+/**
  * Convert a boxed expression to an integer.
  * Returns null if the expression cannot be converted to an integer.
  * If the expression is a complex number, only the real part is considered.
  * If the real part is not an integer, it is rounded to the nearest integer.
+ *
+ * Unlike `asSmallInteger()`, this function does not check if the integer is
+ * within the range of -SMALL_INTEGER to SMALL_INTEGER, and it rounds the
+ * value to the nearest integer if it is a number.
  *
  */
 export declare function toInteger(expr: BoxedExpression | undefined): number | null;
@@ -5047,12 +5099,6 @@ export declare function toInteger(expr: BoxedExpression | undefined): number | n
  * If the real part is not an integer, it is rounded to the nearest integer.
  */
 export declare function toBigint(expr: BoxedExpression | undefined): bigint | null;
-/**
- * Validate if the expression is a small integer.
- * A small integer is an integer between -SMALL_INTEGER and SMALL_INTEGER (inclusive).
- * Returns null if the expression is not a small integer.
- */
-export declare function asSmallInteger(expr: number | BoxedExpression | undefined): number | null;
 import type { Expression } from '../../math-json/types';
 import type { ComputeEngine, TensorDataType, Metadata, BoxedBaseDefinition, BoxedOperatorDefinition, BoxedSubstitution, EvaluateOptions, BoxedExpression, SimplifyOptions, PatternMatchOptions, Tensor } from '../global-types';
 import { BoxedType } from '../../common/type/boxed-type';
@@ -7226,8 +7272,8 @@ export declare class _Parser implements Parser {
      * > (radix 16, preceded by "), an alphabetic constant (preceded by `), or
      * > an internal variable.
      */
-    matchLatexNumber(isInteger?: boolean): null | number;
-    matchChar(): string | null;
+    parseLatexNumber(isInteger?: boolean): null | number;
+    parseChar(): string | null;
     /**
      *
      * If the next token matches the open delimiter, set a boundary with
@@ -7976,7 +8022,7 @@ export interface Parser {
      * This includes plain characters (e.g. 'a', '+'...), characters
      * defined in hex (^^ and ^^^^), the `\char` and `\unicode` command.
      */
-    matchChar(): string | null;
+    parseChar(): string | null;
     /**
      * Parse an expression in a LaTeX group enclosed in curly brackets `{}`.
      * These are often used as arguments to LaTeX commands, for example
@@ -8457,7 +8503,7 @@ export declare const version = "{{SDK_VERSION}}";
 export { ComputeEngine } from './compute-engine/index';
 export * from './compute-engine/types';
 /**
- * The following properties can be added to any MathJSON expression\
+ * The following properties can be added to any MathJSON expression
  * to provide additional information about the expression.
  *
  * @category MathJSON */
