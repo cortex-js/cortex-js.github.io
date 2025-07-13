@@ -2205,6 +2205,16 @@ export interface BoxedExpression {
  * @category Boxed Expression
  */
 export type SemiBoxedExpression = number | bigint | string | BigNum | MathJsonNumberObject | MathJsonStringObject | MathJsonSymbolObject | MathJsonFunctionObject | MathJsonDictionaryObject | readonly [MathJsonSymbol, ...SemiBoxedExpression[]] | BoxedExpression;
+/** Interface for dictionary-like structures.
+ * Use `isDictionary()` to check if an expression is a dictionary.
+ */
+export interface DictionaryInterface {
+    get(key: string): BoxedExpression | undefined;
+    has(key: string): boolean;
+    get keys(): string[];
+    get entries(): [string, BoxedExpression][];
+    get values(): BoxedExpression[];
+}
 /**
  * These handlers compare two expressions.
  *
@@ -3639,8 +3649,7 @@ import { AssumeResult, BoxedExpression } from './global-types';
 export declare function assume(proposition: BoxedExpression): AssumeResult;
 import type { SymbolDefinitions } from '../global-types';
 export declare const COMPLEX_LIBRARY: SymbolDefinitions[];
-import type { BoxedExpression, ComputeEngine, SymbolDefinitions } from '../global-types';
-import { BoxedDictionary } from '../boxed-expression/boxed-dictionary';
+import type { BoxedExpression, SymbolDefinitions } from '../global-types';
 export declare const DEFAULT_LINSPACE_COUNT = 50;
 export declare const COLLECTIONS_LIBRARY: SymbolDefinitions;
 /**
@@ -3666,7 +3675,6 @@ export declare function rangeLast(r: [lower: number, upper: number, step: number
  */
 export declare function reduceCollection<T>(collection: BoxedExpression, fn: (acc: T, next: BoxedExpression) => T | null, initial: T): Generator<T | undefined>;
 export declare function fromRange(start: number, end: number): number[];
-export declare function canonicalDictionary(engine: ComputeEngine, dictionary: BoxedExpression): BoxedDictionary;
 export declare function sortedIndices(expr: BoxedExpression, fn?: BoxedExpression | undefined): number[] | undefined;
 import type { SymbolDefinitions } from '../global-types';
 export declare const POLYNOMIALS_LIBRARY: SymbolDefinitions[];
@@ -4262,46 +4270,6 @@ export declare class BoxedFunction extends _BoxedExpression {
     _computeValue(options?: Partial<EvaluateOptions>): () => BoxedExpression;
     _computeValueAsync(options?: Partial<EvaluateOptions>): () => Promise<BoxedExpression>;
 }
-import type { BoxedExpression, PatternMatchOptions, BoxedSubstitution, ComputeEngine, Metadata, SemiBoxedExpression } from '../global-types';
-import { _BoxedExpression } from './abstract-boxed-expression';
-import { BoxedType } from '../../common/type/boxed-type';
-import { Expression } from '../../math-json/types';
-export interface DictionaryInterface {
-    get(key: string): BoxedExpression | undefined;
-    has(key: string): boolean;
-    get keys(): string[];
-    get entries(): [string, BoxedExpression][];
-    get values(): BoxedExpression[];
-}
-export declare function isDictionary(expr: BoxedExpression | null | undefined): expr is BoxedDictionary;
-/**
- * BoxedDictionary
- *
- */
-export declare class BoxedDictionary extends _BoxedExpression implements DictionaryInterface {
-    [Symbol.toStringTag]: string;
-    private readonly _keyValues;
-    constructor(ce: ComputeEngine, keyValues: Record<string, SemiBoxedExpression>, options?: {
-        metadata?: Metadata;
-        canonical?: boolean;
-    });
-    get json(): Expression;
-    get hash(): number;
-    get operator(): string;
-    get type(): BoxedType;
-    get isPure(): boolean;
-    get isCanonical(): boolean;
-    set isCanonical(_va: boolean);
-    get value(): BoxedExpression;
-    get complexity(): number;
-    get isCollection(): boolean;
-    get(key: string): BoxedExpression | undefined;
-    has(key: string): boolean;
-    get keys(): string[];
-    get entries(): [string, BoxedExpression][];
-    get values(): BoxedExpression[];
-    match(pattern: BoxedExpression, _options?: PatternMatchOptions): BoxedSubstitution | null;
-}
 import type { Expression } from '../../math-json/types';
 import type { ComputeEngine, BoxedExpression, JsonSerializationOptions } from '../global-types';
 export declare function serializeJson(ce: ComputeEngine, expr: BoxedExpression, options: Readonly<JsonSerializationOptions>): Expression;
@@ -4378,6 +4346,8 @@ export declare function box(ce: ComputeEngine, expr: null | undefined | NumericV
     structural?: boolean;
     scope?: Scope;
 }): BoxedExpression;
+export declare function semiCanonical(ce: ComputeEngine, xs: ReadonlyArray<SemiBoxedExpression>, scope?: Scope): ReadonlyArray<BoxedExpression>;
+export declare function canonical(ce: ComputeEngine, xs: ReadonlyArray<BoxedExpression>, scope?: Scope): ReadonlyArray<BoxedExpression>;
 import type { BoxedExpression, Rule } from '../global-types';
 export declare const UNIVARIATE_ROOTS: Rule[];
 /**
@@ -4568,9 +4538,10 @@ export type CachedValue<T> = {
 /** The cache v will get updated if necessary */
 export declare function cachedValue<T>(v: CachedValue<T>, generation: number | undefined, fn: () => T): T;
 export declare function cachedValueAsync<T>(v: CachedValue<T>, generation: number | undefined, fn: () => Promise<T>): Promise<T>;
-import type { BoxedExpression, OperatorDefinition, SemiBoxedExpression, ValueDefinition, ComputeEngine, BoxedDefinition, TaggedValueDefinition, TaggedOperatorDefinition, BoxedOperatorDefinition, BoxedValueDefinition, Scope } from '../global-types';
+import type { BoxedExpression, OperatorDefinition, ValueDefinition, ComputeEngine, BoxedDefinition, TaggedValueDefinition, TaggedOperatorDefinition, BoxedOperatorDefinition, BoxedValueDefinition, DictionaryInterface } from '../global-types';
 import { Type } from '../../common/type/types';
 import { NumericValue } from '../numeric-value/types';
+export declare function isDictionary(expr: any | null | undefined): expr is DictionaryInterface;
 export declare function isBoxedExpression(x: unknown): x is BoxedExpression;
 /**
  * For any numeric result, if `bignumPreferred()` is true, calculate using
@@ -4586,8 +4557,6 @@ export declare function normalizedUnknownsForSolve(syms: string | Iterable<strin
  *
  */
 export declare function getLocalVariables(expr: BoxedExpression): string[];
-export declare function semiCanonical(ce: ComputeEngine, xs: ReadonlyArray<SemiBoxedExpression>, scope?: Scope): ReadonlyArray<BoxedExpression>;
-export declare function canonical(ce: ComputeEngine, xs: ReadonlyArray<BoxedExpression>, scope?: Scope): ReadonlyArray<BoxedExpression>;
 export declare function domainToType(expr: BoxedExpression): Type;
 /**
  * Return the angle in the range [0, 2π) that is equivalent to the given angle.

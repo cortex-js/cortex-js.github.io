@@ -8,9 +8,18 @@
 <link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
 <script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),d="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(d))return;const i=document.createElement("script");m&&(i.type="module"),i.id=d,i.src=o,i.async=!1,t&&n===e.length-1&&(i.onload=t),document.head.appendChild(i)})}()</script>
 <link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;"><link rel="stylesheet" href="/assets/css/styles.6403391c.css">
-<script src="/assets/js/runtime~main.e3f86c71.js" defer="defer"></script>
-<script src="/assets/js/main.93f3d10b.js" defer="defer"></script>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Bold.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Main-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Math-Italic.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_AMS-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.666b97b7.css">
+<script src="/assets/js/runtime~main.f99e6ab7.js" defer="defer"></script>
+<script src="/assets/js/main.6ce5743c.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -35,23 +44,87 @@ the type of <em>expr</em>:</p><ul>
 <li><code>[&quot;Set&quot;]</code> -&gt; <code>{,}</code></li>
 </ul></section>
 <section id="Spacing" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Spacing</b>(<em>width</em>)</p><p>When serializing to LaTeX,  <code>width</code>is the dimension of the spacing, in 1/18 em.</p><p>The <code>Spacing</code> function is <strong>inert</strong> and the value of a <code>[&quot;Spacing&quot;, _expr_]</code> expression is <code>expr</code>.</p></section>
-<section id="Style" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Style</b>(<em>expr</em>, <em>dictionary</em>)</p><ul>
-<li><code>expr</code>an expression</li>
-<li><code>dictionary</code>a dictionary with one or more of the following keys:<!-- -->
-<ul>
-<li><code>_&quot;display&quot;_</code>:<!-- -->
-<ul>
-<li><code>&quot;inline&quot;</code> for <code>\textstyle</code></li>
-<li><code>&quot;block&quot;</code> for <code>\displaystyle</code></li>
-<li><code>&quot;script&quot;</code> for <code>\scriptstyle</code></li>
-<li><code>&quot;scriptscript&quot;</code> for <code>\scriptscriptstyle</code></li>
-</ul>
-</li>
-<li><code>_&quot;size&quot;_</code>: <code>1</code>...<code>10</code>. Size <code>5</code> is normal, size <code>1</code> is smallest</li>
-<li><code>_&quot;color&quot;_</code></li>
-</ul>
-</li>
-</ul><p>The <code>Style</code> function is <strong>inert</strong> and the value of a <code>[&quot;Style&quot;, _expr_]</code> expression is <code>expr</code>.</p></section>
+<section id="Annotated" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Annotated</b>(<em>expr</em>:expression<!-- -->, dictionary<!-- -->) -&gt; <span> <!-- -->expression</span></p><p><code>Annotated(expr, attributes)</code> is an expression that behaves exactly like <code>expr</code>,
+but carries <strong>visual or semantic metadata</strong> as an attribute dictionary.</p><p>The attributes have no effect on evaluation. This function is inert — it
+evaluates to its first argument.</p><p>The <code>attributes</code> dictionary may include:</p><ul>
+<li>Visual style hints (e.g. <code>weight: &quot;bold&quot;</code>, <code>color: &quot;blue&quot;</code>)</li>
+<li>Semantic metadata (e.g. <code>tooltip</code>, <code>language</code>, <code>link</code>)</li>
+</ul><p>Use <code>Annotated</code> when you want to attach presentational or semantic
+information to an expression <strong>without affecting its evaluation or identity</strong>.
+This is useful for rendering, tooltips, highlighting, etc.</p><p>The following keys are applicable to math expressions:</p><ul>
+<li><code>mathStyle</code> = <code>&quot;compact&quot;</code> or <code>&quot;normal&quot;</code>. The <code>&quot;compact&quot;</code> style is used for inline math expressions, while the <code>&quot;normal&quot;</code> style is used for display math expressions.</li>
+<li><code>scriptLevel</code> = <code>0</code>, <code>1</code>, or <code>-1</code>, <code>+1</code>. The script level is used to
+determine the size of the expression in relation to the surrounding text.
+A script level of <code>0</code> is normal size, <code>1</code> is smaller, and <code>2</code> is even smaller.</li>
+</ul><p>The following keys are applicable to text content:</p><ul>
+<li><code>weight</code> a string, one of <code>&quot;normal&quot;</code>, <code>&quot;bold&quot;</code>, <code>&quot;bolder&quot;</code>, <code>&quot;light&quot;</code></li>
+<li><code>style</code> a string, one of <code>&quot;normal&quot;</code>, <code>&quot;italic&quot;</code>, <code>&quot;oblique&quot;</code></li>
+<li><code>language</code> a string indicating the language of the expression, e.g. <code>&quot;en&quot;</code>, <code>&quot;fr&quot;</code>, <code>&quot;es&quot;</code> etc.</li>
+</ul><p>The following keys are applicable to both math expressions and text content:</p><ul>
+<li><code>color</code> a color name or hex code</li>
+<li><code>backgroundColor</code> a color name or hex code for the background color</li>
+<li><code>tooltip</code> a string to be displayed as a tooltip when the expression is hovered over</li>
+<li><code>link</code> a URL to be followed when the expression is clicked</li>
+<li><code>cssClass</code> a string indicating the CSS class to be applied to the expression</li>
+<li><code>cssId</code> a string indicating the CSS id of the expression</li>
+</ul><p>The keys in the dictionary include:</p><ul>
+<li><code>style</code> a string, one of <code>&quot;normal&quot;</code>, <code>&quot;italic&quot;</code>, <code>&quot;oblique&quot;</code></li>
+<li><code>size</code> a number from <code>1</code> to <code>10</code> where <code>5</code> is normal size</li>
+<li><code>font</code> a string indicating the font family</li>
+<li><code>fontSize</code> a number indicating the font size in pixels</li>
+<li><code>fontWeight</code> a string indicating the font weight, e.g. <code>&quot;normal&quot;</code>, <code>&quot;bold&quot;</code>, <code>&quot;bolder&quot;</code>, <code>&quot;lighter&quot;</code></li>
+<li><code>fontStyle</code> a string indicating the font style, e.g. <code>&quot;normal&quot;</code>, <code>&quot;italic&quot;</code>, <code>&quot;oblique&quot;</code></li>
+<li><code>textDecoration</code> a string indicating the text decoration, e.g. <code>&quot;none&quot;</code>, <code>&quot;underline&quot;</code>, <code>&quot;line-through&quot;</code></li>
+<li><code>textAlign</code> a string indicating the text alignment, e.g. <code>&quot;left&quot;</code>, <code>&quot;center&quot;</code>, <code>&quot;right&quot;</code></li>
+<li><code>textTransform</code> a string indicating the text transformation, e.g. <code>&quot;none&quot;</code>, <code>&quot;uppercase&quot;</code>, <code>&quot;lowercase&quot;</code></li>
+<li><code>textIndent</code> a number indicating the text indentation in pixels</li>
+<li><code>lineHeight</code> a number indicating the line height in pixels</li>
+<li><code>letterSpacing</code> a number indicating the letter spacing in pixels</li>
+<li><code>wordSpacing</code> a number indicating the word spacing in pixels</li>
+<li><code>backgroundColor</code> a color name or hex code for the background color</li>
+<li><code>border</code> a string indicating the border style, e.g. <code>&quot;none&quot;</code>, <code>&quot;solid&quot;</code>, <code>&quot;dashed&quot;</code>, <code>&quot;dotted&quot;</code></li>
+<li><code>borderColor</code> a color name or hex code for the border color</li>
+<li><code>borderWidth</code> a number indicating the border width in pixels</li>
+<li><code>padding</code> a number indicating the padding in pixels</li>
+<li><code>margin</code> a number indicating the margin in pixels</li>
+<li><code>textShadow</code> a string indicating the text shadow, e.g. <code>&quot;2px 2px 2px rgba(0,0,0,0.5)&quot;</code></li>
+<li><code>boxShadow</code> a string indicating the box shadow, e.g. <code>&quot;2px 2px 5px rgba(0,0,0,0.5)&quot;</code></li>
+<li><code>opacity</code> a number from <code>0</code> to <code>1</code> indicating the opacity of the expression</li>
+<li><code>transform</code> a string indicating the CSS transform, e.g. <code>&quot;rotate(45deg)&quot;</code>, <code>&quot;scale(1.5)&quot;</code>, <code>&quot;translateX(10px)&quot;</code></li>
+<li><code>transition</code> a string indicating the CSS transition, e.g. <code>&quot;all 0.3s ease-in-out&quot;</code></li>
+<li><code>cursor</code> a string indicating the cursor style, e.g. <code>&quot;pointer&quot;</code>, <code>&quot;default&quot;</code>, <code>&quot;text&quot;</code></li>
+<li><code>display</code> a string indicating the CSS display property, e.g. <code>&quot;inline&quot;</code>, <code>&quot;block&quot;</code>, <code>&quot;flex&quot;</code>, <code>&quot;grid&quot;</code></li>
+<li><code>visibility</code> a string indicating the CSS visibility property, e.g. <code>&quot;visible&quot;</code>, <code>&quot;hidden&quot;</code>, <code>&quot;collapse&quot;</code></li>
+<li><code>zIndex</code> a number indicating the z-index of the expression</li>
+<li><code>position</code> a string indicating the CSS position property, e.g. <code>&quot;static&quot;</code>, <code>&quot;relative&quot;</code>, <code>&quot;absolute&quot;</code>, <code>&quot;fixed&quot;</code></li>
+<li><code>float</code> a string indicating the CSS float property, e.g. <code>&quot;left&quot;</code>, <code>&quot;right&quot;</code>, <code>&quot;none&quot;</code></li>
+<li><code>clear</code> a string indicating the CSS clear property, e.g. <code>&quot;left&quot;</code>, <code>&quot;right&quot;</code>, <code>&quot;both&quot;</code>, <code>&quot;none&quot;</code></li>
+<li><code>overflow</code> a string indicating the CSS overflow property, e.g. <code>&quot;visible&quot;</code>, <code>&quot;hidden&quot;</code>, <code>&quot;scroll&quot;</code>, <code>&quot;auto&quot;</code></li>
+<li><code>overflowX</code> a string indicating the CSS overflow-x property, e.g. <code>&quot;visible&quot;</code>, <code>&quot;hidden&quot;</code>, <code>&quot;scroll&quot;</code>, <code>&quot;auto&quot;</code></li>
+<li><code>overflowY</code> a string indicating the CSS overflow-y property, e.g. <code>&quot;visible&quot;</code>, <code>&quot;hidden&quot;</code>, <code>&quot;scroll&quot;</code>, <code>&quot;auto&quot;</code></li>
+<li><code>whiteSpace</code> a string indicating the CSS white-space property, e.g. <code>&quot;normal&quot;</code>, <code>&quot;nowrap&quot;</code>, <code>&quot;pre&quot;</code>,</li>
+<li><code>textOverflow</code> a string indicating the CSS text-overflow property, e.g. <code>&quot;ellipsis&quot;</code>, <code>&quot;clip&quot;</code></li>
+<li><code>direction</code> a string indicating the text direction, e.g. <code>&quot;ltr&quot;</code> (left-to-right) or <code>&quot;rtl&quot;</code> (right-to-left)</li>
+<li><code>lang</code> a string indicating the language of the expression, e.g. <code>&quot;en&quot;</code> (English), <code>&quot;fr&quot;</code> (French), <code>&quot;es&quot;</code> (Spanish)</li>
+<li><code>role</code> a string indicating the ARIA role of the expression, e.g. <code>&quot;button&quot;</code>, <code>&quot;link&quot;</code>, <code>&quot;textbox&quot;</code></li>
+<li><code>aria-label</code> a string providing an accessible label for the expression</li>
+<li><code>aria-labelledby</code> a string providing an accessible label by referencing another element&#x27;s ID</li>
+<li><code>aria-describedby</code> a string providing an accessible description by referencing another element&#x27;s ID</li>
+<li><code>aria-hidden</code> a boolean indicating whether the expression is hidden from assistive technologies</li>
+<li><code>aria-live</code> a string indicating the ARIA live region, e.g. <code>&quot;off&quot;</code>, <code>&quot;polite&quot;</code>, <code>&quot;assertive&quot;</code></li>
+<li><code>aria-atomic</code> a boolean indicating whether assistive technologies should treat the expression as a whole</li>
+<li><code>aria-relevant</code> a string indicating what changes in the expression are relevant to assistive technologies, e.g. `&quot;additions&quot;</li>
+<li><code>aria-controls</code> a string providing the ID of another element that the expression controls</li>
+<li><code>aria-expanded</code> a boolean indicating whether the expression is expanded or collapsed</li>
+<li><code>aria-pressed</code> a boolean indicating whether the expression is pressed (for toggle buttons)</li>
+<li><code>aria-selected</code> a boolean indicating whether the expression is selected</li>
+<li><code>aria-checked</code> a boolean indicating whether the expression is checked (for checkboxes or radio buttons)</li>
+<li><code>aria-valuenow</code> a number indicating the current value of the expression (for sliders or progress bars)</li>
+<li><code>aria-valuetext</code> a string providing a text representation of the current value of the expression</li>
+<li><code>aria-valuemin</code> a number indicating the minimum value of the expression (for sliders or progress bars)</li>
+<li><code>aria-valuemax</code> a number indicating the maximum value of the expression (for sliders or progress bars)</li>
+<li><code>aria-keyshortcuts</code> a</li>
+</ul><p>The <code>Annotated</code> function is <strong>inert</strong> and the value of a <code>[&quot;Annotated&quot;, expr]</code> expression is <code>expr</code>.</p></section>
 <div class="readMore_KWn8"><a href="/compute-engine/reference/linear-algebra/#formatting"><p>Read more about formatting of <strong>matrixes</strong> and <strong>vectors</strong></p></a></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/reference/strings/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Strings</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/reference/trigonometry/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Trigonometry</div></a></nav></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li><li class="footer__item"><a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li><li class="footer__item"><a href="https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>MathLive GPT<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/about/">About Us</a></li></ul></div></div></div></footer></div>
 </body>
 </html>
