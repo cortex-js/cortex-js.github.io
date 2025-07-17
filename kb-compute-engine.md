@@ -11429,6 +11429,14 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Breaking Changes
+
+- The `[Length]` function has been renamed to `[Count]`.
+- The `xsize` property of collections has been renamed to `count`.
+- The `xcontains()` method of collections has been renamed to `contains()`.
+
 ## 0.30.2 _2025-07-15_
 
 ### Breaking Changes
@@ -14746,7 +14754,7 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.
 ## Structure of a MathJSON Expression
 
 A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
-**functions** and **dictionaries**.
+**functions**.
 
 
 **Number**
@@ -14780,13 +14788,6 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 ```json example
 ["Add", 1, "x"]
 {"fn": ["Add", {"num": "1"}, {"sym": "x"}]}
-```
-
-**Dictionary**
-
-```json example
-{"dict": {"x": 2, "y": 3}}
-["Dictionary", ["Tuple", "'x'", 2], ["Tuple", "'y'", 3]]
 ```
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
@@ -15055,23 +15056,6 @@ The expression corresponding to $ \sin^{-1}(x) $ is:
 The operator of this expression is `"Apply"` and its argument are the expressions
 `["InverseFunction", "Sin"]` and `"x"`.
 
-### Shorthands
-
-The following shorthands are allowed:
-
-- A `["Dictionary"]` expression may be represented as a string starting with
-  **U+007B `{` LEFT CURLY BRACKET** and ending with **U+007D `}` RIGHT CURLY BRACKET**. The string must be a valid JSON object literal.
-- A `["List"]` expression may be represented as a string starting with 
-  **U+005B `[` LEFT SQUARE BRACKET** and ending with
-  **U+005D `]` RIGHT SQUARE BRACKET**. The string must be a valid JSON array.
-
-```json example
-"{\"x\": 2, \"y\": 3}"
-// ➔ ["Dictionary", ["Tuple", "x", 2], ["Tuple", "y", 3]]
-
-"[1, 2, 3]"
-// ➔ ["List", 1, 2, 3]
-```
 
 ## Symbols
 
@@ -15393,49 +15377,66 @@ Modifiers include:
 
 ## Dictionaries
 
-MathJSON supports the concept of **dictionaries**, which are collections of 
-key-value pairs. 
-
-Dictionaries can be represented as a `["Dictionary"]` expression, with 
-its arguments being tuples of key-value pairs.
+**Dictionaries** are collections of key-value pairs. They are represented as a
+`["Dictionary", ["Tuple", key, value], ...]` expression.
 
 ```json example
 ["Dictionary", 
-  ["Tuple", "'x'", 120], 
-  ["Tuple", "'y'", 36]
+  ["Tuple", {str: "x"}, 120], 
+  ["Tuple", {str: "y"}, 36]
 ]
-```
-
-The value of the key-value tuples can be any valid MathJSON expression, including
-numbers, strings, functions, lists, or other dictionaries.
-
-For example, the following dictionary contains an expression and a list as values:
-
-```json example
-["Dictionary",
-  ["Tuple", "'expression'", ["Add", "x", 1]],
-  ["Tuple", "'list'", ["List", 1, 2, 3]]
-]
-```
-
-
-Dictionaries can also be represented as a JSON object literal with a `"dict"` key,
-which is an object with string keys and values that can be any valid MathJSON
-expression.
-
-
-```js
-{
-  "dict": {
-    "expression":  ["Add", "x", 1] ,
-    "list": ["List", 1, 2, 3] 
-  }
-}
 ```
 
 The keys of a dictionary are Unicode strings. They are compared using the
 [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/).
 Keys must be unique within a dictionary.
+
+The value of the key-value tuples can be any valid MathJSON expression, including
+numbers, strings and functions.
+
+For example, the following dictionary contains an expression and a list as values:
+
+```json example
+["Dictionary",
+  ["Tuple", {str: "expression"}, {fn: ["Add", "x", 1]}],
+  ["Tuple", {str: "list"}, [1, 2, 3]]
+]
+```
+
+As a shorthand, dictionaries can be represented as a JSON object literal with a
+`"dict"` property. The keys are strings and the values are interpreted as
+follow:
+
+| Value Type      | MathJSON Representation                       |
+| :------------ | :-------------------------------------------- |
+| boolean       | `{symbol: "True"}` or `{symbol: "False"}`                        |
+| string       | `{str: "value"}`                          |
+| array        | `["List", ...]`             |
+| `{sym: }` | `{sym: "name"}` |
+| `{fn: }`     | `{fn: "name", args: [...]}`             |
+
+The values are *not* interpreted as a MathJSON expression, but as a JSON value,
+which is then transformed into a MathJSON expression.
+
+```json
+{
+  "dict": {
+    "title": "My Dictionary",
+    "enabled": true,
+    "list": [1, 2, 3] 
+  }
+}
+```
+
+which is interpreted as:
+
+```json example
+["Dictionary",
+  ["Tuple", {sym: "title"}, {str: "My Dictionary"}],
+  ["Tuple", {sym: "enabled"}, {sym: "True"}],
+  ["Tuple", {sym: "list"}, ["List", 1, 2, 3]]
+]
+```
 
 
 ## Metadata
@@ -21185,7 +21186,7 @@ the UMD version will make use of polyfills as necessary.
 
 ```html
 <script 
-  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.js">
+  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.umd.js">
 </script>
 <script>
   window.onload = function() {
@@ -21202,14 +21203,13 @@ Alternatively, use the **unpkg** CDN to load the library:
 <script src="//unpkg.com/@cortex-js/compute-engine"></script>
 ```
 
-The UMD version is also available in the npm package in `/compute-engine.min.js` 
+The UMD version is also available in the npm package in `/compute-engine.min.umd.js` 
 
 
 
 ### Other Versions
 
-A non-minified module which may be useful for debugging is available in
-the npm package as `/compute-engine.esm.js`.
+A non-minified module which may be useful for debugging is available as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 
@@ -22419,19 +22419,38 @@ slug: /compute-engine/reference/strings/
 
 ### Strings
 
-A string is a sequence of characters such as <span style={{fontSize: "1.2rem"}}>`"Hello, 🌍!"`</span> or <span style={{fontSize: "1.2rem"}}>`"Simplify(👨‍🚀 + ⚡️) → 👨‍🎤"`.</span>
+A string is a sequence of characters such as <span style={{fontSize: "1.2rem"}}>`"Hello, 🌍!"`</span> or <span style={{fontSize: "1.2rem"}}>`"Simplify(👨‍🚀 × ⚡️) → 👨‍🎤"`.</span>
 
 In the Compute Engine, strings are composed of encoding-independent Unicode
 characters and provide access to those characters through a variety of Unicode
 representations.
 
-Strings are **not treated as collections**. This is 
-because the concept of a “character” is inherently ambiguous: a single 
-user-perceived character (a **grapheme cluster**) may consist of multiple 
-**Unicode scalars** (code points), and those scalars may in turn be represented differently 
-in various encodings. To avoid confusion and ensure consistent behavior, 
-strings must be explicitly converted to a sequence of **grapheme clusters** or 
-**Unicode scalars** when individual elements need to be accessed.
+Strings are **not handled as collections**. This is because the concept of a  
+“character” is inherently ambiguous: a single user-perceived character (a  
+**grapheme cluster**) may consist of multiple **Unicode scalars** (code  
+points), and those scalars may in turn be represented differently in various  
+encodings: UTF-8, UTF-16, or UTF-32.
+
+For example:
+
+- The grapheme `é` can be represented as one Unicode scalar (`U+00E9`) or  
+  two scalars (`U+0065` + `U+0301`, i.e. `e` + combining acute).
+- The emoji `👨‍🚀` is a grapheme cluster made of multiple scalars:  
+  `[U+1F468, U+200D, U+1F680]`.
+
+  In UTF-8, it's encoded as the byte sequence:  
+  `[240, 159, 145, 168, 226, 128, 141, 240, 159, 154, 128]`
+
+  In UTF-16, it's encoded as the code units:  
+  `[55357, 56457, 8205, 55357, 56960]`
+
+
+```live
+const s = ce.string("Hello, 🌍!");
+console.info(ce.function("Utf8", [s]).evaluate().json);
+```
+
+To avoid confusion and ensure consistent behavior, strings are **not accessed directly** as collections of characters. Instead, they must be **explicitly converted** either to a sequence of **grapheme clusters** (what users perceive as individual characters), or to a sequence of **Unicode scalars** (code points). For encoding-level operations (such as manipulating UTF-8 or UTF-16), strings must be converted to their encoded form, as **Unicode scalars are not encodings**. This distinction matters because a single grapheme cluster may be composed of multiple scalars, and each scalar may map to different byte representations depending on the encoding.
 
 
 ### Annotated Expressions
@@ -22465,13 +22484,16 @@ Annotated expressions are similar to attributed strings in other systems.
 ### Text Expressions
 
 A `["Text"]` expression is a sequence of strings, annotated expressions or
-other `["Text"]` expressions. It is used to represent formatted text content 
-in the Compute Engine, for example from a LaTeX expression like `\text{Hello \mathbf{world}}`.
+other `["Text"]` expressions. It is used to represent formatted text content, 
+for example from a LaTeX expression like `\text{Hello \mathbf{world}}`.
 
 What would happen if you used a string expression instead of a text expression?
 
-The argument of a `["String"]` expression get converted to their string
-representation, then joined together with no spaces.
+The arguments of a `["String"]` expression get converted to their string
+representation, then joined together with no spaces. The text representation
+of an annotated expression is the name of the expression, not its formatted
+version. For example, `["Annotated", "world", {"dict": {"color": "blue"}}]` would
+be serialized to LaTeX as `\mathrm{Annotated}(\text{world}, {color \to "blue"})`, which is not what you want.
 
 The arguments of a `["Text"]` expression remain a sequence of elements. When 
 serialized to LaTeX, the elements are serialized to appropriate LaTeX commands
@@ -22482,7 +22504,7 @@ to preserve their formatting and structure.
 const stringExpr = ce.box([
   "String", 
   "Hello", 
-  ["Annotated", "world", {"color": "blue"}]
+  ["Annotated", "world", {dict: {"color": "blue"}}]
 ]);
 console.info(stringExpr.latex);
 // ➔ "\text{Hello $\mathrm{Annotated}(\text{world}, {color: "blue"})$}"
@@ -22490,11 +22512,10 @@ console.info(stringExpr.latex);
 const textExpr = ce.box([
   "Text", 
   "Hello", 
-  ["Annotated", "world", {"color": "blue"}]
+  ["Annotated", "world", {dict: {"color": "blue"}}]
 ]);
 console.info(textExpr.latex);
 // ➔ "\text{Hello \textcolor{blue}{world}}"
-
 ```
 
 ## Functions
@@ -22507,7 +22528,8 @@ console.info(textExpr.latex);
 
 <Signature name="String" returns="string">any*</Signature>
 
-A string created by joining its arguments. The arguments are converted to their default string representation.
+A string created by joining its arguments. The arguments are converted to 
+their default string representation.
 
 
 ```json example
@@ -22541,18 +22563,17 @@ Convert the argument to a string, using the specified _format_.
 For example: 
 
 ```json example
-["StringFrom", [240, 159, 148, 159], "utf-8"]
+["StringFrom", ["List" 240, 159, 148, 159], "utf-8"]
 // ➔ "Hello"
 
-["StringFrom", [55357, 56607], "utf-16"]
+["StringFrom", ["List", 55357, 56607], "utf-16"]
 // ➔ "\u0048\u0065\u006c\u006c\u006f"
 
-["StringFrom", [128287], "unicode-scalars"]
+["StringFrom", 128287, "unicode-scalars"]
 // ➔ "🔟"
 
-["StringFrom", [127467, 127479], "unicode-scalars"]
+["StringFrom", ["List", 127467, 127479], "unicode-scalars"]
 // ➔ "🇫🇷"
-
 ```
 
 </FunctionDefinition>
@@ -22570,11 +22591,11 @@ Return a list of UTF-8 code points for the given _string_.
 **Note:** The values returned are UTF-8 bytes, not Unicode scalar values.
 
 ```json example
-["Utf8", "Hello"]
-// ➔ [72, 101, 108, 108, 111]  
+["Utf8", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]  
 
-["Utf8", "👩‍🎓"]
-// ➔ [240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
+["Utf8", {str: "👩‍🎓"}]
+// ➔ ["List", 240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
 ```
 
 </FunctionDefinition>
@@ -22592,11 +22613,11 @@ Return a list of utf-16 code points for the given _string_.
 **Note:** The values returned are UTF-16 code units, not Unicode scalar values.
 
 ```json example
-["Utf16", "Hello"]
-// ➔ [72, 101, 108, 108, 111]  
+["Utf16", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]  
 
-["Utf16", "👩‍🎓"]
-// ➔ [55357, 56489, 8205, 55356, 57235]
+["Utf16", {str: "👩‍🎓"}]
+// ➔ ["List", 55357, 56489, 8205, 55356, 57235]
 ```
 
 </FunctionDefinition>
@@ -22611,19 +22632,21 @@ Return a list of utf-16 code points for the given _string_.
 
 A **Unicode scalar** is any valid Unicode code point, represented as a number 
 between `U+0000` and `U+10FFFF`, excluding the surrogate range 
-(`U+D800` to `U+DFFF`). In other words, Unicode scalars correspond exactly to UTF-32 code units.
+(`U+D800` to `U+DFFF`). In other words, Unicode scalars correspond exactly to 
+UTF-32 code units.
 
 
 This function returns the sequence of Unicode scalars (code points) that make 
 up the string. Note that some characters perceived as a single visual unit 
 (grapheme clusters) may consist of multiple scalars. For example, the emoji 
-<span style={{fontSize: "1.2em"}}>👩‍🚀</span> is a single grapheme but is composed of several scalars.
+<span style={{fontSize: "1.2em"}}>👩‍🚀</span> is a single grapheme but is 
+composed of several scalars.
 
 ```json example
-["UnicodeScalars", "Hello"]
+["UnicodeScalars", {str: "Hello"}]
 // ➔ [72, 101, 108, 108, 111]  
 
-["UnicodeScalars", "👩‍🎓"]
+["UnicodeScalars", {str: "👩‍🎓"}]
 // ➔ [128105, 8205, 127891]
 ```
 
