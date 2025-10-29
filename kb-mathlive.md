@@ -3095,17 +3095,6 @@ set mathVirtualKeyboardPolicy(value: VirtualKeyboardPolicy): void
 
 <MemberCard>
 
-##### MathfieldElement.virtualKeyboardTargetOrigin
-
-```ts
-get virtualKeyboardTargetOrigin(): string
-set virtualKeyboardTargetOrigin(value: string): void
-```
-
-</MemberCard>
-
-<MemberCard>
-
 ##### MathfieldElement.keypressSound
 
 ```ts
@@ -3171,8 +3160,8 @@ Use `null` to prevent any sound from being loaded.
 ##### MathfieldElement.decimalSeparator
 
 ```ts
-get static decimalSeparator(): "," | "."
-set static decimalSeparator(value: "," | "."): void
+get static decimalSeparator(): "." | ","
+set static decimalSeparator(value: "." | ","): void
 ```
 
 The symbol used to separate the integer part from the fractional part of a
@@ -3281,7 +3270,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.106.0';
+static version: string = '0.107.1';
 ```
 
 </MemberCard>
@@ -3294,6 +3283,14 @@ static version: string = '0.106.0';
 get disabled(): boolean
 set disabled(value: boolean): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathfieldElement.hasEditableContent
+
+True if the mathfield has editable content, such as unlocked prompts
 
 </MemberCard>
 
@@ -5988,13 +5985,13 @@ to a key combination that can be generated on any keyboard.
 
 <MemberCard>
 
-### DynamicValue\<T\>
+### DynamicValue
 
 ```ts
 type DynamicValue<T> = T | (modifiers) => T;
 ```
 
-#### Type declaration
+#### Type Declaration
 
 • T
 
@@ -6002,7 +5999,7 @@ type DynamicValue<T> = T | (modifiers) => T;
 
 <MemberCard>
 
-### MenuItem\<T\>
+### MenuItem
 
 ```ts
 type MenuItem<T> = 
@@ -6014,7 +6011,7 @@ type MenuItem<T> =
 
 Declaration of a menu item
 
-#### Type declaration
+#### Type Declaration
 
 • T = `unknown`
 
@@ -6022,7 +6019,7 @@ Declaration of a menu item
 
 <MemberCard>
 
-### MenuItemCommand\<T\>
+### MenuItemCommand
 
 <MemberCard>
 
@@ -6245,7 +6242,7 @@ type: "heading";
 
 <MemberCard>
 
-### MenuItemProps\<T\>
+### MenuItemProps
 
 These props are passed to the `menu-select` event and `onMenuSelect` hook
 - `id`: the `id` associated with the menu item.
@@ -7477,6 +7474,19 @@ context.
 
 </MemberCard>
 
+<MemberCard>
+
+### initVirtualKeyboardInCurrentBrowsingContext()
+
+```ts
+function initVirtualKeyboardInCurrentBrowsingContext(): VirtualKeyboard
+```
+
+Initialize the virtual keyboard so that it appears in the current browsing
+context. By default, it would only appear in the top-level window.
+
+</MemberCard>
+
 ## Localization
 
 <MemberCard>
@@ -7527,10 +7537,6 @@ function setKeyboardLayout(name): void
 
 Change the current physical keyboard layout.
 
-Note that this affects some keybindings, but not general text input.
-
-If set to `auto` the keyboard layout is guessed.
-
 ##### name
 
 `"auto"` | [`KeyboardLayoutName`](#keyboardlayoutname)
@@ -7545,10 +7551,7 @@ If set to `auto` the keyboard layout is guessed.
 function setKeyboardLayoutLocale(locale): void
 ```
 
-Change the current physical keyboard layout to a layout that matches the
-specified locale, if one is available.
-
-Note that this affects some keybindings, but not general text input.
+Change the current physical keyboard layout to match the specified locale.
 
 ##### locale
 
@@ -7743,7 +7746,7 @@ renderMathInElement("formula");
 
 <MemberCard>
 
-### LatexSyntaxError\<T\>
+### LatexSyntaxError
 
 <MemberCard>
 
@@ -8143,7 +8146,7 @@ const version: {
 };
 ```
 
-Current version: `0.106.0`
+Current version: `0.107.1`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8167,6 +8170,34 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
 ## Coming Soon
+
+### Resolved Issues
+
+- Improved rendering of prompts in some cases.
+- **2849** For compatibility with KaTeX, do not wrap the argument of delimiter
+  commands.
+
+## 0.107.1 _2025-09-30_
+
+### Resolved Issues
+
+- **#2817** Calling `setPromptValue()` no longer changes the focus to the
+  mathfield.
+- **#2805** On mobile, show the math virtual keyboard when using prompts
+- Custom macros are now read when using speakable text to speech.
+- **#2824** Using TypeScript would trigger a compile error about
+  `Cannot find module '../editor/keyboard-layout'`
+
+## 0.107.0 _2025-08-17_
+
+### New Features
+
+- Added `mountMathVirtualKeyboard()` to control in which browsing context the
+  math virtual keyboard is mounted.
+
+### Resolved Issues
+
+- **#2800**: New line on matrix causes duplicated input
 
 ## 0.106.0 _2025-07-11_
 
@@ -8326,7 +8357,6 @@ MathfieldElement.createHTML = (html) => DOMPurify.sanitize(html);
 - Generate only standard trigonometric functions, i.e. those available in the
   `amsmath` package. Use `\operatorname{}` for the others. The standard commands
   are:
-
   - `\arccos`
   - `\arcsin`
   - `\arctan`
@@ -8481,7 +8511,6 @@ For example:
   definition.
 
   The keycaps are one of these special shortcuts:
-
   - `[left]`, `[right]`, `[up]`, `[down]`, `[return]`, `[action]`,
   - `[space]`, `[tab]`, `[backspace]`, `[shift]`,
   - `[undo]`, `[redo]`, `[foreground-color]`, `[background-color]`,
@@ -8696,7 +8725,6 @@ numbers.
 
   Added CSS variables to control the appearance of the toolip displayed with
   `\mathtip` and `\texttip`:
-
   - `--tooltip-border`
   - `--tooltip-color`
   - `--tooltip-background-color`
