@@ -1583,6 +1583,10 @@ is canonical.
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
+
+If this is a function, an empty substitution is given, and the computed value of `canonical`
+does not differ from that of this expr.: then a call this method is analagous to requesting a
+*clone*.
 :::
 
 ####### sub
@@ -1654,11 +1658,25 @@ Transform the expression by applying one or more replacement rules:
 
 See also `expr.subs()` for a simple substitution of symbols.
 
-If `options.canonical` is not set, the result is canonical if `this`
-is canonical.
+Procedure for the determining the canonical-status of the input expression and replacements:
+
+- If `options.canonical` is set, the *entire expr.* is canonicalized to this degree: whether
+the replacement occurs at the top-level, or within/recursively.
+
+- If otherwise, the *direct replacement will be canonical* if either the 'replaced' expression
+is canonical, or the given replacement (- is a BoxedExpression and -) is canonical.
+Notably also, if this replacement takes place recursively (not at the top-level), then exprs.
+containing the replaced expr. will still however have their (previous) canonical-status
+*preserved*... unless this expr. was previously non-canonical, and *replacements have resulted
+in canonical operands*. In this case, an expr. meeting this criteria will be updated to
+canonical status. (Canonicalization is opportunistic here, in other words).
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
+
+To match a specific symbol (not a wildcard pattern), the `match` must be
+a `BoxedExpression` (e.g., `{ match: ce.box('x'), replace: ... }`).
+For simple symbol substitution, consider using `subs()` instead.
 :::
 
 ####### rules
@@ -2831,6 +2849,7 @@ type ReplaceOptions = {
   recursive: boolean;
   once: boolean;
   useVariations: boolean;
+  matchPermutations: boolean;
   iterationLimit: number;
   canonical: CanonicalOptions;
 };
@@ -2952,27 +2971,43 @@ type PatternMatchOptions = {
   substitution: BoxedSubstitution;
   recursive: boolean;
   useVariations: boolean;
+  matchPermutations: boolean;
 };
 ```
 
 Control how a pattern is matched to an expression.
 
-- `substitution`: if present, assumes these values for the named wildcards,
-   and ensure that subsequent occurrence of the same wildcard have the same
-   value.
+### Wildcards
+
+Patterns can include wildcards to match parts of expressions:
+
+- **Universal (`_` or `_name`)**: Matches exactly one element
+- **Sequence (`__` or `__name`)**: Matches one or more elements
+- **Optional Sequence (`___` or `___name`)**: Matches zero or more elements
+
+Named wildcards capture values in the returned substitution:
+- `['Add', '_a', 1].match(['Add', 'x', 1])` → `{_a: 'x'}`
+- `['Add', '__a'].match(['Add', 1, 2, 3])` → `{__a: [1, 2, 3]}`
+
+### Options
+
+- `substitution`: if present, assumes these values for a subset of
+   named wildcards, and ensure that subsequent occurrence of the same
+   wildcard have the same value.
 - `recursive`: if true, match recursively, otherwise match only the top
    level.
 - `useVariations`: if false, only match expressions that are structurally identical.
    If true, match expressions that are structurally identical or equivalent.
-
-   For example, when true, `["Add", '_a', 2]` matches `2`, with a value of
-   `_a` of `0`. If false, the expression does not match. **Default**: `false`
+   For example, when true, `["Add", '_a', 2]` matches `2`, with `_a = 0`.
+   **Default**: `false`
+- `matchPermutations`: if true (default), for commutative operators, try all
+   permutations of pattern operands. If false, match exact order only.
 
 </MemberCard>
 
 <MemberCard>
 
-### Substitution\<T\>
+### Substitution
 
 ```ts
 type Substitution<T> = {};
@@ -3094,18 +3129,22 @@ type Rule =
 };
 ```
 
-A rule describes how to modify an expressions that matches a pattern `match`
+A rule describes how to modify an expression that matches a pattern `match`
 into a new expression `replace`.
 
 - `x-1` \( \to \) `1-x`
 - `(x+1)(x-1)` \( \to \) `x^2-1
 
-The patterns can be expressed as LaTeX strings or a MathJSON expressions.
+The patterns can be expressed as LaTeX strings or `SemiBoxedExpression`'s.
+Alternatively, match/replace logic may be specified by a `RuleFunction`, allowing both custom
+logic/conditions for the match, and either a *BoxedExpression* (or `RuleStep` if being
+descriptive) for the replacement.
 
 As a shortcut, a rule can be defined as a LaTeX string: `x-1 -> 1-x`.
 The expression to the left of `->` is the `match` and the expression to the
 right is the `replace`. When using LaTeX strings, single character variables
-are assumed to be wildcards.
+are assumed to be wildcards. The rule LHS ('match') and RHS ('replace') may also be supplied
+separately: in this case following the same rules.
 
 When using MathJSON expressions, anonymous wildcards (`_`) will match any
 expression. Named wildcards (`_x`, `_a`, etc...) will match any expression
@@ -3418,7 +3457,7 @@ toExpression(ce, x): BoxedExpression
 
 </MemberCard>
 
-### ExpressionMapInterface\<U\>
+### ExpressionMapInterface
 
 <MemberCard>
 
@@ -6996,7 +7035,7 @@ These options control how numbers are parsed and serialized.
 ```ts
 type NumberSerializationFormat = NumberFormat & {
   fractionalDigits: "auto" | "max" | number;
-  notation: "auto" | "engineering" | "scientific";
+  notation: "auto" | "engineering" | "scientific" | "adaptiveScientific";
   avoidExponentsInRange: undefined | null | [number, number];
 };
 ```
@@ -7050,7 +7089,7 @@ The type of the cells in a tensor.
 
 </MemberCard>
 
-### TensorData\<DT\>
+### TensorData
 
 A record representing the type, shape and data of a tensor.
 
@@ -7098,7 +7137,7 @@ data: DataTypeMap[DT][];
 
 </MemberCard>
 
-### TensorField\<T\>
+### TensorField
 
 <MemberCard>
 
@@ -7580,7 +7619,7 @@ conjugate(x): T
 
 </MemberCard>
 
-### Tensor\<DT\>
+### Tensor
 
 #### Extends
 
@@ -9856,20 +9895,117 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.31.0 _2026-01-27_
 
 ### Breaking Changes
 
-- The `Length` function has been renamed to `Count`.
+- The `[Length]` function has been renamed to `[Count]`.
 - The `xsize` property of collections has been renamed to `count`.
 - The `xcontains()` method of collections has been renamed to `contains()`.
-- Handling of dictionaries (`"Dictionary"` expressions and `{dict:...}`
+- Handling of dictionaries (`["Dictionary"]` expressions and `\{dict:...\}`
   shorthand) has been improved.
+- **Inverse hyperbolic functions** have been renamed to follow the ISO 80000-2
+  standard: `Arcsinh` → `Arsinh`, `Arccosh` → `Arcosh`, `Arctanh` → `Artanh`,
+  `Arccoth` → `Arcoth`, `Arcsech` → `Arsech`, `Arccsch` → `Arcsch`. The "ar"
+  prefix (for "area") is mathematically correct since these functions relate to
+  areas on a hyperbola, not arc lengths. Both LaTeX spellings (`\arsinh` and
+  `\arcsinh`) are accepted as input (Postel's law).
 
-## New Features and Improvements
+### Bug Fixes
+
+- **Metadata Preservation**: Fixed `verbatimLatex` not being preserved when
+  parsing with `preserveLatex: true`. The original LaTeX source is now correctly
+  stored on parsed expressions (when using non-canonical mode). Also fixed
+  metadata (`latex`, `wikidata`) being lost when boxing MathJSON objects that
+  contain these attributes.
+
+- **String Parsing**: Fixed parsing of `\text{...}` with `preserveLatex: true`
+  which was incorrectly returning an "invalid-symbol" error instead of a string
+  expression.
+
+- **Derivatives**: `d/dx e^x` now correctly simplifies to `e^x` instead of
+  `ln(e) * e^x`. The `hasSymbolicTranscendental()` function now recognizes that
+  transcendentals which simplify to exact rational values (like `ln(e) = 1`)
+  should not be preserved symbolically.
+
+- **Derivatives**: `d/dx log(x)` now returns `1 / (x * ln(10))` symbolically
+  instead of evaluating to `0.434... / x`. Fixed by using substitution instead
+  of function application when applying derivative formulas, which preserves
+  symbolic transcendental constants.
+
+- **Rationals**: Fixed `reducedRational()` to properly normalize negative
+  denominators before the early return check. Previously `1/-2` would not
+  canonicalize to `-1/2`.
+
+- **Arithmetic**: Fixed `.mul()` to preserve logarithms symbolically. Previously
+  multiplying expressions containing `Ln` or `Log` would evaluate the logarithm
+  to its numeric value.
+
+- **Serialization**: Fixed case inconsistency in `toString()` output for
+  trigonometric functions. Some functions like `Cot` were being serialized with
+  capital letters while others like `csc` were lowercase. All trig functions now
+  consistently serialize in lowercase (e.g., `cot(x)` instead of `Cot(x)`).
+
+- **Serialization**: Improved display of inverse trig derivatives and similar
+  expressions:
+  - Negative exponents like `x^(-1/2)` now display as `1/sqrt(x)` in both LaTeX
+    and ASCII-math output
+  - When a sum starts with a negative term and contains a positive constant, the
+    constant is moved to the front (e.g., `-x^2 + 1` displays as `1 - x^2`)
+    while preserving polynomial ordering (e.g., `x^2 - x + 3` stays unchanged)
+  - `d/dx arcsin(x)` now displays as `1/sqrt(1-x^2)` instead of
+    `(-x^2+1)^(-1/2)`
+
+- **Compilation**: Fixed compilation of `Sum` and `Product` expressions.
+
+- **Sum/Product**: Fixed `sum` and `prod` library functions to correctly handle
+  substitution of index variables.
+
+- **Scientific Notation**: Fixed normalization of scientific notation for
+  fractional values (e.g., numbers less than 1).
+
+### New Features and Improvements
+
+- **Number Serialization**: Added `adaptiveScientific` notation mode. When
+  serializing numbers to LaTeX, this mode uses scientific notation but avoids
+  exponents within a configurable range (controlled by `avoidExponentsInRange`).
+  This provides a balance between readability and precision for numbers across
+  different orders of magnitude.
 
 - Refactored the type parser to use a modular architecture. This allows for
   better extensibility and maintainability of the type system.
+
+- **Pattern Matching**: The `validatePattern()` function is now exported from
+  the public API. Use it to check patterns for invalid combinations like
+  consecutive sequence wildcards before using them.
+
+- **Polynomial Arithmetic**: Added new library functions for polynomial
+  operations:
+  - `PolynomialDegree(expr, var)` - Get the degree of a polynomial
+  - `CoefficientList(expr, var)` - Get the list of coefficients
+  - `PolynomialQuotient(dividend, divisor, var)` - Polynomial division quotient
+  - `PolynomialRemainder(dividend, divisor, var)` - Polynomial division
+    remainder
+  - `PolynomialGCD(a, b, var)` - Greatest common divisor of polynomials
+  - `Cancel(expr, var)` - Cancel common factors in rational expressions
+
+- **Integration**: Significantly expanded symbolic integration capabilities:
+  - **Polynomial division**: Integrals like `∫ x²/(x²+1) dx` now correctly
+    divide first, yielding `x - arctan(x)`
+  - **Repeated linear roots**: `∫ 1/(x-1)² dx = -1/(x-1)` and higher powers
+  - **Derivative pattern recognition**: `∫ f'(x)/f(x) dx = ln|f(x)|` is now
+    recognized automatically
+  - **Completing the square**: Irreducible quadratics like `∫ 1/(x²+2x+2) dx`
+    now yield `arctan(x+1)`
+  - **Reduction formulas**: `∫ 1/(x²+1)² dx` now works using reduction formulas
+  - **Mixed partial fractions**: `∫ 1/((x-1)(x²+1)) dx` now decomposes correctly
+  - **Factor cancellation**: `∫ (x+1)/(x²+3x+2) dx` simplifies before
+    integrating
+  - **Inverse hyperbolic**: Added `∫ 1/√(x²+1) dx = arcsinh(x)` and
+    `∫ 1/√(x²-1) dx = arccosh(x)`
+  - **Arcsec pattern**: Added `∫ 1/(x·√(x²-1)) dx = arcsec(x)`
+  - **Trigonometric substitution**: Added support for `∫√(a²-x²) dx`,
+    `∫√(x²+a²) dx`, and `∫√(x²-a²) dx` using trig/hyperbolic substitution
 
 ## 0.30.2 _2025-07-15_
 
@@ -12219,10 +12355,6 @@ console.log(expr.isEqual(ce.box(2)));
 ### Improvements
 
 - In LaTeX, parse `\operatorname{foo}` as the MathJSON symbol `"foo"`.
-
-```
-
-```
 </ChangeLog>
 ---
 title: Compute Engine Demo

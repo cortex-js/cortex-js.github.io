@@ -2703,8 +2703,8 @@ https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
 ##### MathfieldElement.textToSpeechMarkup
 
 ```ts
-get static textToSpeechMarkup(): "" | "ssml" | "ssml_step" | "mac"
-set static textToSpeechMarkup(value: "" | "ssml" | "ssml_step" | "mac"): void
+get static textToSpeechMarkup(): "" | "mac" | "ssml" | "ssml_step"
+set static textToSpeechMarkup(value: "" | "mac" | "ssml" | "ssml_step"): void
 ```
 
 The markup syntax to use for the output of conversion to spoken text.
@@ -3160,8 +3160,8 @@ Use `null` to prevent any sound from being loaded.
 ##### MathfieldElement.decimalSeparator
 
 ```ts
-get static decimalSeparator(): "." | ","
-set static decimalSeparator(value: "." | ","): void
+get static decimalSeparator(): "," | "."
+set static decimalSeparator(value: "," | "."): void
 ```
 
 The symbol used to separate the integer part from the fractional part of a
@@ -3293,7 +3293,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.108.0';
+static version: string = '0.108.2';
 ```
 
 </MemberCard>
@@ -8531,7 +8531,7 @@ const version: {
 };
 ```
 
-Current version: `0.108.0`
+Current version: `0.108.2`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8554,6 +8554,37 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.108.2 _2025-11-13_
+
+### Resolved Issues
+
+- **#2899** Typing an inline shortcut immediately after inserting a structure
+  (e.g. `sin/cos`) now expands the shortcut correctly and keeps the caret in the
+  numerator placeholder. The inline shortcut buffer is flushed in place, so the
+  first character typed in a fresh placeholder is tracked again, and genfrac
+  insertion prioritizes the numerator placeholder before falling back to the
+  denominator. This fixes both the missing `\cos` expansion and the regression
+  where the denominator was erroneously selected after `/`.
+
+## 0.108.1 _2025-11-11_
+
+### New Features
+
+- **Responsive toggle button layout**: The virtual keyboard toggle and menu
+  button now automatically switch from horizontal (side-by-side) to vertical
+  (stacked) layout when the mathfield height is 100px or greater. This happens
+  dynamically as you add content to the mathfield.
+
+### Resolved Issues
+
+- Fixed virtual keyboard toggle requiring triple-click to activate.
+- **#2892** Fixed vertical alignment issues when using `\colorbox` with
+  expressions that have both subscripts and superscripts. Previously, applying a
+  background color to an expression like `N_{k}^{2019}` would cause the
+  subscripts and superscripts to be misaligned or shift upward. Colorboxes now
+  render correctly with proper baseline alignment regardless of whether the
+  content has only a subscript, only a superscript, or both.
+
 ## 0.108.0 _2025-11-09_
 
 ### New Features
@@ -8652,11 +8683,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **#2419** Fixed parsing of dollar-delimited math expressions when using
   `insert()` in text mode. Previously, when inserting strings like
   `"La fonction $f$ est croissante"` into a mathfield with `defaultMode="text"`,
-  the dollar signs and their content were being escaped, preventing proper
-  math mode switching. The text mode editor now correctly preserves math
-  regions delimited by `$...$` or `$$...$$` while only escaping special
-  characters in text regions, allowing mixed text and inline math expressions
-  to be inserted correctly.
+  the dollar signs and their content were being escaped, preventing proper math
+  mode switching. The text mode editor now correctly preserves math regions
+  delimited by `$...$` or `$$...$$` while only escaping special characters in
+  text regions, allowing mixed text and inline math expressions to be inserted
+  correctly.
 - **#2444** Font style menu items (roman, italic) are now always visible and
   properly toggleable. Previously, these items only appeared when text was
   selected, and toggling them when positioned after styled text would not work
@@ -8728,13 +8759,13 @@ import ChangeLog from '@site/src/components/ChangeLog';
   behaviors. The placeholder is now deleted before keystroke processing,
   allowing all keybindings and character handling to work correctly.
 - **#2579** Fixed multiple mathfields showing blinking cursors simultaneously
-  when `focus()` is called rapidly on multiple mathfields. This occurred
-  because Chromium browsers don't fire blur events reliably during rapid focus
-  changes, causing multiple mathfields to remain in a focused state. The fix
-  implements global focus tracking to ensure only one mathfield can be focused
-  at a time, explicitly blurring any previously focused mathfield when a new
-  one gains focus. This handles browser blur event quirks while maintaining
-  backward compatibility with all existing focus/blur behavior.
+  when `focus()` is called rapidly on multiple mathfields. This occurred because
+  Chromium browsers don't fire blur events reliably during rapid focus changes,
+  causing multiple mathfields to remain in a focused state. The fix implements
+  global focus tracking to ensure only one mathfield can be focused at a time,
+  explicitly blurring any previously focused mathfield when a new one gains
+  focus. This handles browser blur event quirks while maintaining backward
+  compatibility with all existing focus/blur behavior.
 - **#2619** Fixed placeholders in multi-row array environments (like
   `\displaylines`) not being focusable with pointer clicks. The hit-testing
   logic now properly determines which row was clicked before searching for
