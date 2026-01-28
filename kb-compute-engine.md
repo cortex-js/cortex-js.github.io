@@ -4,7 +4,7 @@ slug: /compute-engine/guides/compiling/
 ---
 
 <Intro>
-The Compute Engine **LaTeX expressions** can compile expressions to **JavaScript functions**!
+The Compute Engine can compile **LaTeX expressions** to **JavaScript functions**!
 </Intro>
 
 ## Introduction
@@ -62,7 +62,7 @@ const fn = expr.compile();
 for (let i = 1; i < 10; i++) console.log(fn({ n: i }));
 ```
 
-**To get a list of the unknows of an expression** use the `expr.unknowns`
+**To get a list of the unknowns of an expression** use the `expr.unknowns`
 property:
 
 ```live
@@ -281,7 +281,7 @@ $$
 
 <Latex value="\operatorname{ComplexRoot}(1, 3)"/>
 
-Retrurn a list of the n<sup>th</sup> roots of a number _z_.
+Return a list of the n<sup>th</sup> roots of a number _z_.
 
 The complex roots of a number are the solutions of the equation $$z^n = a$$.
 
@@ -4748,30 +4748,51 @@ operators are applied.
 For example, in `1 + 2 * 3`, the `*` operator has a **higher** precedence
 than the `+` operator, so it is applied first.
 
-The precedence range from 0 to 1000. The larger the number, the higher the
+The precedence ranges from 0 to 1000. The larger the number, the higher the
 precedence, the more "binding" the operator is.
 
-Here are some rough ranges for the precedence:
+### Operator Precedence Table
 
-- 800: prefix and postfix operators: `\lnot` etc...
-   - `POSTFIX_PRECEDENCE` = 810: `!`, `'`
-- 700: some arithmetic operators
-   - `EXPONENTIATION_PRECEDENCE` = 700: `^`
-- 600: some binary operators
-   - `DIVISION_PRECEDENCE` = 600: `\div`
-- 500: not used
-- 400: not used
-- 300: some logic and arithmetic operators:
-       `\land`, `\lor`, `\times`, etc...
-  - `MULTIPLICATION_PRECEDENCE` = 390: `\times`
-- 200: arithmetic operators, inequalities:
-  - `ADDITION_PRECEDENCE` = 275: `+` `-`
-  - `ARROW_PRECEDENCE` = 270: `\to` `\rightarrow`
-  - `ASSIGNMENT_PRECEDENCE` = 260: `:=`
-  - `COMPARISON_PRECEDENCE` = 245: `\lt` `\gt`
-  - 241: `\leq`
-- 100: not used
-- 0: `,`, `;`, etc...
+| Precedence | Operators | Description |
+|------------|-----------|-------------|
+| **880** | `\lnot` `\neg` `++` `--` `+` `-` (prefix) | Prefix/postfix unary |
+| **810** | `!` `'` `!!` `'''` | Factorial, prime (postfix) |
+| **800** | `_` (subscript) | Subscript |
+| **780** | `\degree` `\prime` | Degree, prime symbols |
+| **740** | `\%` | Percent |
+| **720** | `/` (inline division) | Inline division |
+| **700** | `^` `\overset` `\underset` | Exponentiation, over/underscript |
+| **650** | (invisible multiply) `\cdot` | Implicit multiplication |
+| **600** | `\div` `\frac` | Division |
+| **390** | `\times` `*` `/` | Multiplication |
+| **350** | `\cup` `\cap` | Set union/intersection |
+| **275** | `+` `-` (infix) | Addition, subtraction |
+| **270** | `\to` `\rightarrow` `\mapsto` | Arrows |
+| **265** | `\setminus` `\smallsetminus` `:` (range) | Set difference, range |
+| **260** | `:=` | Assignment |
+| **255** | `\ne` | Not equal |
+| **250** | `\not\approxeq` | Not approximately equal |
+| **247** | `\approx` | Approximately |
+| **245-246** | `=` `<` `>` `\lt` `\gt` `\nless` `\ngtr` | Equality, comparison |
+| **241-244** | `\le` `\leq` `\ge` `\geq` `>=` | Less/greater or equal |
+| **240** | `\in` `\notin` `\subset` `\supset` ... | Set membership/relations |
+| **235** | `\land` `\wedge` `\&` | Logical AND |
+| **232** | `\veebar` `\barwedge` (Xor, Nand, Nor) | Logical XOR, NAND, NOR |
+| **230** | `\lor` `\vee` `\parallel` | Logical OR |
+| **220** | `\implies` `\Rightarrow` `\vdash` `\models` | Implication, entailment |
+| **219** | `\iff` `\Leftrightarrow` `\equiv` | Equivalence |
+| **200** | `\forall` `\exists` `\exists!` | Quantifiers |
+| **160** | `\mid` `\vert` (set builder) | Set builder notation |
+| **19-20** | `,` `;` `\ldots` | Sequence separators |
+
+### Key Relationships
+
+- **Comparisons bind tighter than logic**: `x = 1 \lor y = 2` parses as
+  `(x = 1) \lor (y = 2)`, not `x = (1 \lor y) = 2`
+- **AND binds tighter than OR**: `a \land b \lor c` parses as
+  `(a \land b) \lor c`
+- **Logic operators bind tighter than implication**: `a \lor b \implies c`
+  parses as `(a \lor b) \implies c`
 
 Some constants are defined below for common precedence values.
 
@@ -9101,9 +9122,9 @@ date: Last Modified
 | `Sin`    | `Arcsin`                                                                                                  | `Sinh`     | `Arsinh`        |
 | `Cos`    | `Arccos`                                                                                                  | `Cosh`     | `Arcosh`        |
 | `Tan`    | [`Arctan`](https://www.wikidata.org/wiki/Q2257242)<br/> [`Arctan2`](https://www.wikidata.org/wiki/Q776598) | `Tanh`     | `Artanh`        |
-| `Cot`    | `Acot`                                                                                                    | `Coth`     | `Arcoth`        |
-| `Sec`    | `Asec`                                                                                                    | `Sech`     | `Asech`         |
-| `Csc`    | `Acsc`                                                                                                    | `Csch`     | `Acsch`         |
+| `Cot`    | `Arccot`                                                                                                  | `Coth`     | `Arcoth`        |
+| `Sec`    | `Arcsec`                                                                                                  | `Sech`     | `Arsech`        |
+| `Csc`    | `Arccsc`                                                                                                  | `Csch`     | `Arcsch`        |
 
 </div>
 
@@ -9278,7 +9299,7 @@ that a variable is positive.
 </nav>
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_symbol_, _type__</Signature>
+<Signature name="Declare">_symbol_, _type_</Signature>
 
 <Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
@@ -9321,7 +9342,7 @@ a symbol cannot be changed.
 If there is no definition for the symbol, add a new definition in the
 current scope, and use the `value` to infer the type of the symbol.
 
-This is equivalent to `=` in may programming languages.
+This is equivalent to `=` in many programming languages.
 
 `Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
 
@@ -9349,7 +9370,7 @@ The predicate can take the form of:
 - an inequality: `["Assume", ["Greater", "x", 0]]`
 - a membership expression: `["Assume", ["Element", "x", "Integers"]]`
 
-`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+`Assume` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
 
 
@@ -9359,7 +9380,7 @@ since it changes the state of the Compute Engine.
 ## Structural Operations
 
 The following functions can be applied to non-canonical expressions.
-The do not depend on the canonical form, but reflect the structure of the
+They do not depend on the canonical form, but reflect the structure of the
 expression.
 
 <nav className="hidden">
@@ -9367,7 +9388,7 @@ expression.
 </nav>
 <FunctionDefinition name="About">
 
-<Signature name="About">_symbol__</Signature>
+<Signature name="About">_symbol_</Signature>
 
 Evaluate to a dictionary expression containing information about a symbol
 such as its type, its attributes, its value, etc...
@@ -9875,7 +9896,7 @@ These functions are all inert functions, that is they evaluate to themselves.
 | :------------ | :--------------- | :------------------------------------------------------------- |
 | `Subminus`    | $$ x_- $$      |                                                                |
 | `Subplus`     | $$ x_+$$       |                                                                |
-| `Subscript`   | $$ x_{n} $$    |                                                                |
+| `Subscript`   | $$ x_{n} $$    | See below for details on subscript handling.                   |
 | `Substar`     | $$ x_*$$       |                                                                |
 | `Superdagger` | $$ x^\dagger$$ |                                                                |
 | `Superminus`  | $$ x^-$$       |                                                                |
@@ -9883,6 +9904,45 @@ These functions are all inert functions, that is they evaluate to themselves.
 | `Superstar`   | $$ x^*$$       | When the argument is a complex number, indicate the conjugate. |
 
 </div>
+
+### Subscript Handling
+
+When a symbol has a subscript, the Compute Engine converts it to a compound
+symbol name in most cases:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_1` | `A_1` | Numeric subscript becomes part of symbol name |
+| `A_{n}` | `A_n` | Single-letter subscript becomes part of symbol name |
+| `A_{max}` | `A_max` | Multi-letter subscript becomes part of symbol name |
+| `x_{ij}` | `x_ij` | Common for matrix indices |
+| `T_{max}` | `T_max` | Common for named subscripts |
+
+To use an **expression** as a subscript (rather than a symbol name), wrap
+it in parentheses:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_{(n+1)}` | `["Subscript", "A", ...]` | Parentheses indicate an expression |
+| `A_{(CD)}` | `["Subscript", "A", ...]` | Parentheses: `C × D` as expression |
+
+This convention allows natural mathematical notation like `T_{max}` to work
+as expected while still supporting expression subscripts when needed.
+
+#### Styled Subscripts
+
+To apply a specific style to a subscript (italic, bold, etc.), use the
+appropriate LaTeX command:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_{\mathit{max}}` | `A_max_italic` | Italic subscript |
+| `A_{\mathbf{max}}` | `A_max_bold` | Bold subscript |
+| `A_{\mathrm{max}}` | `A_max` | Upright (roman) subscript |
+
+The style suffix (`_italic`, `_bold`, etc.) becomes part of the symbol name,
+allowing you to distinguish between differently styled versions of the same
+subscript if needed.
 ---
 title: Changelog - Compute Engine
 sidebar_label: Changelog
@@ -9895,6 +9955,101 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Bug Fixes
+
+- **([#243](https://github.com/cortex-js/compute-engine/issues/243))
+  LaTeX Parsing**: Fixed logic operator precedence causing expressions like
+  `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
+  `(x = 1) ∨ (x = 2)`. Comparison operators (`=`, `<`, `>`, etc.) now correctly
+  bind tighter than logic operators (`\land`, `\lor`, `\veebar`, etc.).
+
+- **([#258](https://github.com/cortex-js/compute-engine/issues/258))
+  Pattern Matching**: Fixed `BoxedExpression.match()` returning `null` when
+  matching patterns against canonicalized expressions. Several cases are now
+  handled:
+  - `Rational` patterns now match expressions like `['Rational', 'x', 2]` which
+    are canonicalized to `['Multiply', ['Rational', 1, 2], 'x']`
+  - `Power` patterns now match `['Power', 'x', -1]` which is canonicalized to
+    `['Divide', 1, 'x']`, returning `{_base: x, _exp: -1}`
+  - `Power` patterns now match `['Root', 'x', 3]` (cube root), returning
+    `{_base: x, _exp: ['Divide', 1, 3]}`
+
+- **([#264](https://github.com/cortex-js/compute-engine/issues/264))
+  Serialization**: Fixed LaTeX serialization of quantified expressions
+  (`ForAll`, `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`). Previously,
+  only the quantifier symbol was output (e.g., `\forall x` instead of
+  `\forall x, x>y`). The body of the quantified expression is now correctly
+  serialized.
+
+- **([#252](https://github.com/cortex-js/compute-engine/issues/252))
+  Sum/Product**: Fixed `Sum` and `Product` returning `NaN` when the body
+  contains free variables (variables not bound by the index). For example,
+  `\sum_{n=1}^{10}(x)` now correctly evaluates to `10x` instead of `NaN`, and
+  `\prod_{n=1}^{5}(x)` evaluates to `x^5`. Mixed expressions like
+  `\sum_{n=1}^{10}(n \cdot x)` now return `55x`. Also fixed `toString()` for
+  `Sum` and `Product` expressions with non-trivial bodies (e.g., `Multiply`)
+  which were incorrectly displayed as `int()`.
+
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
+  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
+  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
+  unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
+  the existing `\operatorname{lcm}`).
+
+- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+
+- **([#255](https://github.com/cortex-js/compute-engine/issues/255))
+  LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
+  "incompatible-type" errors in arithmetic operations. Multi-letter subscripts
+  without parentheses are now interpreted as compound symbol names (e.g.,
+  `A_{CD}` → `A_CD`, `x_{ij}` → `x_ij`, `T_{max}` → `T_max`). Use parentheses
+  for expression subscripts: `A_{(CD)}` creates a `Subscript` expression where
+  `CD` represents implicit multiplication. The `Delimiter` wrapper is now
+  stripped from subscript expressions for cleaner output.
+
+### Improvements
+
+- **Polynomial Simplification**: The `simplify()` function now automatically
+  cancels common polynomial factors in univariate rational expressions. For
+  example, `(x² - 1)/(x - 1)` simplifies to `x + 1`, `(x³ - x)/(x² - 1)`
+  simplifies to `x`, and `(x + 1)/(x² + 3x + 2)` simplifies to `1/(x + 2)`.
+  Previously, this required explicitly calling the `Cancel` function with a
+  variable argument.
+
+- **Sum/Product Simplification**: Added simplification rules for `Sum` and
+  `Product` expressions with symbolic bounds:
+  - Constant body: `\sum_{n=1}^{b}(x)` simplifies to `b * x`
+  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to `(b(b+1) - a(a-1))/2`
+  - Sum of squares: `\sum_{n=1}^{b}(n^2)` simplifies to `b(b+1)(2b+1)/6`
+  - Sum of cubes: `\sum_{n=1}^{b}(n^3)` simplifies to `[b(b+1)/2]^2`
+  - Geometric series: `\sum_{n=0}^{b}(r^n)` simplifies to `(1-r^(b+1))/(1-r)`
+  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to `(1+(-1)^b)/2`
+  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
+  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
+  - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
+  - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
+  - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
+  - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
+  - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
+  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
+  - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
+  - Factor out constants: `\sum_{n=1}^{b}(c \cdot f(n))` simplifies to
+    `c \cdot \sum_{n=1}^{b}(f(n))`, and similarly for products where the
+    constant is raised to the power of the iteration count
+  - Nested sums/products: inner sums/products are simplified first, enabling
+    cascading simplification
+  - Edge cases: empty ranges (upper < lower) return identity elements (0 for
+    Sum, 1 for Product), and single-iteration ranges substitute the bound value
+
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
+  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
+  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
+  unaffected.
+
 ## 0.31.0 _2026-01-27_
 
 ### Breaking Changes
@@ -12427,13 +12582,27 @@ including complex numbers.`,
       template: 'eval-async'
     },
 
-    { 
-      latex: '2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}', 
+    {
+      latex: '2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}',
       preamble: 'Evaluate a product',
       template: 'eval-async'
     },
 
-    { 
+    {
+      latex: '\\sum_{n=1}^{b} n^2',
+      preamble: `Simplify a sum with symbolic bounds to a closed-form formula.
+The sum of squares simplifies to b(b+1)(2b+1)/6.`,
+      template: 'simplify'
+    },
+
+    {
+      latex: '\\prod_{n=1}^{b} n',
+      preamble: `Simplify a product with symbolic bounds.
+The product of consecutive integers simplifies to factorial.`,
+      template: 'simplify'
+    },
+
+    {
       latex: '\\mathrm{Expand}((a+b)^5)', 
       preamble: `Symbolically expand an expression.
 Use the \`latex\` property to get the result in LaTeX format.`,
@@ -12515,7 +12684,7 @@ console.info(expr.json);
   "eval-string": `$0
 const expr = $1;
 console.info(expr.evaluate());
-`,  
+`,
   "eval-latex": `$0
 const expr = $1;
 console.info(expr.evaluate().latex);
@@ -12527,6 +12696,10 @@ console.info(expr.N());
   "eval-async": `$0
 const expr = $1;
 expr.evaluateAsync().then(result => console.info(result));
+`,
+  "simplify": `$0
+const expr = $1;
+console.info(expr.simplify());
 `
 
 };
@@ -13358,7 +13531,7 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
 object literals with a `"num"` `"str"` `"sym"` or `"fn"` key, respectively, or
-using a shorthand notation as a a JSON number, string or array.
+using a shorthand notation as a JSON number, string or array.
 
 The shorthand notation is more concise and easier to read, but it cannot include
 metadata properties.
@@ -13555,7 +13728,7 @@ arguments `2` and `3`.
 
 ### Functions as Object Literal
 
-The default representation of **function  expressions** is an object literal with
+The default representation of **function expressions** is an object literal with
 a `"fn"` key. The value of the `fn` key is an array representing the function 
 operator (its name) and its arguments (its operands).
 
@@ -13805,7 +13978,7 @@ Modifiers include:
 | `_dot`          | `\dot{}`          | \\( \dot\{x\} \\)          |
 | `_ddot`         | `\ddot{}`         | \\( \ddot\{x\} \\)         |
 | `_tdot`         | `\dddot{}`        | \\( \dddot\{x\} \\)        |
-| `_qdot`         | `\ddddot{}`       | \\( \dddodt\{x\} \\)       |
+| `_qdot`         | `\ddddot{}`       | \\( \ddddot\{x\} \\)       |
 | `_operator`     | `\operatorname{}` | \\( \operatorname\{x\} \\) |
 | `_upright`      | `\mathrm{}`       | \\( \mathrm\{x\} \\)       |
 | `_italic`       | `\mathit{}`       | \\( \mathit\{x\} \\)       |
@@ -13891,7 +14064,7 @@ Modifiers include:
 | `invertedOhm`    | `\mho`        | \\( \mho \\)        |
 | `hBar`           | `\hbar`       | \\( \hbar \\)       |
 | `hSlash`         | `\hslash`     | \\( \hslash \\)     |
-| `blacksquare`    | `\hslash`     | \\( \hslash \\)     |
+| `blacksquare`    | `\blacksquare`| \\( \blacksquare \\)|
 | `bottom`         | `\bot`        | \\( \bot \\)        |
 | `bullet`         | `\bullet`     | \\( \bullet \\)     |
 | `circle`         | `\circ`       | \\( \circ \\)       |
@@ -14079,7 +14252,7 @@ The MathJSON Standard Library includes definitions for:
 When defining a new function, avoid using a name already defined in the Standard
 Library.
 
-<ReadMore path="/compute-compute-engine/guides/augmenting/">
+<ReadMore path="/compute-engine/guides/augmenting/">
 Read more about **Adding New Definitions**<Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -14241,7 +14414,7 @@ When an argument $n$ is present it represents the _n_-th derivative of a functio
 <Latex value="f^{(n)}(x)"/>
 
 ```json example
-["Apply", ["Derivative", "f", n], "x"]
+["Apply", ["Derivative", "f", "n"], "x"]
 ```
 
 
@@ -14638,6 +14811,37 @@ form of wildcards.
 
 Patterns are similar to Regular Expressions in traditional programming languages
 but they are tailored to deal with MathJSON expressions instead of strings.
+
+### Validating Patterns
+
+Some wildcard combinations are invalid because they create ambiguity. For
+example, consecutive sequence wildcards like `['Add', '__a', '__b']` are
+invalid because there's no way to determine where `__a` ends and `__b` begins.
+
+**To check if a pattern is valid**, use the `validatePattern()` function:
+
+```js example
+import { validatePattern } from 'compute-engine';
+
+const ce = new ComputeEngine();
+const pattern = ce.box(['Add', '__a', '__b']);
+
+try {
+  validatePattern(pattern);
+} catch (e) {
+  console.log(e.message);
+  // ➔ "Invalid pattern: consecutive sequence wildcards..."
+}
+```
+
+Invalid patterns include:
+- `['Add', '__a', '__b']` - consecutive sequence wildcards
+- `['Add', '___a', '___b']` - consecutive optional sequence wildcards
+- `['Add', '__a', '___b']` - sequence followed by optional sequence
+
+Valid patterns with multi-element wildcards:
+- `['Add', '__a', '_b']` - `_b` matches last element, `__a` gets the rest
+- `['Add', '___a', '_b', '___c']` - `_b` anchors the middle
 
 Given a pattern and an expression the goal of pattern matching is to find a
 substitution for all the wildcards such that the pattern becomes the expression.
@@ -16005,12 +16209,12 @@ console.log('isEqual?', a.isEqual(b));
 
 </div>
 
-## Replacing a Symbol in an Expresssion
+## Replacing a Symbol in an Expression
 
 **To replace a symbol in an expression** use the `subs()` function.
 
 The argument of the `subs()` function is an object literal. Each key/value 
-pairs is a symbol and the value to be substituted with. The value can be either
+pair is a symbol and the value to be substituted with. The value can be either
 a number or a boxed expression.
 
 ```live show-line-numbers mark-javascript-line="4"
@@ -16202,7 +16406,7 @@ uses `_` as a wildcard for the parameter.
 
 ```json example
 ["Apply", ["Function", ["Add", 2, "x"], "x"], 11]
-// ➔ 22
+// ➔ 13
 
 ["Apply", ["Add", 2, "_"], 4]
 // ➔ 6
@@ -16246,10 +16450,10 @@ when the function is applied, it will use that value of `a` in the computation.
 // ➔ 1 + 10
 ```
 
-Note that the value of `a` is `3` when the function is defined, and it
-is `10` when the function is applied. The function will always use the value of
+Note that the value of `a` is `10` when the function is defined, and it
+is `100` when the function is applied. The function will always use the value of
 `a` that was in scope when the function was defined, not the value of `a` at the
-time the function is applied. In fact, the out `a` is a different variable
+time the function is applied. In fact, the outer `a` is a different variable
 which is unrelated to the `a` in the scope of the function, but with the same
 name.
 
@@ -16551,18 +16755,52 @@ sections below.
 | Key | Description |
 | :--- | :--- |
 | `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
-| `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, or `"engineering"`. Default is `"auto"`. |
+| `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
-| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provide, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
-| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tupe is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
+| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
+| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
   | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
 | `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
 | `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
 | `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
 | `repeatingDecimal` | The decoration around repeating digits. Valid values are `"auto"`, `"vinculum"`, `"dots"`, `"parentheses"`,  `"arc"` and `"none"`. Default is `"auto"`. |
 
+#### Notation Modes Comparison
+
+The following table shows how different numbers are serialized with each notation mode (using default `avoidExponentsInRange` of `[-6, 20]`):
+
+| Value | `"auto"` | `"scientific"` | `"engineering"` | `"adaptiveScientific"` |
+| :---- | :------- | :------------- | :-------------- | :--------------------- |
+| 0.000001234 | $0.000\,001\,234$ | $1.234 \cdot 10^{-6}$ | $1.234 \cdot 10^{-6}$ | $0.000\,001\,234$ |
+| 0.0000001234 | $1.234 \cdot 10^{-7}$ | $1.234 \cdot 10^{-7}$ | $123.4 \cdot 10^{-9}$ | $1.234 \cdot 10^{-7}$ |
+| 3.14159 | $3.141\,59$ | $3.141\,59 \cdot 10^{0}$ | $3.141\,59 \cdot 10^{0}$ | $3.141\,59$ |
+| 1234.5 | $1\,234.5$ | $1.234\,5 \cdot 10^{3}$ | $1.234\,5 \cdot 10^{3}$ | $1\,234.5$ |
+| 12345678 | $12\,345\,678$ | $1.234\,567\,8 \cdot 10^{7}$ | $12.345\,678 \cdot 10^{6}$ | $12\,345\,678$ |
+| 1e21 | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ |
+
+- **`"auto"`**: Uses decimal notation within `avoidExponentsInRange`, otherwise scientific notation. The decision is based on the number's natural string representation.
+- **`"scientific"`**: Always uses scientific notation with one digit before the decimal point. Ignores `avoidExponentsInRange`.
+- **`"engineering"`**: Uses scientific notation with exponents that are multiples of 3.
+- **`"adaptiveScientific"`**: Normalizes to scientific notation first, then falls back to decimal if the exponent is within `avoidExponentsInRange`.
+
+#### Difference between `"auto"` and `"adaptiveScientific"`
+
+With the default `avoidExponentsInRange` of `[-6, 20]`, `"auto"` and `"adaptiveScientific"` produce similar results. The difference becomes apparent with a custom range.
+
+With `avoidExponentsInRange: [-2, 2]`:
+
+| Value | `"auto"` | `"adaptiveScientific"` |
+| :---- | :------- | :--------------------- |
+| 0.05 | $0.05$ | $0.05$ |
+| 0.005 | $0.005$ | $5 \cdot 10^{-3}$ |
+| 50 | $50$ | $50$ |
+| 5000 | $5\,000$ | $5 \cdot 10^{3}$ |
+| 1234.5 | $1\,234.5$ | $1.234\,5 \cdot 10^{3}$ |
+
+The key difference: `"adaptiveScientific"` always computes the scientific notation exponent first, then decides whether to display it. `"auto"` bases its decision on how JavaScript naturally represents the number, which may not have an exponent for moderately-sized values.
+
 ```live
-console.log(ce.parse("\\pi").N().toLatex({ 
+console.log(ce.parse("\\pi").N().toLatex({
     fractionalDigits: 6,
 }));
 ```
@@ -18035,7 +18273,7 @@ is easier to understand.
 </Intro>
 
 The `expr.simplify()` function tries expanding, factoring and applying many
-other transformations to find a simple a simpler form of a symbolic expression.
+other transformations to find a simpler form of a symbolic expression.
 
 Before the transformation rules are applied, the expression is put into a
 canonical form.
@@ -18087,6 +18325,24 @@ It avoids making any simplification that could result in a loss of precision.
 
 For example, \\( 10^{300} + 1\\) cannot be simplified without losing the least
 significant digit, so `expr.simplify()` will return the expression unmodified.
+
+## Polynomial Simplifications
+
+For univariate rational expressions (fractions with polynomials in a single
+variable), `simplify()` automatically cancels common factors in the numerator
+and denominator.
+
+For example:
+- $ \frac{x^2 - 1}{x - 1} $ simplifies to $ x + 1 $
+- $ \frac{x^3 - x}{x^2 - 1} $ simplifies to $ x $
+- $ \frac{x + 1}{x^2 + 3x + 2} $ simplifies to $ \frac{1}{x + 2} $
+
+For more control over polynomial operations, or for multivariate expressions,
+use the explicit `Cancel`, `PolynomialGCD`, `PolynomialQuotient`, and
+`PolynomialRemainder` functions.
+
+<ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
+<strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Using Assumptions
 
@@ -19009,7 +19265,7 @@ slug: /compute-engine/reference/arithmetic/
 
 ## Constants
 
-<div className="symbols-table first-column-header" style={{"--first-col-width":"16h"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
 
 | Symbol            | Value                        |                                                                                                                                                           |
 | :---------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -19086,6 +19342,28 @@ Evaluate to the sum of `body` for each value in `bounds`.
 // ➔ 65
 ```
 
+#### Simplification
+
+When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
+| $$\sum_{n=a}^{b} n$$ | $$\frac{b(b+1) - a(a-1)}{2}$$ | Triangular number (general bounds) |
+| $$\sum_{n=1}^{b} n^2$$ | $$\frac{b(b+1)(2b+1)}{6}$$ | Sum of squares |
+| $$\sum_{n=1}^{b} n^3$$ | $$\left[\frac{b(b+1)}{2}\right]^2$$ | Sum of cubes |
+| $$\sum_{n=0}^{b} r^n$$ | $$\frac{1-r^{b+1}}{1-r}$$ | Geometric series |
+| $$\sum_{n=0}^{b} (-1)^n$$ | $$\frac{1+(-1)^b}{2}$$ | Alternating unit series |
+| $$\sum_{n=0}^{b} (-1)^n \cdot n$$ | $$(-1)^b \lfloor\frac{b+1}{2}\rfloor$$ | Alternating linear series |
+| $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
+| $$\sum_{k=0}^{n} \binom{n}{k}$$ | $$2^n$$ | Sum of binomial coefficients |
+| $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `0`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
+- Nested sums: inner sums are simplified first, enabling cascading simplification
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Product">
@@ -19116,7 +19394,7 @@ Note this is equivalent to:
 
 <Signature name="Product">_f_: function, _bounds_:tuple</Signature>
 
-Return the product of `body`for each value in `bounds`.
+Return the product of `body` for each value in `bounds`.
 
 <Latex value="\prod_{i=1}^{n} f(i)"/>
 
@@ -19124,6 +19402,24 @@ Return the product of `body`for each value in `bounds`.
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
 ```
+
+#### Simplification
+
+When `simplify()` is called on a `Product` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
+| $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
+| $$\prod_{n=1}^{b} (2n-1)$$ | $$(2b-1)!!$$ | Odd double factorial |
+| $$\prod_{n=1}^{b} 2n$$ | $$2^b \cdot b!$$ | Even double factorial |
+| $$\prod_{k=0}^{n-1} (x+k)$$ | $$(x)_n$$ | Rising factorial (Pochhammer) |
+| $$\prod_{k=0}^{n-1} (x-k)$$ | $$\frac{x!}{(x-n)!}$$ | Falling factorial |
+| $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `1`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
 
 </FunctionDefinition>
 
@@ -19399,6 +19695,174 @@ check if the fraction is in its canonical form:
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+## Polynomial Arithmetic
+
+These functions operate on polynomial expressions.
+
+<div className="symbols-table first-column-header">
+
+| Function               | Description                                                      |
+| :--------------------- | :--------------------------------------------------------------- |
+| `Expand`               | Expand products and positive integer powers                      |
+| `ExpandAll`            | Recursively expand products and positive integer powers          |
+| `Factor`               | Factor an expression into irreducible factors                    |
+| `Together`             | Combine rational expressions into a single fraction              |
+| `Distribute`           | Distribute multiplication over addition                          |
+| `PolynomialDegree`     | Return the degree of a polynomial                                |
+| `CoefficientList`      | Return the list of coefficients of a polynomial                  |
+| `PolynomialQuotient`   | Return the quotient of polynomial division                       |
+| `PolynomialRemainder`  | Return the remainder of polynomial division                      |
+| `PolynomialGCD`        | Return the greatest common divisor of two polynomials            |
+| `Cancel`               | Cancel common polynomial factors in a rational expression        |
+
+</div>
+
+<FunctionDefinition name="Expand">
+
+<Signature name="Expand">_expr_</Signature>
+
+Expand out products and positive integer powers in `expr`.
+
+```json example
+["Expand", ["Power", ["Add", "x", 1], 2]]
+// ➔ ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ExpandAll">
+
+<Signature name="ExpandAll">_expr_</Signature>
+
+Recursively expand out products and positive integer powers in `expr` and all subexpressions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Factor">
+
+<Signature name="Factor">_expr_</Signature>
+
+Factor an algebraic expression into a product of irreducible factors.
+
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Power", ["Add", "x", 1], 2]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Together">
+
+<Signature name="Together">_expr_</Signature>
+
+Combine rational expressions into a single fraction with a common denominator.
+
+```json example
+["Together", ["Add", ["Divide", 1, "x"], ["Divide", 1, "y"]]]
+// ➔ ["Divide", ["Add", "x", "y"], ["Multiply", "x", "y"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Distribute">
+
+<Signature name="Distribute">_expr_</Signature>
+
+Distribute multiplication over addition in `expr`.
+
+```json example
+["Distribute", ["Multiply", "a", ["Add", "b", "c"]]]
+// ➔ ["Add", ["Multiply", "a", "b"], ["Multiply", "a", "c"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialDegree">
+
+<Signature name="PolynomialDegree">_poly_, _var_</Signature>
+
+Return the degree of the polynomial `poly` with respect to the variable `var`.
+
+```json example
+["PolynomialDegree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ 3
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="CoefficientList">
+
+<Signature name="CoefficientList">_poly_, _var_</Signature>
+
+Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from lowest to highest degree.
+
+```json example
+["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ ["List", 1, 2, 0, 1]
+```
+
+The result represents the polynomial $$ 1 + 2x + 0x^2 + 1x^3 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialQuotient">
+
+<Signature name="PolynomialQuotient">_dividend_, _divisor_, _var_</Signature>
+
+Return the quotient of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+```json example
+["PolynomialQuotient", ["Subtract", ["Power", "x", 3], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Add", ["Power", "x", 2], "x", 1]
+```
+
+This represents $$ \frac{x^3 - 1}{x - 1} = x^2 + x + 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialRemainder">
+
+<Signature name="PolynomialRemainder">_dividend_, _divisor_, _var_</Signature>
+
+Return the remainder of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+```json example
+["PolynomialRemainder", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], ["Add", "x", 1], "x"]
+// ➔ -2
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialGCD">
+
+<Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
+
+Return the greatest common divisor of two polynomials `a` and `b` with respect to the variable `var`.
+
+```json example
+["PolynomialGCD", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Subtract", "x", 1]
+```
+
+This represents $$ \gcd(x^2 - 1, x - 1) = x - 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Cancel">
+
+<Signature name="Cancel">_expr_, _var_</Signature>
+
+Cancel common polynomial factors in the numerator and denominator of the rational expression `expr` with respect to the variable `var`.
+
+```json example
+["Cancel", ["Divide", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1]], "x"]
+// ➔ ["Add", "x", 1]
+```
+
+This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common factor $$(x - 1)$$.
+
+</FunctionDefinition>
 ---
 title: Combinatorics
 slug: /compute-engine/reference/combinatorics/
@@ -21600,7 +22064,7 @@ Collections can be:
 - **Eager**: elements are fully evaluated when the collection is created.
 - **Lazy**: elements are evaluated only as they are accessed.
 
-Lazy collections are useful when working with with expensive computations
+Lazy collections are useful when working with expensive computations
 and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
@@ -21715,7 +22179,7 @@ Examples of function evaluating to a lazy collection include:
 
 Operations on all collections, whether indexed or not, include:
 - [**Filter**](#filter), [**Map**](#map), and [**Reduce**](#reduce): operations that create new collections by applying a function to each element of an existing collection.
-- [**Length**](#length), [**IsEmpty**](#isempty): check the number of elements of a collection.
+- [**Count**](#count), [**IsEmpty**](#isempty): check the number of elements of a collection.
 - [**Join**](#join), [**Zip**](#zip): combine multiple collections into one.
 - [**Tally**](#tally): count the number of occurrences of each element in a collection.
 
@@ -22541,22 +23005,22 @@ To get the values in sorted order, use `Extract`:
 
 
 <nav className="hidden">
-### Length
+### Count
 </nav>
 
 
 
-<FunctionDefinition name="Length">
+<FunctionDefinition name="Count">
 
-<Signature name="Length" returns="integer">_xs_: collection</Signature>
+<Signature name="Count" returns="integer">_xs_: collection</Signature>
 
 Returns the number of elements in the collection.
 
-When the collection is a matrix (list of lists), `Length` returns the number of
+When the collection is a matrix (list of lists), `Count` returns the number of
 rows.
 
 ```json example
-["Length", ["List", 5, 2, 10, 18]]
+["Count", ["List", 5, 2, 10, 18]]
 // ➔ 4
 ```
 
@@ -23052,15 +23516,15 @@ evaluated and the value of the `["Block"]` is this expression.
 
 <Signature name="If">_condition_, _expr-1_</Signature>
 
-If the value of `condition`is the symbol `True`, the value of the `["If"]`
+If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `Nothing`.
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
-If the value of `condition`is the symbol `True`, the value of the `["If"]`
+If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
 
-Here's an example of a function that returns the absoluve value of a number:
+Here's an example of a function that returns the absolute value of a number:
 
 ```json example
 ["Function", ["If", ["Greater", "n", 0], "n", ["Negate", "n"]], "n"]
@@ -23112,7 +23576,7 @@ the `Which[]` function in Mathematica.
 
 <Signature name="Loop">_body_</Signature>
 
-Repeatedly evaluate `body`until the value of `body`is a `["Break"]` expression,
+Repeatedly evaluate `body` until the value of `body` is a `["Break"]` expression,
 or a `["Return"]` expression.
 
 - `["Break"]` exits the loop immediately. The value of the `["Loop"]` expression
@@ -23151,9 +23615,9 @@ in JavaScript. It is somewhat similar to a `Do[...]` in Mathematica.
 <Signature name="FixedPoint">_body_, _initial-value_,
 _max-iterations_</Signature>
 
-Assumes `body`is an expression using an implicit argument `_`.
+Assumes `body` is an expression using an implicit argument `_`.
 
-Apply `body`to `initial-value`, then apply `body`to the result until the result
+Apply `body` to `initial-value`, then apply `body` to the result until the result
 no longer changes.
 
 To determine if a fixed point has been reached and the loop should terminate,
@@ -23188,7 +23652,7 @@ programming constructs that can be used to replace loops.
 
 <Signature name="Return">_value_</Signature>
 
-Interupts the evaluation of a `["Function"]` expression. The value of the
+Interrupts the evaluation of a `["Function"]` expression. The value of the
 `["Function"]` expression is `value`.
 
 The `["Return"]` expression is useful when used with functions that have
@@ -23222,7 +23686,7 @@ Read more about **functions**.
 <Signature name="Break">_value_</Signature>
 
 When in a loop exit the loop immediately. The final value of the loop is
-`value`or `Nothing` if not provided.
+`value` or `Nothing` if not provided.
 
 </FunctionDefinition>
 
@@ -23352,7 +23816,7 @@ provided in the declaration, the type cannot be changed later.
 
 The `ce.forget()` function will remove any
 [assumptions](/compute-engine/guides/assumptions) associated with a symbol, and
-remove its value. Howeve, the symbol will remained declared, since other
+remove its value. However, the symbol will remain declared, since other
 expressions may depend on it.
 
 **To forget about a specific symbol**, pass the name of the symbol as an
