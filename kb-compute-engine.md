@@ -9154,7 +9154,7 @@ date: Last Modified
 | :--- | :--- | :--- |
 | `True` | `\top` | $$ \top $$ |
 |  ’’ | `\mathsf{T}` | $$ \mathsf{T}$$| 
-|  ’’ | `\operator{True}` | $$ \operatorname{True}$$| 
+|  '' | `\operatorname{True}` | $$ \operatorname{True}$$| 
 | `False` | `\bot` | $$ \bot $$ | 
 | ’’ | `\mathsf{F}` |  $$ \mathsf{F}$$ | 
 |  ’’ | `\operatorname{False}` | $$ \operatorname{False}$$| 
@@ -10030,6 +10030,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
   - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
   - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
+  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to `0`
+  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to `n * 2^(n-1)`
+  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to `n/(n+1)`
   - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
   - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
   - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
@@ -15072,7 +15075,7 @@ slug: /compute-engine/reference/linear-algebra/
 <Intro>
 [Linear algebra](https://en.wikipedia.org/wiki/Linear_algebra) is the branch of 
 mathematics that studies vector spaces and linear transformations between them 
-like adding and scaling. It uses matrixes to represent linear maps. 
+like adding and scaling. It uses matrices to represent linear maps. 
 Linear algebra is widely used in science and engineering. 
 </Intro>
 
@@ -15083,7 +15086,7 @@ In the Compute Engine matrices are represented as lists of lists.
 For example the matrix above is represented as the following list of lists:
 
 ```json example
-["List", ["List", 1, 3, ["List", 5, 0]]]
+["List", ["List", 1, 3], ["List", 5, 0]]
 ```
 
 An **axis** is a dimension of a tensor. A vector has one axis, a matrix has two
@@ -15105,7 +15108,7 @@ of the list is the second row of the matrix, etc.
 
 
 <ReadMore path="/compute-engine/reference/collections/" >Since
-matrixes are `List` collections, some **collection operations**
+matrices are `List` collections, some **collection operations**
 can also be applied to them such as `At`, `Reduce` and `Map`. </ReadMore>
 
 
@@ -15123,9 +15126,9 @@ The Compute Engine provides a number of functions for working with matrices.
 Vectors (row vectors) are represented as lists, that is an expression with the 
 head `List`.
 
-Matrixes are represented as lists of lists.
+Matrices are represented as lists of lists.
 
-Tensors (multi-dimensional matrixes) are represented as nested lists.
+Tensors (multi-dimensional matrices) are represented as nested lists.
 
 :::info[Note]
 Tensors are represented internally using an optimized format that is more
@@ -15138,10 +15141,10 @@ such as `Reshape` and `Transpose` can be done in O(1) time.
 column vector.
 
 `Matrix` is an optional "tag" inert function that is used to influence the visual
-representation of a matrix. It has not impact on the value of the matrix.
+representation of a matrix. It has no impact on the value of the matrix.
 
 In LaTeX notation, a matrix is represented with "environments" (with command
-`\begin` and `\end`) such as  `pmatrix` or `bmatrix`.:
+`\begin` and `\end`) such as `pmatrix` or `bmatrix`:
 
 <Latex value="\begin{pmatrix} 1 & 3 \\ 5 & 0 \end{pmatrix}"/>
 
@@ -15156,11 +15159,11 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 </nav>
 <FunctionDefinition name="Vector">
 
-<Signature name="Vector">_x-1_, ..._x-2_</Signature>
+<Signature name="Vector">_x-1_, ..._x-n_</Signature>
 
 `Vector` interprets the elements _x-1_... as a column vector
 
-This is essentially a shortcut for `["Matrix", ["List", ["List", _x-1_], ["List, _x-2_], ...]]]`.
+This is essentially a shortcut for `["Matrix", ["List", ["List", _x-1_], ["List", _x-2_], ...]]]`.
 
 ```json example
 ["Vector", 1, 3, 5, 0]
@@ -15211,7 +15214,7 @@ The delimiters can be any of the following characters:
 
 In addition, the character `.` can be used to indicate no delimiter.
 
-Some commom combinations may be represented using some 
+Some common combinations may be represented using some 
 standard LaTeX environments:
 
 | Delimiters | LaTeX Environment | Example |
@@ -15228,8 +15231,8 @@ _columns_format_ is an optional string indicating the format of each column.
 A character `=` indicates a centered column, `<` indicates a left-aligned 
 column, and `>` indicates a right-aligned column. 
 
-A character of `|` indicate a solid line between two
-columns and `:` indicate a dashed lines between two columns.
+A character of `|` indicates a solid line between two
+columns and `:` indicates a dashed line between two columns.
 
 </FunctionDefinition>
 
@@ -15348,7 +15351,7 @@ square brackets following a matrix.
 
 
 
-## Transforming Matrixes
+## Transforming Matrices
 
 <nav className="hidden">
 ### Flatten
@@ -15363,7 +15366,7 @@ order.
 This function can also be applied to any collection.
 
 Only elements with the same head as the collection are flattened.
-Matrixes have a head of `List`, so only other `List` elements
+Matrices have a head of `List`, so only other `List` elements
 are flattened.
 
 
@@ -15409,7 +15412,7 @@ If the result has fewer elements, the elements are dropped from the end of the
 element list. If the result has more elements, the lists of elements
 is filled cyclically. 
 
-This is the same behavior as APL, but other environment may behave differently.
+This is the same behavior as APL, but other environments may behave differently.
 For example, by default Mathematica `ArrayReshape` will fill the missing elements
 with zeros.
 
@@ -15520,7 +15523,7 @@ on the diagonal of the matrix.
 
 </FunctionDefinition>
 
-## Calculating with Matrixes
+## Calculating with Matrices
 
 
 <nav className="hidden">
@@ -19947,7 +19950,7 @@ Calculate $$ \binom{6}{2} = \frac{6!}{2!4!} = \frac{720}{2 \times 24} = 15 $$.
 ["Binomial", 6, 2]
 ```
 
-See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficent)
+See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient)
 
 <Latex>{`
 \\mathrm{Binomial}(n, k) = \\binom{n}{k} = \\frac{n!}{k!(n-k)!}
@@ -20875,7 +20878,7 @@ four equal groups, each group comprising a quarter of the _collection_.
 
 <Signature name="InterquartileRange">_collection_</Signature>
 
-Evaluate to the **interquartile range** (IRQ) of a _collection_ of numbers.
+Evaluate to the **interquartile range** (IQR) of a _collection_ of numbers.
 
 The interquartile range is the difference between the third quartile and the
 first quartile.
@@ -21511,7 +21514,7 @@ semantic metadata that is not material to the interpretation of an expression
 such as text color and size or other typographic variations, a tooltip or a hyperlink
 data to link to a web page.
 
-While annotated expression can be applied to string, they can also
+While annotated expressions can be applied to strings, they can also
 be used to annotate mathematical expressions, such as variables, operators, or
 functions, to provide additional context or visual emphasis.
 
@@ -21619,7 +21622,7 @@ If no _format_ is specified, the default is `unicode-scalars`.
 For example: 
 
 ```json example
-["StringFrom", ["List" 240, 159, 148, 159], {str: "utf-8"}]
+["StringFrom", ["List", 240, 159, 148, 159], {str: "utf-8"}]
 // ➔ "Hello"
 
 ["StringFrom", ["List", 55357, 56607], {str: "utf-16"}]
@@ -21876,7 +21879,7 @@ the type of _expr_:
 <Signature name="Spacing">_width_</Signature>
 
 
-When serializing to LaTeX,  `width`is the dimension of the spacing, in 1/18 em.
+When serializing to LaTeX, `width` is the dimension of the spacing, in 1/18 em.
 
 The `Spacing` function is **inert** and the value of a `["Spacing", _expr_]` expression is `expr`.
 
@@ -21957,7 +21960,7 @@ The `Annotated` function is **inert** and the value of a `["Annotated", expr]` e
 
 
 <ReadMore path="/compute-engine/reference/linear-algebra/#formatting" > 
-Read more about formatting of **matrixes** and **vectors**
+Read more about formatting of **matrices** and **vectors**
 </ReadMore>
 
 
@@ -23950,7 +23953,7 @@ $$
 
 <Signature name="GammaLn">_z_</Signature>
 
-<Latex value="\\ln(\\gamma(z))"/>
+<Latex value="\\ln(\\Gamma(z))"/>
 
 This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
 Mathematica.

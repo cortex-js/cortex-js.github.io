@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.2197ffd7.js" defer="defer"></script>
-<script src="/assets/js/main.3d7a1a77.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.2de46e5e.js" defer="defer"></script>
+<script src="/assets/js/main.b29256b9.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -129,6 +129,9 @@ variable argument.</p>
 <li class="">Alternating linear series: <code>\sum_{n=0}^{b}((-1)^n * n)</code> simplifies to <code>(-1)^b * floor((b+1)/2)</code></li>
 <li class="">Arithmetic progression: <code>\sum_{n=0}^{b}(a + d*n)</code> simplifies to <code>(b+1)(a + db/2)</code></li>
 <li class="">Sum of binomial coefficients: <code>\sum_{k=0}^{n}C(n,k)</code> simplifies to <code>2^n</code></li>
+<li class="">Alternating binomial sum: <code>\sum_{k=0}^{n}((-1)^k * C(n,k))</code> simplifies to <code>0</code></li>
+<li class="">Weighted binomial sum: <code>\sum_{k=0}^{n}(k * C(n,k))</code> simplifies to <code>n * 2^(n-1)</code></li>
+<li class="">Partial fractions (telescoping): <code>\sum_{k=1}^{n}(1/(k(k+1)))</code> simplifies to <code>n/(n+1)</code></li>
 <li class="">Product of constant: <code>\prod_{n=1}^{b}(x)</code> simplifies to <code>x^b</code></li>
 <li class="">Factorial: <code>\prod_{n=1}^{b}(n)</code> simplifies to <code>b!</code></li>
 <li class="">Odd double factorial: <code>\prod_{n=1}^{b}(2n-1)</code> simplifies to <code>(2b-1)!!</code></li>
