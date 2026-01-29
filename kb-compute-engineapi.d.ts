@@ -4264,6 +4264,64 @@ export declare const NUMBER_THEORY_LIBRARY: SymbolDefinitions[];
 export declare const LINEAR_ALGEBRA_LIBRARY: SymbolDefinitions[];
 /* 0.31.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const STATISTICS_LIBRARY: SymbolDefinitions[];
+/* 0.31.0 */import type { BoxedExpression, ComputeEngine } from '../global-types';
+/**
+ * Basic evaluation functions for logical operators.
+ * Extracted from logic.ts for better code organization.
+ */
+export declare function evaluateAnd(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateOr(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateNot(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateEquivalent(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateImplies(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateXor(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateNand(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+export declare function evaluateNor(args: ReadonlyArray<BoxedExpression>, { engine: ce }: {
+    engine: ComputeEngine;
+}): BoxedExpression | undefined;
+/**
+ * Convert a boolean expression to Negation Normal Form (NNF).
+ * In NNF, negations only appear directly before variables (literals).
+ * This is a prerequisite for CNF/DNF conversion.
+ */
+export declare function toNNF(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
+/**
+ * Convert a boolean expression to Conjunctive Normal Form (CNF).
+ */
+export declare function toCNF(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
+/**
+ * Convert a boolean expression to Disjunctive Normal Form (DNF).
+ */
+export declare function toDNF(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
+/**
+ * Extract all propositional variables from a boolean expression.
+ * Returns a sorted array of unique variable names.
+ */
+export declare function extractVariables(expr: BoxedExpression): string[];
+/**
+ * Evaluate a boolean expression with a given truth assignment.
+ * Returns True, False, or undefined if the expression cannot be evaluated.
+ */
+export declare function evaluateWithAssignment(expr: BoxedExpression, assignment: Record<string, boolean>, ce: ComputeEngine): BoxedExpression;
+/**
+ * Generate all possible truth assignments for a list of variables.
+ * Each assignment is a Record mapping variable names to boolean values.
+ */
+export declare function generateAssignments(variables: string[]): Generator<Record<string, boolean>>;
 /* 0.31.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const CORE_LIBRARY: SymbolDefinitions[];
 /* 0.31.0 */import type { BoxedExpression, ComputeEngine, Scope } from '../global-types';
@@ -4368,6 +4426,7 @@ export declare function simplifyLogicFunction(x: BoxedExpression): {
     value: BoxedExpression;
     because: string;
 } | undefined;
+export declare const LOGIC_FUNCTION_LIBRARY: SymbolDefinitions;
 /* 0.31.0 */import { Expression } from '../../math-json';
 export declare function randomExpression(level?: number): Expression;
 /* 0.31.0 */import type { SymbolDefinitions } from '../global-types';
@@ -4382,6 +4441,70 @@ export declare const CONTROL_STRUCTURES_LIBRARY: SymbolDefinitions[];
 export declare const SETS_LIBRARY: SymbolDefinitions;
 /* 0.31.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const TRIGONOMETRY_LIBRARY: SymbolDefinitions[];
+/* 0.31.0 */import type { BoxedExpression, ComputeEngine } from '../global-types';
+/**
+ * Quantifier domain helpers and boolean analysis functions.
+ * Extracted from logic.ts for better code organization.
+ */
+/**
+ * Extract the finite domain from a quantifier's condition.
+ * Supports:
+ * - ["Element", "x", ["Set", 1, 2, 3]] → [1, 2, 3]
+ * - ["Element", "x", ["Range", 1, 5]] → [1, 2, 3, 4, 5]
+ * - ["Element", "x", ["Interval", 1, 5]] → [1, 2, 3, 4, 5] (integers only)
+ * Returns null if the domain is not finite or not recognized.
+ */
+export declare function extractFiniteDomain(condition: BoxedExpression, ce: ComputeEngine): {
+    variable: string;
+    values: BoxedExpression[];
+} | null;
+/**
+ * Check if an expression contains a reference to a specific variable.
+ */
+export declare function bodyContainsVariable(expr: BoxedExpression, variable: string): boolean;
+/**
+ * For nested quantifiers like ∀x∈S. ∀y∈T. P(x,y), collect the inner domains.
+ * Returns an array of {variable, values} for nested ForAll/Exists with finite domains.
+ */
+export declare function collectNestedDomains(body: BoxedExpression, ce: ComputeEngine): {
+    variable: string;
+    values: BoxedExpression[];
+}[];
+/**
+ * Get the innermost body of nested quantifiers.
+ */
+export declare function getInnermostBody(body: BoxedExpression): BoxedExpression;
+/**
+ * Evaluate ForAll over a Cartesian product of domains.
+ * Returns True if the predicate holds for all combinations.
+ */
+export declare function evaluateForAllCartesian(domains: {
+    variable: string;
+    values: BoxedExpression[];
+}[], body: BoxedExpression, ce: ComputeEngine): BoxedExpression | undefined;
+/**
+ * Evaluate Exists over a Cartesian product of domains.
+ * Returns True if the predicate holds for at least one combination.
+ */
+export declare function evaluateExistsCartesian(domains: {
+    variable: string;
+    values: BoxedExpression[];
+}[], body: BoxedExpression, ce: ComputeEngine): BoxedExpression | undefined;
+/**
+ * Check if a boolean expression is satisfiable.
+ * Returns True if there exists an assignment that makes the expression true.
+ */
+export declare function isSatisfiable(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
+/**
+ * Check if a boolean expression is a tautology.
+ * Returns True if the expression is true for all possible assignments.
+ */
+export declare function isTautology(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
+/**
+ * Generate a truth table for a boolean expression.
+ * Returns a List of Lists with headers and rows.
+ */
+export declare function generateTruthTable(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
 /* 0.31.0 */export declare function gcd(a: bigint, b: bigint): bigint;
 export declare function lcm(a: bigint, b: bigint): bigint;
 /** Return `[factor, root]` such that
@@ -6784,6 +6907,18 @@ export declare function getSupertype(t1: TensorDataType | undefined, t2: TensorD
  * @internal
  */
 export declare function getExpressionDatatype(expr: BoxedExpression): TensorDataType;
+/* 0.31.0 */import type { BoxedExpression, RuleStep } from '../global-types';
+/**
+ * Product simplification rules extracted from simplify-rules.ts.
+ * Handles 13 patterns for simplifying Product expressions.
+ */
+export declare function simplifyProduct(x: BoxedExpression): RuleStep | undefined;
+/* 0.31.0 */import type { BoxedExpression, RuleStep } from '../global-types';
+/**
+ * Sum simplification rules extracted from simplify-rules.ts.
+ * Handles 16 patterns for simplifying Sum expressions.
+ */
+export declare function simplifySum(x: BoxedExpression): RuleStep | undefined;
 /* 0.31.0 */import type { BoxedExpression } from '../global-types';
 /**
  *
@@ -8327,6 +8462,15 @@ export declare class _Parser implements Parser {
     decorate(expr: Expression | null, start: number): Expression | null;
     error(code: string | [string, ...Expression[]], fromToken: number): Expression;
     private isFunctionOperator;
+    /**
+     * Check if a symbol looks like a predicate in First-Order Logic.
+     * A predicate is typically a single uppercase letter (P, Q, R, etc.)
+     * followed by parentheses containing arguments.
+     *
+     * This enables automatic inference of predicates without explicit declaration,
+     * so `\forall x. P(x)` works without having to declare `P` as a function.
+     */
+    private looksLikePredicate;
     /** Return all defs of the specified kind.
      * The defs at the end of the dictionary have priority, since they may
      * override previous definitions. (For example, there is a core definition
@@ -8886,6 +9030,31 @@ export type ParseLatexOptions = NumberFormat & {
      * **Default:** `false`
      */
     preserveLatex: boolean;
+    /**
+     * Controls how quantifier scope is determined when parsing expressions
+     * like `\forall x. P(x) \rightarrow Q(x)`.
+     *
+     * - `"tight"`: The quantifier binds only to the immediately following
+     *   well-formed formula, stopping at logical connectives (`\rightarrow`,
+     *   `\implies`, `\land`, `\lor`, etc.). This follows standard First-Order
+     *   Logic conventions. Use explicit parentheses for wider scope:
+     *   `\forall x. (P(x) \rightarrow Q(x))`.
+     *
+     * - `"loose"`: The quantifier scope extends to the end of the expression
+     *   or until a lower-precedence operator is encountered.
+     *
+     * **Default:** `"tight"`
+     *
+     * @example
+     * // With "tight" (default):
+     * // \forall x. P(x) \rightarrow Q(x)
+     * // parses as: (∀x. P(x)) → Q(x)
+     *
+     * // With "loose":
+     * // \forall x. P(x) \rightarrow Q(x)
+     * // parses as: ∀x. (P(x) → Q(x))
+     */
+    quantifierScope: 'tight' | 'loose';
 };
 /**
  *

@@ -5253,6 +5253,7 @@ type ParseLatexOptions = NumberFormat & {
   getSymbolType: (symbol) => BoxedType;
   parseUnexpectedToken: (lhs, parser) => Expression | null;
   preserveLatex: boolean;
+  quantifierScope: "tight" | "loose";
 };
 ```
 
@@ -5333,6 +5334,38 @@ replaced by one, with comments removed and with some low-level LaTeX
 commands replaced, for example `\egroup` and `\bgroup`.
 
 **Default:** `false`
+
+#### ParseLatexOptions.quantifierScope
+
+```ts
+quantifierScope: "tight" | "loose";
+```
+
+Controls how quantifier scope is determined when parsing expressions
+like `\forall x. P(x) \rightarrow Q(x)`.
+
+- `"tight"`: The quantifier binds only to the immediately following
+  well-formed formula, stopping at logical connectives (`\rightarrow`,
+  `\implies`, `\land`, `\lor`, etc.). This follows standard First-Order
+  Logic conventions. Use explicit parentheses for wider scope:
+  `\forall x. (P(x) \rightarrow Q(x))`.
+
+- `"loose"`: The quantifier scope extends to the end of the expression
+  or until a lower-precedence operator is encountered.
+
+**Default:** `"tight"`
+
+##### Example
+
+```ts
+// With "tight" (default):
+// \forall x. P(x) \rightarrow Q(x)
+// parses as: (∀x. P(x)) → Q(x)
+
+// With "loose":
+// \forall x. P(x) \rightarrow Q(x)
+// parses as: ∀x. (P(x) → Q(x))
+```
 
 </MemberCard>
 
@@ -9153,11 +9186,11 @@ date: Last Modified
 | Symbol | LaTeX |  Notation |
 | :--- | :--- | :--- |
 | `True` | `\top` | $$ \top $$ |
-|  ’’ | `\mathsf{T}` | $$ \mathsf{T}$$| 
-|  '' | `\operatorname{True}` | $$ \operatorname{True}$$| 
-| `False` | `\bot` | $$ \bot $$ | 
-| ’’ | `\mathsf{F}` |  $$ \mathsf{F}$$ | 
-|  ’’ | `\operatorname{False}` | $$ \operatorname{False}$$| 
+| `True` | `\mathsf{T}` | $$ \mathsf{T}$$ |
+| `True` | `\operatorname{True}` | $$ \operatorname{True}$$ |
+| `False` | `\bot` | $$ \bot $$ |
+| `False` | `\mathsf{F}` |  $$ \mathsf{F}$$ |
+| `False` | `\operatorname{False}` | $$ \operatorname{False}$$ |
 
 </div>
 
@@ -9166,24 +9199,24 @@ date: Last Modified
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
 
-| Symbol |  LaTeX | Notation| |
+| Symbol |  LaTeX | Notation | Description |
 | :--- | :--- | :--- |:---  |
-| `And` | `p \land q` | $$ p \land q$$ | Conjunction | 
-| ’’ | `p \operatorname{and} q` | $$ p \operatorname{and} q$$ |  | 
-| `Or` | `p \lor q` | $$ p \lor q$$ | Disjunction | 
-| ’’ | `p \operatorname{or} q` | $$ p \operatorname{or} q$$ |  | 
-| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive Or | 
-| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | Not And | 
-| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | Not Or | 
-| `Not` | `\lnot p` |  $$ \lnot p$$ | Negation | 
-| ’’ | `\operatorname{not} p` | $$ \operatorname{not} p$$ |  | 
-| `Equivalent` | `p \iff q` | $$ p \iff q$$ || 
-| ’’ | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ || 
-| `Implies` | `p \implies q` | $$p \implies q $$ | | 
-| ’’ | `p \Rightarrow q` | $$p \Rightarrow q $$ | | 
-| `Proves` | `p \vdash q` | $$p \vdash q $$ | | 
-| `Entails` | `p \vDash q` | $$p \vDash q $$ | | 
-| `Satisfies` | `p \models q` | $$p \models q $$ | | 
+| `And` | `p \land q` | $$ p \land q$$ | Conjunction |
+| `And` | `p \operatorname{and} q` | $$ p \operatorname{and} q$$ | |
+| `Or` | `p \lor q` | $$ p \lor q$$ | Disjunction |
+| `Or` | `p \operatorname{or} q` | $$ p \operatorname{or} q$$ | |
+| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive OR (n-ary: true when odd count) |
+| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | NAND (n-ary: NOT of AND) |
+| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | NOR (n-ary: NOT of OR) |
+| `Not` | `\lnot p` |  $$ \lnot p$$ | Negation |
+| `Not` | `\operatorname{not} p` | $$ \operatorname{not} p$$ | |
+| `Equivalent` | `p \iff q` | $$ p \iff q$$ | Equivalence |
+| `Equivalent` | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ | |
+| `Implies` | `p \implies q` | $$ p \implies q $$ | Implication |
+| `Implies` | `p \Rightarrow q` | $$ p \Rightarrow q $$ | |
+| `Proves` | `p \vdash q` | $$ p \vdash q $$ | Provability |
+| `Entails` | `p \vDash q` | $$ p \vDash q $$ | Entailment |
+| `Satisfies` | `p \models q` | $$ p \models q $$ | Satisfaction |
 
 </div>
 
@@ -9196,12 +9229,13 @@ date: Last Modified
 
 The `ForAll` function represents the **universal quantifier**.
 
-The condition is the variable or variables that are being quantified over or
-the set of elements that the variable can take.
+The condition is the variable (or variables) being quantified over, or the set
+of elements that the variable can take.
 
 The predicate is the statement that is being quantified.
 
-The condition and the predicate are separated by a comma, a colon, or a vertical bar. The predicate can also be enclosed in parentheses after the condition.
+The condition and the predicate are separated by a comma, a colon, or a vertical
+bar. The predicate can also be enclosed in parentheses after the condition.
 
 <Latex value="\forall x, x + 1 > x"/>
 
@@ -9229,9 +9263,11 @@ The condition and the predicate are separated by a comma, a colon, or a vertical
 
 The `Exists` function represents the **existential quantifier**.
 
-The condition is the variable or variables that are being quantified over, and the predicate is the statement that is being quantified.
+The condition is the variable (or variables) being quantified over, and the
+predicate is the statement that is being quantified.
 
-The condition and the predicate are separated by a comma, a colon, or a vertical bar. The predicate can also be enclosed in parentheses after the condition.
+The condition and the predicate are separated by a comma, a colon, or a vertical
+bar. The predicate can also be enclosed in parentheses after the condition.
 
 <Latex value="\exists x, x^2 = 1"/>
 
@@ -9247,13 +9283,303 @@ The condition and the predicate are separated by a comma, a colon, or a vertical
 ["Exists", ["Element", "x", "RealNumbers"], ["Equal", ["Square", "x"], 1]]
 ```
 
+</FunctionDefinition>
+
+
+<FunctionDefinition name="ExistsUnique">
+
 <Signature name="ExistsUnique">_condition_, _predicate_</Signature>
 
 The `ExistsUnique` function represents the **unique existential quantifier**.
 
 <Latex value="\exists! x, x^2 = 1"/>
 
-</FunctionDefinition>---
+</FunctionDefinition>
+
+
+## First-Order Logic
+
+When working with First-Order Logic (FOL) expressions, there are several features
+to be aware of:
+
+### Predicates
+
+In FOL, predicates are typically represented as uppercase letters followed by
+arguments in parentheses, such as `P(x)` or `Q(a, b)`.
+
+Single uppercase letters followed by parentheses are **automatically recognized**
+as function/predicate applications:
+
+```javascript
+ce.parse('P(x)')           // → ["P", "x"]
+ce.parse('Q(a, b)')        // → ["Q", "a", "b"]
+```
+
+For multi-letter predicate names or lowercase predicates, you should declare
+them explicitly:
+
+```javascript
+ce.declare('Loves', { signature: '(value, value) -> boolean' });
+ce.parse('Loves(x, y)')    // → ["Loves", "x", "y"]
+```
+
+### Quantifier Scope
+
+By default, quantifiers use **tight binding**, following standard FOL conventions.
+The quantifier scope extends only to the immediately following well-formed formula,
+stopping at logical connectives.
+
+<Latex value="\forall x. P(x) \implies Q(x)"/>
+
+This parses as `(∀x. P(x)) ⇒ Q(x)`, not `∀x. (P(x) ⇒ Q(x))`.
+
+```json example
+["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+```
+
+To include the connective in the quantifier's scope, use explicit parentheses:
+
+<Latex value="\forall x. (P(x) \implies Q(x))"/>
+
+```json example
+["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
+```
+
+### Quantifier Scope Option
+
+You can control the quantifier scope behavior with the `quantifierScope` parsing
+option:
+
+```javascript
+// Tight binding (default) - quantifier binds only the next formula
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'tight' })
+// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+
+// Loose binding - quantifier scope extends to end of expression
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' })
+// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
+```
+
+### Negated Quantifiers
+
+The negated quantifiers `NotForAll` and `NotExists` are also supported:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"14ch"}}>
+
+| Symbol | LaTeX | Notation |
+| :--- | :--- | :--- |
+| `NotForAll` | `\lnot\forall x, P(x)` | $$ \lnot\forall x, P(x) $$ |
+| `NotExists` | `\lnot\exists x, P(x)` | $$ \lnot\exists x, P(x) $$ |
+
+</div>
+
+### Quantifier Evaluation
+
+Quantifiers can be evaluated to Boolean values when the bound variable is
+constrained to a finite domain using an `Element` condition.
+
+**Supported domains:**
+- `Set` - explicit finite sets: `["Element", "x", ["Set", 1, 2, 3]]`
+- `List` - explicit finite lists: `["Element", "x", ["List", 1, 2, 3]]`
+- `Range` - integer ranges: `["Element", "n", ["Range", 1, 10]]`
+- `Interval` - integer intervals: `["Element", "n", ["Interval", 1, 10]]`
+
+Domains are limited to 1000 elements maximum.
+
+```javascript
+// All elements in {1, 2, 3} are greater than 0
+ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
+// → True
+
+// Some element in {1, 2, 3} is greater than 2
+ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
+// → True (x = 3 satisfies the condition)
+
+// Exactly one element equals 2
+ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
+// → True
+```
+
+**Nested quantifiers** are evaluated over the Cartesian product of domains:
+
+```javascript
+// For all (x, y) in {1, 2} × {1, 2}: x + y > 0
+ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
+  ['ForAll', ['Element', 'y', ['Set', 1, 2]],
+    ['Greater', ['Add', 'x', 'y'], 0]]]).evaluate()
+// → True
+
+// Some (x, y) in {1, 2} × {1, 2} satisfies x + y = 4
+ce.box(['Exists', ['Element', 'x', ['Set', 1, 2]],
+  ['Exists', ['Element', 'y', ['Set', 1, 2]],
+    ['Equal', ['Add', 'x', 'y'], 4]]]).evaluate()
+// → True (x = 2, y = 2)
+```
+
+**Symbolic simplifications** are applied when possible:
+- `∀x. True` → `True`
+- `∀x. False` → `False`
+- `∃x. True` → `True`
+- `∃x. False` → `False`
+- `∀x. P` (where P doesn't contain x) → `P`
+- `∃x. P` (where P doesn't contain x) → `P`
+
+
+## Normal Forms
+
+<FunctionDefinition name="ToCNF">
+
+<Signature name="ToCNF">_expression_</Signature>
+
+Converts a boolean expression to **Conjunctive Normal Form** (CNF).
+
+CNF is a conjunction (And) of disjunctions (Or) of literals. A literal is
+either a variable or its negation.
+
+Example: $(A \lor B) \land (\lnot A \lor C)$
+
+The conversion applies:
+- De Morgan's laws: $\lnot(A \land B) \equiv \lnot A \lor \lnot B$
+- Distribution: $(A \land B) \lor C \equiv (A \lor C) \land (B \lor C)$
+- Implication elimination: $A \to B \equiv \lnot A \lor B$
+- Equivalence elimination: $A \leftrightarrow B \equiv (\lnot A \lor B) \land (\lnot B \lor A)$
+
+```javascript
+ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
+// → (A ∨ C) ∧ (B ∨ C)
+
+ce.box(['ToCNF', ['Implies', 'A', 'B']]).evaluate()
+// → ¬A ∨ B
+
+ce.box(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate()
+// → ¬A ∨ ¬B  (De Morgan's law)
+```
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="ToDNF">
+
+<Signature name="ToDNF">_expression_</Signature>
+
+Converts a boolean expression to **Disjunctive Normal Form** (DNF).
+
+DNF is a disjunction (Or) of conjunctions (And) of literals. A literal is
+either a variable or its negation.
+
+Example: $(A \land B) \lor (\lnot A \land C)$
+
+The conversion applies:
+- De Morgan's laws: $\lnot(A \lor B) \equiv \lnot A \land \lnot B$
+- Distribution: $(A \lor B) \land C \equiv (A \land C) \lor (B \land C)$
+- Implication and equivalence elimination (same as CNF)
+
+```javascript
+ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
+// → (A ∧ C) ∨ (B ∧ C)
+
+ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate()
+// → ¬A ∧ ¬B  (De Morgan's law)
+```
+
+</FunctionDefinition>
+
+
+## Satisfiability and Tautology
+
+<FunctionDefinition name="IsSatisfiable">
+
+<Signature name="IsSatisfiable">_expression_</Signature>
+
+Checks if a Boolean expression is **satisfiable** — that is, whether there exists
+an assignment of truth values to variables that makes the expression true.
+
+Returns `True` if the expression is satisfiable, `False` otherwise.
+
+```javascript
+// A contradiction is not satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()
+// → False
+
+// Most formulas are satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()
+// → True
+
+// A tautology is also satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate()
+// → True
+```
+
+Limited to expressions with at most 20 variables (2^20 = 1,048,576 combinations).
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="IsTautology">
+
+<Signature name="IsTautology">_expression_</Signature>
+
+Checks if a Boolean expression is a **tautology** — that is, whether it is true
+for all possible assignments of truth values to variables.
+
+Returns `True` if the expression is a tautology, `False` otherwise.
+
+```javascript
+// Law of excluded middle
+ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()
+// → True
+
+// Double negation elimination
+ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate()
+// → True
+
+// De Morgan's law
+ce.box(['IsTautology', ['Equivalent',
+  ['Not', ['And', 'A', 'B']],
+  ['Or', ['Not', 'A'], ['Not', 'B']]
+]]).evaluate()
+// → True
+
+// A simple variable is not a tautology
+ce.box(['IsTautology', 'A']).evaluate()
+// → False
+```
+
+Limited to expressions with at most 20 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="TruthTable">
+
+<Signature name="TruthTable">_expression_</Signature>
+
+Generates a complete **truth table** for a Boolean expression.
+
+Returns a `List` of `List`s, where the first row contains the variable names
+followed by "Result", and subsequent rows contain the truth values for each
+combination of inputs.
+
+```javascript
+ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate()
+// → [["A", "B", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "False"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+
+ce.box(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
+// → [["P", "Q", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "True"],
+//    ["True", "False", "True"],
+//    ["True", "True", "False"]]
+```
+
+Limited to expressions with at most 10 variables (1024 rows).
+
+</FunctionDefinition>
+---
 title: Core
 slug: /compute-engine/reference/core/
 ---
@@ -9959,6 +10285,81 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
+- **Sign Simplification**: Fixed `Sign(x).simplify()` returning `1` instead of
+  `-1` when `x` is negative. The simplification rule incorrectly returned
+  `ce.One` for both positive and negative cases.
+
+- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with
+  a variable that has an assigned value. The derivative formula now uses
+  `Sign(x)` instead of a complex `Which` expression that couldn't be evaluated
+  symbolically.
+
+- **LaTeX Serialization**: Fixed TypeScript error in power serialization where
+  `denom` (a `number | null`) was incorrectly passed where an `Expression` was
+  expected. Now correctly uses `operand(exp, 2)` to get the expression form.
+
+- **Step Function Derivatives**: Fixed `D(floor(x), x)`, `D(ceil(x), x)`, and
+  `D(round(x), x)` causing infinite recursion. These step functions now correctly
+  return 0 (the derivative is 0 almost everywhere). Also fixed a bug where
+  derivative formulas that evaluate to 0 weren't recognized due to a falsy check.
+
+- **Inverse Trig Integrals**: Fixed incorrect integration formulas for `arcsin`,
+  `arccos`, and `arctan`. The previous formulas were completely wrong. Correct:
+  - `∫ arcsin(x) dx = x·arcsin(x) + √(1-x²)`
+  - `∫ arccos(x) dx = x·arccos(x) - √(1-x²)`
+  - `∫ arctan(x) dx = x·arctan(x) - (1/2)·ln(1+x²)`
+
+- **Erfc Derivative**: Fixed incorrect derivative formula for `erfc(x)`. Now
+  correctly returns `-2/√π · e^(-x²)` (the negative of the `erf` derivative).
+
+- **LogGamma Derivative**: Added derivative rule for `LogGamma(x)` which returns
+  `Digamma(x)` (the digamma/psi function).
+
+- **Polynomial Degree Detection**: Fixed `polynomialDegree()` returning 0 for
+  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a polynomial).
+  When the base of a power is constant but the exponent depends on the variable,
+  this is not a polynomial. This bug caused infinite recursion in simplification
+  when simplifying expressions containing exponentials, such as the derivative
+  of `erf(x)` which is `(2/√π)·e^(-x²)`.
+
+- **Special Function Derivatives**: Fixed derivative formulas for several special
+  functions and removed incorrect ones:
+  - Fixed `d/dx erfi(x) = (2/√π)·e^(x²)` (imaginary error function)
+  - Fixed `d/dx S(x) = sin(πx²/2)` (Fresnel sine integral)
+  - Fixed `d/dx C(x) = cos(πx²/2)` (Fresnel cosine integral)
+  - Removed incorrect derivative formulas for Zeta, Digamma, PolyGamma, Beta,
+    LambertW, Bessel functions, and Airy functions (these now return symbolic
+    derivatives like `Digamma'(x)` instead of wrong numeric results)
+
+- **Symbolic Derivative Evaluation**: Fixed derivatives of unknown functions
+  returning `0` instead of symbolic derivatives. For example, `D(Digamma(x), x)`
+  now correctly returns `Digamma'(x)` (as `Apply(Derivative(Digamma, 1), x)`)
+  instead of incorrectly returning `0`.
+
+- **([#168](https://github.com/cortex-js/compute-engine/issues/168))
+  Absolute Value**: Fixed parsing of nested absolute value expressions that
+  start with a double bar (e.g. `||3-5|-4|`), which previously produced an
+  invalid structure instead of evaluating correctly.
+
+- **([#244](https://github.com/cortex-js/compute-engine/issues/244))
+  Serialization**: Fixed LaTeX and ASCIIMath serialization ambiguity for
+  negative bases and negated powers. Powers now render `(-2)^2` (instead of
+  `-2^2`) when the base is negative, and negated powers now render as `-(2^2)`
+  rather than `-2^2`.
+
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
+  Quantifier Scope**: Fixed quantifier scope in First-Order Logic expressions.
+  Previously, `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication
+  inside the quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it
+  correctly follows standard FOL conventions where the quantifier binds only
+  the immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`.
+  This applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`,
+  `NotForAll`, `NotExists`) and all logical connectives (`\rightarrow`, `\to`,
+  `\implies`, `\land`, `\lor`, `\iff`). Use explicit parentheses for wider
+  scope: `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type
+  signatures to properly return `boolean`, enabling correct type checking
+  when quantified expressions are used as arguments to logical operators.
+
 - **([#243](https://github.com/cortex-js/compute-engine/issues/243))
   LaTeX Parsing**: Fixed logic operator precedence causing expressions like
   `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
@@ -9999,7 +10400,28 @@ import ChangeLog from '@site/src/components/ChangeLog';
   unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
   the existing `\operatorname{lcm}`).
 
+- **([#223](https://github.com/cortex-js/compute-engine/issues/223))
+  Serialization**: Fixed scientific/engineering LaTeX serialization dropping
+  the leading coefficient for exact powers of ten. For example, `1000` now
+  serializes to `1\cdot10^{3}` (or `1\times10^{3}` depending on
+  `exponentProduct`) instead of `10^{3}`.
+
 - **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+
+- **([#242](https://github.com/cortex-js/compute-engine/issues/242))
+  Solve**: Fixed `solve()` returning an empty array for equations with variables
+  in fractions. For example, `F = 3g/h` solved for `g` now correctly returns
+  `Fh/3` instead of an empty array. The solver now clears denominators before
+  applying solve rules, enabling it to handle expressions like `a + bx/c = 0`.
+  Also added support for solving equations where the variable is in the
+  denominator (e.g., `a/x = b` now returns `x = a/b`).
+
+- **([#220](https://github.com/cortex-js/compute-engine/issues/220))
+  Solve**: Fixed `solve()` returning an empty array for equations involving
+  square roots of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles
+  equations of the form `ax + b√x + c = 0` using quadratic substitution. Also
+  added support for solving logarithmic equations like `a·ln(x) + b = 0` which
+  returns `x = e^(-b/a)`.
 
 - **([#255](https://github.com/cortex-js/compute-engine/issues/255))
   LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
@@ -10011,6 +10433,85 @@ import ChangeLog from '@site/src/components/ChangeLog';
   stripped from subscript expressions for cleaner output.
 
 ### Improvements
+
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
+  First-Order Logic**: Added several improvements for working with First-Order
+  Logic expressions:
+  - **Configurable quantifier scope**: New `quantifierScope` parsing option
+    controls how quantifier scope is determined. Use `"tight"` (default) for
+    standard FOL conventions where quantifiers bind only the immediately
+    following formula, or `"loose"` for scope extending to the end of the
+    expression.
+    ```typescript
+    ce.parse('\\forall x. P(x)', { quantifierScope: 'tight' })  // default
+    ce.parse('\\forall x. P(x)', { quantifierScope: 'loose' })
+    ```
+  - **Automatic predicate inference**: Single uppercase letters followed by
+    parentheses (e.g., `P(x)`, `Q(a,b)`) are now automatically recognized as
+    predicate/function applications without requiring explicit declaration.
+    This enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)`
+    to work out of the box.
+  - **Quantifier evaluation over finite domains**: Quantifiers (`ForAll`,
+    `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`) now evaluate to boolean
+    values when the bound variable is constrained to a finite set. For example:
+    ```typescript
+    ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
+    // Returns True (all values in {1,2,3} are > 0)
+    ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
+    // Returns True (3 > 2)
+    ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
+    // Returns True (only one element equals 2)
+    ```
+    Supports `Set`, `List`, `Range`, and integer `Interval` domains up to 1000
+    elements. Nested quantifiers are evaluated over the Cartesian product of
+    their domains.
+  - **Symbolic simplification for quantifiers**: Quantifiers now simplify
+    automatically in special cases:
+    - `∀x. True` → `True`, `∀x. False` → `False`
+    - `∃x. True` → `True`, `∃x. False` → `False`
+    - `∀x. P` → `P` (when P doesn't contain x)
+    - `∃x. P` → `P` (when P doesn't contain x)
+  - **CNF/DNF conversion**: New `ToCNF` and `ToDNF` functions convert boolean
+    expressions to Conjunctive Normal Form and Disjunctive Normal Form
+    respectively:
+    ```typescript
+    ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
+    // Returns (A ∨ C) ∧ (B ∨ C)
+    ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
+    // Returns (A ∧ C) ∨ (B ∧ C)
+    ```
+    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and `Nor`
+    operators using De Morgan's laws and distribution.
+  - **Boolean operator evaluation**: Added evaluation support for `Xor`, `Nand`,
+    and `Nor` operators with `True`/`False` arguments:
+    ```typescript
+    ce.box(['Xor', 'True', 'False']).evaluate()   // Returns True
+    ce.box(['Nand', 'True', 'True']).evaluate()   // Returns False
+    ce.box(['Nor', 'False', 'False']).evaluate()  // Returns True
+    ```
+  - **N-ary boolean operators**: `Xor`, `Nand`, and `Nor` now support any number
+    of arguments:
+    - `Xor(a, b, c, ...)` returns true when an odd number of arguments are true
+    - `Nand(a, b, c, ...)` returns the negation of `And(a, b, c, ...)`
+    - `Nor(a, b, c, ...)` returns the negation of `Or(a, b, c, ...)`
+  - **Satisfiability checking**: New `IsSatisfiable` function checks if a boolean
+    expression can be made true with some assignment of variables:
+    ```typescript
+    ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()  // False
+    ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()            // True
+    ```
+  - **Tautology checking**: New `IsTautology` function checks if a boolean
+    expression is true for all possible variable assignments:
+    ```typescript
+    ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()     // True
+    ce.box(['IsTautology', ['And', 'A', 'B']]).evaluate()             // False
+    ```
+  - **Truth table generation**: New `TruthTable` function generates a complete
+    truth table for a boolean expression:
+    ```typescript
+    ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate()
+    // Returns [["A","B","Result"],["False","False","False"],...]
+    ```
 
 - **Polynomial Simplification**: The `simplify()` function now automatically
   cancels common polynomial factors in univariate rational expressions. For
@@ -10033,12 +10534,22 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to `0`
   - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to `n * 2^(n-1)`
   - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to `n/(n+1)`
+  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to `(n-1)/n`
+  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to `n(n+1) * 2^(n-2)`
+  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to `n²(n+3) * 2^(n-3)`
+  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))` simplifies to `0` (n ≥ 2)
+  - Sum of binomial squares: `\sum_{k=0}^{n}(C(n,k)^2)` simplifies to `C(2n, n)`
+  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to `n(n+1)(n+2)/3`
+  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)` simplifies to `(b-m+1)(a + d(m+b)/2)`
   - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
   - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
+  - Shifted factorial: `\prod_{n=1}^{b}(n+c)` simplifies to `(b+c)!/c!`
   - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
   - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
   - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
   - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
+  - Telescoping product: `\prod_{k=1}^{n}((k+1)/k)` simplifies to `n+1`
+  - Wallis-like product: `\prod_{k=2}^{n}(1 - 1/k^2)` simplifies to `(n+1)/(2n)`
   - Factor out constants: `\sum_{n=1}^{b}(c \cdot f(n))` simplifies to
     `c \cdot \sum_{n=1}^{b}(f(n))`, and similarly for products where the
     constant is raised to the power of the iteration count
@@ -12998,8 +13509,7 @@ try {
 }
 ```
 
-```text
-
+```live
 :::html
 <div class="stack">
   <div class="row">
@@ -13344,7 +13854,7 @@ ce.verify(ce.parse("x > 0"));
 ```
 
 
-The method `ce.verify()` return `true` if the assumption is true, `false` if it is
+The method `ce.verify()` returns `true` if the assumption is true, `false` if it is
 not, and `undefined` if it cannot be determined.
 
 While `ce.verify()` is appropriate to get boolean answers, more complex queries can
@@ -13368,7 +13878,6 @@ ce.ask(["Greater", "x", "_val"]);
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > 
 Read more about **Patterns and Rules**<Icon name="chevron-right-bold" />
 </ReadMore>
-
 
 
 
@@ -15720,7 +16229,7 @@ like to parse to MathJSON. <Icon name="chevron-right-bold" />
 
 ## Introduction
 
-When an symbol such as `Pi` or `Sin` is encountered in an expression, the 
+When a symbol such as `Pi` or `Sin` is encountered in an expression, the 
 Compute Engine will look up its definition in the set of known 
 symbols, including the Standard Library.
 
@@ -15823,14 +16332,14 @@ ce.declare("f", {
 ### Declaring a Symbol
 
 **To declare a symbol** use the `ce.declare()` method with the name of the
-symmbol as the first argument and a type as the second argument.
+symbol as the first argument and a type as the second argument.
 
 ```js
 ce.declare("n", "integer");
 ```
 
 <ReadMore path="/compute-engine/guides/types" >The type specifies the 
-valid values of the symbol. For example, `boolean`, `integer`, `rational`, `function`, `string` etc.. Learn more about **types**.<Icon name="chevron-right-bold" /></ReadMore>
+valid values of the symbol. For example, `boolean`, `integer`, `rational`, `function`, `string`, etc. Learn more about **types**.<Icon name="chevron-right-bold" /></ReadMore>
 
 Alternatively, you can provide an object literal with the additional properties
 `value`, `type`, `isConstant`, and more.
@@ -15865,13 +16374,13 @@ Alternatively, you can set the value of a symbol using the `value` property:
 ce.box("m").value = 42;
 ```
 
-**To prevent the value of a symbol from being changed**, set the `constant`
+**To prevent the value of a symbol from being changed**, set the `isConstant`
 property to `true`:
 
 ```js
 ce.declare("m_e", {
   value: 9.1e-31,
-  constant: true,
+  isConstant: true,
 });
 ```
 
@@ -16110,7 +16619,7 @@ and `rhs`.
 
 - \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
   integers, the other is an integer
-- \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structural equal, one is a
+- \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structurally equal, one is a
   power of a sum, the other a sum of terms.
 
 
@@ -16172,7 +16681,7 @@ identical in general.
 However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.
 
-The `lhs.isEqual(rhs)` function return true if `lhs` and `rhs` represent the
+The `lhs.isEqual(rhs)` function returns true if `lhs` and `rhs` represent the
 same mathematical object. 
 
 If `lhs` and `rhs` are numeric expressions, they are evaluated before being 
@@ -16604,7 +17113,8 @@ document:
 ```js
 const ce = new ComputeEngine();
 MathfieldElement.computeEngine = ce;
-console.log(mfe.expression.json);
+const mf = document.querySelector("math-field");
+console.log(mf.expression.json);
 ```
 
 <hr/>
@@ -16617,7 +17127,7 @@ console.log(ce.parse("5x + 1").json);
 // ➔  ["Add", ["Multiply", 5, "x"], 1]
 ```
 
-By default, `ce.parse()` return a
+By default, `ce.parse()` returns a
 [canonical expression](/compute-engine/guides/canonical-form/). To get a
 non-canonical expression instead, use the `{canonical: false}` option: The
 non-canonical form is closer to the literal LaTeX input.
@@ -16760,9 +17270,9 @@ sections below.
 | `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
 | `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
-| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
-| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
-  | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
+| `digitGroupSeparator` | The LaTeX string used to separate groups of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
+| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`. |
+| `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
 | `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
 | `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
 | `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
@@ -17728,10 +18238,10 @@ const expr = ce.parse("\\frac{3}{5}");
 console.log(expr.toMathJson());
 // ➔ ["Rational", 3, 5]
 
-console.log(expr.expr.toMathJson({ exclude: ["Rational"] }));
+console.log(expr.toMathJson({ exclude: ["Rational"] }));
 // ➔ ["Divide", 3, 5]
 // We have excluded `["Rational"]` expressions, so it 
-// is interepreted as a division instead.
+// is interpreted as a division instead.
 ```
 
 
@@ -17902,7 +18412,7 @@ ce.parse(latex,
 You can also define your own transformations to apply to an expression to
 obtain a custom canonical form.
 
-For example, let's say you want to the structural form of two expressions
+For example, let's say you want to compare the structural form of two expressions
 but ignoring any extra parentheses. You could define a transformation like this:
 
 ```js
@@ -17918,7 +18428,8 @@ const transformedExpr1 = deparenthesize(expr1);
 const transformedExpr2 = deparenthesize(expr2);
 console.log(transformedExpr1.isSame(transformedExpr2));
 // ➔ true
-```---
+```
+---
 title: Numeric Evaluation
 slug: /compute-engine/guides/numeric-evaluation/
 date: Last Modified
@@ -17926,7 +18437,7 @@ date: Last Modified
 
 <Intro>
 To obtain an exact numeric evaluation of an expression use `expr.evaluate()`. 
-To obtain a  numeric approximation use `expr.N()`.
+To obtain a numeric approximation use `expr.N()`.
 </Intro>
 
 
@@ -17972,6 +18483,20 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(ce.parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+## Angular Units
+
+When a trigonometric function is given a unitless value, the Compute Engine
+interprets it using the current angular unit. Set it with `ce.angularUnit`
+(default: `"rad"`).
+
+Valid values: `"rad"`, `"deg"`, `"grad"`, `"turn"`.
+
+```live
+ce.angularUnit = "deg";
+console.log(ce.parse("\\cos 60").N());
+// ➔ 0.5
+```
+
 ## JavaScript Interoperability
 
 The result of `expr.evaluate()` and `expr.N()` is a boxed expression. 
@@ -18001,16 +18526,16 @@ console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
 
-The `valueOf()` property of a boxed expression can be used in JavaScript
+The `valueOf()` method of a boxed expression can be used in JavaScript
 expressions.
 
 ```live
 const expr = ce.parse('1/3 + 1/4');
 console.log(expr.N().valueOf() + 1);
+```
 
-
-Unlike the `.re` property, the `.value` property can also return a `boolean`
-or a `string`, depending on the value of the expression.
+Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
+`string`, depending on the value of the expression.
 
 
 
@@ -18044,7 +18569,7 @@ If the precision is 15 or less, the Compute Engine uses a
 for its internal calculations.
 
 This format is implemented in hardware and well suited to do fast computations.
-It uses a fixed amount of memory and represent significant digits in base-2 with
+It uses a fixed amount of memory and represents significant digits in base-2 with
 about 15 digits of precision and with a minimum value of $ \pm5\times
 10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308}
 $
@@ -18140,6 +18665,9 @@ be a MathJSON number that looks like this:
 of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
+`ce.assign()` accepts booleans, numbers, bigints, boxed expressions, or
+functions. Use `undefined` to clear a value.
+
 ```live
 const expr = ce.parse("3x^2+4x+2");
 
@@ -18163,10 +18691,10 @@ for (let x = 0; x < 1; x += 0.01) {
 **To reset a variable to be unbound to a value** use `ce.assign()`
 
 ```live
-ce.assign("x", null);
+ce.assign("x", undefined);
 
 console.log(ce.parse("3x^2+4x+2").N());
-// ➔ "3x^2+4x+c"
+// ➔ "3x^2+4x+2"
 ```
 
 **To change the value of a variable** set its `value` property:
@@ -18181,6 +18709,7 @@ ce.symbol("x").value = undefined;
 ## Compiling
 
 If performance is important, the expression can be compiled to a JavaScript
+function.
 
 **To get a compiled version of an expression** use the `expr.compile()` method:
 
@@ -19360,6 +19889,16 @@ When `simplify()` is called on a `Sum` expression with symbolic bounds, the foll
 | $$\sum_{n=0}^{b} (-1)^n \cdot n$$ | $$(-1)^b \lfloor\frac{b+1}{2}\rfloor$$ | Alternating linear series |
 | $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
 | $$\sum_{k=0}^{n} \binom{n}{k}$$ | $$2^n$$ | Sum of binomial coefficients |
+| $$\sum_{k=0}^{n} (-1)^k \binom{n}{k}$$ | $$0$$ | Alternating binomial sum |
+| $$\sum_{k=0}^{n} k \binom{n}{k}$$ | $$n \cdot 2^{n-1}$$ | Weighted binomial sum |
+| $$\sum_{k=1}^{n} \frac{1}{k(k+1)}$$ | $$\frac{n}{n+1}$$ | Partial fractions (telescoping) |
+| $$\sum_{k=2}^{n} \frac{1}{k(k-1)}$$ | $$\frac{n-1}{n}$$ | Partial fractions (telescoping) |
+| $$\sum_{k=0}^{n} k^2 \binom{n}{k}$$ | $$n(n+1) \cdot 2^{n-2}$$ | Weighted squared binomial sum |
+| $$\sum_{k=0}^{n} k^3 \binom{n}{k}$$ | $$n^2(n+3) \cdot 2^{n-3}$$ | Weighted cubed binomial sum |
+| $$\sum_{k=0}^{n} (-1)^k k \binom{n}{k}$$ | $$0$$ | Alternating weighted binomial sum (n ≥ 2) |
+| $$\sum_{k=0}^{n} \binom{n}{k}^2$$ | $$\binom{2n}{n}$$ | Sum of binomial squares |
+| $$\sum_{k=1}^{n} k(k+1)$$ | $$\frac{n(n+1)(n+2)}{3}$$ | Sum of consecutive products |
+| $$\sum_{n=m}^{b} (a + dn)$$ | $$(b-m+1)\left(a + \frac{d(m+b)}{2}\right)$$ | Arithmetic progression (general bounds) |
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
@@ -19414,10 +19953,13 @@ When `simplify()` is called on a `Product` expression with symbolic bounds, the 
 | :------ | :------------ | :--- |
 | $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
 | $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
+| $$\prod_{n=1}^{b} (n+c)$$ | $$\frac{(b+c)!}{c!}$$ | Shifted factorial |
 | $$\prod_{n=1}^{b} (2n-1)$$ | $$(2b-1)!!$$ | Odd double factorial |
 | $$\prod_{n=1}^{b} 2n$$ | $$2^b \cdot b!$$ | Even double factorial |
 | $$\prod_{k=0}^{n-1} (x+k)$$ | $$(x)_n$$ | Rising factorial (Pochhammer) |
 | $$\prod_{k=0}^{n-1} (x-k)$$ | $$\frac{x!}{(x-n)!}$$ | Falling factorial |
+| $$\prod_{k=1}^{n} \frac{k+1}{k}$$ | $$n+1$$ | Telescoping product |
+| $$\prod_{k=2}^{n} (1 - \frac{1}{k^2})$$ | $$\frac{n+1}{2n}$$ | Wallis-like product |
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
@@ -20183,7 +20725,7 @@ The expression \\(x^2 + 2x + 1\\) is represented in MathJSON as:
 The Compute Engine can:
 - <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX.
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> symbolic expressions
-- evaluate expression <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
+- evaluate expressions <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
   or <a href="/compute-engine/guides/numeric-evaluation/">**numerically**</a>
 - solve equations, calculate derivatives and integrals, and perform other
   <a href="/compute-engine/reference/calculus/">**calculus**</a> operations
@@ -21011,7 +21553,7 @@ repetitive calculations. They also ensure that expressions are valid and in a
 standard format.
 
 Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
-as **VSCode Studio**, to provide hints in the editor regarding the
+as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
 methods and properties available for a given expression.
 
 Boxed Expressions can be created from a LaTeX string or from a raw MathJSON
@@ -21306,8 +21848,9 @@ or a string use the following boolean expressions:
 
 ## Accessing the Value of an Expression
 
-**To access the value of an expression as a MathJSON expression** use
-`expr.json`.
+**To access the expression as a MathJSON expression** use
+`expr.json`. To access the evaluated value as MathJSON, evaluate first:
+`expr.evaluate().json`.
 
 **To access the value of an expression as a JavaScript primitive** use
 `expr.valueOf()`. The result is a JavaScript primitive, such as a number, string or
@@ -23833,6 +24376,460 @@ Note that only symbols in the current scope are forgotten. If assumptions about
 the symbol existed in a previous scope, those assumptions will be in effect when
 returning to the previous scope.
 :::
+---
+title: Logic and First-Order Logic
+slug: /compute-engine/guides/logic/
+---
+
+This guide covers working with logical expressions and First-Order Logic (FOL)
+in the Compute Engine. You'll learn how to parse, manipulate, evaluate, and
+transform Boolean and quantified expressions.
+
+## Boolean Expressions
+
+### Basic Logical Operators
+
+The Compute Engine supports standard logical operators:
+
+```js example
+const ce = new ComputeEngine();
+
+// Conjunction (AND)
+ce.parse('p \\land q');           // → ["And", "p", "q"]
+
+// Disjunction (OR)
+ce.parse('p \\lor q');            // → ["Or", "p", "q"]
+
+// Negation (NOT)
+ce.parse('\\lnot p');             // → ["Not", "p"]
+
+// Implication
+ce.parse('p \\implies q');        // → ["Implies", "p", "q"]
+
+// Equivalence (biconditional)
+ce.parse('p \\iff q');            // → ["Equivalent", "p", "q"]
+```
+
+### Additional Operators
+
+The Compute Engine also supports exclusive OR, NAND, and NOR:
+
+```js example
+// Exclusive OR (XOR)
+ce.parse('p \\veebar q');         // → ["Xor", "p", "q"]
+
+// NAND (Not AND)
+ce.parse('p \\barwedge q');       // → ["Nand", "p", "q"]
+```
+
+These operators support any number of arguments:
+
+```js example
+// N-ary XOR: true when an odd number of arguments are true
+ce.box(['Xor', 'True', 'True', 'True']).evaluate();   // → True (3 is odd)
+ce.box(['Xor', 'True', 'True', 'False']).evaluate();  // → False (2 is even)
+
+// N-ary NAND: NOT(AND(a, b, c, ...))
+ce.box(['Nand', 'True', 'True', 'False']).evaluate(); // → True
+
+// N-ary NOR: NOT(OR(a, b, c, ...))
+ce.box(['Nor', 'False', 'False', 'False']).evaluate(); // → True
+```
+
+### Evaluating Boolean Expressions
+
+Boolean expressions with concrete `True`/`False` values evaluate to their
+logical result:
+
+```js example
+ce.box(['And', 'True', 'False']).evaluate();     // → False
+ce.box(['Or', 'True', 'False']).evaluate();      // → True
+ce.box(['Not', 'False']).evaluate();             // → True
+ce.box(['Implies', 'True', 'False']).evaluate(); // → False
+ce.box(['Implies', 'False', 'True']).evaluate(); // → True
+ce.box(['Xor', 'True', 'False']).evaluate();     // → True
+ce.box(['Nand', 'True', 'True']).evaluate();     // → False
+ce.box(['Nor', 'False', 'False']).evaluate();    // → True
+```
+
+## First-Order Logic
+
+First-Order Logic extends propositional logic with quantifiers and predicates,
+allowing you to make statements about objects in a domain.
+
+### Predicates
+
+In FOL, predicates are functions that return Boolean values. They are typically
+written as uppercase letters followed by arguments:
+
+```js example
+// Single uppercase letters are automatically recognized as predicates
+ce.parse('P(x)');           // → ["P", "x"]
+ce.parse('Q(a, b)');        // → ["Q", "a", "b"]
+```
+
+For multi-letter predicate names, declare them explicitly:
+
+```js example
+ce.declare('Loves', { signature: '(value, value) -> boolean' });
+ce.parse('Loves(x, y)');    // → ["Loves", "x", "y"]
+```
+
+### Quantifiers
+
+The Compute Engine supports universal and existential quantifiers:
+
+```js example
+// Universal quantifier: "for all x"
+ce.parse('\\forall x, P(x)');
+// → ["ForAll", "x", ["P", "x"]]
+
+// Existential quantifier: "there exists x"
+ce.parse('\\exists x, P(x)');
+// → ["Exists", "x", ["P", "x"]]
+
+// Unique existential: "there exists exactly one x"
+ce.parse('\\exists! x, P(x)');
+// → ["ExistsUnique", "x", ["P", "x"]]
+```
+
+Negated quantifiers are also supported: `NotForAll` and `NotExists`.
+
+Quantifiers can also specify a domain using set membership:
+
+```js example
+ce.parse('\\forall x \\in \\R, x^2 \\geq 0');
+// → ["ForAll", ["Element", "x", "RealNumbers"], ["GreaterEqual", ["Square", "x"], 0]]
+```
+
+### Quantifier Scope
+
+By default, quantifiers use **tight binding** following standard FOL conventions.
+The scope extends only to the immediately following formula:
+
+```js example
+ce.parse('\\forall x. P(x) \\implies Q(x)');
+// Parses as: (∀x. P(x)) → Q(x)
+// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+```
+
+Use parentheses to extend the quantifier's scope:
+
+```js example
+ce.parse('\\forall x. (P(x) \\implies Q(x))');
+// Parses as: ∀x. (P(x) → Q(x))
+// → ["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
+```
+
+You can change this behavior with the `quantifierScope` option:
+
+```js example
+// Loose binding - scope extends to end of expression
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' });
+// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
+```
+
+## Evaluating Quantifiers
+
+Quantifiers can be evaluated to Boolean values when the bound variable is
+constrained to a finite domain.
+
+### Finite Domain Evaluation
+
+Specify a finite domain using `Element` with a `Set`, `List`, `Range`, or
+`Interval`:
+
+```js example
+// Universal: all elements satisfy the predicate
+ce.box(['ForAll',
+  ['Element', 'x', ['Set', 1, 2, 3]],
+  ['Greater', 'x', 0]
+]).evaluate();
+// → True (1 > 0, 2 > 0, 3 > 0 all hold)
+
+// Existential: at least one element satisfies the predicate
+ce.box(['Exists',
+  ['Element', 'x', ['Set', 1, 2, 3]],
+  ['Greater', 'x', 2]
+]).evaluate();
+// → True (3 > 2 holds)
+
+// Unique existential: exactly one element satisfies the predicate
+ce.box(['ExistsUnique',
+  ['Element', 'x', ['Set', 1, 2, 3]],
+  ['Equal', 'x', 2]
+]).evaluate();
+// → True (only 2 equals 2)
+```
+
+### Using Range Domains
+
+For integer ranges, use `Range`:
+
+```js example
+// All integers from 1 to 100 are positive
+ce.box(['ForAll',
+  ['Element', 'n', ['Range', 1, 100]],
+  ['Greater', 'n', 0]
+]).evaluate();
+// → True
+
+// Some integer from 1 to 10 is a perfect square greater than 5
+ce.box(['Exists',
+  ['Element', 'n', ['Range', 1, 10]],
+  ['And', ['Greater', 'n', 5], ['Equal', ['Sqrt', 'n'], ['Floor', ['Sqrt', 'n']]]]
+]).evaluate();
+// → True (9 is a perfect square > 5)
+```
+
+### Nested Quantifiers
+
+Nested quantifiers are evaluated over the Cartesian product of their domains:
+
+```js example
+// For all pairs (x, y) in {1,2} × {1,2}: x + y > 0
+ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
+  ['ForAll', ['Element', 'y', ['Set', 1, 2]],
+    ['Greater', ['Add', 'x', 'y'], 0]
+  ]
+]).evaluate();
+// → True (checks all 4 pairs: (1,1), (1,2), (2,1), (2,2))
+
+// There exist x, y in {1,2,3} such that x + y = 5
+ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]],
+  ['Exists', ['Element', 'y', ['Set', 1, 2, 3]],
+    ['Equal', ['Add', 'x', 'y'], 5]
+  ]
+]).evaluate();
+// → True (x=2, y=3 or x=3, y=2)
+```
+
+### Symbolic Simplification
+
+Quantifiers simplify automatically in certain cases:
+
+```js example
+// Constant body
+ce.box(['ForAll', 'x', 'True']).evaluate();   // → True
+ce.box(['ForAll', 'x', 'False']).evaluate();  // → False
+ce.box(['Exists', 'x', 'True']).evaluate();   // → True
+ce.box(['Exists', 'x', 'False']).evaluate();  // → False
+
+// Body doesn't contain the quantified variable
+ce.box(['ForAll', 'x', ['Greater', 'y', 0]]).evaluate();
+// → y > 0 (the quantifier is eliminated)
+```
+
+## Normal Forms
+
+The Compute Engine can convert Boolean expressions to standard normal forms,
+useful for automated reasoning and satisfiability checking.
+
+### Conjunctive Normal Form (CNF)
+
+CNF is a conjunction (AND) of disjunctions (OR) of literals:
+
+```js example
+// Convert (A ∧ B) ∨ C to CNF
+ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate();
+// → (A ∨ C) ∧ (B ∨ C)
+
+// Convert implication to CNF
+ce.box(['ToCNF', ['Implies', 'A', 'B']]).evaluate();
+// → ¬A ∨ B
+
+// De Morgan's law is applied automatically
+ce.box(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate();
+// → ¬A ∨ ¬B
+```
+
+### Disjunctive Normal Form (DNF)
+
+DNF is a disjunction (OR) of conjunctions (AND) of literals:
+
+```js example
+// Convert (A ∨ B) ∧ C to DNF
+ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate();
+// → (A ∧ C) ∨ (B ∧ C)
+
+// De Morgan's law
+ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate();
+// → ¬A ∧ ¬B
+```
+
+### How Conversion Works
+
+The conversion process:
+1. **Eliminate implications**: `A → B` becomes `¬A ∨ B`
+2. **Eliminate equivalences**: `A ↔ B` becomes `(¬A ∨ B) ∧ (¬B ∨ A)`
+3. **Push negations inward** (De Morgan's laws): `¬(A ∧ B)` becomes `¬A ∨ ¬B`
+4. **Distribute** to get the target form:
+   - For CNF: distribute OR over AND
+   - For DNF: distribute AND over OR
+
+## Practical Examples
+
+### Validating Logical Arguments
+
+Check if an argument is valid by verifying the conclusion follows from premises:
+
+```js example
+// Modus Ponens: If P → Q and P, then Q
+// Check: for all truth values, (P → Q) ∧ P → Q is a tautology
+
+ce.box(['ForAll', ['Element', 'p', ['Set', 'True', 'False']],
+  ['ForAll', ['Element', 'q', ['Set', 'True', 'False']],
+    ['Implies',
+      ['And', ['Implies', 'p', 'q'], 'p'],
+      'q'
+    ]
+  ]
+]).evaluate();
+// → True (Modus Ponens is valid)
+```
+
+### Checking Properties Over Domains
+
+Verify mathematical properties:
+
+```js example
+// Commutativity of addition for small integers
+ce.box(['ForAll', ['Element', 'a', ['Range', -5, 5]],
+  ['ForAll', ['Element', 'b', ['Range', -5, 5]],
+    ['Equal', ['Add', 'a', 'b'], ['Add', 'b', 'a']]
+  ]
+]).evaluate();
+// → True
+
+// Check if a function is injective over a domain
+// f(x) = x² is not injective on {-2, -1, 0, 1, 2}
+ce.box(['Exists', ['Element', 'x', ['Set', -2, -1, 0, 1, 2]],
+  ['Exists', ['Element', 'y', ['Set', -2, -1, 0, 1, 2]],
+    ['And',
+      ['NotEqual', 'x', 'y'],
+      ['Equal', ['Square', 'x'], ['Square', 'y']]
+    ]
+  ]
+]).evaluate();
+// → True (x=-1, y=1 both give 1)
+```
+
+### Database-Style Queries
+
+Use quantifiers for set-based queries:
+
+```js example
+// Define a "database" of people and their ages
+const people = ['Set',
+  ['List', 'Alice', 25],
+  ['List', 'Bob', 30],
+  ['List', 'Carol', 22]
+];
+
+// Check if someone is over 28
+ce.box(['Exists', ['Element', 'person', people],
+  ['Greater', ['At', 'person', 2], 28]
+]).evaluate();
+// → True (Bob is 30)
+```
+
+## Satisfiability and Tautology Checking
+
+The Compute Engine can check whether Boolean formulas are satisfiable (can be
+made true) or are tautologies (always true).
+
+### Satisfiability
+
+Use `IsSatisfiable` to check if there exists an assignment of truth values that
+makes the expression true:
+
+```js example
+// A contradiction is not satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate();
+// → False
+
+// Most formulas are satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', 'B']]).evaluate();
+// → True (set A=True, B=True)
+
+// A tautology is satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate();
+// → True
+```
+
+### Tautology Checking
+
+Use `IsTautology` to check if an expression is true for all possible assignments:
+
+```js example
+// Law of excluded middle
+ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate();
+// → True
+
+// Double negation
+ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate();
+// → True
+
+// De Morgan's law
+ce.box(['IsTautology', ['Equivalent',
+  ['Not', ['And', 'A', 'B']],
+  ['Or', ['Not', 'A'], ['Not', 'B']]
+]]).evaluate();
+// → True
+
+// Modus Ponens
+ce.box(['IsTautology', ['Implies',
+  ['And', ['Implies', 'A', 'B'], 'A'],
+  'B'
+]]).evaluate();
+// → True
+
+// A simple conjunction is not a tautology
+ce.box(['IsTautology', ['And', 'A', 'B']]).evaluate();
+// → False
+```
+
+## Truth Table Generation
+
+Use `TruthTable` to generate a complete truth table for any Boolean expression:
+
+```js example
+// Truth table for AND
+ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate();
+// → [["A", "B", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "False"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+
+// Truth table for implication
+ce.box(['TruthTable', ['Implies', 'P', 'Q']]).evaluate();
+// → [["P", "Q", "Result"],
+//    ["False", "False", "True"],
+//    ["False", "True", "True"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+```
+
+Truth tables are limited to 10 variables (1024 rows) to prevent excessive output.
+
+## Performance Considerations
+
+- **Domain size**: Evaluation iterates through all domain elements. Keep domains
+  under 1000 elements.
+- **Nested quantifiers**: With n quantifiers over domains of size k, evaluation
+  checks k^n combinations. Use sparingly.
+- **Short-circuit evaluation**: `ForAll` stops at the first `False`, `Exists`
+  stops at the first `True`.
+- **Satisfiability/Tautology**: These check all 2^n truth assignments for n
+  variables. Limited to 20 variables.
+
+## See Also
+
+- [Logic Reference](/compute-engine/reference/logic/) - Complete list of logic
+  operators and their signatures
+- [Sets Reference](/compute-engine/reference/sets/) - Working with sets and
+  set operations
 ---
 title: Special Functions
 slug: /compute-engine/reference/special-functions/
