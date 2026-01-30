@@ -10628,6 +10628,18 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
+- **([#176](https://github.com/cortex-js/compute-engine/issues/176)) Power
+  Combination Simplification**: Fixed simplification failing to combine powers
+  with the same base when one factor has an implicit exponent or when there are
+  3+ operands. Previously, expressions like `2 * 2^x`, `e * e^x * e^{-x}`, and
+  `x^2 * x` would not simplify. Now correctly simplifies to `2^(x+1)`, `e`, and
+  `x^3` respectively. The fix includes:
+  - Extended power combination rules to support numeric literal bases
+  - Added functional rule to handle n-ary Multiply expressions (3+ operands)
+  - Adjusted simplification cost threshold from 1.2 to 1.3 to accept
+    mathematically valid simplifications where exponents become slightly more
+    complex (e.g., `2 * 2^x → 2^(x+1)`)
+
 - **Matrix Operations Type Validation**: Fixed matrix operations (`Shape`, `Rank`,
   `Flatten`, `Transpose`, `Determinant`, `Inverse`, `Trace`, etc.) returning
   incorrect results or failing with type errors. The root cause was a type
@@ -13625,18 +13637,31 @@ approximates a number as a rational.`
       template: 'eval-string'
     },
 
-    { 
-      latex: '\\sin(30\\degree)', 
+    {
+      latex: '\\sin(30\\degree)',
       preamble: 'Use degrees unit in trig functions',
       template: 'eval-string'
+    },
+
+    {
+      latex: '(1,2,3)+(3,5,6)',
+      preamble: 'Vector addition with element-wise operations',
+      template: 'eval-string'
+    },
+
+    {
+      json: '["MatrixMultiply", ["List", ["List", 1, 2], ["List", 3, 4]], ["List", ["List", 5, 6], ["List", 7, 8]]]',
+      label: 'Matrix Multiply',
+      preamble: 'Matrix multiplication using MatrixMultiply function',
+      template: 'as-json'
     },
 
     {
       latex: `\\begin{cases}
 0 & n =  0\\\\
 1 & n =  1\\\\
-n^2+1 & n \\geq 2   
-\\end{cases}`, 
+n^2+1 & n \\geq 2
+\\end{cases}`,
       label: "Piecewise"
     },
 
@@ -19891,6 +19916,70 @@ slug: /compute-engine/guides/linear-algebra/
 This guide covers working with vectors, matrices, and tensors in the Compute
 Engine. You'll learn how to create, manipulate, and perform operations on
 multidimensional arrays.
+
+## Quick Start: Basic Operations
+
+If you're just getting started, here are the most common operations:
+
+### Vector Addition
+
+Add vectors element-wise using LaTeX parentheses notation:
+
+```js example
+const ce = new ComputeEngine();
+
+// Parse and evaluate vector addition
+ce.parse('(1,2,3) + (3,5,6)').evaluate();
+// → [4,7,9]
+
+// Or using the Add function directly
+ce.box(['Add', ['List', 1, 2, 3], ['List', 3, 5, 6]]).evaluate();
+// → [5,7,9]
+```
+
+### Matrix Addition
+
+Matrices are added element-wise:
+
+```js example
+const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+m1.add(m2).evaluate();
+// → [[6,8],[10,12]]
+```
+
+### Scalar Multiplication
+
+Multiply a scalar with a vector or matrix:
+
+```js example
+ce.parse('2(1,2,3)').evaluate();
+// → [2,4,6]
+```
+
+### Element-wise vs Matrix Multiplication
+
+**Important distinction:**
+- Use `Multiply` or `*` for **element-wise** multiplication (Hadamard product)
+- Use `MatrixMultiply` for **linear algebraic** matrix multiplication
+
+```js example
+// Element-wise multiplication
+ce.box(['Multiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[5,12],[21,32]]  (each element multiplied independently)
+
+// Matrix multiplication (linear algebraic product)
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[19,22],[43,50]]  (row-column dot products)
+```
+
+For detailed information on matrix multiplication, see the [Matrix Multiplication](#matrix-multiplication) section below.
 
 ## LaTeX Matrix Notation
 

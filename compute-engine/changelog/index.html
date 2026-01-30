@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.29e9c570.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.99aa8c34.js" defer="defer"></script>
 <script src="/assets/js/main.d70092fb.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -331,6 +331,21 @@ and tensors (rank &gt; 2).</p>
 </ul>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bug-fixes">Bug Fixes<a href="#bug-fixes" class="hash-link" aria-label="Direct link to Bug Fixes" title="Direct link to Bug Fixes" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>(<a href="https://github.com/cortex-js/compute-engine/issues/176" target="_blank" rel="noopener noreferrer" class="">#176</a>) Power
+Combination Simplification</strong>: Fixed simplification failing to combine powers
+with the same base when one factor has an implicit exponent or when there are
+3+ operands. Previously, expressions like <code>2 * 2^x</code>, <code>e * e^x * e^{-x}</code>, and
+<code>x^2 * x</code> would not simplify. Now correctly simplifies to <code>2^(x+1)</code>, <code>e</code>, and
+<code>x^3</code> respectively. The fix includes:</p>
+<ul>
+<li class="">Extended power combination rules to support numeric literal bases</li>
+<li class="">Added functional rule to handle n-ary Multiply expressions (3+ operands)</li>
+<li class="">Adjusted simplification cost threshold from 1.2 to 1.3 to accept
+mathematically valid simplifications where exponents become slightly more
+complex (e.g., <code>2 * 2^x → 2^(x+1)</code>)</li>
+</ul>
+</li>
 <li class="">
 <p><strong>Matrix Operations Type Validation</strong>: Fixed matrix operations (<code>Shape</code>, <code>Rank</code>,
 <code>Flatten</code>, <code>Transpose</code>, <code>Determinant</code>, <code>Inverse</code>, <code>Trace</code>, etc.) returning
