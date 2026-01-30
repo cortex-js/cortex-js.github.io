@@ -5237,7 +5237,7 @@ type LatexDictionaryEntry = OneOf<[
 A dictionary entry is a record that maps a LaTeX token or string of tokens
 ( a trigger) to a MathJSON expression or to a parsing handler.
 
-Set the ComputeEngine.latexDictionary property to an array of
+Set the `ComputeEngine.latexDictionary` property to an array of
 dictionary entries to define custom LaTeX parsing and serialization.
 
 </MemberCard>
@@ -5254,6 +5254,7 @@ type ParseLatexOptions = NumberFormat & {
   parseUnexpectedToken: (lhs, parser) => Expression | null;
   preserveLatex: boolean;
   quantifierScope: "tight" | "loose";
+  timeDerivativeVariable: string;
 };
 ```
 
@@ -5366,6 +5367,19 @@ like `\forall x. P(x) \rightarrow Q(x)`.
 // \forall x. P(x) \rightarrow Q(x)
 // parses as: ∀x. (P(x) → Q(x))
 ```
+
+#### ParseLatexOptions.timeDerivativeVariable
+
+```ts
+timeDerivativeVariable: string;
+```
+
+The variable used for time derivatives in Newton notation
+(`\dot{x}`, `\ddot{x}`, etc.).
+
+When parsing `\dot{x}`, it will be interpreted as `["D", "x", timeDerivativeVariable]`.
+
+**Default:** `"t"`
 
 </MemberCard>
 
@@ -6218,7 +6232,7 @@ powerStyle: (expr, level) => "quotient" | "solidus" | "root";
 ##### Serializer.numericSetStyle()
 
 ```ts
-numericSetStyle: (expr, level) => "interval" | "compact" | "regular" | "set-builder";
+numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
 ```
 
 </MemberCard>
@@ -7912,7 +7926,7 @@ diagonal(axis1?, axis2?): DataTypeMap[DT][]
 ##### Tensor.trace()
 
 ```ts
-trace(axis1?, axis2?): DataTypeMap[DT]
+trace(axis1?, axis2?): Tensor<DT> | DataTypeMap[DT]
 ```
 
 ####### axis1?
@@ -9248,13 +9262,54 @@ date: Last Modified
 | `Not` | `\operatorname{not} p` | $$ \operatorname{not} p$$ | |
 | `Equivalent` | `p \iff q` | $$ p \iff q$$ | Equivalence |
 | `Equivalent` | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ | |
+| `Equivalent` | `p \leftrightarrow q` | $$ p \leftrightarrow q$$ | |
+| `Equivalent` | `p \Longleftrightarrow q` | $$ p \Longleftrightarrow q$$ | |
+| `Equivalent` | `p \longleftrightarrow q` | $$ p \longleftrightarrow q$$ | |
 | `Implies` | `p \implies q` | $$ p \implies q $$ | Implication |
 | `Implies` | `p \Rightarrow q` | $$ p \Rightarrow q $$ | |
+| `Implies` | `p \rightarrow q` | $$ p \rightarrow q $$ | |
+| `Implies` | `p \Longrightarrow q` | $$ p \Longrightarrow q $$ | |
+| `Implies` | `p \longrightarrow q` | $$ p \longrightarrow q $$ | |
 | `Proves` | `p \vdash q` | $$ p \vdash q $$ | Provability |
 | `Entails` | `p \vDash q` | $$ p \vDash q $$ | Entailment |
 | `Satisfies` | `p \models q` | $$ p \models q $$ | Satisfaction |
 
 </div>
+
+### Operator Precedence
+
+Logical operators have lower precedence than comparison and arithmetic operators,
+so expressions parse naturally without requiring parentheses:
+
+| Precedence | Operators | Example |
+| :--- | :--- | :--- |
+| 880 | `Not` (`\lnot`, `\neg`) | `\lnot p` binds only to `p` |
+| 245 | Comparisons (`=`, `<`, `>`, `\leq`, `\geq`, `\neq`) | `x = 1` |
+| 240 | Set relations (`\subset`, `\subseteq`, `\in`, etc.) | `x \in S` |
+| 235 | `And` (`\land`, `\wedge`) | `p \land q` |
+| 232 | `Xor`, `Nand`, `Nor` | `p \veebar q` |
+| 230 | `Or` (`\lor`, `\vee`) | `p \lor q` |
+| 220 | `Implies` (`\implies`, `\Rightarrow`, `\rightarrow`) | `p \implies q` |
+| 219 | `Equivalent` (`\iff`, `\Leftrightarrow`, `\leftrightarrow`) | `p \iff q` |
+| 200 | Quantifiers (`\forall`, `\exists`) | `\forall x, P(x)` |
+
+**Examples:**
+
+- `x = 1 \lor y = 2` parses as `(x = 1) \lor (y = 2)` — comparisons bind tighter than `Or`
+- `p \land q \lor r` parses as `(p \land q) \lor r` — `And` binds tighter than `Or`
+- `p \lor q \implies r` parses as `(p \lor q) \implies r` — `Or` binds tighter than `Implies`
+
+**Important:** `Not` has very high precedence and only applies to the immediately
+following atom. To negate a compound expression, use parentheses:
+
+- `\lnot p \land q` parses as `(\lnot p) \land q`
+- `\lnot(p \land q)` parses as `\lnot(p \land q)` — negates the entire conjunction
+
+### Arrow Notation
+
+Note that `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
+and parses as `To`, not `Implies`. Use `\rightarrow`, `\Rightarrow`, or `\implies`
+for logical implication.
 
 ## Quantifiers
 
@@ -10368,34 +10423,318 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Features
+
+- **([#163](https://github.com/cortex-js/compute-engine/issues/163)) Additional
+  Derivative Notations**: Added support for parsing multiple derivative notations
+  beyond Leibniz notation:
+
+  - **Newton's dot notation** for time derivatives: `\dot{x}` → `["D", "x", "t"]`,
+    `\ddot{x}` for second derivative, `\dddot{x}` and `\ddddot{x}` for higher orders.
+    The time variable is configurable via the new `timeDerivativeVariable` parser
+    option (default: `"t"`).
+
+  - **Lagrange prime notation with arguments**: `f'(x)` now parses to
+    `["D", ["f", "x"], "x"]`, inferring the differentiation variable from the
+    function argument. Works for `f''(x)`, `f'''(x)`, etc. for higher derivatives.
+
+  - **Euler's subscript notation**: `D_x f` → `["D", "f", "x"]` and
+    `D^2_x f` or `D_x^2 f` for second derivatives.
+
+  - **Derivative serialization**: `D` expressions now serialize to Leibniz notation
+    (`\frac{\mathrm{d}}{\mathrm{d}x}f`) for consistent round-trip parsing.
+
+- **Special Function Definitions**: Added type signatures for Digamma, Trigamma,
+  and PolyGamma functions to the library:
+  - `Digamma(x)` - The digamma function ψ(x), logarithmic derivative of Gamma
+  - `Trigamma(x)` - The trigamma function ψ₁(x), derivative of digamma
+  - `PolyGamma(n, x)` - The polygamma function ψₙ(x), nth derivative of digamma
+
+- **Derivative Rules for Special Functions**: Added derivative formulas for:
+  - `d/dx Digamma(x) = Trigamma(x)`
+  - `d/dx Erf(x)`, `d/dx Erfc(x)`, `d/dx Erfi(x)`
+  - `d/dx FresnelS(x)`, `d/dx FresnelC(x)`
+  - `d/dx LogGamma(x) = Digamma(x)`
+
+- **Trigonometric Periodicity Reduction**: Trigonometric functions now simplify
+  arguments containing integer multiples of π:
+  - `sin(5π + k)` → `-sin(k)` (period 2π, with sign change for odd multiples)
+  - `cos(4π + k)` → `cos(k)` (period 2π)
+  - `tan(3π + k)` → `tan(k)` (period π)
+  - Works for all six trig functions: sin, cos, tan, cot, sec, csc
+  - Handles both positive and negative multiples of π
+
+- **Pythagorean Trigonometric Identities**: Added simplification rules for all
+  Pythagorean identities:
+  - `sin²(x) + cos²(x)` → `1`
+  - `1 - sin²(x)` → `cos²(x)` and `1 - cos²(x)` → `sin²(x)`
+  - `sin²(x) - 1` → `-cos²(x)` and `cos²(x) - 1` → `-sin²(x)`
+  - `tan²(x) + 1` → `sec²(x)` and `sec²(x) - 1` → `tan²(x)`
+  - `1 + cot²(x)` → `csc²(x)` and `csc²(x) - 1` → `cot²(x)`
+  - `a·sin²(x) + a·cos²(x)` → `a` (with coefficient)
+
+- **Trigonometric Equation Solving**: The `solve()` method now handles basic
+  trigonometric equations:
+  - `sin(x) = a` → `x = arcsin(a)` and `x = π - arcsin(a)` (two solutions)
+  - `cos(x) = a` → `x = arccos(a)` and `x = -arccos(a)` (two solutions)
+  - `tan(x) = a` → `x = arctan(a)` (one solution per period)
+  - `cot(x) = a` → `x = arccot(a)`
+  - Supports coefficient form: `a·sin(x) + b = 0`
+  - Domain validation: returns no solutions when |a| > 1 for sin/cos
+  - Automatic deduplication of equivalent solutions (e.g., `cos(x) = 1` → single solution `0`)
+
+- **([#133](https://github.com/cortex-js/compute-engine/issues/133)) Element-based
+  Indexing Sets for Sum/Product**: Added support for `\in` notation in summation
+  and product subscripts:
+
+  - **Parsing**: `\sum_{n \in \{1,2,3\}} n` now correctly parses to
+    `["Sum", "n", ["Element", "n", ["Set", 1, 2, 3]]]` instead of silently
+    dropping the constraint.
+
+  - **Evaluation**: Sums and products over finite sets, lists, and ranges are
+    now evaluated correctly:
+    - `\sum_{n \in \{1,2,3\}} n` → `6`
+    - `\sum_{n \in \{1,2,3\}} n^2` → `14`
+    - `\prod_{k \in \{1,2,3,4\}} k` → `24`
+
+  - **Serialization**: Element-based indexing sets serialize back to LaTeX with
+    proper `\in` notation: `\sum_{n\in \{1, 2, 3\}}n`
+
+  - **Range support**: Works with `Range` expressions via `ce.box()`:
+    `["Sum", "n", ["Element", "n", ["Range", 1, 5]]]` → `15`
+
+  - **Bracket notation as Range**: Two-element integer lists in bracket notation
+    `[a,b]` are now treated as Range(a,b) when used in Element context:
+    - `\sum_{n \in [1,5]} n` → `15` (iterates 1, 2, 3, 4, 5)
+    - Previously returned `6` (treated as List with just elements 1 and 5)
+
+  - **Interval support**: `Interval` expressions work with Element-based indexing,
+    including support for `Open` and `Closed` boundary markers:
+    - `["Interval", 1, 5]` → iterates integers 1, 2, 3, 4, 5 (closed bounds)
+    - `["Interval", ["Open", 0], 5]` → iterates 1, 2, 3, 4, 5 (excludes 0)
+    - `["Interval", 1, ["Open", 6]]` → iterates 1, 2, 3, 4, 5 (excludes 6)
+
+  - **Infinite series with Element notation**: Known infinite integer sets are
+    converted to their equivalent Limits form and iterated (capped at 1,000,000):
+    - `NonNegativeIntegers` (ℕ₀) → iterates from 0, like `\sum_{n=0}^{\infty}`
+    - `PositiveIntegers` (ℤ⁺) → iterates from 1, like `\sum_{n=1}^{\infty}`
+    - Convergent series produce numeric approximations:
+      `\sum_{n \in \Z^+} \frac{1}{n^2}` → `≈1.6449` (close to π²/6)
+
+  - **Non-enumerable domains stay symbolic**: When the domain cannot be enumerated
+    (unknown symbol, non-iterable infinite set, or symbolic bounds), the expression
+    stays symbolic instead of returning NaN:
+    - `\sum_{n \in S} n` with unknown `S` → stays as `["Sum", "n", ["Element", "n", "S"]]`
+    - `\sum_{n \in \Z} n` → stays symbolic (bidirectional, can't forward iterate)
+    - `\sum_{x \in \R} f(x)` → stays symbolic (non-countable)
+    - `\sum_{n \in [1,a]} n` with symbolic bound → stays symbolic
+    - Previously these would all return `NaN` with no explanation
+
+  - **Multiple Element indexing sets**: Comma-separated Element expressions now
+    parse and evaluate correctly:
+    - `\sum_{n \in A, m \in B} (n+m)` → `["Sum", ..., ["Element", "n", "A"], ["Element", "m", "B"]]`
+    - Nested sums like `\sum_{i \in A}\sum_{j \in B} i \cdot j` evaluate correctly
+    - Mixed indexing sets (Element + Limits) work together
+
+  - **Condition/filter support in Element expressions**: Conditions can be attached
+    to Element expressions to filter values from the set:
+    - `\sum_{n \in S, n > 0} n` → sums only positive values from S
+    - `\sum_{n \in S, n \ge 2} n` → sums values ≥ 2 from S
+    - `\prod_{k \in S, k < 0} k` → multiplies only negative values from S
+    - Supported operators: `>`, `>=`, `<`, `<=`, `!=`
+    - Conditions are attached as the 4th operand of Element:
+      `["Element", "n", "S", ["Greater", "n", 0]]`
+
+- **Linear Algebra Enhancements**: Improved tensor and matrix operations with
+  better scalar handling, new functionality, and clearer error messages:
+
+  - **Matrix Multiplication**: Added `MatrixMultiply` function supporting:
+    - Matrix × Matrix: `A (m×n) × B (n×p) → result (m×p)`
+    - Matrix × Vector: `A (m×n) × v (n) → result (m)`
+    - Vector × Matrix: `v (m) × B (m×n) → result (n)`
+    - Vector × Vector (dot product): `v1 (n) · v2 (n) → scalar`
+    - Proper dimension validation with `incompatible-dimensions` errors
+    - LaTeX serialization using `\cdot` notation
+
+  - **Matrix Addition and Scalar Broadcasting**: `Add` now supports element-wise
+    operations on tensors (matrices and vectors):
+    - Matrix + Matrix: Element-wise addition (shapes must match)
+    - Scalar + Matrix: Broadcasts scalar to all elements
+    - Vector + Vector: Element-wise addition
+    - Scalar + Vector: Broadcasts scalar to all elements
+    - Symbolic support: `[[a,b],[c,d]] + [[1,2],[3,4]]` evaluates correctly
+    - Proper dimension validation with `incompatible-dimensions` errors
+
+  - **Matrix Construction Functions**: Added convenience functions for creating
+    common matrices:
+    - `IdentityMatrix(n)`: Creates an n×n identity matrix
+    - `ZeroMatrix(m, n?)`: Creates an m×n matrix of zeros (square if n omitted)
+    - `OnesMatrix(m, n?)`: Creates an m×n matrix of ones (square if n omitted)
+
+  - **Matrix and Vector Norms**: Added `Norm` function for computing various
+    norms:
+    - **Vector norms**: L1 (sum of absolute values), L2 (Euclidean, default),
+      L-infinity (max absolute value), and general Lp norms
+    - **Matrix norms**: Frobenius (default, sqrt of sum of squared elements),
+      L1 (max column sum), L-infinity (max row sum)
+    - Scalar norms return the absolute value
+
+  - **Higher-Rank Tensor Operations**: Extended `Transpose`, `ConjugateTranspose`,
+    and `Trace` to work with rank > 2 tensors:
+    - **Transpose**: Swaps last two axes by default (batch transpose), or
+      specify explicit axes with `['Transpose', T, axis1, axis2]`
+    - **ConjugateTranspose**: Same axis behavior as Transpose, plus element-wise
+      complex conjugation
+    - **Trace (batch trace)**: Returns a tensor of traces over the last two axes.
+      For a `[2,2,2]` tensor, returns `[trace of T[0], trace of T[1]]`.
+      Optional axis parameters: `['Trace', T, axis1, axis2]`
+    - All operations support explicit axis specification for flexible tensor
+      manipulation
+
+  - **Eigenvalues and Eigenvectors**: Added functions for eigenvalue decomposition:
+    - `Eigenvalues(matrix)`: Returns list of eigenvalues
+      - 2×2 matrices: symbolic computation via characteristic polynomial
+      - 3×3 matrices: Cardano's formula for cubic roots
+      - Larger matrices: numeric QR algorithm
+      - Optimized for diagonal/triangular matrices
+    - `Eigenvectors(matrix)`: Returns list of corresponding eigenvectors
+      - Uses null space computation via Gaussian elimination
+    - `Eigen(matrix)`: Returns tuple of (eigenvalues, eigenvectors)
+
+  - **Diagonal function**: Now fully implemented with bidirectional behavior:
+    - Vector → Matrix: Creates a diagonal matrix from a vector
+      (`Diagonal([1,2,3])` → 3×3 diagonal matrix)
+    - Matrix → Vector: Extracts the diagonal as a vector
+      (`Diagonal([[1,2],[3,4]])` → `[1,4]`)
+
+  - **Reshape cycling**: Implements APL-style ravel cycling. When reshaping
+    to a larger shape, elements cycle from the beginning:
+    `Reshape([1,2,3], (2,2))` → `[[1,2],[3,1]]`
+
+  - **Scalar handling**: Most linear algebra functions now handle scalar inputs:
+    - `Flatten(42)` → `[42]` (single-element list)
+    - `Transpose(42)` → `42` (identity)
+    - `Determinant(42)` → `42` (1×1 matrix determinant)
+    - `Trace(42)` → `42` (1×1 matrix trace)
+    - `Inverse(42)` → `1/42` (scalar reciprocal)
+    - `ConjugateTranspose(42)` → `42` (conjugate of real is itself)
+    - `Reshape(42, (2,2))` → `[[42,42],[42,42]]` (scalar replication)
+
+  - **Error messages**: Operations requiring square matrices (`Determinant`,
+    `Trace`, `Inverse`) now return `expected-square-matrix` error for vectors
+    and tensors (rank > 2).
+
+### Bug Fixes
+
+- **Matrix Operations Type Validation**: Fixed matrix operations (`Shape`, `Rank`,
+  `Flatten`, `Transpose`, `Determinant`, `Inverse`, `Trace`, etc.) returning
+  incorrect results or failing with type errors. The root cause was a type
+  mismatch: function signatures expected `matrix` type (a 2D list with dimensions),
+  but `BoxedTensor.type` returned `list<number>` without dimensions. Now
+  `BoxedTensor`, `BoxedFunction`, and `BoxedSymbol` correctly derive `shape` and
+  `rank` from their type's dimensions. Additionally, linear algebra functions now
+  properly evaluate their operands before checking if they are tensors.
+
+- **Numerical Integration**: Fixed `\int_0^1 \sin(x) dx` returning `NaN` when
+  evaluated numerically with `.N()`. The integrand was already wrapped in a
+  `Function` expression by the canonical form, but the numerical evaluation code
+  was wrapping it again, creating a nested function that returned a function
+  instead of a number. Now correctly checks if the integrand is already a
+  `Function` before wrapping.
+
+- **Subscript Function Calls**: Fixed parsing of function calls with subscripted
+  names like `f_\text{a}(5)`. Previously, this was incorrectly parsed as a
+  `Tuple` instead of a function call because `Subscript` expressions weren't
+  being canonicalized before the function call check. Now correctly recognizes
+  that `f_a(5)` is a function call when the subscript canonicalizes to a symbol.
+
+- **Symbolic Factorial**: Fixed `(n-1)!` incorrectly evaluating to `NaN` instead
+  of staying symbolic. The factorial `evaluate` function was attempting numeric
+  computation on symbolic arguments. Now correctly returns `undefined` (keeping
+  the expression symbolic) when the argument is not a number literal.
+
+- **([#130](https://github.com/cortex-js/compute-engine/issues/130)) Prefix/Postfix
+  Operator LaTeX Serialization**: Fixed incorrect LaTeX output for prefix operators
+  (like `Negate`) and postfix operators (like `Factorial`) when applied to
+  expressions with lower precedence. Previously, `Negate(Add(a, b))` incorrectly
+  serialized as `-a+b` instead of `-(a+b)`, causing round-trip failures where
+  parsing the output produced a mathematically different expression. Similarly,
+  `Factorial(Add(a, b))` now correctly serializes as `(a+b)!` instead of `a+b!`.
+  The fix ensures operands are wrapped in parentheses when their precedence is
+  lower than the operator's precedence.
+
+- **Rules Cache Isolation**: Fixed rules cache building failing with "Invalid
+  rule" errors when user expressions had previously polluted the global scope.
+  For example, parsing `x(y+z)` would add `x` as a symbol with function type to
+  the global scope. Later, when the simplification rules cache was built, rule
+  parsing would fail because wildcards like `_x` in rules would be type-checked
+  against the polluted scope where `x` had incompatible type. The fix ensures
+  rule parsing uses a clean scope that inherits only from the system scope
+  (containing built-in definitions), not from user-polluted scopes.
+
+- **([#156](https://github.com/cortex-js/compute-engine/issues/156)) Logical
+  Operator Precedence**: Fixed parsing of logical operators `\vee` (Or) and
+  `\wedge` (And) with relational operators. Previously, expressions like
+  `3=4\vee 7=8` were incorrectly parsed with the wrong precedence. Now correctly
+  parses as `["Or", ["Equal", 3, 4], ["Equal", 7, 8]]`. Logical operators have
+  lower precedence (230-235) than comparison operators (245) and set relations
+  (240), so compound propositions parse correctly without requiring parentheses.
+
+- **([#156](https://github.com/cortex-js/compute-engine/issues/156)) Logical
+  Connective Arrows**: Added support for additional arrow notation in logical
+  expressions:
+  - `\rightarrow` now parses as `Implies` (previously parsed as `To` for
+    set/function mapping)
+  - `\leftrightarrow` now parses as `Equivalent` (previously produced an
+    "unexpected-command" error)
+  - Long arrow variants now supported: `\Longrightarrow`, `\longrightarrow` →
+    `Implies`; `\Longleftrightarrow`, `\longleftrightarrow` → `Equivalent`
+  - The existing variants `\Rightarrow`, `\Leftrightarrow`, `\implies`, `\iff`
+    continue to work
+  - `\to` remains available for function/set mapping notation (e.g., `f: A \to B`)
+
+- **Simplification Rules**: Added and fixed several simplification rules:
+  - `x + x` now correctly simplifies to `2x` (term combination)
+  - `e^x * e^{-x}` now correctly simplifies to `1` (exponential inverse)
+  - `sin(∞)` and `cos(∞)` now correctly evaluate to `NaN`
+  - `tanh(∞)` now correctly evaluates to `1`, `tanh(-∞)` to `-1`
+  - `log_b(x^n)` now correctly simplifies to `n * log_b(x)` (log power rule)
+  - Improved cost function to prefer `n * ln(x)` form over `ln(x^n)`
+  - Trigonometric functions now reduce arguments by their period (e.g.,
+    `cos(5π + k)` simplifies using `cos(π + k) = -cos(k)`)
+
 ## 0.32.0 _2026-01-28_
 
 ### Bug Fixes
 
-- **([#256](https://github.com/cortex-js/compute-engine/issues/256))
-  Subscript Symbol Parsing**: Fixed parsing of single-letter symbols with
-  subscripts. Previously, `i_A` was incorrectly parsed as
+- **([#256](https://github.com/cortex-js/compute-engine/issues/256)) Subscript
+  Symbol Parsing**: Fixed parsing of single-letter symbols with subscripts.
+  Previously, `i_A` was incorrectly parsed as
   `["Subscript", ["Complex", 0, 1], "A"]` because `i` was recognized as the
   imaginary unit before the subscript was processed. Now `i_A` correctly parses
   as the symbol `i_A`. This applies to all single-letter symbols including
   constants like `e` and `i`. Complex subscripts containing operators (`n+1`),
-  commas (`n,m`), or parentheses (`(n+1)`) still produce `Subscript` expressions.
+  commas (`n,m`), or parentheses (`(n+1)`) still produce `Subscript`
+  expressions.
 
-- **([#230](https://github.com/cortex-js/compute-engine/issues/230))
-  Root Derivatives**: Fixed the `D` operator not differentiating expressions
+- **([#230](https://github.com/cortex-js/compute-engine/issues/230)) Root
+  Derivatives**: Fixed the `D` operator not differentiating expressions
   containing the `Root` operator (n-th roots). Previously, `D(Root(x, 3), x)`
   (derivative of ∛x) would return an unevaluated derivative expression instead
   of computing the result. Now correctly returns `1/(3x^(2/3))`, equivalent to
-  the expected `(1/3)·x^(-2/3)`. The fix adds a special case in the `differentiate`
-  function to handle `Root(base, n)` by applying the power rule with exponent `1/n`.
+  the expected `(1/3)·x^(-2/3)`. The fix adds a special case in the
+  `differentiate` function to handle `Root(base, n)` by applying the power rule
+  with exponent `1/n`.
 
 - **Sign Simplification**: Fixed `Sign(x).simplify()` returning `1` instead of
   `-1` when `x` is negative. The simplification rule incorrectly returned
   `ce.One` for both positive and negative cases.
 
-- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with
-  a variable that has an assigned value. The derivative formula now uses
-  `Sign(x)` instead of a complex `Which` expression that couldn't be evaluated
+- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with a
+  variable that has an assigned value. The derivative formula now uses `Sign(x)`
+  instead of a complex `Which` expression that couldn't be evaluated
   symbolically.
 
 - **LaTeX Serialization**: Fixed TypeScript error in power serialization where
@@ -10403,14 +10742,15 @@ import ChangeLog from '@site/src/components/ChangeLog';
   expected. Now correctly uses `operand(exp, 2)` to get the expression form.
 
 - **Step Function Derivatives**: Fixed `D(floor(x), x)`, `D(ceil(x), x)`, and
-  `D(round(x), x)` causing infinite recursion. These step functions now correctly
-  return 0 (the derivative is 0 almost everywhere). Also fixed a bug where
-  derivative formulas that evaluate to 0 weren't recognized due to a falsy check.
+  `D(round(x), x)` causing infinite recursion. These step functions now
+  correctly return 0 (the derivative is 0 almost everywhere). Also fixed a bug
+  where derivative formulas that evaluate to 0 weren't recognized due to a falsy
+  check.
 
-- **Ceil Type Signature**: Fixed `Ceil` function signature from `(real) -> integer`
-  to `(number) -> integer` to match `Floor`. This resolves "incompatible-type" errors
-  when computing derivatives of ceiling expressions or using `Ceil` in contexts
-  expecting a general number type.
+- **Ceil Type Signature**: Fixed `Ceil` function signature from
+  `(real) -> integer` to `(number) -> integer` to match `Floor`. This resolves
+  "incompatible-type" errors when computing derivatives of ceiling expressions
+  or using `Ceil` in contexts expecting a general number type.
 
 - **Inverse Trig Integrals**: Fixed incorrect integration formulas for `arcsin`,
   `arccos`, and `arctan`. The previous formulas were completely wrong. Correct:
@@ -10425,14 +10765,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `Digamma(x)` (the digamma/psi function).
 
 - **Polynomial Degree Detection**: Fixed `polynomialDegree()` returning 0 for
-  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a polynomial).
-  When the base of a power is constant but the exponent depends on the variable,
-  this is not a polynomial. This bug caused infinite recursion in simplification
-  when simplifying expressions containing exponentials, such as the derivative
-  of `erf(x)` which is `(2/√π)·e^(-x²)`.
+  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a
+  polynomial). When the base of a power is constant but the exponent depends on
+  the variable, this is not a polynomial. This bug caused infinite recursion in
+  simplification when simplifying expressions containing exponentials, such as
+  the derivative of `erf(x)` which is `(2/√π)·e^(-x²)`.
 
-- **Special Function Derivatives**: Fixed derivative formulas for several special
-  functions and removed incorrect ones:
+- **Special Function Derivatives**: Fixed derivative formulas for several
+  special functions and removed incorrect ones:
   - Fixed `d/dx erfi(x) = (2/√π)·e^(x²)` (imaginary error function)
   - Fixed `d/dx S(x) = sin(πx²/2)` (Fresnel sine integral)
   - Fixed `d/dx C(x) = cos(πx²/2)` (Fresnel cosine integral)
@@ -10445,10 +10785,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
   now correctly returns `Digamma'(x)` (as `Apply(Derivative(Digamma, 1), x)`)
   instead of incorrectly returning `0`.
 
-- **([#168](https://github.com/cortex-js/compute-engine/issues/168))
-  Absolute Value**: Fixed parsing of nested absolute value expressions that
-  start with a double bar (e.g. `||3-5|-4|`), which previously produced an
-  invalid structure instead of evaluating correctly.
+- **([#168](https://github.com/cortex-js/compute-engine/issues/168)) Absolute
+  Value**: Fixed parsing of nested absolute value expressions that start with a
+  double bar (e.g. `||3-5|-4|`), which previously produced an invalid structure
+  instead of evaluating correctly.
 
 - **([#244](https://github.com/cortex-js/compute-engine/issues/244))
   Serialization**: Fixed LaTeX and ASCIIMath serialization ambiguity for
@@ -10456,29 +10796,28 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `-2^2`) when the base is negative, and negated powers now render as `-(2^2)`
   rather than `-2^2`.
 
-- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
-  Quantifier Scope**: Fixed quantifier scope in First-Order Logic expressions.
-  Previously, `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication
-  inside the quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it
-  correctly follows standard FOL conventions where the quantifier binds only
-  the immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`.
-  This applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`,
-  `NotForAll`, `NotExists`) and all logical connectives (`\rightarrow`, `\to`,
-  `\implies`, `\land`, `\lor`, `\iff`). Use explicit parentheses for wider
-  scope: `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type
-  signatures to properly return `boolean`, enabling correct type checking
-  when quantified expressions are used as arguments to logical operators.
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263)) Quantifier
+  Scope**: Fixed quantifier scope in First-Order Logic expressions. Previously,
+  `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication inside the
+  quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it correctly
+  follows standard FOL conventions where the quantifier binds only the
+  immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`. This
+  applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`, `NotForAll`,
+  `NotExists`) and all logical connectives (`\rightarrow`, `\to`, `\implies`,
+  `\land`, `\lor`, `\iff`). Use explicit parentheses for wider scope:
+  `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type signatures to
+  properly return `boolean`, enabling correct type checking when quantified
+  expressions are used as arguments to logical operators.
 
-- **([#243](https://github.com/cortex-js/compute-engine/issues/243))
-  LaTeX Parsing**: Fixed logic operator precedence causing expressions like
+- **([#243](https://github.com/cortex-js/compute-engine/issues/243)) LaTeX
+  Parsing**: Fixed logic operator precedence causing expressions like
   `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
   `(x = 1) ∨ (x = 2)`. Comparison operators (`=`, `<`, `>`, etc.) now correctly
   bind tighter than logic operators (`\land`, `\lor`, `\veebar`, etc.).
 
-- **([#258](https://github.com/cortex-js/compute-engine/issues/258))
-  Pattern Matching**: Fixed `BoxedExpression.match()` returning `null` when
-  matching patterns against canonicalized expressions. Several cases are now
-  handled:
+- **([#258](https://github.com/cortex-js/compute-engine/issues/258)) Pattern
+  Matching**: Fixed `BoxedExpression.match()` returning `null` when matching
+  patterns against canonicalized expressions. Several cases are now handled:
   - `Rational` patterns now match expressions like `['Rational', 'x', 2]` which
     are canonicalized to `['Multiply', ['Rational', 1, 2], 'x']`
   - `Power` patterns now match `['Power', 'x', -1]` which is canonicalized to
@@ -10502,38 +10841,40 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `Sum` and `Product` expressions with non-trivial bodies (e.g., `Multiply`)
   which were incorrectly displayed as `int()`.
 
-- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
-  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
-  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
-  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
-  unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
-  the existing `\operatorname{lcm}`).
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257)) LaTeX
+  Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as
+  `["Tuple", "GCD", ["Tuple", 24, 37]]` instead of the expected
+  `["GCD", 24, 37]`. The `\operatorname{gcd}` form was unaffected. Also added
+  support for `\lcm` as a LaTeX command (in addition to the existing
+  `\operatorname{lcm}`).
 
 - **([#223](https://github.com/cortex-js/compute-engine/issues/223))
-  Serialization**: Fixed scientific/engineering LaTeX serialization dropping
-  the leading coefficient for exact powers of ten. For example, `1000` now
+  Serialization**: Fixed scientific/engineering LaTeX serialization dropping the
+  leading coefficient for exact powers of ten. For example, `1000` now
   serializes to `1\cdot10^{3}` (or `1\times10^{3}` depending on
   `exponentProduct`) instead of `10^{3}`.
 
-- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of
+  `Cosh`.
 
-- **([#242](https://github.com/cortex-js/compute-engine/issues/242))
-  Solve**: Fixed `solve()` returning an empty array for equations with variables
-  in fractions. For example, `F = 3g/h` solved for `g` now correctly returns
-  `Fh/3` instead of an empty array. The solver now clears denominators before
-  applying solve rules, enabling it to handle expressions like `a + bx/c = 0`.
-  Also added support for solving equations where the variable is in the
-  denominator (e.g., `a/x = b` now returns `x = a/b`).
+- **([#242](https://github.com/cortex-js/compute-engine/issues/242)) Solve**:
+  Fixed `solve()` returning an empty array for equations with variables in
+  fractions. For example, `F = 3g/h` solved for `g` now correctly returns `Fh/3`
+  instead of an empty array. The solver now clears denominators before applying
+  solve rules, enabling it to handle expressions like `a + bx/c = 0`. Also added
+  support for solving equations where the variable is in the denominator (e.g.,
+  `a/x = b` now returns `x = a/b`).
 
-- **([#220](https://github.com/cortex-js/compute-engine/issues/220))
-  Solve**: Fixed `solve()` returning an empty array for equations involving
-  square roots of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles
-  equations of the form `ax + b√x + c = 0` using quadratic substitution. Also
-  added support for solving logarithmic equations like `a·ln(x) + b = 0` which
-  returns `x = e^(-b/a)`.
+- **([#220](https://github.com/cortex-js/compute-engine/issues/220)) Solve**:
+  Fixed `solve()` returning an empty array for equations involving square roots
+  of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles equations of the
+  form `ax + b√x + c = 0` using quadratic substitution. Also added support for
+  solving logarithmic equations like `a·ln(x) + b = 0` which returns
+  `x = e^(-b/a)`.
 
-- **([#255](https://github.com/cortex-js/compute-engine/issues/255))
-  LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
+- **([#255](https://github.com/cortex-js/compute-engine/issues/255)) LaTeX
+  Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
   "incompatible-type" errors in arithmetic operations. Multi-letter subscripts
   without parentheses are now interpreted as compound symbol names (e.g.,
   `A_{CD}` → `A_CD`, `x_{ij}` → `x_ij`, `T_{max}` → `T_max`). Use parentheses
@@ -10543,9 +10884,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
-- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
-  First-Order Logic**: Added several improvements for working with First-Order
-  Logic expressions:
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263)) First-Order
+  Logic**: Added several improvements for working with First-Order Logic
+  expressions:
   - **Configurable quantifier scope**: New `quantifierScope` parsing option
     controls how quantifier scope is determined. Use `"tight"` (default) for
     standard FOL conventions where quantifiers bind only the immediately
@@ -10557,9 +10898,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ```
   - **Automatic predicate inference**: Single uppercase letters followed by
     parentheses (e.g., `P(x)`, `Q(a,b)`) are now automatically recognized as
-    predicate/function applications without requiring explicit declaration.
-    This enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)`
-    to work out of the box.
+    predicate/function applications without requiring explicit declaration. This
+    enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)` to work
+    out of the box.
   - **Quantifier evaluation over finite domains**: Quantifiers (`ForAll`,
     `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`) now evaluate to boolean
     values when the bound variable is constrained to a finite set. For example:
@@ -10589,8 +10930,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
     // Returns (A ∧ C) ∨ (B ∧ C)
     ```
-    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and `Nor`
-    operators using De Morgan's laws and distribution.
+    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and
+    `Nor` operators using De Morgan's laws and distribution.
   - **Boolean operator evaluation**: Added evaluation support for `Xor`, `Nand`,
     and `Nor` operators with `True`/`False` arguments:
     ```typescript
@@ -10603,8 +10944,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     - `Xor(a, b, c, ...)` returns true when an odd number of arguments are true
     - `Nand(a, b, c, ...)` returns the negation of `And(a, b, c, ...)`
     - `Nor(a, b, c, ...)` returns the negation of `Or(a, b, c, ...)`
-  - **Satisfiability checking**: New `IsSatisfiable` function checks if a boolean
-    expression can be made true with some assignment of variables:
+  - **Satisfiability checking**: New `IsSatisfiable` function checks if a
+    boolean expression can be made true with some assignment of variables:
     ```typescript
     ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()  // False
     ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()            // True
@@ -10632,7 +10973,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     // Returns ["ForAll", "x", ["Predicate", "P", "x"]]
     ```
     Outside quantifier scopes, `P(x)` is still parsed as `["P", "x"]` to
-    maintain backward compatibility with function definitions like `Q(x) := ...`.
+    maintain backward compatibility with function definitions like
+    `Q(x) := ...`.
   - **`D(f, x)` no longer maps to derivative**: The LaTeX notation `D(f, x)` is
     not standard mathematical notation for derivatives and previously caused
     confusion with the `D` derivative function in MathJSON. Now `D(f, x)` in
@@ -10642,9 +10984,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - **`N(x)` no longer maps to numeric evaluation**: Similarly, `N(x)` in LaTeX
     is CAS-specific notation, not standard math notation. Now `N(x)` parses as
     `["Predicate", "N", "x"]` instead of the numeric evaluation function. This
-    allows `N` to be used as a variable (e.g., "for all N in Naturals"). Use
-    the `.N()` method for numeric evaluation, or construct it directly in
-    MathJSON: `["N", expr]`.
+    allows `N` to be used as a variable (e.g., "for all N in Naturals"). Use the
+    `.N()` method for numeric evaluation, or construct it directly in MathJSON:
+    `["N", expr]`.
 
 - **Polynomial Simplification**: The `simplify()` function now automatically
   cancels common polynomial factors in univariate rational expressions. For
@@ -10656,30 +10998,44 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **Sum/Product Simplification**: Added simplification rules for `Sum` and
   `Product` expressions with symbolic bounds:
   - Constant body: `\sum_{n=1}^{b}(x)` simplifies to `b * x`
-  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to `(b(b+1) - a(a-1))/2`
+  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to
+    `(b(b+1) - a(a-1))/2`
   - Sum of squares: `\sum_{n=1}^{b}(n^2)` simplifies to `b(b+1)(2b+1)/6`
   - Sum of cubes: `\sum_{n=1}^{b}(n^3)` simplifies to `[b(b+1)/2]^2`
   - Geometric series: `\sum_{n=0}^{b}(r^n)` simplifies to `(1-r^(b+1))/(1-r)`
-  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to `(1+(-1)^b)/2`
-  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
-  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
+  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to
+    `(1+(-1)^b)/2`
+  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to
+    `(-1)^b * floor((b+1)/2)`
+  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to
+    `(b+1)(a + db/2)`
   - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
-  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to `0`
-  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to `n * 2^(n-1)`
-  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to `n/(n+1)`
-  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to `(n-1)/n`
-  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to `n(n+1) * 2^(n-2)`
-  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to `n²(n+3) * 2^(n-3)`
-  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))` simplifies to `0` (n ≥ 2)
+  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to
+    `0`
+  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to
+    `n * 2^(n-1)`
+  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to
+    `n/(n+1)`
+  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to
+    `(n-1)/n`
+  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to
+    `n(n+1) * 2^(n-2)`
+  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to
+    `n²(n+3) * 2^(n-3)`
+  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))`
+    simplifies to `0` (n ≥ 2)
   - Sum of binomial squares: `\sum_{k=0}^{n}(C(n,k)^2)` simplifies to `C(2n, n)`
-  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to `n(n+1)(n+2)/3`
-  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)` simplifies to `(b-m+1)(a + d(m+b)/2)`
+  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to
+    `n(n+1)(n+2)/3`
+  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)`
+    simplifies to `(b-m+1)(a + d(m+b)/2)`
   - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
   - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
   - Shifted factorial: `\prod_{n=1}^{b}(n+c)` simplifies to `(b+c)!/c!`
   - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
   - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
-  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
+  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to
+    `(x)_n`
   - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
   - Telescoping product: `\prod_{k=1}^{n}((k+1)/k)` simplifies to `n+1`
   - Wallis-like product: `\prod_{k=2}^{n}(1 - 1/k^2)` simplifies to `(n+1)/(2n)`
@@ -10691,11 +11047,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Edge cases: empty ranges (upper < lower) return identity elements (0 for
     Sum, 1 for Product), and single-iteration ranges substitute the bound value
 
-- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
-  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
-  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
-  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
-  unaffected.
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257)) LaTeX
+  Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as
+  `["Tuple", "GCD", ["Tuple", 24, 37]]` instead of the expected
+  `["GCD", 24, 37]`. The `\operatorname{gcd}` form was unaffected.
 
 ## 0.31.0 _2026-01-27_
 
@@ -14955,19 +15311,69 @@ The limit is taken as $$ h $$ approaches $$ 0 $$ because the derivative is the i
 - **Wolfram Mathworld**: [Derivative](https://mathworld.wolfram.com/Derivative.html)
 - **NIST**: [Derivative](https://dlmf.nist.gov/2.1#E1)
 
-<b>Lagrange Notation</b>
+<b>Lagrange Notation (Prime Notation)</b>
+
+When the prime notation is followed by arguments, the differentiation variable
+is inferred from the first argument:
 
 | LaTeX                 | MathJSON          |
 | :-------------------- | :---------------- |
-| `f'(x)`               | `["Derivative", "f", "x"]` |
-| `f\prime(x)`          | `["Derivative", "f", "x"]` |
-| `f^{\prime}(x)`       |   `["Derivative", "f", "x"]` |
-| `f''(x)`              | `["Derivative", "f", "x", "x"]` |
-| `f\prime\prime(x)`    | `["Derivative", "f", "x", "x"]` |
-| `f^{\prime\prime}(x)` | `["Derivative", "f", "x", "x"]` |
-| `f\doubleprime(x)` |  `["Derivative", "f", "x", "x"]` |
-| `f^{(n)}(x)` |  `["Derivative", "f", "x", n]` |
+| `f'(x)`               | `["D", ["f", "x"], "x"]` |
+| `f''(x)`              | `["D", ["D", ["f", "x"], "x"], "x"]` |
+| `f'''(x)`             | Third derivative with nested `D` |
+| `\sin'(x)`            | `["D", ["Sin", "x"], "x"]` |
 
+When the prime notation is used without arguments, it represents a derivative operator:
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `f'`                  | `["Derivative", "f"]` |
+| `f\prime`             | `["Derivative", "f"]` |
+| `f^{\prime}`          | `["Derivative", "f"]` |
+| `f''`                 | `["Derivative", "f", 2]` |
+| `f^{(n)}`             | `["Derivative", "f", n]` |
+
+<b>Newton Notation (Dot Notation)</b>
+
+Newton's notation uses dots above the variable to indicate time derivatives.
+This is common in physics for derivatives with respect to time.
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `\dot{x}`             | `["D", "x", "t"]` |
+| `\ddot{x}`            | `["D", ["D", "x", "t"], "t"]` |
+| `\dddot{x}`           | Third derivative w.r.t. time |
+| `\ddddot{x}`          | Fourth derivative w.r.t. time |
+
+The time variable defaults to `"t"` but can be configured via the
+`timeDerivativeVariable` parser option:
+
+```javascript
+ce.parse('\\dot{x}', { timeDerivativeVariable: 'τ' })
+// → ["D", "x", "τ"]
+```
+
+<b>Euler Notation (Subscript Notation)</b>
+
+Euler's notation uses subscripts to indicate the differentiation variable:
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `D_x f`               | `["D", "f", "x"]` |
+| `D_t x`               | `["D", "x", "t"]` |
+| `D^2_x f`             | `["D", ["D", "f", "x"], "x"]` |
+| `D_x^2 f`             | `["D", ["D", "f", "x"], "x"]` |
+| `D_x (x^2 + 1)`       | `["D", ["Add", ["Square", "x"], 1], "x"]` |
+
+Note: Plain `D` without a subscript is parsed as a symbol, not a derivative operator.
+
+<b>Leibniz Notation</b>
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `\frac{d}{dx}f`       | `["D", "f", "x"]` |
+| `\frac{df}{dx}`       | `["D", "f", "x"]` |
+| `\frac{d^2f}{dx^2}`   | `["D", ["D", "f", "x"], "x"]` |
 
 The `Derivative` function represents a derivative of a function with respect to a single variable.
 The `D` function is used to calculate the symbolic derivative of a function with respect to one or more variables.
@@ -16011,7 +16417,7 @@ square brackets following a matrix.
 </nav>
 <FunctionDefinition name="Flatten">
 
-<Signature name="Flatten">_matrix_</Signature>
+<Signature name="Flatten">_value_</Signature>
 
 Returns a list of all the elements of the matrix, recursively, in row-major
 order.
@@ -16022,10 +16428,16 @@ Only elements with the same head as the collection are flattened.
 Matrices have a head of `List`, so only other `List` elements
 are flattened.
 
-
 ```json example
 ["Flatten", ["List", ["List", 5, 2, 10, 18], ["List", 1, 2, 3]]]
 // ➔ ["List", 5, 2, 10, 18, 1, 2, 3]
+```
+
+**Scalar**: A scalar is wrapped in a single-element list.
+
+```json example
+["Flatten", 42]
+// ➔ ["List", 42]
 ```
 
 `Flatten` is similar to the APL `,` Ravel operator or `numpy.ravel`
@@ -16062,8 +16474,31 @@ When reshaping, the elements are taken from the original tensor in row-major
 order, that is the order of elements as returned by `Flatten`.
 
 If the result has fewer elements, the elements are dropped from the end of the
-element list. If the result has more elements, the lists of elements
-is filled cyclically. 
+element list. If the result has more elements, the list of elements
+is filled cyclically (APL-style ravel cycling).
+
+```json example
+// Reshape a 7-element vector to a 3x3 matrix (9 elements needed)
+// Elements cycle: 7, -2, 11, -5, 13, -7, 17, 7, -2
+["Reshape", ["List", 7, -2, 11, -5, 13, -7, 17], ["Tuple", 3, 3]]
+// ➔ ["List", ["List", 7, -2, 11], ["List", -5, 13, -7], ["List", 17, 7, -2]]
+```
+
+**Scalar input**: A scalar can be reshaped to any shape. The scalar value is
+replicated to fill the entire result:
+
+```json example
+["Reshape", 42, ["Tuple", 2, 3]]
+// ➔ ["List", ["List", 42, 42, 42], ["List", 42, 42, 42]]
+```
+
+**Empty shape**: Reshaping to an empty shape `["Tuple"]` returns the first
+element as a scalar:
+
+```json example
+["Reshape", ["List", 5, 2, 10], ["Tuple"]]
+// ➔ 5
+```
 
 This is the same behavior as APL, but other environments may behave differently.
 For example, by default Mathematica `ArrayReshape` will fill the missing elements
@@ -16088,10 +16523,29 @@ Returns the transpose of the matrix.
 // ➔ ["List", ["List", 1, 4], ["List", 2, 5], ["List", 3, 6]]
 ```
 
+<Signature name="Transpose">_tensor_</Signature>
+
+For tensors with rank > 2, swaps the last two axes by default (batch transpose).
+This is useful for transposing each matrix "slice" in a batch of matrices.
+
+```json example
+// 2×2×2 tensor (two 2×2 matrices)
+["Transpose", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                       ["List", ["List", 5, 6], ["List", 7, 8]]]]
+// ➔ [[[1,3],[2,4]],[[5,7],[6,8]]] (each matrix transposed)
+```
+
 <Signature name="Transpose">_tensor_, _axis-1_, _axis-2_</Signature>
 
 Swap the two specified axes of the tensor. Note that axis
 indexes start at 1.
+
+```json example
+// Swap axes 1 and 2 of a rank-3 tensor
+["Transpose", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                       ["List", ["List", 5, 6], ["List", 7, 8]]], 1, 2]
+// Rearranges the tensor by swapping the first two axes
+```
 
 </FunctionDefinition>
 
@@ -16106,7 +16560,7 @@ indexes start at 1.
 <Latex value="A^\star"/>
 
 Returns the [conjugate transpose](https://en.wikipedia.org/wiki/Conjugate_transpose) of the matrix, that is
-the transpose of the matrix with all its (complex) elements conjugated. 
+the transpose of the matrix with all its (complex) elements conjugated.
 Also known as the Hermitian transpose.
 
 ```json example
@@ -16114,9 +16568,17 @@ Also known as the Hermitian transpose.
 // ➔ ["List", ["List", 1, 4], ["List", 2, 5], ["List", 3, 6]]
 ```
 
-<Signature name="ConjugateTranspose">_matrix_, _axis-1_, _axis-2_</Signature>
+<Signature name="ConjugateTranspose">_tensor_</Signature>
 
-Swap the two specified axes of the _matrix_. Note that axis
+For tensors with rank > 2, swaps the last two axes by default (batch conjugate transpose)
+and conjugates all elements. This is useful for computing the Hermitian adjoint of each
+matrix "slice" in a batch.
+
+For vectors (rank 1), returns the element-wise conjugate without transposition.
+
+<Signature name="ConjugateTranspose">_tensor_, _axis-1_, _axis-2_</Signature>
+
+Swap the two specified axes of the _tensor_. Note that axis
 indexes start at 1. In addition, all the (complex) elements
 of the tensor are conjugated.
 
@@ -16134,9 +16596,19 @@ Returns the inverse of the matrix.
 
 <Latex value="\mathbf{A}^{-1}"/>
 
+The matrix must be square and non-singular (determinant ≠ 0). For vectors
+or tensors (rank > 2), an `expected-square-matrix` error is returned.
+
 ```json example
 ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", ["List", -2, 1], ["List", 1.5, -0.5]]
+```
+
+**Scalar**: The inverse of a scalar is its reciprocal (1/scalar).
+
+```json example
+["Inverse", 4]
+// ➔ 0.25
 ```
 
 </FunctionDefinition>
@@ -16164,15 +16636,105 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 </nav>
 <FunctionDefinition name="Diagonal">
 
-<Signature name="Diagonal">_matrix_</Signature>
+<Signature name="Diagonal">_value_</Signature>
 
-Returns the diagonal of the matrix, that is the list of all the elements
-on the diagonal of the matrix.
+`Diagonal` has bidirectional behavior depending on the input:
+
+**Vector → Matrix**: When given a vector, creates a square diagonal matrix with
+the vector elements along the diagonal and zeros elsewhere.
+
+```json example
+["Diagonal", ["List", 1, 2, 3]]
+// ➔ ["List", ["List", 1, 0, 0], ["List", 0, 2, 0], ["List", 0, 0, 3]]
+```
+
+**Matrix → Vector**: When given a matrix, extracts the diagonal elements as a
+vector. For non-square matrices, extracts min(rows, cols) diagonal elements.
 
 ```json example
 ["Diagonal", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", 1, 4]
+
+["Diagonal", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ ["List", 1, 5]
 ```
+
+**Scalar**: Returns the scalar unchanged (can be thought of as a 1×1 matrix).
+
+```json example
+["Diagonal", 5]
+// ➔ 5
+```
+
+**Tensor (rank > 2)**: Returns an error. `Diagonal` is only defined for
+vectors and 2D matrices.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IdentityMatrix
+</nav>
+<FunctionDefinition name="IdentityMatrix">
+
+<Signature name="IdentityMatrix">_n_</Signature>
+
+Creates an n×n [identity matrix](https://en.wikipedia.org/wiki/Identity_matrix),
+a square matrix with ones on the main diagonal and zeros elsewhere.
+
+```json example
+["IdentityMatrix", 3]
+// ➔ ["List", ["List", 1, 0, 0], ["List", 0, 1, 0], ["List", 0, 0, 1]]
+
+["IdentityMatrix", 2]
+// ➔ ["List", ["List", 1, 0], ["List", 0, 1]]
+```
+
+The argument _n_ must be a positive integer. If not, an `expected-positive-integer`
+error is returned.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ZeroMatrix
+</nav>
+<FunctionDefinition name="ZeroMatrix">
+
+<Signature name="ZeroMatrix">_m_, _n?_</Signature>
+
+Creates an m×n matrix filled with zeros. If _n_ is omitted, creates a square
+m×m matrix.
+
+```json example
+["ZeroMatrix", 3]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0], ["List", 0, 0, 0]]
+
+["ZeroMatrix", 2, 4]
+// ➔ ["List", ["List", 0, 0, 0, 0], ["List", 0, 0, 0, 0]]
+```
+
+Both _m_ and _n_ must be positive integers.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### OnesMatrix
+</nav>
+<FunctionDefinition name="OnesMatrix">
+
+<Signature name="OnesMatrix">_m_, _n?_</Signature>
+
+Creates an m×n matrix filled with ones. If _n_ is omitted, creates a square
+m×m matrix.
+
+```json example
+["OnesMatrix", 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1], ["List", 1, 1, 1]]
+
+["OnesMatrix", 2, 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1]]
+```
+
+Both _m_ and _n_ must be positive integers.
 
 </FunctionDefinition>
 
@@ -16188,9 +16750,20 @@ on the diagonal of the matrix.
 
 Returns the determinant of the matrix.
 
+The matrix must be square (same number of rows and columns). For vectors
+or tensors (rank > 2), an `expected-square-matrix` error is returned.
+
 ```json example
 ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ -2
+```
+
+**Scalar**: The determinant of a scalar (thought of as a 1×1 matrix) is the
+scalar itself.
+
+```json example
+["Determinant", 5]
+// ➔ 5
 ```
 
 </FunctionDefinition>
@@ -16232,14 +16805,386 @@ the element.
 
 <Latex value="\operatorname{tr}(\mathbf{A})"/>
 
-Returns the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of 
-the matrix, the sum of the elements on the diagonal of the matrix. The trace 
-is only defined for square matrices. The trace is also the sum of the 
+Returns the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of
+the matrix, the sum of the elements on the diagonal of the matrix. The trace
+is only defined for square matrices. The trace is also the sum of the
 eigenvalues of the matrix.
 
 ```json example
 ["Trace", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ 5
+```
+
+**Scalar**: The trace of a scalar (thought of as a 1×1 matrix) is the
+scalar itself.
+
+**Vector**: For vectors (rank 1), an `expected-matrix-or-tensor` error is returned.
+
+<Signature name="Trace">_tensor_</Signature>
+
+For tensors with rank > 2 (batch trace), returns a tensor of traces computed over
+the last two axes. The last two axes must have the same size (square slices).
+
+```json example
+// 2×2×2 tensor (two 2×2 matrices)
+["Trace", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                   ["List", ["List", 5, 6], ["List", 7, 8]]]]
+// ➔ [5, 13] (trace of first matrix: 1+4=5, trace of second: 5+8=13)
+```
+
+<Signature name="Trace">_tensor_, _axis-1_, _axis-2_</Signature>
+
+Compute the trace over the specified axes. Both axes must have the same size.
+Note that axis indexes start at 1.
+
+```json example
+// Trace over axes 1 and 2 instead of last two axes
+["Trace", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                   ["List", ["List", 5, 6], ["List", 7, 8]]], 1, 2]
+// Returns a vector with traces computed over the first two axes
+```
+
+```json example
+["Trace", 5]
+// ➔ 5
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### MatrixMultiply
+</nav>
+<FunctionDefinition name="MatrixMultiply">
+
+<Signature name="MatrixMultiply">_A_, _B_</Signature>
+
+<Latex value="\mathbf{A} \cdot \mathbf{B}"/>
+
+Returns the [matrix product](https://en.wikipedia.org/wiki/Matrix_multiplication)
+of two matrices, vectors, or a combination thereof.
+
+**Matrix × Matrix**: If _A_ is an m×n matrix and _B_ is an n×p matrix, the result
+is an m×p matrix where each element (i,j) is the dot product of row i of _A_
+and column j of _B_.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
+```
+
+**Matrix × Vector**: If _A_ is an m×n matrix and _B_ is an n-element vector
+(treated as a column vector), the result is an m-element vector.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]],
+  ["List", 1, 2, 3]]
+// ➔ ["List", 14, 32]
+```
+
+**Vector × Matrix**: If _A_ is an m-element vector (treated as a row vector)
+and _B_ is an m×n matrix, the result is an n-element vector.
+
+```json example
+["MatrixMultiply",
+  ["List", 1, 2],
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ ["List", 9, 12, 15]
+```
+
+**Vector × Vector (Dot Product)**: If both _A_ and _B_ are vectors of the same
+length, the result is their dot product (a scalar).
+
+```json example
+["MatrixMultiply",
+  ["List", 1, 2, 3],
+  ["List", 4, 5, 6]]
+// ➔ 32
+```
+
+**Dimension Validation**: The inner dimensions must match. For matrix × matrix,
+the number of columns in _A_ must equal the number of rows in _B_. If dimensions
+are incompatible, an `incompatible-dimensions` error is returned.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", 1, 2, 3]]
+// ➔ Error("incompatible-dimensions", "2 vs 3")
+```
+
+**Symbolic Operations**: `MatrixMultiply` works with symbolic matrices:
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", "a", "b"], ["List", "c", "d"]],
+  ["List", ["List", "e", "f"], ["List", "g", "h"]]]
+// ➔ ["List", ["List", ["Add", ["Multiply", "a", "e"], ["Multiply", "b", "g"]], ...], ...]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Matrix Addition (Add)
+</nav>
+<FunctionDefinition name="Add">
+
+<Signature name="Add">_A_, _B_, ...</Signature>
+
+The `Add` function supports element-wise addition of matrices and vectors,
+as well as scalar broadcasting.
+
+**Matrix + Matrix**: If all matrix operands have the same shape, elements are
+added position by position.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 6, 8], ["List", 10, 12]]
+```
+
+**Scalar + Matrix**: A scalar is broadcast to all elements of the matrix.
+
+```json example
+["Add", 10, ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", ["List", 11, 12], ["List", 13, 14]]
+```
+
+**Vector + Vector**: Vectors of the same length are added element-wise.
+
+```json example
+["Add", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+// ➔ ["List", 5, 7, 9]
+```
+
+**Scalar + Vector**: A scalar is broadcast to all elements of the vector.
+
+```json example
+["Add", ["List", 7, 11], 3]
+// ➔ ["List", 10, 14]
+```
+
+**Multiple Operands**: Multiple matrices and scalars can be combined in a
+single `Add` operation.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  10,
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 16, 18], ["List", 20, 22]]
+```
+
+**Symbolic Operations**: `Add` works with symbolic matrices:
+
+```json example
+["Add",
+  ["List", ["List", "a", "b"], ["List", "c", "d"]],
+  ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", ["List", ["Add", "a", 1], ["Add", "b", 2]], ["List", ["Add", "c", 3], ["Add", "d", 4]]]
+```
+
+**Dimension Validation**: All matrices must have the same shape. If shapes
+are incompatible, an `incompatible-dimensions` error is returned.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]],
+  ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ Error("incompatible-dimensions", "2x2 vs 2x3")
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Norm
+</nav>
+<FunctionDefinition name="Norm">
+
+<Signature name="Norm">_value_</Signature>
+
+<Signature name="Norm">_value_, _p_</Signature>
+
+<Latex value="\| \mathbf{v} \|"/>
+
+Returns the [norm](https://en.wikipedia.org/wiki/Norm_(mathematics)) of a vector
+or matrix.
+
+**Scalar**: The norm of a scalar is its absolute value.
+
+```json example
+["Norm", -5]
+// ➔ 5
+```
+
+**Vector Norms**:
+
+The default is the L2 (Euclidean) norm: sqrt(sum of |xi|^2)
+
+```json example
+["Norm", ["List", 3, 4]]
+// ➔ 5
+```
+
+The second argument specifies the norm type:
+
+- **L1 norm** (_p_ = 1): Sum of absolute values: sum of |xi|
+
+```json example
+["Norm", ["List", 3, -4], 1]
+// ➔ 7
+```
+
+- **L2 norm** (_p_ = 2, default): Euclidean norm: sqrt(sum of |xi|^2)
+
+```json example
+["Norm", ["List", 3, 4], 2]
+// ➔ 5
+```
+
+- **L-infinity norm** (_p_ = `"Infinity"`): Maximum absolute value: max(|xi|)
+
+```json example
+["Norm", ["List", 3, -4], "Infinity"]
+// ➔ 4
+```
+
+- **General Lp norm**: (sum of |xi|^p)^(1/p)
+
+```json example
+["Norm", ["List", 3, 4], 3]
+// ➔ 4.498 (the cube root of 91)
+```
+
+**Matrix Norms**:
+
+For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ sqrt(30) ≈ 5.477
+```
+
+- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
+// ➔ sqrt(30) ≈ 5.477
+```
+
+- **L1 norm** (_p_ = 1): Maximum column sum of absolute values
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 1]
+// ➔ 6 (max of column sums: 4 and 6)
+```
+
+- **L-infinity norm** (_p_ = `"Infinity"`): Maximum row sum of absolute values
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Infinity"]
+// ➔ 7 (max of row sums: 3 and 7)
+```
+
+</FunctionDefinition>
+
+
+## Eigenvalues and Eigenvectors
+
+<nav className="hidden">
+### Eigenvalues
+</nav>
+<FunctionDefinition name="Eigenvalues">
+
+<Signature name="Eigenvalues">_matrix_</Signature>
+
+Returns the [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalue) of a square matrix as a list.
+
+Eigenvalues are the scalars λ such that Av = λv for some non-zero vector v (the eigenvector).
+
+The matrix must be square. For non-square matrices, an `expected-square-matrix` error is returned.
+
+```json example
+["Eigenvalues", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["List", 2, 3]
+
+["Eigenvalues", ["List", ["List", 4, 2], ["List", 1, 3]]]
+// ➔ ["List", 5, 2]  (roots of characteristic polynomial)
+```
+
+**Computation Methods**:
+- **1×1 matrices**: Returns the single element
+- **Diagonal/triangular matrices**: Returns the diagonal elements (fast path)
+- **2×2 matrices**: Uses the quadratic formula on the characteristic polynomial
+- **3×3 matrices**: Uses Cardano's formula for the cubic characteristic polynomial
+- **Larger matrices**: Uses the QR algorithm for numerical computation
+
+**Symbolic matrices**: For symbolic matrices, the eigenvalue computation may be returned unevaluated if closed-form solutions cannot be determined.
+
+```json example
+["Eigenvalues", ["List", ["List", "a", 0], ["List", 0, "b"]]]
+// ➔ ["List", "a", "b"]  (diagonal matrix)
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Eigenvectors
+</nav>
+<FunctionDefinition name="Eigenvectors">
+
+<Signature name="Eigenvectors">_matrix_</Signature>
+
+Returns the [eigenvectors](https://en.wikipedia.org/wiki/Eigenvector) of a square matrix as a list of vectors.
+
+An eigenvector v is a non-zero vector such that Av = λv for some eigenvalue λ.
+
+The eigenvectors are returned in the same order as the eigenvalues from `Eigenvalues`.
+Each eigenvector is normalized.
+
+```json example
+["Eigenvectors", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["List", ["List", 1, 0], ["List", 0, 1]]
+
+["Eigenvectors", ["List", ["List", 4, 2], ["List", 1, 3]]]
+// ➔ ["List", ["List", 0.894, 0.447], ["List", -0.707, 0.707]]
+```
+
+**Computation**: For each eigenvalue λ, the eigenvector is found by solving the null space of (A - λI), where I is the identity matrix.
+
+**Numerical precision**: For matrices with repeated or nearly-repeated eigenvalues, eigenvector computation may be less numerically stable.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Eigen
+</nav>
+<FunctionDefinition name="Eigen">
+
+<Signature name="Eigen">_matrix_</Signature>
+
+Returns both the eigenvalues and eigenvectors of a square matrix as a dictionary with keys `Eigenvalues` and `Eigenvectors`.
+
+This is more efficient than calling `Eigenvalues` and `Eigenvectors` separately when both are needed.
+
+```json example
+["Eigen", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["Dictionary",
+//     ["KeyValuePair", "Eigenvalues", ["List", 2, 3]],
+//     ["KeyValuePair", "Eigenvectors", ["List", ["List", 1, 0], ["List", 0, 1]]]]
+```
+
+**Usage**: Access the components using dictionary operations:
+
+```json example
+["At", ["Eigen", matrix], "Eigenvalues"]
+// Returns just the eigenvalues
+
+["At", ["Eigen", matrix], "Eigenvectors"]
+// Returns just the eigenvectors
 ```
 
 </FunctionDefinition>
@@ -18939,6 +19884,840 @@ evaluations for their numeric functions:
 
 </div>
 ---
+title: Linear Algebra
+slug: /compute-engine/guides/linear-algebra/
+---
+
+This guide covers working with vectors, matrices, and tensors in the Compute
+Engine. You'll learn how to create, manipulate, and perform operations on
+multidimensional arrays.
+
+## LaTeX Matrix Notation
+
+The Compute Engine supports standard LaTeX matrix environments. Here's a quick
+reference:
+
+### Matrix Environments
+
+| LaTeX Environment | Delimiters | Example |
+|-------------------|------------|---------|
+| `matrix` | None | $\begin{matrix} a & b \\ c & d \end{matrix}$ |
+| `pmatrix` | Parentheses ( ) | $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$ |
+| `bmatrix` | Brackets [ ] | $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$ |
+| `vmatrix` | Vertical bars \| \| | $\begin{vmatrix} a & b \\ c & d \end{vmatrix}$ (determinant) |
+| `Vmatrix` | Double bars ‖ ‖ | $\begin{Vmatrix} a & b \\ c & d \end{Vmatrix}$ (norm) |
+
+```js example
+const ce = new ComputeEngine();
+
+// All these create the same 2×2 matrix internally
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+ce.parse('\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}');
+ce.parse('\\begin{matrix} 1 & 2 \\\\ 3 & 4 \\end{matrix}');
+// → ["List", ["List", 1, 2], ["List", 3, 4]]
+
+// vmatrix is parsed as a determinant
+ce.parse('\\begin{vmatrix} 1 & 2 \\\\ 3 & 4 \\end{vmatrix}');
+// → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
+```
+
+### LaTeX Syntax Rules
+
+- Use `&` to separate columns
+- Use `\\` to separate rows
+- Spaces are optional but improve readability
+
+```latex
+% Row vector (1×3)
+\begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+
+% Column vector (3×1)
+\begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}
+
+% 2×3 matrix
+\begin{bmatrix}
+  1 & 2 & 3 \\
+  4 & 5 & 6
+\end{bmatrix}
+
+% Symbolic matrix
+\begin{pmatrix}
+  a & b \\
+  c & d
+\end{pmatrix}
+```
+
+### Common Operations in LaTeX
+
+```js example
+// Transpose using superscript T
+ce.parse('A^T');
+// → ["Transpose", "A"]
+
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^T');
+// → ["Transpose", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Determinant using vertical bars
+ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}');
+// → ["Determinant", ["List", ["List", "a", "b"], ["List", "c", "d"]]]
+
+// Determinant using \det command
+ce.parse('\\det\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+// → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Inverse using superscript -1
+ce.parse('A^{-1}');
+// → ["Inverse", "A"]
+
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
+// → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Trace using \operatorname
+ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+// → ["Trace", ["List", ["List", 1, 2], ["List", 3, 4]]]
+```
+
+## Creating Vectors and Matrices
+
+### Vectors
+
+A vector is a one-dimensional array represented as a `List`:
+
+```js example
+const ce = new ComputeEngine();
+
+// Row vector
+const v = ce.box(['List', 1, 2, 3]);
+console.log(v.toString());  // → [1, 2, 3]
+
+// Parse from LaTeX
+ce.parse('\\begin{bmatrix} 1 & 2 & 3 \\end{bmatrix}');
+// → ["List", 1, 2, 3]
+```
+
+For column vectors, use `Vector`:
+
+```js example
+// Column vector
+ce.box(['Vector', 1, 2, 3]);
+// Internally becomes: ["Matrix", ["List", ["List", 1], ["List", 2], ["List", 3]]]
+
+// Parse from LaTeX
+ce.parse('\\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}');
+```
+
+### Matrices
+
+A matrix is a two-dimensional array represented as a nested `List`:
+
+```js example
+// 2×3 matrix
+const M = ce.box(['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]);
+console.log(M.toString());  // → [[1, 2, 3], [4, 5, 6]]
+
+// Parse from LaTeX
+ce.parse('\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}');
+```
+
+### Tensors
+
+Higher-dimensional arrays (tensors) use deeper nesting:
+
+```js example
+// 2×2×2 tensor
+const T = ce.box(['List',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]);
+```
+
+## Understanding Shape and Rank
+
+### Shape
+
+The **shape** of an array is a tuple of dimensions along each axis:
+
+```js example
+// Scalar: empty shape
+ce.box(['Shape', 5]).evaluate();  // → ()
+
+// Vector: single dimension
+ce.box(['Shape', ['List', 1, 2, 3]]).evaluate();  // → (3)
+
+// 2×3 Matrix
+ce.box(['Shape', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]]).evaluate();  // → (2, 3)
+
+// 2×3×4 Tensor
+ce.box(['Shape', ['List',
+  ['List', ['List', 1, 2, 3, 4], ['List', 5, 6, 7, 8], ['List', 9, 10, 11, 12]],
+  ['List', ['List', 13, 14, 15, 16], ['List', 17, 18, 19, 20], ['List', 21, 22, 23, 24]]
+]]).evaluate();  // → (2, 3, 4)
+```
+
+### Rank
+
+The **rank** is the number of dimensions (length of the shape):
+
+```js example
+ce.box(['Rank', 5]).evaluate();                  // → 0 (scalar)
+ce.box(['Rank', ['List', 1, 2, 3]]).evaluate();  // → 1 (vector)
+ce.box(['Rank', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();  // → 2 (matrix)
+```
+
+## Transforming Arrays
+
+### Flatten
+
+`Flatten` converts any array to a 1D list in row-major order:
+
+```js example
+// Flatten a matrix
+ce.box(['Flatten', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]]).evaluate();
+// → [1, 2, 3, 4, 5, 6]
+
+// Flatten a scalar (returns single-element list)
+ce.box(['Flatten', 42]).evaluate();
+// → [42]
+```
+
+### Reshape
+
+`Reshape` changes the dimensions of an array. Elements are taken in row-major
+order and cycle if needed (APL-style):
+
+```js example
+// Reshape a vector to a matrix
+ce.box(['Reshape', ['List', 1, 2, 3, 4, 5, 6], ['Tuple', 2, 3]]).evaluate();
+// → [[1, 2, 3], [4, 5, 6]]
+
+// Reshape with cycling (7 elements → 9 needed for 3×3)
+ce.box(['Reshape', ['List', 1, 2, 3, 4, 5, 6, 7], ['Tuple', 3, 3]]).evaluate();
+// → [[1, 2, 3], [4, 5, 6], [7, 1, 2]]
+
+// Create a matrix filled with a single value
+ce.box(['Reshape', 0, ['Tuple', 3, 3]]).evaluate();
+// → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+// Reshape to scalar (takes first element)
+ce.box(['Reshape', ['List', 5, 10, 15], ['Tuple']]).evaluate();
+// → 5
+```
+
+### Transpose
+
+`Transpose` swaps rows and columns (or specified axes):
+
+```js example
+ce.box(['Transpose', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]]).evaluate();
+// → [[1, 4], [2, 5], [3, 6]]
+
+// Transpose of a scalar is itself
+ce.box(['Transpose', 42]).evaluate();
+// → 42
+```
+
+**LaTeX:** Use superscript `T` for transpose:
+
+```js example
+ce.parse('\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}^T').evaluate();
+// → [[1, 4], [2, 5], [3, 6]]
+
+// Or with a named matrix
+ce.parse('A^T');  // → ["Transpose", "A"]
+```
+
+### Conjugate Transpose
+
+For complex matrices, `ConjugateTranspose` transposes and conjugates each element:
+
+```js example
+ce.box(['ConjugateTranspose', ['List',
+  ['List', ['Complex', 1, 2], ['Complex', 3, 4]],
+  ['List', ['Complex', 5, 6], ['Complex', 7, 8]]
+]]).evaluate();
+// → [[(1 - 2i), (5 - 6i)], [(3 - 4i), (7 - 8i)]]
+```
+
+**LaTeX:** Use superscript `*`, `†` (dagger), or `H` (Hermitian):
+
+```js example
+ce.parse('A^*');   // → ["ConjugateTranspose", "A"]
+ce.parse('A^\\dagger');  // → ["ConjugateTranspose", "A"]
+```
+
+## Working with Diagonals
+
+The `Diagonal` function has bidirectional behavior:
+
+### Extract Diagonal from Matrix
+
+```js example
+ce.box(['Diagonal', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6],
+  ['List', 7, 8, 9]
+]]).evaluate();
+// → [1, 5, 9]
+```
+
+### Create Diagonal Matrix from Vector
+
+```js example
+ce.box(['Diagonal', ['List', 1, 2, 3]]).evaluate();
+// → [[1, 0, 0], [0, 2, 0], [0, 0, 3]]
+
+// Create an identity matrix
+ce.box(['Diagonal', ['List', 1, 1, 1]]).evaluate();
+// → [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+```
+
+## Matrix Computations
+
+### Determinant
+
+The determinant is defined for square matrices:
+
+```js example
+ce.box(['Determinant', ['List',
+  ['List', 1, 2],
+  ['List', 3, 4]
+]]).evaluate();
+// → -2
+
+// Symbolic determinant
+ce.box(['Determinant', ['List',
+  ['List', 'a', 'b'],
+  ['List', 'c', 'd']
+]]).evaluate();
+// → a*d - b*c
+```
+
+**LaTeX:** Use `vmatrix` environment or `\det` command:
+
+```js example
+// Using vmatrix (vertical bars denote determinant)
+ce.parse('\\begin{vmatrix} 1 & 2 \\\\ 3 & 4 \\end{vmatrix}').evaluate();
+// → -2
+
+// Using \det command
+ce.parse('\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}').evaluate();
+// → a*d - b*c
+
+// Symbolic determinant
+ce.parse('\\det(A)');  // → ["Determinant", "A"]
+```
+
+### Trace
+
+The trace is the sum of diagonal elements:
+
+```js example
+ce.box(['Trace', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6],
+  ['List', 7, 8, 9]
+]]).evaluate();
+// → 15  (1 + 5 + 9)
+```
+
+**LaTeX:** Use `\operatorname{tr}` or `\mathrm{tr}`:
+
+```js example
+ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}').evaluate();
+// → 15
+
+ce.parse('\\operatorname{tr}(A)');  // → ["Trace", "A"]
+```
+
+### Inverse
+
+```js example
+ce.box(['Inverse', ['List',
+  ['List', 1, 2],
+  ['List', 3, 4]
+]]).evaluate();
+// → [[-2, 1], [1.5, -0.5]]
+
+// Inverse of a scalar is its reciprocal
+ce.box(['Inverse', 4]).evaluate();
+// → 0.25
+```
+
+**LaTeX:** Use superscript `-1`:
+
+```js example
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}').evaluate();
+// → [[-2, 1], [1.5, -0.5]]
+
+ce.parse('A^{-1}');  // → ["Inverse", "A"]
+```
+
+### Norm
+
+The `Norm` function computes various norms for vectors and matrices.
+
+**Vector Norms:**
+
+```js example
+// L2 norm (Euclidean, default): √(|3|² + |4|²) = 5
+ce.box(['Norm', ['List', 3, 4]]).evaluate();
+// → 5
+
+// L1 norm: |3| + |-4| = 7
+ce.box(['Norm', ['List', 3, -4], 1]).evaluate();
+// → 7
+
+// L-infinity norm: max(|3|, |-4|) = 4
+ce.box(['Norm', ['List', 3, -4], 'Infinity']).evaluate();
+// → 4
+
+// General Lp norm: (|3|³ + |4|³)^(1/3)
+ce.box(['Norm', ['List', 3, 4], 3]).evaluate();
+// → ≈4.498
+```
+
+**Matrix Norms:**
+
+```js example
+// Frobenius norm (default): √(1² + 2² + 3² + 4²) = √30
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+// → √30 ≈ 5.477
+
+// L1 norm: max column sum = max(4, 6) = 6
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
+// → 6
+
+// L-infinity norm: max row sum = max(3, 7) = 7
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 'Infinity']).evaluate();
+// → 7
+```
+
+**Scalar:** The norm of a scalar is its absolute value.
+
+```js example
+ce.box(['Norm', -5]).evaluate();
+// → 5
+```
+
+## Eigenvalues and Eigenvectors
+
+Eigenvalues and eigenvectors are fundamental concepts in linear algebra, used
+in applications ranging from principal component analysis to solving differential
+equations.
+
+### Computing Eigenvalues
+
+The `Eigenvalues` function returns the eigenvalues of a square matrix:
+
+```js example
+// Diagonal matrix: eigenvalues are the diagonal elements
+ce.box(['Eigenvalues', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → [2, 3]
+
+// General 2×2 matrix
+ce.box(['Eigenvalues', ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+]]).evaluate();
+// → [5, 2]
+
+// 3×3 matrix
+ce.box(['Eigenvalues', ['List',
+  ['List', 1, 2, 0],
+  ['List', 0, 3, 0],
+  ['List', 2, -4, 2]
+]]).evaluate();
+// → [3, 2, 1]
+```
+
+### Computing Eigenvectors
+
+The `Eigenvectors` function returns the eigenvectors corresponding to each
+eigenvalue:
+
+```js example
+// Eigenvectors of a diagonal matrix are the standard basis vectors
+ce.box(['Eigenvectors', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → [[1, 0], [0, 1]]
+
+// General matrix eigenvectors
+ce.box(['Eigenvectors', ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+]]).evaluate();
+// → [[0.894, 0.447], [-0.707, 0.707]]
+```
+
+### Getting Both at Once
+
+Use `Eigen` to compute both eigenvalues and eigenvectors in a single operation:
+
+```js example
+const result = ce.box(['Eigen', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → Dictionary with 'Eigenvalues' and 'Eigenvectors' keys
+
+// Access the components
+ce.box(['At', result, 'Eigenvalues']).evaluate();
+// → [2, 3]
+
+ce.box(['At', result, 'Eigenvectors']).evaluate();
+// → [[1, 0], [0, 1]]
+```
+
+### Practical Example: Diagonalization
+
+A matrix A can be diagonalized as A = PDP⁻¹ where D is a diagonal matrix of
+eigenvalues and P is the matrix of eigenvectors:
+
+```js example
+const A = ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+];
+
+// Get eigenvalues and eigenvectors
+const eigenvalues = ce.box(['Eigenvalues', A]).evaluate();
+// → [5, 2]
+
+const eigenvectors = ce.box(['Eigenvectors', A]).evaluate();
+// → [[0.894, 0.447], [-0.707, 0.707]]
+
+// The eigenvalues form the diagonal of D
+const D = ce.box(['Diagonal', eigenvalues]).evaluate();
+// → [[5, 0], [0, 2]]
+```
+
+## Matrix Multiplication
+
+Use `MatrixMultiply` to perform matrix multiplication. The function supports
+multiple combinations of operands:
+
+### Matrix × Matrix
+
+```js example
+// 2×3 matrix times 3×2 matrix → 2×2 matrix
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', ['List', 7, 8], ['List', 9, 10], ['List', 11, 12]]
+]).evaluate();
+// → [[58, 64], [139, 154]]
+
+// Symbolic matrix multiplication
+ce.box(['MatrixMultiply',
+  ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
+  ['List', ['List', 'e', 'f'], ['List', 'g', 'h']]
+]).evaluate();
+// → [[a*e + b*g, a*f + b*h], [c*e + d*g, c*f + d*h]]
+```
+
+### Matrix × Vector
+
+When multiplying a matrix by a vector, the vector is treated as a column vector:
+
+```js example
+// 2×3 matrix times 3-vector → 2-vector
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', 1, 2, 3]
+]).evaluate();
+// → [14, 32]
+```
+
+### Vector × Matrix
+
+When a vector multiplies a matrix, it's treated as a row vector:
+
+```js example
+// 2-vector times 2×3 matrix → 3-vector
+ce.box(['MatrixMultiply',
+  ['List', 1, 2],
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]]
+]).evaluate();
+// → [9, 12, 15]
+```
+
+### Dot Product (Vector × Vector)
+
+Multiplying two vectors of the same length computes their dot product:
+
+```js example
+ce.box(['MatrixMultiply',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]).evaluate();
+// → 32  (1*4 + 2*5 + 3*6)
+```
+
+### Dimension Validation
+
+`MatrixMultiply` validates that dimensions are compatible and returns an error
+if they don't match:
+
+```js example
+// 2×2 matrix times 3-vector: incompatible (2 ≠ 3)
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', 1, 2, 3]
+]).evaluate();
+// → Error("incompatible-dimensions", "2 vs 3")
+```
+
+### LaTeX Serialization
+
+`MatrixMultiply` expressions serialize using the `\cdot` notation:
+
+```js example
+const A = ['Matrix', ['List', ['List', 1, 2], ['List', 3, 4]]];
+const B = ['Matrix', ['List', ['List', 5, 6], ['List', 7, 8]]];
+ce.box(['MatrixMultiply', A, B]).latex;
+// → "\begin{pmatrix}1 & 2\\ 3 & 4\end{pmatrix} \cdot \begin{pmatrix}5 & 6\\ 7 & 8\end{pmatrix}"
+```
+
+## Matrix Addition and Scalar Broadcasting
+
+The `Add` function supports element-wise addition of matrices and vectors,
+as well as scalar broadcasting.
+
+### Matrix + Matrix
+
+Add two matrices of the same shape element-wise:
+
+```js example
+// 2×2 matrix + 2×2 matrix
+ce.box(['Add',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[6, 8], [10, 12]]
+
+// Symbolic matrix addition
+ce.box(['Add',
+  ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
+  ['List', ['List', 1, 2], ['List', 3, 4]]
+]).evaluate();
+// → [[a + 1, b + 2], [c + 3, d + 4]]
+```
+
+### Scalar + Matrix
+
+Add a scalar to every element of a matrix:
+
+```js example
+// Scalar + 2×2 matrix
+ce.box(['Add', 10, ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+// → [[11, 12], [13, 14]]
+
+// Multiple operands: scalar + matrix + matrix
+ce.box(['Add',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  10,
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[16, 18], [20, 22]]
+```
+
+### Vector Addition
+
+Vectors also support element-wise addition and scalar broadcasting:
+
+```js example
+// Vector + vector
+ce.box(['Add', ['List', 1, 2, 3], ['List', 4, 5, 6]]).evaluate();
+// → [5, 7, 9]
+
+// Scalar + vector
+ce.box(['Add', ['List', 7, 11], 3]).evaluate();
+// → [10, 14]
+```
+
+### Dimension Validation
+
+`Add` validates that all matrices have compatible dimensions:
+
+```js example
+// 2×3 matrix + 2×2 matrix: incompatible shapes
+ce.box(['Add',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', ['List', 1, 2], ['List', 3, 4]]
+]).evaluate();
+// → Error("incompatible-dimensions", "2x2 vs 2x3")
+```
+
+## Accessing Elements
+
+Use `At` to access elements by index (1-based):
+
+```js example
+const M = ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+];
+
+// Access element at row 2, column 3
+ce.box(['At', M, 2, 3]).evaluate();
+// → 6
+
+// Negative indices count from the end
+ce.box(['At', M, -1, -1]).evaluate();
+// → 6 (last row, last column)
+```
+
+## Practical Examples
+
+### Creating Special Matrices
+
+```js example
+// Identity matrix (3×3)
+ce.box(['IdentityMatrix', 3]).evaluate();
+// → [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+// Zero matrix (3×3) - square
+ce.box(['ZeroMatrix', 3]).evaluate();
+// → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+// Zero matrix (2×4) - rectangular
+ce.box(['ZeroMatrix', 2, 4]).evaluate();
+// → [[0, 0, 0, 0], [0, 0, 0, 0]]
+
+// Ones matrix (2×3)
+ce.box(['OnesMatrix', 2, 3]).evaluate();
+// → [[1, 1, 1], [1, 1, 1]]
+
+// Matrix filled with a specific value using Reshape
+ce.box(['Reshape', 7, ['Tuple', 2, 4]]).evaluate();
+// → [[7, 7, 7, 7], [7, 7, 7, 7]]
+
+// Diagonal matrix from vector
+ce.box(['Diagonal', ['List', 1, 2, 3]]).evaluate();
+// → [[1, 0, 0], [0, 2, 0], [0, 0, 3]]
+```
+
+### Matrix Properties
+
+```js example
+const M = ['List',
+  ['List', 'a', 'b'],
+  ['List', 'c', 'd']
+];
+
+// Check if square: compare shape dimensions
+const shape = ce.box(['Shape', M]).evaluate();
+// → (2, 2) - equal dimensions means square
+```
+
+### Solving Linear Systems
+
+To solve Ax = b, multiply both sides by A⁻¹:
+
+```js example
+// Solve: x + 2y = 5, 3x + 4y = 11
+// Matrix form: [[1, 2], [3, 4]] * [x, y]ᵀ = [5, 11]ᵀ
+
+const A = ['List', ['List', 1, 2], ['List', 3, 4]];
+const b = ['List', 5, 11];
+
+// x = A⁻¹ * b
+const A_inv = ce.box(['Inverse', A]).evaluate();
+// → [[-2, 1], [1.5, -0.5]]
+
+const solution = ce.box(['MatrixMultiply', A_inv, b]).evaluate();
+// → [1, 2]
+// Solution: x = 1, y = 2
+```
+
+## Performance Considerations
+
+Tensors are stored internally in an optimized format:
+
+- **Memory efficient**: Uses flat arrays with stride calculations
+- **O(1) reshaping**: `Reshape` and `Transpose` often just change metadata
+- **Lazy evaluation**: Operations are computed on demand
+
+For large matrices, avoid creating intermediate results when possible:
+
+```js example
+// Instead of multiple reshape operations, compute the final shape first
+const data = ['Range', 1, 24];
+ce.box(['Reshape', data, ['Tuple', 2, 3, 4]]).evaluate();
+```
+
+## Error Handling
+
+Operations that require specific matrix properties return errors when those
+properties aren't met:
+
+```js example
+// Determinant requires a square matrix
+ce.box(['Determinant', ['List', 1, 2, 3]]).evaluate();
+// → Error("expected-square-matrix", "[1, 2, 3]")
+
+// Inverse requires a square matrix
+ce.box(['Inverse', ['List',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]]).evaluate();
+// → Error("expected-square-matrix", "[[1, 2, 3], [4, 5, 6]]")
+```
+
+## Serializing to LaTeX
+
+After performing computations, you can convert results back to LaTeX for display:
+
+```js example
+const ce = new ComputeEngine();
+
+// Create and evaluate a matrix operation
+const M = ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+const inv = ce.box(['Inverse', M]).evaluate();
+
+// Convert back to LaTeX
+console.log(inv.latex);
+// → "\begin{pmatrix}-2 & 1\\ \frac{3}{2} & -\frac{1}{2}\end{pmatrix}"
+
+// Transpose example
+const T = ce.box(['Transpose', M]).evaluate();
+console.log(T.latex);
+// → "\begin{pmatrix}1 & 3\\ 2 & 4\end{pmatrix}"
+
+// Determinant (returns a scalar)
+const det = ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}').evaluate();
+console.log(det.latex);
+// → "ad - bc"
+```
+
+### Controlling Matrix Delimiters
+
+By default, matrices serialize with parentheses (`pmatrix`). The delimiter style
+is preserved from the original parse when possible.
+
+## See Also
+
+- [Linear Algebra Reference](/compute-engine/reference/linear-algebra/) - Complete
+  list of linear algebra functions
+- [Collections Reference](/compute-engine/reference/collections/) - Working with
+  lists and other collections
+---
 title: Simplify
 slug: /compute-engine/guides/simplify/
 ---
@@ -20018,6 +21797,83 @@ Evaluate to the sum of `body` for each value in `bounds`.
 // ➔ 65
 ```
 
+<Signature name="Sum" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the sum of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\sum_{n \in \{1,2,3\}} n"/>
+
+```json example
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 6
+
+["Sum", ["Power", "n", 2], ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 14  (1² + 2² + 3² = 1 + 4 + 9)
+
+["Sum", "n", ["Element", "n", ["Range", 1, 5]]]
+// ➔ 15  (1 + 2 + 3 + 4 + 5)
+```
+
+The indexing set can be:
+- **Set**: `["Set", 1, 2, 3]` - explicit finite set of values
+- **List**: `["List", 1, 2, 3]` - ordered list of values
+- **List (2-element)**: `["List", 1, 5]` - when a List has exactly 2 integer elements,
+  it is treated as a Range. This allows bracket notation like `\sum_{n \in [1,5]} n`
+  to iterate over all integers from 1 to 5 (evaluates to 15, not 6).
+- **Range**: `["Range", 1, 10]` - integer range from 1 to 10
+- **Interval**: `["Interval", 1, 10]` - enumerates integers in the interval.
+  Supports `Open` and `Closed` boundary markers:
+  - `["Interval", 1, 5]` → iterates 1, 2, 3, 4, 5 (closed bounds)
+  - `["Interval", ["Open", 0], 5]` → iterates 1, 2, 3, 4, 5 (excludes 0)
+  - `["Interval", 1, ["Open", 6]]` → iterates 1, 2, 3, 4, 5 (excludes 6)
+
+**Note:** Evaluation requires a finite, enumerable domain with at most 1000 elements.
+Sums over infinite sets (like `\sum_{n \in \mathbb{N}}`) remain symbolic.
+
+#### Multiple Indexing Sets
+
+Multiple Element expressions can be specified for multi-index sums:
+
+<Latex flow="column" value="\sum_{n \in A}\sum_{m \in B} n \cdot m"/>
+
+```json example
+["Sum", ["Multiply", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Element", "m", ["Set", 3, 4]]]
+// ➔ 21  (1·3 + 1·4 + 2·3 + 2·4)
+```
+
+Mixed indexing sets (Element + Limits) can be used together:
+
+```json example
+["Sum", ["Add", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Limits", "m", 1, 2]]
+// ➔ 12  (n iterates {1,2}, m iterates 1 to 2)
+```
+
+#### Condition Filtering
+
+A condition can be attached to an Element expression to filter values from the set.
+The condition is the optional 4th operand of the Element expression.
+
+<Latex flow="column" value="\sum_{n \in S, n > 0} n"/>
+
+```json example
+// Sum only positive values from S
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, -1, -2], ["Greater", "n", 0]]]
+// ➔ 6  (only 1 + 2 + 3)
+
+// Sum values greater than or equal to 2
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, 4], ["GreaterEqual", "n", 2]]]
+// ➔ 9  (only 2 + 3 + 4)
+
+// Product of negative values
+["Product", "k", ["Element", "k", ["Set", 1, -2, 3, -4], ["Less", "k", 0]]]
+// ➔ 8  (only (-2) × (-4))
+```
+
+Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `NotEqual`.
+
 #### Simplification
 
 When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
@@ -20088,6 +21944,25 @@ Return the product of `body` for each value in `bounds`.
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
 ```
+
+<Signature name="Product" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the product of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\prod_{k \in \{1,2,3,4\}} k"/>
+
+```json example
+["Product", "k", ["Element", "k", ["Set", 1, 2, 3, 4]]]
+// ➔ 24  (4!)
+
+["Product", ["Power", "k", 2], ["Element", "k", ["Set", 1, 2, 3]]]
+// ➔ 36  (1² × 2² × 3² = 1 × 4 × 9)
+```
+
+See the `Sum` documentation above for details on supported collection types.
 
 #### Simplification
 
@@ -24547,12 +26422,19 @@ ce.parse('p \\lor q');            // → ["Or", "p", "q"]
 // Negation (NOT)
 ce.parse('\\lnot p');             // → ["Not", "p"]
 
-// Implication
+// Implication (multiple notations supported)
 ce.parse('p \\implies q');        // → ["Implies", "p", "q"]
+ce.parse('p \\Rightarrow q');     // → ["Implies", "p", "q"]
+ce.parse('p \\rightarrow q');     // → ["Implies", "p", "q"]
 
-// Equivalence (biconditional)
+// Equivalence (biconditional, multiple notations)
 ce.parse('p \\iff q');            // → ["Equivalent", "p", "q"]
+ce.parse('p \\Leftrightarrow q'); // → ["Equivalent", "p", "q"]
+ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 ```
+
+**Note:** `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
+and parses as `To`, not `Implies`.
 
 ### Additional Operators
 
@@ -24578,6 +26460,46 @@ ce.box(['Nand', 'True', 'True', 'False']).evaluate(); // → True
 
 // N-ary NOR: NOT(OR(a, b, c, ...))
 ce.box(['Nor', 'False', 'False', 'False']).evaluate(); // → True
+```
+
+### Operator Precedence
+
+Logical operators are designed to work naturally with comparison operators.
+Comparisons bind tighter than logical operators, so you can write compound
+conditions without parentheses:
+
+```js example
+// Comparisons bind tighter than Or
+ce.parse('x = 1 \\lor y = 2');
+// → ["Or", ["Equal", "x", 1], ["Equal", "y", 2]]
+
+// And binds tighter than Or
+ce.parse('a \\land b \\lor c');
+// → ["Or", ["And", "a", "b"], "c"]
+
+// Or binds tighter than Implies
+ce.parse('p \\lor q \\implies r');
+// → ["Implies", ["Or", "p", "q"], "r"]
+```
+
+**Important:** `Not` (`\lnot`, `\neg`) has very high precedence and only applies
+to the immediately following atom. This matches standard mathematical convention:
+
+```js example
+// \lnot only applies to p, not the whole expression
+ce.parse('\\lnot p \\land q');
+// → ["And", ["Not", "p"], "q"]
+
+// Use parentheses to negate compound expressions
+ce.parse('\\lnot(p \\land q)');
+// → ["Not", ["And", "p", "q"]]
+
+// Similarly for comparisons
+ce.parse('\\lnot x = 1');
+// → ["Equal", ["Not", "x"], 1]  -- probably not what you want!
+
+ce.parse('\\lnot(x = 1)');
+// → ["Not", ["Equal", "x", 1]]  -- correct way to negate a comparison
 ```
 
 ### Evaluating Boolean Expressions
