@@ -2973,7 +2973,51 @@ export type ValueDefinition = BaseDefinition & {
     neq: (a: BoxedExpression) => boolean | undefined;
     cmp: (a: BoxedExpression) => '=' | '>' | '<' | undefined;
     collection: CollectionHandlers;
+    /**
+     * Custom evaluation handler for subscripted expressions of this symbol.
+     * Called when evaluating `Subscript(symbol, index)`.
+     *
+     * @param subscript - The subscript expression (already evaluated)
+     * @param options - Contains the compute engine and evaluation options
+     * @returns The evaluated result, or `undefined` to fall back to symbolic form
+     */
+    subscriptEvaluate?: (subscript: BoxedExpression, options: {
+        engine: ComputeEngine;
+        numericApproximation?: boolean;
+    }) => BoxedExpression | undefined;
 };
+/**
+ * Definition for a sequence declared with `ce.declareSequence()`.
+ *
+ * A sequence is defined by base cases and a recurrence relation.
+ *
+ * @example
+ * ```typescript
+ * // Fibonacci sequence
+ * ce.declareSequence('F', {
+ *   base: { 0: 0, 1: 1 },
+ *   recurrence: 'F_{n-1} + F_{n-2}',
+ * });
+ * ce.parse('F_{10}').evaluate();  // → 55
+ * ```
+ *
+ * @category Definitions
+ */
+export interface SequenceDefinition {
+    /** Index variable name, default 'n' */
+    variable?: string;
+    /** Base cases as index → value mapping */
+    base: Record<number, number | BoxedExpression>;
+    /** Recurrence relation as LaTeX string or BoxedExpression */
+    recurrence: string | BoxedExpression;
+    /** Whether to memoize computed values (default: true) */
+    memoize?: boolean;
+    /** Valid index domain constraints */
+    domain?: {
+        min?: number;
+        max?: number;
+    };
+}
 /**
  * Definition record for a function.
  * @category Definitions
@@ -3456,6 +3500,14 @@ export interface BoxedValueDefinition extends BoxedBaseDefinition {
      */
     inferredType: boolean;
     type: BoxedType;
+    /**
+     * Custom evaluation handler for subscripted expressions of this symbol.
+     * Called when evaluating `Subscript(symbol, index)`.
+     */
+    subscriptEvaluate?: (subscript: BoxedExpression, options: {
+        engine: ComputeEngine;
+        numericApproximation?: boolean;
+    }) => BoxedExpression | undefined;
 }
 /**
  * An operator definition can have some flags to indicate specific
@@ -4093,6 +4145,20 @@ export interface ComputeEngine extends IBigNum {
         [id: MathJsonSymbol]: Type | TypeString | Partial<SymbolDefinition>;
     }, arg2?: Type | TypeString | Partial<SymbolDefinition>, arg3?: Scope): ComputeEngine;
     assume(predicate: BoxedExpression): AssumeResult;
+    /**
+     * Declare a sequence with a recurrence relation.
+     *
+     * @example
+     * ```typescript
+     * // Fibonacci sequence
+     * ce.declareSequence('F', {
+     *   base: { 0: 0, 1: 1 },
+     *   recurrence: 'F_{n-1} + F_{n-2}',
+     * });
+     * ce.parse('F_{10}').evaluate();  // → 55
+     * ```
+     */
+    declareSequence(name: string, def: SequenceDefinition): ComputeEngine;
     forget(symbol?: MathJsonSymbol | MathJsonSymbol[]): void;
     ask(pattern: BoxedExpression): BoxedSubstitution[];
     verify(query: BoxedExpression): boolean;
@@ -4235,7 +4301,7 @@ export type * from './latex-syntax/types';
 export * from './numerics/types';
 export * from './numeric-value/types';
 export * from './global-types';
-/* 0.33.0 */import { AssumeResult, BoxedExpression } from './global-types';
+/* 0.33.0 */import { AssumeResult, BoxedExpression, ComputeEngine, Sign } from './global-types';
 /**
  * Add an assumption, in the form of a predicate, for example:
  *
@@ -4261,6 +4327,22 @@ export * from './global-types';
  *
  */
 export declare function assume(proposition: BoxedExpression): AssumeResult;
+/**
+ * Query assumptions to determine the sign of a symbol.
+ *
+ * Examines inequality assumptions in the current context to determine
+ * if a symbol's sign can be inferred. Assumptions are stored in normalized
+ * form (Less or LessEqual with lhs-rhs compared to 0), so:
+ * - `x > 0` is stored as `Less(-x, 0)` meaning `-x < 0`
+ * - `x >= 0` is stored as `LessEqual(-x, 0)` meaning `-x <= 0`
+ * - `x < 0` is stored as `Less(x, 0)` meaning `x < 0`
+ * - `x <= 0` is stored as `LessEqual(x, 0)` meaning `x <= 0`
+ *
+ * @param ce - The compute engine instance
+ * @param symbol - The symbol name to query
+ * @returns The inferred sign, or undefined if no relevant assumptions found
+ */
+export declare function getSignFromAssumptions(ce: ComputeEngine, symbol: string): Sign | undefined;
 /* 0.33.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const COMPLEX_LIBRARY: SymbolDefinitions[];
 /* 0.33.0 */import type { BoxedExpression, SymbolDefinitions } from '../global-types';
@@ -4616,17 +4698,112 @@ export declare function evaluateExistsCartesian(domains: {
 }[], body: BoxedExpression, ce: ComputeEngine): BoxedExpression | undefined;
 /**
  * Check if a boolean expression is satisfiable.
- * Returns True if there exists an assignment that makes the expression true.
+ *
+ * Returns `True` if there exists an assignment of truth values to variables
+ * that makes the expression true, `False` if no such assignment exists.
+ *
+ * ## Algorithm
+ *
+ * Uses brute-force enumeration of all possible truth assignments.
+ * This has **O(2^n) time complexity** where n is the number of variables.
+ *
+ * ## Performance Characteristics
+ *
+ * | Variables | Assignments | Approximate Time |
+ * |-----------|-------------|------------------|
+ * | 10        | 1,024       | < 1ms            |
+ * | 15        | 32,768      | ~10ms            |
+ * | 20        | 1,048,576   | ~100ms-1s        |
+ * | > 20      | (rejected)  | N/A              |
+ *
+ * ## Limits
+ *
+ * - **Maximum 20 variables**: Expressions with more than 20 distinct boolean
+ *   variables will return the unevaluated `IsSatisfiable` expression rather
+ *   than attempting evaluation (to prevent blocking the thread).
+ *
+ * ## Future Improvements
+ *
+ * For better performance on larger expressions, a DPLL-based SAT solver
+ * could be implemented. The current brute-force approach is suitable for
+ * small expressions typically encountered in educational and verification
+ * contexts.
+ *
+ * @param expr - A boolean expression to check for satisfiability
+ * @param ce - The ComputeEngine instance
+ * @returns `True` if satisfiable, `False` if unsatisfiable, or the
+ *          unevaluated expression if the variable limit is exceeded
  */
 export declare function isSatisfiable(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
 /**
  * Check if a boolean expression is a tautology.
- * Returns True if the expression is true for all possible assignments.
+ *
+ * Returns `True` if the expression evaluates to true for all possible
+ * assignments of truth values to variables, `False` otherwise.
+ *
+ * ## Algorithm
+ *
+ * Uses brute-force enumeration of all possible truth assignments.
+ * This has **O(2^n) time complexity** where n is the number of variables.
+ *
+ * ## Performance Characteristics
+ *
+ * | Variables | Assignments | Approximate Time |
+ * |-----------|-------------|------------------|
+ * | 10        | 1,024       | < 1ms            |
+ * | 15        | 32,768      | ~10ms            |
+ * | 20        | 1,048,576   | ~100ms-1s        |
+ * | > 20      | (rejected)  | N/A              |
+ *
+ * ## Limits
+ *
+ * - **Maximum 20 variables**: Expressions with more than 20 distinct boolean
+ *   variables will return the unevaluated `IsTautology` expression rather
+ *   than attempting evaluation (to prevent blocking the thread).
+ *
+ * ## Future Improvements
+ *
+ * For better performance on larger expressions, a DPLL-based approach
+ * (checking unsatisfiability of the negation) could be implemented.
+ *
+ * @param expr - A boolean expression to check
+ * @param ce - The ComputeEngine instance
+ * @returns `True` if a tautology, `False` if not, or the unevaluated
+ *          expression if the variable limit is exceeded
  */
 export declare function isTautology(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
 /**
  * Generate a truth table for a boolean expression.
- * Returns a List of Lists with headers and rows.
+ *
+ * Returns a `List` of `List`s where the first row contains column headers
+ * (variable names followed by "Result") and subsequent rows contain the
+ * truth values for each assignment.
+ *
+ * ## Algorithm
+ *
+ * Generates all 2^n possible truth assignments and evaluates the expression
+ * for each. This has **O(2^n) time and space complexity**.
+ *
+ * ## Performance Characteristics
+ *
+ * | Variables | Rows Generated | Output Size |
+ * |-----------|----------------|-------------|
+ * | 5         | 32             | ~1 KB       |
+ * | 8         | 256            | ~8 KB       |
+ * | 10        | 1,024          | ~32 KB      |
+ * | > 10      | (rejected)     | N/A         |
+ *
+ * ## Limits
+ *
+ * - **Maximum 10 variables**: Expressions with more than 10 distinct boolean
+ *   variables will return the unevaluated `TruthTable` expression. This
+ *   stricter limit (compared to `IsSatisfiable`/`IsTautology`) accounts for
+ *   the memory required to store all rows.
+ *
+ * @param expr - A boolean expression to generate a truth table for
+ * @param ce - The ComputeEngine instance
+ * @returns A `List` of `List`s representing the truth table, or the
+ *          unevaluated expression if the variable limit is exceeded
  */
 export declare function generateTruthTable(expr: BoxedExpression, ce: ComputeEngine): BoxedExpression;
 /* 0.33.0 */export declare function gcd(a: bigint, b: bigint): bigint;
@@ -6569,6 +6746,10 @@ export declare class _BoxedValueDefinition implements BoxedValueDefinition, Conf
     neq?: (a: BoxedExpression) => boolean | undefined;
     cmp?: (a: BoxedExpression) => '=' | '>' | '<' | undefined;
     collection?: CollectionHandlers;
+    subscriptEvaluate?: (subscript: BoxedExpression, options: {
+        engine: ComputeEngine;
+        numericApproximation?: boolean;
+    }) => BoxedExpression | undefined;
     constructor(ce: ComputeEngine, name: string, def: Partial<ValueDefinition>);
     /** For debugging */
     toJSON(): any;
@@ -7331,8 +7512,23 @@ export declare function derivative(fn: BoxedExpression, order: number): BoxedExp
  * All expressions that do not explicitly depend on `v` are taken to have zero
  * partial derivative.
  *
+ * ## Recursion Safety
+ *
+ * This function includes a depth limit (`MAX_DIFFERENTIATION_DEPTH`) to prevent
+ * stack overflow from pathological expressions. The depth is tracked internally
+ * and incremented on each recursive call. If the limit is reached, the function
+ * returns `undefined` rather than continuing to recurse.
+ *
+ * Normal differentiation (including higher-order derivatives of complex
+ * expressions) should never approach this limit. Hitting the limit indicates
+ * either a bug in the differentiation rules or a maliciously constructed input.
+ *
+ * @param expr - The expression to differentiate
+ * @param v - The variable to differentiate with respect to
+ * @param depth - Internal recursion depth counter (do not pass manually)
+ * @returns The derivative expression, or `undefined` if unable to differentiate
  */
-export declare function differentiate(expr: BoxedExpression, v: string): BoxedExpression | undefined;
+export declare function differentiate(expr: BoxedExpression, v: string, depth?: number): BoxedExpression | undefined;
 /* 0.33.0 *//**
  * Fu Algorithm for Trigonometric Simplification
  *
@@ -7705,7 +7901,7 @@ import { BoxedType } from '../common/type/boxed-type';
 import type { OneOf } from '../common/one-of';
 import { ConfigurationChangeListener } from '../common/configuration-change';
 import type { Expression, MathJsonSymbol, MathJsonNumberObject } from '../math-json/types';
-import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, BoxedExpression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, SymbolDefinitions, Metadata, Rule, Scope, EvalContext, SemiBoxedExpression, ComputeEngine as IComputeEngine, BoxedDefinition, SymbolDefinition } from './global-types';
+import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, BoxedExpression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, SymbolDefinitions, Metadata, Rule, Scope, EvalContext, SemiBoxedExpression, ComputeEngine as IComputeEngine, BoxedDefinition, SymbolDefinition, SequenceDefinition } from './global-types';
 import type { LatexDictionaryEntry, LatexString, LibraryCategory, ParseLatexOptions } from './latex-syntax/types';
 import { type IndexedLatexDictionary } from './latex-syntax/dictionary/definitions';
 import type { BigNum, Rational } from './numerics/types';
@@ -8192,6 +8388,20 @@ export declare class ComputeEngine implements IComputeEngine {
         [id: string]: Type | TypeString | Partial<SymbolDefinition>;
     }): IComputeEngine;
     /**
+     * Declare a sequence with a recurrence relation.
+     *
+     * @example
+     * ```typescript
+     * // Fibonacci sequence
+     * ce.declareSequence('F', {
+     *   base: { 0: 0, 1: 1 },
+     *   recurrence: 'F_{n-1} + F_{n-2}',
+     * });
+     * ce.parse('F_{10}').evaluate();  // → 55
+     * ```
+     */
+    declareSequence(name: string, def: SequenceDefinition): IComputeEngine;
+    /**
      * Return an evaluation context in which the symbol is defined.
      */
     lookupContext(id: MathJsonSymbol): EvalContext | undefined;
@@ -8358,6 +8568,52 @@ export declare class ComputeEngine implements IComputeEngine {
      * */
     forget(symbol: undefined | MathJsonSymbol | MathJsonSymbol[]): void;
 }
+/* 0.33.0 *//**
+ * Utilities for declarative sequence definitions.
+ *
+ * This module provides functions to create subscriptEvaluate handlers
+ * from sequence definitions (base cases + recurrence relation).
+ */
+import type { BoxedExpression, ComputeEngine, SequenceDefinition } from './global-types';
+/**
+ * Create a subscriptEvaluate handler from a sequence definition.
+ *
+ * The handler evaluates expressions like `F_{10}` by:
+ * 1. Checking base cases first
+ * 2. Looking up memoized values
+ * 3. Recursively evaluating the recurrence relation
+ */
+export declare function createSequenceHandler(ce: ComputeEngine, _name: string, def: SequenceDefinition): (subscript: BoxedExpression, options: {
+    engine: ComputeEngine;
+    numericApproximation?: boolean;
+}) => BoxedExpression | undefined;
+/**
+ * Validate a sequence definition.
+ */
+export declare function validateSequenceDefinition(ce: ComputeEngine, name: string, def: SequenceDefinition): {
+    valid: boolean;
+    error?: string;
+};
+/**
+ * Add a base case for a sequence definition.
+ * e.g., from `L_0 := 1`
+ */
+export declare function addSequenceBaseCase(ce: ComputeEngine, name: string, index: number, value: BoxedExpression): void;
+/**
+ * Add a recurrence relation for a sequence definition.
+ * e.g., from `L_n := L_{n-1} + 1`
+ */
+export declare function addSequenceRecurrence(ce: ComputeEngine, name: string, variable: string, expr: BoxedExpression): void;
+/**
+ * Check if expression contains self-reference to sequence name.
+ * e.g., `a_{n-1}` when defining sequence 'a'
+ */
+export declare function containsSelfReference(expr: BoxedExpression, seqName: string): boolean;
+/**
+ * Extract the index variable from a subscript expression.
+ * e.g., from `n-1` extract 'n', from `2*k` extract 'k'
+ */
+export declare function extractIndexVariable(subscript: BoxedExpression): string | undefined;
 /* 0.33.0 */import type { Expression } from '../../math-json/types';
 import { LatexString, SerializeLatexOptions, DelimiterScale } from './types';
 import type { IndexedLatexDictionary, IndexedLatexDictionaryEntry } from './dictionary/definitions';
@@ -8466,6 +8722,7 @@ export declare class _Parser implements Parser {
     private _peekCounter;
     constructor(tokens: LatexToken[], dictionary: IndexedLatexDictionary, options: Readonly<ParseLatexOptions>);
     getSymbolType(id: MathJsonSymbol): BoxedType;
+    hasSubscriptEvaluate(id: MathJsonSymbol): boolean;
     get peek(): LatexToken;
     nextToken(): LatexToken;
     get atEnd(): boolean;
@@ -9236,6 +9493,13 @@ export type ParseLatexOptions = NumberFormat & {
      *
      */
     getSymbolType: (symbol: MathJsonSymbol) => BoxedType;
+    /**
+     * This handler is invoked when the parser needs to determine if a symbol
+     * has a custom subscript evaluation handler. If true, subscripts on this
+     * symbol will be kept as `Subscript` expressions rather than being absorbed
+     * into a compound symbol name.
+     */
+    hasSubscriptEvaluate?: (symbol: MathJsonSymbol) => boolean;
     /** This handler is invoked when the parser encounters an unexpected token.
      *
      * The `lhs` argument is the left-hand side of the token, if any.
@@ -9310,8 +9574,12 @@ export type ParseLatexOptions = NumberFormat & {
  * @category Latex Parsing and Serialization
  */
 export interface Parser {
-    readonly options: Required<ParseLatexOptions>;
+    readonly options: Readonly<ParseLatexOptions>;
     getSymbolType(id: MathJsonSymbol): BoxedType;
+    /**
+     * Check if a symbol has a custom subscript evaluation handler.
+     */
+    hasSubscriptEvaluate(id: MathJsonSymbol): boolean;
     pushSymbolTable(): void;
     popSymbolTable(): void;
     addSymbol(id: MathJsonSymbol, type: BoxedType | TypeString): void;
