@@ -71,6 +71,465 @@ console.log(ce.parse("n^2").unknowns);
 console.log(ce.parse("a^2+b^3").unknowns);
 ```
 
+## Custom Operators
+
+By default, operators like `+`, `-`, `*`, `/` compile to their JavaScript equivalents. However, you can override operators to use custom function calls instead. This is particularly useful for:
+
+- **Vector and matrix operations** - where `[1,2,3] + [4,5,6]` should call a custom `add()` function
+- **Custom domain-specific languages** - where operations have specialized semantics
+- **Type-specific operations** - where the same operator behaves differently for different types
+
+### Basic Usage
+
+Override operators by passing an `operators` option to `compile()`:
+
+```javascript
+const expr = ce.parse('v + w');
+const fn = expr.compile({
+  operators: {
+    Add: ['add', 11],      // Convert + to add() function
+    Multiply: ['mul', 12]  // Convert * to mul() function
+  },
+  functions: {
+    add: (a, b) => a.map((v, i) => v + b[i]),
+    mul: (a, b) => a.map((v, i) => v * b[i])
+  }
+});
+
+const result = fn({ v: [1, 2, 3], w: [4, 5, 6] });
+console.log(result);
+// ➔ [5, 7, 9]
+```
+
+The operator override format is `[functionName, precedence]`:
+- **functionName**: The name of the function to call (alphanumeric identifier)
+- **precedence**: Numeric precedence level (higher = tighter binding)
+
+### Function-Based Overrides
+
+You can also use a function to conditionally override operators:
+
+```javascript
+const fn = expr.compile({
+  operators: (op) => {
+    // Only override Add, let other operators use defaults
+    if (op === 'Add') return ['vectorAdd', 11];
+    return undefined;
+  },
+  functions: {
+    vectorAdd: (a, b) => a.map((v, i) => v + b[i])
+  }
+});
+```
+
+### Complex Expressions
+
+Operator overrides work with complex nested expressions:
+
+```javascript
+const expr = ce.parse('(a + b) * c');
+const fn = expr.compile({
+  operators: {
+    Add: ['add', 11],
+    Multiply: ['mul', 12]
+  },
+  functions: {
+    add: (a, b) => a.map((v, i) => v + b[i]),
+    mul: (a, b) => a.map((v, i) => v * b[i])
+  }
+});
+
+const result = fn({
+  a: [1, 2, 3],
+  b: [4, 5, 6],
+  c: [2, 2, 2]
+});
+console.log(result);
+// ➔ [10, 14, 18]  // (a + b) * c = ([1,2,3] + [4,5,6]) * [2,2,2]
+```
+
+### Important Notes
+
+**Canonical Form**: Expressions are canonicalized before compilation, which may affect operator usage:
+- Subtraction `a - b` is canonicalized to `Add(a, Negate(b))`
+- To handle subtraction with custom operations, override both `Add` and `Negate`
+
+**Symbol vs Function Names**:
+- **Function names** (alphanumeric like `add`, `mul`) compile to function calls: `add(a, b)`
+- **Symbol operators** (like `+`, `-`, `⊕`) compile to infix operators: `a + b`
+
+**Partial Overrides**: You can override only some operators; others will use their default JavaScript implementations.
+
+### Example: Complete Vector Math
+
+```live
+// Define vector operations
+function add(a, b) { return a.map((v, i) => v + b[i]); }
+function mul(a, b) { return a.map((v, i) => v * b[i]); }
+function neg(a) { return a.map(v => -v); }
+
+const expr = ce.parse('u * v + w - z');
+const fn = expr.compile({
+  operators: {
+    Add: ['add', 11],
+    Multiply: ['mul', 12],
+    Negate: ['neg', 14]
+  },
+  functions: { add, mul, neg }
+});
+
+console.log(fn({
+  u: [2, 3, 4],
+  v: [1, 1, 1],
+  w: [5, 6, 7],
+  z: [1, 2, 3]
+}));
+// ➔ [6, 7, 8]  // u*v + w - z = [2,3,4] + [5,6,7] - [1,2,3]
+```
+
+## Advanced: Custom Compilation Targets
+
+For advanced use cases, you can create completely custom compilation targets by using the exported `CompileTarget` interface and `BaseCompiler` class.
+
+### Exported Interfaces
+
+```javascript
+import {
+  ComputeEngine,
+  BaseCompiler,
+  JavaScriptTarget,
+  type CompileTarget,
+} from '@cortex-js/compute-engine';
+```
+
+### Creating a Custom Target
+
+Define a custom target object that implements the `CompileTarget` interface:
+
+```javascript
+const myTarget = {
+  language: 'my-dsl',
+  operators: (op) => {
+    const ops = {
+      Add: ['ADD', 11],
+      Multiply: ['MUL', 12],
+      Divide: ['DIV', 13],
+    };
+    return ops[op];
+  },
+  functions: (id) => id.toUpperCase(),
+  var: (id) => `VAR("${id}")`,
+  string: (s) => `"${s}"`,
+  number: (n) => n.toString(),
+  ws: () => ' ',
+  preamble: '',
+  indent: 0,
+};
+
+const expr = ce.parse('x + y * 2');
+const code = BaseCompiler.compile(expr, myTarget);
+console.log(code);
+// → ADD(VAR("x"), MUL(VAR("y"), 2))
+```
+
+### Example: SQL-like Target
+
+```javascript
+const sqlTarget = {
+  language: 'sql',
+  operators: (op) => {
+    return {
+      Equal: ['=', 8],
+      NotEqual: ['<>', 8],
+      And: ['AND', 4],
+      Or: ['OR', 3],
+    }[op];
+  },
+  functions: (id) => ({ Abs: 'ABS', Sqrt: 'SQRT' }[id]),
+  var: (id) => `"${id}"`, // Quote column names
+  string: (s) => `'${s.replace(/'/g, "''")}'`,
+  number: (n) => n.toString(),
+  ws: () => ' ',
+  preamble: '',
+  indent: 0,
+};
+
+const whereExpr = ce.parse('x > 10 \\land y \\leq 20');
+const sql = BaseCompiler.compile(whereExpr, sqlTarget);
+console.log(`SELECT * FROM table WHERE ${sql}`);
+// → SELECT * FROM table WHERE AND("x" > 10, "y" <= 20)
+```
+
+For more examples of custom targets, see [`examples/compile-custom-target.js`](../examples/compile-custom-target.js).
+
+## Plugin Architecture: Registering Custom Targets
+
+The Compute Engine includes a plugin architecture that allows you to register custom compilation targets and switch between them easily.
+
+### Built-in Targets
+
+The Compute Engine comes with three compilation targets:
+
+- **`javascript`** (default) - Compiles to executable JavaScript functions
+- **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
+- **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
+
+### Compiling to Different Targets
+
+Use the `to` option to specify the target language:
+
+```javascript
+const expr = ce.parse('x^2 + y^2');
+
+// Compile to JavaScript (default)
+const jsFunc = expr.compile();
+console.log(jsFunc({ x: 3, y: 4 })); // → 25
+
+// Compile to GLSL
+const glslCode = expr.compile({ to: 'glsl' });
+console.log(glslCode.toString()); // → pow(x, 2.0) + pow(y, 2.0)
+```
+
+### Python/NumPy Target
+
+The Compute Engine includes a complete Python/NumPy compilation target for scientific computing:
+
+```javascript
+import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+
+// Register the Python target with NumPy support
+ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
+
+// Compile expressions to Python/NumPy code
+const expr = ce.parse('\\sin(x) + \\cos(y)');
+const pythonCode = expr.compile({ to: 'python' });
+console.log(pythonCode.toString());
+// → import numpy as np
+//
+//   np.sin(x) + np.cos(y)
+```
+
+#### Generating Python Functions
+
+The `PythonTarget` can generate complete Python functions:
+
+```javascript
+import { PythonTarget } from '@cortex-js/compute-engine';
+
+const python = new PythonTarget({ includeImports: true });
+const expr = ce.parse('\\sqrt{x^2 + y^2}');
+
+const func = python.compileFunction(
+  expr,
+  'euclidean_distance',
+  ['x', 'y'],
+  'Calculate Euclidean distance between two points'
+);
+
+console.log(func);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def euclidean_distance(x, y):
+    """Calculate Euclidean distance between two points"""
+    return np.sqrt(x ** 2 + y ** 2)
+```
+
+#### Use Cases
+
+The Python target is ideal for:
+
+- **Scientific Computing**: Generate NumPy code for numerical analysis
+- **Machine Learning**: Create feature engineering functions
+- **Data Analysis**: Convert formulas to Pandas/NumPy operations
+- **Education**: Show Python equivalents of mathematical notation
+- **Code Generation**: Automated function creation from LaTeX
+
+#### Lambda Functions
+
+Generate Python lambda expressions:
+
+```javascript
+const expr = ce.parse('x^2 + 2x + 1');
+const lambda = python.compileLambda(expr, ['x']);
+console.log(lambda);
+// → lambda x: x ** 2 + 2 * x + 1
+```
+
+#### Supported Functions
+
+The Python target maps to NumPy functions:
+
+- **Trigonometric**: `sin` → `np.sin`, `cos` → `np.cos`, etc.
+- **Exponential**: `exp` → `np.exp`, `ln` → `np.log`
+- **Power**: `x^n` → `x ** n`, `sqrt` → `np.sqrt`
+- **Statistics**: `sum` → `np.sum`, `mean` → `np.mean`
+- **Linear Algebra**: `dot` → `np.dot`, `cross` → `np.cross`
+
+For complete documentation, see the [Python Target Guide](https://cortexjs.io/compute-engine/guides/python-target/).
+
+### Registering Custom Targets
+
+You can also create your own compilation targets using `ce.registerCompilationTarget()`:
+
+```javascript
+import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+
+// Define a custom target (e.g., for R, MATLAB, etc.)
+class CustomTarget {
+  getOperators() {
+    return {
+      Add: ['+', 11],
+      Multiply: ['*', 12],
+      // ... other operators
+    };
+  }
+
+  getFunctions() {
+    return {
+      Sin: 'sin',
+      Cos: 'cos',
+      // ... other functions
+    };
+  }
+
+  createTarget() {
+    return {
+      language: 'custom',
+      operators: (op) => this.getOperators()[op],
+      functions: (id) => this.getFunctions()[id],
+      var: (id) => id,
+      string: (str) => JSON.stringify(str),
+      number: (n) => n.toString(),
+      indent: 0,
+      ws: () => ' ',
+      preamble: '',
+    };
+  }
+
+  compileToExecutable(expr, options = {}) {
+    const target = this.createTarget();
+    const code = BaseCompiler.compile(expr, target);
+
+    const result = function () { return code; };
+    Object.defineProperty(result, 'toString', { value: () => code });
+    Object.defineProperty(result, 'isCompiled', { value: true });
+    return result;
+  }
+}
+
+// Register and use
+ce.registerCompilationTarget('custom', new CustomTarget());
+const code = expr.compile({ to: 'custom' });
+```
+
+### Direct Target Override
+
+For one-time use, you can provide a `CompileTarget` directly without registration:
+
+```javascript
+const expr = ce.parse('a + b');
+
+const customTarget = {
+  language: 'custom',
+  operators: () => ['+', 10],
+  functions: () => undefined,
+  var: (id) => id.toUpperCase(),
+  string: (str) => `"${str}"`,
+  number: (n) => n.toString(),
+  indent: 0,
+  ws: () => ' ',
+  preamble: '',
+};
+
+const code = expr.compile({ target: customTarget });
+console.log(code.toString()); // → A + B
+```
+
+The `target` option takes precedence over the `to` option if both are provided.
+
+### Creating Custom Language Targets
+
+To create a custom language target, implement the `LanguageTarget` interface:
+
+```typescript
+interface LanguageTarget {
+  /**
+   * Returns operator mappings for this language.
+   * Maps operator names to [operator_string, precedence] tuples.
+   */
+  getOperators(): CompiledOperators;
+
+  /**
+   * Returns function mappings for this language.
+   * Maps function names to language-specific function names or implementations.
+   */
+  getFunctions(): CompiledFunctions;
+
+  /**
+   * Creates a CompileTarget with the specified options.
+   */
+  createTarget(options?: Partial<CompileTarget>): CompileTarget;
+
+  /**
+   * Compiles an expression to an executable form.
+   * For non-JavaScript targets, this typically returns a function
+   * that returns the source code as a string.
+   */
+  compileToExecutable(
+    expr: BoxedExpression,
+    options?: CompilationOptions
+  ): CompiledExecutable;
+}
+```
+
+For complete examples of custom targets including RPN (Reverse Polish Notation), Python, and more, see [`examples/compile-plugin-architecture.js`](../examples/compile-plugin-architecture.js).
+
+## Performance Benchmarks
+
+### JavaScript vs Python/NumPy
+
+To compare performance across compilation targets, the project includes benchmark scripts:
+
+**JavaScript Benchmarks** (Node.js):
+```bash
+npm run test compute-engine/compile-performance
+```
+
+**Python Benchmarks** (generated):
+```bash
+# Generate the Python benchmark script
+npm run test compute-engine/compile-python-generate
+
+# Run Python benchmarks (requires NumPy)
+python benchmarks/python-performance.py
+```
+
+### Expected Results
+
+The benchmarks test the same mathematical expressions across different targets:
+
+| Target | Performance | Use Case |
+|--------|------------|----------|
+| **JavaScript Compiled** | 40-2900x faster than eval | CPU computation, real-time calculations |
+| **Python/NumPy** | Fast for arrays, some overhead for scalars | Scientific computing, data analysis |
+| **GLSL** | Massively parallel on GPU | Graphics, WebGL shaders |
+
+**Key Insights**:
+- JavaScript compilation is excellent for single-threaded CPU performance
+- Python/NumPy excels at vectorized array operations
+- GLSL enables GPU parallelism for millions of simultaneous operations
+
+See [`benchmarks/README.md`](../benchmarks/README.md) for detailed benchmark documentation.
+
 ## Limitations
 
 The calculations are only performed using machine precision numbers.
@@ -80,7 +539,7 @@ supported.
 
 Some functions are not supported.
 
-If the expression cannot be compiled, the `compile()` method will throw an 
+If the expression cannot be compiled, the `compile()` method will throw an
 error. The expression can be numerically evaluated as a fallback:
 
 ```live
@@ -1187,7 +1646,7 @@ If *false*, evaluating this expression may change the state of the
 Compute Engine or it may return a different value each time it is
 evaluated, even if the state of the Compute Engine is the same.
 
-As an example, the ["Add", 2, 3]` function expression is pure, but
+As an example, the `["Add", 2, 3]` function expression is pure, but
 the `["Random"]` function expression is not pure.
 
 For a function expression to be pure, the function itself (its operator)
@@ -2042,11 +2501,34 @@ falls back to the interpreting the expression, unless the
 `options.fallback` is set to `false`. If it is set to `false`, the
 function will throw an error if it cannot be compiled.
 
+**Custom operators**: You can override operators to use function calls
+instead of native operators, useful for vector/matrix operations:
+
+```javascript
+const expr = ce.parse("v + w");
+const f = expr.compile({
+  operators: {
+    Add: ['add', 11],      // Convert + to add()
+    Multiply: ['mul', 12]   // Convert * to mul()
+  }
+});
+// Result: add(v, w) instead of v + w
+```
+
 ####### options?
 
 ####### to?
 
-`"javascript"` \| `"wgsl"` \| `"python"` \| `"webassembly"`
+`string`
+
+####### target?
+
+`any`
+
+####### operators?
+
+  \| `Partial`\<`Record`\<`string`, \[`string`, `number`\]\>\>
+  \| (`op`) => \[`string`, `number`\]
 
 ####### functions?
 
@@ -2075,15 +2557,33 @@ function will throw an error if it cannot be compiled.
 ##### BoxedExpression.solve()
 
 ```ts
-solve(vars?): readonly BoxedExpression[]
+solve(vars?): 
+  | readonly BoxedExpression[]
+  | Record<string, BoxedExpression>
+  | Record<string, BoxedExpression>[]
 ```
 
 If this is an equation, solve the equation for the variables in vars.
 Otherwise, solve the equation `this = 0` for the variables in vars.
 
+For univariate equations, returns an array of solutions (roots).
+For systems of linear equations (List of Equal expressions), returns
+an object mapping variable names to their values.
+For non-linear polynomial systems (like xy=6, x+y=5), returns an array
+of solution objects (multiple solutions possible).
+
 ```javascript
+// Univariate equation
 const expr = ce.parse("x^2 + 2*x + 1 = 0");
-console.log(expr.solve("x"));
+console.log(expr.solve("x")); // Returns array of roots
+
+// System of linear equations
+const system = ce.parse("\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}");
+console.log(system.solve(["x", "y"])); // Returns { x: 60, y: 10 }
+
+// Non-linear polynomial system (product + sum)
+const nonlinear = ce.parse("\\begin{cases}xy=6\\\\x+y=5\\end{cases}");
+console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y: 2 }]
 ```
 
 ####### vars?
@@ -3167,7 +3667,7 @@ A rule describes how to modify an expression that matches a pattern `match`
 into a new expression `replace`.
 
 - `x-1` \( \to \) `1-x`
-- `(x+1)(x-1)` \( \to \) `x^2-1
+- `(x+1)(x-1)` \( \to \) `x^2-1`
 
 The patterns can be expressed as LaTeX strings or `SemiBoxedExpression`'s.
 Alternatively, match/replace logic may be specified by a `RuleFunction`, allowing both custom
@@ -3774,7 +4274,23 @@ ce.parse('F_{10}').evaluate();  // → 55
 optional variable: string;
 ```
 
-Index variable name, default 'n'
+Index variable name for single-index sequences, default 'n'.
+For multi-index sequences, use `variables` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceDefinition.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names for multi-index sequences.
+Example: `['n', 'k']` for Pascal's triangle `P\_{n,k}`
+
+If provided, this takes precedence over `variable`.
 
 </MemberCard>
 
@@ -3783,10 +4299,27 @@ Index variable name, default 'n'
 ##### SequenceDefinition.base
 
 ```ts
-base: Record<number, number | BoxedExpression>;
+base: Record<number | string, number | BoxedExpression>;
 ```
 
-Base cases as index → value mapping
+Base cases as index → value mapping.
+
+For single-index sequences, use numeric keys:
+```typescript
+base: { 0: 0, 1: 1 }  // F_0 = 0, F_1 = 1
+```
+
+For multi-index sequences, use comma-separated string keys:
+```typescript
+base: {
+  '0,0': 1,    // Exact: P_{0,0} = 1
+  'n,0': 1,    // Pattern: P_{n,0} = 1 for all n
+  'n,n': 1,    // Pattern: P_{n,n} = 1 (diagonal)
+}
+```
+
+Pattern keys use variable names to match any value. When the same
+variable appears multiple times (e.g., 'n,n'), the indices must be equal.
 
 </MemberCard>
 
@@ -3819,13 +4352,237 @@ Whether to memoize computed values (default: true)
 ##### SequenceDefinition.domain?
 
 ```ts
-optional domain: {
+optional domain: 
+  | {
   min: number;
   max: number;
-};
+ }
+  | Record<string, {
+  min: number;
+  max: number;
+}>;
 ```
 
-Valid index domain constraints
+Valid index domain constraints.
+
+For single-index sequences:
+```typescript
+domain: { min: 0, max: 100 }
+```
+
+For multi-index sequences, use per-variable constraints:
+```typescript
+domain: { n: { min: 0 }, k: { min: 0 } }
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceDefinition.constraints?
+
+```ts
+optional constraints: string | BoxedExpression;
+```
+
+Constraint expression for multi-index sequences.
+The expression should evaluate to a boolean/numeric value.
+If it evaluates to false or 0, the subscript is considered out of domain.
+
+Example: `'k <= n'` for Pascal's triangle (only valid when k ≤ n)
+
+</MemberCard>
+
+### SequenceStatus
+
+Status of a sequence definition.
+
+<MemberCard>
+
+##### SequenceStatus.status
+
+```ts
+status: "complete" | "pending" | "not-a-sequence";
+```
+
+Status of the sequence:
+- 'complete': Both base case(s) and recurrence defined
+- 'pending': Waiting for base case(s) or recurrence
+- 'not-a-sequence': Symbol is not a sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.hasBase
+
+```ts
+hasBase: boolean;
+```
+
+Whether at least one base case is defined
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.hasRecurrence
+
+```ts
+hasRecurrence: boolean;
+```
+
+Whether a recurrence relation is defined
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.baseIndices
+
+```ts
+baseIndices: (string | number)[];
+```
+
+Keys of defined base cases.
+For single-index: numeric indices (e.g., [0, 1])
+For multi-index: string keys including patterns (e.g., ['0,0', 'n,0', 'n,n'])
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.variable?
+
+```ts
+optional variable: string;
+```
+
+Index variable name if recurrence is defined (single-index)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names if recurrence is defined (multi-index)
+
+</MemberCard>
+
+### SequenceInfo
+
+Information about a defined sequence for introspection.
+
+<MemberCard>
+
+##### SequenceInfo.name
+
+```ts
+name: string;
+```
+
+The sequence name
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.variable?
+
+```ts
+optional variable: string;
+```
+
+Index variable name for single-index sequences (e.g., `"n"`)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names for multi-index sequences (e.g., `["n", "k"]`)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.baseIndices
+
+```ts
+baseIndices: (string | number)[];
+```
+
+Base case keys.
+For single-index: numeric indices
+For multi-index: string keys including patterns
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.memoize
+
+```ts
+memoize: boolean;
+```
+
+Whether memoization is enabled
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.domain
+
+```ts
+domain: 
+  | {
+  min: number;
+  max: number;
+ }
+  | Record<string, {
+  min: number;
+  max: number;
+}>;
+```
+
+Domain constraints.
+For single-index: `{ min?, max? }`
+For multi-index: per-variable constraints
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.cacheSize
+
+```ts
+cacheSize: number;
+```
+
+Number of cached values
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.isMultiIndex
+
+```ts
+isMultiIndex: boolean;
+```
+
+Whether this is a multi-index sequence
 
 </MemberCard>
 
@@ -5403,6 +6160,7 @@ dictionary entries to define custom LaTeX parsing and serialization.
 
 ```ts
 type ParseLatexOptions = NumberFormat & {
+  strict: boolean;
   skipSpace: boolean;
   parseNumbers: "auto" | "rational" | "decimal" | "never";
   getSymbolType: (symbol) => BoxedType;
@@ -5415,6 +6173,20 @@ type ParseLatexOptions = NumberFormat & {
 ```
 
 The LaTeX parsing options can be used with the `ce.parse()` method.
+
+#### ParseLatexOptions.strict
+
+```ts
+strict: boolean;
+```
+
+Controls the strictness of LaTeX parsing:
+
+- `true`: Strict LaTeX syntax required (e.g., `\sin{x}`, `x^{n+1}`)
+- `false`: Accept relaxed Math-ASCII/Typst-like syntax in addition to
+  LaTeX (e.g., `sin(x)`, `x^(n+1)`)
+
+**Default**: `true`
 
 #### ParseLatexOptions.skipSpace
 
@@ -7189,6 +7961,112 @@ bignum(value): Decimal
 ####### value
 
 `string` | `number` | `bigint` | `Decimal`
+
+</MemberCard>
+
+## OEIS
+
+### OEISSequenceInfo
+
+Result from an OEIS lookup operation.
+
+<MemberCard>
+
+##### OEISSequenceInfo.id
+
+```ts
+id: string;
+```
+
+OEIS sequence ID (e.g., 'A000045')
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.name
+
+```ts
+name: string;
+```
+
+Sequence name/description
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.terms
+
+```ts
+terms: number[];
+```
+
+First several terms of the sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.formula?
+
+```ts
+optional formula: string;
+```
+
+Formula or recurrence (if available)
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.comments?
+
+```ts
+optional comments: string[];
+```
+
+Comments about the sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.url
+
+```ts
+url: string;
+```
+
+URL to the OEIS page
+
+</MemberCard>
+
+### OEISOptions
+
+Options for OEIS operations.
+
+<MemberCard>
+
+##### OEISOptions.timeout?
+
+```ts
+optional timeout: number;
+```
+
+Request timeout in milliseconds (default: 10000)
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISOptions.maxResults?
+
+```ts
+optional maxResults: number;
+```
+
+Maximum number of results to return for lookups (default: 5)
 
 </MemberCard>
 
@@ -9528,6 +10406,45 @@ Note that `\to` is reserved for function/set mapping notation (e.g., `f: A \to B
 and parses as `To`, not `Implies`. Use `\rightarrow`, `\Rightarrow`, or `\implies`
 for logical implication.
 
+## Boolean Simplification
+
+When `simplify()` is called on boolean expressions, the following algebraic laws
+are applied automatically:
+
+| Law | Rule | Example |
+| :--- | :--- | :--- |
+| **Absorption** | $A \land (A \lor B) \to A$ | `And(A, Or(A, B))` → `A` |
+| **Absorption** | $A \lor (A \land B) \to A$ | `Or(A, And(A, B))` → `A` |
+| **Idempotence** | $A \land A \to A$ | `And(A, A)` → `A` |
+| **Idempotence** | $A \lor A \to A$ | `Or(A, A)` → `A` |
+| **Complementation** | $A \land \lnot A \to \bot$ | `And(A, Not(A))` → `False` |
+| **Complementation** | $A \lor \lnot A \to \top$ | `Or(A, Not(A))` → `True` |
+| **Identity** | $A \land \top \to A$ | `And(A, True)` → `A` |
+| **Identity** | $A \lor \bot \to A$ | `Or(A, False)` → `A` |
+| **Domination** | $A \land \bot \to \bot$ | `And(A, False)` → `False` |
+| **Domination** | $A \lor \top \to \top$ | `Or(A, True)` → `True` |
+| **Double Negation** | $\lnot\lnot A \to A$ | `Not(Not(A))` → `A` |
+
+```javascript
+ce.box(['And', 'A', ['Or', 'A', 'B']]).simplify()
+// → A (absorption)
+
+ce.box(['Or', 'A', ['And', 'A', 'B']]).simplify()
+// → A (absorption)
+
+ce.box(['And', 'A', 'A', 'B']).simplify()
+// → A ∧ B (idempotence)
+
+ce.box(['And', 'A', ['Not', 'A']]).simplify()
+// → False (complementation)
+
+ce.box(['Or', 'A', ['Not', 'A']]).simplify()
+// → True (complementation)
+
+ce.box(['Not', ['Not', 'A']]).simplify()
+// → A (double negation)
+```
+
 ## Quantifiers
 
 
@@ -9936,6 +10853,128 @@ ce.box(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
 ```
 
 Limited to expressions with at most 10 variables (1024 rows).
+
+</FunctionDefinition>
+
+
+## Prime Implicants and Minimal Normal Forms
+
+The following functions use the **Quine-McCluskey algorithm** to find minimal
+representations of Boolean expressions.
+
+<FunctionDefinition name="PrimeImplicants">
+
+<Signature name="PrimeImplicants">_expression_</Signature>
+
+Finds all **prime implicants** of a Boolean expression.
+
+A prime implicant is a product term (conjunction of literals) that:
+1. Implies the original expression (covers some minterms)
+2. Cannot be reduced further (removing any literal would make it not an implicant)
+
+Returns a `List` of expressions, each representing a prime implicant.
+
+```javascript
+// AB ∨ A¬B has one prime implicant: A
+ce.box(['PrimeImplicants', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+// → [A]
+
+// A ∨ B has two prime implicants
+ce.box(['PrimeImplicants', ['Or', 'A', 'B']]).evaluate()
+// → [A, B]
+
+// XOR has two prime implicants
+ce.box(['PrimeImplicants', ['Xor', 'A', 'B']]).evaluate()
+// → [¬A ∧ B, A ∧ ¬B]
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="PrimeImplicates">
+
+<Signature name="PrimeImplicates">_expression_</Signature>
+
+Finds all **prime implicates** of a Boolean expression.
+
+A prime implicate is a sum term (disjunction of literals) that:
+1. Is implied by the original expression (is true whenever the expression is true)
+2. Cannot be reduced further (removing any literal would make it not an implicate)
+
+Prime implicates are the dual of prime implicants and represent the minimal
+clauses in CNF.
+
+Returns a `List` of expressions, each representing a prime implicate.
+
+```javascript
+// A ∧ B implies both A and B separately
+ce.box(['PrimeImplicates', ['And', 'A', 'B']]).evaluate()
+// → [A, B]
+
+// A ∨ B has one prime implicate
+ce.box(['PrimeImplicates', ['Or', 'A', 'B']]).evaluate()
+// → [A ∨ B]
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="MinimalDNF">
+
+<Signature name="MinimalDNF">_expression_</Signature>
+
+Converts a Boolean expression to **minimal Disjunctive Normal Form** (DNF).
+
+Uses the Quine-McCluskey algorithm to find prime implicants, then selects a
+minimal cover. The result is a disjunction of conjunctions with the fewest
+terms possible.
+
+Unlike `ToDNF` which may produce a non-minimal DNF, `MinimalDNF` guarantees
+the result has the minimum number of product terms.
+
+```javascript
+// AB ∨ A¬B ∨ ¬AB simplifies to A ∨ B
+ce.box(['MinimalDNF', ['Or',
+  ['And', 'A', 'B'],
+  ['And', 'A', ['Not', 'B']],
+  ['And', ['Not', 'A'], 'B']
+]]).evaluate()
+// → A ∨ B (3 terms reduced to 2)
+
+// AB ∨ A¬B simplifies to A
+ce.box(['MinimalDNF', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+// → A (2 terms reduced to 1)
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="MinimalCNF">
+
+<Signature name="MinimalCNF">_expression_</Signature>
+
+Converts a Boolean expression to **minimal Conjunctive Normal Form** (CNF).
+
+Uses the Quine-McCluskey algorithm to find prime implicates, then selects a
+minimal cover. The result is a conjunction of disjunctions with the fewest
+clauses possible.
+
+Unlike `ToCNF` which may produce a non-minimal CNF, `MinimalCNF` guarantees
+the result has the minimum number of clauses.
+
+```javascript
+// (A ∨ B) ∧ (A ∨ ¬B) simplifies to A
+ce.box(['MinimalCNF', ['And', ['Or', 'A', 'B'], ['Or', 'A', ['Not', 'B']]]]).evaluate()
+// → A (2 clauses reduced to 1)
+```
+
+Limited to expressions with at most 12 variables.
 
 </FunctionDefinition>
 ---
@@ -10728,11 +11767,542 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.34.0 _2026-02-01_
 
-### New Features
+### Parsing
 
-#### Subscripts and Indexing
+- **`\mathopen` and `\mathclose`**: The LaTeX parser supports `\mathopen` and
+  `\mathclose` delimiter prefixes for matchfix operators (explicit delimiter
+  spacing control), e.g. `\mathopen(a, b\mathclose)` and
+  `\mathopen{(}a, b\mathclose{)}`.
+
+- **Interval Notation Parsing**: Added support for parsing mathematical interval
+  notation from LaTeX, including half-open intervals. Addresses #254.
+
+  ```javascript
+  // Half-open intervals (American notation)
+  ce.parse('[3, 4)').json;   // → ["Interval", 3, ["Open", 4]]
+  ce.parse('(3, 4]').json;   // → ["Interval", ["Open", 3], 4]
+
+  // Open intervals (ISO/European notation)
+  ce.parse(']3, 4[').json;   // → ["Interval", ["Open", 3], ["Open", 4]]
+
+  // LaTeX bracket commands and sizing prefixes
+  ce.parse('\\lbrack 3, 4\\rparen').json;  // → ["Interval", 3, ["Open", 4]]
+  ce.parse('\\left[ 3, 4 \\right)').json;  // → ["Interval", 3, ["Open", 4]]
+  ce.parse('\\bigl( 3, 4 \\bigr]').json;   // → ["Interval", ["Open", 3], 4]
+  ```
+
+  **Contextual Parsing**: Lists and tuples are automatically converted to
+  intervals when used in set contexts (Element, Union, Intersection, etc.):
+
+  ```javascript
+  ce.parse('x \\in [0, 1]').json;
+  // → ["Element", "x", ["Interval", 0, 1]]
+
+  ce.parse('[0, 1] \\cup [2, 3]').json;
+  // → ["Union", ["Interval", 0, 1], ["Interval", 2, 3]]
+
+  // Standalone notation remains backward compatible
+  ce.parse('[0, 1]').json;  // → ["List", 0, 1]
+  ce.parse('(0, 1)').json;  // → ["Tuple", 0, 1]
+  ```
+
+### Compilation
+
+- **Custom Operator Compilation**: The `compile()` method now supports overriding
+  operators to use function calls instead of native operators. This enables
+  compilation of vector/matrix operations and custom domain-specific languages.
+  Addresses #240.
+
+  ```javascript
+  // Override operators for vector operations
+  const expr = ce.parse('v + w');
+  const compiled = expr.compile({
+    operators: {
+      Add: ['add', 11],      // Convert + to add() function
+      Multiply: ['mul', 12]  // Convert * to mul() function
+    },
+    functions: {
+      add: (a, b) => a.map((v, i) => v + b[i]),
+      mul: (a, b) => a.map((v, i) => v * b[i])
+    }
+  });
+
+  const result = compiled({ v: [1, 2, 3], w: [4, 5, 6] });
+  // → [5, 7, 9]
+  ```
+
+  Highlights:
+  - Map operators via an object or a function
+  - Function-name operators compile to calls; symbol operators compile to infix
+  - Supports scalar/collection arguments and partial overrides
+
+- **Exported Compilation Interfaces**: Advanced users can now create custom
+  compilation targets by using the exported `CompileTarget` interface,
+  `BaseCompiler` class, and `JavaScriptTarget` class.
+
+  ```javascript
+  import { BaseCompiler, JavaScriptTarget } from '@cortex-js/compute-engine';
+
+  // Create a custom compilation target
+  const customTarget = {
+    language: 'my-dsl',
+    operators: (op) => ({ Add: ['ADD', 11], Multiply: ['MUL', 12] }[op]),
+    functions: (id) => id.toUpperCase(),
+    var: (id) => `VAR("${id}")`,
+    string: (s) => `"${s}"`,
+    number: (n) => n.toString(),
+    ws: () => ' ',
+    preamble: '',
+    indent: 0,
+  };
+
+  const expr = ce.parse('x + y * 2');
+  const code = BaseCompiler.compile(expr, customTarget);
+  // → "ADD(VAR("x"), MUL(VAR("y"), 2))"
+  ```
+
+  Exported building blocks include `CompileTarget`, `LanguageTarget`,
+  `CompilationOptions`, `CompiledExecutable`, `BaseCompiler`, `JavaScriptTarget`,
+  and `GLSLTarget` (plus helper types like `CompiledOperators` and
+  `CompiledFunctions`).
+
+- **Compilation Plugin Architecture**: The Compute Engine now supports registering
+  custom compilation targets, allowing you to compile mathematical expressions to
+  any target language beyond the built-in JavaScript and GLSL targets.
+
+  ```javascript
+  import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
+
+  const ce = new ComputeEngine();
+
+  // Define a custom Python target
+  class PythonTarget {
+    // ... implementation (see documentation)
+  }
+
+  // Register the custom target
+  ce.registerCompilationTarget('python', new PythonTarget());
+
+  // Compile to Python
+  const expr = ce.parse('\\sin(x) + \\cos(y)');
+  const pythonCode = expr.compile({ to: 'python' });
+  console.log(pythonCode.toString());
+  // → math.sin(x) + math.cos(y)
+
+  // Switch between targets
+  const jsFunc = expr.compile({ to: 'javascript' });
+  const glslCode = expr.compile({ to: 'glsl' });
+  ```
+
+  Notes:
+  - Built-in targets: `javascript` (executable) and `glsl` (shader code)
+  - Add targets via `ce.registerCompilationTarget(name, target)`
+  - Switch targets with `compile({ to: ... })` (or override once with `target`)
+
+- **Python/NumPy Compilation Target**: Added a complete Python/NumPy compilation
+  target for scientific computing workflows. The `PythonTarget` class compiles
+  mathematical expressions to NumPy-compatible Python code.
+
+  ```javascript
+  import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+
+  const ce = new ComputeEngine();
+  const python = new PythonTarget({ includeImports: true });
+
+  // Register the target
+  ce.registerCompilationTarget('python', python);
+
+  // Compile expressions to Python
+  const expr = ce.parse('\\sin(x) + \\cos(y)');
+  const code = expr.compile({ to: 'python' });
+  console.log(code.toString());
+  // → import numpy as np
+  //
+  //   np.sin(x) + np.cos(y)
+
+  // Generate complete Python functions
+  const func = python.compileFunction(
+    ce.parse('\\sqrt{x^2 + y^2}'),
+    'magnitude',
+    ['x', 'y'],
+    'Calculate vector magnitude'
+  );
+  // Generates:
+  // import numpy as np
+  //
+  // def magnitude(x, y):
+  //     """Calculate vector magnitude"""
+  //     return np.sqrt(x ** 2 + y ** 2)
+  ```
+
+  Highlights:
+  - NumPy-compatible output (including arrays)
+  - Function mapping for common math + linear algebra
+  - Helpers for full functions, lambdas, and vectorized code
+
+  See the [Python/NumPy Target Guide](/compute-engine/guides/python-target/) for
+  complete documentation and examples.
+
+- **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language) target
+  for compiling mathematical expressions to WebGL shaders.
+
+  ```javascript
+  const expr = ce.parse('x^2 + y^2');
+  const glslCode = expr.compile({ to: 'glsl' });
+  console.log(glslCode.toString());
+  // → pow(x, 2.0) + pow(y, 2.0)
+
+  // Generate complete GLSL functions
+  import { GLSLTarget } from '@cortex-js/compute-engine';
+  const glsl = new GLSLTarget();
+
+  const distExpr = ce.parse('\\sqrt{x^2 + y^2 + z^2}');
+  const func = glsl.compileFunction(distExpr, 'distance3D', 'float', [
+    ['x', 'float'],
+    ['y', 'float'],
+    ['z', 'float'],
+  ]);
+  console.log(func);
+  // → float distance3D(float x, float y, float z) {
+  //     return sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
+  //   }
+
+  // Generate complete shaders
+  const shader = glsl.compileShader({
+    type: 'fragment',
+    version: '300 es',
+    outputs: [{ name: 'fragColor', type: 'vec4' }],
+    body: [
+      {
+        variable: 'fragColor',
+        expression: ce.box(['List', 1, 0, 0, 1]),
+      },
+    ],
+  });
+  ```
+
+  Highlights:
+  - Native vector/matrix operators and constructors
+  - Float literal formatting (`2.0`)
+  - Helpers for functions and complete shaders
+
+### Algebra
+
+- **Polynomial Factoring**: The `Factor` function now supports comprehensive
+  polynomial factoring including perfect square trinomials, difference of
+  squares, and quadratic factoring with rational roots. Addresses #180 and #33.
+
+  ```javascript
+  // Perfect square trinomials
+  ce.parse('x^2 + 2x + 1').factor().latex;
+  // → "(x+1)^2"
+
+  ce.parse('4x^2 + 12x + 9').factor().latex;
+  // → "(2x+3)^2"
+
+  // Difference of squares
+  ce.parse('x^2 - 4').factor().latex;
+  // → "(x-2)(x+2)"
+
+  // Quadratic with rational roots
+  ce.box(['Factor', ['Add', ['Power', 'x', 2], ['Multiply', 5, 'x'], 6], 'x'])
+    .evaluate().latex;
+  // → "(x+2)(x+3)"
+  ```
+
+  **Automatic Factoring in sqrt Simplification**: Square roots now
+  automatically factor their arguments before applying simplification rules,
+  enabling expressions like `√(x²+2x+1)` to simplify to `|x+1|`.
+
+  ```javascript
+  // Issue #180 - Now works!
+  ce.parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
+  // → "\\vert x+1\\vert"
+
+  ce.parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
+  // → "\\vert 2x+3\\vert"
+
+  ce.parse('\\sqrt{a^2 + 2ab + b^2}').simplify().latex;
+  // → "\\vert a+b\\vert"
+  ```
+
+  Includes perfect square trinomials, difference of squares, and quadratics with
+  rational roots. Helper functions are exported for advanced usage
+  (`factorPerfectSquare`, `factorDifferenceOfSquares`, `factorQuadratic`,
+  `factorPolynomial`).
+
+  **MathJSON API**:
+  ```json
+  ["Factor", expr]              // Auto-detect variable
+  ["Factor", expr, variable]    // Explicit variable specification
+  ```
+
+  The enhanced factoring system works seamlessly with existing polynomial
+  functions like `Expand`, `Together`, `Cancel`, `PolynomialGCD`, and others.
+
+### Simplification
+
+- **Absolute Value Power Simplification**: Fixed simplification of `|x^n|`
+  expressions with even and rational exponents. Previously, expressions like
+  `|x²|` and `|x^{2/3}|` were not simplified. Now they correctly simplify based
+  on the parity of the exponent's numerator. Addresses #181.
+
+  ```javascript
+  ce.parse('|x^2|').simplify().latex;      // → "x^2" (even exponent)
+  ce.parse('|x^3|').simplify().latex;      // → "|x|^3" (odd exponent)
+  ce.parse('|x^{2/3}|').simplify().latex;  // → "x^{2/3}" (even numerator)
+  ce.parse('|x^{3/2}|').simplify().latex;  // → "|x|^{3/2}" (odd numerator)
+  ```
+
+- **Assumption-Based Simplification**: Simplification rules use assumptions about
+  symbol signs:
+
+  ```javascript
+  ce.assume(ce.parse('x > 0'));
+  ce.parse('\\sqrt{x^2}').simplify().latex;  // → "x" (was "|x|")
+  ce.parse('|x|').simplify().latex;          // → "x" (was "|x|")
+
+  ce.assume(ce.parse('y < 0'));
+  ce.parse('\\sqrt{y^2}').simplify().latex;  // → "-y"
+  ce.parse('|y|').simplify().latex;          // → "-y"
+  ```
+
+- **Nested Root Simplification**: Nested roots simplify to a single root:
+
+  ```javascript
+  ce.box(['Sqrt', ['Sqrt', 'x']]).simplify()     // → root(4)(x)
+  ce.box(['Root', ['Root', 'x', 3], 2]).simplify() // → root(6)(x)
+  ce.box(['Sqrt', ['Root', 'x', 3]]).simplify()  // → root(6)(x)
+  ```
+
+  Applies to all combinations: `sqrt(sqrt(x))`, `root(sqrt(x), n)`,
+  `sqrt(root(x, n))`, and `root(root(x, m), n)`.
+
+### Assumptions & Types
+
+- **Improved `ask()` Queries**: `ce.ask()` now matches patterns with wildcards
+  correctly, can answer common "bound" queries such as
+  `ask(["Greater", "x", "_k"])` and `ask(["Greater", "_x", "_k"])`, normalizes
+  inequality patterns for matching (e.g. `ask(["Greater", "_x", 0])`), and falls
+  back to `verify()` for closed predicates when the fact is known but not stored
+  as an explicit assumption.
+
+- **Tri-state `verify()`**: Implemented `ce.verify()` as a truth query that
+  returns `true`, `false` or `undefined` when a predicate cannot be determined
+  from the current assumptions and declarations. `And`/`Or`/`Not` use 3-valued
+  logic.
+
+- **`Element`/`NotElement` Type Membership**: `Element(x, T)` and
+  `NotElement(x, T)` now support type-style RHS (e.g. `real`, `finite_real`,
+  `number`, `any`) in addition to set collections (e.g. `RealNumbers`,
+  `Integers`).
+
+- **Value Resolution from Equality Assumptions**: After
+  `ce.assume(['Equal', symbol, value])`, the symbol now evaluates to the assumed
+  value:
+
+  ```javascript
+  ce.assume(ce.box(['Equal', 'one', 1]));
+  ce.box('one').evaluate();               // → 1 (was: 'one')
+  ce.box(['Equal', 'one', 1]).evaluate(); // → True (was: ['Equal', 'one', 1])
+  ce.box(['Equal', 'one', 0]).evaluate(); // → False
+  ce.box('one').type.matches('integer');  // → true
+  ```
+
+  This also fixes comparison evaluation: `Equal(symbol, assumed_value)` now
+  correctly evaluates to `True` instead of staying symbolic.
+
+- **Inequality Evaluation Using Assumptions**: Inequality comparisons can use
+  transitive bounds extracted from assumptions.
+
+  ```javascript
+  ce.assume(ce.box(['Greater', 'x', 4]));
+  ce.box(['Greater', 'x', 0]).evaluate();  // → True (x > 4 > 0)
+  ce.box(['Less', 'x', 0]).evaluate();     // → False
+  ce.box('x').isGreater(0);                // → true
+  ce.box('x').isPositive;                  // → true
+  ```
+
+- **Type Inference from Assumptions**: Inequalities infer `real`; equalities
+  infer from the value.
+
+  ```javascript
+  ce.assume(ce.box(['Greater', 'x', 4]));
+  ce.box('x').type.toString();  // → 'real' (was: 'unknown')
+
+  ce.assume(ce.box(['Equal', 'one', 1]));
+  ce.box('one').type.toString();  // → 'integer' (was: 'unknown')
+  ```
+
+- **Tautology and Contradiction Detection**: `ce.assume()` returns `'tautology'`
+  for redundant assumptions and `'contradiction'` for conflicts.
+
+  ```javascript
+  ce.assume(ce.box(['Greater', 'x', 4]));
+
+  // Redundant assumption (x > 4 implies x > 0)
+  ce.assume(ce.box(['Greater', 'x', 0]));  // → 'tautology' (was: 'ok')
+
+  // Conflicting assumption (x > 4 contradicts x < 0)
+  ce.assume(ce.box(['Less', 'x', 0]));     // → 'contradiction'
+
+  // Same assumption repeated
+  ce.assume(ce.box(['Equal', 'one', 1]));
+  ce.assume(ce.box(['Equal', 'one', 1]));  // → 'tautology'
+
+  // Conflicting equality
+  ce.assume(ce.box(['Less', 'one', 0]));   // → 'contradiction'
+  ```
+
+### Solving
+
+- **Systems of Linear Equations**: The `solve()` method now handles systems of
+  linear equations parsed from LaTeX `\begin{cases}...\end{cases}` environments.
+  Returns an object mapping variable names to their solutions.
+
+  ```javascript
+  const e = ce.parse('\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}');
+  const result = e.solve(['x', 'y']);
+  console.log(result.x.json);  // 60
+  console.log(result.y.json);  // 10
+
+  // 3x3 systems work too
+  const e2 = ce.parse('\\begin{cases}x+y+z=6\\\\2x+y-z=1\\\\x-y+2z=5\\end{cases}');
+  const result2 = e2.solve(['x', 'y', 'z']);
+  // → { x: 1, y: 2, z: 3 }
+  ```
+
+  Non-linear systems that don't match known patterns and inconsistent systems
+  return `null`.
+
+- **Non-linear Polynomial Systems**: The `solve()` method now handles certain
+  non-linear polynomial systems with 2 equations and 2 variables:
+  - **Product + sum pattern**: Systems like `xy = p, x + y = s` are solved by
+    recognizing that x and y are roots of the quadratic `t² - st + p = 0`.
+
+  - **Substitution method**: When one equation is linear in one variable, it
+    substitutes into the other equation and solves the resulting univariate
+    equation.
+
+  Returns an array of solution objects (multiple solutions possible):
+
+  ```javascript
+  // Product + sum pattern
+  const e = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
+  const result = e.solve(['x', 'y']);
+  // → [{ x: 2, y: 3 }, { x: 3, y: 2 }]
+
+  // Substitution method
+  const e2 = ce.parse('\\begin{cases}x+y=5\\\\x^2+y=7\\end{cases}');
+  const result2 = e2.solve(['x', 'y']);
+  // → [{ x: 2, y: 3 }, { x: -1, y: 6 }]
+  ```
+
+  Only real solutions are returned; complex solutions are filtered out.
+
+- **Exact Rational Arithmetic in Linear Systems**: The linear system solver now
+  uses exact rational arithmetic throughout the Gaussian elimination process.
+  Systems with fractional coefficients produce exact fractional results rather
+  than floating-point approximations.
+
+  ```javascript
+  const e = ce.parse('\\begin{cases}x+y=1\\\\x-y=1/2\\end{cases}');
+  const result = e.solve(['x', 'y']);
+  console.log(result.x.json);  // ["Rational", 3, 4]  (exact 3/4)
+  console.log(result.y.json);  // ["Rational", 1, 4]  (exact 1/4)
+
+  // Fractional coefficients
+  const e2 = ce.parse('\\begin{cases}x/3+y/2=1\\\\x/4+y/5=1\\end{cases}');
+  const result2 = e2.solve(['x', 'y']);
+  // → { x: 36/7, y: -10/7 }
+  ```
+
+- **Linear Inequality Systems**: The `solve()` method now handles systems of
+  linear inequalities in 2 variables, returning the vertices of the feasible
+  region (convex polygon). Supports all inequality operators: `<`, `<=`, `>`,
+  `>=`.
+
+  ```javascript
+  // Triangle: x >= 0, y >= 0, x + y <= 10
+  const e = ce.parse('\\begin{cases}x\\geq 0\\\\y\\geq 0\\\\x+y\\leq 10\\end{cases}');
+  const result = e.solve(['x', 'y']);
+  // → [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }]
+
+  // Square: 0 <= x <= 5, 0 <= y <= 5
+  const square = ce.parse('\\begin{cases}x\\geq 0\\\\x\\leq 5\\\\y\\geq 0\\\\y\\leq 5\\end{cases}');
+  square.solve(['x', 'y']);
+  // → [{ x: 0, y: 0 }, { x: 5, y: 0 }, { x: 5, y: 5 }, { x: 0, y: 5 }]
+  ```
+
+  Vertices are returned in counterclockwise convex hull order. Returns `null`
+  for infeasible systems or non-linear constraints.
+
+- **Under-determined Systems (Parametric Solutions)**: The `solve()` method now
+  returns parametric solutions for under-determined linear systems (fewer
+  equations than variables) instead of returning `null`. Free variables appear
+  as themselves in the solution, with other variables expressed in terms of
+  them.
+
+  ```javascript
+  // Single equation with two variables
+  const e = ce.parse('\\begin{cases}x+y=5\\end{cases}');
+  const result = e.solve(['x', 'y']);
+  // → { x: -y + 5, y: y }  (y is a free variable)
+
+  // Two equations with three variables
+  const e2 = ce.parse('\\begin{cases}x+y+z=6\\\\x-y=2\\end{cases}');
+  const result2 = e2.solve(['x', 'y', 'z']);
+  // → { x: -z/2 + 4, y: -z/2 + 2, z: z }  (z is a free variable)
+  ```
+
+  Inconsistent systems still return `null`.
+
+- **Extended Sqrt Equation Solving**: The equation solver now handles sqrt
+  equations of the form `√(f(x)) = g(x)` by squaring both sides and solving the
+  resulting polynomial. Extraneous roots are automatically filtered.
+
+  ```javascript
+  ce.parse('\\sqrt{x+1} = x').solve('x');      // → [1.618...] (golden ratio)
+  ce.parse('\\sqrt{2x+3} = x - 1').solve('x'); // → [4.449...]
+  ce.parse('\\sqrt{3x-2} = x').solve('x');     // → [1, 2]
+  ce.parse('\\sqrt{x} = x').solve('x');        // → [0, 1]
+  ```
+
+- **Two Sqrt Equation Solving**: The equation solver now handles equations with
+  two sqrt terms of the form `√(f(x)) + √(g(x)) = e` using double squaring. Both
+  addition and subtraction forms are supported, and extraneous roots are
+  automatically filtered.
+
+  ```javascript
+  ce.parse('\\sqrt{x+1} + \\sqrt{x+4} = 3').solve('x');  // → [0]
+  ce.parse('\\sqrt{x} + \\sqrt{x+7} = 7').solve('x');    // → [9]
+  ce.parse('\\sqrt{x+5} - \\sqrt{x-3} = 2').solve('x');  // → [4]
+  ce.parse('\\sqrt{2x+1} + \\sqrt{x-1} = 4').solve('x'); // → [46 - 8√29] ≈ 2.919
+  ```
+
+- **Nested Sqrt Equation Solving**: The equation solver now handles nested sqrt
+  equations of the form `√(x + √x) = a` using substitution. These patterns have
+  √x inside the argument of an outer sqrt. The solver uses u = √x substitution,
+  solves the resulting quadratic, and filters negative u values.
+
+  ```javascript
+  ce.parse('\\sqrt{x + 2\\sqrt{x}} = 3').solve('x');  // → [11 - 2√10] ≈ 4.675
+  ce.parse('\\sqrt{x + \\sqrt{x}} = 2').solve('x');   // → [9/2 - √17/2] ≈ 2.438
+  ce.parse('\\sqrt{x - \\sqrt{x}} = 1').solve('x');   // → [φ²] ≈ 2.618
+  ```
+
+- **Quadratic Equations Without Constant Term**: Added support for solving
+  quadratic equations of the form `ax² + bx = 0` (missing constant term). These
+  are solved by factoring: `x(ax + b) = 0` → `x = 0` or `x = -b/a`.
+
+  ```javascript
+  ce.parse('x^2 + 3x = 0').solve('x');  // → [0, -3]
+  ce.parse('2x^2 - 4x = 0').solve('x'); // → [0, 2]
+  ```
+
+### Subscripts & Indexing
 
 - **Subscript Evaluation Handler**: Define custom evaluation functions for
   subscripted symbols like mathematical sequences using `subscriptEvaluate`:
@@ -10754,9 +12324,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   Both simple subscripts (`F_5`) and complex subscripts (`F_{5}`) are supported.
-  When the handler returns `undefined`, the expression stays symbolic. Subscripted
-  expressions with `subscriptEvaluate` have type `number` and can be used in
-  arithmetic operations: `ce.parse('F_{5} + F_{3}').evaluate()` works correctly.
+  When the handler returns `undefined`, the expression stays symbolic.
+  Subscripted expressions with `subscriptEvaluate` have type `number` and can be
+  used in arithmetic operations: `ce.parse('F_{5} + F_{3}').evaluate()` works
+  correctly.
 
 - **Type-Aware Subscript Handling**: Subscripts on symbols declared as
   collection types (list, tuple, matrix, etc.) now automatically convert to
@@ -10805,7 +12376,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.parse('v_{\\text{initial}}');  // → symbol "v_initial"
   ```
 
-#### Sequences
+### Sequences
 
 - **Declarative Sequence Definitions**: Define mathematical sequences using
   recurrence relations with the new `declareSequence()` method:
@@ -10842,7 +12413,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Domain constraints (min/max valid indices)
   - Symbolic subscripts stay symbolic (e.g., `F_k` remains unevaluated)
 
-  Alternatively, sequences can be defined using natural LaTeX assignment notation:
+  Alternatively, sequences can be defined using natural LaTeX assignment
+  notation:
 
   ```javascript
   // Arithmetic sequence via LaTeX
@@ -10860,10 +12432,130 @@ import ChangeLog from '@site/src/components/ChangeLog';
   Base cases and recurrence can be defined in any order. The sequence is
   finalized when both are present.
 
-#### Special Functions
+- **Sequence Status API**: Query the status of sequence definitions with
+  `getSequenceStatus()`:
 
-- **Special Function Definitions**: Added type signatures for special mathematical
-  functions, enabling them to be used in expressions without type errors:
+  ```javascript
+  ce.parse('F_0 := 0').evaluate();
+  ce.getSequenceStatus('F');
+  // → { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
+
+  ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+  ce.getSequenceStatus('F');
+  // → { status: 'complete', hasBase: true, hasRecurrence: true, baseIndices: [0] }
+
+  ce.getSequenceStatus('x');
+  // → { status: 'not-a-sequence', hasBase: false, hasRecurrence: false }
+  ```
+
+- **Sequence Introspection API**: Inspect and manage defined sequences:
+
+  ```javascript
+  // Get sequence information
+  ce.getSequence('F');
+  // → { name: 'F', variable: 'n', baseIndices: [0, 1], memoize: true, cacheSize: 5 }
+
+  // List all defined sequences
+  ce.listSequences();  // → ['F', 'A', 'H']
+
+  // Check if a symbol is a sequence
+  ce.isSequence('F');  // → true
+  ce.isSequence('x');  // → false
+
+  // Manage memoization cache
+  ce.getSequenceCache('F');  // → Map { 2 => 1, 3 => 2, ... }
+  ce.clearSequenceCache('F');  // Clear cache for specific sequence
+  ce.clearSequenceCache();     // Clear all sequence caches
+  ```
+
+- **Generate Sequence Terms**: Generate a list of sequence terms with
+  `getSequenceTerms()`:
+
+  ```javascript
+  ce.declareSequence('F', {
+    base: { 0: 0, 1: 1 },
+    recurrence: 'F_{n-1} + F_{n-2}',
+  });
+
+  ce.getSequenceTerms('F', 0, 10);
+  // → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+  // With step parameter (every other term)
+  ce.getSequenceTerms('F', 0, 10, 2);
+  // → [0, 1, 3, 8, 21, 55]
+  ```
+
+- **Sum and Product over Sequences**: `Sum` and `Product` now work seamlessly
+  with user-defined sequences:
+
+  ```javascript
+  ce.declareSequence('F', {
+    base: { 0: 0, 1: 1 },
+    recurrence: 'F_{n-1} + F_{n-2}',
+  });
+
+  ce.parse('\\sum_{k=0}^{10} F_k').evaluate();  // → 143
+  ce.parse('\\prod_{k=1}^{5} A_k').evaluate();  // Works with any defined sequence
+  ```
+
+- **OEIS Integration**: Look up sequences in the Online Encyclopedia of Integer
+  Sequences (OEIS) and verify your sequences against known mathematical
+  sequences:
+
+  ```javascript
+  // Look up a sequence by its terms
+  const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
+  // → [{ id: 'A000045', name: 'Fibonacci numbers', terms: [...], url: '...' }]
+
+  // Check if your sequence matches a known OEIS sequence
+  ce.declareSequence('F', {
+    base: { 0: 0, 1: 1 },
+    recurrence: 'F_{n-1} + F_{n-2}',
+  });
+
+  const result = await ce.checkSequenceOEIS('F', 10);
+  // → { matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }], terms: [...] }
+  ```
+
+  Note: OEIS lookups require network access to oeis.org.
+
+- **Multi-Index Sequences**: Define sequences with multiple indices like
+  Pascal's triangle `P_{n,k}` or grid-based recurrences:
+
+  ```javascript
+  // Pascal's Triangle: P_{n,k} = P_{n-1,k-1} + P_{n-1,k}
+  ce.declareSequence('P', {
+    variables: ['n', 'k'],
+    base: { 'n,0': 1, 'n,n': 1 },  // Pattern-based base cases
+    recurrence: 'P_{n-1,k-1} + P_{n-1,k}',
+    domain: { n: { min: 0 }, k: { min: 0 } },
+    constraints: 'k <= n',  // k must not exceed n
+  });
+
+  ce.parse('P_{5,2}').evaluate();  // → 10
+  ce.parse('P_{10,5}').evaluate(); // → 252
+  ```
+
+  Features:
+  - Multiple index variables with `variables: ['n', 'k']`
+  - Pattern-based base cases: `'n,0'` matches any (n, 0), `'n,n'` matches
+    diagonal
+  - Per-variable domain constraints
+  - Constraint expressions (e.g., `'k <= n'`)
+  - Composite key memoization (e.g., `'5,2'`)
+  - Full introspection support with `isMultiIndex` flag
+
+  Pattern matching for base cases:
+  - Exact values: `'0,0'` matches only (0, 0)
+  - Wildcards: `'n,0'` matches any value for n with k=0
+  - Equality: `'n,n'` matches when both indices are equal
+  - Priority: exact matches are checked before patterns
+
+### Special Functions
+
+- **Special Function Definitions**: Added type signatures for special
+  mathematical functions, enabling them to be used in expressions without type
+  errors:
   - `Zeta` - Riemann zeta function ζ(s)
   - `Beta` - Euler beta function B(a,b) = Γ(a)Γ(b)/Γ(a+b)
   - `LambertW` - Lambert W function (product logarithm)
@@ -10879,13 +12571,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   via `\operatorname{J}`, `\operatorname{Y}`, etc., and Airy functions via
   `\operatorname{Ai}`, `\operatorname{Bi}`.
 
-#### Calculus
+### Calculus
 
 - **LambertW Derivative**: Added derivative rule for the Lambert W function:
   `d/dx W(x) = W(x)/(x·(1+W(x)))`
 
 - **Bessel Function Derivatives**: Added derivative support for all four Bessel
   function types using order-dependent recurrence relations:
+
   ```javascript
   ce.box(['D', ['BesselJ', 'n', 'x'], 'x']).evaluate();
   // → 1/2 * BesselJ(n-1, x) - 1/2 * BesselJ(n+1, x)
@@ -10896,15 +12589,17 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.box(['D', ['BesselK', 'n', 'x'], 'x']).evaluate();
   // → -1/2 * BesselK(n-1, x) - 1/2 * BesselK(n+1, x)
   ```
+
   Chain rule is automatically applied for composite arguments.
 
 - **Multi-Argument Function Derivatives**: Added derivative support for:
-
   - **Log(x, base)** - Logarithm with custom base:
+
     ```javascript
     ce.box(['D', ['Log', 'x', 2], 'x']).evaluate();  // → 1/(x·ln(2))
     ce.box(['D', ['Log', 'x', 'a'], 'x']).evaluate(); // → 1/(x·ln(a))
     ```
+
     Also handles cases where both x and base depend on the variable by applying
     the quotient rule to ln(x)/ln(base).
 
@@ -10916,22 +12611,106 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ```
 
 - **Integration of `1/(x·ln(x))` Pattern**: Added support for integrating
-  expressions where the denominator is a product and one factor is the derivative
-  of another:
+  expressions where the denominator is a product and one factor is the
+  derivative of another:
+
   ```javascript
   ce.parse('\\int \\frac{1}{x\\ln x} dx').evaluate();  // → ln(|ln(x)|)
   ce.parse('\\int \\frac{3}{x\\ln x} dx').evaluate();  // → 3·ln(|ln(x)|)
   ```
+
   This uses u-substitution: since `1/x = d/dx(ln(x))`, the integral becomes
   `∫ h'(x)/h(x) dx = ln|h(x)|`.
 
-#### Linear Algebra
+- **Cyclic Integration for e^x with Trigonometric Functions**: Added support for
+  integrating products of exponentials and trigonometric functions that require
+  the "solve for the integral" technique:
+
+  ```javascript
+  ce.parse('\\int e^x \\sin x dx').evaluate();
+  // → -1/2·cos(x)·e^x + 1/2·sin(x)·e^x
+
+  ce.parse('\\int e^x \\cos x dx').evaluate();
+  // → 1/2·sin(x)·e^x + 1/2·cos(x)·e^x
+
+  // Also works with linear arguments:
+  ce.parse('\\int e^x \\sin(2x) dx').evaluate();
+  // → -2/5·cos(2x)·e^x + 1/5·sin(2x)·e^x
+
+  ce.parse('\\int e^x \\cos(2x) dx').evaluate();
+  // → 1/5·cos(2x)·e^x + 2/5·sin(2x)·e^x
+  ```
+
+  These patterns cannot be solved by standard integration by parts (which would
+  lead to infinite recursion) and instead use direct formulas:
+  - `∫ e^x·sin(ax+b) dx = (e^x/(a²+1))·(sin(ax+b) - a·cos(ax+b))`
+  - `∫ e^x·cos(ax+b) dx = (e^x/(a²+1))·(a·sin(ax+b) + cos(ax+b))`
+
+- **Derivative Recursion Safety**: Added recursion protection to
+  `differentiate()` with a depth limit (`MAX_DIFFERENTIATION_DEPTH`), returning
+  `undefined` when the limit is exceeded.
+
+- **Equation Equivalence in `isEqual()`** (Issue #275): Two equations are now
+  recognized as equivalent if they have the same solution set:
+
+  ```javascript
+  ce.parse('2x+1=0').isEqual(ce.parse('x=-1/2'));   // → true
+  ce.parse('3x+1=0').isEqual(ce.parse('6x+2=0'));   // → true
+  ```
+
+  Uses sampling to check whether (LHS₁-RHS₁)/(LHS₂-RHS₂) is a non-zero constant.
+
+### Logic
+
+- **Boolean Simplification Rules**: Added absorption laws and improved boolean
+  expression simplification:
+  - **Absorption**: `A ∧ (A ∨ B) → A` and `A ∨ (A ∧ B) → A`
+  - **Idempotence**: `A ∧ A → A` and `A ∨ A → A`
+  - **Complementation**: `A ∧ ¬A → False` and `A ∨ ¬A → True`
+  - **Identity**: `A ∧ True → A` and `A ∨ False → A`
+  - **Domination**: `A ∧ False → False` and `A ∨ True → True`
+  - **Double negation**: `¬¬A → A`
+
+  These rules are applied automatically during simplification:
+
+  ```javascript
+  ce.box(['And', 'A', ['Or', 'A', 'B']]).simplify();  // → A
+  ce.box(['Or', 'A', ['And', 'A', 'B']]).simplify();  // → A
+  ```
+
+- **Prime Implicants and Minimal Normal Forms**: Added Quine-McCluskey algorithm
+  for finding prime implicants/implicates and computing minimal CNF/DNF:
+  - `PrimeImplicants(expr)` - Find all prime implicants (minimal product terms)
+  - `PrimeImplicates(expr)` - Find all prime implicates (minimal sum clauses)
+  - `MinimalDNF(expr)` - Convert to minimal DNF using prime implicant cover
+  - `MinimalCNF(expr)` - Convert to minimal CNF using prime implicate cover
+
+  ```javascript
+  // Find prime implicants (terms that can't be further simplified)
+  ce.box(['PrimeImplicants', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate();
+  // → [A] (AB and A¬B combine to just A)
+
+  // Compute minimal DNF
+  ce.box(['MinimalDNF', ['Or',
+    ['And', 'A', 'B'],
+    ['And', 'A', ['Not', 'B']],
+    ['And', ['Not', 'A'], 'B']
+  ]]).evaluate();
+  // → A ∨ B (simplified from 3 terms to 2)
+  ```
+
+  Limited to 12 variables to prevent exponential blowup; larger expressions
+  return unevaluated.
+
+### Linear Algebra
 
 - **Matrix Decompositions**: Added four matrix decomposition functions for
   numerical linear algebra:
   - `LUDecomposition(A)` → `[P, L, U]` - LU factorization with partial pivoting
-  - `QRDecomposition(A)` → `[Q, R]` - QR factorization using Householder reflections
-  - `CholeskyDecomposition(A)` → `L` - Cholesky factorization for positive definite matrices
+  - `QRDecomposition(A)` → `[Q, R]` - QR factorization using Householder
+    reflections
+  - `CholeskyDecomposition(A)` → `L` - Cholesky factorization for positive
+    definite matrices
   - `SVD(A)` → `[U, Σ, V]` - Singular Value Decomposition
 
   ```javascript
@@ -10948,43 +12727,54 @@ import ChangeLog from '@site/src/components/ChangeLog';
   // → [U, Σ, V] where A = UΣV^T
   ```
 
-#### Simplification
+### Fixed
 
-- **Assumption-Based Simplification**: Simplification rules now correctly use
-  assumptions about symbol signs. For example:
+- **replace() Literal Matching in Object Rules**:
+  `.replace({ match: 'a', replace: 2 })` no longer treats `'a'` as a wildcard
+  (string rules like `"a*x -> 2*x"` still auto-wildcard).
 
   ```javascript
-  ce.assume(ce.parse('x > 0'));
-  ce.parse('\\sqrt{x^2}').simplify().latex;  // → "x" (was "|x|")
-  ce.parse('|x|').simplify().latex;          // → "x" (was "|x|")
-
-  ce.assume(ce.parse('y < 0'));
-  ce.parse('\\sqrt{y^2}').simplify().latex;  // → "-y"
-  ce.parse('|y|').simplify().latex;          // → "-y"
+  const expr = ce.box(['Add', ['Multiply', 'a', 'x'], 'b']);
+  expr.replace({match: 'a', replace: 2}, {recursive: true});
+  // → 2x + b (was: 2 - incorrectly matched entire expression)
   ```
 
-  This enables important mathematical simplifications that depend on knowing
-  whether a variable is positive, negative, or zero.
+- **forget() Clears Assumed Values**: `ce.forget()` now clears values set by
+  equality assumptions across all evaluation context frames.
 
-### Improvements
-
-#### Simplification
-
-- **Nested Root Simplification**: Nested roots now simplify to a single root:
   ```javascript
-  ce.box(['Sqrt', ['Sqrt', 'x']]).simplify()     // → root(4)(x)
-  ce.box(['Root', ['Root', 'x', 3], 2]).simplify() // → root(6)(x)
-  ce.box(['Sqrt', ['Root', 'x', 3]]).simplify()  // → root(6)(x)
+  ce.assume(ce.box(['Equal', 'x', 5]));
+  ce.box('x').evaluate();  // → 5
+  ce.forget('x');
+  ce.box('x').evaluate();  // → 'x' (was: 5)
   ```
-  This applies to all combinations: `sqrt(sqrt(x))`, `root(sqrt(x), n)`,
-  `sqrt(root(x, n))`, and `root(root(x, m), n)`.
 
-#### Calculus
+- **Scoped Assumptions Clean Up on popScope()**: Assumptions made inside a scope
+  no longer leak after `popScope()`.
 
-- **Derivative Recursion Safety**: Added robust recursion protection to the
-  `differentiate()` function with a depth limit (`MAX_DIFFERENTIATION_DEPTH`) to
-  guard against pathological expressions. All recursive calls now track depth
-  and gracefully return `undefined` if the limit is exceeded.
+  ```javascript
+  ce.pushScope();
+  ce.assume(ce.box(['Equal', 'y', 10]));
+  ce.box('y').evaluate();  // → 10
+  ce.popScope();
+  ce.box('y').evaluate();  // → 'y' (was: 10)
+  ```
+
+- **Extraneous Root Filtering for Sqrt Equations**: Candidate solutions are now
+  validated against the original expression (before clearing denominators /
+  harmonization) to filter extraneous roots.
+
+  Examples of equations that now correctly filter extraneous roots:
+  - `√x = x - 2` → returns `[4]` (filters out x=1)
+  - `√x + x - 2 = 0` → returns `[1]` (filters out x=4)
+  - `√x - x + 2 = 0` → returns `[4]` (filters out x=1)
+  - `x - 2√x - 3 = 0` → returns `[9]` (filters out x=1)
+  - `2x + 3√x - 2 = 0` → returns `[1/4]` (filters out x=4)
+
+- **Simplification (#178)**:
+  - Safer division canonicalization for denominators that may simplify to `0`
+  - Implicit multiplication powers: `xx` → `x^2`
+  - Targeted exp/log rewriting for `\exp(\log(x)±y)`
 
 ## 0.33.0 _2026-01-30_
 
@@ -11336,84 +13126,77 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 #### Linear Algebra
 
-- **Linear Algebra Enhancements**: Improved tensor and matrix operations with
-  better scalar handling, new functionality, and clearer error messages:
-  - **Matrix Multiplication**: Added `MatrixMultiply` function supporting:
-    - Matrix × Matrix: `A (m×n) × B (n×p) → result (m×p)`
-    - Matrix × Vector: `A (m×n) × v (n) → result (m)`
-    - Vector × Matrix: `v (m) × B (m×n) → result (n)`
-    - Vector × Vector (dot product): `v1 (n) · v2 (n) → scalar`
-    - Proper dimension validation with `incompatible-dimensions` errors
-    - LaTeX serialization using `\cdot` notation
+- **Matrix Multiplication**: Added `MatrixMultiply` function supporting:
+  - Matrix × Matrix: `A (m×n) × B (n×p) → result (m×p)`
+  - Matrix × Vector: `A (m×n) × v (n) → result (m)`
+  - Vector × Matrix: `v (m) × B (m×n) → result (n)`
+  - Vector × Vector (dot product): `v1 (n) · v2 (n) → scalar`
+  - Proper dimension validation with `incompatible-dimensions` errors
+  - LaTeX serialization using `\cdot` notation
 
-  - **Matrix Addition and Scalar Broadcasting**: `Add` now supports element-wise
-    operations on tensors (matrices and vectors):
-    - Matrix + Matrix: Element-wise addition (shapes must match)
-    - Scalar + Matrix: Broadcasts scalar to all elements
-    - Vector + Vector: Element-wise addition
-    - Scalar + Vector: Broadcasts scalar to all elements
-    - Symbolic support: `[[a,b],[c,d]] + [[1,2],[3,4]]` evaluates correctly
-    - Proper dimension validation with `incompatible-dimensions` errors
+- **Matrix Addition and Scalar Broadcasting**: `Add` now supports element-wise
+  operations on tensors (matrices and vectors):
+  - Matrix + Matrix: Element-wise addition (shapes must match)
+  - Scalar + Matrix: Broadcasts scalar to all elements
+  - Vector + Vector: Element-wise addition
+  - Scalar + Vector: Broadcasts scalar to all elements
+  - Symbolic support: `[[a,b],[c,d]] + [[1,2],[3,4]]` evaluates correctly
+  - Proper dimension validation with `incompatible-dimensions` errors
 
-  - **Matrix Construction Functions**: Added convenience functions for creating
-    common matrices:
-    - `IdentityMatrix(n)`: Creates an n×n identity matrix
-    - `ZeroMatrix(m, n?)`: Creates an m×n matrix of zeros (square if n omitted)
-    - `OnesMatrix(m, n?)`: Creates an m×n matrix of ones (square if n omitted)
+- **Matrix Construction Functions**: Added convenience functions for creating
+  common matrices:
+  - `IdentityMatrix(n)`: Creates an n×n identity matrix
+  - `ZeroMatrix(m, n?)`: Creates an m×n matrix of zeros (square if n omitted)
+  - `OnesMatrix(m, n?)`: Creates an m×n matrix of ones (square if n omitted)
 
-  - **Matrix and Vector Norms**: Added `Norm` function for computing various
-    norms:
-    - **Vector norms**: L1 (sum of absolute values), L2 (Euclidean, default),
-      L-infinity (max absolute value), and general Lp norms
-    - **Matrix norms**: Frobenius (default, sqrt of sum of squared elements), L1
-      (max column sum), L-infinity (max row sum)
-    - Scalar norms return the absolute value
+- **Matrix and Vector Norms**: Added `Norm` function for computing various
+  norms:
+  - **Vector norms**: L1 (sum of absolute values), L2 (Euclidean, default),
+    L-infinity (max absolute value), and general Lp norms
+  - **Matrix norms**: Frobenius (default, sqrt of sum of squared elements), L1
+    (max column sum), L-infinity (max row sum)
+  - Scalar norms return the absolute value
 
-  - **Higher-Rank Tensor Operations**: Extended `Transpose`,
-    `ConjugateTranspose`, and `Trace` to work with rank > 2 tensors:
-    - **Transpose**: Swaps last two axes by default (batch transpose), or
-      specify explicit axes with `['Transpose', T, axis1, axis2]`
-    - **ConjugateTranspose**: Same axis behavior as Transpose, plus element-wise
-      complex conjugation
-    - **Trace (batch trace)**: Returns a tensor of traces over the last two
-      axes. For a `[2,2,2]` tensor, returns `[trace of T[0], trace of T[1]]`.
-      Optional axis parameters: `['Trace', T, axis1, axis2]`
-    - All operations support explicit axis specification for flexible tensor
-      manipulation
+- **Eigenvalues and Eigenvectors**: Added functions for eigenvalue
+  decomposition:
+  - `Eigenvalues(matrix)`: Returns list of eigenvalues (2×2: symbolic via
+    characteristic polynomial; 3×3: Cardano's formula; larger: numeric QR)
+  - `Eigenvectors(matrix)`: Returns list of corresponding eigenvectors using
+    null space computation via Gaussian elimination
+  - `Eigen(matrix)`: Returns tuple of (eigenvalues, eigenvectors)
 
-  - **Eigenvalues and Eigenvectors**: Added functions for eigenvalue
-    decomposition:
-    - `Eigenvalues(matrix)`: Returns list of eigenvalues
-      - 2×2 matrices: symbolic computation via characteristic polynomial
-      - 3×3 matrices: Cardano's formula for cubic roots
-      - Larger matrices: numeric QR algorithm
-      - Optimized for diagonal/triangular matrices
-    - `Eigenvectors(matrix)`: Returns list of corresponding eigenvectors
-      - Uses null space computation via Gaussian elimination
-    - `Eigen(matrix)`: Returns tuple of (eigenvalues, eigenvectors)
+- **Diagonal Function**: Now fully implemented with bidirectional behavior:
+  - Vector → Matrix: Creates a diagonal matrix from a vector
+    (`Diagonal([1,2,3])` → 3×3 diagonal matrix)
+  - Matrix → Vector: Extracts the diagonal as a vector
+    (`Diagonal([[1,2],[3,4]])` → `[1,4]`)
 
-  - **Diagonal function**: Now fully implemented with bidirectional behavior:
-    - Vector → Matrix: Creates a diagonal matrix from a vector
-      (`Diagonal([1,2,3])` → 3×3 diagonal matrix)
-    - Matrix → Vector: Extracts the diagonal as a vector
-      (`Diagonal([[1,2],[3,4]])` → `[1,4]`)
+- **Higher-Rank Tensor Operations**: Extended `Transpose`, `ConjugateTranspose`,
+  and `Trace` to work with rank > 2 tensors:
+  - **Transpose**: Swaps last two axes by default (batch transpose), or specify
+    explicit axes with `['Transpose', T, axis1, axis2]`
+  - **ConjugateTranspose**: Same axis behavior as Transpose, plus element-wise
+    complex conjugation
+  - **Trace (batch trace)**: Returns a tensor of traces over the last two axes.
+    For a `[2,2,2]` tensor, returns `[trace of T[0], trace of T[1]]`. Optional
+    axis parameters: `['Trace', T, axis1, axis2]`
 
-  - **Reshape cycling**: Implements APL-style ravel cycling. When reshaping to a
-    larger shape, elements cycle from the beginning: `Reshape([1,2,3], (2,2))` →
-    `[[1,2],[3,1]]`
+- **Reshape Cycling**: Implements APL-style ravel cycling. When reshaping to a
+  larger shape, elements cycle from the beginning: `Reshape([1,2,3], (2,2))` →
+  `[[1,2],[3,1]]`
 
-  - **Scalar handling**: Most linear algebra functions now handle scalar inputs:
-    - `Flatten(42)` → `[42]` (single-element list)
-    - `Transpose(42)` → `42` (identity)
-    - `Determinant(42)` → `42` (1×1 matrix determinant)
-    - `Trace(42)` → `42` (1×1 matrix trace)
-    - `Inverse(42)` → `1/42` (scalar reciprocal)
-    - `ConjugateTranspose(42)` → `42` (conjugate of real is itself)
-    - `Reshape(42, (2,2))` → `[[42,42],[42,42]]` (scalar replication)
+- **Scalar Handling**: Most linear algebra functions now handle scalar inputs:
+  - `Flatten(42)` → `[42]` (single-element list)
+  - `Transpose(42)` → `42` (identity)
+  - `Determinant(42)` → `42` (1×1 matrix determinant)
+  - `Trace(42)` → `42` (1×1 matrix trace)
+  - `Inverse(42)` → `1/42` (scalar reciprocal)
+  - `ConjugateTranspose(42)` → `42` (conjugate of real is itself)
+  - `Reshape(42, (2,2))` → `[[42,42],[42,42]]` (scalar replication)
 
-  - **Error messages**: Operations requiring square matrices (`Determinant`,
-    `Trace`, `Inverse`) now return `expected-square-matrix` error for vectors
-    and tensors (rank > 2).
+- **Improved Error Messages**: Operations requiring square matrices
+  (`Determinant`, `Trace`, `Inverse`) now return `expected-square-matrix` error
+  for vectors and tensors (rank > 2).
 
 ### Performance
 
@@ -13926,7 +15709,7 @@ They can be iterated, sliced, filtered, mapped, etc...
   - `apply`
 
 - Properly handle inverse and derivate notations, e.g. `\sin^{-1}(x)`,
-  `\sin'(x)`, `\cos''(x)`, \cos^{(4)}(x)`or even`\sin^{-1}''(x)`
+  `\sin'(x)`, `\cos''(x)`, `\cos^{(4)}(x)` or even `\sin^{-1}''(x)`
 
 ## 0.13.0 _2023-09-09_
 
@@ -14159,7 +15942,7 @@ Work around unpckg.com issue with libraries using BigInt.
   used to represent both integers and floating point numbers. Its key
   characteristic is that it is an arbitrary precision number, aka "bignum". This
   affects `ce.numericMode` which now uses `bignum` instead of
-  `decimal', `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`-> `bignumValue()`
+  `decimal`, `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`->`bignumValue()`
 
 ### Bugs Fixed
 
@@ -14189,7 +15972,7 @@ Work around unpckg.com issue with libraries using BigInt.
 - Parsing of `\sum`, `\prod`, `\int`.
 - Added parsing of log functions, `\lb`, `\ln`, `\ln_{10}`, `\ln_2`, etc...
 - Added
-  `expr.`subexpressions`, `expr.getSubexpressions()`, `expr.errors`, `expr.symbols`, `expr.isValid`.
+  `expr.subexpressions`, `expr.getSubexpressions()`, `expr.errors`, `expr.symbols`, `expr.isValid`.
 - Symbols can now be used to represent functions, i.e. `ce.box('Sin').domain`
   correctly returns `["Domain", "Function"]`.
 - Correctly handle rational numbers with a numerator or denominator outside the
@@ -14557,7 +16340,8 @@ n^2+1 & n \\geq 2
       latex: 'F_{10}',
       label: "Fibonacci",
       preamble: `Define sequences using LaTeX assignment notation.
-Base cases and recurrence relations are automatically detected.`,
+Base cases and recurrence are automatically detected.
+Generate terms and compute sums over sequences.`,
       template: "sequence"
     }
   ];
@@ -14622,6 +16406,14 @@ ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
 // Evaluate specific terms
 console.info('F_10 =', ce.parse('F_{10}').evaluate().value);
 console.info('F_20 =', ce.parse('F_{20}').evaluate().value);
+
+// Generate a list of terms
+const terms = ce.getSequenceTerms('F', 0, 10);
+console.info('First 11 terms:', terms.map(t => t.value).join(', '));
+
+// Sum over sequence terms
+const sum = ce.parse('\\\\sum_{k=0}^{10} F_k').evaluate();
+console.info('Sum of F_0 to F_10 =', sum.value);
 `
 
 };
@@ -15167,6 +16959,95 @@ ce.assume(ce.parse("\\beta \\neq 0"));
 
 Each call to `ce.assume()` replaces the previous assumptions about the symbol.
 
+### Return Values
+
+The `ce.assume()` method returns a status indicating the result of the assumption:
+
+- `'ok'` - The assumption was successfully added
+- `'tautology'` - The assumption is redundant (already implied by existing assumptions)
+- `'contradiction'` - The assumption conflicts with existing assumptions
+- `'not-a-predicate'` - The expression is not a valid assumption proposition
+
+```js
+ce.assume(ce.parse("x > 4"));
+
+// Redundant assumption (x > 4 implies x > 0)
+ce.assume(ce.parse("x > 0"));
+// ➔ 'tautology'
+
+// Conflicting assumption (x > 4 contradicts x < 0)
+ce.assume(ce.parse("x < 0"));
+// ➔ 'contradiction'
+
+// Same assumption repeated
+ce.assume(ce.parse("y = 5"));
+ce.assume(ce.parse("y = 5"));
+// ➔ 'tautology'
+```
+
+## Value Resolution from Assumptions
+
+When an equality assumption is made, the symbol evaluates to the assumed value:
+
+```js
+ce.assume(ce.parse("\\alpha = 5"));
+ce.parse("\\alpha").evaluate();
+// ➔ 5
+
+ce.parse("\\alpha + 1").evaluate();
+// ➔ 6
+
+// Equality comparisons work correctly
+ce.parse("\\alpha = 5").evaluate();
+// ➔ True
+
+ce.parse("\\alpha = 0").evaluate();
+// ➔ False
+```
+
+## Inequality Evaluation
+
+When inequality assumptions are made, the Compute Engine uses transitive reasoning
+to determine the results of comparisons:
+
+```js
+ce.assume(ce.parse("x > 4"));
+
+// Transitive reasoning: x > 4 > 0, so x > 0
+ce.parse("x > 0").evaluate();
+// ➔ True
+
+ce.parse("x < 0").evaluate();
+// ➔ False
+
+// Properties are also available
+ce.parse("x").isPositive;
+// ➔ true
+
+ce.parse("x").isGreater(0);
+// ➔ true
+```
+
+## Type Inference from Assumptions
+
+The type of a symbol is automatically inferred from assumptions:
+
+```js
+ce.assume(ce.parse("x > 4"));
+ce.box("x").type.toString();
+// ➔ 'real'
+
+ce.assume(ce.parse("n = 42"));
+ce.box("n").type.toString();
+// ➔ 'integer'
+
+ce.assume(ce.parse("z = 3.14"));
+ce.box("z").type.toString();
+// ➔ 'real'
+```
+
+Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`.
+Equality assumptions infer the type from the value.
 
 ## Assumptions Lifecycle
 
@@ -15187,35 +17068,51 @@ When a context is exited, all assumptions made in that context are forgotten.
 - Passing a symbol name will only remove assumptions about that particular
   symbol.
 
+The `forget()` method clears both the assumptions and any values set by equality
+assumptions:
+
 ```js
-ce.declare("x", "number");
-ce.assume(ce.parse("x > 0"));
-ce.is(ce.parse("x > 2"));
-// ➔  true
+ce.assume(ce.parse("x = 5"));
+ce.parse("x").evaluate();
+// ➔ 5
 
 ce.forget("x");
 
-ce.is(ce.parse("x > 2"));
-// ➔  undefined
+ce.parse("x").evaluate();
+// ➔ x (symbol, no longer has a value)
+
+ce.verify(ce.parse("x > 0"));
+// ➔ undefined (assumption cleared)
 ```
 
 **To temporarily define a series of assumptions**, create a new scope.
 
+Assumptions made in a nested scope are automatically cleaned up when `popScope()`
+is called. This includes both the assumptions and any values set by equality
+assumptions:
+
 ```js
 ce.declare("x", "number");
-ce.is(ce.parse("x > 2"));
+ce.verify(ce.parse("x > 2"));
 // ➔ undefined
 
 ce.pushScope();
 
 ce.assume(ce.parse("x > 0"));
-ce.is(ce.parse("x > 2"));
-// ➔  true
+ce.verify(ce.parse("x > 2"));
+// ➔ true
+
+ce.assume(ce.parse("y = 10"));
+ce.parse("y").evaluate();
+// ➔ 10
 
 ce.popScope(); // all assumptions made in the current scope are forgotten
 
-ce.is(ce.parse("x > 2"));
-// ➔  undefined
+ce.verify(ce.parse("x > 2"));
+// ➔ undefined
+
+ce.parse("y").evaluate();
+// ➔ y (value cleared when scope exited)
 ```
 
 
@@ -15265,6 +17162,9 @@ ce.verify(ce.parse("x > 0"));
 The method `ce.verify()` returns `true` if the assumption is true, `false` if it is
 not, and `undefined` if it cannot be determined.
 
+Logical operators (`And`, `Or`, `Not`) use 3-valued logic, so expressions like
+`And(True, Unknown)` return `undefined`.
+
 While `ce.verify()` is appropriate to get boolean answers, more complex queries can
 also be made.
 
@@ -15274,21 +17174,29 @@ The argument of `ce.ask()` can be a pattern, and it returns an array of matches 
 `Substitution` objects.
 
 ```js
-// "x is a positive integer"
+// "x is positive"
 ce.assume(ce.parse("x > 0"));
 
-// "What is x greater than?"
-ce.ask(["Greater", "x", "_val"]);
+// Ask for a lower bound (common query pattern)
+ce.ask(["Greater", "x", "_k"]);
 
-//  -> [{"val": 0}] "It is greater than 0"
+//  -> [{"_k": 0}] "It is greater than 0"
+
+// You can also ask "which symbols are greater than 0?"
+ce.ask(["Greater", "_x", 0]);
+
+//  -> [{"_x": x}]
+
+// Inequalities are stored internally in a normalized form, so this is also a
+// matching query:
+ce.ask(["Less", ["Negate", "x"], "_k"]);
+
+//  -> [{"_k": 0}]
 ```
 
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > 
 Read more about **Patterns and Rules**<Icon name="chevron-right-bold" />
 </ReadMore>
-
-
-
 ---
 title: MathJSON Format
 slug: /math-json/
@@ -16700,6 +18608,67 @@ The numerical approximation is computed using a **Monte Carlo** method.
 
 
 </FunctionDefinition>
+
+### Supported Integral Formulas
+
+The `Integrate` function supports symbolic integration for standard forms including
+polynomials, exponentials, logarithms, trigonometric functions, and their compositions.
+Below are some notable integration patterns:
+
+#### Logarithmic Patterns
+
+The pattern $\int \frac{1}{x \ln x} dx$ is recognized as a case where the denominator
+is a product and one factor is the derivative of another:
+
+$$
+\int \frac{1}{x \ln x} \, dx = \ln|\ln x| + C
+$$
+
+```javascript
+ce.parse('\\int \\frac{1}{x\\ln x} dx').evaluate()
+// → ln(|ln(x)|)
+
+ce.parse('\\int \\frac{3}{x\\ln x} dx').evaluate()
+// → 3·ln(|ln(x)|)
+```
+
+This uses u-substitution: since $\frac{1}{x} = \frac{d}{dx}(\ln x)$, the integral
+becomes $\int \frac{h'(x)}{h(x)} dx = \ln|h(x)| + C$.
+
+#### Exponential-Trigonometric Products
+
+Products of exponentials and trigonometric functions require the "solve for the
+integral" technique (also known as cyclic integration):
+
+$$
+\int e^x \sin x \, dx = \frac{e^x}{2}(\sin x - \cos x) + C
+$$
+
+$$
+\int e^x \cos x \, dx = \frac{e^x}{2}(\sin x + \cos x) + C
+$$
+
+```javascript
+ce.parse('\\int e^x \\sin x dx').evaluate()
+// → -1/2·cos(x)·e^x + 1/2·sin(x)·e^x
+
+ce.parse('\\int e^x \\cos x dx').evaluate()
+// → 1/2·sin(x)·e^x + 1/2·cos(x)·e^x
+```
+
+This also works with linear arguments in the trigonometric function:
+
+```javascript
+ce.parse('\\int e^x \\sin(2x) dx').evaluate()
+// → -2/5·cos(2x)·e^x + 1/5·sin(2x)·e^x
+
+ce.parse('\\int e^x \\cos(2x) dx').evaluate()
+// → 1/5·cos(2x)·e^x + 2/5·sin(2x)·e^x
+```
+
+The general formulas used are:
+- $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
+- $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
 
 
 ## Limit
@@ -18482,6 +20451,19 @@ ce.parse("42 \\in \\Z").evaluate().print();
 // ➔ True
 ```
 
+`Element` and `NotElement` can also be used with a **type name** on the right
+hand side (e.g. `integer`, `real`, `finite_real`, `number`, `any`), in which
+case the check is done against the expression type.
+
+```js
+ce.declare('x', 'finite_real');
+ce.box(['Element', 'x', 'real']).evaluate().print();
+// ➔ True
+
+ce.box(['Element', 'x', 'integer']).evaluate().print();
+// ➔ False
+```
+
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
 
@@ -18569,6 +20551,83 @@ To check the membership of an element in a set or the relationship between two s
 | `SupersetEqual` | $$ \operatorname{A} \supseteq \operatorname{B} $$                                                                                                                       | `\operatorname{A} \supseteq \operatorname{B}`                                                              |
 
 </div>
+
+## Intervals
+
+An **interval** is a set of real numbers that contains all numbers between two endpoints. Intervals can be open (excluding endpoints), closed (including endpoints), or half-open (including one endpoint but not the other).
+
+### Interval Notation
+
+The Compute Engine supports both American and ISO/European interval notation:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
+
+| Notation | LaTeX | MathJSON | Description |
+| :------- | :---- | :------- | :---------- |
+| $[a, b]$ | `[a, b]` | `["Interval", a, b]` | Closed interval (both endpoints included) |
+| $(a, b)$ | `(a, b)` | `["Interval", ["Open", a], ["Open", b]]` | Open interval (both endpoints excluded) |
+| $[a, b)$ | `[a, b)` | `["Interval", a, ["Open", b]]` | Half-open (closed-open) |
+| $(a, b]$ | `(a, b]` | `["Interval", ["Open", a], b]` | Half-open (open-closed) |
+| $]a, b[$ | `]a, b[` | `["Interval", ["Open", a], ["Open", b]]` | Open interval (ISO notation) |
+
+</div>
+
+The `Open` wrapper indicates that an endpoint is excluded from the interval.
+
+### Delimiter Variants
+
+All interval notations support LaTeX delimiter sizing commands:
+
+- **Explicit bracket commands**: `\lbrack`, `\rbrack`, `\lparen`, `\rparen`
+- **Sizing prefixes**: `\left`/`\right`, `\bigl`/`\bigr`, `\Bigl`/`\Bigr`, `\biggl`/`\biggr`, `\Biggl`/`\Biggr`
+- **Spacing commands**: `\mathopen`/`\mathclose`
+
+```js
+// All of these parse to the same Interval expression:
+ce.parse('[3, 4)').json;
+ce.parse('\\lbrack 3, 4\\rparen').json;
+ce.parse('\\left[ 3, 4 \\right)').json;
+ce.parse('\\bigl[ 3, 4 \\bigr)').json;
+ce.parse('\\mathopen\\lbrack 3, 4\\mathclose\\rparen').json;
+// → ["Interval", 3, ["Open", 4]]
+```
+
+```js
+ce.parse('[0, 1)').json;
+// ➔ ["Interval", 0, ["Open", 1]]
+
+ce.parse('(-\\infty, 0]').json;
+// ➔ ["Interval", ["Open", ["Negate", "PositiveInfinity"]], 0]
+```
+
+### Contextual Interval Parsing
+
+When bracket notation appears in a set context (such as with `\in`, `\cup`, `\cap`, `\subset`, etc.), the Compute Engine automatically interprets it as an interval:
+
+```js
+// In set context: [0, 1] becomes an Interval
+ce.parse('x \\in [0, 1]').json;
+// ➔ ["Element", "x", ["Interval", 0, 1]]
+
+ce.parse('[0, 1] \\cup [2, 3]').json;
+// ➔ ["Union", ["Interval", 0, 1], ["Interval", 2, 3]]
+
+// Standalone: [0, 1] remains a List for backward compatibility
+ce.parse('[0, 1]').json;
+// ➔ ["List", 0, 1]
+```
+
+### Interval Serialization
+
+Intervals are serialized using American notation with explicit LaTeX bracket commands:
+
+```js
+ce.box(['Interval', 0, ['Open', 1]]).latex;
+// ➔ "\\lbrack0, 1\\rparen"
+
+ce.box(['Interval', ['Open', 0], ['Open', 1]]).latex;
+// ➔ "\\lparen0, 1\\rparen"
+```
 ---
 title: Custom Functions and Symbols
 slug: /compute-engine/guides/augmenting/
@@ -19057,6 +21116,139 @@ ce.parse('f_x := x^2').evaluate();
 ce.parse('f_{3}').evaluate();  // → 9
 ```
 
+### Sequence Status and Introspection
+
+You can query the status of sequence definitions and inspect defined sequences:
+
+```js
+// Check if a sequence is fully defined
+ce.parse('F_0 := 0').evaluate();
+ce.getSequenceStatus('F');
+// → { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
+
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+ce.getSequenceStatus('F');
+// → { status: 'complete', hasBase: true, hasRecurrence: true, baseIndices: [0] }
+
+// For non-sequences:
+ce.getSequenceStatus('x');
+// → { status: 'not-a-sequence', hasBase: false, hasRecurrence: false }
+```
+
+**Introspection methods** let you examine and manage defined sequences:
+
+```js
+// Get detailed information about a sequence
+ce.getSequence('F');
+// → { name: 'F', variable: 'n', baseIndices: [0, 1], memoize: true, cacheSize: 5 }
+
+// List all defined sequences
+ce.listSequences();  // → ['F', 'A', 'T']
+
+// Check if a symbol is a sequence
+ce.isSequence('F');  // → true
+ce.isSequence('x');  // → false
+
+// Manage memoization cache
+ce.getSequenceCache('F');  // → Map { 2 => 1, 3 => 2, 5 => 5, ... }
+ce.clearSequenceCache('F');  // Clear cache for specific sequence
+ce.clearSequenceCache();     // Clear all sequence caches
+```
+
+### Generating Sequence Terms
+
+Generate a list of sequence terms with `getSequenceTerms()`:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+// Get terms from index 0 to 10 (inclusive)
+ce.getSequenceTerms('F', 0, 10);
+// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+// With a step parameter (every other term)
+ce.getSequenceTerms('F', 0, 10, 2);
+// → [0, 1, 3, 8, 21, 55]
+
+// Starting from a non-zero index
+ce.getSequenceTerms('F', 5, 10);
+// → [5, 8, 13, 21, 34, 55]
+```
+
+### Sum and Product over Sequences
+
+`Sum` and `Product` work seamlessly with user-defined sequences:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+// Sum of Fibonacci terms from k=0 to 10
+ce.parse('\\sum_{k=0}^{10} F_k').evaluate();  // → 143
+
+// Product over sequence terms
+ce.declareSequence('A', {
+  base: { 1: 1 },
+  recurrence: 'A_{n-1} + 1',
+});
+ce.parse('\\prod_{k=1}^{5} A_k').evaluate();  // → 120 (factorial)
+```
+
+### OEIS Integration
+
+The [Online Encyclopedia of Integer Sequences (OEIS)](https://oeis.org) contains
+over 350,000 integer sequences. You can look up sequences and verify your
+definitions against known mathematical sequences:
+
+```js
+// Look up a sequence by its terms
+const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
+// → [{ id: 'A000045', name: 'Fibonacci numbers', terms: [...], url: '...' }]
+
+// Each result contains:
+// - id: OEIS sequence ID (e.g., 'A000045')
+// - name: Sequence description
+// - terms: First several terms
+// - formula: Formula if available
+// - url: Link to OEIS page
+```
+
+**Verify your sequences** against OEIS:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+const result = await ce.checkSequenceOEIS('F', 10);
+// → {
+//     matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }],
+//     terms: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+//   }
+
+if (result.matches.length > 0) {
+  console.log(`Your sequence matches ${result.matches[0].name}!`);
+}
+```
+
+**Options:**
+
+```js
+// Limit number of results
+await ce.lookupOEIS([1, 2, 3, 4, 5], { maxResults: 3 });
+
+// Set timeout (in milliseconds)
+await ce.lookupOEIS([1, 2, 3, 4, 5], { timeout: 5000 });
+```
+
+> **Note:** OEIS lookups require network access to oeis.org.
+
 ## Overloading Functions
 
 **Overloading** is the ability to define multiple functions with the same name.
@@ -19352,6 +21544,425 @@ elements in an expression or apply conditional rewriting rules to an expression.
 
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > Read more about
 <strong>Patterns and Rules</strong> for these operations <Icon name="chevron-right-bold" /></ReadMore>
+---
+title: Python/NumPy Compilation Target
+slug: /compute-engine/guides/python-target/
+---
+
+<Intro>
+The Python compilation target generates NumPy-compatible Python code from mathematical expressions, enabling seamless integration with scientific Python workflows.
+</Intro>
+
+## Overview
+
+The `PythonTarget` class compiles Compute Engine expressions to Python code that uses NumPy for numerical operations. The generated code is:
+- **Vectorized**: Works with both scalars and NumPy arrays
+- **Readable**: Clean, idiomatic Python code
+- **Efficient**: Leverages NumPy's optimized implementations
+- **Compatible**: Works with SciPy, Pandas, and other scientific Python libraries
+
+## Basic Usage
+
+```typescript
+import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+const python = new PythonTarget();
+
+// Compile a simple expression
+const expr = ce.parse('x^2 + y^2');
+const code = python.compile(expr);
+console.log(code); // "x ** 2 + y ** 2"
+```
+
+## Using with expr.compile()
+
+To use the Python target with `expr.compile()`, register it first:
+
+```javascript
+import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+
+// Register the Python target (only need to do this once)
+ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
+
+// Now you can use it throughout your code
+const expr = ce.parse('\\sin(x) + \\cos(y)');
+const pythonCode = expr.compile({ to: 'python' });
+console.log(pythonCode.toString());
+// → import numpy as np
+//
+//   np.sin(x) + np.cos(y)
+```
+
+## Features
+
+### 1. Expression Compilation
+
+Convert mathematical notation to Python code:
+
+```typescript
+const python = new PythonTarget();
+
+// Polynomial
+ce.parse('x^4 + 3x^3 + 2x^2 + x + 1');
+// → "x ** 4 + 3 * x ** 3 + 2 * x ** 2 + x + 1"
+
+// Trigonometric
+ce.parse('\\sin(x) + \\cos(y)');
+// → "np.sin(x) + np.cos(y)"
+
+// Square root
+ce.parse('\\sqrt{x^2 + y^2}');
+// → "np.sqrt(x ** 2 + y ** 2)"
+
+// Constants
+ce.parse('2\\pi r');
+// → "2 * np.pi * r"
+```
+
+### 2. Function Generation
+
+Generate complete Python functions:
+
+```typescript
+const python = new PythonTarget({ includeImports: true });
+
+const expr = ce.parse('\\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}');
+const func = python.compileFunction(
+  expr,
+  'euclidean_distance',
+  ['x_1', 'y_1', 'x_2', 'y_2'],
+  'Calculate Euclidean distance between two points'
+);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def euclidean_distance(x_1, y_1, x_2, y_2):
+    """Calculate Euclidean distance between two points"""
+    return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
+```
+
+### 3. Lambda Functions
+
+Create Python lambda expressions:
+
+```typescript
+const expr = ce.parse('x^2 + 2x + 1');
+const lambda = python.compileLambda(expr, ['x']);
+// → "lambda x: x ** 2 + 2 * x + 1"
+```
+
+### 4. Vectorized Functions
+
+Generate NumPy-vectorized functions:
+
+```typescript
+const expr = ce.parse('\\sin(x) * \\cos(x)');
+const func = python.compileVectorized(expr, 'trig_product', ['x']);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def _trig_product_scalar(x):
+    return np.sin(x) * np.cos(x)
+
+# Vectorized version
+trig_product = np.vectorize(_trig_product_scalar)
+```
+
+## Supported Functions
+
+### Trigonometric
+- `sin`, `cos`, `tan` → `np.sin`, `np.cos`, `np.tan`
+- `arcsin`, `arccos`, `arctan` → `np.arcsin`, `np.arccos`, `np.arctan`
+- `sinh`, `cosh`, `tanh` → `np.sinh`, `np.cosh`, `np.tanh`
+
+### Exponential & Logarithmic
+- `exp` → `np.exp`
+- `ln` → `np.log`
+- `log10` → `np.log10`
+- `log2` → `np.log2`
+
+### Power & Roots
+- `x^n` → `x ** n`
+- `sqrt` → `np.sqrt`
+- `power` → `np.power`
+
+### Rounding
+- `abs` → `np.abs`
+- `floor` → `np.floor`
+- `ceiling` → `np.ceil`
+- `round` → `np.round`
+
+### Statistics
+- `sum` → `np.sum`
+- `mean` → `np.mean`
+- `median` → `np.median`
+- `std` → `np.std`
+
+### Linear Algebra
+- `dot` → `np.dot`
+- `cross` → `np.cross`
+- `norm` → `np.linalg.norm`
+- `det` → `np.linalg.det`
+- `inv` → `np.linalg.inv`
+
+## Configuration Options
+
+```typescript
+new PythonTarget({
+  includeImports: true,  // Add "import numpy as np" to output
+  useScipy: false        // Include scipy.special for advanced functions
+})
+```
+
+## Real-World Examples
+
+### Physics: Kinematic Equation
+
+```typescript
+const expr = ce.parse('u \\cdot t + \\frac{1}{2} a \\cdot t^2');
+const kinematics = python.compileFunction(
+  expr,
+  'position',
+  ['u', 'a', 't'],
+  'Position with initial velocity u, acceleration a, at time t'
+);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def position(u, a, t):
+    """Position with initial velocity u, acceleration a, at time t"""
+    return 0.5 * a * t ** 2 + t * u
+```
+
+### Mathematics: Quadratic Formula
+
+```typescript
+const expr = ce.parse('\\frac{-b + \\sqrt{b^2 - 4ac}}{2a}');
+const quadratic = python.compileFunction(
+  expr,
+  'quadratic_root',
+  ['a', 'b', 'c'],
+  'Calculate one root of a quadratic equation'
+);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def quadratic_root(a, b, c):
+    """Calculate one root of a quadratic equation"""
+    return (-b + np.sqrt(b ** 2 + -(4 * a * c))) / (2 * a)
+```
+
+### Statistics: Gaussian Function
+
+```typescript
+const expr = ce.parse('e^{-x^2}');
+const gaussian = python.compileFunction(
+  expr,
+  'gaussian',
+  ['x'],
+  'Unnormalized Gaussian function'
+);
+```
+
+Generates:
+
+```python
+import numpy as np
+
+def gaussian(x):
+    """Unnormalized Gaussian function"""
+    return np.e ** (-x ** 2)
+```
+
+## Use Cases
+
+### 1. Scientific Computing
+Generate NumPy code for numerical analysis and simulations:
+
+```python
+# Generated function works with arrays
+import numpy as np
+
+# ... generated function here ...
+
+x = np.linspace(0, 10, 100)
+y = gaussian(x)  # Vectorized operation
+```
+
+### 2. Machine Learning
+Create feature engineering functions:
+
+```typescript
+const expr = ce.parse('\\frac{x - \\mu}{\\sigma}');
+const normalize = python.compileFunction(expr, 'z_score', ['x', 'mu', 'sigma']);
+// Use in ML pipeline for feature normalization
+```
+
+### 3. Data Analysis
+Convert formulas to vectorized Pandas operations:
+
+```python
+import pandas as pd
+# Generated function
+def calculate_metric(x, y):
+    return np.sqrt(x ** 2 + y ** 2)
+
+# Use with DataFrames
+df['result'] = calculate_metric(df['col1'], df['col2'])
+```
+
+### 4. Education
+Show Python equivalents of mathematical notation:
+
+```typescript
+// Students see: ∑(xᵢ - μ)²/n
+const expr = ce.parse('\\frac{\\sum(x - \\mu)^2}{n}');
+const code = python.compile(expr);
+// Students learn: np.sum((x - mu) ** 2) / n
+```
+
+### 5. Code Generation
+Automated function creation from specifications:
+
+```typescript
+// Read formulas from config/database
+const formulas = loadFormulas();
+formulas.forEach(formula => {
+  const expr = ce.parse(formula.latex);
+  const code = python.compileFunction(expr, formula.name, formula.params);
+  writeToFile(`generated/${formula.name}.py`, code);
+});
+```
+
+## Integration Examples
+
+### With Jupyter Notebooks
+
+```python
+# Cell 1: Generated functions
+%load generated_functions.py
+
+# Cell 2: Use with data
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-5, 5, 1000)
+y = gaussian(x)
+
+plt.plot(x, y)
+plt.title('Generated Gaussian Function')
+plt.show()
+```
+
+### With SciPy
+
+```typescript
+// Generate function using SciPy special functions
+const python = new PythonTarget({ includeImports: true, useScipy: true });
+const expr = ce.parse('\\Gamma(x)');
+const code = python.compile(expr);
+// → Uses scipy.special.gamma
+```
+
+### Complete Pipeline
+
+```typescript
+// 1. Parse LaTeX from document
+const latex = extractLatexFromDocument('paper.tex');
+
+// 2. Compile to Python
+const python = new PythonTarget({ includeImports: true });
+const functions = latex.formulas.map(f =>
+  python.compileFunction(ce.parse(f.equation), f.name, f.variables)
+);
+
+// 3. Generate Python module
+const module = functions.join('\n\n');
+fs.writeFileSync('generated_math.py', module);
+
+// 4. Use in Python
+// from generated_math import *
+```
+
+## Comparison with Other Targets
+
+| Feature | JavaScript | GLSL | Python |
+|---------|-----------|------|--------|
+| **Execution** | Node.js/Browser | GPU (WebGL) | Python Runtime |
+| **Use Case** | CPU Computation | Graphics/Parallel | Scientific Computing |
+| **Output** | Executable Function | Shader Code (String) | Python Code (String) |
+| **Performance** | Fast (JIT) | Very Fast (Parallel) | Fast (NumPy/C) |
+| **Integration** | Direct in JS | WebGL Context | Import in Python |
+
+## Best Practices
+
+### 1. Choose the Right Target
+- **JavaScript**: Browser/Node.js execution, immediate use
+- **Python**: Scientific workflows, NumPy integration
+- **GLSL**: GPU parallel computation, graphics
+
+### 2. Handle Imports Properly
+```typescript
+// For standalone scripts
+const python = new PythonTarget({ includeImports: true });
+
+// For modules (import at top of file separately)
+const python = new PythonTarget({ includeImports: false });
+```
+
+### 3. Vectorization
+Generated functions work with both scalars and arrays:
+
+```python
+# Scalar
+result = euclidean_distance(1, 2, 4, 6)  # Single value
+
+# Arrays (element-wise)
+x1 = np.array([1, 2, 3])
+y1 = np.array([1, 2, 3])
+x2 = np.array([4, 5, 6])
+y2 = np.array([4, 5, 6])
+result = euclidean_distance(x1, y1, x2, y2)  # Array of distances
+```
+
+### 4. Type Safety
+Remember that generated Python code is untyped. Add type hints manually if needed:
+
+```python
+def euclidean_distance(x_1: float, y_1: float, x_2: float, y_2: float) -> float:
+    return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
+```
+
+## Limitations
+
+1. **Not Executable in JavaScript**: Python code must be run in a Python environment
+2. **Type Information Lost**: Generated code is untyped (can add hints manually)
+3. **Some Simplifications**: Expressions are canonicalized (e.g., `x/2` → `0.5 * x`)
+4. **Requires NumPy**: Most functions need NumPy to be installed
+
+## See Also
+
+- [Compiling Expressions Guide](/compute-engine/guides/compiling/)
+- [Custom Compilation Targets](/compute-engine/guides/compiling/#plugin-architecture-registering-custom-targets)
 ---
 title: Functions
 slug: /compute-engine/reference/functions/
@@ -21016,6 +23627,387 @@ console.log(transformedExpr1.isSame(transformedExpr2));
 // ➔ true
 ```
 ---
+title: Sequences
+slug: /compute-engine/guides/sequences/
+---
+
+<Intro>
+Mathematical sequences like the Fibonacci numbers, arithmetic progressions, or
+Pascal's triangle can be defined declaratively using recurrence relations.
+The Compute Engine provides tools to define, evaluate, and analyze sequences.
+</Intro>
+
+Sequences are defined by specifying:
+- **Base cases**: Initial values that anchor the sequence
+- **Recurrence relation**: A formula expressing each term in terms of previous terms
+
+Once defined, sequences can be evaluated at any index, used in summations and
+products, and even compared against the Online Encyclopedia of Integer Sequences (OEIS).
+
+## Defining Sequences
+
+There are two ways to define sequences: using the `declareSequence()` method
+or using LaTeX assignment notation.
+
+### Using declareSequence()
+
+The `declareSequence()` method provides a structured way to define sequences:
+
+```javascript
+// Fibonacci sequence: F_n = F_{n-1} + F_{n-2}
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+ce.parse('F_{10}').evaluate();
+// ➔ 55
+
+ce.parse('F_{20}').evaluate();
+// ➔ 6765
+```
+
+#### Options
+
+The `declareSequence()` method accepts the following options:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| `base` | `Record<number, number>` | Initial values as index → value pairs |
+| `recurrence` | `string \| BoxedExpression` | The recurrence formula |
+| `variable` | `string` | Index variable name (default: `'n'`) |
+| `memoize` | `boolean` | Enable caching of computed values (default: `true`) |
+| `domain` | `{ min?: number, max?: number }` | Valid index range |
+
+#### Examples
+
+**Arithmetic sequence** (adding a constant):
+
+```javascript
+ce.declareSequence('A', {
+  base: { 0: 1 },
+  recurrence: 'A_{n-1} + 2',
+});
+
+ce.parse('A_{5}').evaluate();
+// ➔ 11  (1, 3, 5, 7, 9, 11)
+```
+
+**Geometric sequence** (multiplying by a constant):
+
+```javascript
+ce.declareSequence('G', {
+  base: { 0: 1 },
+  recurrence: '2 \\cdot G_{n-1}',
+});
+
+ce.parse('G_{5}').evaluate();
+// ➔ 32  (1, 2, 4, 8, 16, 32)
+```
+
+**Factorial via recurrence**:
+
+```javascript
+ce.declareSequence('H', {
+  base: { 0: 1 },
+  recurrence: 'n \\cdot H_{n-1}',
+});
+
+ce.parse('H_{5}').evaluate();
+// ➔ 120
+```
+
+### Using LaTeX Assignment Notation
+
+Sequences can also be defined naturally using LaTeX assignment syntax:
+
+```javascript
+// Define base cases
+ce.parse('F_0 := 0').evaluate();
+ce.parse('F_1 := 1').evaluate();
+
+// Define recurrence
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+
+// Use the sequence
+ce.parse('F_{10}').evaluate();
+// ➔ 55
+```
+
+Base cases and the recurrence can be defined in any order. The sequence becomes
+usable once all necessary components are present.
+
+```javascript
+// Define recurrence first
+ce.parse('L_n := L_{n-1} + 2').evaluate();
+
+// Then add base case
+ce.parse('L_0 := 1').evaluate();
+
+// Now it works
+ce.parse('L_{5}').evaluate();
+// ➔ 11
+```
+
+## Using Sequences
+
+### Evaluation
+
+Subscripted sequence symbols evaluate to their computed values:
+
+```javascript
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+// Single value
+ce.parse('F_{10}').evaluate();
+// ➔ 55
+
+// In expressions
+ce.parse('F_{10} + F_{5}').evaluate();
+// ➔ 60
+
+// Symbolic subscripts stay symbolic
+ce.parse('F_k').evaluate();
+// ➔ F_k (unevaluated)
+```
+
+### Sum and Product
+
+Sequences work with `Sum` and `Product`:
+
+```javascript
+// Sum of first 11 Fibonacci numbers
+ce.parse('\\sum_{k=0}^{10} F_k').evaluate();
+// ➔ 143
+
+// Product of sequence terms
+ce.parse('\\prod_{k=1}^{5} A_k').evaluate();
+```
+
+### Generating Terms
+
+Use `getSequenceTerms()` to generate a list of terms:
+
+```javascript
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+ce.getSequenceTerms('F', 0, 10);
+// ➔ [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+// With step parameter (every other term)
+ce.getSequenceTerms('F', 0, 10, 2);
+// ➔ [0, 1, 3, 8, 21, 55]
+```
+
+## Custom Evaluation with subscriptEvaluate
+
+For sequences that don't fit a simple recurrence pattern, use `subscriptEvaluate`
+to define a custom evaluation function:
+
+```javascript
+// Define a sequence with custom evaluation logic
+ce.declare('P', {
+  subscriptEvaluate: (subscript, { engine }) => {
+    const n = subscript.re;
+    if (!Number.isInteger(n) || n < 0) return undefined;
+
+    // Return nth prime number
+    return engine.number(getNthPrime(n));
+  },
+});
+
+ce.parse('P_{5}').evaluate();
+// ➔ 11 (the 5th prime)
+
+ce.parse('P_k').evaluate();
+// ➔ P_k (stays symbolic when subscript is not numeric)
+```
+
+When `subscriptEvaluate` returns `undefined`, the expression stays symbolic.
+
+Subscripted expressions with `subscriptEvaluate` have type `number` and can
+participate in arithmetic:
+
+```javascript
+ce.parse('P_{5} + P_{3}').evaluate();
+// ➔ 16 (11 + 5)
+```
+
+## Multi-Index Sequences
+
+Sequences can have multiple indices, useful for structures like Pascal's triangle
+or grid-based recurrences:
+
+```javascript
+// Pascal's Triangle: P_{n,k} = P_{n-1,k-1} + P_{n-1,k}
+ce.declareSequence('P', {
+  variables: ['n', 'k'],
+  base: { 'n,0': 1, 'n,n': 1 },  // Pattern-based base cases
+  recurrence: 'P_{n-1,k-1} + P_{n-1,k}',
+  domain: { n: { min: 0 }, k: { min: 0 } },
+  constraints: 'k <= n',
+});
+
+ce.parse('P_{5,2}').evaluate();
+// ➔ 10
+
+ce.parse('P_{10,5}').evaluate();
+// ➔ 252
+```
+
+### Multi-Index Options
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| `variables` | `string[]` | Names of index variables (e.g., `['n', 'k']`) |
+| `base` | `Record<string, number>` | Pattern-based base cases |
+| `constraints` | `string` | Constraint expression (e.g., `'k <= n'`) |
+
+### Pattern-Based Base Cases
+
+Base case keys support patterns:
+
+| Pattern | Matches |
+|:--------|:--------|
+| `'0,0'` | Only (0, 0) |
+| `'n,0'` | Any (n, 0) - first column |
+| `'n,n'` | Any (n, n) - diagonal |
+| `'0,k'` | Any (0, k) - first row |
+
+Exact matches take priority over patterns.
+
+## Sequence Introspection
+
+### Checking Sequence Status
+
+Use `getSequenceStatus()` to check if a sequence definition is complete:
+
+```javascript
+ce.parse('F_0 := 0').evaluate();
+ce.getSequenceStatus('F');
+// ➔ { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
+
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+ce.getSequenceStatus('F');
+// ➔ { status: 'complete', hasBase: true, hasRecurrence: true, baseIndices: [0] }
+
+ce.getSequenceStatus('x');
+// ➔ { status: 'not-a-sequence', hasBase: false, hasRecurrence: false }
+```
+
+### Sequence Information
+
+```javascript
+// Get sequence details
+ce.getSequence('F');
+// ➔ { name: 'F', variable: 'n', baseIndices: [0, 1], memoize: true, cacheSize: 5 }
+
+// List all defined sequences
+ce.listSequences();
+// ➔ ['F', 'A', 'H']
+
+// Check if a symbol is a sequence
+ce.isSequence('F');
+// ➔ true
+
+ce.isSequence('x');
+// ➔ false
+```
+
+### Cache Management
+
+Sequences with `memoize: true` (the default) cache computed values:
+
+```javascript
+// View cached values
+ce.getSequenceCache('F');
+// ➔ Map { 2 => 1, 3 => 2, 4 => 3, ... }
+
+// Clear cache for a specific sequence
+ce.clearSequenceCache('F');
+
+// Clear all sequence caches
+ce.clearSequenceCache();
+```
+
+## OEIS Integration
+
+The Compute Engine can look up sequences in the
+[Online Encyclopedia of Integer Sequences (OEIS)](https://oeis.org/).
+
+### Looking Up Sequences
+
+```javascript
+// Look up a sequence by its terms
+const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
+// ➔ [{ id: 'A000045', name: 'Fibonacci numbers', terms: [...], url: '...' }]
+```
+
+### Verifying Your Sequences
+
+Check if your defined sequence matches a known OEIS sequence:
+
+```javascript
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+const result = await ce.checkSequenceOEIS('F', 10);
+// ➔ {
+//     matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }],
+//     terms: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+//   }
+```
+
+:::info[Note]
+OEIS lookups require network access to oeis.org.
+:::
+
+## Text Subscripts
+
+For descriptive subscript names, use `\text{}` in LaTeX:
+
+```javascript
+ce.parse('x_{\\text{max}}');
+// ➔ symbol "x_max"
+
+ce.parse('v_{\\text{initial}}');
+// ➔ symbol "v_initial"
+```
+
+This creates a single symbol with the text as part of its name.
+
+## Type-Aware Subscripts
+
+When a symbol is declared as a collection type, subscripts automatically
+convert to `At()` indexing operations:
+
+```javascript
+ce.declare('v', 'list<number>');
+ce.parse('v_n');
+// ➔ ["At", "v", "n"]
+
+ce.parse('v_{n+1}');
+// ➔ ["At", "v", ["Add", "n", 1]]
+
+ce.parse('v_{i,j}');
+// ➔ ["At", "v", ["Tuple", "i", "j"]]
+```
+
+The type of the resulting expression is inferred from the collection's element
+type, allowing subscripted elements to be used in arithmetic.
+
+<ReadMore path="/compute-engine/reference/collections/" >
+Read more about **Collections** and the `At` function <Icon name="chevron-right-bold" />
+</ReadMore>
+---
 title: Numeric Evaluation
 slug: /compute-engine/guides/numeric-evaluation/
 date: Last Modified
@@ -22317,7 +25309,39 @@ const shape = ce.box(['Shape', M]).evaluate();
 
 ### Solving Linear Systems
 
-To solve Ax = b, multiply both sides by A⁻¹:
+The most direct way to solve systems of linear equations is using the `solve()`
+method on a system parsed from LaTeX `\begin{cases}` notation:
+
+```js example
+// Solve the system: x + y = 70, 2x - 4y = 80
+const system = ce.parse('\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}');
+const result = system.solve(['x', 'y']);
+
+console.log(result.x.json);  // 60
+console.log(result.y.json);  // 10
+```
+
+The `solve()` method returns an object mapping variable names to their solutions,
+or `null` if the system has no unique solution (inconsistent or under-determined).
+
+```js example
+// 3x3 system: x + y + z = 6, 2x + y - z = 1, x - y + 2z = 5
+const system3 = ce.parse('\\begin{cases}x+y+z=6\\\\2x+y-z=1\\\\x-y+2z=5\\end{cases}');
+const result3 = system3.solve(['x', 'y', 'z']);
+// → { x: 1, y: 2, z: 3 }
+
+// Inconsistent system returns null
+const bad = ce.parse('\\begin{cases}x+y=1\\\\x+y=2\\end{cases}');
+bad.solve(['x', 'y']);  // → null
+
+// Non-linear systems also return null
+const nonlinear = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
+nonlinear.solve(['x', 'y']);  // → null (contains product xy)
+```
+
+#### Matrix Method
+
+Alternatively, you can solve Ax = b by multiplying both sides by A⁻¹:
 
 ```js example
 // Solve: x + 2y = 5, 3x + 4y = 11
@@ -22485,6 +25509,51 @@ For more control over polynomial operations, or for multivariate expressions,
 use the explicit `Cancel`, `PolynomialGCD`, `PolynomialQuotient`, and
 `PolynomialRemainder` functions.
 
+### Automatic Factoring in Square Roots
+
+When simplifying square root expressions, the engine automatically attempts to
+factor the argument to enable further simplification. This handles cases where
+the argument is an expanded perfect square.
+
+For example:
+- $ \sqrt{x^2 + 2x + 1} $ simplifies to $ |x + 1| $ (recognizes perfect square trinomial)
+- $ \sqrt{4x^2 + 12x + 9} $ simplifies to $ |2x + 3| $
+- $ \sqrt{a^2 + 2ab + b^2} $ simplifies to $ |a + b| $
+- $ \sqrt{a^2 - 2ab + b^2} $ simplifies to $ |a - b| $
+
+```javascript
+ce.parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
+// ➔ "|x+1|"
+
+ce.parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
+// ➔ "|2x+3|"
+```
+
+This automatic factoring only occurs within `sqrt()` expressions during
+simplification. For explicit factoring of polynomials, use the `Factor` function.
+
+### Explicit Factoring and Expansion
+
+For more control over polynomial form, use `Factor` and `Expand`:
+
+```javascript
+// Factor a polynomial
+ce.parse('x^2 + 5x + 6').factor().latex;
+// ➔ "(x+2)(x+3)"
+
+ce.parse('x^2 - 4').factor().latex;
+// ➔ "(x-2)(x+2)"
+
+// Expand a product
+ce.parse('(x+1)(x+2)').expand().latex;
+// ➔ "x^2+3x+2"
+```
+
+The `Factor` function currently supports:
+- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
+- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
+- **Quadratics with rational roots**: $ x^2 + bx + c $ when roots are rational
+
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
@@ -22499,8 +25568,60 @@ For example, if no assumptions about \\(x \\) is available the expression \\(
 \sqrt\{x^2\} \\) cannot be simplified. However, if an assumption that \\( x \geq 0
 \\) is available, then the expression can be simplified to \\( x \\).
 
+### Sign-Dependent Simplifications
+
+When assumptions about the sign of a variable are available, several
+simplifications become possible:
+
+```javascript
+// Without assumptions, sqrt(x^2) = |x|
+ce.parse('\\sqrt{x^2}').simplify().latex;
+// ➔ "|x|"
+
+// With positive assumption
+ce.assume(ce.parse('x > 0'));
+ce.parse('\\sqrt{x^2}').simplify().latex;
+// ➔ "x"
+
+ce.parse('|x|').simplify().latex;
+// ➔ "x"
+```
+
+```javascript
+// With negative assumption
+ce.assume(ce.parse('y < 0'));
+ce.parse('\\sqrt{y^2}').simplify().latex;
+// ➔ "-y"
+
+ce.parse('|y|').simplify().latex;
+// ➔ "-y"
+```
+
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+## Nested Root Simplification
+
+Nested roots are automatically simplified to a single root with the product
+of the indices:
+
+| Expression | Simplified |
+|:-----------|:-----------|
+| `sqrt(sqrt(x))` | `root(4)(x)` |
+| `root(sqrt(x), n)` | `root(2n)(x)` |
+| `sqrt(root(x, n))` | `root(2n)(x)` |
+| `root(root(x, m), n)` | `root(m·n)(x)` |
+
+```javascript
+ce.box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
+// ➔ "\\sqrt[4]{x}"
+
+ce.box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
+// ➔ "\\sqrt[6]{x}"
+
+ce.box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
+// ➔ "\\sqrt[6]{x}"
+```
 
 ## Trigonometric Simplification
 
@@ -24050,11 +27171,46 @@ Recursively expand out products and positive integer powers in `expr` and all su
 
 <Signature name="Factor">_expr_</Signature>
 
-Factor an algebraic expression into a product of irreducible factors.
+<Signature name="Factor">_expr_, _var_</Signature>
 
+Factor a polynomial expression into a product of irreducible factors.
+
+Supports:
+- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
+- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
+- **Quadratic factoring**: $ ax^2 + bx + c $ (when roots are rational)
+- **Common factor extraction**: $ 2x + 4 \to 2(x+2) $
+
+The optional `var` parameter specifies which variable to factor over.
+
+**Perfect square trinomial:**
 ```json example
 ["Factor", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
-// ➔ ["Power", ["Add", "x", 1], 2]
+// ➔ ["Power", ["Add", "x", 1], 2]  // (x+1)²
+```
+
+**Quadratic with rational roots:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 5, "x"], 6]]
+// ➔ ["Multiply", ["Add", "x", 2], ["Add", "x", 3]]  // (x+2)(x+3)
+```
+
+**Difference of squares:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], -4]]
+// ➔ ["Multiply", ["Add", "x", -2], ["Add", "x", 2]]  // (x-2)(x+2)
+```
+
+**With coefficients:**
+```json example
+["Factor", ["Add", ["Multiply", 4, ["Power", "x", 2]], ["Multiply", 12, "x"], 9]]
+// ➔ ["Power", ["Add", ["Multiply", 2, "x"], 3], 2]  // (2x+3)²
+```
+
+**Automatic use in sqrt simplification:**
+```json example
+["Sqrt", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Abs", ["Add", "x", 1]]  // |x+1| (auto-factors before applying sqrt rule)
 ```
 
 </FunctionDefinition>
@@ -24725,7 +27881,7 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 
 <FunctionDefinition name="Eulerian">
 <Signature name="Eulerian" returns="integer">n: integer, m: integer</Signature>
-Returns the <b>Eulerian number</b> A(n, m), counting permutations of {1..n} with exactly m ascents.
+Returns the <b>Eulerian number</b> A(n, m), counting permutations of `{1..n}` with exactly m ascents.
 
 Eulerian numbers count the permutations of the numbers 1 through $n$ that have exactly $m$ ascents (positions where the next number is greater than the previous one). For example, for $n=4$ and $m=2$, there are 11 such permutations.
 
@@ -28812,6 +31968,254 @@ $$
 
 This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
 Mathematica.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="Zeta">
+
+<Signature name="Zeta">_s_</Signature>
+
+<Latex value="\\zeta(s)"/>
+
+The [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
+defined for complex numbers with real part greater than 1 as:
+
+$$
+\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}
+$$
+
+and extended to other values by analytic continuation.
+
+```json example
+["Zeta", 2]
+// ➔ π²/6
+```
+
+- Wikidata: [Q187235](https://www.wikidata.org/wiki/Q187235)
+- NIST: http://dlmf.nist.gov/25.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="Beta">
+
+<Signature name="Beta">_a_, _b_</Signature>
+
+<Latex value="\\Beta(a, b)"/>
+
+The [Euler beta function](https://en.wikipedia.org/wiki/Beta_function), defined as:
+
+$$
+\operatorname{B}(a, b) = \frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}
+$$
+
+It can also be expressed as an integral:
+
+$$
+\operatorname{B}(a, b) = \int_0^1 t^{a-1}(1-t)^{b-1} \, dt
+$$
+
+```json example
+["Beta", 2, 3]
+// ➔ 1/12
+```
+
+- Wikidata: [Q192828](https://www.wikidata.org/wiki/Q192828)
+- NIST: http://dlmf.nist.gov/5.12
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="LambertW">
+
+<Signature name="LambertW">_x_</Signature>
+
+<Latex value="\\operatorname{W}(x)"/>
+
+The [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function),
+also called the product logarithm. It is the inverse function of
+$$ f(w) = w e^w $$.
+
+For a given value $x$, $W(x)$ is the value $w$ such that $w e^w = x$.
+
+The derivative of the Lambert W function is:
+
+$$
+\frac{d}{dx} W(x) = \frac{W(x)}{x(1 + W(x))}
+$$
+
+```json example
+["LambertW", 1]
+// ➔ Ω ≈ 0.5671 (the Omega constant)
+```
+
+- Wikidata: [Q429963](https://www.wikidata.org/wiki/Q429963)
+- NIST: http://dlmf.nist.gov/4.13
+
+</FunctionDefinition>
+
+
+## Bessel Functions
+
+Bessel functions are solutions to Bessel's differential equation:
+
+$$
+x^2 \frac{d^2 y}{dx^2} + x \frac{dy}{dx} + (x^2 - n^2)y = 0
+$$
+
+They arise in problems with cylindrical or spherical symmetry.
+
+
+<FunctionDefinition name="BesselJ">
+
+<Signature name="BesselJ">_n_, _x_</Signature>
+
+<Latex value="J_n(x)"/>
+
+The [Bessel function of the first kind](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind)
+of order $n$.
+
+The derivative with respect to $x$ is:
+
+$$
+\frac{d}{dx} J_n(x) = \frac{1}{2}(J_{n-1}(x) - J_{n+1}(x))
+$$
+
+```json example
+["BesselJ", 0, 1]
+// ➔ J₀(1) ≈ 0.7652
+```
+
+- NIST: http://dlmf.nist.gov/10.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="BesselY">
+
+<Signature name="BesselY">_n_, _x_</Signature>
+
+<Latex value="Y_n(x)"/>
+
+The [Bessel function of the second kind](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind)
+of order $n$, also called the Neumann function.
+
+The derivative with respect to $x$ is:
+
+$$
+\frac{d}{dx} Y_n(x) = \frac{1}{2}(Y_{n-1}(x) - Y_{n+1}(x))
+$$
+
+```json example
+["BesselY", 0, 1]
+// ➔ Y₀(1) ≈ 0.0883
+```
+
+- NIST: http://dlmf.nist.gov/10.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="BesselI">
+
+<Signature name="BesselI">_n_, _x_</Signature>
+
+<Latex value="I_n(x)"/>
+
+The [modified Bessel function of the first kind](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions)
+of order $n$.
+
+The derivative with respect to $x$ is:
+
+$$
+\frac{d}{dx} I_n(x) = \frac{1}{2}(I_{n-1}(x) + I_{n+1}(x))
+$$
+
+```json example
+["BesselI", 0, 1]
+// ➔ I₀(1) ≈ 1.2661
+```
+
+- NIST: http://dlmf.nist.gov/10.25
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="BesselK">
+
+<Signature name="BesselK">_n_, _x_</Signature>
+
+<Latex value="K_n(x)"/>
+
+The [modified Bessel function of the second kind](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions)
+of order $n$, also called the MacDonald function.
+
+The derivative with respect to $x$ is:
+
+$$
+\frac{d}{dx} K_n(x) = -\frac{1}{2}(K_{n-1}(x) + K_{n+1}(x))
+$$
+
+```json example
+["BesselK", 0, 1]
+// ➔ K₀(1) ≈ 0.4210
+```
+
+- NIST: http://dlmf.nist.gov/10.25
+
+</FunctionDefinition>
+
+
+## Airy Functions
+
+Airy functions are solutions to the Airy differential equation:
+
+$$
+\frac{d^2 y}{dx^2} - xy = 0
+$$
+
+They arise in physics, particularly in quantum mechanics and optics.
+
+
+<FunctionDefinition name="AiryAi">
+
+<Signature name="AiryAi">_x_</Signature>
+
+<Latex value="\\operatorname{Ai}(x)"/>
+
+The [Airy function of the first kind](https://en.wikipedia.org/wiki/Airy_function).
+
+It is the solution to the Airy equation that decays exponentially for
+positive $x$ and oscillates for negative $x$.
+
+```json example
+["AiryAi", 0]
+// ➔ 1/(3^(2/3) Γ(2/3)) ≈ 0.3550
+```
+
+- NIST: http://dlmf.nist.gov/9.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="AiryBi">
+
+<Signature name="AiryBi">_x_</Signature>
+
+<Latex value="\\operatorname{Bi}(x)"/>
+
+The [Airy function of the second kind](https://en.wikipedia.org/wiki/Airy_function).
+
+It is the solution to the Airy equation that grows exponentially for
+positive $x$ and oscillates for negative $x$.
+
+```json example
+["AiryBi", 0]
+// ➔ 1/(3^(1/6) Γ(2/3)) ≈ 0.6149
+```
+
+- NIST: http://dlmf.nist.gov/9.2
 
 </FunctionDefinition>
 
