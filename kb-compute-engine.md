@@ -268,11 +268,13 @@ The Compute Engine includes a plugin architecture that allows you to register cu
 
 ### Built-in Targets
 
-The Compute Engine comes with three compilation targets:
+The Compute Engine comes with these compilation targets:
 
 - **`javascript`** (default) - Compiles to executable JavaScript functions
 - **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
 - **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
+- **`interval-js`** - Compiles to JavaScript using interval arithmetic for reliable function plotting
+- **`interval-glsl`** - Compiles to GLSL using interval arithmetic for GPU-based plotting
 
 ### Compiling to Different Targets
 
@@ -373,6 +375,123 @@ The Python target maps to NumPy functions:
 - **Linear Algebra**: `dot` → `np.dot`, `cross` → `np.cross`
 
 For complete documentation, see the [Python Target Guide](https://cortexjs.io/compute-engine/guides/python-target/).
+
+### Interval Arithmetic Targets
+
+The Compute Engine includes interval arithmetic compilation targets designed for
+reliable function plotting. These targets operate on intervals `[lo, hi]` rather
+than point values, providing guaranteed enclosures of the true result and
+detecting singularities.
+
+#### Why Interval Arithmetic?
+
+Standard plotting approaches sample functions at regular intervals, which can:
+- Miss features (spikes between sample points)
+- Create aliasing (high-frequency oscillations appear as lower frequencies)
+- Produce wild line segments at singularities (like `tan(π/2)`)
+- Render discontinuities as vertical lines
+
+Interval arithmetic addresses these by:
+- Returning wide intervals when uncertainty is high (triggers refinement)
+- Explicitly detecting division by zero and other singularities
+- Indicating when function domains are restricted
+
+#### JavaScript Interval Target (`interval-js`)
+
+```javascript
+const expr = ce.parse('\\sin(x) / x');
+const fn = expr.compile({ to: 'interval-js' });
+
+// Call with interval inputs
+const result = fn({ x: { lo: -0.1, hi: 0.1 } });
+console.log(result);
+// → { kind: 'singular' }  // Division by interval containing zero
+```
+
+The function accepts an object where keys are variable names and values are
+`Interval` objects with `lo` and `hi` properties.
+
+#### Result Types
+
+The compiled function returns an `IntervalResult` discriminated union:
+
+| Kind | Meaning | Example |
+|------|---------|---------|
+| `interval` | Normal result with bounds | `sin([0, π])` → `{ kind: 'interval', value: { lo: 0, hi: 1 } }` |
+| `empty` | No valid output values | `sqrt([-2, -1])` → `{ kind: 'empty' }` |
+| `entire` | Result spans all reals | Division with mixed signs near zero |
+| `singular` | Contains a pole/asymptote | `1 / [-1, 1]` → `{ kind: 'singular' }` |
+| `partial` | Partially valid domain | `sqrt([-1, 4])` → `{ kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }` |
+
+#### Examples
+
+```javascript
+// Simple function - normal result
+const sin = ce.parse('\\sin(x)').compile({ to: 'interval-js' });
+sin({ x: { lo: 0, hi: Math.PI } });
+// → { kind: 'interval', value: { lo: 0, hi: 1 } }
+
+// Singularity detection
+const recip = ce.parse('1/x').compile({ to: 'interval-js' });
+recip({ x: { lo: -1, hi: 1 } });
+// → { kind: 'singular' }
+
+// Partial domain
+const sqrt = ce.parse('\\sqrt{x}').compile({ to: 'interval-js' });
+sqrt({ x: { lo: -1, hi: 4 } });
+// → { kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }
+
+// Multi-variable expressions
+const fn = ce.parse('x^2 + y').compile({ to: 'interval-js' });
+fn({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
+// → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
+```
+
+#### GLSL Interval Target (`interval-glsl`)
+
+For GPU-based plotting, compile to GLSL interval arithmetic:
+
+```javascript
+import { IntervalGLSLTarget } from '@cortex-js/compute-engine';
+
+const target = new IntervalGLSLTarget();
+const expr = ce.parse('\\sin(x) + y^2');
+
+// Generate complete shader code
+const shader = target.compileShaderFunction(expr, {
+  functionName: 'evaluateInterval',
+  parameters: ['x', 'y'],
+  version: '300 es'
+});
+
+console.log(shader);
+// Outputs complete GLSL shader with interval arithmetic library
+```
+
+In GLSL, intervals are represented as `vec2` where `.x` is the lower bound and
+`.y` is the upper bound. The generated shader includes status flags for
+singularity detection.
+
+#### Plotting Integration
+
+The interval results enable adaptive plotting algorithms:
+
+```javascript
+function shouldSubdivide(result, tolerance) {
+  switch (result.kind) {
+    case 'singular':
+    case 'entire':
+      return true;  // Always refine near singularities
+    case 'interval':
+    case 'partial':
+      return (result.value.hi - result.value.lo) > tolerance;
+    case 'empty':
+      return false;  // Nothing to plot
+  }
+}
+```
+
+For detailed documentation on interval arithmetic, see [`INTERVAL_ARITHMETIC.md`](../INTERVAL_ARITHMETIC.md).
 
 ### Registering Custom Targets
 
@@ -11454,6 +11573,15 @@ const correct = ce.parse(mf.value, {canonical: "Order"})
 
 Both `1+x` and `x+1` will return **true**, but `2-1+x` will return **false**.
 
+**Note**: The **Divide** form internally applies the **Power** form to its
+operands. If you need division canonicalization, it is not necessary to
+separately specify **Power** in your form list, though it does no harm.
+
+The result of partial canonicalization is a **structural** expression.
+Calling `.canonical` on the result will perform full canonicalization.
+The form application order matters: forms are applied sequentially, and
+each form may benefit from transformations made by earlier forms.
+
 **Note**: see also the options for the `canonical` option of `ce.parse()` and
 `ce.box()` which can also be used to specify a custom canonical form:
 
@@ -11767,6 +11895,74 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.35.2 _2026-02-05_
+
+### Bug Fixes
+
+- **Decimal Number Representation**: Numbers written with a decimal point (e.g.,
+  `6.02e23`) are now correctly treated as approximate decimal values
+  (`BigNumericValue`) rather than exact integers. Previously, `6.02e23` was
+  incorrectly converted to the exact bigint `602000000000000000000000`, which
+  implied false precision and caused memory inefficiency for very large
+  exponents. Numbers without a decimal point (e.g., `602e21`) continue to be
+  treated as exact integers when possible. This change aligns with the
+  documented behavior of the `parseNumbers: 'auto'` option.
+
+- **Scientific Notation Serialization** ([#284](https://github.com/cortex-js/compute-engine/issues/284)):
+  Fixed `toLatex()` with `scientific` and `adaptiveScientific` notation options
+  to produce properly normalized output. Previously, numbers like `6.02e23`
+  would serialize as `602\cdot10^{21}` instead of the expected
+  `6.02\cdot10^{23}`. The output now depends only on the numeric value and
+  formatting options, not on the internal representation.
+
+- **Numeric Sum Precision**: Fixed precision loss when summing large integers
+  with rational values (e.g., `12345678^3 + 1/3`). The `ExactNumericValue.sum()`
+  method now uses `bignumRe` instead of `re` to preserve full precision when
+  handling large integer values from `BigNumericValue`.
+
+- **Broadcastable Functions with Union/Any Types** ([#235](https://github.com/cortex-js/compute-engine/issues/235)):
+  Broadcastable (threadable) functions like `Multiply` and `Add` no longer
+  reject arguments whose type is a union of numeric and collection types (e.g.,
+  `number | list`) or `any`. Previously, declaring a symbol as
+  `ce.declare('a', 'number | list')` and using it in `ce.box(['Multiply', 'a', 'b'])`
+  would produce an `incompatible-type` error.
+
+- **Division Canonicalization Over-Simplification** ([#227](https://github.com/cortex-js/compute-engine/issues/227)):
+  Fixed `A/A` being incorrectly simplified to `1` during canonicalization for
+  constant expressions that evaluate to infinity or zero, such as
+  `tan(π/2)/tan(π/2)`. This now correctly evaluates to `NaN` (since `∞/∞` is
+  indeterminate) instead of `1`. Expressions with free variables (e.g., `x/x`,
+  `sin(x)/sin(x)`) continue to simplify to `1` per standard algebraic
+  convention. Also fixed deferred constant divisions like `0/(1-1)` and
+  `(1-1)/(1-1)` to properly evaluate to `NaN` instead of remaining as
+  unevaluated expressions.
+
+## 0.35.1 _2026-02-03_
+
+### Bug Fixes
+
+- **Interval Arithmetic (JS/GLSL)**: Fixed interval evaluation of compound
+  arguments (e.g. `sin(2x)`, `sin(x+x)`, `sin(x^2)`, `cos(2x)`) by propagating
+  interval results through trig, elementary, and comparison functions in
+  `interval-js`, and by adding `IntervalResult` overloads to the GLSL interval
+  library for `interval-glsl`.
+
+## 0.35.0 _2026-02-02_
+
+### Parsing
+
+- **Large Integer Precision**: Fixed precision loss when parsing integers
+  exceeding `Number.MAX_SAFE_INTEGER` with `parseNumbers: 'rational'`. Large
+  integers and rational numerators now use BigInt arithmetic to preserve exact
+  values. Fixes #283.
+
+### Compilation
+
+- **Interval Arithmetic Targets**: Added two new compilation targets for
+  reliable singularity detection:
+  - `interval-js` - Compiles to JavaScript using interval arithmetic
+  - `interval-glsl` - Compiles to GLSL for GPU-based interval evaluation
+
 ## 0.34.0 _2026-02-01_
 
 ### Parsing
@@ -11810,10 +12006,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Compilation
 
-- **Custom Operator Compilation**: The `compile()` method now supports overriding
-  operators to use function calls instead of native operators. This enables
-  compilation of vector/matrix operations and custom domain-specific languages.
-  Addresses #240.
+- **Custom Operator Compilation**: The `compile()` method now supports
+  overriding operators to use function calls instead of native operators. This
+  enables compilation of vector/matrix operations and custom domain-specific
+  languages. Addresses #240.
 
   ```javascript
   // Override operators for vector operations
@@ -11864,13 +12060,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   Exported building blocks include `CompileTarget`, `LanguageTarget`,
-  `CompilationOptions`, `CompiledExecutable`, `BaseCompiler`, `JavaScriptTarget`,
-  and `GLSLTarget` (plus helper types like `CompiledOperators` and
-  `CompiledFunctions`).
+  `CompilationOptions`, `CompiledExecutable`, `BaseCompiler`,
+  `JavaScriptTarget`, and `GLSLTarget` (plus helper types like
+  `CompiledOperators` and `CompiledFunctions`).
 
-- **Compilation Plugin Architecture**: The Compute Engine now supports registering
-  custom compilation targets, allowing you to compile mathematical expressions to
-  any target language beyond the built-in JavaScript and GLSL targets.
+- **Compilation Plugin Architecture**: The Compute Engine now supports
+  registering custom compilation targets, allowing you to compile mathematical
+  expressions to any target language beyond the built-in JavaScript and GLSL
+  targets.
 
   ```javascript
   import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
@@ -11945,8 +12142,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   See the [Python/NumPy Target Guide](/compute-engine/guides/python-target/) for
   complete documentation and examples.
 
-- **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language) target
-  for compiling mathematical expressions to WebGL shaders.
+- **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language)
+  target for compiling mathematical expressions to WebGL shaders.
 
   ```javascript
   const expr = ce.parse('x^2 + y^2');
@@ -12012,9 +12209,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   // → "(x+2)(x+3)"
   ```
 
-  **Automatic Factoring in sqrt Simplification**: Square roots now
-  automatically factor their arguments before applying simplification rules,
-  enabling expressions like `√(x²+2x+1)` to simplify to `|x+1|`.
+  **Automatic Factoring in sqrt Simplification**: Square roots now automatically
+  factor their arguments before applying simplification rules, enabling
+  expressions like `√(x²+2x+1)` to simplify to `|x+1|`.
 
   ```javascript
   // Issue #180 - Now works!
@@ -12034,6 +12231,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `factorPolynomial`).
 
   **MathJSON API**:
+
   ```json
   ["Factor", expr]              // Auto-detect variable
   ["Factor", expr, variable]    // Explicit variable specification
@@ -12056,8 +12254,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.parse('|x^{3/2}|').simplify().latex;  // → "|x|^{3/2}" (odd numerator)
   ```
 
-- **Assumption-Based Simplification**: Simplification rules use assumptions about
-  symbol signs:
+- **Assumption-Based Simplification**: Simplification rules use assumptions
+  about symbol signs:
 
   ```javascript
   ce.assume(ce.parse('x > 0'));
@@ -15941,8 +16139,8 @@ Work around unpckg.com issue with libraries using BigInt.
 - Changed from "decimal" to "bignum". "Decimal" is a confusing name, since it is
   used to represent both integers and floating point numbers. Its key
   characteristic is that it is an arbitrary precision number, aka "bignum". This
-  affects `ce.numericMode` which now uses `bignum` instead of
-  `decimal`, `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`->`bignumValue()`
+  affects `ce.numericMode` which now uses `bignum` instead of `decimal`,
+  `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`->`bignumValue()`
 
 ### Bugs Fixed
 
@@ -15971,8 +16169,8 @@ Work around unpckg.com issue with libraries using BigInt.
 - Added `Min`, `Max`, `Clamp`
 - Parsing of `\sum`, `\prod`, `\int`.
 - Added parsing of log functions, `\lb`, `\ln`, `\ln_{10}`, `\ln_2`, etc...
-- Added
-  `expr.subexpressions`, `expr.getSubexpressions()`, `expr.errors`, `expr.symbols`, `expr.isValid`.
+- Added `expr.subexpressions`, `expr.getSubexpressions()`, `expr.errors`,
+  `expr.symbols`, `expr.isValid`.
 - Symbols can now be used to represent functions, i.e. `ce.box('Sin').domain`
   correctly returns `["Domain", "Function"]`.
 - Correctly handle rational numbers with a numerator or denominator outside the
@@ -23603,6 +23801,33 @@ ce.parse(latex,
   {canonical: ["InvisibleOperator", "Add", "Order", ]}
 ).print();
 ```
+
+## Canonical Form Pipeline
+
+When you specify a list of canonical forms (e.g., `["Number", "Power", "Divide"]`),
+the forms are applied in the specified order. Each form recursively transforms
+sub-expressions that match its type.
+
+Some forms have dependencies on other forms:
+
+- The **Divide** form internally applies the **Power** form to its operands
+  before calling `canonicalDivide`. This is because division canonicalization
+  benefits from having power expressions already normalized.
+
+- All forms apply **symbol canonicalization** first (constant symbols with
+  `holdUntil: 'never'` are substituted with their values).
+
+The result of partial canonicalization is a **structural** expression, not a
+fully canonical one. This means:
+
+- `expr.isCanonical` returns `false`
+- `expr.isStructural` returns `true`
+- Calling `expr.canonical` will perform full canonicalization
+- The expression can be used in arithmetic operations (`.add()`, `.mul()`, etc.)
+
+The order in which forms are specified matters. For example, applying `"Number"`
+before `"Power"` ensures that numeric literals are resolved before power
+simplifications are attempted.
 
 ## Custom Transformations
 
