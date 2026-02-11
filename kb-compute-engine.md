@@ -19,47 +19,69 @@ that can be evaluated much faster.
 For example this approximation: $ \pi \approx \textstyle\sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} $
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
 const expr = ce.parse("\\sqrt{6\\sum^{10^2}_{n=1}\\frac{1}{n^2}}");
 
 // Numerical evaluation using the Compute Engine
 console.time('evaluate');
-console.timeEnd('evaluate', expr.evaluate());
+const evaluated = expr.evaluate();
+console.timeEnd('evaluate');
+console.log(evaluated.toString());
 
 // Compilation to a JavaScript function and execution
 console.time('compile');
-const fn = expr.compile();
-console.timeEnd('compile', fn());
+const result = compile(expr);
+console.timeEnd('compile');
+console.log(result.run?.());
 ```
 
 ## Compiling
 
-**To get a compiled version of an expression** use the `expr.compile()` method:
+**To get a compiled version of an expression** use the `compile()` function:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse("2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}");
-const fn = expr.compile();
+const result = compile(expr);
 ```
 
-**To evaluate the compiled expression** call the function returned by
-`expr.compile()`:
+**To evaluate the compiled expression** call the `run` method on the
+`CompilationResult` returned by `compile()`:
 
 ```javascript
-console.log(fn());
+console.log(result.run());
 // ➔ 3.141592653589793
 ```
 
-If the expression cannot be compiled, the `compile()` method will throw an error.
+If the expression cannot be compiled, the `result.success` property will be
+`false`.
+
+### Validation and Fallback Behavior
+
+Compilation APIs enforce runtime contracts to catch malformed extension payloads
+early:
+
+- `ce.registerCompilationTarget(name, target)` validates target names and
+  required `LanguageTarget` methods (`getOperators()`, `getFunctions()`,
+  `createTarget()`, `compile()`).
+- `compile(expr, options)` validates option payload shape for `to`, `target`,
+  `operators`, `functions`, `vars`, `imports`, `preamble`, and `fallback`.
+
+By default, `compile()` falls back to interpretation (`success: false` with a
+`run` function). To disable fallback and fail fast, set `fallback: false`.
 
 ## Arguments
 
-The function returned by `expr.compile()` can be called with an object literal
+The `run` method on the `CompilationResult` can be called with an object literal
 containing the value of the arguments:
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
 const expr = ce.parse("n^2");
-const fn = expr.compile();
+const result = compile(expr);
 
-for (let i = 1; i < 10; i++) console.log(fn({ n: i }));
+for (let i = 1; i < 10; i++) console.log(result.run({ n: i }));
 ```
 
 **To get a list of the unknowns of an expression** use the `expr.unknowns`
@@ -84,8 +106,10 @@ By default, operators like `+`, `-`, `*`, `/` compile to their JavaScript equiva
 Override operators by passing an `operators` option to `compile()`:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('v + w');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],      // Convert + to add() function
     Multiply: ['mul', 12]  // Convert * to mul() function
@@ -96,8 +120,8 @@ const fn = expr.compile({
   }
 });
 
-const result = fn({ v: [1, 2, 3], w: [4, 5, 6] });
-console.log(result);
+const value = result.run({ v: [1, 2, 3], w: [4, 5, 6] });
+console.log(value);
 // ➔ [5, 7, 9]
 ```
 
@@ -110,7 +134,9 @@ The operator override format is `[functionName, precedence]`:
 You can also use a function to conditionally override operators:
 
 ```javascript
-const fn = expr.compile({
+import { compile } from '@cortex-js/compute-engine';
+
+const result = compile(expr, {
   operators: (op) => {
     // Only override Add, let other operators use defaults
     if (op === 'Add') return ['vectorAdd', 11];
@@ -127,8 +153,10 @@ const fn = expr.compile({
 Operator overrides work with complex nested expressions:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('(a + b) * c');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12]
@@ -139,12 +167,12 @@ const fn = expr.compile({
   }
 });
 
-const result = fn({
+const value = result.run({
   a: [1, 2, 3],
   b: [4, 5, 6],
   c: [2, 2, 2]
 });
-console.log(result);
+console.log(value);
 // ➔ [10, 14, 18]  // (a + b) * c = ([1,2,3] + [4,5,6]) * [2,2,2]
 ```
 
@@ -163,13 +191,15 @@ console.log(result);
 ### Example: Complete Vector Math
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
+
 // Define vector operations
 function add(a, b) { return a.map((v, i) => v + b[i]); }
 function mul(a, b) { return a.map((v, i) => v * b[i]); }
 function neg(a) { return a.map(v => -v); }
 
 const expr = ce.parse('u * v + w - z');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12],
@@ -178,7 +208,7 @@ const fn = expr.compile({
   functions: { add, mul, neg }
 });
 
-console.log(fn({
+console.log(result.run({
   u: [2, 3, 4],
   v: [1, 1, 1],
   w: [5, 6, 7],
@@ -207,6 +237,8 @@ import {
 Define a custom target object that implements the `CompileTarget` interface:
 
 ```javascript
+import { BaseCompiler } from '@cortex-js/compute-engine';
+
 const myTarget = {
   language: 'my-dsl',
   operators: (op) => {
@@ -235,6 +267,8 @@ console.log(code);
 ### Example: SQL-like Target
 
 ```javascript
+import { BaseCompiler } from '@cortex-js/compute-engine';
+
 const sqlTarget = {
   language: 'sql',
   operators: (op) => {
@@ -281,15 +315,17 @@ The Compute Engine comes with these compilation targets:
 Use the `to` option to specify the target language:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('x^2 + y^2');
 
 // Compile to JavaScript (default)
-const jsFunc = expr.compile();
-console.log(jsFunc({ x: 3, y: 4 })); // → 25
+const jsResult = compile(expr);
+console.log(jsResult.run({ x: 3, y: 4 })); // → 25
 
 // Compile to GLSL
-const glslCode = expr.compile({ to: 'glsl' });
-console.log(glslCode.toString()); // → pow(x, 2.0) + pow(y, 2.0)
+const glslResult = compile(expr, { to: 'glsl' });
+console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
 ```
 
 ### Python/NumPy Target
@@ -297,7 +333,7 @@ console.log(glslCode.toString()); // → pow(x, 2.0) + pow(y, 2.0)
 The Compute Engine includes a complete Python/NumPy compilation target for scientific computing:
 
 ```javascript
-import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -306,8 +342,8 @@ ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }
 
 // Compile expressions to Python/NumPy code
 const expr = ce.parse('\\sin(x) + \\cos(y)');
-const pythonCode = expr.compile({ to: 'python' });
-console.log(pythonCode.toString());
+const result = compile(expr, { to: 'python' });
+console.log(result.code);
 // → import numpy as np
 //
 //   np.sin(x) + np.cos(y)
@@ -399,12 +435,14 @@ Interval arithmetic addresses these by:
 #### JavaScript Interval Target (`interval-js`)
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('\\sin(x) / x');
-const fn = expr.compile({ to: 'interval-js' });
+const result = compile(expr, { to: 'interval-js' });
 
 // Call with interval inputs
-const result = fn({ x: { lo: -0.1, hi: 0.1 } });
-console.log(result);
+const value = result.run({ x: { lo: -0.1, hi: 0.1 } });
+console.log(value);
 // → { kind: 'singular' }  // Division by interval containing zero
 ```
 
@@ -426,24 +464,26 @@ The compiled function returns an `IntervalResult` discriminated union:
 #### Examples
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 // Simple function - normal result
-const sin = ce.parse('\\sin(x)').compile({ to: 'interval-js' });
-sin({ x: { lo: 0, hi: Math.PI } });
+const sinResult = compile(ce.parse('\\sin(x)'), { to: 'interval-js' });
+sinResult.run({ x: { lo: 0, hi: Math.PI } });
 // → { kind: 'interval', value: { lo: 0, hi: 1 } }
 
 // Singularity detection
-const recip = ce.parse('1/x').compile({ to: 'interval-js' });
-recip({ x: { lo: -1, hi: 1 } });
+const recipResult = compile(ce.parse('1/x'), { to: 'interval-js' });
+recipResult.run({ x: { lo: -1, hi: 1 } });
 // → { kind: 'singular' }
 
 // Partial domain
-const sqrt = ce.parse('\\sqrt{x}').compile({ to: 'interval-js' });
-sqrt({ x: { lo: -1, hi: 4 } });
+const sqrtResult = compile(ce.parse('\\sqrt{x}'), { to: 'interval-js' });
+sqrtResult.run({ x: { lo: -1, hi: 4 } });
 // → { kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }
 
 // Multi-variable expressions
-const fn = ce.parse('x^2 + y').compile({ to: 'interval-js' });
-fn({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
+const fnResult = compile(ce.parse('x^2 + y'), { to: 'interval-js' });
+fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 // → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
 ```
 
@@ -497,7 +537,7 @@ function shouldSubdivide(result, tolerance) {
 You can also create your own compilation targets using `ce.registerCompilationTarget()`:
 
 ```javascript
-import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
+import { ComputeEngine, BaseCompiler, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -533,20 +573,22 @@ class CustomTarget {
     };
   }
 
-  compileToExecutable(expr, options = {}) {
+  compile(expr, options = {}) {
     const target = this.createTarget();
     const code = BaseCompiler.compile(expr, target);
 
-    const result = function () { return code; };
-    Object.defineProperty(result, 'toString', { value: () => code });
-    Object.defineProperty(result, 'isCompiled', { value: true });
-    return result;
+    return {
+      target: 'custom',
+      success: true,
+      code,
+    };
   }
 }
 
 // Register and use
 ce.registerCompilationTarget('custom', new CustomTarget());
-const code = expr.compile({ to: 'custom' });
+const result = compile(expr, { to: 'custom' });
+console.log(result.code);
 ```
 
 ### Direct Target Override
@@ -554,6 +596,8 @@ const code = expr.compile({ to: 'custom' });
 For one-time use, you can provide a `CompileTarget` directly without registration:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('a + b');
 
 const customTarget = {
@@ -568,8 +612,8 @@ const customTarget = {
   preamble: '',
 };
 
-const code = expr.compile({ target: customTarget });
-console.log(code.toString()); // → A + B
+const result = compile(expr, { target: customTarget });
+console.log(result.code); // → A + B
 ```
 
 The `target` option takes precedence over the `to` option if both are provided.
@@ -598,14 +642,14 @@ interface LanguageTarget {
   createTarget(options?: Partial<CompileTarget>): CompileTarget;
 
   /**
-   * Compiles an expression to an executable form.
-   * For non-JavaScript targets, this typically returns a function
-   * that returns the source code as a string.
+   * Compiles an expression to a CompilationResult.
+   * For non-JavaScript targets, this typically returns a result
+   * with the source code in the `code` property.
    */
-  compileToExecutable(
-    expr: BoxedExpression,
+  compile(
+    expr: Expression,
     options?: CompilationOptions
-  ): CompiledExecutable;
+  ): CompilationResult;
 }
 ```
 
@@ -646,8 +690,6 @@ The benchmarks test the same mathematical expressions across different targets:
 - Python/NumPy excels at vectorized array operations
 - GLSL enables GPU parallelism for millions of simultaneous operations
 
-See [`benchmarks/README.md`](../benchmarks/README.md) for detailed benchmark documentation.
-
 ## Limitations
 
 The calculations are only performed using machine precision numbers.
@@ -657,25 +699,28 @@ supported.
 
 Some functions are not supported.
 
-If the expression cannot be compiled, the `compile()` method will throw an
-error. The expression can be numerically evaluated as a fallback:
+If the expression cannot be compiled, `compile()` returns a `CompilationResult`
+with `success` set to `false`. The expression can be numerically evaluated as a
+fallback:
 
 ```live
+// import { compile, isNumber } from '@cortex-js/compute-engine';
 function compileOrEvaluate(expr) {
-  try {
-    const fn = expr.compile();
-    return   fn() + " (compiled)";
-  } catch (e) {
-    return   expr.N().numericValue + " (evaluated)";
+  const result = compile(expr);
+  if (result.success) {
+    return   result.run() + " (compiled)";
+  } else {
+    const evaluated = expr.N();
+    return (isNumber(evaluated) ? evaluated.numericValue : evaluated) + " (evaluated)";
   }
 }
 
-  // `expr.compile()` can handle this expression
+  // `compile()` can handle this expression
   console.log(compileOrEvaluate(ce.parse("\\frac{\\sqrt{5}+1}{2}")));
 
 
-  // `expr.compile()` cannot handle complex numbers, so it throws
-  // and we fall back to numerical evaluation with expr.N()
+  // `compile()` cannot handle complex numbers, so it falls back
+  // and we use numerical evaluation with expr.N()
   console.log(compileOrEvaluate(ce.parse("-i\\sqrt{-1}")));
 
 ```
@@ -920,78 +965,1584 @@ ce.angularUnit = 'deg';
 ### AssignValue
 
 ```ts
-type AssignValue = 
-  | boolean
-  | number
-  | bigint
-  | SemiBoxedExpression
-  | (args, options) => BoxedExpression
-  | undefined;
+type AssignValue = KernelAssignValue<Expression, ExpressionInput, ComputeEngine>;
 ```
 
-The argument of `ce.assign()` is a value that can be assigned to a variable.
-It can be a primitive value, a boxed expression, or a function that
-takes a list of arguments and returns a boxed expression.
+Assignable value for `ce.assign()`.
+
+</MemberCard>
+
+### ExpressionComputeEngine
+
+Compute engine surface used by expression types.
+
+This interface is augmented by `types-engine.ts` with the concrete
+`IComputeEngine` members to avoid type-layer circular dependencies.
+
+<MemberCard>
+
+##### ExpressionComputeEngine.latexDictionary
+
+```ts
+latexDictionary: readonly OnlyFirst<
+  | DefaultEntry
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | EnvironmentEntry
+  | SymbolEntry
+  | FunctionEntry, {} & 
+  | DefaultEntry
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | EnvironmentEntry
+  | SymbolEntry
+  | FunctionEntry>[];
+```
 
 </MemberCard>
 
 <MemberCard>
 
-### EvalContext
+##### ExpressionComputeEngine.decimalSeparator
 
 ```ts
-type EvalContext = {
-  lexicalScope: Scope;
-  assumptions: ExpressionMapInterface<boolean>;
-  values: Record<string, BoxedExpression | undefined>;
-  name: undefined | string;
-};
+decimalSeparator: string;
 ```
 
-An evaluation context is a set of bindings mapping symbols to their
-values. It also includes a reference to the lexical scope of the
-context, as well as a set of assumptions about the values of the
-symbols.
+</MemberCard>
 
-Eval contexts are arranged in a stack structure. When a new context is
-created, it is pushed on the top of the stack.
+<MemberCard>
 
-A new eval context is created when a function expression that needs to track
-its own local variables and named arguments is evaluated. This kind of
-function is a "scoped" function, meaning that it has its own local variables
-and named arguments.
+##### ExpressionComputeEngine.True
 
-For example, the `Sum` function creates a new eval context to track the local
-variable used as the index of the sum.
+```ts
+readonly True: Expression;
+```
 
-The eval context stack is used to resolve the value of symbols.
+</MemberCard>
 
-When a scoped recursive function is called, a new context is created for each
-recursive call.
+<MemberCard>
 
-In contrast, the lexical scope is used to resolve the metadata about
-symbols, such as their type, whether they are constant, etc... A new
-scope is not created for recursive calls, since the metadata
-does not change, only the values of the symbols change.
+##### ExpressionComputeEngine.False
 
-The name of the eval context is used to print a "stack trace" for
-debugging.
+```ts
+readonly False: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.Pi
+
+```ts
+readonly Pi: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.E
+
+```ts
+readonly E: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.Nothing
+
+```ts
+readonly Nothing: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.Zero
+
+```ts
+readonly Zero: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.One
+
+```ts
+readonly One: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.Half
+
+```ts
+readonly Half: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.NegativeOne
+
+```ts
+readonly NegativeOne: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.I
+
+```ts
+readonly I: Expression;
+```
+
+ImaginaryUnit
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.NaN
+
+```ts
+readonly NaN: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.PositiveInfinity
+
+```ts
+readonly PositiveInfinity: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.NegativeInfinity
+
+```ts
+readonly NegativeInfinity: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.ComplexInfinity
+
+```ts
+readonly ComplexInfinity: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.context
+
+```ts
+readonly context: EvalContext;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.contextStack
+
+```ts
+contextStack: readonly EvalContext[];
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.timeLimit
+
+```ts
+timeLimit: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.iterationLimit
+
+```ts
+iterationLimit: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.recursionLimit
+
+```ts
+recursionLimit: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.bignum()
+
+```ts
+bignum: (a) => Decimal;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.complex()
+
+```ts
+complex: (a, b?) => Complex;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.tolerance
+
+```ts
+tolerance: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.angularUnit
+
+```ts
+angularUnit: AngularUnit;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.costFunction()
+
+```ts
+costFunction: (expr) => number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.simplificationRules
+
+```ts
+simplificationRules: Rule[];
+```
+
+The rules used by `.simplify()` when no explicit `rules` option is passed.
+ Initialized to the built-in simplification rules.
+ Users can `push()` additional rules or replace the entire array.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.strict
+
+```ts
+strict: boolean;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.trace
+
+```ts
+trace: readonly string[];
+```
+
+A list of the function calls to the current evaluation context
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.precision
+
+```ts
+get precision(): number
+set precision(p: number | "auto" | "machine"): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.chop()
+
+###### chop(n)
+
+```ts
+chop(n): number
+```
+
+####### n
+
+`number`
+
+###### chop(n)
+
+```ts
+chop(n): 0 | Decimal
+```
+
+####### n
+
+`Decimal`
+
+###### chop(n)
+
+```ts
+chop(n): number | Decimal
+```
+
+####### n
+
+`number` | `Decimal`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.box()
+
+```ts
+box(expr, options?): Expression
+```
+
+####### expr
+
+[`NumericValue`](#numericvalue) | [`ExpressionInput`](#expressioninput)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.function()
+
+```ts
+function(name, ops, options?): Expression
+```
+
+####### name
+
+`string`
+
+####### ops
+
+readonly [`ExpressionInput`](#expressioninput)[]
+
+####### options?
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.registerCompilationTarget()
+
+```ts
+registerCompilationTarget(name, target): void
+```
+
+Register a custom compilation target.
+
+####### name
+
+`string`
+
+####### target
+
+`LanguageTarget`\<[`Expression`](#expression-4)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getCompilationTarget()
+
+```ts
+getCompilationTarget(name): LanguageTarget<Expression>
+```
+
+Get a registered compilation target by name.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.listCompilationTargets()
+
+```ts
+listCompilationTargets(): string[]
+```
+
+Return the names of all registered compilation targets.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.unregisterCompilationTarget()
+
+```ts
+unregisterCompilationTarget(name): void
+```
+
+Remove a registered compilation target.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.number()
+
+```ts
+number(value, options?): Expression
+```
+
+####### value
+
+`any`
+
+####### options?
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+####### canonical?
+
+[`CanonicalOptions`](#canonicaloptions)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.symbol()
+
+```ts
+symbol(sym, options?): Expression
+```
+
+####### sym
+
+`string`
+
+####### options?
+
+####### canonical?
+
+[`CanonicalOptions`](#canonicaloptions)
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.string()
+
+```ts
+string(s, metadata?): Expression
+```
+
+####### s
+
+`string`
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.error()
+
+```ts
+error(message, where?): Expression
+```
+
+####### message
+
+`string` | `string`[]
+
+####### where?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.typeError()
+
+```ts
+typeError(expectedType, actualType, where?): Expression
+```
+
+####### expectedType
+
+[`Type`](#type-3)
+
+####### actualType
+
+[`Type`](#type-3) | [`BoxedType`](#boxedtype)
+
+####### where?
+
+[`ExpressionInput`](#expressioninput)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.hold()
+
+```ts
+hold(expr): Expression
+```
+
+####### expr
+
+[`ExpressionInput`](#expressioninput)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.tuple()
+
+###### tuple(elements)
+
+```ts
+tuple(...elements): Expression
+```
+
+####### elements
+
+...readonly `number`[]
+
+###### tuple(elements)
+
+```ts
+tuple(...elements): Expression
+```
+
+####### elements
+
+...readonly [`Expression`](#expression-4)[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.type()
+
+```ts
+type(type): BoxedType
+```
+
+####### type
+
+`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | [`BoxedType`](#boxedtype)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.rules()
+
+```ts
+rules(rules, options?): BoxedRuleSet
+```
+
+####### rules
+
+`Rule` | `BoxedRuleSet` | readonly Rule \| BoxedRule[]
+
+####### options?
+
+####### canonical?
+
+`boolean`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getRuleSet()
+
+```ts
+getRuleSet(id?): BoxedRuleSet
+```
+
+####### id?
+
+`"harmonization"` | `"solve-univariate"` | `"standard-simplification"`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.parse()
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): null
+```
+
+####### latex
+
+`null`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.pushScope()
+
+```ts
+pushScope(scope?, name?): void
+```
+
+####### scope?
+
+`Scope`
+
+####### name?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.popScope()
+
+```ts
+popScope(): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.lookupContext()
+
+```ts
+lookupContext(id): EvalContext
+```
+
+####### id
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.lookupDefinition()
+
+```ts
+lookupDefinition(id): BoxedDefinition
+```
+
+####### id
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.assign()
+
+###### assign(ids)
+
+```ts
+assign(ids): IComputeEngine
+```
+
+####### ids
+
+###### assign(id, value)
+
+```ts
+assign(id, value): IComputeEngine
+```
+
+####### id
+
+`string`
+
+####### value
+
+`AssignValue`
+
+###### assign(arg1, arg2)
+
+```ts
+assign(arg1, arg2?): IComputeEngine
+```
+
+####### arg1
+
+`string` | \{\}
+
+####### arg2?
+
+`AssignValue`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.declareType()
+
+```ts
+declareType(name, type, options?): void
+```
+
+####### name
+
+`string`
+
+####### type
+
+[`Type`](#type-3)
+
+####### options?
+
+####### alias?
+
+`boolean`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.declare()
+
+###### declare(symbols)
+
+```ts
+declare(symbols): IComputeEngine
+```
+
+####### symbols
+
+###### declare(id, def, scope)
+
+```ts
+declare(id, def, scope?): IComputeEngine
+```
+
+####### id
+
+`string`
+
+####### def
+
+`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
+`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
+`type`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`inferred`: `boolean`;
+`value`:   \| [`ExpressionInput`](#expressioninput)
+\| (`ce`) => [`Expression`](#expression-4);
+`eq`: (`a`) => `boolean`;
+`neq`: (`a`) => `boolean`;
+`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+`signature`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`type`: (`ops`, `options`) =>
+\| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`sgn`: (`ops`, `options`) => [`Sign`](#sign);
+`isPositive`: `boolean`;
+`isNonNegative`: `boolean`;
+`isNegative`: `boolean`;
+`isNonPositive`: `boolean`;
+`even`: (`ops`, `options`) => `boolean`;
+`complexity`: `number`;
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+`eq`: (`a`, `b`) => `boolean`;
+`neq`: (`a`, `b`) => `boolean`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+\}\>\> | `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
+`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
+`type`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`inferred`: `boolean`;
+`value`:   \| [`ExpressionInput`](#expressioninput)
+\| (`ce`) => [`Expression`](#expression-4);
+`eq`: (`a`) => `boolean`;
+`neq`: (`a`) => `boolean`;
+`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+`signature`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`type`: (`ops`, `options`) =>
+\| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`sgn`: (`ops`, `options`) => [`Sign`](#sign);
+`isPositive`: `boolean`;
+`isNonNegative`: `boolean`;
+`isNegative`: `boolean`;
+`isNonPositive`: `boolean`;
+`even`: (`ops`, `options`) => `boolean`;
+`complexity`: `number`;
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+`eq`: (`a`, `b`) => `boolean`;
+`neq`: (`a`, `b`) => `boolean`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+\}\>\>
+
+####### scope?
+
+`Scope`
+
+###### declare(arg1, arg2, arg3)
+
+```ts
+declare(arg1, arg2?, arg3?): IComputeEngine
+```
+
+####### arg1
+
+`string` | \{\}
+
+####### arg2?
+
+`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
+`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
+`type`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`inferred`: `boolean`;
+`value`:   \| [`ExpressionInput`](#expressioninput)
+\| (`ce`) => [`Expression`](#expression-4);
+`eq`: (`a`) => `boolean`;
+`neq`: (`a`) => `boolean`;
+`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+`signature`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`type`: (`ops`, `options`) =>
+\| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`sgn`: (`ops`, `options`) => [`Sign`](#sign);
+`isPositive`: `boolean`;
+`isNonNegative`: `boolean`;
+`isNegative`: `boolean`;
+`isNonPositive`: `boolean`;
+`even`: (`ops`, `options`) => `boolean`;
+`complexity`: `number`;
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+`eq`: (`a`, `b`) => `boolean`;
+`neq`: (`a`, `b`) => `boolean`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+\}\>\> | `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
+`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
+`type`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`inferred`: `boolean`;
+`value`:   \| [`ExpressionInput`](#expressioninput)
+\| (`ce`) => [`Expression`](#expression-4);
+`eq`: (`a`) => `boolean`;
+`neq`: (`a`) => `boolean`;
+`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+`signature`:   \| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`type`: (`ops`, `options`) =>
+\| `string`
+\| [`AlgebraicType`](#algebraictype)
+\| [`NegationType`](#negationtype)
+\| [`CollectionType`](#collectiontype)
+\| [`ListType`](#listtype)
+\| [`SetType`](#settype)
+\| [`RecordType`](#recordtype)
+\| [`DictionaryType`](#dictionarytype)
+\| [`TupleType`](#tupletype)
+\| [`SymbolType`](#symboltype)
+\| [`ExpressionType`](#expressiontype)
+\| [`NumericType`](#numerictype)
+\| [`FunctionSignature`](#functionsignature)
+\| [`ValueType`](#valuetype)
+\| [`TypeReference`](#typereference)
+\| [`BoxedType`](#boxedtype);
+`sgn`: (`ops`, `options`) => [`Sign`](#sign);
+`isPositive`: `boolean`;
+`isNonNegative`: `boolean`;
+`isNegative`: `boolean`;
+`isNonPositive`: `boolean`;
+`even`: (`ops`, `options`) => `boolean`;
+`complexity`: `number`;
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+`eq`: (`a`, `b`) => `boolean`;
+`neq`: (`a`, `b`) => `boolean`;
+`collection`: [`CollectionHandlers`](#collectionhandlers);
+\}\>\>
+
+####### arg3?
+
+`Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.assume()
+
+```ts
+assume(predicate): AssumeResult
+```
+
+####### predicate
+
+[`Expression`](#expression-4)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.declareSequence()
+
+```ts
+declareSequence(name, def): IComputeEngine
+```
+
+Declare a sequence with a recurrence relation.
+
+####### name
+
+`string`
+
+####### def
+
+[`SequenceDefinition`](#sequencedefinition)
+
+###### Example
+
+```typescript
+// Fibonacci sequence
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+ce.parse('F_{10}').evaluate();  // → 55
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getSequenceStatus()
+
+```ts
+getSequenceStatus(name): SequenceStatus
+```
+
+Get the status of a sequence definition.
+
+####### name
+
+`string`
+
+###### Example
+
+```typescript
+ce.parse('F_0 := 0').evaluate();
+ce.getSequenceStatus('F');
+// → { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getSequence()
+
+```ts
+getSequence(name): SequenceInfo
+```
+
+Get information about a defined sequence.
+Returns `undefined` if the symbol is not a sequence.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.listSequences()
+
+```ts
+listSequences(): string[]
+```
+
+List all defined sequences.
+Returns an array of sequence names.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.isSequence()
+
+```ts
+isSequence(name): boolean
+```
+
+Check if a symbol is a defined sequence.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.clearSequenceCache()
+
+```ts
+clearSequenceCache(name?): void
+```
+
+Clear the memoization cache for a sequence.
+If no name is provided, clears caches for all sequences.
+
+####### name?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getSequenceCache()
+
+```ts
+getSequenceCache(name): Map<string | number, Expression>
+```
+
+Get the memoization cache for a sequence.
+Returns a Map of index → value, or `undefined` if not a sequence or memoization is disabled.
+
+For single-index sequences, keys are numbers.
+For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.getSequenceTerms()
+
+```ts
+getSequenceTerms(
+   name, 
+   start, 
+   end, 
+   step?): Expression[]
+```
+
+Generate a list of sequence terms from start to end (inclusive).
+
+####### name
+
+`string`
+
+The sequence name
+
+####### start
+
+`number`
+
+Starting index (inclusive)
+
+####### end
+
+`number`
+
+Ending index (inclusive)
+
+####### step?
+
+`number`
+
+Step size (default: 1)
+
+###### Example
+
+```typescript
+ce.declareSequence('F', { base: { 0: 0, 1: 1 }, recurrence: 'F_{n-1} + F_{n-2}' });
+ce.getSequenceTerms('F', 0, 10);
+// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.lookupOEIS()
+
+```ts
+lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
+```
+
+Look up sequences in OEIS by their terms.
+
+####### terms
+
+(`number` \| [`Expression`](#expression-4))[]
+
+Array of sequence terms to search for
+
+####### options?
+
+[`OEISOptions`](#oeisoptions)
+
+Optional configuration (timeout, maxResults)
+
+###### Example
+
+```typescript
+const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
+// → [{ id: 'A000045', name: 'Fibonacci numbers', ... }]
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.checkSequenceOEIS()
+
+```ts
+checkSequenceOEIS(name, count?, options?): Promise<{
+  matches: OEISSequenceInfo[];
+  terms: number[];
+}>
+```
+
+Check if a defined sequence matches an OEIS sequence.
+
+####### name
+
+`string`
+
+Name of the defined sequence
+
+####### count?
+
+`number`
+
+Number of terms to check (default: 10)
+
+####### options?
+
+[`OEISOptions`](#oeisoptions)
+
+Optional configuration
+
+###### Example
+
+```typescript
+ce.declareSequence('F', { base: { 0: 0, 1: 1 }, recurrence: 'F_{n-1} + F_{n-2}' });
+const result = await ce.checkSequenceOEIS('F', 10);
+// → { matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }], terms: [0, 1, 1, ...] }
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.forget()
+
+```ts
+forget(symbol?): void
+```
+
+####### symbol?
+
+`string` | `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.ask()
+
+```ts
+ask(pattern): BoxedSubstitution[]
+```
+
+####### pattern
+
+[`Expression`](#expression-4)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.verify()
+
+```ts
+verify(query): boolean
+```
+
+####### query
+
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 ## Boxed Expression
 
-### BoxedExpression
+<MemberCard>
+
+### SimplifyOptions
+
+```ts
+type SimplifyOptions = {
+  rules: null | Rule | ReadonlyArray<BoxedRule | Rule> | BoxedRuleSet;
+  costFunction: (expr) => number;
+  strategy: "default" | "fu";
+};
+```
+
+Options for `Expression.simplify()`
+
+</MemberCard>
+
+<MemberCard>
+
+### EvaluateOptions
+
+```ts
+type EvaluateOptions = KernelEvaluateOptions<Expression>;
+```
+
+Options for evaluating boxed expressions.
+
+This is the compute-engine-specialized form of the generic kernel type.
+
+</MemberCard>
+
+### Expression
 
 :::info[THEORY OF OPERATIONS]
 
-The `BoxedExpression` interface includes the methods and properties
+The `Expression` interface includes the methods and properties
 applicable to all kinds of expression. For example it includes `expr.symbol`
 which only applies to symbols or `expr.ops` which only applies to
 function expressions.
 
-When a property is not applicable to this `BoxedExpression` its value is
-`null`. For example `expr.symbol` for a `BoxedNumber` is `null`.
+When a property is not applicable to this `Expression` its value is
+`undefined`. For example `expr.symbol` for a `BoxedNumber` is `undefined`.
 
 This convention makes it convenient to manipulate expressions without
 having to check what kind of instance they are before manipulating them.
@@ -1153,22 +2704,7 @@ of the symbol, not its value.
 
 <MemberCard>
 
-##### BoxedExpression.isFunctionExpression
-
-```ts
-readonly isFunctionExpression: boolean;
-```
-
-Return `true` if this expression is a function expression.
-
-If `true`, `expr.ops` is not `null`, and `expr.operator` is the name
-of the function.
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.operator
+##### Expression.operator
 
 ```ts
 readonly operator: string;
@@ -1188,141 +2724,11 @@ collapse to `"Number"`.
 
 </MemberCard>
 
-<MemberCard>
-
-##### BoxedExpression.ops
-
-```ts
-readonly ops: readonly BoxedExpression[];
-```
-
-The list of operands of the function.
-
-If the expression is not a function, return `null`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.nops
-
-```ts
-readonly nops: number;
-```
-
-If this expression is a function, the number of operands, otherwise 0.
-
-Note that a function can have 0 operands, so to check if this expression
-is a function, check if `this.ops !== null` instead.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.op1
-
-```ts
-readonly op1: BoxedExpression;
-```
-
-First operand, i.e.`this.ops[0]`.
-
-If there is no first operand, return the symbol `Nothing`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.op2
-
-```ts
-readonly op2: BoxedExpression;
-```
-
-Second operand, i.e.`this.ops[1]`
-
-If there is no second operand, return the symbol `Nothing`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.op3
-
-```ts
-readonly op3: BoxedExpression;
-```
-
-Third operand, i.e. `this.ops[2]`
-
-If there is no third operand, return the symbol `Nothing`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
 #### Numeric Expression
 
 <MemberCard>
 
-##### BoxedExpression.isNumberLiteral
-
-```ts
-readonly isNumberLiteral: boolean;
-```
-
-Return `true` if this expression is a number literal, for example
-`2`, `3.14`, `1/2`, `√2` etc.
-
-When `true`, `expr.numericValue` is not `null`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.numericValue
-
-```ts
-readonly numericValue: number | NumericValue;
-```
-
-Return the value of this expression, if a number literal.
-
-Note it is possible for `expr.numericValue` to be `null`, and for
-`expr.is(0)` to be false. For example, when a symbol has been
-defined with an assumption.
-
-Conversely, `expr.isNumber` may be true even if `expr.numericValue` is
-`null`, for example the symbol `Pi` return `true` for `isNumber` but
-`expr.numericValue` is `null` (it's a symbol, not a number literal).
-Its value can be accessed with `expr.value`.
-
-To check if an expression is a number literal, use `expr.isNumberLiteral`.
-If `expr.isNumberLiteral` is `true`, `expr.numericValue` is not `null`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.isEven
+##### Expression.isEven
 
 ```ts
 readonly isEven: boolean;
@@ -1334,7 +2740,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.isOdd
+##### Expression.isOdd
 
 ```ts
 readonly isOdd: boolean;
@@ -1346,7 +2752,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.re
+##### Expression.re
 
 ```ts
 readonly re: number;
@@ -1360,7 +2766,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### BoxedExpression.im
+##### Expression.im
 
 ```ts
 readonly im: number;
@@ -1375,7 +2781,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### BoxedExpression.bignumRe
+##### Expression.bignumRe
 
 ```ts
 readonly bignumRe: Decimal;
@@ -1397,7 +2803,7 @@ otherwise as a number or `NaN` if the value is not a number.
 
 <MemberCard>
 
-##### BoxedExpression.bignumIm
+##### Expression.bignumIm
 
 ```ts
 readonly bignumIm: Decimal;
@@ -1421,7 +2827,7 @@ When using this pattern, the value is returned as a bignum if available, otherwi
 
 <MemberCard>
 
-##### BoxedExpression.sgn
+##### Expression.sgn
 
 ```ts
 readonly sgn: Sign;
@@ -1443,7 +2849,7 @@ Non-canonical expressions return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.isPositive
+##### Expression.isPositive
 
 ```ts
 readonly isPositive: boolean;
@@ -1455,7 +2861,7 @@ The value of this expression is > 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNonNegative
+##### Expression.isNonNegative
 
 ```ts
 readonly isNonNegative: boolean;
@@ -1467,7 +2873,7 @@ The value of this expression is >= 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNegative
+##### Expression.isNegative
 
 ```ts
 readonly isNegative: boolean;
@@ -1479,7 +2885,7 @@ The value of this expression is &lt; 0, same as `isLess(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNonPositive
+##### Expression.isNonPositive
 
 ```ts
 readonly isNonPositive: boolean;
@@ -1491,7 +2897,7 @@ The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNaN
+##### Expression.isNaN
 
 ```ts
 readonly isNaN: boolean;
@@ -1509,7 +2915,7 @@ number).
 
 <MemberCard>
 
-##### BoxedExpression.isInfinity
+##### Expression.isInfinity
 
 ```ts
 readonly isInfinity: boolean;
@@ -1521,7 +2927,7 @@ The numeric value of this expression is `±Infinity` or ComplexInfinity.
 
 <MemberCard>
 
-##### BoxedExpression.isFinite
+##### Expression.isFinite
 
 ```ts
 readonly isFinite: boolean;
@@ -1536,10 +2942,10 @@ This expression is a number, but not `±Infinity`, `ComplexInfinity` or
 
 <MemberCard>
 
-##### BoxedExpression.engine
+##### Expression.engine
 
 ```ts
-readonly engine: ComputeEngine;
+readonly engine: ExpressionComputeEngine;
 ```
 
 The Compute Engine instance associated with this expression provides
@@ -1550,7 +2956,7 @@ and functions.
 
 <MemberCard>
 
-##### BoxedExpression.toLatex()
+##### Expression.toLatex()
 
 ```ts
 toLatex(options?): string
@@ -1570,7 +2976,7 @@ Will ignore any LaTeX metadata.
 
 <MemberCard>
 
-##### BoxedExpression.latex
+##### Expression.latex
 
 LaTeX representation of this expression.
 
@@ -1589,10 +2995,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.toMathJson()
+##### Expression.toMathJson()
 
 ```ts
-toMathJson(options?): Expression
+toMathJson(options?): MathJsonExpression
 ```
 
 Serialize to a MathJSON expression with specified options
@@ -1605,10 +3011,10 @@ Serialize to a MathJSON expression with specified options
 
 <MemberCard>
 
-##### BoxedExpression.json
+##### Expression.json
 
 ```ts
-readonly json: Expression;
+readonly json: MathJsonExpression;
 ```
 
 MathJSON representation of this expression.
@@ -1633,7 +3039,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.print()
+##### Expression.print()
 
 ```ts
 print(): void
@@ -1647,7 +3053,7 @@ Note that lazy collections are eagerly evaluated when printed.
 
 <MemberCard>
 
-##### BoxedExpression.verbatimLatex?
+##### Expression.verbatimLatex?
 
 ```ts
 optional verbatimLatex: string;
@@ -1660,7 +3066,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
-##### BoxedExpression.isCanonical
+##### Expression.isCanonical
 
 If `true`, this expression is in a canonical form.
 
@@ -1668,19 +3074,19 @@ If `true`, this expression is in a canonical form.
 
 <MemberCard>
 
-##### BoxedExpression.isStructural
+##### Expression.isStructural
 
 If `true`, this expression is in a structural form.
 
 The structural form of an expression is used when applying rules to
 an expression. For example, a rational number is represented as a
-function expression instead of a `BoxedExpression` object.
+function expression instead of a `Expression` object.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.canonical
+##### Expression.canonical
 
 Return the canonical form of this expression.
 
@@ -1714,12 +3120,12 @@ This means that, likewise for partially canonical expressions, the
 
 <MemberCard>
 
-##### BoxedExpression.structural
+##### Expression.structural
 
 Return the structural form of this expression.
 
 Some expressions, such as rational numbers, are represented with
-a `BoxedExpression` object. In some cases, for example when doing a
+a `Expression` object. In some cases, for example when doing a
 structural comparison of two expressions, it is useful to have a
 structural representation of the expression where the rational numbers
 is represented by a function expression instead.
@@ -1731,7 +3137,7 @@ otherwise return `this`.
 
 <MemberCard>
 
-##### BoxedExpression.isValid
+##### Expression.isValid
 
 ```ts
 readonly isValid: boolean;
@@ -1751,7 +3157,7 @@ mismatch, or missing or unexpected arguments.
 
 <MemberCard>
 
-##### BoxedExpression.isPure
+##### Expression.isPure
 
 ```ts
 readonly isPure: boolean;
@@ -1783,7 +3189,7 @@ Applicable to canonical expressions only
 
 <MemberCard>
 
-##### BoxedExpression.isConstant
+##### Expression.isConstant
 
 ```ts
 readonly isConstant: boolean;
@@ -1806,10 +3212,10 @@ with constant arguments are all *constant*, i.e.:
 
 <MemberCard>
 
-##### BoxedExpression.errors
+##### Expression.errors
 
 ```ts
-readonly errors: readonly BoxedExpression[];
+readonly errors: readonly Expression[];
 ```
 
 All the `["Error"]` subexpressions.
@@ -1825,10 +3231,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.getSubexpressions()
+##### Expression.getSubexpressions()
 
 ```ts
-getSubexpressions(operator): readonly BoxedExpression[]
+getSubexpressions(operator): readonly Expression[]
 ```
 
 All the subexpressions matching the named operator, recursively.
@@ -1853,10 +3259,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.subexpressions
+##### Expression.subexpressions
 
 ```ts
-readonly subexpressions: readonly BoxedExpression[];
+readonly subexpressions: readonly Expression[];
 ```
 
 All the subexpressions in this expression, recursively
@@ -1877,7 +3283,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.symbols
+##### Expression.symbols
 
 ```ts
 readonly symbols: readonly string[];
@@ -1899,7 +3305,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.unknowns
+##### Expression.unknowns
 
 ```ts
 readonly unknowns: readonly string[];
@@ -1912,10 +3318,10 @@ associated with them, i.e. they are declared but not defined.
 
 <MemberCard>
 
-##### BoxedExpression.toNumericValue()
+##### Expression.toNumericValue()
 
 ```ts
-toNumericValue(): [NumericValue, BoxedExpression]
+toNumericValue(): [NumericValue, Expression]
 ```
 
 Attempt to factor a numeric coefficient `c` and a `rest` out of a
@@ -1935,10 +3341,10 @@ Attempts to make `rest` a positive value (i.e. pulls out negative sign).
 
 <MemberCard>
 
-##### BoxedExpression.neg()
+##### Expression.neg()
 
 ```ts
-neg(): BoxedExpression
+neg(): Expression
 ```
 
 Negate (additive inverse)
@@ -1947,10 +3353,10 @@ Negate (additive inverse)
 
 <MemberCard>
 
-##### BoxedExpression.inv()
+##### Expression.inv()
 
 ```ts
-inv(): BoxedExpression
+inv(): Expression
 ```
 
 Inverse (multiplicative inverse)
@@ -1959,10 +3365,10 @@ Inverse (multiplicative inverse)
 
 <MemberCard>
 
-##### BoxedExpression.abs()
+##### Expression.abs()
 
 ```ts
-abs(): BoxedExpression
+abs(): Expression
 ```
 
 Absolute value
@@ -1971,106 +3377,106 @@ Absolute value
 
 <MemberCard>
 
-##### BoxedExpression.add()
+##### Expression.add()
 
 ```ts
-add(rhs): BoxedExpression
+add(rhs): Expression
 ```
 
 Addition
 
 ####### rhs
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.sub()
+##### Expression.sub()
 
 ```ts
-sub(rhs): BoxedExpression
+sub(rhs): Expression
 ```
 
 Subtraction
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.mul()
+##### Expression.mul()
 
 ```ts
-mul(rhs): BoxedExpression
+mul(rhs): Expression
 ```
 
 Multiplication
 
 ####### rhs
 
-`number` | [`NumericValue`](#numericvalue-1) | [`BoxedExpression`](#boxedexpression)
+`number` | [`NumericValue`](#numericvalue) | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.div()
+##### Expression.div()
 
 ```ts
-div(rhs): BoxedExpression
+div(rhs): Expression
 ```
 
 Division
 
 ####### rhs
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.pow()
+##### Expression.pow()
 
 ```ts
-pow(exp): BoxedExpression
+pow(exp): Expression
 ```
 
 Power
 
 ####### exp
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.root()
+##### Expression.root()
 
 ```ts
-root(exp): BoxedExpression
+root(exp): Expression
 ```
 
 Exponentiation
 
 ####### exp
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.sqrt()
+##### Expression.sqrt()
 
 ```ts
-sqrt(): BoxedExpression
+sqrt(): Expression
 ```
 
 Square root
@@ -2079,23 +3485,23 @@ Square root
 
 <MemberCard>
 
-##### BoxedExpression.ln()
+##### Expression.ln()
 
 ```ts
-ln(base?): BoxedExpression
+ln(base?): Expression
 ```
 
 Logarithm (natural by default)
 
 ####### base?
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.numerator
+##### Expression.numerator
 
 Return this expression expressed as a numerator.
 
@@ -2103,7 +3509,7 @@ Return this expression expressed as a numerator.
 
 <MemberCard>
 
-##### BoxedExpression.denominator
+##### Expression.denominator
 
 Return this expression expressed as a denominator.
 
@@ -2111,7 +3517,7 @@ Return this expression expressed as a denominator.
 
 <MemberCard>
 
-##### BoxedExpression.numeratorDenominator
+##### Expression.numeratorDenominator
 
 Return this expression expressed as a numerator and denominator.
 
@@ -2119,7 +3525,7 @@ Return this expression expressed as a numerator and denominator.
 
 <MemberCard>
 
-##### BoxedExpression.isScoped
+##### Expression.isScoped
 
 ```ts
 readonly isScoped: boolean;
@@ -2133,7 +3539,7 @@ function expression.
 
 <MemberCard>
 
-##### BoxedExpression.localScope
+##### Expression.localScope
 
 If this expression has a local scope, return it.
 
@@ -2141,10 +3547,10 @@ If this expression has a local scope, return it.
 
 <MemberCard>
 
-##### BoxedExpression.subs()
+##### Expression.subs()
 
 ```ts
-subs(sub, options?): BoxedExpression
+subs(sub, options?): Expression
 ```
 
 Replace all the symbols in the expression as indicated.
@@ -2168,7 +3574,7 @@ does not differ from that of this expr.: then a call this method is analagous to
 
 ####### sub
 
-[`Substitution`](#substitution-1)
+`Substitution`\<[`ExpressionInput`](#expressioninput)\>
 
 ####### options?
 
@@ -2180,10 +3586,10 @@ does not differ from that of this expr.: then a call this method is analagous to
 
 <MemberCard>
 
-##### BoxedExpression.map()
+##### Expression.map()
 
 ```ts
-map(fn, options?): BoxedExpression
+map(fn, options?): Expression
 ```
 
 Recursively replace all the subexpressions in the expression as indicated.
@@ -2204,7 +3610,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### fn
 
-(`expr`) => [`BoxedExpression`](#boxedexpression)
+(`expr`) => [`Expression`](#expression-4)
 
 ####### options?
 
@@ -2220,10 +3626,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.replace()
+##### Expression.replace()
 
 ```ts
-replace(rules, options?): BoxedExpression
+replace(rules, options?): Expression
 ```
 
 Transform the expression by applying one or more replacement rules:
@@ -2241,7 +3647,7 @@ Procedure for the determining the canonical-status of the input expression and r
 the replacement occurs at the top-level, or within/recursively.
 
 - If otherwise, the *direct replacement will be canonical* if either the 'replaced' expression
-is canonical, or the given replacement (- is a BoxedExpression and -) is canonical.
+is canonical, or the given replacement (- is a Expression and -) is canonical.
 Notably also, if this replacement takes place recursively (not at the top-level), then exprs.
 containing the replaced expr. will still however have their (previous) canonical-status
 *preserved*... unless this expr. was previously non-canonical, and *replacements have resulted
@@ -2252,13 +3658,13 @@ canonical status. (Canonicalization is opportunistic here, in other words).
 Applicable to canonical and non-canonical expressions.
 
 To match a specific symbol (not a wildcard pattern), the `match` must be
-a `BoxedExpression` (e.g., `{ match: ce.box('x'), replace: ... }`).
+a `Expression` (e.g., `{ match: ce.box('x'), replace: ... }`).
 For simple symbol substitution, consider using `subs()` instead.
 :::
 
 ####### rules
 
-[`BoxedRuleSet`](#boxedruleset) | [`Rule`](#rule) | [`Rule`](#rule)[]
+`Rule` | `BoxedRuleSet` | `Rule`[]
 
 ####### options?
 
@@ -2268,7 +3674,7 @@ For simple symbol substitution, consider using `subs()` instead.
 
 <MemberCard>
 
-##### BoxedExpression.has()
+##### Expression.has()
 
 ```ts
 has(v): boolean
@@ -2288,10 +3694,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.match()
+##### Expression.match()
 
 ```ts
-match(pattern, options?): BoxedSubstitution
+match(pattern, options?): BoxedSubstitution<Expression>
 ```
 
 If this expression matches `pattern`, return a substitution that makes
@@ -2312,17 +3718,17 @@ Applicable to canonical and non-canonical expressions.
 
 ####### pattern
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 ####### options?
 
-[`PatternMatchOptions`](#patternmatchoptions)
+`PatternMatchOptions`\<[`Expression`](#expression-4)\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.wikidata
+##### Expression.wikidata
 
 ```ts
 readonly wikidata: string;
@@ -2336,7 +3742,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.description
+##### Expression.description
 
 ```ts
 readonly description: string[];
@@ -2352,7 +3758,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.url
+##### Expression.url
 
 ```ts
 readonly url: string;
@@ -2367,7 +3773,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.complexity
+##### Expression.complexity
 
 ```ts
 readonly complexity: number;
@@ -2382,7 +3788,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.baseDefinition
+##### Expression.baseDefinition
 
 ```ts
 readonly baseDefinition: BoxedBaseDefinition;
@@ -2398,7 +3804,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.operatorDefinition
+##### Expression.operatorDefinition
 
 ```ts
 readonly operatorDefinition: BoxedOperatorDefinition;
@@ -2415,7 +3821,7 @@ its value is `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.valueDefinition
+##### Expression.valueDefinition
 
 ```ts
 readonly valueDefinition: BoxedValueDefinition;
@@ -2430,10 +3836,10 @@ If not a canonical expression, or not a value, its value is `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.simplify()
+##### Expression.simplify()
 
 ```ts
-simplify(options?): BoxedExpression
+simplify(options?): Expression
 ```
 
 Return a simpler form of this expression.
@@ -2456,62 +3862,16 @@ To manipulate symbolically non-canonical expressions, use `expr.replace()`.
 
 ####### options?
 
-`Partial`\<[`SimplifyOptions`](#simplifyoptions)\>
+`Partial`\<`SimplifyOptions`\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.trigSimplify()
+##### Expression.evaluate()
 
 ```ts
-trigSimplify(): BoxedExpression
-```
-
-Apply the Fu algorithm to simplify trigonometric expressions.
-
-The Fu algorithm is a systematic approach to trigonometric simplification
-that uses transformation rules (TR1-TR22), combination transforms (CTR),
-and rule lists (RL) to reduce the number of trigonometric functions.
-
-This is equivalent to calling `simplify({ strategy: 'fu' })` but is
-more convenient for trig-heavy expressions.
-
-Reference: Fu, Hongguang, Xiuqin Zhong, and Zhenbing Zeng.
-"Automated and readable simplification of trigonometric expressions."
-Mathematical and Computer Modelling 44.11 (2006): 1169-1177.
-
-###### Example
-
-```typescript
-ce.parse('\\sin(x)\\cos(x)').trigSimplify()
-// => sin(2x)/2
-
-ce.parse('\\sin^2(x) + \\cos^2(x)').trigSimplify()
-// => 1
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.expand()
-
-```ts
-expand(): BoxedExpression
-```
-
-Expand the expression: distribute multiplications over additions,
-and expand powers.
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.evaluate()
-
-```ts
-evaluate(options?): BoxedExpression
+evaluate(options?): Expression
 ```
 
 Return the value of the canonical form of this expression.
@@ -2533,16 +3893,16 @@ The result is in canonical form.
 
 ####### options?
 
-`Partial`\<[`EvaluateOptions`](#evaluateoptions)\>
+`Partial`\<`EvaluateOptions`\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.evaluateAsync()
+##### Expression.evaluateAsync()
 
 ```ts
-evaluateAsync(options?): Promise<BoxedExpression>
+evaluateAsync(options?): Promise<Expression>
 ```
 
 Asynchronous version of `evaluate()`.
@@ -2552,16 +3912,16 @@ The `options` argument can include a `signal` property, which is an
 
 ####### options?
 
-`Partial`\<[`EvaluateOptions`](#evaluateoptions)\>
+`Partial`\<`EvaluateOptions`\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.N()
+##### Expression.N()
 
 ```ts
-N(): BoxedExpression
+N(): Expression
 ```
 
 Return a numeric approximation of the canonical form of this expression.
@@ -2583,102 +3943,13 @@ The result is in canonical form.
 
 <MemberCard>
 
-##### BoxedExpression.compile()
-
-```ts
-compile(options?): (...args) => any & {
-  isCompiled: boolean;
-}
-```
-
-Compile the expression to a JavaScript function.
-
-The function takes an object as argument, with the keys being the
-symbols in the expression, and returns the value of the expression.
-
-```javascript
-const expr = ce.parse("x^2 + y^2");
-const f = expr.compile();
-console.log(f({x: 2, y: 3}));
-// -> 13
-```
-
-If the expression is a function literal, the function takes the
-arguments of the function as arguments, and returns the value of the
-expression.
-
-```javascript
-const expr = ce.parse("(x) \mapsto 2x");
-const f = expr.compile();
-console.log(f(42));
-// -> 84
-```
-
-If the expression cannot be compiled, a JS function is returned that
-falls back to the interpreting the expression, unless the
-`options.fallback` is set to `false`. If it is set to `false`, the
-function will throw an error if it cannot be compiled.
-
-**Custom operators**: You can override operators to use function calls
-instead of native operators, useful for vector/matrix operations:
-
-```javascript
-const expr = ce.parse("v + w");
-const f = expr.compile({
-  operators: {
-    Add: ['add', 11],      // Convert + to add()
-    Multiply: ['mul', 12]   // Convert * to mul()
-  }
-});
-// Result: add(v, w) instead of v + w
-```
-
-####### options?
-
-####### to?
-
-`string`
-
-####### target?
-
-`any`
-
-####### operators?
-
-  \| `Partial`\<`Record`\<`string`, \[`string`, `number`\]\>\>
-  \| (`op`) => \[`string`, `number`\]
-
-####### functions?
-
-`Record`\<[`MathJsonSymbol`](#mathjsonsymbol), [`JSSource`](#jssource) \| (...`any`) => `any`\>
-
-####### vars?
-
-`Record`\<[`MathJsonSymbol`](#mathjsonsymbol), [`JSSource`](#jssource)\>
-
-####### imports?
-
-(...`any`) => `any`[]
-
-####### preamble?
-
-`string`
-
-####### fallback?
-
-`boolean`
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.solve()
+##### Expression.solve()
 
 ```ts
 solve(vars?): 
-  | readonly BoxedExpression[]
-  | Record<string, BoxedExpression>
-  | Record<string, BoxedExpression>[]
+  | readonly Expression[]
+  | Record<string, Expression>
+  | Record<string, Expression>[]
 ```
 
 If this is an equation, solve the equation for the variables in vars.
@@ -2706,16 +3977,16 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 ####### vars?
 
-`string` | `Iterable`\<`string`, `any`, `any`\> | [`BoxedExpression`](#boxedexpression) | `Iterable`\<[`BoxedExpression`](#boxedexpression), `any`, `any`\>
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-4) | `Iterable`\<[`Expression`](#expression-4), `any`, `any`\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.value
+##### Expression.value
 
 ```ts
-get value(): BoxedExpression
+get value(): Expression
 set value(value: 
   | string
   | number
@@ -2731,7 +4002,7 @@ set value(value:
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>
+ } & Expression>
   | OnlyFirst<{
   num: number;
   denom: number;
@@ -2741,14 +4012,14 @@ set value(value:
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>
-  | OnlyFirst<BoxedExpression, {
+ } & Expression>
+  | OnlyFirst<Expression, {
   re: number;
   im: number;
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>): void
+ } & Expression>): void
 ```
 
 If this expression is a number literal, a string literal or a function
@@ -2771,7 +4042,7 @@ about it in the current scope.
 
 <MemberCard>
 
-##### BoxedExpression.isCollection
+##### Expression.isCollection
 
 ```ts
 isCollection: boolean;
@@ -2792,7 +4063,7 @@ When `isCollection` is `true`, the expression:
 
 <MemberCard>
 
-##### BoxedExpression.isIndexedCollection
+##### Expression.isIndexedCollection
 
 ```ts
 isIndexedCollection: boolean;
@@ -2809,7 +4080,7 @@ When `isIndexedCollection` is `true`, the expression:
    as for a collection.
 - has an `at(index: number)` method that returns the element at the
    specified index.
-- has an `indexWhere(predicate: (element: BoxedExpression) => boolean)`
+- has an `indexWhere(predicate: (element: Expression) => boolean)`
    method that returns the index of the first element that matches the
    predicate.
 
@@ -2817,7 +4088,7 @@ When `isIndexedCollection` is `true`, the expression:
 
 <MemberCard>
 
-##### BoxedExpression.isLazyCollection
+##### Expression.isLazyCollection
 
 ```ts
 isLazyCollection: boolean;
@@ -2836,10 +4107,10 @@ lazy collections.
 
 <MemberCard>
 
-##### BoxedExpression.each()
+##### Expression.each()
 
 ```ts
-each(): Generator<BoxedExpression>
+each(): Generator<Expression>
 ```
 
 If this is a collection, return an iterator over the elements of the
@@ -2856,7 +4127,7 @@ for (const e of expr.each()) {
 
 <MemberCard>
 
-##### BoxedExpression.contains()
+##### Expression.contains()
 
 ```ts
 contains(rhs): boolean
@@ -2870,13 +4141,13 @@ iterating over the collection.
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.subsetOf()
+##### Expression.subsetOf()
 
 ```ts
 subsetOf(other, strict): boolean
@@ -2886,7 +4157,7 @@ Check if this collection is a subset of another collection.
 
 ####### other
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 The other collection to check against.
 
@@ -2900,7 +4171,7 @@ If true, the subset relation is strict (i.e., proper subset).
 
 <MemberCard>
 
-##### BoxedExpression.count
+##### Expression.count
 
 If this is a collection, return the number of elements in the collection.
 
@@ -2914,7 +4185,7 @@ be determined without iterating over the collection.
 
 <MemberCard>
 
-##### BoxedExpression.isFiniteCollection
+##### Expression.isFiniteCollection
 
 ```ts
 isFiniteCollection: boolean;
@@ -2926,7 +4197,7 @@ If this is a finite collection, return true.
 
 <MemberCard>
 
-##### BoxedExpression.isEmptyCollection
+##### Expression.isEmptyCollection
 
 ```ts
 isEmptyCollection: boolean;
@@ -2940,10 +4211,10 @@ An empty collection has a size of 0.
 
 <MemberCard>
 
-##### BoxedExpression.at()
+##### Expression.at()
 
 ```ts
-at(index): BoxedExpression
+at(index): Expression
 ```
 
 If this is an indexed collection, return the element at the specified
@@ -2961,26 +4232,26 @@ The last element is at index -1.
 
 <MemberCard>
 
-##### BoxedExpression.get()
+##### Expression.get()
 
 ```ts
-get(key): BoxedExpression
+get(key): Expression
 ```
 
 If this is a keyed collection (map, record, tuple), return the value of
 the corresponding key.
 
-If `key` is a `BoxedExpression`, it should be a string.
+If `key` is a `Expression`, it should be a string.
 
 ####### key
 
-`string` | [`BoxedExpression`](#boxedexpression)
+`string` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.indexWhere()
+##### Expression.indexWhere()
 
 ```ts
 indexWhere(predicate): number
@@ -2999,7 +4270,7 @@ that matches the predicate.
 
 <MemberCard>
 
-##### BoxedExpression.valueOf()
+##### Expression.valueOf()
 
 ```ts
 valueOf(): string | number | boolean | number[] | number[][] | number[][][]
@@ -3035,7 +4306,7 @@ of the expression.
 
 <MemberCard>
 
-##### BoxedExpression.\[toPrimitive\]()
+##### Expression.\[toPrimitive\]()
 
 ```ts
 toPrimitive: string | number
@@ -3051,7 +4322,7 @@ Similar to`expr.valueOf()` but includes a hint.
 
 <MemberCard>
 
-##### BoxedExpression.toString()
+##### Expression.toString()
 
 ```ts
 toString(): string
@@ -3066,16 +4337,16 @@ To get a LaTeX representation of the expression, use `expr.latex`.
 
 Note that lazy collections are eagerly evaluated.
 
-Used when coercing a `BoxedExpression` to a `String`.
+Used when coercing a `Expression` to a `String`.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.toJSON()
+##### Expression.toJSON()
 
 ```ts
-toJSON(): Expression
+toJSON(): MathJsonExpression
 ```
 
 Used by `JSON.stringify()` to serialize this object to JSON.
@@ -3090,19 +4361,19 @@ Note that lazy collections are *not* eagerly evaluated.
 
 <MemberCard>
 
-##### BoxedExpression.is()
+##### Expression.is()
 
 ```ts
 is(other): boolean
 ```
 
-Equivalent to `BoxedExpression.isSame()` but the argument can be
+Equivalent to `Expression.isSame()` but the argument can be
 a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 `expr.isSame(ce.number(2))`.
 
 ####### other
 
-`string` | `number` | `bigint` | `boolean` | [`BoxedExpression`](#boxedexpression)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3110,7 +4381,7 @@ a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 
 <MemberCard>
 
-##### BoxedExpression.isSame()
+##### Expression.isSame()
 
 ```ts
 isSame(rhs): boolean
@@ -3118,7 +4389,7 @@ isSame(rhs): boolean
 
 Structural/symbolic equality (weak equality).
 
-`ce.parse('1+x', {canonical: false}).isSame(ce.parse('x+1', {canonical: false}))` is `false`.
+`ce.parse('1+x', {form: 'raw'}).isSame(ce.parse('x+1', {form: 'raw'}))` is `false`.
 
 See `expr.isEqual()` for mathematical equality.
 
@@ -3128,13 +4399,13 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isLess()
+##### Expression.isLess()
 
 ```ts
 isLess(other): boolean
@@ -3146,13 +4417,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isLessEqual()
+##### Expression.isLessEqual()
 
 ```ts
 isLessEqual(other): boolean
@@ -3164,13 +4435,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isGreater()
+##### Expression.isGreater()
 
 ```ts
 isGreater(other): boolean
@@ -3182,13 +4453,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isGreaterEqual()
+##### Expression.isGreaterEqual()
 
 ```ts
 isGreaterEqual(other): boolean
@@ -3200,13 +4471,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isEqual()
+##### Expression.isEqual()
 
 ```ts
 isEqual(other): boolean
@@ -3244,45 +4515,7 @@ console.log(expr.is(4)); // true (fastest)
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-#### String Expression
-
-<MemberCard>
-
-##### BoxedExpression.string
-
-```ts
-readonly string: string;
-```
-
-If this expression is a string, return the value of the string.
-Otherwise, return `null`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-#### Symbol Expression
-
-<MemberCard>
-
-##### BoxedExpression.symbol
-
-```ts
-readonly symbol: string;
-```
-
-If this expression is a symbol, return the name of the symbol as a string.
-Otherwise, return `null`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3290,24 +4523,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.tensor
-
-```ts
-readonly tensor: Tensor<any>;
-```
-
-If this expression is a tensor, return the tensor data.
-Otherwise, return `null`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedExpression.shape
+##### Expression.shape
 
 ```ts
 readonly shape: number[];
@@ -3326,7 +4542,7 @@ When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
 
 <MemberCard>
 
-##### BoxedExpression.rank
+##### Expression.rank
 
 ```ts
 readonly rank: number;
@@ -3353,7 +4569,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### BoxedExpression.type
+##### Expression.type
 
 ```ts
 get type(): BoxedType
@@ -3394,7 +4610,7 @@ If the type is not known, return `"unknown"`.
 
 <MemberCard>
 
-##### BoxedExpression.isNumber
+##### Expression.isNumber
 
 ```ts
 readonly isNumber: boolean;
@@ -3418,7 +4634,7 @@ number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
 
 <MemberCard>
 
-##### BoxedExpression.isInteger
+##### Expression.isInteger
 
 ```ts
 readonly isInteger: boolean;
@@ -3432,7 +4648,7 @@ Note that ±∞ and NaN are not integers.
 
 <MemberCard>
 
-##### BoxedExpression.isRational
+##### Expression.isRational
 
 ```ts
 readonly isRational: boolean;
@@ -3450,7 +4666,7 @@ Note that ±∞ and NaN are not rationals.
 
 <MemberCard>
 
-##### BoxedExpression.isReal
+##### Expression.isReal
 
 ```ts
 readonly isReal: boolean;
@@ -3464,12 +4680,313 @@ Note that ±∞ and NaN are not real numbers.
 
 </MemberCard>
 
+### NumberLiteralInterface
+
+Narrowed interface for number literal expressions.
+
+Obtained via `isNumber()`.
+
 <MemberCard>
 
-### SemiBoxedExpression
+##### NumberLiteralInterface.numericValue
 
 ```ts
-type SemiBoxedExpression = 
+readonly numericValue: number | NumericValue;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### NumberLiteralInterface.isNumberLiteral
+
+```ts
+readonly isNumberLiteral: true;
+```
+
+</MemberCard>
+
+### SymbolInterface
+
+Narrowed interface for symbol expressions.
+
+Obtained via `isSymbol()`.
+
+<MemberCard>
+
+##### SymbolInterface.symbol
+
+```ts
+readonly symbol: string;
+```
+
+</MemberCard>
+
+### FunctionInterface
+
+Narrowed interface for function expressions.
+
+Obtained via `isFunction()`.
+
+<MemberCard>
+
+##### FunctionInterface.isFunctionExpression
+
+```ts
+readonly isFunctionExpression: true;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.ops
+
+```ts
+readonly ops: readonly Expression[];
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.nops
+
+```ts
+readonly nops: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.op1
+
+```ts
+readonly op1: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.op2
+
+```ts
+readonly op2: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.op3
+
+```ts
+readonly op3: Expression;
+```
+
+</MemberCard>
+
+### StringInterface
+
+Narrowed interface for string expressions.
+
+Obtained via `isString()`.
+
+<MemberCard>
+
+##### StringInterface.string
+
+```ts
+readonly string: string;
+```
+
+</MemberCard>
+
+### TensorInterface
+
+Narrowed interface for tensor expressions.
+
+Obtained via `isTensor()`.
+
+<MemberCard>
+
+##### TensorInterface.tensor
+
+```ts
+readonly tensor: Tensor<keyof DataTypeMap>;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### TensorInterface.shape
+
+```ts
+readonly shape: number[];
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### TensorInterface.rank
+
+```ts
+readonly rank: number;
+```
+
+</MemberCard>
+
+### CollectionInterface
+
+Narrowed interface for collection expressions.
+
+Obtained via `isCollection()`.
+
+#### Extended by
+
+- [`IndexedCollectionInterface`](#indexedcollectioninterface)
+
+<MemberCard>
+
+##### CollectionInterface.isCollection
+
+```ts
+readonly isCollection: true;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.count
+
+```ts
+readonly count: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.isFiniteCollection
+
+```ts
+readonly isFiniteCollection: boolean;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.isEmptyCollection
+
+```ts
+readonly isEmptyCollection: boolean;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.each()
+
+```ts
+each(): Generator<Expression>
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.contains()
+
+```ts
+contains(rhs): boolean
+```
+
+####### rhs
+
+[`Expression`](#expression-4)
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.subsetOf()
+
+```ts
+subsetOf(other, strict): boolean
+```
+
+####### other
+
+[`Expression`](#expression-4)
+
+####### strict
+
+`boolean`
+
+</MemberCard>
+
+### IndexedCollectionInterface
+
+Narrowed interface for indexed collection expressions (lists, vectors,
+matrices, tuples).
+
+Obtained via `isIndexedCollection()`.
+
+#### Extends
+
+- [`CollectionInterface`](#collectioninterface)
+
+<MemberCard>
+
+##### IndexedCollectionInterface.isIndexedCollection
+
+```ts
+readonly isIndexedCollection: true;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionInterface.at()
+
+```ts
+at(index): Expression
+```
+
+####### index
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionInterface.indexWhere()
+
+```ts
+indexWhere(predicate): number
+```
+
+####### predicate
+
+(`element`) => `boolean`
+
+</MemberCard>
+
+<MemberCard>
+
+### ExpressionInput
+
+```ts
+type ExpressionInput = 
   | number
   | bigint
   | string
@@ -3479,15 +4996,15 @@ type SemiBoxedExpression =
   | MathJsonSymbolObject
   | MathJsonFunctionObject
   | MathJsonDictionaryObject
-  | readonly [MathJsonSymbol, ...SemiBoxedExpression[]]
-  | BoxedExpression;
+  | readonly [MathJsonSymbol, ...ExpressionInput[]]
+  | Expression;
 ```
 
-A semi boxed expression is a MathJSON expression which can include some
-boxed terms.
+An expression input is a MathJSON expression which can include some
+engine expression terms.
 
 This is convenient when creating new expressions from portions
-of an existing `BoxedExpression` while avoiding unboxing and reboxing.
+of an existing `Expression` while avoiding unboxing and reboxing.
 
 </MemberCard>
 
@@ -3506,24 +5023,7 @@ type ReplaceOptions = {
 };
 ```
 
-</MemberCard>
-
-<MemberCard>
-
-### SimplifyOptions
-
-```ts
-type SimplifyOptions = {
-  rules:   | null
-     | Rule
-     | ReadonlyArray<BoxedRule | Rule>
-     | BoxedRuleSet;
-  costFunction: (expr) => number;
-  strategy: "default" | "fu";
-};
-```
-
-Options for `BoxedExpression.simplify()`
+Options for `Expression.replace()`.
 
 </MemberCard>
 
@@ -3543,27 +5043,7 @@ type CanonicalForm =
   | "Order";
 ```
 
-When provided, canonical forms are used to put an expression in a
-"standard" form.
-
-Each canonical form applies some transformation to an expression. When
-specified as an array, each transformation is done in the order in which
-it was provided.
-
-- `InvisibleOperator`: replace use of the `InvisibleOperator` with
-   another operation, such as multiplication (i.e. `2x` or function
-   application (`f(x)`). Also replaces ['InvisibleOperator', real, imaginary] instances with
-   complex (imaginary) numbers.
-- `Number`: replace all numeric values with their
-   canonical representation, for example, reduce
-   rationals and replace complex numbers with no imaginary part with a real number.
-- `Multiply`: replace negation with multiplication by -1, remove 1 from multiplications, simplify signs (`-y \times -x` -> `x \times y`), complex numbers are promoted (['Multiply', 2, 'ImaginaryUnit'] -> `["Complex", 0, 2]`)
-- `Add`: replace `Subtract` with `Add`, removes 0 in addition, promote complex numbers (["Add", "a", ["Complex", 0, "b"] -> `["Complex", "a", "b"]`)
-- `Power`: simplify `Power` expression, for example, `x^{-1}` -> `\frac{1}{x}`, `x^0` -> `1`, `x^1` -> `x`, `1^x` -> `1`, `x^{\frac{1}{2}}` -> `\sqrt{x}`, `a^b^c` -> `a^{bc}`...
-- `Divide`: replace with a `Rational` number if numerator and denominator are integers, simplify, e.g. `\frac{x}{1}` -> `x`...
-- `Flatten`: remove any unnecessary `Delimiter` expression, and flatten any associative functions, for example `["Add", ["Add", "a", "b"], "c"]` -> `["Add", "a", "b", "c"]`
-- `Order`: when applicable, sort the arguments in a specific order, for
-   example for addition and multiplication.
+Canonical normalization transforms.
 
 </MemberCard>
 
@@ -3582,18 +5062,18 @@ type CanonicalOptions =
 
 <MemberCard>
 
-### EvaluateOptions
+### FormOption
 
 ```ts
-type EvaluateOptions = {
-  numericApproximation: boolean;
-  materialization: boolean | number | [number, number];
-  signal: AbortSignal;
-  withArguments: Record<MathJsonSymbol, BoxedExpression>;
-};
+type FormOption = 
+  | "canonical"
+  | "structural"
+  | "raw"
+  | CanonicalForm
+  | CanonicalForm[];
 ```
 
-Options for `BoxedExpression.evaluate()`
+Controls how expressions are created.
 
 </MemberCard>
 
@@ -3608,7 +5088,7 @@ type Metadata = {
 };
 ```
 
-Metadata that can be associated with an MathJSON expression.
+Metadata that can be associated with a MathJSON expression.
 
 </MemberCard>
 
@@ -3616,53 +5096,10 @@ Metadata that can be associated with an MathJSON expression.
 
 <MemberCard>
 
-### PatternMatchOptions
-
-```ts
-type PatternMatchOptions = {
-  substitution: BoxedSubstitution;
-  recursive: boolean;
-  useVariations: boolean;
-  matchPermutations: boolean;
-};
-```
-
-Control how a pattern is matched to an expression.
-
-### Wildcards
-
-Patterns can include wildcards to match parts of expressions:
-
-- **Universal (`_` or `_name`)**: Matches exactly one element
-- **Sequence (`__` or `__name`)**: Matches one or more elements
-- **Optional Sequence (`___` or `___name`)**: Matches zero or more elements
-
-Named wildcards capture values in the returned substitution:
-- `['Add', '_a', 1].match(['Add', 'x', 1])` → `{_a: 'x'}`
-- `['Add', '__a'].match(['Add', 1, 2, 3])` → `{__a: [1, 2, 3]}`
-
-### Options
-
-- `substitution`: if present, assumes these values for a subset of
-   named wildcards, and ensure that subsequent occurrence of the same
-   wildcard have the same value.
-- `recursive`: if true, match recursively, otherwise match only the top
-   level.
-- `useVariations`: if false, only match expressions that are structurally identical.
-   If true, match expressions that are structurally identical or equivalent.
-   For example, when true, `["Add", '_a', 2]` matches `2`, with `_a = 0`.
-   **Default**: `false`
-- `matchPermutations`: if true (default), for commutative operators, try all
-   permutations of pattern operands. If false, match exact order only.
-
-</MemberCard>
-
-<MemberCard>
-
 ### Substitution
 
 ```ts
-type Substitution<T> = {};
+type Substitution<T> = KernelSubstitution<T>;
 ```
 
 A substitution describes the values of the wildcards in a pattern so that
@@ -3673,7 +5110,7 @@ rule whose `match` is always a symbol.
 
 #### Type Parameters
 
-• T = [`SemiBoxedExpression`](#semiboxedexpression)
+• T = [`ExpressionInput`](#expressioninput)
 
 </MemberCard>
 
@@ -3682,8 +5119,28 @@ rule whose `match` is always a symbol.
 ### BoxedSubstitution
 
 ```ts
-type BoxedSubstitution = Substitution<BoxedExpression>;
+type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
 ```
+
+#### Type Parameters
+
+• T = [`Expression`](#expression-4)
+
+</MemberCard>
+
+<MemberCard>
+
+### PatternMatchOptions
+
+```ts
+type PatternMatchOptions<T> = KernelPatternMatchOptions<T>;
+```
+
+Control how a pattern is matched to an expression.
+
+#### Type Parameters
+
+• T = [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3691,68 +5148,37 @@ type BoxedSubstitution = Substitution<BoxedExpression>;
 
 <MemberCard>
 
-### RuleReplaceFunction()
+### RuleReplaceFunction
 
 ```ts
-type RuleReplaceFunction = (expr, wildcards) => BoxedExpression | undefined;
+type RuleReplaceFunction = KernelRuleReplaceFunction<Expression>;
 ```
 
-Given an expression and set of wildcards, return a new expression.
-
-For example:
-
-```ts
-{
-   match: '_x',
-   replace: (expr, {_x}) => { return ['Add', 1, _x] }
-}
-```
+Rule replacement callback specialized to boxed expressions.
 
 </MemberCard>
 
 <MemberCard>
 
-### RuleConditionFunction()
+### RuleConditionFunction
 
 ```ts
-type RuleConditionFunction = (wildcards, ce) => boolean;
+type RuleConditionFunction = KernelRuleConditionFunction<Expression, ComputeEngine>;
 ```
+
+Rule condition callback with access to the compute engine.
 
 </MemberCard>
 
 <MemberCard>
 
-### RuleFunction()
+### RuleFunction
 
 ```ts
-type RuleFunction = (expr) => 
-  | undefined
-  | BoxedExpression
-  | RuleStep;
+type RuleFunction = KernelRuleFunction<Expression>;
 ```
 
-</MemberCard>
-
-<MemberCard>
-
-### RuleStep
-
-```ts
-type RuleStep = {
-  value: BoxedExpression;
-  because: string;
-};
-```
-
-</MemberCard>
-
-<MemberCard>
-
-### RuleSteps
-
-```ts
-type RuleSteps = RuleStep[];
-```
+Dynamic rule callback.
 
 </MemberCard>
 
@@ -3761,443 +5187,40 @@ type RuleSteps = RuleStep[];
 ### Rule
 
 ```ts
-type Rule = 
-  | string
-  | RuleFunction
-  | {
-  match:   | LatexString
-     | SemiBoxedExpression
-     | BoxedExpression;
-  replace:   | LatexString
-     | SemiBoxedExpression
-     | RuleReplaceFunction
-     | RuleFunction;
-  condition:   | LatexString
-     | RuleConditionFunction;
-  useVariations: boolean;
-  id: string;
-  onBeforeMatch: (rule, expr) => void;
-  onMatch: (rule, expr, replace) => void;
-};
+type Rule = KernelRule<Expression, ExpressionInput, ComputeEngine>;
 ```
 
-A rule describes how to modify an expression that matches a pattern `match`
-into a new expression `replace`.
-
-- `x-1` \( \to \) `1-x`
-- `(x+1)(x-1)` \( \to \) `x^2-1`
-
-The patterns can be expressed as LaTeX strings or `SemiBoxedExpression`'s.
-Alternatively, match/replace logic may be specified by a `RuleFunction`, allowing both custom
-logic/conditions for the match, and either a *BoxedExpression* (or `RuleStep` if being
-descriptive) for the replacement.
-
-As a shortcut, a rule can be defined as a LaTeX string: `x-1 -> 1-x`.
-The expression to the left of `->` is the `match` and the expression to the
-right is the `replace`. When using LaTeX strings, single character variables
-are assumed to be wildcards. The rule LHS ('match') and RHS ('replace') may also be supplied
-separately: in this case following the same rules.
-
-When using MathJSON expressions, anonymous wildcards (`_`) will match any
-expression. Named wildcards (`_x`, `_a`, etc...) will match any expression
-and bind the expression to the wildcard name.
-
-In addition the sequence wildcard (`__1`, `__a`, etc...) will match
-a sequence of one or more expressions, and bind the sequence to the
-wildcard name.
-
-Sequence wildcards are useful when the number of elements in the sequence
-is not known in advance. For example, in a sum, the number of terms is
-not known in advance. ["Add", 0, `__a`] will match two or more terms and
-the `__a` wildcard will be a sequence of the matchign terms.
-
-If `exact` is false, the rule will match variants.
-
-For example 'x' will match 'a + x', 'x' will match 'ax', etc...
-
-For simplification rules, you generally want `exact` to be true, but
-to solve equations, you want it to be false. Default to true.
-
-When set to false, infinite recursion is possible.
-
-</MemberCard>
-
-<MemberCard>
-
-### BoxedRule
-
-```ts
-type BoxedRule = {
-  match: undefined | BoxedExpression;
-  replace:   | BoxedExpression
-     | RuleReplaceFunction
-     | RuleFunction;
-  condition: undefined | RuleConditionFunction;
-  useVariations: boolean;
-  id: string;
-  onBeforeMatch: (rule, expr) => void;
-  onMatch: (rule, expr, replace) => void;
-};
-```
-
-If the `match` property is `undefined`, all expressions match this rule
-and `condition` should also be `undefined`. The `replace` property should
-be a `BoxedExpression` or a `RuleFunction`, and further filtering can be
-done in the `replace` function.
-
-</MemberCard>
-
-<MemberCard>
-
-### BoxedRuleSet
-
-```ts
-type BoxedRuleSet = {
-  rules: ReadonlyArray<BoxedRule>;
-};
-```
-
-To create a BoxedRuleSet use the `ce.rules()` method.
-
-Do not create a `BoxedRuleSet` directly.
+Rule declaration specialized to boxed expression and compute engine types.
 
 </MemberCard>
 
 ## Assumptions
 
-### Assumption
-
 <MemberCard>
-
-##### Assumption.isPositive
-
-```ts
-isPositive: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isNonNegative
-
-```ts
-isNonNegative: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isNegative
-
-```ts
-isNegative: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isNonPositive
-
-```ts
-isNonPositive: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isNumber
-
-```ts
-isNumber: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isInteger
-
-```ts
-isInteger: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isRational
-
-```ts
-isRational: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isReal
-
-```ts
-isReal: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isComplex
-
-```ts
-isComplex: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isImaginary
-
-```ts
-isImaginary: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isFinite
-
-```ts
-isFinite: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isInfinite
-
-```ts
-isInfinite: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isNaN
-
-```ts
-isNaN: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isZero
-
-```ts
-isZero: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.matches()
-
-```ts
-matches(t): boolean
-```
-
-####### t
-
-[`BoxedType`](#boxedtype)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isGreater()
-
-```ts
-isGreater(other): boolean
-```
-
-####### other
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isGreaterEqual()
-
-```ts
-isGreaterEqual(other): boolean
-```
-
-####### other
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isLess()
-
-```ts
-isLess(other): boolean
-```
-
-####### other
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isLessEqual()
-
-```ts
-isLessEqual(other): boolean
-```
-
-####### other
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.isEqual()
-
-```ts
-isEqual(other): boolean
-```
-
-####### other
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Assumption.toExpression()
-
-```ts
-toExpression(ce, x): BoxedExpression
-```
-
-####### ce
-
-`ComputeEngine`
-
-####### x
-
-`string`
-
-</MemberCard>
 
 ### ExpressionMapInterface
 
-<MemberCard>
-
-##### ExpressionMapInterface.has()
-
 ```ts
-has(expr): boolean
+type ExpressionMapInterface<U> = KernelExpressionMapInterface<U, Expression>;
 ```
 
-####### expr
+Map-like interface keyed by boxed expressions.
 
-[`BoxedExpression`](#boxedexpression)
+#### Type Parameters
+
+• U
 
 </MemberCard>
 
 <MemberCard>
 
-##### ExpressionMapInterface.get()
+### Assumption
 
 ```ts
-get(expr): U
+type Assumption = KernelAssumption<Expression, ComputeEngine>;
 ```
 
-####### expr
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionMapInterface.set()
-
-```ts
-set(expr, value): void
-```
-
-####### expr
-
-[`BoxedExpression`](#boxedexpression)
-
-####### value
-
-`U`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionMapInterface.delete()
-
-```ts
-delete(expr): void
-```
-
-####### expr
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionMapInterface.clear()
-
-```ts
-clear(): void
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionMapInterface.\[iterator\]()
-
-```ts
-iterator: IterableIterator<[BoxedExpression, U]>
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionMapInterface.entries()
-
-```ts
-entries(): IterableIterator<[BoxedExpression, U]>
-```
+Assumption predicates bound to this compute engine.
 
 </MemberCard>
 
@@ -4244,51 +5267,13 @@ type JSSource = string;
 
 ```ts
 type CompiledExpression = {
-  evaluate: (scope) => number | BoxedExpression;
+  evaluate: (scope) => number | Expression;
 };
 ```
 
 </MemberCard>
 
 ## Definitions
-
-### EqHandlers
-
-These handlers compare two expressions.
-
-If only one of the handlers is provided, the other is derived from it.
-
-Having both may be useful if comparing non-equality is faster than equality.
-
-<MemberCard>
-
-##### EqHandlers.eq()
-
-```ts
-eq: (a, b) => boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### EqHandlers.neq()
-
-```ts
-neq: (a, b) => boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-### Hold
-
-```ts
-type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
-```
-
-</MemberCard>
 
 <MemberCard>
 
@@ -4302,13 +5287,13 @@ type ValueDefinition = BaseDefinition & {
      | BoxedType;
   inferred: boolean;
   value:   | LatexString
-     | SemiBoxedExpression
-     | (ce) => BoxedExpression | null;
+     | ExpressionInput
+     | (ce) => Expression | null;
   eq: (a) => boolean | undefined;
   neq: (a) => boolean | undefined;
   cmp: (a) => "=" | ">" | "<" | undefined;
   collection: CollectionHandlers;
-  subscriptEvaluate: (subscript, options) => BoxedExpression | undefined;
+  subscriptEvaluate: (subscript, options) => Expression | undefined;
 };
 ```
 
@@ -4330,8 +5315,8 @@ declared.
 ```ts
 value: 
   | LatexString
-  | SemiBoxedExpression
-  | (ce) => BoxedExpression | null;
+  | ExpressionInput
+  | (ce) => Expression | null;
 ```
 
 `value` can be a JS function since for some constants, such as
@@ -4341,7 +5326,7 @@ value:
 #### ValueDefinition.subscriptEvaluate()?
 
 ```ts
-optional subscriptEvaluate: (subscript, options) => BoxedExpression | undefined;
+optional subscriptEvaluate: (subscript, options) => Expression | undefined;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -4349,7 +5334,7 @@ Called when evaluating `Subscript(symbol, index)`.
 
 ###### subscript
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 The subscript expression (already evaluated)
 
@@ -4417,7 +5402,7 @@ If provided, this takes precedence over `variable`.
 ##### SequenceDefinition.base
 
 ```ts
-base: Record<number | string, number | BoxedExpression>;
+base: Record<number | string, number | Expression>;
 ```
 
 Base cases as index → value mapping.
@@ -4446,10 +5431,10 @@ variable appears multiple times (e.g., 'n,n'), the indices must be equal.
 ##### SequenceDefinition.recurrence
 
 ```ts
-recurrence: string | BoxedExpression;
+recurrence: string | Expression;
 ```
 
-Recurrence relation as LaTeX string or BoxedExpression
+Recurrence relation as LaTeX string or Expression
 
 </MemberCard>
 
@@ -4500,7 +5485,7 @@ domain: { n: { min: 0 }, k: { min: 0 } }
 ##### SequenceDefinition.constraints?
 
 ```ts
-optional constraints: string | BoxedExpression;
+optional constraints: string | Expression;
 ```
 
 Constraint expression for multi-index sequences.
@@ -4725,11 +5710,11 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   isNonPositive: boolean;
   even: (ops, options) => boolean | undefined;
   complexity: number;
-  canonical: (ops, options) => BoxedExpression | null;
-  evaluate:   | (ops, options) => BoxedExpression | undefined
-     | BoxedExpression;
-  evaluateAsync: (ops, options) => Promise<BoxedExpression | undefined>;
-  evalDimension: (args, options) => BoxedExpression;
+  canonical: (ops, options) => Expression | null;
+  evaluate:   | (ops, options) => Expression | undefined
+     | Expression;
+  evaluateAsync: (ops, options) => Promise<Expression | undefined>;
+  evalDimension: (args, options) => Expression;
   xcompile: (expr) => CompiledExpression;
   eq: (a, b) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
@@ -4867,7 +5852,7 @@ lower complexity when ordered canonically in commutative functions.
 #### OperatorDefinition.canonical()?
 
 ```ts
-optional canonical: (ops, options) => BoxedExpression | null;
+optional canonical: (ops, options) => Expression | null;
 ```
 
 Return the canonical form of the expression with the arguments `args`.
@@ -4910,8 +5895,8 @@ canonical form, the handler should return `null`.
 
 ```ts
 optional evaluate: 
-  | (ops, options) => BoxedExpression | undefined
-  | BoxedExpression;
+  | (ops, options) => Expression | undefined
+  | Expression;
 ```
 
 Evaluate a function expression.
@@ -4933,7 +5918,7 @@ an `["Error"]` expression.
 #### OperatorDefinition.evaluateAsync()?
 
 ```ts
-optional evaluateAsync: (ops, options) => Promise<BoxedExpression | undefined>;
+optional evaluateAsync: (ops, options) => Promise<Expression | undefined>;
 ```
 
 An asynchronous version of `evaluate`.
@@ -4941,7 +5926,7 @@ An asynchronous version of `evaluate`.
 #### OperatorDefinition.evalDimension()?
 
 ```ts
-optional evalDimension: (args, options) => BoxedExpression;
+optional evalDimension: (args, options) => Expression;
 ```
 
 **`Experimental`**
@@ -5061,6 +6046,90 @@ type SymbolDefinitions = Readonly<{}>;
 
 </MemberCard>
 
+### LibraryDefinition
+
+A library bundles symbol/operator definitions with their LaTeX dictionary
+entries and declares dependencies on other libraries.
+
+Use with the `libraries` constructor option to load standard or custom
+libraries:
+
+```ts
+const ce = new ComputeEngine({
+  libraries: ['core', 'arithmetic', {
+    name: 'custom',
+    requires: ['arithmetic'],
+    definitions: { G: { value: 6.674e-11, type: 'real', isConstant: true } },
+  }],
+});
+```
+
+<MemberCard>
+
+##### LibraryDefinition.name
+
+```ts
+name: string;
+```
+
+Library identifier
+
+</MemberCard>
+
+<MemberCard>
+
+##### LibraryDefinition.requires?
+
+```ts
+optional requires: string[];
+```
+
+Libraries that must be loaded before this one
+
+</MemberCard>
+
+<MemberCard>
+
+##### LibraryDefinition.definitions?
+
+```ts
+optional definitions: Readonly<{}> | Readonly<{}>[];
+```
+
+Symbol and operator definitions
+
+</MemberCard>
+
+<MemberCard>
+
+##### LibraryDefinition.latexDictionary?
+
+```ts
+optional latexDictionary: readonly Partial<OnlyFirst<
+  | DefaultEntry
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | EnvironmentEntry
+  | SymbolEntry
+  | FunctionEntry, {} & 
+  | DefaultEntry
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | EnvironmentEntry
+  | SymbolEntry
+  | FunctionEntry>>[];
+```
+
+LaTeX dictionary entries for parsing/serialization
+
+</MemberCard>
+
 ### BaseCollectionHandlers
 
 These handlers are the primitive operations that can be performed on
@@ -5073,7 +6142,7 @@ all collections, indexed or not.
 ##### BaseCollectionHandlers.iterator()
 
 ```ts
-iterator: (collection) => Iterator<BoxedExpression, undefined, any>;
+iterator: (collection) => Iterator<Expression, undefined, any>;
 ```
 
 Return an iterator that iterates over the elements of the collection.
@@ -5211,7 +6280,7 @@ the order of the elements is defined.
 ##### IndexedCollectionHandlers.at()
 
 ```ts
-at: (collection, index) => BoxedExpression;
+at: (collection, index) => Expression;
 ```
 
 Return the element at the specified index.
@@ -5304,7 +6373,7 @@ references to the definition in bound expressions.
 
 #### Extends
 
-- `Partial`\<[`BaseDefinition`](#basedefinition-1)\>
+- `Partial`\<[`BaseDefinition`](#basedefinition)\>
 
 #### Extended by
 
@@ -5366,7 +6435,7 @@ Some examples:
 ##### BoxedValueDefinition.value
 
 ```ts
-readonly value: BoxedExpression;
+readonly value: Expression;
 ```
 
 This is either the initial value of the symbol (i.e. when a new
@@ -5435,7 +6504,7 @@ type: BoxedType;
 ##### BoxedValueDefinition.subscriptEvaluate()?
 
 ```ts
-optional subscriptEvaluate: (subscript, options) => BoxedExpression;
+optional subscriptEvaluate: (subscript, options) => Expression;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -5586,7 +6655,7 @@ optional neq: (a, b) => boolean;
 ##### BoxedOperatorDefinition.canonical()?
 
 ```ts
-optional canonical: (ops, options) => BoxedExpression;
+optional canonical: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -5596,7 +6665,7 @@ optional canonical: (ops, options) => BoxedExpression;
 ##### BoxedOperatorDefinition.evaluate()?
 
 ```ts
-optional evaluate: (ops, options) => BoxedExpression;
+optional evaluate: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -5606,7 +6675,7 @@ optional evaluate: (ops, options) => BoxedExpression;
 ##### BoxedOperatorDefinition.evaluateAsync()?
 
 ```ts
-optional evaluateAsync: (ops, options?) => Promise<BoxedExpression>;
+optional evaluateAsync: (ops, options?) => Promise<Expression>;
 ```
 
 </MemberCard>
@@ -5616,7 +6685,7 @@ optional evaluateAsync: (ops, options?) => Promise<BoxedExpression>;
 ##### BoxedOperatorDefinition.evalDimension()?
 
 ```ts
-optional evalDimension: (ops, options) => BoxedExpression;
+optional evalDimension: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -5631,28 +6700,41 @@ optional compile: (expr) => CompiledExpression;
 
 </MemberCard>
 
+### EqHandlers
+
+These handlers compare two expressions.
+
+If only one of the handlers is provided, the other is derived from it.
+
+Having both may be useful if comparing non-equality is faster than equality.
+
 <MemberCard>
 
-### Scope
+##### EqHandlers.eq()
 
 ```ts
-type Scope = {
-  parent: Scope | null;
-  bindings: Map<string, BoxedDefinition>;
-  types: Record<string, TypeReference>;
-};
+eq: (a, b) => boolean;
 ```
 
-A lexical scope is a table mapping symbols to their definitions. The
-symbols are the names of the variables, unknowns and functions in the scope.
+</MemberCard>
 
-The lexical scope is used to resolve the metadata about symbols, such as
-their type, whether they are constant, etc...
+<MemberCard>
 
-It does not resolve the values of the symbols, since those depend on the
-evaluation context. For example, the local variables of a recursive function
-will have the same lexical scope, but different values in each evaluation
-context.
+##### EqHandlers.neq()
+
+```ts
+neq: (a, b) => boolean;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### Hold
+
+```ts
+type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
+```
 
 </MemberCard>
 
@@ -5733,31 +6815,21 @@ type DelimiterScale = "normal" | "scaled" | "big" | "none";
 
 ```ts
 type LibraryCategory = 
-  | "algebra"
   | "arithmetic"
   | "calculus"
   | "collections"
   | "control-structures"
   | "combinatorics"
-  | "complex"
   | "core"
-  | "data-structures"
-  | "dimensions"
-  | "domains"
   | "linear-algebra"
   | "logic"
   | "number-theory"
-  | "numeric"
   | "other"
   | "physics"
   | "polynomials"
   | "relop"
-  | "sets"
   | "statistics"
-  | "styling"
-  | "symbols"
-  | "trigonometry"
-  | "units";
+  | "trigonometry";
 ```
 
 </MemberCard>
@@ -5900,7 +6972,7 @@ return `Nothing`.
 ### ExpressionParseHandler()
 
 ```ts
-type ExpressionParseHandler = (parser, until?) => Expression | null;
+type ExpressionParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5910,7 +6982,7 @@ type ExpressionParseHandler = (parser, until?) => Expression | null;
 ### PrefixParseHandler()
 
 ```ts
-type PrefixParseHandler = (parser, until?) => Expression | null;
+type PrefixParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5920,7 +6992,7 @@ type PrefixParseHandler = (parser, until?) => Expression | null;
 ### SymbolParseHandler()
 
 ```ts
-type SymbolParseHandler = (parser, until?) => Expression | null;
+type SymbolParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5930,7 +7002,7 @@ type SymbolParseHandler = (parser, until?) => Expression | null;
 ### FunctionParseHandler()
 
 ```ts
-type FunctionParseHandler = (parser, until?) => Expression | null;
+type FunctionParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5940,7 +7012,7 @@ type FunctionParseHandler = (parser, until?) => Expression | null;
 ### EnvironmentParseHandler()
 
 ```ts
-type EnvironmentParseHandler = (parser, until?) => Expression | null;
+type EnvironmentParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5950,7 +7022,7 @@ type EnvironmentParseHandler = (parser, until?) => Expression | null;
 ### PostfixParseHandler()
 
 ```ts
-type PostfixParseHandler = (parser, lhs, until?) => Expression | null;
+type PostfixParseHandler = (parser, lhs, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5960,7 +7032,7 @@ type PostfixParseHandler = (parser, lhs, until?) => Expression | null;
 ### InfixParseHandler()
 
 ```ts
-type InfixParseHandler = (parser, lhs, until) => Expression | null;
+type InfixParseHandler = (parser, lhs, until) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -5970,7 +7042,7 @@ type InfixParseHandler = (parser, lhs, until) => Expression | null;
 ### MatchfixParseHandler()
 
 ```ts
-type MatchfixParseHandler = (parser, body) => Expression | null;
+type MatchfixParseHandler = (parser, body) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -6042,7 +7114,7 @@ Maps a string of LaTeX tokens to a function or symbol and vice-versa.
 
 ```ts
 type DefaultEntry = BaseEntry & Trigger & {
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | ExpressionParseHandler;
 };
 ```
@@ -6056,7 +7128,7 @@ type DefaultEntry = BaseEntry & Trigger & {
 ```ts
 type ExpressionEntry = BaseEntry & Trigger & {
   kind: "expression";
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | ExpressionParseHandler;
   precedence: Precedence;
 };
@@ -6210,7 +7282,7 @@ construct using `\begin{...}...\end{...}`.
 type SymbolEntry = BaseEntry & Trigger & {
   kind: "symbol";
   precedence: Precedence;
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | SymbolParseHandler;
 };
 ```
@@ -6232,8 +7304,9 @@ Used for appropriate wrapping (i.e. when to surround it with parens)
 ```ts
 type FunctionEntry = BaseEntry & Trigger & {
   kind: "function";
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | FunctionParseHandler;
+  arguments: "enclosure" | "implicit";
 };
 ```
 
@@ -6244,6 +7317,20 @@ A function is a symbol followed by:
 For more complex situations, for example implicit arguments or
 inverse functions postfix (i.e. ^{-1}), use a custom parse handler with a
 entry of kind `expression`.
+
+#### FunctionEntry.arguments?
+
+```ts
+optional arguments: "enclosure" | "implicit";
+```
+
+How arguments are parsed:
+- `'enclosure'` (default): arguments must be enclosed in parentheses,
+  e.g. `\max(a, b)`.
+- `'implicit'`: arguments can be provided with or without parentheses,
+  e.g. `\det A` is parsed as `\det(A)`.
+  Bare arguments are parsed at multiplication precedence, so
+  `\det 2A + 1` is parsed as `\det(2A) + 1`.
 
 </MemberCard>
 
@@ -6281,9 +7368,11 @@ type ParseLatexOptions = NumberFormat & {
   strict: boolean;
   skipSpace: boolean;
   parseNumbers: "auto" | "rational" | "decimal" | "never";
-  getSymbolType: (symbol) => BoxedType;
+  getSymbolType: (symbol) => 
+     | BoxedType
+     | TypeString;
   hasSubscriptEvaluate: (symbol) => boolean;
-  parseUnexpectedToken: (lhs, parser) => Expression | null;
+  parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
   preserveLatex: boolean;
   quantifierScope: "tight" | "loose";
   timeDerivativeVariable: string;
@@ -6340,7 +7429,9 @@ it will be parsed as a decimal number even if this setting is `"rational"`.
 #### ParseLatexOptions.getSymbolType()
 
 ```ts
-getSymbolType: (symbol) => BoxedType;
+getSymbolType: (symbol) => 
+  | BoxedType
+  | TypeString;
 ```
 
 This handler is invoked when the parser encounters a
@@ -6362,7 +7453,7 @@ into a compound symbol name.
 #### ParseLatexOptions.parseUnexpectedToken()
 
 ```ts
-parseUnexpectedToken: (lhs, parser) => Expression | null;
+parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
 ```
 
 This handler is invoked when the parser encounters an unexpected token.
@@ -6657,14 +7748,14 @@ between `start` and `end` (default: the whole expression)
 ##### Parser.error()
 
 ```ts
-error(code, fromToken): Expression
+error(code, fromToken): MathJsonExpression
 ```
 
 Return an error expression with the specified code and arguments
 
 ####### code
 
-`string` | \[`string`, `...Expression[]`\]
+`string` | \[`string`, `...MathJsonExpression[]`\]
 
 ####### fromToken
 
@@ -6765,7 +7856,7 @@ defined in hex (^^ and ^^^^), the `\char` and `\unicode` command.
 ##### Parser.parseGroup()
 
 ```ts
-parseGroup(): Expression
+parseGroup(): MathJsonExpression
 ```
 
 Parse an expression in a LaTeX group enclosed in curly brackets `{}`.
@@ -6782,7 +7873,7 @@ Return `Nothing` if an empty group `{}` was found
 ##### Parser.parseToken()
 
 ```ts
-parseToken(): Expression
+parseToken(): MathJsonExpression
 ```
 
 Some LaTeX commands (but not all) can accept arguments as single
@@ -6805,7 +7896,7 @@ The excluded tokens include `!"#$%&(),/;:?@[]`|~", `\left`, `\bigl`, etc...
 ##### Parser.parseOptionalGroup()
 
 ```ts
-parseOptionalGroup(): Expression
+parseOptionalGroup(): MathJsonExpression
 ```
 
 Parse an expression enclosed in a LaTeX optional group enclosed in square brackets `[]`.
@@ -6819,7 +7910,7 @@ Return `null` if none was found.
 ##### Parser.parseEnclosure()
 
 ```ts
-parseEnclosure(): Expression
+parseEnclosure(): MathJsonExpression
 ```
 
 Parse an enclosure (open paren/close paren, etc..) and return the expression inside the enclosure
@@ -6859,7 +7950,7 @@ otherwise it is a regular group in braces.
 ##### Parser.parseSymbol()
 
 ```ts
-parseSymbol(until?): Expression
+parseSymbol(until?): MathJsonExpression
 ```
 
 A symbol can be:
@@ -6878,7 +7969,7 @@ A symbol can be:
 ##### Parser.parseTabular()
 
 ```ts
-parseTabular(): Expression[][]
+parseTabular(): MathJsonExpression[][]
 ```
 
 Parse an expression in a tabular format, where rows are separated by `\\`
@@ -6894,7 +7985,7 @@ and empty cells are also indicated with `Nothing`.
 ##### Parser.parseArguments()
 
 ```ts
-parseArguments(kind?, until?): readonly Expression[]
+parseArguments(kind?, until?): readonly MathJsonExpression[]
 ```
 
 Parse an argument list, for example: `(12, x+1)` or `\left(x\right)`
@@ -6909,7 +8000,7 @@ argument was found.
 
 ####### kind?
 
-`"implicit"` | `"enclosure"`
+`"enclosure"` | `"implicit"`
 
 ####### until?
 
@@ -6922,7 +8013,7 @@ argument was found.
 ##### Parser.parsePostfixOperator()
 
 ```ts
-parsePostfixOperator(lhs, until?): Expression
+parsePostfixOperator(lhs, until?): MathJsonExpression
 ```
 
 Parse a postfix operator, such as `'` or `!`.
@@ -6931,7 +8022,7 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 
 ####### lhs
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 ####### until?
 
@@ -6944,7 +8035,7 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 ##### Parser.parseExpression()
 
 ```ts
-parseExpression(until?): Expression
+parseExpression(until?): MathJsonExpression
 ```
 
 Parse an expression:
@@ -6983,7 +8074,7 @@ or the sequence of tokens `until.tokens` is encountered
 ##### Parser.parseNumber()
 
 ```ts
-parseNumber(): Expression
+parseNumber(): MathJsonExpression
 ```
 
 Parse a number.
@@ -7041,12 +8132,12 @@ matchBoundary(): boolean
 ##### Parser.boundaryError()
 
 ```ts
-boundaryError(msg): Expression
+boundaryError(msg): MathJsonExpression
 ```
 
 ####### msg
 
-`string` | \[`string`, `...Expression[]`\]
+`string` | \[`string`, `...MathJsonExpression[]`\]
 
 </MemberCard>
 
@@ -7180,7 +8271,7 @@ readonly options: Required<SerializeLatexOptions>;
 ##### Serializer.dictionary
 
 ```ts
-readonly dictionary: IndexedLatexDictionary;
+readonly dictionary: SerializerDictionary;
 ```
 
 </MemberCard>
@@ -7320,11 +8411,11 @@ serializeFunction(expr, def?): string
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 ####### def?
 
-`IndexedLatexDictionaryEntry`
+`SerializerDictionaryEntry`
 
 </MemberCard>
 
@@ -7338,7 +8429,7 @@ serializeSymbol(expr): string
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -7381,7 +8472,7 @@ commas.
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -7398,7 +8489,7 @@ short (not a function)
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -7416,23 +8507,6 @@ a function of this type.
 </MemberCard>
 
 ## Numerics
-
-<MemberCard>
-
-### Sign
-
-```ts
-type Sign = 
-  | "zero"
-  | "positive"
-  | "negative"
-  | "non-negative"
-  | "non-positive"
-  | "not-zero"
-  | "unsigned";
-```
-
-</MemberCard>
 
 <MemberCard>
 
@@ -7670,7 +8744,7 @@ abstract add(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7684,7 +8758,7 @@ abstract sub(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue-1)
+[`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7698,7 +8772,7 @@ abstract mul(other): NumericValue
 
 ####### other
 
-`number` | `Decimal` | [`NumericValue`](#numericvalue-1)
+`number` | `Decimal` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7712,7 +8786,7 @@ abstract div(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7726,7 +8800,7 @@ abstract pow(n): NumericValue
 
 ####### n
 
-`number` | [`NumericValue`](#numericvalue-1) | \{
+`number` | [`NumericValue`](#numericvalue) | \{
 `re`: `number`;
 `im`: `number`;
 \}
@@ -7767,7 +8841,7 @@ abstract gcd(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue-1)
+[`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7845,7 +8919,7 @@ abstract eq(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7859,7 +8933,7 @@ abstract lt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7873,7 +8947,7 @@ abstract lte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7887,7 +8961,7 @@ abstract gt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7901,7 +8975,7 @@ abstract gte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue-1)
+`number` | [`NumericValue`](#numericvalue)
 
 </MemberCard>
 
@@ -7939,7 +9013,7 @@ Object.toPrimitive()
 ##### NumericValue.toJSON()
 
 ```ts
-toJSON(): any
+toJSON(): unknown
 ```
 
 Object.toJSON
@@ -7992,6 +9066,16 @@ a pair of big integers.
 
 ```ts
 type BigNum = Decimal;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### BigNumFactory()
+
+```ts
+type BigNumFactory = (value) => Decimal;
 ```
 
 </MemberCard>
@@ -8079,6 +9163,23 @@ bignum(value): Decimal
 ####### value
 
 `string` | `number` | `bigint` | `Decimal`
+
+</MemberCard>
+
+<MemberCard>
+
+### Sign
+
+```ts
+type Sign = 
+  | "zero"
+  | "positive"
+  | "negative"
+  | "non-negative"
+  | "non-positive"
+  | "not-zero"
+  | "unsigned";
+```
 
 </MemberCard>
 
@@ -8190,6 +9291,91 @@ Maximum number of results to return for lookups (default: 5)
 
 ## Other
 
+<MemberCard>
+
+### SymbolTable
+
+```ts
+type SymbolTable = {
+  parent: SymbolTable | null;
+  ids: {};
+};
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### RuleStep
+
+```ts
+type RuleStep = KernelRuleStep<Expression>;
+```
+
+A single rule application step with provenance.
+
+</MemberCard>
+
+<MemberCard>
+
+### RuleSteps
+
+```ts
+type RuleSteps = KernelRuleSteps<Expression>;
+```
+
+A list of rule application steps.
+
+</MemberCard>
+
+<MemberCard>
+
+### BoxedRule
+
+```ts
+type BoxedRule = KernelBoxedRule<Expression, ComputeEngine>;
+```
+
+A boxed/normalized rule form.
+
+</MemberCard>
+
+<MemberCard>
+
+### BoxedRuleSet
+
+```ts
+type BoxedRuleSet = KernelBoxedRuleSet<Expression, ComputeEngine>;
+```
+
+Collection of boxed rules.
+
+</MemberCard>
+
+<MemberCard>
+
+### Scope
+
+```ts
+type Scope = KernelScope<BoxedDefinition>;
+```
+
+Lexical scope specialized to boxed definitions.
+
+</MemberCard>
+
+<MemberCard>
+
+### EvalContext
+
+```ts
+type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
+```
+
+Evaluation context specialized to this engine/runtime model.
+
+</MemberCard>
+
 ### DictionaryInterface
 
 Interface for dictionary-like structures.
@@ -8218,7 +9404,7 @@ Use `isDictionary()` to check if an expression is a dictionary.
 ##### DictionaryInterface.get()
 
 ```ts
-get(key): BoxedExpression
+get(key): Expression
 ```
 
 ####### key
@@ -8243,47 +9429,33 @@ has(key): boolean
 
 <MemberCard>
 
-### SymbolTable
+### ~~BoxedExpression~~
 
 ```ts
-type SymbolTable = {
-  parent: SymbolTable | null;
-  ids: {};
-};
+type BoxedExpression = Expression;
 ```
+
+#### Deprecated
+
+Use `Expression` instead.
 
 </MemberCard>
 
 <MemberCard>
 
-### BigNumFactory()
+### ~~SemiBoxedExpression~~
 
 ```ts
-type BigNumFactory = (value) => Decimal;
+type SemiBoxedExpression = ExpressionInput;
 ```
+
+#### Deprecated
+
+Use `ExpressionInput` instead.
 
 </MemberCard>
 
 ## Serialization
-
-<MemberCard>
-
-### JsonSerializationOptions
-
-```ts
-type JsonSerializationOptions = {
-  prettify: boolean;
-  exclude: string[];
-  shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
-  metadata: ("all" | "wikidata" | "latex")[];
-  repeatingDecimal: boolean;
-  fractionalDigits: "auto" | "max" | number;
-};
-```
-
-Options to control the serialization to MathJSON when using `BoxedExpression.toMathJson()`.
-
-</MemberCard>
 
 <MemberCard>
 
@@ -8337,6 +9509,26 @@ Default: `"auto"`
 
 </MemberCard>
 
+<MemberCard>
+
+### JsonSerializationOptions
+
+```ts
+type JsonSerializationOptions = {
+  prettify: boolean;
+  exclude: string[];
+  shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
+  metadata: ("all" | "wikidata" | "latex")[];
+  repeatingDecimal: boolean;
+  fractionalDigits: "auto" | "max" | number;
+};
+```
+
+Options to control serialization to MathJSON when using
+`Expression.toMathJson()`.
+
+</MemberCard>
+
 ## Tensors
 
 <MemberCard>
@@ -8352,7 +9544,7 @@ type DataTypeMap = {
   complex128: Complex;
   complex64: Complex;
   bool: boolean;
-  expression: BoxedExpression;
+  expression: Expression;
 };
 ```
 
@@ -8557,7 +9749,7 @@ cast(x, dtype): boolean
 ###### cast(x, dtype)
 
 ```ts
-cast(x, dtype): BoxedExpression
+cast(x, dtype): Expression
 ```
 
 ####### x
@@ -8669,7 +9861,7 @@ cast(x, dtype): boolean[]
 ###### cast(x, dtype)
 
 ```ts
-cast(x, dtype): BoxedExpression[]
+cast(x, dtype): Expression[]
 ```
 
 ####### x
@@ -8701,7 +9893,7 @@ keyof [`DataTypeMap`](#datatypemap)
 ##### TensorField.expression()
 
 ```ts
-expression(x): BoxedExpression
+expression(x): Expression
 ```
 
 ####### x
@@ -8963,7 +10155,7 @@ readonly field: TensorField<DT>;
 ##### Tensor.expression
 
 ```ts
-readonly expression: BoxedExpression;
+readonly expression: Expression;
 ```
 
 </MemberCard>
@@ -9777,7 +10969,7 @@ type MathJsonStringObject = {
 
 ```ts
 type MathJsonFunctionObject = {
-  fn: [MathJsonSymbol, ...Expression[]];
+  fn: [MathJsonSymbol, ...MathJsonExpression[]];
  } & MathJsonAttributes;
 ```
 
@@ -9827,15 +11019,15 @@ type ExpressionObject =
 
 <MemberCard>
 
-### Expression
+### MathJsonExpression
 
 ```ts
-type Expression = 
+type MathJsonExpression = 
   | ExpressionObject
   | number
   | MathJsonSymbol
   | string
-  | readonly [MathJsonSymbol, ...Expression[]];
+  | readonly [MathJsonSymbol, ...MathJsonExpression[]];
 ```
 
 A MathJSON expression is a recursive data structure.
@@ -11894,16 +13086,531 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.50.0 _2026-02-11_
+
+### Breaking API Changes
+
+This release includes several breaking changes to the public API.
+
+The most significant is the restructuring of the `Expression` type hierarchy and
+the introduction of type-guarded role interfaces, which improves type safety and
+API ergonomics but requires updates to code that accessed role-specific
+properties directly on expression instances.
+
+See
+[`MIGRATION_GUIDE_0.50.0.md`](https://github.com/cortex-js/compute-engine/blob/main/MIGRATION_GUIDE_0.50.0.md)
+for details.
+
+#### Naming Alignment: `Expression`, `MathJsonExpression`, and `ExpressionInput`
+
+- The compute-engine runtime type is now `Expression` (preferred name).
+  `BoxedExpression` is retained as a deprecated alias for migration.
+- The MathJSON type is now `MathJsonExpression` (the old MathJSON `Expression`
+  name has been removed from the `math-json` entrypoint).
+- `SemiBoxedExpression` is now `ExpressionInput` (with a deprecated alias for
+  migration).
+
+#### Role-Specific Properties Moved to Type-Guarded Interfaces
+
+Properties that were previously on all `Expression` instances (returning
+`undefined` when not applicable) have been moved to role interfaces. They are
+now only accessible after narrowing with a type guard.
+
+| Removed from `Expression`             | Access via                                |
+| :------------------------------------ | :---------------------------------------- |
+| `.symbol`                             | `isSymbol(expr)` then `expr.symbol`       |
+| `.string`                             | `isString(expr)` then `expr.string`       |
+| `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` then `expr.ops` etc.   |
+| `.numericValue`, `.isNumberLiteral`   | `isNumber(expr)` then `expr.numericValue` |
+| `.tensor`                             | `isTensor(expr)` then `expr.tensor`       |
+
+```ts
+// Before
+if (expr.symbol !== null) console.log(expr.symbol);
+
+// After
+import { isSymbol, sym } from '@cortex-js/compute-engine';
+
+if (isSymbol(expr)) console.log(expr.symbol);
+// or use the convenience helper:
+if (sym(expr) === 'Pi') { /* ... */ }
+```
+
+Properties that remain on `Expression`: `.operator`, `.re`/`.im`, `.shape`, all
+arithmetic methods (`.add()`, `.mul()`, etc.), and all numeric predicates
+(`.isPositive`, `.isInteger`, etc.).
+
+#### Expression Creation: `form` Replaces `canonical`/`structural`
+
+The `canonical` (boolean or array) and `structural` (boolean) options on
+`ce.box()`, `ce.function()`, and `ce.parse()` have been unified into a single
+`form` option.
+
+```ts
+ce.box(['Add', 1, 'x'], { form: 'canonical' }); // default
+ce.box(['Add', 1, 'x'], { form: 'raw' });        // no canonicalization, no binding
+ce.function('Add', [1, 'x'], { form: 'structural' }); // bound, not fully canonical
+ce.box(['Add', 1, 'x'], { form: ['Number', 'Order'] }); // selective passes
+```
+
+#### New Free Functions
+
+Top-level free functions are now available for common operations and use a
+shared `ComputeEngine` instance created on first call.
+
+| Function                               | Purpose                                                        |
+| :------------------------------------- | :------------------------------------------------------------- |
+| `getDefaultEngine()`                   | Return the shared default `ComputeEngine` instance.            |
+| `parse(latex)`                         | Parse a LaTeX string into an `Expression`.                     |
+| `simplify(exprOrLatex)`                | Simplify an expression or LaTeX input.                         |
+| `evaluate(exprOrLatex)`                | Evaluate an expression or LaTeX input symbolically.            |
+| `N(exprOrLatex)`                       | Numerically evaluate an expression or LaTeX input.             |
+| `assign(id, value)` / `assign(record)` | Assign one symbol value or many at once.                       |
+| `expand(exprOrLatex)`                  | Expand distributively at the top level (`Expression \| null`). |
+| `expandAll(exprOrLatex)`               | Expand distributively recursively (`Expression \| null`).      |
+| `solve(exprOrLatex, vars?)`            | Solve equations/systems (returns solve result variants).       |
+| `factor(exprOrLatex)`                  | Factor an expression.                                          |
+| `compile(exprOrLatex, options?)`       | Compile to a target language with `CompilationResult`.         |
+
+```ts
+import {
+  getDefaultEngine,
+  parse,
+  simplify,
+  evaluate,
+  N,
+  assign,
+  expand,
+  expandAll,
+  solve,
+  factor,
+  compile,
+} from '@cortex-js/compute-engine';
+
+assign('x', 3);
+
+const expr = parse('x^2 - 5x + 6');
+solve(expr, 'x');           // [2, 3]
+factor('(2x)(4y)');         // 8xy
+compile('x^2 + 1').run({ x: 3 }); // 10
+```
+
+Except for `parse()`, `assign()`, and `getDefaultEngine()`, these free functions
+accept either a LaTeX string or an existing `Expression`.
+
+#### Free Function Notes
+
+- `compile()` is now a top-level entry point returning `CompilationResult`.
+  Custom compilation targets are managed with `ce.registerCompilationTarget()`
+  and `ce.unregisterCompilationTarget()`.
+- `expand()` and `expandAll()` return `null` when an expression is not
+  expandable.
+- `solve()` is available as a top-level wrapper over equation/system solving.
+- `factor()` is the top-level factoring entry point. Specialized helpers such as
+  `factorPolynomial()` and `factorQuadratic()` remain expression-only APIs.
+
+#### `trigSimplify()` Method Removed
+
+Use `simplify({ strategy: 'fu' })` instead, which is equivalent.
+
+```ts
+// Before
+const result = expr.trigSimplify();
+
+// After
+const result = expr.simplify({ strategy: 'fu' });
+```
+
+#### Library System
+
+The constructor now accepts a `libraries` option for controlling which libraries
+are loaded. Libraries declare their dependencies and are loaded in topological
+order.
+
+```ts
+// Load specific standard libraries
+const ce = new ComputeEngine({
+  libraries: ['core', 'arithmetic', 'trigonometry'],
+});
+
+// Add a custom library
+const ce = new ComputeEngine({
+  libraries: [
+    ...ComputeEngine.getStandardLibrary(),
+    { name: 'physics', requires: ['arithmetic'], definitions: { /* ... */ } },
+  ],
+});
+```
+
+#### User-Extensible Simplification Rules
+
+`ce.simplificationRules` is now a public getter/setter. Users can push
+additional rules or replace the entire rule set.
+
+```ts
+ce.simplificationRules.push({
+  match: ['Power', ['Sin', '_x'], 2],
+  replace: ['Subtract', 1, ['Power', ['Cos', '_x'], 2]],
+});
+```
+
+### Canonicalization
+
+- **Exact numeric folding during canonicalization**: `canonicalAdd` and
+  `canonicalMultiply` now fold **exact** numeric operands at canonicalization
+  time, making behavior consistent with `canonicalDivide` which already folded
+  coefficients. This means expressions are reduced earlier in the pipeline
+  without waiting for a `.simplify()` call.
+
+  **What gets folded** (exact values):
+  - Integers: `Add(2, x, 5)` &rarr; `Add(x, 7)`
+  - Rationals: `Add(1/3, x, 2/3)` &rarr; `Add(x, 1)`
+  - Radicals: `Add(√2, x, √2)` &rarr; `Add(x, 2√2)`
+  - Mixed exact: `Multiply(2, x, 5)` &rarr; `Multiply(10, x)`
+  - Full reduction: `Add(2, 3)` &rarr; `5`, `Multiply(2, 3)` &rarr; `6`
+  - Identity elimination: `Multiply(1/2, x, 2)` &rarr; `x`
+  - Complex promotion: `Add(1, Complex(0, -1))` &rarr; `Complex(1, -1)`
+
+  **What is NOT folded** (non-exact values):
+  - Machine floats: `Add(1.5, x, 0.5)` remains `Add(x, 0.5, 1.5)`
+  - Infinity/NaN: `Multiply(0, ∞)` correctly returns `NaN`
+  - Single numeric: `Multiply(5, Pi)` is unchanged (nothing to fold)
+
+  The folding uses the existing `ExactNumericValue` arithmetic, which
+  automatically handles radical grouping (`√2 + √2 = 2√2`) and rational
+  simplification (`1/3 + 2/3 = 1`).
+
+- **Exact numeric folding in `canonicalPower`**: Integer powers of numeric
+  literals are now folded during canonicalization when the exponent is an
+  integer with |e| &le; 64. For machine-number bases, the result must be a safe
+  integer; for exact numeric values (rationals, radicals), `NumericValue.pow()`
+  is used.
+  - `Power(2, 3)` &rarr; `8`
+  - `Power(3, 2)` &rarr; `9`
+  - `Power(1/2, 2)` &rarr; `1/4`
+  - `Power(-2, 3)` &rarr; `-8`
+  - `Power(2, 100)` remains unevaluated (exponent exceeds limit)
+
+- **Complex promotion handles non-adjacent operands**: `canonicalAdd` now
+  combines a real float with imaginary terms even when they are not adjacent in
+  the operand list. Previously, only a real immediately followed by an imaginary
+  was promoted to a complex number.
+
+### Type Inference
+
+- **Type handlers for 25 operators**: Added explicit `type` handlers to
+  operators that were missing them, enabling the type system to return precise
+  types instead of the broad signature return type.
+  - **Arithmetic**: `Factorial`, `Factorial2`, `Sign` return `finite_integer`;
+    `Ceil` and `Floor` return `finite_integer` for finite inputs, `integer`
+    otherwise.
+  - **Trigonometry**: `Arctan` uses `numericTypeHandler` (returns `finite_real`
+    for real inputs, `finite_number` for complex).
+  - **Complex**: `Real`, `Imaginary`, `Argument` return `finite_real`.
+  - **Number theory**: `Totient`, `Sigma0`, `Sigma1`, `Eulerian`, `Stirling`,
+    `NPartition` return `finite_integer`; `SigmaMinus1` returns
+    `finite_rational`.
+  - **Combinatorics**: `Choose`, `Fibonacci`, `Binomial`, `Multinomial`,
+    `Subfactorial`, `BellNumber` return `finite_integer`.
+  - **`Truncate`, `GCD`, `LCM` type handlers**: `Truncate` returns
+    `finite_integer` for finite inputs (matching `Ceil`/`Floor`); `GCD` and
+    `LCM` always return `finite_integer`.
+
+### Solving
+
+- **`And` operator support for systems of equations**: `solve()` now accepts
+  `And(Equal(...), Equal(...))` in addition to `List(Equal(...), Equal(...))`
+  for representing systems of equations. Both forms route through the same
+  linear, polynomial, and inequality solvers.
+
+- **Parametric solution type filtering**: `filterSolutionByTypes` now uses
+  `=== false` instead of `!== true` for type predicate checks. This allows
+  underdetermined (parametric) solutions to pass through when type predicates
+  return `undefined` (unknown) rather than being incorrectly rejected.
+
+- **`Or` operator support in `solve()`**: Solving `Or(Equal(x,1), Equal(x,2))`
+  returns the union of solutions from each branch, with deduplication. Works for
+  both univariate (returns array of values) and multivariate (returns array of
+  records) cases.
+
+- **Mixed equality + inequality systems**: `solve()` now handles systems
+  combining `Equal` and inequality operators (`Less`, `LessEqual`, `Greater`,
+  `GreaterEqual`). Equalities are solved first, then solutions are filtered
+  against the inequalities.
+
+- **Parametric solutions omit free variables**: Underdetermined linear systems
+  no longer include free variables (self-referential entries) in the result
+  record. Only dependent variables with non-trivial expressions are returned.
+
+### Special Functions
+
+- **Numeric evaluation for Digamma, Trigamma, PolyGamma, Beta, Zeta, LambertW**:
+  These six functions now evaluate numerically when `.N()` is called, at both
+  machine precision and arbitrary precision (bignum). Returns unevaluated
+  without numeric approximation.
+  - `Digamma`/`Trigamma`: recurrence + asymptotic with Bernoulli numbers
+  - `PolyGamma`: generalized recurrence for arbitrary order n
+  - `Beta`: via gamma, with log-gamma fallback for large arguments
+  - `Zeta`: Cohen-Villegas-Zagier acceleration, functional equation for
+    $\operatorname{Re}(s)<0$
+  - `LambertW`: Halley's method with branch-point handling
+
+- **Arbitrary-precision (bignum) variants for special functions**: When
+  `ce.precision > 15`, `Digamma`, `Trigamma`, `PolyGamma`, `Beta`, `Zeta`, and
+  `LambertW` now compute results to the requested precision using bignum
+  arithmetic. The asymptotic shift threshold scales with precision to maintain
+  accuracy (e.g., `ce.precision = 50` produces 50-digit results for Digamma and
+  Zeta).
+
+- **Numeric evaluation for Bessel functions (`BesselJ`, `BesselY`, `BesselI`,
+  `BesselK`)**: Integer-order Bessel functions now evaluate numerically.
+  - `BesselJ`: power series for small $|x|$, Miller's backward recurrence for
+    intermediate values, Hankel asymptotic expansion for large $|x|$
+  - `BesselY`: DLMF 10.8.3 series for $Y_0$/$Y_1$, forward recurrence for higher
+    orders, shared Hankel asymptotic with `BesselJ`
+  - `BesselI`: power series + asymptotic expansion
+  - `BesselK`: series for $K_0$, Wronskian-derived $K_1$, forward recurrence for
+    higher orders, asymptotic for large $x$
+
+- **Numeric evaluation for Airy functions (`AiryAi`, `AiryBi`)**: Power series
+  using Maclaurin coefficients for $|x| \leq 5$, asymptotic expansions
+  (exponential decay for Ai, exponential growth for Bi at positive $x$,
+  oscillatory for negative $x$) for large arguments.
+
+### Linear Algebra
+
+(Fix [#285](https://github.com/cortex-js/compute-engine/issues/285))
+
+- **`\begin{vmatrix}` now parses to `Determinant`**: The `vmatrix` LaTeX
+  environment now produces `["Determinant", ["Matrix", ...]]` instead of
+  `["Matrix", ..., "'||'"]`. Serialization round-trips correctly back to
+  `\begin{vmatrix}...\end{vmatrix}` when the argument is a `Matrix` expression,
+  and uses `\det\left(...\right)` for symbol arguments.
+
+- **`\begin{Vmatrix}` now parses to `Norm`**: The `Vmatrix` LaTeX environment
+  now produces `["Norm", ["Matrix", ...]]` instead of `["Matrix", ..., "'‖‖'"]`.
+  Serialization round-trips to `\begin{Vmatrix}...\end{Vmatrix}` when the
+  argument is a `Matrix`, and uses `\left\Vert...\right\Vert` for symbol
+  arguments.
+
+- **`A^{-1}` produces `Inverse` for matrix-typed symbols and matrix
+  expressions**: When a symbol is declared with type `matrix`, parsing `A^{-1}`
+  now returns `["Inverse", "A"]` instead of `["Power", "A", -1]`. This also
+  works for inline matrix expressions, e.g.
+  `\begin{pmatrix}...\end{pmatrix}^{-1}`. Undeclared symbols still fall through
+  to the default `Power`/`Divide` handling, and function symbols still produce
+  `InverseFunction` (e.g., `\sin^{-1}` &rarr; `Arcsin`).
+
+- **`Inverse` serializes as `^{-1}`**: `["Inverse", "A"]` now serializes to
+  `A^{-1}` instead of `\mathrm{Inverse}(A)`.
+
+- **`Power(A, -1)` canonicalizes to `Inverse(A)` for matrices**: When `A` has a
+  matrix type, `ce.box(["Power", "A", -1])` now canonicalizes to
+  `["Inverse", "A"]` instead of `["Divide", 1, "A"]`.
+
+- **`\det(A)` and `\tr(A)` now parse correctly**: Fixed `Determinant` and
+  `Trace` LaTeX dictionary entries to use `latexTrigger` (`\det`, `\tr`) instead
+  of `symbolTrigger`, which only matches plain identifiers. Both functions also
+  accept plain text forms (`det(A)`, `tr(A)`).
+
+- **`\det A` and `\tr A` work without parentheses**: `Determinant` and `Trace`
+  now accept implicit arguments, so `\det A` parses as `["Determinant", "A"]`
+  (like `\cos x` parses as `["Cos", "x"]`). Implicit arguments bind at
+  multiplication precedence, so `\det 2A + 1` parses as `det(2A) + 1`.
+
+- **`Determinant` serialization uses `\det A` for simple arguments**: Symbol
+  arguments serialize as `\det A` instead of `\det\left(A\right)`. Matrix
+  arguments still serialize as `\begin{vmatrix}...\end{vmatrix}`.
+
+- **Added standard LaTeX operators `\ker`, `\dim`, `\deg`, `\hom`**: These
+  commands are now in the MathJSON LaTeX dictionary as function entries with
+  implicit arguments, so forms like `\ker V`, `\dim V`, `\deg p`, and
+  `\hom(V, W)` parse correctly and serialize back to the corresponding standard
+  operator notation. The corresponding function symbols (`Kernel`, `Dimension`,
+  `Degree`, `Hom`) are also registered in the linear algebra library.
+
+- **Implemented runtime evaluation for `Kernel`, `Dimension`, `Degree`, and
+  `Hom`**:
+  - `Kernel` now computes a numeric null-space basis (for scalar/vector/matrix
+    real inputs) and returns it as a list of basis vectors.
+  - `Dimension` now evaluates finite dimensions for concrete tensors and
+    collections, and computes `dim(Hom(V, W)) = dim(V) * dim(W)` when both
+    dimensions are inferable.
+  - `Degree` now evaluates polynomial degree for polynomial-form expressions
+    while keeping ambiguous bare symbols (for example `Degree(p)`) unevaluated.
+  - `Hom` now evaluates/simplifies its arguments while preserving the symbolic
+    `Hom(...)` form.
+
+### LaTeX Parsing
+
+- **`arguments: 'implicit'` option for function dictionary entries**: Function
+  entries in the LaTeX dictionary can now set `arguments: 'implicit'` to accept
+  bare arguments without parentheses (e.g., `\det A`), matching the behavior of
+  trig functions. The default remains `'enclosure'` (parentheses required).
+  Applied to `\det`, `\tr`, `\Re`, `\Im`, `\arg`, `\max`, `\min`, `\sup`,
+  `\inf`.
+
+### Simplification
+
+- **Infinity handling for 24+ functions**: `arctan(∞)`, `arccot(±∞)`,
+  `tanh/coth/sech/csch(±∞)`, `arsinh(-∞)`, `arcosh(-∞)`, `arccoth(±∞)`,
+  `arcsch(±∞)`, `π^∞`, `∞^n`, `(-∞)^{-n}`, `log_∞(x)`, `log_{0.5}(∞)`, `√∞`,
+  `∛∞` now all return correct limits.
+
+- **Root edge cases**: `Root(x, 0) → NaN`, `Root(0, n)`, `Root(1, n)`,
+  `Root(+∞, n)`, and `Sqrt(+∞)` now handled correctly.
+
+- **Division edge cases**: `a/a → 1` now works for compound expressions (e.g.,
+  `(π+1)/(π+1)`); `2/0 → ComplexInfinity` and `1/(1/0) → 0` propagate correctly.
+
+- **Logarithm edge cases**: Fixed infinity detection in `simplify-log.ts` (was
+  using `sym()` which fails on `BoxedNumber` infinity values); added
+  `log_∞(∞) → NaN`, base-aware `log_c(0)`, guards for `log_1(x)` and
+  `log_c(c^x)` evaluation.
+
+- **Absolute value of odd functions**: `|arcsin(x)|`, `|sinh(x)|`,
+  `|arsinh(x)|`, `|artanh(x)|` now simplify to `f(|x|)`.
+
+- **Even function with abs argument**: `cosh(|x+2|) → cosh(x+2)`.
+
+- **Trig period shifts**: `cot(π+x) → cot(x)`, `csc(π+x) → -csc(x)`.
+
+- **Ln simplification in Add/Multiply operands**: `ln(x^3) − 3·ln(x) → 0` and
+  `ln(x^√2) → √2·ln(x)` now work; cost function bypassed for log rules that are
+  mathematically valid but structurally more expensive.
+
+- **Preserved function identity**: Removed unconditional expansions of
+  `sinh/cosh → exp`, `arsinh/arcosh/artanh → ln`, and `arcsin → arctan2` that
+  prevented abs/odd-function rules from firing.
+
+### Compilation
+
+- **WGSL (WebGPU Shading Language) Compilation Target**: New built-in WGSL
+  target for compiling mathematical expressions to WebGPU shaders.
+
+  ```ts
+  // Via the registry
+  const result = compile(expr, { to: 'wgsl' });
+  ```
+
+  WGSL-specific differences from GLSL:
+  - `inverseSqrt` (camelCase) instead of `inversesqrt`
+  - `%` operator for mod instead of `mod()` function
+  - `vec2f`/`vec3f`/`vec4f` constructors instead of `vec2`/`vec3`/`vec4`
+  - `array<f32, n>()` instead of `float[n]()`
+  - `fn name(x: f32) -> f32` instead of `float name(float x)`
+  - `@vertex`/`@fragment`/`@compute` entry points with struct-based I/O
+  - `@group`/`@binding` uniform declarations and `@workgroup_size` for compute
+
+- **Interval WGSL Compilation Target**: New `interval-wgsl` target for interval
+  arithmetic in WebGPU shaders, mirroring the existing `interval-glsl` target.
+  Since WGSL does not support function overloading, the library uses `_v`
+  suffixes for internal vec2f-parameter implementations (e.g., `ia_add_v`),
+  while the public API (`ia_add`, `ia_sin`, etc.) takes `IntervalResult` values.
+
+### Bug Fixes
+
+- **`Sequence` type inference now returns a proper tuple type**: Multi-argument
+  `Sequence` expressions previously returned `'any'` as their inferred type,
+  losing all type information. They now return a `tuple<...>` type with each
+  element's individual type preserved (e.g., `Sequence(1, "a")` types as
+  `tuple<integer, string>`), consistent with the `Tuple` operator.
+
+- **Subscript parsing now checks for collection type**: The LaTeX subscript
+  (`_`) parser now checks whether the LHS is a collection (symbol declared as
+  `indexed_collection`, or a list literal) and produces `At()` directly at parse
+  time, consistent with bracket indexing (`x[i]`). Multi-index subscripts on
+  collections (`A_{k,j}`) are now correctly unpacked into separate `At`
+  arguments instead of being wrapped in a `Tuple`.
+
+- **`NumericValue(0).mul(Infinity)` now returns NaN**: All three `NumericValue`
+  subclasses (`MachineNumericValue`, `BigNumericValue`, `ExactNumericValue`) had
+  an early-return `if (this.isZero) return this` in `mul()`, which returned `0`
+  without checking if the other operand was infinity. `0 × ±∞` is now correctly
+  indeterminate (`NaN`), and `±∞ × 0` is handled symmetrically.
+
+- **Power simplification `(a^n)^m -> a^{nm}` now correctly guarded**: The rule
+  was applied unconditionally, which is mathematically incorrect when the base
+  can be negative and exponents are non-integer. The classic counterexample:
+  `((-1)^2)^{1/2} = 1`, but `(-1)^{2·1/2} = -1`. The rule is now only applied
+  when: (1) the base is non-negative, (2) the outer exponent is an integer, or
+  (3) the inner exponent is an odd integer. This fix applies to canonicalization
+  (`canonicalPower`), the `pow()` helper, and simplification (`simplifyPower`).
+  As a result, `(x^2)^{1/2}` now correctly simplifies to `|x|` instead of `x`.
+
+- **Power distribution rules now guarded for non-integer exponents**: Three
+  additional power distribution rules in `pow()` were applied unconditionally,
+  producing wrong results when the exponent is non-integer and operands are
+  negative. (1) `(a/b)^c -> a^c / b^c` — e.g. `((-2)(-3))^{1/2} = sqrt(6)` but
+  distributing gives `(-2)^{1/2} * (-3)^{1/2} = -sqrt(6)`. (2)
+  `(a*b)^c -> a^c * b^c` — same class of bug. (3) `(-x)^n` used `n % 2 === 0` to
+  test parity, but for non-integer `n` (e.g. 0.5), `0.5 % 2 = 0.5` falls to the
+  odd branch, giving `(-x)^{0.5} -> -(x^{0.5})` which is wrong. All three rules,
+  plus the corresponding `canonicalPower()` Divide rule, now require integer
+  exponents (or non-negative operands) before distributing.
+
+- **Sqrt/Root exponent rearrangement now guarded**: Two more rules in `pow()`
+  unconditionally rearranged exponents. (1) `(√a)^b -> √(a^b)` rearranges
+  `(a^{1/2})^b` to `(a^b)^{1/2}`, which is wrong for negative `a` (e.g.
+  `(√(-4))^3 = -8i` but `√((-4)^3) = 8i`). Now only applied when `a >= 0`. The
+  even-integer branches (`(√a)^2 -> a`, `(√a)^{2k} -> a^k`) remain unconditional
+  since integer outer exponents are always safe. (2) `Root(a,b)^c -> a^{c/b}`
+  combined exponents unconditionally. Now guarded with `a >= 0` or `c` is
+  integer. Audit of `simplify-power.ts` confirmed all rules there are already
+  properly guarded.
+
+- **Relational operators now evaluate**: Seven relational operators
+  (`TildeFullEqual`, `TildeEqual`, `Approx`, `ApproxEqual`, `ApproxNotEqual`,
+  `Precedes`, `Succeeds`) previously had `canonical` handlers but no `evaluate`
+  handlers, so expressions like `Approx(3.14, 3.14)` returned unevaluated. The
+  approximate-equality family (`TildeFullEqual`, `TildeEqual`, `Approx`,
+  `ApproxEqual`) now checks whether `|a - b| <= tolerance` via `ce.chop()`, with
+  support for multi-argument chains. `Precedes` and `Succeeds` evaluate as
+  numeric `<` and `>` respectively. Negated variants (`NotApprox`,
+  `NotTildeFullEqual`, etc.) work automatically through the `Not` operator.
+
+- **`BoxedNumber.operator` now returns specific numeric types**: The `operator`
+  property on `BoxedNumber` instances previously returned the generic `'Number'`
+  for all numeric values. It now returns specific types that match the internal
+  type system: `'Integer'` for integers, `'Rational'` for non-integer rationals,
+  `'Real'` for floating-point numbers, `'Complex'` for complex numbers with
+  non-zero imaginary part, and `'NaN'`, `'PositiveInfinity'`,
+  `'NegativeInfinity'` for special values. This improves API consistency with
+  the `type` property and enables more precise pattern matching and type
+  discrimination in user code. **Breaking change**: Code that explicitly checks
+  for `.operator === 'Number'` will need to be updated to check for specific
+  numeric types or use the `isNumber()` type guard instead.
+
+- **Non-XIDC Unicode characters in symbol names now encoded correctly**: When
+  parsing LaTeX symbols containing non-identifier Unicode characters via
+  `\unicode{...}`, `\char`, or `^^XX` escapes (e.g., figure dash U+2012 in
+  `\operatorname{speed\unicode{"2012}of\unicode{"2012}sound}`), the characters
+  are now encoded as `____XXXXXX` (4 underscores + 6 hex digits) in the symbol
+  name. This encoding is valid per `isValidSymbol()` and round-trips correctly:
+  the serializer decodes `____XXXXXX` back to `\unicode{"XXXX"}` in LaTeX
+  output. Previously, these characters passed through raw and caused symbol
+  validation to fail.
+
+- **Assign to compound symbol names no longer misinterpreted as sequence
+  definitions** (fixes
+  [#286](https://github.com/cortex-js/compute-engine/issues/286)):
+  `ce.box(["Assign", "t_half", 10])` previously failed because the Assign
+  evaluate handler split any symbol containing `_` and treated it as a
+  subscripted sequence definition. User-provided compound symbols like `t_half`
+  or `half_life` are now assigned correctly. Sequence definitions via parsed
+  LaTeX (e.g., `L_0 := 1`) continue to work as before.
+
 ## 0.35.6 _2026-02-07_
 
 ### Bug Fixes
 
 - **Monte Carlo improper integrals**: Fixed two bugs in `monteCarloEstimate()`
   that produced incorrect results (typically `NaN` or `Infinity`) for improper
-  integrals. The change-of-variables estimator was inverted (`f(x) / jacobian`
-  instead of `f(x) * jacobian`), and the finite-interval scale factor `b - a`
-  was applied to transformed domains where it is infinite. Affects `NIntegrate`
-  and compiled `integrate` for any integral with infinite bounds.
+  integrals. The change-of-variables estimator was inverted
+  ($f(x) / \mathrm{jacobian}$ instead of $f(x) * \mathrm{jacobian}$), and the
+  finite-interval scale factor $b - a$ was applied to transformed domains where
+  it is infinite. Affects `NIntegrate` and compiled `integrate` for any integral
+  with infinite bounds.
 
 ### Compilation
 
@@ -12368,6 +14075,27 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
   Applies to all combinations: `sqrt(sqrt(x))`, `root(sqrt(x), n)`,
   `sqrt(root(x, n))`, and `root(root(x, m), n)`.
+
+- **Extended Coefficient Factoring in Power Combination**: The power combination
+  rule now handles additional coefficient forms when combining same-base powers
+  in products:
+  - **Multi-prime coefficients**: `12·2ˣ·3ˣ` &rarr; `2^(x+2)·3^(x+1)` (since 12
+    = 2²·3). All primes in the factorization must have a matching base.
+    Non-matching multi-prime coefficients like `6·2ˣ` are left unchanged.
+  - **Negative coefficients**: `-4·2ˣ` &rarr; `-2^(x+2)`, `-8·2ˣ` &rarr;
+    `-2^(x+3)`. The absolute value is factored and the sign is preserved.
+  - **Rational-radical coefficients**: `√2·2ˣ` &rarr; `2^(x+½)`, `2√2·2ˣ` &rarr;
+    `2^(x+3/2)`, `(√2/2)·2ˣ` &rarr; `2^(x-½)`. Decomposes `(num/den)·√radical`
+    into prime contributions from all three components (radical primes get
+    half-integer exponents, numerator primes get positive exponents, denominator
+    primes get negative exponents).
+  - **Rational coefficients**: `2ˣ/4` &rarr; `2^(x-2)`, `3ˣ/9` &rarr; `3^(x-2)`.
+    Factors both numerator (positive exponents) and denominator (negative
+    exponents).
+
+- **Improved Cost Function for Negated Powers**: `Negate(Power(...))` now costs
+  `3 + cost(exponent)`, consistent with the cost of `Multiply(-1, Power(...))`.
+  This makes the cost model more accurate when comparing negated power forms.
 
 ### Assumptions & Types
 
@@ -12845,8 +14573,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **Special Function Definitions**: Added type signatures for special
   mathematical functions, enabling them to be used in expressions without type
   errors:
-  - `Zeta` - Riemann zeta function ζ(s)
-  - `Beta` - Euler beta function B(a,b) = Γ(a)Γ(b)/Γ(a+b)
+  - `Zeta` - Riemann zeta function $\zeta(s)$
+  - `Beta` - Euler beta function $B(a,b) = \Gamma(a)\Gamma(b)/\Gamma(a+b)$
   - `LambertW` - Lambert W function (product logarithm)
   - `BesselJ`, `BesselY`, `BesselI`, `BesselK` - Bessel functions of
     first/second kind
@@ -16521,7 +18249,7 @@ export function ExampleSelector({ onSelect, index }) {
     { 
       latex: "\\frac{165}{315}",
       json: '["Divide", 165, 315]', 
-      preamble: `To create a boxed expression from a MathJSON expression, 
+      preamble: `To create a expression from a MathJSON expression, 
 use the \`ce.box()\` function.
 
 By default expressions are put in canonical form. 
@@ -16531,7 +18259,7 @@ The canonical form of fractions is their reduced form.`,
 
     { 
       latex: 'e^{i\\pi}', 
-      preamble: `To create a boxed expression from a LaTeX string, 
+      preamble: `To create a expression from a LaTeX string, 
 use the \`ce.parse()\` function.
 
 The \`expr.N()\` function evaluates the expression numerically, 
@@ -16939,16 +18667,33 @@ expr.evaluate().print();
 expr.N().print();
 ```
 
+### Parse + Evaluate Free Function
+
+For the common "parse then evaluate" flow, use the `evaluate()` free function:
+
+```live
+// import { evaluate, assign } from '@cortex-js/compute-engine';
+assign('x', 3);
+evaluate('x+2').print();
+evaluate('\\sqrt{2}').print();
+```
+
+The `evaluate()` free function accepts either a LaTeX string or a
+`Expression`. It uses a shared `ComputeEngine` instance created on
+first call.
+
 ### Compilation
 
-An expression can be evaluated by compiling it to JavaScript using the `expr.compile()` method.
-The method returns a JavaScript function that can be called to evaluate the expression.
+An expression can be evaluated by compiling it to JavaScript using the `compile()` function.
+The result includes a `run` function that can be called to evaluate the expression.
 
 
 
 ```live
-const f = ce.parse('2\\pi').compile();
-console.log(f());
+// import { compile } from '@cortex-js/compute-engine';
+const result = compile(ce.parse('2\\pi'));
+console.log(result.success ? 'compiled' : 'fallback');
+console.log(result.run?.());
 ```
 
 
@@ -19331,7 +21076,7 @@ const squareRule = {
   replace: ["Square", "_x"],
 };
 
-const expr = ce.box(["Multiply", 7, 7], { canonical: false });
+const expr = ce.box(["Multiply", 7, 7], { form: 'raw' });
 (expr.replace(squareRule) ?? expr).print();
 // ➔ ["Square", 7]
 ```
@@ -20202,6 +21947,165 @@ Note that axis indexes start at 1.
 </FunctionDefinition>
 
 <nav className="hidden">
+### Kernel
+</nav>
+<FunctionDefinition name="Kernel">
+
+<Signature name="Kernel">_map_</Signature>
+
+<Latex value="\ker \mathbf{A}"/>
+
+Returns a basis for the [kernel (null space)](https://en.wikipedia.org/wiki/Kernel_(linear_algebra))
+of a linear map.
+
+For numeric real vectors and matrices, `Kernel` returns a list of basis vectors.
+Each basis vector is represented as a `List`.
+
+```json example
+["Kernel", ["List", ["List", 1, 0], ["List", 0, 0]]]
+// ➔ ["List", ["List", 0, 1]]
+```
+
+If the kernel is trivial, the result is an empty list:
+
+```json example
+["Kernel", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List"]
+```
+
+Vectors are interpreted as 1×n linear maps:
+
+```json example
+["Kernel", ["List", 1, 0, 0]]
+// ➔ ["List", ["List", 0, 1, 0], ["List", 0, 0, 1]]
+```
+
+Scalars are treated as 1×1 maps:
+
+```json example
+["Kernel", 0]
+// ➔ ["List", ["List", 1]]
+
+["Kernel", 5]
+// ➔ ["List"]
+```
+
+**Edge cases**
+- Rank > 2 tensors return `Error("expected-matrix", ...)`.
+- Non-numeric/symbolic inputs, or complex entries with non-zero imaginary part,
+  remain unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Dimension
+</nav>
+<FunctionDefinition name="Dimension">
+
+<Signature name="Dimension">_value_</Signature>
+
+<Latex value="\dim V"/>
+
+Returns the finite dimension of an object when it can be inferred.
+
+For concrete tensors/collections, `Dimension` returns the product of axis sizes
+(or the element count for finite indexed collections).
+
+```json example
+["Dimension", 5]
+// ➔ 1
+
+["Dimension", ["List", 1, 2, 3]]
+// ➔ 3
+
+["Dimension", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ 6
+```
+
+For hom-sets with inferable finite dimensions:
+
+```json example
+["Dimension", ["Hom", ["List", 1, 2], ["List", 3, 4, 5]]]
+// ➔ 6
+```
+
+**Note:** This is not matrix rank (number of linearly independent rows/columns).
+Use `Rank` for tensor rank (number of axes), and other specialized tools for
+row/column rank.
+
+If the dimension cannot be inferred, the expression remains unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Degree
+</nav>
+<FunctionDefinition name="Degree">
+
+<Signature name="Degree">_expr_</Signature>
+
+<Latex value="\deg p"/>
+
+Returns the polynomial degree (total degree) of polynomial-form expressions.
+
+```json example
+["Degree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1]]
+// ➔ 3
+```
+
+Constants have degree 0:
+
+```json example
+["Degree", 42]
+// ➔ 0
+```
+
+**Edge cases**
+- Bare symbols are ambiguous and remain symbolic:
+
+```json example
+["Degree", "p"]
+// ➔ ["Degree", "p"]
+```
+
+- Non-polynomial expressions remain unevaluated:
+
+```json example
+["Degree", ["Sin", "x"]]
+// ➔ ["Degree", ["Sin", "x"]]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Hom
+</nav>
+<FunctionDefinition name="Hom">
+
+<Signature name="Hom">_domain_, _codomain_</Signature>
+
+<Latex value="\hom(V, W)"/>
+
+Represents the hom-set of morphisms from _domain_ to _codomain_.
+
+`Hom` is symbolic: it preserves the `Hom(...)` form, but evaluates/simplifies
+its arguments.
+
+```json example
+["Hom", ["Add", 1, 2], ["Multiply", 2, 3]]
+// ➔ ["Hom", 3, 6]
+```
+
+`Hom` is commonly used with `Dimension`:
+
+```json example
+["Dimension", ["Hom", ["List", 1, 2], ["List", 3, 4, 5]]]
+// ➔ 6
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### MatrixMultiply
 </nav>
 <FunctionDefinition name="MatrixMultiply">
@@ -20720,7 +22624,6 @@ For a rectangular m×n matrix with m > n:
 - The 2-norm of a matrix equals its largest singular value
 
 </FunctionDefinition>
-
 ---
 title: Sets
 slug: /compute-engine/reference/sets/
@@ -21122,7 +23025,7 @@ ce.declare("double", { evaluate: ([x]) => x.mul(2) });
 The signature of the `evaluate` handler is `(args[], options)`, where:
 
 - `args`: an array of the arguments that have been applied to the function. Each
-  argument is a boxed expression. The array may be empty if there are no
+  argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
   Compute Engine instance that is evaluating the expression and a `numericApproximation` property that is true if the result should be a numeric approximation.
@@ -21239,11 +23142,13 @@ ce.parse("F_n").evaluate();     // → Subscript(F, n) - stays symbolic
 `Tuple` expression:
 
 ```js
+import { isFunction } from '@cortex-js/compute-engine';
+
 const matrix = [[1,2,3], [4,5,6], [7,8,9]];
 
 ce.declare("M", {
   subscriptEvaluate: (subscript, { engine }) => {
-    if (subscript.operator === "Tuple" && subscript.ops) {
+    if (isFunction(subscript) && subscript.operator === "Tuple") {
       const [i, j] = subscript.ops;
       const row = matrix[i.re - 1];  // 1-indexed
       if (row && row[j.re - 1] !== undefined) {
@@ -21285,8 +23190,8 @@ The `SequenceDefinition` object accepts:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `base` | `Record<number, number \| BoxedExpression>` | **Required.** Base cases as index → value mapping |
-| `recurrence` | `string \| BoxedExpression` | **Required.** Recurrence relation (LaTeX string or expression) |
+| `base` | `Record<number, number \| Expression>` | **Required.** Base cases as index → value mapping |
+| `recurrence` | `string \| Expression` | **Required.** Recurrence relation (LaTeX string or expression) |
 | `variable` | `string` | Index variable name (default: `'n'`) |
 | `memoize` | `boolean` | Cache computed values (default: `true`) |
 | `domain` | `{ min?: number, max?: number }` | Valid index range |
@@ -21717,8 +23622,8 @@ const a = ce.parse('\\frac{1}{10}');
 const b = ce.parse('\\frac{2}{20}');
 console.log('Canonical isSame?', a.isSame(b));
 
-const aPrime = ce.parse('\\frac{1}{10}', {canonical: false});
-const bPrime = ce.parse('\\frac{2}{20}', {canonical: false});
+const aPrime = ce.parse('\\frac{1}{10}', {form: 'raw'});
+const bPrime = ce.parse('\\frac{2}{20}', {form: 'raw'});
 console.log('Non-canonical isSame?', aPrime.isSame(bPrime));
 ```
 
@@ -21794,7 +23699,7 @@ console.log('isEqual?', a.isEqual(b));
 
 The argument of the `subs()` function is an object literal. Each key/value 
 pair is a symbol and the value to be substituted with. The value can be either
-a number or a boxed expression.
+a number or a expression.
 
 ```live show-line-numbers mark-javascript-line="4"
 
@@ -21864,12 +23769,12 @@ const code = python.compile(expr);
 console.log(code); // "x ** 2 + y ** 2"
 ```
 
-## Using with expr.compile()
+## Using with compile()
 
-To use the Python target with `expr.compile()`, register it first:
+To use the Python target with `compile()`, register it first:
 
 ```javascript
-import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -21878,8 +23783,8 @@ ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }
 
 // Now you can use it throughout your code
 const expr = ce.parse('\\sin(x) + \\cos(y)');
-const pythonCode = expr.compile({ to: 'python' });
-console.log(pythonCode.toString());
+const result = compile(expr, { to: 'python' });
+console.log(result.code);
 // → import numpy as np
 //
 //   np.sin(x) + np.cos(y)
@@ -22563,7 +24468,7 @@ string (**serializing**)
 :::info[Note]
 In this documentation, functions such as `ce.box()` and `ce.parse()` require a
 `ComputeEngine` instance which is denoted by a `ce.` prefix.<br/>Functions that
-apply to a boxed expression, such as `expr.simplify()` are denoted with a
+apply to a expression, such as `expr.simplify()` are denoted with a
 `expr.` prefix.
 :::
 
@@ -22615,14 +24520,14 @@ console.log(ce.parse("5x + 1").json);
 
 By default, `ce.parse()` returns a
 [canonical expression](/compute-engine/guides/canonical-form/). To get a
-non-canonical expression instead, use the `{canonical: false}` option: The
+non-canonical expression instead, use the `{form: 'raw'}` option: The
 non-canonical form is closer to the literal LaTeX input.
 
 ```js
 ce.parse("\\frac{7}{-4}").json;
 // ➔  ["Rational", -7, 4]
 
-ce.parse("\\frac{7}{-4}", { canonical: false }).json;
+ce.parse("\\frac{7}{-4}", { form: 'raw' }).json;
 // ➔  ["Divide", 7, -4]
 ```
 
@@ -22932,7 +24837,7 @@ console.log(ce.parse("\\sin x").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("(a+b)", {canonical: false}).toLatex({
+console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
   groupStyle: () => "big"
 }));
 ```
@@ -23530,10 +25435,12 @@ serialization handler with a MathJSON symbol.
   serialize: (serializer, expr) =>
     "\\oplus" + serializer.wrapArguments(expr),
   evaluate: (ce, args) => {
+    const { isNumber } = ce;
     let result = '';
     for (const arg of args) {
-      val = arg.numericValue;
-      if (val === null || ce.isComplex(val) || Array.isArray(val)) return null;
+      if (!isNumber(arg)) return null;
+      const val = arg.numericValue;
+      if (ce.isComplex(val) || Array.isArray(val)) return null;
       if (ce.isBignum(val)) {
         if (!val.isInteger() || val.isNegative()) return null;
         result += val.toString();
@@ -23689,7 +25596,7 @@ The `ce.box()` and `ce.parse()` functions return a canonical expression by
 default, which is the desirable behavior in most cases.
 
 **To get a non-canonical version of an expression** use
-of `ce.parse(s, {canonical: false})` or `ce.box(expr, {canonical: false})`.
+of `ce.parse(s, {form: 'raw'})` or `ce.box(expr, {form: 'raw'})`.
 
 You can further customize the canonical form of an expression by using the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
@@ -23704,7 +25611,7 @@ console.info(ce.parse('\\frac{30}{-50}').json);
 // The canonical version moves the sign to the numerator 
 // and reduces the numerator and denominator
 
-console.info(ce.parse('\\frac{30}{-50}', { canonical: false }).json);
+console.info(ce.parse('\\frac{30}{-50}', { form: 'raw' }).json);
 // ➔ ["Divide", 30, -50]
 // The non-canonical version does not change the arguments,
 // so this is interpreted as a regular fraction ("Divide"), 
@@ -23732,7 +25639,7 @@ console.log(expr.toMathJson({ exclude: ["Rational"] }));
 
 
 ```js
-const expr = ce.parse("\\frac{10}{30}", { canonical: false });
+const expr = ce.parse("\\frac{10}{30}", { form: 'raw' });
 console.log(expr.json);
 // ➔ ["Divide", 10, 30]
 
@@ -23787,32 +25694,39 @@ Below is a list of some of the transformations applied to obtain the canonical
 form:
 
 - **Literal Numbers**
-  - Rationals are reduced, e.g. \\( \frac{6}{4} \to \frac{3}{2}\\)
-  - The denominator of rationals is made positive, e.g. \\(\frac{5}{-11}
-    \to \frac{-5}{11}\\)
+  - Rationals are reduced, e.g. $ \frac{6}{4} \to \frac{3}{2}$
+  - The denominator of rationals is made positive, e.g. $\frac{5}{-11} \to \frac{-5}{11}$
   - A rational with a denominator of 1 is replaced with the numerator, e.g.
-    \\(\frac{19}{1} \to 19\\)
+    $\frac{19}{1} \to 19$
   - Complex numbers with no imaginary component are replaced with the real component
 - `Add`
   - Literal 0 is removed
+  - Exact numeric operands are folded: integers, rationals, and radicals are
+    summed together, e.g. \\(2 + x + 5 \to x + 7\\), 
+    $\frac{1}{3} + x + \frac{2}{3} \to x + 1$, 
+    $\sqrt{2} + x + \sqrt{2} \to x + 2\sqrt{2}$.
+    Machine floats (e.g. $1.5$) are not folded.
   - Sum of a literal and the product of a literal with the imaginary unit are
     replaced with a complex number.
   - Associativity is applied
   - Arguments are sorted
 - `Multiply`
-  - Literal 1 is removed
+  - Literal $1$ is removed
+  - Exact numeric operands are folded: integers, rationals, and radicals are
+    multiplied together, e.g. \\(2 \times x \times 5 \to 10x\\), $\frac{1}{2} \times x \times 2 \to x$. 
+    Machine floats (e.g. $1.5$) are not folded.
   - Product of a literal and the imaginary unit are replaced with a complex
     number.
   - Literal -1 multiplied by an expression is replaced with the negation of the
     expression.
-  - Signs are simplified: (-x)(-y) -> xy
+  - Signs are simplified: $(-x)(-y)$ -> $xy$
   - Associativity is applied
   - Arguments are sorted
 - `Negate`
   - Literal numbers are negated
   - Negate of a negation is removed
 - `Power`
-  - \\(x^n)^m \to x^\{nm\}\\)
+  - \\((x^n)^m \to x^\{nm\}\\)
   - \\(x^\{\tilde\infty\} \to \operatorname\{NaN\}\\)
   - \\(x^0 \to 1\\)
   - \\(x^1 \to x\\)
@@ -23841,35 +25755,35 @@ representation for a given application. For example, if you want to check
 the answers from a quiz, you may want to compare the user input with a
 canonical form that is closer to the user input.
 
-**To get the non-canonical form**, use `ce.box(expr, { canonical: false })` or
-`ce.parse(s, { canonical: false })`.
+**To get the non-canonical form**, use `ce.box(expr, { form: 'raw' })` or
+`ce.parse(s, { form: 'raw' })`.
 
 ```live
-console.log(ce.parse("2(0+x\\times x-1)", {canonical: false}).json);
+console.log(ce.parse("2(0+x\\times x-1)", {form: 'raw'}).json);
 ```
 
-**To get the full canonical form**, use `ce.box(expr, { canonical: true })` or
-`ce.parse(s, { canonical: true })`. The `canonical` option can be omitted
-as it is `true` by default.
+**To get the full canonical form**, use `ce.box(expr, { form: 'canonical' })` or
+`ce.parse(s, { form: 'canonical' })`. The `form` option can be omitted
+as it defaults to `'canonical'`.
 
 ```live
-console.log(ce.parse("2(0+x\\times x-1)", {canonical: true}).json);
+console.log(ce.parse("2(0+x\\times x-1)", {form: 'canonical'}).json);
 
 console.log(ce.parse("2(0+x\\times x-1)").json);
 ```
 
 **To get a custom canonical form of an expression**, use the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
-or specify the form you want to use with the `canonical` option of `ce.box()` 
+or specify the form you want to use with the `form` option of `ce.box()`
 and `ce.parse()`.
 
 
 
-**To order the arguments in a canonical order**, use `ce.box(expr, { canonical: "Order" })` or `ce.parse(s, { canonical: "Order" })`.
+**To order the arguments in a canonical order**, use `ce.box(expr, { form: "Order" })` or `ce.parse(s, { form: "Order" })`.
 
 ```live
 ce.parse("0+1+x+2+\\sqrt{5}", 
-  {canonical: "Order"}
+  {form: "Order"}
 ).print();
 ```
 
@@ -23884,12 +25798,12 @@ For example:
 
 ```live
 const latex = "3(2+x)";
-ce.parse(latex, {canonical: false}).print();
+ce.parse(latex, {form: 'raw'}).print();
 
-ce.parse(latex, {canonical: ["InvisibleOperator"]}).print();
+ce.parse(latex, {form: ["InvisibleOperator"]}).print();
 
-ce.parse(latex, 
-  {canonical: ["InvisibleOperator", "Add", "Order", ]}
+ce.parse(latex,
+  {form: ["InvisibleOperator", "Add", "Order", ]}
 ).print();
 ```
 
@@ -23929,14 +25843,16 @@ For example, let's say you want to compare the structural form of two expression
 but ignoring any extra parentheses. You could define a transformation like this:
 
 ```js
+import { isFunction } from '@cortex-js/compute-engine';
+
 const deparenthesize = (expr) =>
-  expr.map((e) => (e.operator === 'Delimiter' ? e.op1 : e));
+  expr.map((e) => (isFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
 ```
 You can then apply this transformation to an expression like this:
 
 ```js
-const expr1 = ce.parse('3+4\\times2', { canonical: false });
-const expr2 = ce.parse('3+(4\\times(2))', { canonical: false });
+const expr1 = ce.parse('3+4\\times2', { form: 'raw' });
+const expr2 = ce.parse('3+(4\\times(2))', { form: 'raw' });
 const transformedExpr1 = deparenthesize(expr1);
 const transformedExpr2 = deparenthesize(expr2);
 console.log(transformedExpr1.isSame(transformedExpr2));
@@ -23990,7 +25906,7 @@ The `declareSequence()` method accepts the following options:
 | Option | Type | Description |
 |:-------|:-----|:------------|
 | `base` | `Record<number, number>` | Initial values as index → value pairs |
-| `recurrence` | `string \| BoxedExpression` | The recurrence formula |
+| `recurrence` | `string \| Expression` | The recurrence formula |
 | `variable` | `string` | Index variable name (default: `'n'`) |
 | `memoize` | `boolean` | Enable caching of computed values (default: `true`) |
 | `domain` | `{ min?: number, max?: number }` | Valid index range |
@@ -24334,6 +26250,19 @@ To obtain an exact numeric evaluation of an expression use `expr.evaluate()`.
 To obtain a numeric approximation use `expr.N()`.
 </Intro>
 
+## Parse + Numeric Free Function
+
+For the common "parse then numeric approximation" flow, use the `N()` free
+function:
+
+```live
+// import { N } from '@cortex-js/compute-engine';
+N("\\sqrt{2}").print();
+```
+
+The `N()` free function accepts either a LaTeX string or an `Expression`.
+It uses a shared `ComputeEngine` instance created on first call.
+
 
 ## Exact Evaluation
 
@@ -24393,7 +26322,7 @@ console.log(ce.parse("\\cos 60").N());
 
 ## JavaScript Interoperability
 
-The result of `expr.evaluate()` and `expr.N()` is a boxed expression. 
+The result of `expr.evaluate()` and `expr.N()` is a expression. 
 
 The `numericValue` property of this expression is either a machine number 
 (a JavaScript `number`), a `NumericValue` object or `null` if the expression 
@@ -24412,7 +26341,7 @@ console.log(expr.N().re);
 ```
 
 Another way to obtain a JavaScript compatible representation of an expression
-is to use the `valueOf()` method of the boxed expression.
+is to use the `valueOf()` method of the expression.
 
 ```js
 const expr = ce.parse('1/3 + 1/4');
@@ -24420,7 +26349,7 @@ console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
 
-The `valueOf()` method of a boxed expression can be used in JavaScript
+The `valueOf()` method of a expression can be used in JavaScript
 expressions.
 
 ```live
@@ -24433,11 +26362,11 @@ Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
 
 
 
-**To get a boxed number from a JavaScript number**, use `ce.box()` or `ce.number()`.
+**To get an `Expression` number literal from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
-const boxed = ce.box(1.5);
-console.log(boxed.valueOf());
+const expr = ce.box(1.5);
+console.log(expr.valueOf());
 ```
 
 
@@ -24464,9 +26393,7 @@ for its internal calculations.
 
 This format is implemented in hardware and well suited to do fast computations.
 It uses a fixed amount of memory and represents significant digits in base-2 with
-about 15 digits of precision and with a minimum value of $ \pm5\times
-10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308}
-$
+about 15 digits of precision and with a minimum value of $ \pm5\times 10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308} $
 
 **To change the precision to machine precision**, use
 `ce.precision = "machine"`.
@@ -24503,9 +26430,7 @@ Arithmetic"** by David Goldberg <Icon name="chevron-right-bold" />
 If `ce.precision` is greater than 15, numbers are represented as bignum numbers,
 a string of base-10 digits and an exponent.
 
-Bignum numbers have a minimum value of $ \pm
-10^{-9\,000\,000\,000\,000\,000} $ and a maximum value of $
-\pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} $.
+Bignum numbers have a minimum value of $ \pm 10^{-9\,000\,000\,000\,000\,000} $ and a maximum value of $ \pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} $.
 
 
 ```ts
@@ -24559,7 +26484,7 @@ be a MathJSON number that looks like this:
 of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
-`ce.assign()` accepts booleans, numbers, bigints, boxed expressions, or
+`ce.assign()` accepts booleans, numbers, bigints, expressions, or
 functions. Use `undefined` to clear a value.
 
 ```live
@@ -24605,12 +26530,14 @@ ce.symbol("x").value = undefined;
 If performance is important, the expression can be compiled to a JavaScript
 function.
 
-**To get a compiled version of an expression** use the `expr.compile()` method:
+**To get a compiled version of an expression** use the `compile()` function:
 
 ```js
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse("3x^2+4x+2");
-const fn = expr.compile();
-for (const x = 0; x < 1; x += 0.01) console.log(fn({ x }));
+const result = compile(expr);
+for (const x = 0; x < 1; x += 0.01) console.log(result.run({ x }));
 ```
 
 :::info[Note]
@@ -25289,6 +27216,8 @@ LU decomposition factors a matrix A into a lower triangular matrix L and an uppe
 triangular matrix U, with a permutation matrix P for numerical stability:
 
 ```js example
+import { isFunction } from '@cortex-js/compute-engine';
+
 // LU decomposition returns [P, L, U] where PA = LU
 const result = ce.box(['LUDecomposition', ['List',
   ['List', 2, 3, 1],
@@ -25297,10 +27226,12 @@ const result = ce.box(['LUDecomposition', ['List',
 ]]).evaluate();
 
 // Extract components
-const [P, L, U] = result.ops;
-// P: permutation matrix
-// L: lower triangular with 1s on diagonal
-// U: upper triangular
+if (isFunction(result)) {
+  const [P, L, U] = result.ops;
+  // P: permutation matrix
+  // L: lower triangular with 1s on diagonal
+  // U: upper triangular
+}
 ```
 
 **Use Cases:**
@@ -25314,6 +27245,8 @@ QR decomposition factors a matrix A into an orthogonal matrix Q and an upper
 triangular matrix R:
 
 ```js example
+import { isFunction } from '@cortex-js/compute-engine';
+
 // QR decomposition returns [Q, R] where A = QR
 const result = ce.box(['QRDecomposition', ['List',
   ['List', 1, 2],
@@ -25321,9 +27254,11 @@ const result = ce.box(['QRDecomposition', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-const [Q, R] = result.ops;
-// Q: orthogonal matrix (Q^T × Q = I)
-// R: upper triangular matrix
+if (isFunction(result)) {
+  const [Q, R] = result.ops;
+  // Q: orthogonal matrix (Q^T × Q = I)
+  // R: upper triangular matrix
+}
 ```
 
 **Use Cases:**
@@ -25363,6 +27298,8 @@ SVD factors any matrix A into three matrices: U (left singular vectors),
 Σ (diagonal matrix of singular values), and V (right singular vectors):
 
 ```js example
+import { isFunction } from '@cortex-js/compute-engine';
+
 // SVD returns [U, Σ, V] where A = U × Σ × V^T
 const result = ce.box(['SVD', ['List',
   ['List', 1, 2],
@@ -25370,10 +27307,12 @@ const result = ce.box(['SVD', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-const [U, Sigma, V] = result.ops;
-// U: m×m orthogonal matrix
-// Σ: m×n diagonal matrix of singular values
-// V: n×n orthogonal matrix
+if (isFunction(result)) {
+  const [U, Sigma, V] = result.ops;
+  // U: m×m orthogonal matrix
+  // Σ: m×n diagonal matrix of singular values
+  // V: n×n orthogonal matrix
+}
 ```
 
 **Use Cases:**
@@ -25389,6 +27328,8 @@ Using LU decomposition to solve Ax = b is more efficient than computing A⁻¹
 directly, especially when solving multiple systems with the same matrix A:
 
 ```js example
+import { isFunction } from '@cortex-js/compute-engine';
+
 const A = ['List',
   ['List', 2, 1, 1],
   ['List', 4, 3, 3],
@@ -25397,12 +27338,15 @@ const A = ['List',
 const b = ['List', 4, 10, 24];
 
 // Get LU decomposition
-const [P, L, U] = ce.box(['LUDecomposition', A]).evaluate().ops;
+const luResult = ce.box(['LUDecomposition', A]).evaluate();
+if (isFunction(luResult)) {
+  const [P, L, U] = luResult.ops;
 
-// The solution process:
-// 1. Solve Ly = Pb for y (forward substitution)
-// 2. Solve Ux = y for x (back substitution)
-// This is implemented internally when using Inverse
+  // The solution process:
+  // 1. Solve Ly = Pb for y (forward substitution)
+  // 2. Solve Ux = y for x (back substitution)
+  // This is implemented internally when using Inverse
+}
 ```
 
 ## Matrix Multiplication
@@ -25649,11 +27593,30 @@ const result3 = system3.solve(['x', 'y', 'z']);
 // Inconsistent system returns null
 const bad = ce.parse('\\begin{cases}x+y=1\\\\x+y=2\\end{cases}');
 bad.solve(['x', 'y']);  // → null
-
-// Non-linear systems also return null
-const nonlinear = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
-nonlinear.solve(['x', 'y']);  // → null (contains product xy)
 ```
+
+#### Exact Rational Arithmetic
+
+The linear system solver uses exact rational arithmetic throughout the Gaussian
+elimination process. When a system has fractional coefficients, the solution
+preserves exact rational results rather than introducing floating-point errors:
+
+```js example
+// System with fractional coefficients
+const frac = ce.parse('\\begin{cases}x+y=1\\\\x-y=\\frac{1}{2}\\end{cases}');
+const result = frac.solve(['x', 'y']);
+
+console.log(result.x.json);  // ["Rational", 3, 4]  (exact 3/4)
+console.log(result.y.json);  // ["Rational", 1, 4]  (exact 1/4)
+
+// More complex fractional system
+const frac2 = ce.parse('\\begin{cases}\\frac{x}{3}+\\frac{y}{2}=1\\\\\\frac{x}{4}+\\frac{y}{5}=1\\end{cases}');
+const result2 = frac2.solve(['x', 'y']);
+// → { x: 36/7, y: -10/7 }
+```
+
+This is particularly useful for educational applications where exact fractions
+are preferred over decimal approximations.
 
 #### Matrix Method
 
@@ -25674,6 +27637,99 @@ const solution = ce.box(['MatrixMultiply', A_inv, b]).evaluate();
 // → [1, 2]
 // Solution: x = 1, y = 2
 ```
+
+#### Non-linear Polynomial Systems
+
+The `solve()` method also handles certain non-linear polynomial systems with
+2 equations and 2 variables. Two patterns are recognized:
+
+**Product + Sum Pattern**: Systems where one equation is a product `xy = p` and
+another is a sum `x + y = s`:
+
+```js example
+// xy = 6, x + y = 5
+// x and y are roots of t² - 5t + 6 = 0
+const e = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 2, y: 3 }, { x: 3, y: 2 }]
+```
+
+**Substitution Method**: When one equation is linear in one variable:
+
+```js example
+// From x + y = 5: y = 5 - x
+// Substitute into x² + y = 7: x² + (5-x) = 7 → x² - x - 2 = 0
+const e = ce.parse('\\begin{cases}x+y=5\\\\x^2+y=7\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 2, y: 3 }, { x: -1, y: 6 }]
+```
+
+Non-linear systems return an array of solution objects (since there may be
+multiple solutions), unlike linear systems which return a single object.
+Only real solutions are returned; complex solutions are filtered out.
+
+#### Linear Inequality Systems
+
+The `solve()` method also handles systems of linear inequalities in 2 variables.
+Instead of finding a single point, it returns the vertices of the feasible region
+(a convex polygon):
+
+```js example
+// Triangle region: x >= 0, y >= 0, x + y <= 10
+const e = ce.parse('\\begin{cases}x\\geq 0\\\\y\\geq 0\\\\x+y\\leq 10\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }]
+
+// Square region: 0 <= x <= 5, 0 <= y <= 5
+const square = ce.parse('\\begin{cases}x\\geq 0\\\\x\\leq 5\\\\y\\geq 0\\\\y\\leq 5\\end{cases}');
+const vertices = square.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 5, y: 0 }, { x: 5, y: 5 }, { x: 0, y: 5 }]
+
+// Pentagon with multiple constraints
+const pentagon = ce.parse('\\begin{cases}x\\geq 0\\\\y\\geq 0\\\\x\\leq 4\\\\y\\leq 4\\\\x+y\\leq 6\\end{cases}');
+const pentagonVertices = pentagon.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 2 }, { x: 2, y: 4 }, { x: 0, y: 4 }]
+```
+
+The solver supports all inequality operators: `<`, `<=`, `>`, `>=`. Vertices are
+returned in counterclockwise convex hull order. Returns `null` if the system has
+no feasible region (infeasible) or contains non-linear constraints.
+
+**Note:** Currently only 2-variable systems are supported. The solver finds the
+vertices of the feasible region by computing all pairwise intersections of
+constraint boundaries and filtering to those that satisfy all constraints.
+
+#### Under-determined Systems (Parametric Solutions)
+
+When a linear system has fewer equations than variables (under-determined), it has
+infinitely many solutions. Instead of returning `null`, the `solve()` method
+returns parametric solutions where free variables appear as themselves:
+
+```js example
+// Single equation with two variables
+const e = ce.parse('\\begin{cases}x+y=5\\end{cases}');
+const result = e.solve(['x', 'y']);
+console.log(result.x.latex);  // "5 - y"
+console.log(result.y.latex);  // "y"
+// Here y is a free variable, and x is expressed in terms of y
+
+// Two equations with three variables
+const e2 = ce.parse('\\begin{cases}x+y+z=6\\\\x-y=2\\end{cases}');
+const result2 = e2.solve(['x', 'y', 'z']);
+console.log(result2.x.latex);  // "4 - z/2"
+console.log(result2.y.latex);  // "2 - z/2"
+console.log(result2.z.latex);  // "z"
+// Here z is free, and x, y are expressed in terms of z
+
+// Three equations with four variables
+const e3 = ce.parse('\\begin{cases}a+b+c+d=10\\\\a-b=2\\\\c+d=4\\end{cases}');
+const result3 = e3.solve(['a', 'b', 'c', 'd']);
+// → { a: 4, b: 2, c: 4 - d, d: d }
+```
+
+The solver uses Gaussian elimination to identify which variables are "pivot"
+variables (determined by the equations) and which are "free" variables (can take
+any value). Inconsistent systems still return `null`.
 
 ## Performance Considerations
 
@@ -25769,6 +27825,22 @@ function will be held, that is, not simplified. Conversely, a held argument
 wrapped with a `ReleaseHold` function will not be held, and it will be
 simplified.
 
+## Parse + Simplify Free Function
+
+For the common "parse then simplify" flow, use the `simplify()` free function:
+
+```live
+// import { simplify } from '@cortex-js/compute-engine';
+simplify("x+x+1").print();
+```
+
+The `simplify()` free function accepts either a LaTeX string or a
+`Expression`. It uses a shared `ComputeEngine` instance created on
+first call.
+
+For trigonometric simplification, use `expr.simplify({ strategy: 'fu' })`
+on a parsed expression.
+
 ## Defining "Simpler"
 
 An expression may be represented by several equivalent forms.
@@ -25861,7 +27933,8 @@ ce.parse('x^2 - 4').factor().latex;
 // ➔ "(x-2)(x+2)"
 
 // Expand a product
-ce.parse('(x+1)(x+2)').expand().latex;
+// import { expand } from '@cortex-js/compute-engine';
+expand(ce.parse('(x+1)(x+2)')).latex;
 // ➔ "x^2+3x+2"
 ```
 
@@ -25880,9 +27953,7 @@ Assumptions are additional information available about some symbols, for example
 
 Some transformations are only applicable if some assumptions can be verified.
 
-For example, if no assumptions about \\(x \\) is available the expression \\(
-\sqrt\{x^2\} \\) cannot be simplified. However, if an assumption that \\( x \geq 0
-\\) is available, then the expression can be simplified to \\( x \\).
+For example, if no assumptions about \\(x\\) is available the expression \\(\sqrt\{x^2\}\\) cannot be simplified. However, if an assumption that \\(x \geq 0\\) is available, then the expression can be simplified to \\(x\\).
 
 ### Sign-Dependent Simplifications
 
@@ -27965,6 +30036,29 @@ The Compute Engine can:
   <a href="/compute-engine/reference/calculus/">**calculus**</a> operations
 - <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript
 
+## Free Functions
+
+For common operations, use the free functions — no setup required:
+
+```live
+simplify("x+x+1").print();
+evaluate("2^{11} - 1").print();
+N("\\frac{1}{3}").print();
+```
+
+Available free functions:
+
+- `parse(latex)` — parse a LaTeX string into an `Expression`
+- `simplify(latex | expr)` — simplify a LaTeX string or expression
+- `evaluate(latex | expr)` — evaluate a LaTeX string or expression
+- `N(latex | expr)` — compute a numeric approximation
+- `assign(id, value)` — assign a value to a symbol
+
+:::info[Note]
+
+These use a shared `ComputeEngine` instance created on first call.
+Use `getDefaultEngine()` to configure it.
+:::
 
 
 <ReadMore path="/compute-engine/demo/" >
@@ -27984,10 +30078,9 @@ from a CDN, then create a `ComputeEngine` instance.
 
 ```html
 <script type="module">
-  import { ComputeEngine } from "https://esm.run/@cortex-js/compute-engine";
+  import { evaluate } from "https://esm.run/@cortex-js/compute-engine";
 
-  const ce = new ComputeEngine();
-  ce.parse("e^{i\\pi}").evaluate().print();
+  evaluate("e^{i\\pi}").print();
   // ➔ "-1"
 </script>
 ```
@@ -28076,9 +30169,9 @@ that the function is a method of the `ComputeEngine` class.
 
 
 The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
-function is a method of the `BoxedExpression` class.
+function is a method of the `Expression` class.
 
-**To create a new boxed expression** use `expr = ce.parse()` or `expr = ce.box()`
+**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
 
 :::
 
@@ -28780,31 +30873,31 @@ In the Compute Engine, expressions are represented internally using the
 [MathJSON format](/math-json/).
 
 They are wrapped in a JavaScript object, a process called **boxing**, and the
-resulting expressions are **Boxed Expressions**.
+resulting expressions are **Expressions**.
 
-Boxed Expressions improve performance by implementing caching to avoid
+Expressions improve performance by implementing caching to avoid
 repetitive calculations. They also ensure that expressions are valid and in a
 standard format.
 
-Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
+Unlike the plain data types used by JSON, Expressions allow an IDE, such
 as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
 methods and properties available for a given expression.
 
-Boxed Expressions can be created from a LaTeX string or from a raw MathJSON
+Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
 ## Boxing
 
-**To create a `BoxedExpression` from a MathJSON expression** use the `ce.box()`
+**To create an `Expression` from a MathJSON expression** use the `ce.box()`
 method.
 
 The input of `ce.box()` can be:
 - a [MathJSON expression](/math-json/)
-- a `BoxedExpression` (in which case it is returned as-is)
-- a `SemiBoxedExpression`, that is a MathJSON expression with some of its
-  subexpressions already boxed.
+- an `Expression` (in which case it is returned as-is)
+- an `ExpressionInput`, that is a MathJSON expression with some of its
+  subexpressions already represented as `Expression` values.
 
-The result is an instance of a `BoxedExpression`.
+The result is an instance of an `Expression`.
 
 ```js
 let expr = ce.box(1.729e3);
@@ -28824,7 +30917,7 @@ console.log(expr.operator);
 ```
 
 
-**To create a Boxed Expression from a LaTeX string** use the `ce.parse()`
+**To create a Expression from a LaTeX string** use the `ce.parse()`
 function.
 
 ```js
@@ -28836,7 +30929,7 @@ console.log(expr.json);
 // ➔ ["Add", 3, "x", "y"]
 ```
 
-**To get a Boxed Expression representing the content of a mathfield**
+**To get a Expression representing the content of a mathfield**
 use the `mf.expression` property:
 
 ```js
@@ -28874,7 +30967,7 @@ console.log(expr.json);
 number** check that the GCD of the numerator and denominator is 1.
 
 ```js example
-const input = ce.parse("\\frac{30}{50}", {canonical: false});
+const input = ce.parse("\\frac{30}{50}", {form: 'raw'});
 console.info(ce.box(
   ["GCD", ["NumeratorDenominator", input]]
 ).evaluate().valueOf() === 1);
@@ -28898,7 +30991,7 @@ Read more about the **Canonical Form** <Icon name="chevron-right-bold" />
 By default, `ce.box()` and `ce.parse()` produce a canonical expression.
 
 **To get a non-canonical expression instead**, use
-`ce.box(expr, {canonical: false})` or `ce.parse(latex, {canonical: false})`.
+`ce.box(expr, {form: 'raw'})` or `ce.parse(latex, {form: 'raw'})`.
 
 When using `ce.parse()`, the non-canonical form sticks closer to the original 
 LaTeX input. When using `ce.box()`, the non-canonical form matches the
@@ -28910,10 +31003,10 @@ const latex = "\\frac{30}{-50}";
 ce.parse(latex);
 // canonical form ➔ ["Rational", -3, 5]
 
-ce.parse(latex, { canonical: false });
+ce.parse(latex, { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 
-ce.box(["Divide", 30, -50], { canonical: false });
+ce.box(["Divide", 30, -50], { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
@@ -28983,7 +31076,7 @@ console.log(expr.latex);
 
 ## Unboxing
 
-**To access the MathJSON expression of a boxed expression as plain JSON** use
+**To access the MathJSON expression of a expression as plain JSON** use
 the `expr.json` property. This property is an "unboxed" version of the
 expression.
 
@@ -29023,8 +31116,8 @@ console.log("expr.toMathJson():", expr.toMathJson({
 
 Unless otherwise specified, expressions are immutable.
 
-The functions that manipulate Boxed Expressions, such as `expr.simplify()`,
-`expr.evaluate()`, `expr.N()` return a new Boxed Expression, without modifying
+The functions that manipulate Expressions, such as `expr.simplify()`,
+`expr.evaluate()`, `expr.N()` return a new Expression, without modifying
 `expr`.
 
 However, the properties of the expression may change, since some of them may
@@ -29066,18 +31159,58 @@ function itself is pure, and all its arguments are pure as well.
 ## Checking the Kind of Expression
 
 To identify if an expression is a number literal, a symbol, a function expression
-or a string use the following boolean expressions:
+or a string, use **type guards**. Type guards narrow the type of the expression
+and provide type-safe access to properties specific to that expression type:
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
-| Kind           | Boolean Expression                  |
+| Kind           | Type Guard                  |
 | :------------- | :---------------------------------- |
-| **Number Literal**     | `expr.isNumberLiteral`              |
-| **Function Expression**   | `expr.isFunctionExpression`         |
-| **Symbol**     | `expr.symbol !== null`              |
-| **String**     | `expr.string !== null`              |
+| **Number Literal**     | `isNumber(expr)`              |
+| **Function Expression**   | `isFunction(expr)`         |
+| **Symbol**     | `isSymbol(expr)`         |
+| **String**     | `isString(expr)`         |
 
 </div>
+
+After using a type guard, you can safely access properties specific to that type:
+
+```js
+import { isNumber, isSymbol, isFunction } from '@cortex-js/compute-engine';
+
+const expr = ce.parse("3.14");
+
+// Check if it's a number and access its numeric value
+if (isNumber(expr)) {
+  console.log(expr.numericValue);  // Type-safe access
+  console.log(expr.isNumberLiteral); // Always true for number literals
+}
+
+// Check if it's a symbol and access its name
+const sym = ce.parse("x");
+if (isSymbol(sym)) {
+  console.log(sym.symbol);  // Type-safe access to symbol name
+}
+
+// Check if it's a function and access its operands
+const fn = ce.parse("2 + 3");
+if (isFunction(fn)) {
+  console.log(fn.operator);  // "Add"
+  console.log(fn.ops.length); // 2
+  console.log(fn.op1, fn.op2); // Access first and second operands
+}
+```
+
+For convenience, use the `sym()` helper to get a symbol name without explicit type checking:
+
+```js
+import { sym } from '@cortex-js/compute-engine';
+
+const expr = ce.parse("Pi");
+if (sym(expr) === 'Pi') {
+  // This is the Pi symbol
+}
+```
 
 
 ## Accessing the Value of an Expression
@@ -29101,7 +31234,7 @@ JavaScript primitive. For example, `ce.parse("2 + 3").valueOf()` will return
 `"2 + 3"`, while `ce.parse("2 + 3").evaluate().valueOf()` will return `5`.
 
 If the expression is a number literal or a symbol with a numeric value, the
-`expr.value` property will return the value of the expression as `BoxedExpression`
+`expr.value` property will return the value of the expression as `Expression`
 or `undefined` if the expression is not a number.
 
 
@@ -29110,7 +31243,7 @@ or `undefined` if the expression is not a number.
 
 Sometimes, things go wrong.
 
-If a boxed expression is not valid, the `expr.isValid` property will be set to
+If a expression is not valid, the `expr.isValid` property will be set to
 `false`, and the `expr.errors` property will contain a list of all the
 `["Error"]` subexpressions.
 
@@ -29752,7 +31885,7 @@ date: Last Modified
 <Intro>
 In the Compute Engine, **collections** group together multiple elements
 into one unit. Each element in a collection is a
-[**Boxed Expression**](/compute-engine/guides/expressions/).
+[**Expression**](/compute-engine/guides/expressions/).
 </Intro>
 
 ## Introduction

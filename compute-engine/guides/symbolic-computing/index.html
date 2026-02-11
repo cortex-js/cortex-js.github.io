@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.2ed200f5.js" defer="defer"></script>
-<script src="/assets/js/main.ea86a8c5.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.393b9c0d.js" defer="defer"></script>
+<script src="/assets/js/main.c394800c.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -32,7 +32,7 @@ rewriting rules to a MathJSON expression.</p></div>
 <p>A key difference between <code>expr.evaluate()</code> and <code>expr.N()</code> is that the former
 will use the exact value of symbols, while the latter will use their numeric
 approximation. An exact value is a rational number, an integer, the square root
-of an integer and some constants such as \(\pi\) or \(e\). A numeric
+of an integer and some constants such as $\pi$ or $e$. A numeric
 approximation is a floating point number.</p>
 <div class="first-column-header"><table><thead><tr><th style="text-align:left"> </th><th style="text-align:center"><code>expr.simplify()</code></th><th style="text-align:center"><code>expr.evaluate()</code></th><th style="text-align:center"><code>expr.N()</code></th></tr></thead><tbody><tr><td style="text-align:left">Use assumptions on symbols</td><td style="text-align:center"><svg class="icon_qj0s"><use xlink:href="/icons.svg#circle-check" style="color:var(--green-700)"></use></svg></td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td style="text-align:left">Exact calculations</td><td style="text-align:center"><svg class="icon_qj0s"><use xlink:href="/icons.svg#circle-check" style="color:var(--green-700)"></use></svg></td><td style="text-align:center"><svg class="icon_qj0s"><use xlink:href="/icons.svg#circle-check" style="color:var(--green-700)"></use></svg></td><td style="text-align:center"></td></tr><tr><td style="text-align:left">Floating-point approximations</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"><svg class="icon_qj0s"><use xlink:href="/icons.svg#circle-check" style="color:var(--green-700)"></use></svg></td></tr></tbody></table></div>
 <div class="readMore_KWn8"><a href="/compute-engine/guides/simplify/"> Read more about
@@ -57,18 +57,18 @@ replacing part of it, and applying conditional rewrite rules.</p>
 to represent an expression.</p>
 <p>The symbolic structure of an expression is the tree of symbols and functions
 that make up the expression.</p>
-<p>For example, the symbolic structure of \(2 + 1\) is a sum of two terms,
+<p>For example, the symbolic structure of $2 + 1$ is a sum of two terms,
 the first term is the number <code>2</code> and the second term is the number <code>1</code>.</p>
-<p>The symbolic structure of \(3\) is a number <code>3</code>.</p>
-<p>The symbolic structure of \(2 + 1\) and \(3\) are different, even though
+<p>The symbolic structure of $3$ is a number <code>3</code>.</p>
+<p>The symbolic structure of $2 + 1$ and $3$ are different, even though
 they represent the same mathematical object.</p>
 <p>The <code>lhs.isSame(rhs)</code> function returns true if <code>lhs</code> and <code>rhs</code> are structurally
 exactly identical, that is each sub-expression is recursively identical in <code>lhs</code>
 and <code>rhs</code>.</p>
 <ul>
-<li class="">\(1 + 1 \) and \( 2 \) are not structurally equal, one is a sum of two
+<li class="">$1 + 1 $ and $ 2 $ are not structurally equal, one is a sum of two
 integers, the other is an integer</li>
-<li class="">\( (x + 1)^2 \) and \( x^2 + 2x + 1 \) are not structurally equal, one is a
+<li class="">$ (x + 1)^2 $ and $ x^2 + 2x + 1 $ are not structurally equal, one is a
 power of a sum, the other a sum of terms.</li>
 </ul>
 <code-playground show-line-numbers=""><div slot="javascript">const a = ce.parse(&#x27;2 + 1&#x27;);
@@ -81,7 +81,7 @@ and arguments are sorted in a standard way.</p>
 <p>The expressions \( \frac<!-- -->1<!-- -->10<!-- --> \) and \( \frac<!-- -->2<!-- -->20<!-- --> \) are
 structurally equal because they get put into a canonical form when parsed,
 in which the fractions are reduced.</p>
-<p>Similarly, \( x^2 - 3x + 4 \) and \( 4 - 3x + x^2 \) are structurally equal
+<p>Similarly, $ x^2 - 3x + 4 $ and $ 4 - 3x + x^2 $ are structurally equal
 (<code>isSame</code> returns true) because the arguments of the sum are sorted in a standard
 way.</p>
 <p><strong>To compare two expressions without canonicalizing them</strong>, parse or box
@@ -90,8 +90,8 @@ them with the <code>canonical</code> option set to <code>false</code>.</p>
 <!-- -->const b = ce.parse(&#x27;\\frac{2}{20}&#x27;);
 <!-- -->console.log(&#x27;Canonical isSame?&#x27;, a.isSame(b));
 <!-- -->
-<!-- -->const aPrime = ce.parse(&#x27;\\frac{1}{10}&#x27;, {canonical: false});
-<!-- -->const bPrime = ce.parse(&#x27;\\frac{2}{20}&#x27;, {canonical: false});
+<!-- -->const aPrime = ce.parse(&#x27;\\frac{1}{10}&#x27;, {form: &#x27;raw&#x27;});
+<!-- -->const bPrime = ce.parse(&#x27;\\frac{2}{20}&#x27;, {form: &#x27;raw&#x27;});
 <!-- -->console.log(&#x27;Non-canonical isSame?&#x27;, aPrime.isSame(bPrime));
 </div></code-playground>
 <p>In some cases you may want to compare two expressions with a weak form
@@ -111,9 +111,9 @@ same mathematical object.</p>
 <p>If <code>lhs</code> and <code>rhs</code> are numeric expressions, they are evaluated before being
 compared. They are considered equal if the absolute value of the difference
 between them is less than <code>ce.tolerance</code>.</p>
-<p>The expressions \( x^2 - 3x + 4 \) and \( 4 - 3x + x^2 \) will be considered
+<p>The expressions $ x^2 - 3x + 4 $ and $ 4 - 3x + x^2 $ will be considered
 equal (<code>isEqual</code> returns true) because the difference between them is zero,
-i.e. \( (x^2 - 3x + 4) - (4 - 3x + x^2) \) is zero once the expression has
+i.e. $ (x^2 - 3x + 4) - (4 - 3x + x^2) $ is zero once the expression has
 been simplified.</p>
 <p>Note that unlike <code>expr.isSame()</code>, <code>expr.isEqual()</code> can return <code>true</code>, <code>false</code> or
 <code>undefined</code>. The latter value indicates that there is not enough information to
@@ -128,7 +128,7 @@ determine if the two expressions are mathematically equal.</p>
 <p><strong>To replace a symbol in an expression</strong> use the <code>subs()</code> function.</p>
 <p>The argument of the <code>subs()</code> function is an object literal. Each key/value
 pair is a symbol and the value to be substituted with. The value can be either
-a number or a boxed expression.</p>
+a number or a expression.</p>
 <code-playground show-line-numbers="" mark-javascript-line="4"><div slot="javascript">
 <!-- -->let expr = ce.parse(&#x27;\\sqrt{\\frac{1}{x+1}}&#x27;);
 <!-- -->console.log(expr.json);

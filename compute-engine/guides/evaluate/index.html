@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.2ed200f5.js" defer="defer"></script>
-<script src="/assets/js/main.ea86a8c5.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.393b9c0d.js" defer="defer"></script>
+<script src="/assets/js/main.c394800c.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -48,11 +48,23 @@ looks up the symbol in the current scope and returns its value.</p>
 <!-- -->expr.evaluate().print();
 <!-- -->expr.N().print();
 </div></code-playground>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="parse--evaluate-free-function">Parse + Evaluate Free Function<a href="#parse--evaluate-free-function" class="hash-link" aria-label="Direct link to Parse + Evaluate Free Function" title="Direct link to Parse + Evaluate Free Function" translate="no">​</a></h3>
+<p>For the common &quot;parse then evaluate&quot; flow, use the <code>evaluate()</code> free function:</p>
+<code-playground><div slot="javascript">// import { evaluate, assign } from &#x27;@cortex-js/compute-engine&#x27;;
+<!-- -->assign(&#x27;x&#x27;, 3);
+<!-- -->evaluate(&#x27;x+2&#x27;).print();
+<!-- -->evaluate(&#x27;\\sqrt{2}&#x27;).print();
+</div></code-playground>
+<p>The <code>evaluate()</code> free function accepts either a LaTeX string or a
+<code>Expression</code>. It uses a shared <code>ComputeEngine</code> instance created on
+first call.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compilation">Compilation<a href="#compilation" class="hash-link" aria-label="Direct link to Compilation" title="Direct link to Compilation" translate="no">​</a></h3>
-<p>An expression can be evaluated by compiling it to JavaScript using the <code>expr.compile()</code> method.
-The method returns a JavaScript function that can be called to evaluate the expression.</p>
-<code-playground><div slot="javascript">const f = ce.parse(&#x27;2\\pi&#x27;).compile();
-<!-- -->console.log(f());
+<p>An expression can be evaluated by compiling it to JavaScript using the <code>compile()</code> function.
+The result includes a <code>run</code> function that can be called to evaluate the expression.</p>
+<code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
+<!-- -->const result = compile(ce.parse(&#x27;2\\pi&#x27;));
+<!-- -->console.log(result.success ? &#x27;compiled&#x27; : &#x27;fallback&#x27;);
+<!-- -->console.log(result.run?.());
 </div></code-playground>
 <div class="readMore_KWn8"><a href="/compute-engine/guides/compiling/"><p>Read more about <strong>compiling expressions</strong> <svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="asynchronous-evaluation">Asynchronous Evaluation<a href="#asynchronous-evaluation" class="hash-link" aria-label="Direct link to Asynchronous Evaluation" title="Direct link to Asynchronous Evaluation" translate="no">​</a></h2>
@@ -207,8 +219,7 @@ sequence is empty, ignore the argument.</p>
 </ol>
 </li>
 <li class="">
-<p>If the function is associative, flatten its arguments as necessary. \[
-f(f(a, b), c) \to f(a, b, c) \]</p>
+<p>If the function is associative, flatten its arguments as necessary. $$$1$$</p>
 </li>
 <li class="">
 <p>Apply the function to the arguments</p>
@@ -216,7 +227,7 @@ f(f(a, b), c) \to f(a, b, c) \]</p>
 <li class="">
 <p>Return the result in canonical form.</p>
 </li>
-</ol></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/expressions/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Expressions</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/symbolic-computing/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Symbolic Computing</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#evaluation-methods" class="table-of-contents__link toc-highlight">Evaluation Methods</a><ul><li><a href="#compilation" class="table-of-contents__link toc-highlight">Compilation</a></li></ul></li><li><a href="#asynchronous-evaluation" class="table-of-contents__link toc-highlight">Asynchronous Evaluation</a></li><li><a href="#lexical-scopes-and-evaluation-contexts" class="table-of-contents__link toc-highlight">Lexical Scopes and Evaluation Contexts</a><ul><li><a href="#binding" class="table-of-contents__link toc-highlight">Binding</a></li><li><a href="#default-scopes" class="table-of-contents__link toc-highlight">Default Scopes</a></li><li><a href="#creating-new-scopes" class="table-of-contents__link toc-highlight">Creating New Scopes</a></li></ul></li><li><a href="#evaluation-loop" class="table-of-contents__link toc-highlight">Evaluation Loop</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+</ol></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/expressions/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Expressions</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/symbolic-computing/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Symbolic Computing</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#evaluation-methods" class="table-of-contents__link toc-highlight">Evaluation Methods</a><ul><li><a href="#parse--evaluate-free-function" class="table-of-contents__link toc-highlight">Parse + Evaluate Free Function</a></li><li><a href="#compilation" class="table-of-contents__link toc-highlight">Compilation</a></li></ul></li><li><a href="#asynchronous-evaluation" class="table-of-contents__link toc-highlight">Asynchronous Evaluation</a></li><li><a href="#lexical-scopes-and-evaluation-contexts" class="table-of-contents__link toc-highlight">Lexical Scopes and Evaluation Contexts</a><ul><li><a href="#binding" class="table-of-contents__link toc-highlight">Binding</a></li><li><a href="#default-scopes" class="table-of-contents__link toc-highlight">Default Scopes</a></li><li><a href="#creating-new-scopes" class="table-of-contents__link toc-highlight">Creating New Scopes</a></li></ul></li><li><a href="#evaluation-loop" class="table-of-contents__link toc-highlight">Evaluation Loop</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
