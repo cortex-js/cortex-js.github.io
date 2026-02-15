@@ -2703,8 +2703,8 @@ https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
 ##### MathfieldElement.textToSpeechMarkup
 
 ```ts
-get static textToSpeechMarkup(): "" | "mac" | "ssml" | "ssml_step"
-set static textToSpeechMarkup(value: "" | "mac" | "ssml" | "ssml_step"): void
+get static textToSpeechMarkup(): "" | "ssml" | "ssml_step" | "mac"
+set static textToSpeechMarkup(value: "" | "ssml" | "ssml_step" | "mac"): void
 ```
 
 The markup syntax to use for the output of conversion to spoken text.
@@ -3160,8 +3160,8 @@ Use `null` to prevent any sound from being loaded.
 ##### MathfieldElement.decimalSeparator
 
 ```ts
-get static decimalSeparator(): "," | "."
-set static decimalSeparator(value: "," | "."): void
+get static decimalSeparator(): "." | ","
+set static decimalSeparator(value: "." | ","): void
 ```
 
 The symbol used to separate the integer part from the fractional part of a
@@ -3293,7 +3293,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.108.2';
+static version: string = '0.108.3';
 ```
 
 </MemberCard>
@@ -8531,7 +8531,7 @@ const version: {
 };
 ```
 
-Current version: `0.108.2`
+Current version: `0.108.3`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
@@ -8554,6 +8554,15 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.108.3 _2026-02-11_
+
+### Resolved Issues
+
+- **#2906** Fixed a runtime error
+  (`undefined is not an object (evaluating 'this.ariaLiveText.textContent=""')`)
+  that occurred when the mathfield element could not be fully initialized (e.g.
+  in Vue runtime-only builds) or after the mathfield was disposed.
+
 ## 0.108.2 _2025-11-13_
 
 ### Resolved Issues

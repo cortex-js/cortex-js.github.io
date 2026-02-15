@@ -6818,6 +6818,7 @@ type LibraryCategory =
   | "arithmetic"
   | "calculus"
   | "collections"
+  | "colors"
   | "control-structures"
   | "combinatorics"
   | "core"
@@ -6829,7 +6830,8 @@ type LibraryCategory =
   | "polynomials"
   | "relop"
   | "statistics"
-  | "trigonometry";
+  | "trigonometry"
+  | "units";
 ```
 
 </MemberCard>
@@ -13086,6 +13088,226 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.51.0 _2026-02-14_
+
+### Colors
+
+- **New `colors` library**: Four MathJSON operators for color manipulation and
+  color space conversion, available as the `"colors"` library category.
+- **`Color`**: Parse a color string (hex 3/6/8-digit, `rgb()`, `hsl()`, named
+  CSS color, `transparent`) into a canonical sRGB `Tuple` with components
+  normalized to 0-1. Alpha is included as a fourth component when not equal
+  to 1.
+- **`Colormap`**: Sample named visualization palettes. Three variants: no second
+  argument returns the full palette as a `List`; integer _n_ >= 2 resamples to
+  _n_ evenly spaced colors; real _t_ in [0, 1] interpolates at position _t_
+  using OKLCh color space with shorter-arc hue interpolation. Includes 8
+  sequential palettes (viridis, inferno, magma, plasma, cividis, turbo, rocket,
+  mako), 6 categorical palettes (graph6, spectrum6, spectrum12, tableau10,
+  tycho11, kelly22), and 12 diverging palettes (roma, vik, broc, rdbu,
+  coolwarm, ocean-balance, plus reversed variants).
+- **`ColorToColorspace`**: Convert an sRGB color (string or `Tuple`) to
+  components in `"rgb"`, `"hsl"`, `"oklch"`, or `"oklab"` (alias `"lab"`).
+  Preserves alpha when present.
+- **`ColorFromColorspace`**: Convert color space components back to a canonical
+  sRGB `Tuple`. Accepts the same color space names as `ColorToColorspace`.
+- **`ColorToString`**: Convert a color (string or sRGB `Tuple`) to a formatted
+  string. Supports optional format argument: `"hex"` (default), `"rgb"`,
+  `"hsl"`, or `"oklch"` for CSS-style output. Alpha is included when not
+  equal to 1.
+- **`ColorMix`**: Blend two colors in OKLCh space with an optional ratio
+  (default 0.5). Accepts color strings or sRGB `Tuple` values. Interpolates
+  lightness and chroma linearly, hue with shorter-arc interpolation.
+- **`ColorContrast`**: Compute the APCA contrast ratio between a background
+  and foreground color. Returns a positive value for dark-on-light and
+  negative for light-on-dark.
+- **`ContrastingColor`**: Choose the foreground color with better APCA contrast
+  against a background. With one argument, picks between white and black. With
+  three arguments, picks the better of two foreground candidates.
+- **LaTeX color support**: `\textcolor{color}{body}`, `\colorbox{color}{body}`,
+  and `\boxed{body}` now roundtrip through `Annotated` expressions. Parsing
+  and serialization are handled in the core `Annotated` infrastructure.
+- **LaTeX font annotations**: `\textbf`, `\textit`, `\texttt`, `\textsf`,
+  `\textup` now serialize correctly from `Annotated` expressions via
+  `fontWeight`, `fontStyle`, and `fontFamily` dict keys.
+- **JavaScript compilation**: All color operators (`Color`, `ColorToString`,
+  `ColorMix`, `ColorContrast`, `ContrastingColor`, `ColorToColorspace`,
+  `ColorFromColorspace`, `Colormap`) now compile to JavaScript.
+- **`oklab()` CSS parsing**: `parseColor()` now accepts `oklab(L a b)` and
+  `oklab(L a b / alpha)` syntax, matching the existing `oklch()` support.
+- **GPU compilation**: `ColorMix`, `ColorContrast`, `ContrastingColor`,
+  `ColorToColorspace`, and `ColorFromColorspace` now compile to GLSL and WGSL.
+  Preamble functions provide sRGB ↔ OKLab ↔ OKLCh conversion, color mixing
+  with shorter-arc hue interpolation, and APCA contrast on the GPU.
+- Added `rgbToHsl()` conversion function. Exported `hslToRgb()` (previously
+  private).
+
+### Bug Fixes
+
+- **(#290) Derivatives of user-defined functions**: `\frac{d}{dx} f` and `f'(x)`
+  now correctly evaluate when `f` is a user-defined function (e.g.,
+  `f(x) := 2x`). Previously `\frac{d}{dx} f` returned `0` and `f'(x)` returned a
+  symbolic `Apply(Derivative(...))`.
+- **Cleaner `D` canonical form**: `f'(x)` now canonicalizes to
+  `["D", ["f", "x"], "x"]` instead of the verbose
+  `["D", ["Function", ["Block", ["f", "x"]], "x"], "x"]`. Function calls are no
+  longer redundantly wrapped in `Function(Block(...))`. Similarly,
+  `\frac{d}{dx} f` where `f` is a known function symbol canonicalizes to
+  `["D", ["f", "x"], "x"]` by applying the function to the differentiation
+  variable.
+
+### Free Functions
+
+- Free functions (`simplify`, `evaluate`, `N`, `expand`, `expandAll`, `factor`,
+  `solve`, `compile`) now accept `ExpressionInput` in addition to `LatexString`
+  and `Expression`. This means you can pass numbers, MathJSON objects, or tuple
+  arrays directly — e.g., `evaluate(["Add", 1, 2])` or
+  `simplify(["Power", "x", 2])`.
+- Added `declare()` free function to declare symbols without instantiating a
+  `ComputeEngine` explicitly — e.g., `declare('x', 'integer')` or
+  `declare({ x: 'integer', y: 'real' })`.
+
+### Units and Quantities
+
+- **New `units` library**: A comprehensive unit system for physical quantities,
+  available as the `"units"` library category. Supports SI base units, 18 named
+  derived units, SI prefixes (quetta through quecto), and common non-SI units
+  (imperial, angles, logarithmic).
+- **`Quantity` expression**: Pairs a numeric value with a unit:
+  `["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]`. Accessors
+  `QuantityMagnitude` and `QuantityUnit` extract the parts.
+- **Quantity arithmetic**: `Add`, `Subtract`, `Multiply`, `Divide`, and `Power`
+  are unit-aware. Addition and subtraction automatically convert compatible
+  units and express the result in the unit with the largest scale factor (e.g.,
+  `12 cm + 1 m` evaluates to `1.12 m`). Incompatible dimensions remain
+  unevaluated.
+- **Unit conversion**: `UnitConvert` converts between compatible units,
+  including compound units like `m/s` to `km/h`. Supports affine temperature
+  conversions (`degC`, `degF`, `K`). Returns an error for incompatible units.
+  `UnitSimplify` reduces compound units to named derived units when possible
+  (e.g., `kg*m/s^2` to `N`).
+- **Dimensional analysis**: `IsCompatibleUnit` tests dimensional compatibility.
+  `UnitDimension` returns the 7-element SI dimension vector. Both support
+  compound unit expressions.
+- **LaTeX parsing**: `\mathrm{...}` and `\text{...}` containing recognized units
+  produce `Quantity` expressions when juxtaposed with numbers. Compound units
+  with `/`, `^`, and `\cdot` are supported (e.g., `5\,\mathrm{m/s^{2}}`).
+- **siunitx commands**: `\qty{value}{unit}`, `\SI{value}{unit}`, `\unit{unit}`,
+  and `\si{unit}` are parsed.
+- **LaTeX serialization**: `Quantity` expressions serialize to
+  `value\,\mathrm{unit}` notation.
+- **DSL string sugar**: Compound units can be specified as strings in MathJSON:
+  `["Quantity", 9.8, "m/s^2"]` is canonicalized to the structured form.
+  Parentheses are supported for grouping: `"kg/(m*s^2)"`.
+- **Temperature units**: `degC` and `degF` with affine offset conversions.
+- **Angular unit unification**: Trigonometric functions (`Sin`, `Cos`, `Tan`,
+  etc.) accept `Quantity` arguments with angular units (`deg`, `rad`, `grad`,
+  `arcmin`, `arcsec`) and convert to radians automatically.
+- **Physics constants**: 11 CODATA 2018 constants defined as `Quantity`
+  expressions: `SpeedOfLight`, `PlanckConstant`, `Mu0`, `StandardGravity`,
+  `ElementaryCharge`, `BoltzmannConstant`, `AvogadroConstant`,
+  `VacuumPermittivity`, `GravitationalConstant`, `StefanBoltzmannConstant`, and
+  `GasConstant`.
+
+### Compilation
+
+- **Tuple and Matrix compilation**: `Tuple` and `Matrix` expressions can now be
+  compiled across all targets. `compile('(\\sin(t), \\cos(t))')` produces
+  `[Math.sin(t), Math.cos(t)]` in JavaScript, `vec2(sin(t), cos(t))` in GLSL,
+  `vec2f(sin(t), cos(t))` in WGSL, and `(np.sin(t), np.cos(t))` in Python.
+- **GPU-native matrix types**: Square matrices (2x2, 3x3, 4x4) compile to native
+  GPU matrix constructors (`mat2`/`mat3`/`mat4` in GLSL,
+  `mat2x2f`/`mat3x3f`/`mat4x4f` in WGSL) with proper column-major transposition.
+  Column vectors are flattened to `vecN`/`vecNf` instead of nested
+  single-element arrays.
+- **Complex number compilation**: The JavaScript compilation target now supports
+  complex-valued expressions. The compiler performs static type analysis at
+  compile time to determine whether each subexpression is real or complex, and
+  emits the appropriate code path. Simple arithmetic (Add, Subtract, Multiply,
+  Divide, Negate) uses inline `{re, im}` field math to avoid allocation.
+  Transcendental functions (Sin, Cos, Exp, Ln, Sqrt, Power, and others) delegate
+  to runtime helpers backed by the `complex-esm` library. Mixed real/complex
+  operands are promoted inline. `ImaginaryUnit` compiles to `{re: 0, im: 1}`.
+  Symbols with unknown type are assumed real. Complex-aware `Sum` and `Product`
+  loops emit `{re, im}` accumulators when the loop body is complex-valued.
+  Reciprocal trig/hyperbolic functions (Cot, Sec, Csc, Coth, Sech, Csch) and
+  their inverses dispatch to complex helpers when operands are complex.
+- **Python complex compilation**: The Python target now supports complex-valued
+  expressions using Python's native `complex()` constructor and the `cmath`
+  module for transcendental functions. Real-valued expressions continue to use
+  NumPy.
+- **Gamma function compilation**: `Gamma` and `GammaLn` can now be compiled to
+  `interval-js`, `glsl`, `wgsl`, and `interval-glsl` targets. The interval
+  targets include pole detection at non-positive integers and correct
+  monotonicity handling around the minimum at x ≈ 1.46.
+- **Special function compilation**: 27 additional functions can now be compiled
+  to JavaScript: `Erf`, `Erfc`, `ErfInv`, `Beta`, `Digamma`, `Trigamma`,
+  `PolyGamma`, `Zeta`, `LambertW`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`,
+  `AiryAi`, `AiryBi`, `Factorial`, `Factorial2`, `Exp2`, `Log2`, `Log10`, `Lg`,
+  `Arctan2`, `Hypot`, `Degrees`, `Haversine`, `InverseHaversine`, `Binomial`,
+  and `Fibonacci`.
+- **GPU special functions**: `Erf`, `Erfc`, `ErfInv`, `Beta`, `Factorial`,
+  `Arctan2`, `Hypot`, `Haversine`, `InverseHaversine`, `Log10`, and `Lg` can now
+  be compiled to GLSL and WGSL targets. `Erf`/`ErfInv` use Abramowitz & Stegun
+  polynomial approximations; `Beta` and `Factorial` leverage the existing GPU
+  Gamma preamble.
+
+### Simplification
+
+- **Factorial quotient simplification**: `n!/k!` is now simplified to a partial
+  product for both concrete integers (e.g., `10!/7!` → `720`) and symbolic
+  expressions with small constant difference (e.g., `n!/(n-2)!` → `n(n-1)`).
+- **Binomial detection**: Expressions of the form `n!/(k!(n-k)!)` are
+  automatically recognized and simplified to `Binomial(n, k)`.
+- **Binomial identity simplification**: `C(n,0)` → `1`, `C(n,1)` → `n`, `C(n,n)`
+  → `1`, `C(n,n-1)` → `n`.
+- **Factorial sum factoring**: Sums and differences of factorials with related
+  arguments are factored out, e.g., `n! - (n-1)!` → `(n-1)! * (n-1)`,
+  `(n+1)! + n!` → `n! * (n+2)`.
+
+## 0.50.2 _2026-02-12_
+
+### Numerics
+
+- **Centralized overflow protection**: Improved robustness of `Rational` and
+  `ExactNumericValue` arithmetic by centralizing overflow checks and automatic
+  promotion to `BigInt`.
+- **\[#287\](https://github.com/cortex-js/compute-engine/issues/287) Improved
+  precision for large integer products**: Multiplications and additions of large
+  integers that would previously lose precision (exceeding
+  `Number.MAX_SAFE_INTEGER`) are now automatically promoted to `BigInt` to
+  maintain exact results.
+
+### Symbols
+
+- **[\#288](https://github.com/cortex-js/compute-engine/issues/288) Allow
+  reassigning a symbol from operator to value**: `ce.assign()` no longer throws
+  when assigning a plain value to a symbol that was previously declared as a
+  function. Existing expressions using the symbol as a function head will
+  produce a type error at evaluation time if the new value is not callable.
+
+### Evaluation
+
+- **Fixed scope leaks**: Ensured that evaluation contexts are correctly popped
+  even when an error or timeout occurs in `BoxedFunction.evaluate()`,
+  `findUnivariateRoots()`, and rule-boxing operations.
+- **Improved numerical evaluation performance**: `Sum`, `Product`, `Divide`, and
+  statistical operators (`Mean`, `Variance`, etc.) now correctly propagate the
+  `numericApproximation` option, significantly speeding up large numerical
+  calculations by avoiding expensive exact arithmetic.
+
+## 0.50.1 _2026-02-11_
+
+### Compilation
+
+- **`CompilationResult.preamble` for shader targets**: `compile()` with
+  `interval-wgsl` and `interval-glsl` targets now returns a `preamble` field
+  containing the interval arithmetic library (struct definitions, helper
+  functions). Previously, the compiled `code` referenced functions like `ia_div`
+  and `ia_sin` that were not included in the output. Use `preamble + code` for a
+  self-contained shader, or call `compileShaderFunction()` on the target
+  directly.
+
 ## 0.50.0 _2026-02-11_
 
 ### Breaking API Changes
@@ -20789,6 +21011,7 @@ the documentation.
 | [Arithmetic](/compute-engine/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
 | [Calculus](/compute-engine/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
 | [Collections](/compute-engine/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
+| [Colors](/compute-engine/reference/colors/)                         | `Color` `ColorToString` `ColorMix` `ColorContrast` `ContrastingColor` `Colormap` `ColorToColorspace` `ColorFromColorspace` |
 | [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
 | [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
 | [Core](/compute-engine/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
@@ -24964,7 +25187,62 @@ such as `Divide` or `PlusMinus` and are not prefixed with a backslash.
 
 
 **To extend the LaTeX syntax** update the `latexDictionary` property of the
-Compute Engine
+Compute Engine.
+
+The simplest way to add a custom LaTeX command for a function is to provide
+a declarative entry with `name`, `kind`, and a trigger. No custom `parse`
+handler is needed:
+
+```js
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  {
+    name: "triple",
+    kind: "function",
+    latexTrigger: "\\triple",
+    // "implicit" so that \triple{x}, \triple(x), and \triple x all work
+    arguments: "implicit",
+    serialize: "\\triple",
+  },
+];
+
+ce.parse("\\triple{5}").json;
+// ➔ ["triple", 5]
+```
+
+If the function has already been declared with `ce.declare()`, parsing and
+evaluating work together:
+
+```js
+ce.declare("triple", {
+  signature: "number -> number",
+  evaluate: ([x]) => x.mul(3),
+});
+
+ce.parse("\\triple{5}").evaluate().json;
+// ➔ 15
+```
+
+For **multi-character names** that don't need their own LaTeX command, use
+`symbolTrigger` instead of `latexTrigger`. This matches
+`\operatorname{name}` and `\mathrm{name}` automatically:
+
+```js
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  {
+    kind: "function",
+    symbolTrigger: "double",
+    parse: "double",
+  },
+];
+
+ce.parse("\\operatorname{double}(5)").json;
+// ➔ ["double", 5]
+```
+
+For more complex parsing — for example when a command takes multiple
+LaTeX group arguments — use a custom `parse` handler:
 
 ```live
 ce.latexDictionary = [
@@ -24972,7 +25250,7 @@ ce.latexDictionary = [
   ...ce.latexDictionary,
   // ...and add the `\smoll{}{}` command
   {
-    // The parse handler below will be invoked when this LaTeX command 
+    // The parse handler below will be invoked when this LaTeX command
     // is encountered
     latexTrigger: '\\smoll',
     parse: (parser) => {
@@ -26239,6 +26517,339 @@ type, allowing subscripted elements to be used in arithmetic.
 <ReadMore path="/compute-engine/reference/collections/" >
 Read more about **Collections** and the `At` function <Icon name="chevron-right-bold" />
 </ReadMore>
+---
+title: Colors
+slug: /compute-engine/reference/colors/
+date: Last Modified
+---
+
+<Intro>
+The Colors library provides operators for parsing color strings, sampling
+visualization palettes, and converting between color spaces. Colors are
+represented as `Tuple` expressions with 3 or 4 sRGB components normalized
+to 0-1.
+</Intro>
+
+## Color
+
+<FunctionDefinition name="Color">
+
+<Signature name="Color">_color-string_</Signature>
+
+Parse a color string and return a canonical sRGB `Tuple`.
+
+Supported input formats:
+
+| Format | Example |
+| :----- | :------ |
+| Hex 6-digit | `#ff6600` |
+| Hex 3-digit | `#f60` |
+| Hex 8-digit (with alpha) | `#ff660080` |
+| `rgb()` | `rgb(255, 102, 0)` |
+| `hsl()` | `hsl(24, 100%, 50%)` |
+| Named color | `red`, `blue` |
+| `transparent` | `transparent` |
+
+```json example
+["Color", "'#ff0000'"]
+// → ["Tuple", 1, 0, 0]
+
+["Color", "'rgb(0, 128, 255)'"]
+// → ["Tuple", 0, 0.502, 1]
+
+["Color", "'transparent'"]
+// → ["Tuple", 0, 0, 0, 0]
+
+["Color", "'hsl(120, 100%, 50%)'"]
+// → ["Tuple", 0, 1, 0]
+```
+
+Returns an `Error` if the input string is not a recognized color format.
+
+</FunctionDefinition>
+
+
+## ColorToString
+
+<FunctionDefinition name="ColorToString">
+
+<Signature name="ColorToString">_color_</Signature>
+
+<Signature name="ColorToString">_color_, _format_</Signature>
+
+Convert a color to a string representation. The _color_ argument can be a color
+string (same formats as `Color`) or an sRGB `Tuple`.
+
+The optional _format_ argument controls the output format:
+
+| Format | Output | Example |
+| :----- | :----- | :------ |
+| `"hex"` (default) | `#rrggbb` or `#rrggbbaa` | `#ff0000` |
+| `"rgb"` | CSS `rgb()` syntax | `rgb(255 0 0)` |
+| `"hsl"` | CSS `hsl()` syntax | `hsl(0 100% 50%)` |
+| `"oklch"` | CSS `oklch()` syntax | `oklch(0.628 0.258 29.2)` |
+
+Alpha is included when not equal to 1 (e.g., `rgb(255 0 0 / 0.5)`).
+
+```json example
+["ColorToString", "'#ff0000'"]
+// → "'#ff0000'"
+
+["ColorToString", ["Tuple", 0, 1, 0]]
+// → "'#00ff00'"
+
+["ColorToString", "'#ff0000'", "'rgb'"]
+// → "'rgb(255 0 0)'"
+
+["ColorToString", "'#ff0000'", "'oklch'"]
+// → "'oklch(0.628 0.258 29.2)'"
+```
+
+</FunctionDefinition>
+
+
+## ColorMix
+
+<FunctionDefinition name="ColorMix">
+
+<Signature name="ColorMix">_color1_, _color2_</Signature>
+
+<Signature name="ColorMix">_color1_, _color2_, _ratio_</Signature>
+
+Blend two colors in OKLCh perceptual color space. Each color argument can be a
+color string or an sRGB `Tuple`.
+
+The optional _ratio_ controls the blend position: 0 returns the first color,
+1 returns the second, and 0.5 (default) is an equal mix. Values outside [0, 1]
+are clamped.
+
+Interpolation uses linear blending for lightness and chroma, and shorter-arc
+interpolation for hue. Alpha channels are interpolated linearly.
+
+```json example
+["ColorMix", "'#ff0000'", "'#0000ff'"]
+// → ["Tuple", ...]  (equal mix of red and blue in OKLCh)
+
+["ColorMix", "'#ff0000'", "'#0000ff'", 0]
+// → ["Tuple", 1, 0, 0]  (pure red)
+
+["ColorMix", "'white'", "'black'", 0.5]
+// → ["Tuple", ...]  (perceptual midpoint gray)
+```
+
+</FunctionDefinition>
+
+
+## ColorContrast
+
+<FunctionDefinition name="ColorContrast">
+
+<Signature name="ColorContrast">_background_, _foreground_</Signature>
+
+Compute the APCA (Accessible Perceptual Contrast Algorithm) contrast ratio
+between two colors. The first argument is the background color, the second is
+the foreground (text) color. Each can be a color string or an sRGB `Tuple`.
+
+APCA is asymmetric: swapping background and foreground gives a different result.
+Positive values indicate dark text on a light background; negative values
+indicate light text on a dark background.
+
+```json example
+["ColorContrast", "'#ffffff'", "'#000000'"]
+// → 1.086  (black text on white background)
+
+["ColorContrast", "'#000000'", "'#ffffff'"]
+// → -1.086  (white text on black background)
+
+["ColorContrast", "'#808080'", "'#808080'"]
+// → 0  (no contrast)
+```
+
+</FunctionDefinition>
+
+
+## ContrastingColor
+
+<FunctionDefinition name="ContrastingColor">
+
+<Signature name="ContrastingColor">_background_</Signature>
+
+<Signature name="ContrastingColor">_background_, _foreground1_, _foreground2_</Signature>
+
+Choose the foreground color with better APCA contrast against a background.
+Each argument can be a color string or an sRGB `Tuple`.
+
+With one argument, picks between white (`#ffffff`) and black (`#000000`).
+With three arguments, picks the better of the two foreground candidates.
+
+Returns the chosen color as a canonical sRGB `Tuple`.
+
+```json example
+["ContrastingColor", "'#ffffff'"]
+// → ["Tuple", 0, 0, 0]  (black text on white background)
+
+["ContrastingColor", "'#000000'"]
+// → ["Tuple", 1, 1, 1]  (white text on black background)
+
+["ContrastingColor", "'#336699'", "'#ffffff'", "'#ffff00'"]
+// → ["Tuple", 1, 1, 1]  (white has better contrast on this blue)
+```
+
+</FunctionDefinition>
+
+
+## Colormap
+
+<FunctionDefinition name="Colormap">
+
+<Signature name="Colormap">_palette-name_</Signature>
+
+<Signature name="Colormap">_palette-name_, _n_</Signature>
+
+<Signature name="Colormap">_palette-name_, _t_</Signature>
+
+Sample colors from a named visualization palette. The behavior depends on the
+second argument:
+
+- **No second argument**: return the full palette as a `List` of sRGB `Tuple`
+  values.
+- **Integer _n_ (>= 2)**: resample the palette to exactly _n_ evenly spaced
+  colors.
+- **Real _t_ in [0, 1]**: interpolate the palette at position _t_ using OKLCh
+  color space with shorter-arc hue interpolation. Returns a single `Tuple`.
+
+Values of _t_ outside [0, 1] are clamped.
+
+```json example
+["Colormap", "'viridis'"]
+// → ["List", ["Tuple", ...], ["Tuple", ...], ...]
+//   (full palette, 256 colors)
+
+["Colormap", "'viridis'", 5]
+// → ["List", ["Tuple", ...], ..., ["Tuple", ...]]
+//   (5 evenly spaced colors)
+
+["Colormap", "'viridis'", 0.5]
+// → ["Tuple", 0.127, 0.567, 0.551]
+//   (interpolated color at midpoint)
+```
+
+### Available Palettes
+
+**Sequential** (256 stops, perceptually uniform):
+
+| Name | Description |
+| :--- | :---------- |
+| `viridis` | Purple to yellow-green (colorblind-safe) |
+| `inferno` | Black to yellow through red |
+| `magma` | Black to light pink through purple |
+| `plasma` | Purple to yellow |
+| `cividis` | Blue to yellow (colorblind-optimized) |
+| `turbo` | Rainbow-like (improved jet) |
+| `rocket` | Dark to light warm tones |
+| `mako` | Blue to teal |
+
+**Categorical** (discrete, distinct colors):
+
+| Name | Colors | Description |
+| :--- | :----- | :---------- |
+| `graph6` | 6 | Default graph palette |
+| `spectrum6` | 6 | Spectrum-based |
+| `spectrum12` | 12 | Extended spectrum |
+| `tableau10` | 10 | Tableau classic |
+| `tycho11` | 11 | High-contrast |
+| `kelly22` | 22 | Kelly's maximum contrast |
+
+**Diverging** (256 stops, symmetric around midpoint):
+
+| Name | Description |
+| :--- | :---------- |
+| `roma` | Blue to red-orange |
+| `roma-reversed` | Reversed roma |
+| `vik` | Blue to red through white |
+| `vik-reversed` | Reversed vik |
+| `broc` | Green to brown |
+| `broc-reversed` | Reversed broc |
+| `rdbu` | Red to blue |
+| `rdbu-reversed` | Reversed rdbu |
+| `coolwarm` | Cool blue to warm red |
+| `coolwarm-reversed` | Reversed coolwarm |
+| `ocean-balance` | Dark teal to dark red |
+| `ocean-balance-reversed` | Reversed ocean-balance |
+
+Returns an `Error` if the palette name is not recognized.
+
+</FunctionDefinition>
+
+
+## ColorToColorspace
+
+<FunctionDefinition name="ColorToColorspace">
+
+<Signature name="ColorToColorspace">_color_, _space_</Signature>
+
+Convert a color to components in the target color space. The _color_ argument
+can be a color string (same formats as `Color`) or an sRGB `Tuple`.
+
+Supported color spaces:
+
+| Space | Components | Range |
+| :---- | :--------- | :---- |
+| `"rgb"` | red, green, blue | 0-1 each |
+| `"hsl"` | hue, saturation, lightness | H: 0-360, S/L: 0-1 |
+| `"oklch"` | lightness, chroma, hue | L: 0-1, C: 0-0.4, H: 0-360 |
+| `"oklab"` or `"lab"` | lightness, a, b | L: 0-1, a/b: approx -0.4 to 0.4 |
+
+Returns a `Tuple` with 3 components, or 4 if the input has an alpha channel.
+
+```json example
+["ColorToColorspace", "'#ff0000'", "'oklch'"]
+// → ["Tuple", 0.628, 0.258, 29.23]
+
+["ColorToColorspace", "'#3366cc'", "'hsl'"]
+// → ["Tuple", 220, 0.6, 0.5]
+
+["ColorToColorspace", ["Tuple", 1, 0, 0], "'oklab'"]
+// → ["Tuple", 0.628, 0.225, 0.126]
+```
+
+</FunctionDefinition>
+
+
+## ColorFromColorspace
+
+<FunctionDefinition name="ColorFromColorspace">
+
+<Signature name="ColorFromColorspace">_components_, _space_</Signature>
+
+Convert color space components back to a canonical sRGB `Tuple`. The
+_components_ argument is a `Tuple` of 3 or 4 values in the source color space.
+The _space_ argument accepts the same values as `ColorToColorspace`.
+
+Out-of-gamut values are clamped to the sRGB range.
+
+```json example
+["ColorFromColorspace", ["Tuple", 0.6, 0.26, 29], "'oklch'"]
+// → ["Tuple", 0.918, 0.155, 0.039]
+
+["ColorFromColorspace", ["Tuple", 0, 1, 0.5], "'hsl'"]
+// → ["Tuple", 1, 0, 0]
+
+["ColorFromColorspace", ["Tuple", 0.628, 0.225, 0.126], "'lab'"]
+// → ["Tuple", 1, 0, 0]
+```
+
+A roundtrip is exact within floating-point precision:
+
+```json example
+// Convert to OKLCh and back
+["ColorFromColorspace",
+  ["ColorToColorspace", "'#3366cc'", "'oklch'"],
+  "'oklch'"]
+// ≈ ["Color", "'#3366cc'"]
+```
+
+</FunctionDefinition>
 ---
 title: Numeric Evaluation
 slug: /compute-engine/guides/numeric-evaluation/
@@ -28965,6 +29576,348 @@ before declaring it. If the referenced type is already defined, the `type` keywo
 
 
 ---
+title: Units and Quantities
+slug: /compute-engine/guides/units/
+date: Last Modified
+---
+
+<Intro>
+The Compute Engine supports physical units and quantities. You can parse LaTeX
+expressions with units, perform arithmetic on quantities, convert between units,
+and check dimensional compatibility.
+</Intro>
+
+## Quick Start
+
+```live
+// import { parse, evaluate } from '@cortex-js/compute-engine';
+
+// Parse LaTeX with units
+parse('12\\,\\mathrm{cm}').print();
+
+// Arithmetic: add compatible quantities (largest-scale-unit wins)
+evaluate('12\\,\\mathrm{cm} + 1\\,\\mathrm{m}').print();
+
+// Convert units
+evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']).print();
+```
+
+## Creating Quantities
+
+A quantity pairs a numeric value with a unit. Use the `Quantity` function in
+MathJSON:
+
+```json example
+["Quantity", 3.5, "m"]
+["Quantity", 100, "km"]
+["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]
+```
+
+### Simple Units
+
+Simple units use standard SI abbreviations as strings:
+
+```json example
+"m", "kg", "s", "A", "K", "mol", "cd"
+```
+
+Prefixed units are also single strings:
+
+```json example
+"km", "mg", "ns", "GHz", "kN"
+```
+
+### Compound Units
+
+Compound units are built with `Multiply`, `Divide`, and `Power`:
+
+```json example
+["Divide", "m", "s"]                         // velocity (m/s)
+["Divide", "m", ["Power", "s", 2]]           // acceleration (m/s^2)
+["Multiply", "kg", "m", ["Power", "s", -2]]  // force (N)
+```
+
+### DSL String Shorthand
+
+For convenience, compound units can also be written as strings using a simple
+DSL syntax. The string is automatically parsed into the structured form during
+canonicalization:
+
+```json example
+["Quantity", 9.8, "m/s^2"]
+// canonicalizes to:
+["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]
+```
+
+The DSL supports:
+- `/` for division: `m/s`
+- `^` for exponents: `s^-2`
+- `*` for multiplication: `kg*m`
+- `(...)` for grouping: `kg/(m*s^2)`
+- SI prefixes: `km/h`
+
+:::info[Note]
+`"ms"` is always parsed as the prefixed unit millisecond, not meter times
+second. Use `"m*s"` for the product.
+:::
+
+
+## Parsing LaTeX with Units
+
+The engine recognizes units inside `\mathrm{...}` and `\text{...}` when they
+appear next to a number:
+
+```live
+parse('5\\,\\mathrm{m}').print();
+
+parse('9.8\\,\\mathrm{m/s^{2}}').print();
+
+parse('3\\,\\text{kg}').print();
+```
+
+### siunitx Commands
+
+The `siunitx` LaTeX package commands are also supported:
+
+```live
+// Modern siunitx
+parse('\\qty{12}{cm}').print();
+parse('\\unit{m/s}').print();
+
+// Legacy siunitx
+parse('\\SI{5}{kg}').print();
+parse('\\si{MHz}').print();
+```
+
+### Serialization
+
+Quantities serialize back to LaTeX with a thin space and upright unit:
+
+```live
+console.info(parse('5\\,\\mathrm{m}').latex);
+// → "5\,\mathrm{m}"
+
+console.info(parse('9.8\\,\\mathrm{m/s^{2}}').latex);
+// → "9.8\,\mathrm{m/s^{2}}"
+```
+
+
+## Arithmetic on Quantities
+
+### Addition and Subtraction
+
+Operands must have compatible dimensions. The result is expressed in the unit
+with the largest scale factor:
+
+```live
+evaluate(['Add', ['Quantity', 12, 'cm'], ['Quantity', 1, 'm']]).print();
+// → ["Quantity", 1.12, "m"]
+```
+
+Adding quantities with incompatible dimensions (e.g., meters + seconds) returns
+the expression unevaluated.
+
+### Multiplication and Division
+
+Units combine when multiplying or dividing quantities:
+
+```live
+evaluate(['Multiply', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]).print();
+// → ["Quantity", 15, ["Multiply", "m", "s"]]
+
+evaluate(['Divide', ['Quantity', 100, 'm'], ['Quantity', 10, 's']]).print();
+// → ["Quantity", 10, ["Divide", "m", "s"]]
+```
+
+Scalar multiplication works naturally:
+
+```live
+evaluate(['Multiply', 2, ['Quantity', 5, 'kg']]).print();
+// → ["Quantity", 10, "kg"]
+```
+
+### Exponentiation
+
+The unit is raised to the power:
+
+```live
+evaluate(['Power', ['Quantity', 3, 'm'], 2]).print();
+// → ["Quantity", 9, ["Power", "m", 2]]
+```
+
+## Unit Conversion
+
+Use `UnitConvert` to convert a quantity to a different compatible unit:
+
+```live
+evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']).print();
+// → ["Quantity", 1.5, "km"]
+
+evaluate(['UnitConvert', ['Quantity', 180, 'deg'], 'rad']).print();
+// → ["Quantity", 3.14159..., "rad"]
+```
+
+Compound unit conversion is also supported:
+
+```live
+evaluate(['UnitConvert',
+  ['Quantity', 36, ['Divide', 'km', 'h']],
+  ['Divide', 'm', 's']
+]).print();
+// → ["Quantity", 10, ["Divide", "m", "s"]]
+```
+
+### Temperature Conversion
+
+Temperature units (`degC`, `degF`, `K`) use affine conversions that correctly
+handle the offset between scales:
+
+```live
+evaluate(['UnitConvert', ['Quantity', 100, 'degC'], 'degF']).print();
+// → ["Quantity", 212, "degF"]
+
+evaluate(['UnitConvert', ['Quantity', 32, 'degF'], 'degC']).print();
+// → ["Quantity", 0, "degC"]
+
+evaluate(['UnitConvert', ['Quantity', 0, 'K'], 'degC']).print();
+// → ["Quantity", -273.15, "degC"]
+```
+
+Converting incompatible units returns an `Error` expression:
+
+```live
+evaluate(['UnitConvert', ['Quantity', 5, 'm'], 's']).print();
+// → Error
+```
+
+## Unit Simplification
+
+`UnitSimplify` reduces a compound unit to a named derived unit when one exists:
+
+```live
+evaluate(['UnitSimplify',
+  ['Quantity', 100, ['Multiply', 'kg', 'm', ['Power', 's', -2]]]
+]).print();
+// → ["Quantity", 100, "N"]
+```
+
+If no simpler named form exists, the quantity is returned unchanged.
+
+
+## Dimensional Analysis
+
+### Checking Compatibility
+
+Use `IsCompatibleUnit` to test whether two units have the same dimension.
+Both simple and compound unit expressions are supported:
+
+```live
+evaluate(['IsCompatibleUnit', 'm', 'km']).print();
+// → True
+
+evaluate(['IsCompatibleUnit', 'm', 's']).print();
+// → False
+
+evaluate(['IsCompatibleUnit',
+  ['Divide', 'm', 's'],
+  ['Divide', 'km', 'h']
+]).print();
+// → True
+```
+
+### Dimension Vectors
+
+Every unit maps to a 7-element dimension vector over the SI base dimensions:
+`[length, mass, time, current, temperature, amount, luminosity]`.
+
+Use `UnitDimension` to retrieve it. Both simple symbols and compound
+expressions are supported:
+
+```live
+evaluate(['UnitDimension', 'm']).print();
+// → [1, 0, 0, 0, 0, 0, 0]
+
+evaluate(['UnitDimension', ['Divide', 'm', ['Power', 's', 2]]]).print();
+// → [1, 0, -2, 0, 0, 0, 0]
+```
+
+## Angular Units and Trigonometry
+
+Trigonometric functions accept `Quantity` arguments with angular units. The
+angle is automatically converted to radians before evaluation:
+
+```live
+evaluate(['Sin', ['Quantity', 90, 'deg']]).print();
+// → 1
+
+evaluate(['Cos', ['Quantity', 200, 'grad']]).print();
+// → -1
+```
+
+Supported angular units: `deg`, `rad`, `grad`, `turn`, `arcmin`, `arcsec`.
+
+
+## Physics Constants
+
+The `physics` library (loaded by default) provides physical constants as
+`Quantity` expressions:
+
+```live
+evaluate('SpeedOfLight').print();
+// → ["Quantity", 299792458, ["Divide", "m", "s"]]
+
+evaluate('PlanckConstant').print();
+// → ["Quantity", 6.62607015e-34, ["Multiply", "J", "s"]]
+
+evaluate('StandardGravity').print();
+// → ["Quantity", 9.80665, ["Divide", "m", ["Power", "s", 2]]]
+```
+
+| Constant         | Symbol              | Value            | Unit   |
+| :--------------- | :------------------ | :--------------- | :----- |
+| Speed of light   | `SpeedOfLight`      | 299792458        | m/s    |
+| Planck constant  | `PlanckConstant`    | 6.62607015e-34   | J s    |
+| Vacuum permeability | `Mu0`            | 1.25663706212e-6 | N/A^2  |
+| Standard gravity | `StandardGravity`   | 9.80665          | m/s^2  |
+| Elementary charge | `ElementaryCharge` | 1.602176634e-19  | C      |
+| Boltzmann constant | `BoltzmannConstant` | 1.380649e-23   | J/K    |
+| Avogadro constant | `AvogadroConstant` | 6.02214076e23    | mol^-1 |
+| Vacuum permittivity | `VacuumPermittivity` | 8.8541878128e-12 | F/m |
+| Gravitational constant | `GravitationalConstant` | 6.67430e-11 | m^3/(kg s^2) |
+| Stefan-Boltzmann | `StefanBoltzmannConstant` | 5.670374419e-8 | W/(m^2 K^4) |
+| Gas constant     | `GasConstant`       | 8.314462618      | J/(mol K) |
+
+
+## Supported Units
+
+### SI Base Units
+
+`m`, `kg`, `s`, `A`, `K`, `mol`, `cd`
+
+### Named Derived SI Units
+
+`Hz`, `N`, `Pa`, `J`, `W`, `C`, `V`, `F`, `ohm`, `S`, `Wb`, `T`, `H`, `lm`,
+`lx`, `Bq`, `Gy`, `Sv`, `kat`
+
+### SI Prefixes
+
+All SI prefixes from quetta (10^30) to quecto (10^-30) are supported on base
+and named derived units. For example: `km`, `mg`, `GHz`, `kN`, `nA`.
+
+### Non-SI Units
+
+Time: `min`, `h`, `d` | Length: `in`, `ft`, `mi`, `au` |
+Mass: `t`, `lb`, `oz`, `Da` | Volume: `L`, `gal` |
+Energy: `eV`, `cal`, `kWh` | Pressure: `atm`, `bar` |
+Area: `ha` | Temperature: `degC`, `degF` |
+Angle: `deg`, `rad`, `grad`, `turn`, `arcmin`, `arcsec` |
+Other: `percent`, `ppm`, `dB`, `Np`
+
+
+<ReadMore path="/compute-engine/reference/units/" >
+See the **Units Reference** for the complete list of functions<Icon name="chevron-right-bold" />
+</ReadMore>
+---
 title: Arithmetic
 slug: /compute-engine/reference/arithmetic/
 ---
@@ -29985,28 +30938,21 @@ mathematical expressions.
 </Intro>
 
 
-
-:::info[Note]
-To use Compute Engine, you must write JavaScript or TypeScript code. 
-This guide assumes you’re familiar with these languages.
-:::
-
 <div style={{height:"1rem"}}></div>
 
 ```live
-console.log("exp(i*pi) =", ce.parse("e^{i\\pi}").evaluate());
+console.log(evaluate("e^{i\\pi}"));
 ```
 
 ```live
-const expr = ce.parse("(a+b)^2");
-ce.box(["Expand", expr]).evaluate().print();
+console.log(expand("(a+b)^2"));
 ```
 
 
 ```live
-const lhs = ce.parse("1 + x(1 + 2x) + 2x");
-const rhs = ce.parse("2x^2 + 3x + 1");
-console.log(lhs, lhs.isEqual(rhs) ? "=" : "≠", rhs);
+console.log(simplify(
+  "(sin(alpha)**2 + cos(alpha)**2) * (x**2 + 2*x + 1) / (x + 1)"
+));
 ```
 
 
@@ -30046,17 +30992,29 @@ evaluate("2^{11} - 1").print();
 N("\\frac{1}{3}").print();
 ```
 
-Available free functions:
+| Function                               | Purpose                                                        |
+| :------------------------------------- | :------------------------------------------------------------- |
+| `evaluate(expr \| latex)`                | Evaluate an expression or LaTeX input symbolically.            |
+| `N(expr \| latex)`                       | Numerically evaluate an expression or LaTeX input.             |
+| `simplify(expr \| latex)`                | Simplify an expression or LaTeX input.                         |
+| `assign(id, value)` / `assign(record)` | Assign one symbol value or many at once.                       |
+| `expand(expr \| latex)`                  | Expand distributively at the top level (`Expression \| null`). |
+| `expandAll(expr \| latex)`               | Expand distributively recursively (`Expression \| null`).      |
+| `factor(expr \| latex)`                  | Factor an expression.                                          |
+| `solve(expr \| latex, vars?)`            | Solve equations/systems (returns solve result variants).       |
+| `compile(expr \| latex, options?)`       | Compile to a target language with `CompilationResult`.         |
+| `parse(latex)`                         | Parse a LaTeX string into an `Expression`.                     |
 
-- `parse(latex)` — parse a LaTeX string into an `Expression`
-- `simplify(latex | expr)` — simplify a LaTeX string or expression
-- `evaluate(latex | expr)` — evaluate a LaTeX string or expression
-- `N(latex | expr)` — compute a numeric approximation
-- `assign(id, value)` — assign a value to a symbol
+You can use either regular LaTeX strings or a looser syntax similar
+to ASCIIMath or Typst:
+
+```live
+console.log(N("(1+sqrt(5))/2"));
+```
 
 :::info[Note]
 
-These use a shared `ComputeEngine` instance created on first call.
+These functions use a shared `ComputeEngine` instance created on first call.
 Use `getDefaultEngine()` to configure it.
 :::
 
@@ -30067,11 +31025,6 @@ Try the **interactive demo** now<Icon name="chevron-right-bold" />
 
 
 ## Getting Started
-
-The easiest way to get started is to load the Compute Engine JavaScript module
-from a CDN, then create a `ComputeEngine` instance.
-
-### Using JavaScript Modules
 
 **To load the Compute Engine module from the jsdelivr CDN**, use a `<script>` tag with the
 `type="module"` attribute and an `import` statement.
@@ -30085,7 +31038,7 @@ from a CDN, then create a `ComputeEngine` instance.
 </script>
 ```
 
-Alternatively, you can use the **unpkg** CDN to load the module:
+Alternatively, you can use the **unpkg** CDN:
 
 ```js
 import { ComputeEngine } from 
@@ -30093,52 +31046,11 @@ import { ComputeEngine } from
 ```
 
 
-The ESM (module) version is also available in the npm package as `/compute-engine.min.esm.js` 
-
-
-### Using Vintage JavaScript
-
-If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. 
-
-For example, WebPack 4 does not support the optional chaining operator, using 
-the UMD version will make use of polyfills as necessary.
-
-**To load the UMD version**, use a `<script>` tag with the `src` attribute.
-
-
-```html
-<script 
-  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.umd.js">
-</script>
-<script>
-  window.onload = function() {
-    const ce = new ComputeEngine.ComputeEngine();
-    console.log(ce.parse("e^{i\\pi}").evaluate());
-    // ➔ "-1"
-  }
-</script>
-```
-
-Alternatively, use the **unpkg** CDN to load the library:
-
-```html
-<script src="//unpkg.com/@cortex-js/compute-engine"></script>
-```
-
-The UMD version is also available in the npm package in `/compute-engine.min.umd.js` 
-
-
-
-### Other Versions
-
-A non-minified module which may be useful for debugging is available as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 
-The operators in a MathJSON expression are defined in libraries. The 
-**MathJSON Standard Library** is a collection of functions and symbols that are
-available by default to a `ComputeEngine` instance.
+The **MathJSON Standard Library** is a collection of functions and symbols that are
+available by default.
 
 <div className="symbols-table" style={{"--first-col-width":"21ch"}}>
 
@@ -30161,22 +31073,6 @@ available by default to a `ComputeEngine` instance.
 </div>
 
 
-:::info[Note]
-In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
-that the function is a method of the `ComputeEngine` class.
-
-**To create a new `ComputeEngine` instance** use `ce = new ComputeEngine()`
-
-
-The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
-function is a method of the `Expression` class.
-
-**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
-
-:::
-
-
-
 <ReadMore path="/compute-engine/standard-library/" >
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
@@ -30194,6 +31090,24 @@ LaTeX to MathJSON.
 <ReadMore path="/compute-engine/guides/latex-syntax/" >
 Read more about **Parsing and Serializing LaTeX**<Icon name="chevron-right-bold" />
 </ReadMore>
+
+
+:::info[Note]
+In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
+that the function is a method of the `ComputeEngine` class.
+
+Use `getDefaultEngine()` to access the shared `ComputeEngine` instance used by the free functions, or create your own instance with `new ComputeEngine()`.
+
+The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
+function is a method of the `Expression` class.
+
+**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
+
+:::
+
+
+
+
 ---
 title: Number Theory
 slug: /compute-engine/reference/number-theory/
@@ -30872,23 +31786,32 @@ such as numbers, constants, variables and functions.
 In the Compute Engine, expressions are represented internally using the
 [MathJSON format](/math-json/).
 
-They are wrapped in a JavaScript object, a process called **boxing**, and the
-resulting expressions are **Expressions**.
+They are wrapped in a JavaScript object, an instance of the `Expression` class.
 
-Expressions improve performance by implementing caching to avoid
-repetitive calculations. They also ensure that expressions are valid and in a
-standard format.
-
-Unlike the plain data types used by JSON, Expressions allow an IDE, such
+Unlike the plain data types used by JSON, `Expression` objects allow an IDE, such
 as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
-methods and properties available for a given expression.
+methods and properties available.
 
 Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
-## Boxing
+## Creating Expressions
 
-**To create an `Expression` from a MathJSON expression** use the `ce.box()`
+**To create a Expression from a LaTeX string** use the `parse()` or `ce.parse()`
+function. You would use `ce.parse()` if you want to use a custom instance of 
+the `ComputeEngine` class.
+
+```js
+const expr = parse("3 + x + y");
+console.log(expr.operator);
+// ➔ "Add"
+
+console.log(expr.json);
+// ➔ ["Add", "x", "y", 3]
+```
+
+
+**To create an `Expression` object from a MathJSON expression** use the `ce.box()`
 method.
 
 The input of `ce.box()` can be:
@@ -30897,7 +31820,7 @@ The input of `ce.box()` can be:
 - an `ExpressionInput`, that is a MathJSON expression with some of its
   subexpressions already represented as `Expression` values.
 
-The result is an instance of an `Expression`.
+The result is an `Expression` object.
 
 ```js
 let expr = ce.box(1.729e3);
@@ -30909,35 +31832,11 @@ console.log(expr.isPositive);
 
 expr = ce.box({ num: "+Infinity" });
 console.log(expr.latex);
-// ➔ "+\infty"
+// ➔ "\infty"
 
 expr = ce.box(["Add", 3, "x"]);
 console.log(expr.operator);
 // ➔ "Add"
-```
-
-
-**To create a Expression from a LaTeX string** use the `ce.parse()`
-function.
-
-```js
-const expr = ce.parse("3 + x + y");
-console.log(expr.operator);
-// ➔ "Add"
-
-console.log(expr.json);
-// ➔ ["Add", 3, "x", "y"]
-```
-
-**To get a Expression representing the content of a mathfield**
-use the `mf.expression` property:
-
-```js
-const mf = document.getElementById("input");
-mf.value = "\\frac{10}{5}";
-const expr = mf.expression;
-console.log(expr.evaluate());
-// ➔ 2
 ```
 
 ## Canonical Expressions
@@ -30945,11 +31844,11 @@ console.log(expr.evaluate());
 The **canonical form** of an expression is a conventional way of writing an
 expression.
 
-For example, the canonical form of a fraction of two integers is a reduced
+For example, the canonical form of a fraction is a reduced
 rational number, written as a tuple of two integers, such that the GCD of the
 numerator and denominator is 1, and the denominator is positive.
 
-```js
+```live
 const expr = ce.parse("\\frac{30}{-50}");
 console.log(expr.json);
 // ➔ ["Rational", -3, 5]
@@ -30959,7 +31858,7 @@ The canonical form of a rational with a denominator of 1 is an integer.
 
 ```js
 const expr = ce.parse("\\frac{17}{1}");
-console.log(expr.json);
+console.log(expr);
 // ➔ 17
 ```
 
@@ -33639,6 +34538,448 @@ iteration is `value` or `Nothing` if not provided.
 
 </FunctionDefinition>
 
+---
+title: Units and Quantities
+slug: /compute-engine/reference/units/
+date: Last Modified
+---
+
+<Intro>
+The Compute Engine provides a unit system for representing and computing with
+physical quantities. Units are organized around
+[SI base dimensions](https://en.wikipedia.org/wiki/International_System_of_Units)
+with support for derived, prefixed, and non-SI units.
+</Intro>
+
+<ReadMore path="/compute-engine/guides/units/" >
+Read the **Units and Quantities Guide** for a tutorial introduction with
+examples<Icon name="chevron-right-bold" />
+</ReadMore>
+
+
+## Quantity
+
+<FunctionDefinition name="Quantity">
+
+<Signature name="Quantity">_magnitude_, _unit_</Signature>
+
+A value paired with a physical unit.
+
+The _magnitude_ is any numeric expression. The _unit_ is a unit symbol (string)
+or a compound unit expression built from `Multiply`, `Divide`, and `Power`.
+
+<Latex value="9.8\,\mathrm{m/s^{2}}"/>
+
+```json example
+["Quantity", 3.5, "m"]
+// A simple quantity: 3.5 meters
+
+["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]
+// A compound unit: 9.8 m/s^2
+
+["Quantity", 100, "km"]
+// Prefixed unit: 100 kilometers
+```
+
+A DSL string shorthand is accepted for compound units and canonicalized to the
+structured form:
+
+```json example
+["Quantity", 9.8, "m/s^2"]
+// → ["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]
+
+["Quantity", 1, "kg/(m*s^2)"]
+// → ["Quantity", 1, ["Divide", "kg", ["Multiply", "m", ["Power", "s", 2]]]]
+```
+
+**Arithmetic on quantities:**
+
+`Add` and `Subtract` require compatible dimensions and express the result in the
+unit with the largest scale factor:
+
+```json example
+["Add", ["Quantity", 12, "cm"], ["Quantity", 1, "m"]]
+// → ["Quantity", 1.12, "m"]
+```
+
+`Multiply` and `Divide` combine units:
+
+```json example
+["Multiply", ["Quantity", 5, "m"], ["Quantity", 3, "s"]]
+// → ["Quantity", 15, ["Multiply", "m", "s"]]
+```
+
+`Power` raises the unit to the exponent:
+
+```json example
+["Power", ["Quantity", 3, "m"], 2]
+// → ["Quantity", 9, ["Power", "m", 2]]
+```
+
+</FunctionDefinition>
+
+
+## QuantityMagnitude
+
+<FunctionDefinition name="QuantityMagnitude">
+
+<Signature name="QuantityMagnitude">_quantity_</Signature>
+
+Extract the numeric magnitude from a `Quantity` expression.
+
+```json example
+["QuantityMagnitude", ["Quantity", 3.5, "m"]]
+// → 3.5
+```
+
+</FunctionDefinition>
+
+
+## QuantityUnit
+
+<FunctionDefinition name="QuantityUnit">
+
+<Signature name="QuantityUnit">_quantity_</Signature>
+
+Extract the unit expression from a `Quantity`.
+
+```json example
+["QuantityUnit", ["Quantity", 3.5, "m"]]
+// → "m"
+
+["QuantityUnit", ["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]]
+// → ["Divide", "m", ["Power", "s", 2]]
+```
+
+</FunctionDefinition>
+
+
+## UnitConvert
+
+<FunctionDefinition name="UnitConvert">
+
+<Signature name="UnitConvert">_quantity_, _target-unit_</Signature>
+
+Convert a quantity to a different compatible unit. The target can be a simple
+unit symbol or a compound unit expression.
+
+Returns the converted `Quantity`, or an `Error` if the units are incompatible.
+
+Supports affine temperature conversions (`degC`, `degF`, `K`).
+
+```json example
+["UnitConvert", ["Quantity", 1500, "m"], "km"]
+// → ["Quantity", 1.5, "km"]
+
+["UnitConvert", ["Quantity", 180, "deg"], "rad"]
+// → ["Quantity", 3.14159..., "rad"]
+
+["UnitConvert",
+  ["Quantity", 36, ["Divide", "km", "h"]],
+  ["Divide", "m", "s"]]
+// → ["Quantity", 10, ["Divide", "m", "s"]]
+
+["UnitConvert", ["Quantity", 100, "degC"], "degF"]
+// → ["Quantity", 212, "degF"]
+
+["UnitConvert", ["Quantity", 5, "m"], "s"]
+// → Error (incompatible dimensions)
+```
+
+</FunctionDefinition>
+
+
+## UnitSimplify
+
+<FunctionDefinition name="UnitSimplify">
+
+<Signature name="UnitSimplify">_quantity_</Signature>
+
+Reduce a compound unit to a named derived SI unit if one matches the dimension
+and has scale factor 1.
+
+```json example
+["UnitSimplify",
+  ["Quantity", 100, ["Multiply", "kg", "m", ["Power", "s", -2]]]]
+// → ["Quantity", 100, "N"]
+```
+
+If no simpler named form exists, the quantity is returned unchanged.
+
+</FunctionDefinition>
+
+
+## IsCompatibleUnit
+
+<FunctionDefinition name="IsCompatibleUnit">
+
+<Signature name="IsCompatibleUnit">_unit-a_, _unit-b_</Signature>
+
+Test whether two units have the same dimension vector. Returns `True` or
+`False`. Both simple unit symbols and compound unit expressions are accepted.
+
+```json example
+["IsCompatibleUnit", "m", "km"]
+// → True
+
+["IsCompatibleUnit", "m", "s"]
+// → False
+
+["IsCompatibleUnit", "J", "eV"]
+// → True
+
+["IsCompatibleUnit", ["Divide", "m", "s"], ["Divide", "km", "h"]]
+// → True
+```
+
+</FunctionDefinition>
+
+
+## UnitDimension
+
+<FunctionDefinition name="UnitDimension">
+
+<Signature name="UnitDimension">_unit_</Signature>
+
+Return the 7-element dimension vector of a unit. The vector encodes the
+exponents of the SI base dimensions:
+`[length, mass, time, current, temperature, amount, luminosity]`.
+
+Both simple unit symbols and compound unit expressions are accepted.
+
+```json example
+["UnitDimension", "m"]
+// → [1, 0, 0, 0, 0, 0, 0]
+
+["UnitDimension", "N"]
+// → [1, 1, -2, 0, 0, 0, 0]
+
+["UnitDimension", "V"]
+// → [2, 1, -3, -1, 0, 0, 0]
+
+["UnitDimension", ["Divide", "m", ["Power", "s", 2]]]
+// → [1, 0, -2, 0, 0, 0, 0]
+```
+
+</FunctionDefinition>
+
+
+## Physics Constants
+
+The `physics` library provides physical constants as `Quantity` expressions.
+These constants use the [2018 CODATA](https://physics.nist.gov/cuu/Constants/)
+recommended values.
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
+
+| Symbol            | Value                 | Unit                 | Description |
+| :---------------- | :-------------------- | :------------------- | :---------- |
+| `SpeedOfLight`    | 299792458             | m/s                  | [Speed of light in vacuum](https://www.wikidata.org/wiki/Q2111) |
+| `PlanckConstant`  | 6.62607015e-34        | J s                  | [Planck constant](https://www.wikidata.org/wiki/Q524) |
+| `Mu0`             | 1.25663706212e-6      | N/A^2                | [Vacuum permeability](https://www.wikidata.org/wiki/Q1515261) |
+| `StandardGravity` | 9.80665               | m/s^2                | [Standard acceleration due to gravity](https://www.wikidata.org/wiki/Q30006) |
+| `ElementaryCharge` | 1.602176634e-19      | C                    | [Elementary charge](https://www.wikidata.org/wiki/Q2101) |
+| `BoltzmannConstant` | 1.380649e-23        | J/K                  | [Boltzmann constant](https://www.wikidata.org/wiki/Q131536) |
+| `AvogadroConstant` | 6.02214076e23        | mol^-1               | [Avogadro constant](https://www.wikidata.org/wiki/Q47574) |
+| `VacuumPermittivity` | 8.8541878128e-12   | F/m                  | [Vacuum permittivity](https://www.wikidata.org/wiki/Q176908) |
+| `GravitationalConstant` | 6.67430e-11     | m^3/(kg s^2)         | [Gravitational constant](https://www.wikidata.org/wiki/Q30022) |
+| `StefanBoltzmannConstant` | 5.670374419e-8 | W/(m^2 K^4)         | [Stefan-Boltzmann constant](https://www.wikidata.org/wiki/Q196898) |
+| `GasConstant`     | 8.314462618           | J/(mol K)            | [Molar gas constant](https://www.wikidata.org/wiki/Q39600) |
+
+</div>
+
+<Latex value="\mu_0"/>
+
+The vacuum permeability constant `Mu0` can be entered in LaTeX as `\mu_0`.
+
+<Latex value="\varepsilon_0"/>
+
+The vacuum permittivity constant `VacuumPermittivity` can be entered in LaTeX as `\varepsilon_0`.
+
+
+## Supported Units
+
+### SI Base Units
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"8ch"}}>
+
+| Symbol | Quantity            | Name     |
+| :----- | :------------------ | :------- |
+| `m`    | Length              | meter    |
+| `kg`   | Mass                | kilogram |
+| `s`    | Time                | second   |
+| `A`    | Electric current    | ampere   |
+| `K`    | Temperature         | kelvin   |
+| `mol`  | Amount of substance | mole     |
+| `cd`   | Luminous intensity  | candela  |
+
+</div>
+
+### Named Derived SI Units
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"8ch"}}>
+
+| Symbol | Quantity               | Name      | In base units          |
+| :----- | :--------------------- | :-------- | :--------------------- |
+| `Hz`   | Frequency              | hertz     | s^-1                   |
+| `N`    | Force                  | newton    | kg m s^-2              |
+| `Pa`   | Pressure               | pascal    | kg m^-1 s^-2           |
+| `J`    | Energy                 | joule     | kg m^2 s^-2            |
+| `W`    | Power                  | watt      | kg m^2 s^-3            |
+| `C`    | Electric charge        | coulomb   | A s                    |
+| `V`    | Voltage                | volt      | kg m^2 s^-3 A^-1       |
+| `F`    | Capacitance            | farad     | kg^-1 m^-2 s^4 A^2     |
+| `ohm`  | Resistance             | ohm       | kg m^2 s^-3 A^-2       |
+| `S`    | Conductance            | siemens   | kg^-1 m^-2 s^3 A^2     |
+| `Wb`   | Magnetic flux          | weber     | kg m^2 s^-2 A^-1       |
+| `T`    | Magnetic flux density  | tesla     | kg s^-2 A^-1           |
+| `H`    | Inductance             | henry     | kg m^2 s^-2 A^-2       |
+| `lm`   | Luminous flux          | lumen     | cd                     |
+| `lx`   | Illuminance            | lux       | cd m^-2                |
+| `Bq`   | Radioactivity          | becquerel | s^-1                   |
+| `Gy`   | Absorbed dose          | gray      | m^2 s^-2               |
+| `Sv`   | Equivalent dose        | sievert   | m^2 s^-2               |
+| `kat`  | Catalytic activity     | katal     | mol s^-1               |
+
+</div>
+
+### SI Prefixes
+
+All SI prefixes are supported on base and named derived units:
+
+<div className='equal-width-columns'>
+
+| Prefix | Symbol | Factor  |
+| :----- | :----- | :------ |
+| quetta | Q      | 10^30   |
+| ronna  | R      | 10^27   |
+| yotta  | Y      | 10^24   |
+| zetta  | Z      | 10^21   |
+| exa    | E      | 10^18   |
+| peta   | P      | 10^15   |
+| tera   | T      | 10^12   |
+| giga   | G      | 10^9    |
+| mega   | M      | 10^6    |
+| kilo   | k      | 10^3    |
+| hecto  | h      | 10^2    |
+| deca   | da     | 10^1    |
+
+| Prefix | Symbol | Factor  |
+| :----- | :----- | :------ |
+| deci   | d      | 10^-1   |
+| centi  | c      | 10^-2   |
+| milli  | m      | 10^-3   |
+| micro  | u      | 10^-6   |
+| nano   | n      | 10^-9   |
+| pico   | p      | 10^-12  |
+| femto  | f      | 10^-15  |
+| atto   | a      | 10^-18  |
+| zepto  | z      | 10^-21  |
+| yocto  | y      | 10^-24  |
+| ronto  | r      | 10^-27  |
+| quecto | q      | 10^-30  |
+
+</div>
+
+:::info[Note]
+Prefixes are applicable to all base and derived units except `kg`. Use `g` as
+the base for mass prefixing: `mg`, `ug`, etc.
+:::
+
+### Non-SI Units
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"8ch"}}>
+
+| Symbol    | Quantity    | SI Equivalent        |
+| :-------- | :---------- | :------------------- |
+| `min`     | Time        | 60 s                 |
+| `h`       | Time        | 3600 s               |
+| `d`       | Time        | 86400 s              |
+| `ha`      | Area        | 10^4 m^2             |
+| `L`       | Volume      | 10^-3 m^3            |
+| `t`       | Mass        | 10^3 kg              |
+| `eV`      | Energy      | 1.602176634e-19 J    |
+| `Da`      | Mass        | 1.66053906660e-27 kg |
+| `au`      | Length      | 1.495978707e11 m     |
+| `in`      | Length      | 0.0254 m             |
+| `ft`      | Length      | 0.3048 m             |
+| `mi`      | Length      | 1609.344 m           |
+| `lb`      | Mass        | 0.45359237 kg        |
+| `oz`      | Mass        | 0.028349523125 kg    |
+| `gal`     | Volume      | 3.785411784e-3 m^3   |
+| `atm`     | Pressure    | 101325 Pa            |
+| `bar`     | Pressure    | 10^5 Pa              |
+| `cal`     | Energy      | 4.184 J              |
+| `kWh`     | Energy      | 3.6e6 J              |
+| `degC`    | Temperature | K - 273.15           |
+| `degF`    | Temperature | (K - 459.67) x 5/9  |
+
+</div>
+
+:::info[Note]
+`degC` and `degF` use affine conversions (offset + scale), not just linear
+scaling. `UnitConvert` handles these correctly.
+:::
+
+### Angular Units
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"10ch"}}>
+
+| Symbol   | Name      | In radians         |
+| :------- | :-------- | :----------------- |
+| `rad`    | radian    | 1                  |
+| `deg`    | degree    | pi/180             |
+| `grad`   | gradian   | pi/200             |
+| `turn`   | turn      | 2 pi               |
+| `arcmin` | arcminute | pi/10800           |
+| `arcsec` | arcsecond | pi/648000          |
+
+</div>
+
+Angular units are dimensionless. Trigonometric functions (`Sin`, `Cos`, `Tan`,
+etc.) automatically convert `Quantity` arguments with angular units to radians.
+
+### Dimensionless Units
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"10ch"}}>
+
+| Symbol    | Scale factor |
+| :-------- | :----------- |
+| `percent` | 0.01         |
+| `ppm`     | 10^-6        |
+| `dB`      | 1 (nominal)  |
+| `Np`      | 1 (nominal)  |
+
+</div>
+
+:::info[Note]
+Logarithmic units (`dB`, `Np`) are parsed and stored but conversion between
+logarithmic and linear scales is not supported in v1.
+:::
+
+
+## LaTeX Parsing
+
+### Supported Input Forms
+
+| LaTeX | MathJSON |
+| :---- | :------- |
+| `5\,\mathrm{m}` | `["Quantity", 5, "m"]` |
+| `3\,\text{kg}` | `["Quantity", 3, "kg"]` |
+| `9.8\,\mathrm{m/s^{2}}` | `["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]` |
+| `\qty{12}{cm}` | `["Quantity", 12, "cm"]` |
+| `\SI{5}{kg}` | `["Quantity", 5, "kg"]` |
+| `\unit{m/s}` | `["Divide", "m", "s"]` |
+| `\si{MHz}` | `"MHz"` |
+
+### Unit Parsing Rules
+
+Within `\mathrm{...}` or `\text{...}`, the parser interprets:
+
+- `/` as division
+- `^` and `^{...}` as exponents
+- `\cdot` as multiplication
+- Juxtaposed symbols as individual units or prefixed units
 ---
 title: Symbols
 slug: /compute-engine/guides/symbols/
