@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.050cdb91.js" defer="defer"></script>
-<script src="/assets/js/main.4829b30c.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d63b987f.js" defer="defer"></script>
+<script src="/assets/js/main.32393aa9.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -31,7 +31,7 @@ To obtain a numeric approximation use <code>expr.N()</code>.</p></div>
 <p>For the common &quot;parse then numeric approximation&quot; flow, use the <code>N()</code> free
 function:</p>
 <code-playground><div slot="javascript">// import { N } from &#x27;@cortex-js/compute-engine&#x27;;
-<!-- -->N(&quot;\\sqrt{2}&quot;).print();
+<!-- -->console.log(N(&quot;\\sqrt{2}&quot;));
 </div></code-playground>
 <p>The <code>N()</code> free function accepts either a LaTeX string or an <code>Expression</code>.
 It uses a shared <code>ComputeEngine</code> instance created on first call.</p>

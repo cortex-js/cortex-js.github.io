@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.050cdb91.js" defer="defer"></script>
-<script src="/assets/js/main.4829b30c.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d63b987f.js" defer="defer"></script>
+<script src="/assets/js/main.32393aa9.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -187,9 +187,9 @@ as it defaults to <code>&#x27;canonical&#x27;</code>.</p>
 or specify the form you want to use with the <code>form</code> option of <code>ce.box()</code>
 and <code>ce.parse()</code>.</p>
 <p><strong>To order the arguments in a canonical order</strong>, use <code>ce.box(expr, { form: &quot;Order&quot; })</code> or <code>ce.parse(s, { form: &quot;Order&quot; })</code>.</p>
-<code-playground><div slot="javascript">ce.parse(&quot;0+1+x+2+\\sqrt{5}&quot;,
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;0+1+x+2+\\sqrt{5}&quot;,
 <!-- -->  <!-- -->{form: &quot;Order&quot;}
-<!-- -->).print();
+<!-- -->));
 </div></code-playground>
 <p>Note in particular that the <code>0</code> is preserved in the expression, which is not
 the case in the full canonical form.</p>
@@ -198,13 +198,13 @@ expression. See the documentation of
 <a class="" href="/compute-engine/reference/core/#CanonicalForm"><code>[&quot;CanonicalForm&quot;]</code></a> for more details.</p>
 <p>For example:</p>
 <code-playground><div slot="javascript">const latex = &quot;3(2+x)&quot;;
-<!-- -->ce.parse(latex, {form: &#x27;raw&#x27;}).print();
+<!-- -->console.log(ce.parse(latex, {form: &#x27;raw&#x27;}));
 <!-- -->
-<!-- -->ce.parse(latex, {form: [&quot;InvisibleOperator&quot;]}).print();
+<!-- -->console.log(ce.parse(latex, {form: [&quot;InvisibleOperator&quot;]}));
 <!-- -->
-<!-- -->ce.parse(latex,
+<!-- -->console.log(ce.parse(latex,
 <!-- -->  <!-- -->{form: [&quot;InvisibleOperator&quot;, &quot;Add&quot;, &quot;Order&quot;, ]}
-<!-- -->).print();
+<!-- -->));
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="canonical-form-pipeline">Canonical Form Pipeline<a href="#canonical-form-pipeline" class="hash-link" aria-label="Direct link to Canonical Form Pipeline" title="Direct link to Canonical Form Pipeline" translate="no">​</a></h2>
 <p>When you specify a list of canonical forms (e.g., <code>[&quot;Number&quot;, &quot;Power&quot;, &quot;Divide&quot;]</code>),

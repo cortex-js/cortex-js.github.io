@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.050cdb91.js" defer="defer"></script>
-<script src="/assets/js/main.4829b30c.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d63b987f.js" defer="defer"></script>
+<script src="/assets/js/main.32393aa9.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -160,7 +160,7 @@ it was derived from, use the <code>subs()</code> function.</p>
 <!-- -->console.log(subs);
 <!-- -->// ➔ { _a: &quot;x&quot; }
 <!-- -->
-<!-- -->pattern.subs(subs).print();
+<!-- -->console.log(pattern.subs(subs));
 <!-- -->// ➔ [&quot;Add&quot;, 1, &quot;x&quot;]
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="applying-rewrite-rules">Applying Rewrite Rules<a href="#applying-rewrite-rules" class="hash-link" aria-label="Direct link to Applying Rewrite Rules" title="Direct link to Applying Rewrite Rules" translate="no">​</a></h2>
@@ -180,7 +180,7 @@ matches, the expression is replaced by the substitution pattern of the rule.</p>
 <!-- -->};
 <!-- -->
 <!-- -->const expr = ce.box([&quot;Multiply&quot;, 7, 7], { form: &#x27;raw&#x27; });
-<!-- -->(expr.replace(squareRule) ?? expr).print();
+<!-- -->console.log(expr.replace(squareRule) ?? expr);
 <!-- -->// ➔ [&quot;Square&quot;, 7]
 </div></code-playground>
 <p>The <code>expr.replace()</code> function continues applying all the rules in the ruleset
@@ -195,15 +195,15 @@ canonical either.</p>
 <code>expr.subs()</code> function can be used to replace all occurrences of matching symbols.</p>
 <code-playground><div slot="javascript">const expr = ce.box([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;a&quot;, &quot;x&quot;], &quot;b&quot;]);
 <!-- -->
-<!-- -->expr.replace([
+<!-- -->console.log(expr.replace([
 <!-- -->    <!-- -->{ match: &quot;a&quot;, replace: 2 },
 <!-- -->    <!-- -->{ match: &quot;b&quot;, replace: 3 }
 <!-- -->  <!-- -->],
 <!-- -->  <!-- -->{ recursive: true }
-<!-- -->)?.print();
+<!-- -->));
 <!-- -->// ➔ 2x + 3
 <!-- -->
-<!-- -->expr.subs({&quot;a&quot;: 2, &quot;b&quot;: 3}).print();
+<!-- -->console.log(expr.subs({&quot;a&quot;: 2, &quot;b&quot;: 3}));
 <!-- -->// ➔ 2x + 3
 </div></code-playground></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/assumptions/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Assumptions</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/logic/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Logic and First-Order Logic</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#wildcards" class="table-of-contents__link toc-highlight">Wildcards</a></li><li><a href="#patterns" class="table-of-contents__link toc-highlight">Patterns</a><ul><li><a href="#validating-patterns" class="table-of-contents__link toc-highlight">Validating Patterns</a></li></ul></li><li><a href="#matching-an-expression-to-a-pattern" class="table-of-contents__link toc-highlight">Matching an Expression to a Pattern</a><ul><li><a href="#commutativity" class="table-of-contents__link toc-highlight">Commutativity</a></li><li><a href="#exact-matching" class="table-of-contents__link toc-highlight">Exact Matching</a></li><li><a href="#recursive-matching" class="table-of-contents__link toc-highlight">Recursive Matching</a></li><li><a href="#repeated-named-wildcards" class="table-of-contents__link toc-highlight">Repeated Named Wildcards</a></li><li><a href="#capturing-the-head-of-functions" class="table-of-contents__link toc-highlight">Capturing the Head of Functions</a></li></ul></li><li><a href="#substitution" class="table-of-contents__link toc-highlight">Substitution</a></li><li><a href="#applying-rewrite-rules" class="table-of-contents__link toc-highlight">Applying Rewrite Rules</a><ul><li><a href="#simplifying-an-expression" class="table-of-contents__link toc-highlight">Simplifying an Expression</a></li><li><a href="#substituting-symbols" class="table-of-contents__link toc-highlight">Substituting Symbols</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>

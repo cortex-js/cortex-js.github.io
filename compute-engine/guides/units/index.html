@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.050cdb91.js" defer="defer"></script>
-<script src="/assets/js/main.4829b30c.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d63b987f.js" defer="defer"></script>
+<script src="/assets/js/main.32393aa9.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -32,13 +32,13 @@ and check dimensional compatibility.</p></div>
 <code-playground><div slot="javascript">// import { parse, evaluate } from &#x27;@cortex-js/compute-engine&#x27;;
 <!-- -->
 <!-- -->// Parse LaTeX with units
-<!-- -->parse(&#x27;12\\,\\mathrm{cm}&#x27;).print();
+<!-- -->console.log(parse(&#x27;12\\,\\mathrm{cm}&#x27;));
 <!-- -->
 <!-- -->// Arithmetic: add compatible quantities (largest-scale-unit wins)
-<!-- -->evaluate(&#x27;12\\,\\mathrm{cm} + 1\\,\\mathrm{m}&#x27;).print();
+<!-- -->console.log(evaluate(&#x27;12\\,\\mathrm{cm} + 1\\,\\mathrm{m}&#x27;));
 <!-- -->
 <!-- -->// Convert units
-<!-- -->evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 1500, &#x27;m&#x27;], &#x27;km&#x27;]).print();
+<!-- -->console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 1500, &#x27;m&#x27;], &#x27;km&#x27;]));
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="creating-quantities">Creating Quantities<a href="#creating-quantities" class="hash-link" aria-label="Direct link to Creating Quantities" title="Direct link to Creating Quantities" translate="no">​</a></h2>
 <p>A quantity pairs a numeric value with a unit. Use the <code>Quantity</code> function in
@@ -70,21 +70,21 @@ second. Use <code>&quot;m*s&quot;</code> for the product.</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="parsing-latex-with-units">Parsing LaTeX with Units<a href="#parsing-latex-with-units" class="hash-link" aria-label="Direct link to Parsing LaTeX with Units" title="Direct link to Parsing LaTeX with Units" translate="no">​</a></h2>
 <p>The engine recognizes units inside <code>\mathrm{...}</code> and <code>\text{...}</code> when they
 appear next to a number:</p>
-<code-playground><div slot="javascript">parse(&#x27;5\\,\\mathrm{m}&#x27;).print();
+<code-playground><div slot="javascript">console.log(parse(&#x27;5\\,\\mathrm{m}&#x27;));
 <!-- -->
-<!-- -->parse(&#x27;9.8\\,\\mathrm{m/s^{2}}&#x27;).print();
+<!-- -->console.log(parse(&#x27;9.8\\,\\mathrm{m/s^{2}}&#x27;));
 <!-- -->
-<!-- -->parse(&#x27;3\\,\\text{kg}&#x27;).print();
+<!-- -->console.log(parse(&#x27;3\\,\\text{kg}&#x27;));
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="siunitx-commands">siunitx Commands<a href="#siunitx-commands" class="hash-link" aria-label="Direct link to siunitx Commands" title="Direct link to siunitx Commands" translate="no">​</a></h3>
 <p>The <code>siunitx</code> LaTeX package commands are also supported:</p>
 <code-playground><div slot="javascript">// Modern siunitx
-<!-- -->parse(&#x27;\\qty{12}{cm}&#x27;).print();
-<!-- -->parse(&#x27;\\unit{m/s}&#x27;).print();
+<!-- -->console.log(parse(&#x27;\\qty{12}{cm}&#x27;));
+<!-- -->console.log(parse(&#x27;\\unit{m/s}&#x27;));
 <!-- -->
 <!-- -->// Legacy siunitx
-<!-- -->parse(&#x27;\\SI{5}{kg}&#x27;).print();
-<!-- -->parse(&#x27;\\si{MHz}&#x27;).print();
+<!-- -->console.log(parse(&#x27;\\SI{5}{kg}&#x27;));
+<!-- -->console.log(parse(&#x27;\\si{MHz}&#x27;));
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="serialization">Serialization<a href="#serialization" class="hash-link" aria-label="Direct link to Serialization" title="Direct link to Serialization" translate="no">​</a></h3>
 <p>Quantities serialize back to LaTeX with a thin space and upright unit:</p>
@@ -98,64 +98,64 @@ appear next to a number:</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="addition-and-subtraction">Addition and Subtraction<a href="#addition-and-subtraction" class="hash-link" aria-label="Direct link to Addition and Subtraction" title="Direct link to Addition and Subtraction" translate="no">​</a></h3>
 <p>Operands must have compatible dimensions. The result is expressed in the unit
 with the largest scale factor:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;Add&#x27;, [&#x27;Quantity&#x27;, 12, &#x27;cm&#x27;], [&#x27;Quantity&#x27;, 1, &#x27;m&#x27;]]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;Add&#x27;, [&#x27;Quantity&#x27;, 12, &#x27;cm&#x27;], [&#x27;Quantity&#x27;, 1, &#x27;m&#x27;]]));
 <!-- -->// → [&quot;Quantity&quot;, 1.12, &quot;m&quot;]
 </div></code-playground>
 <p>Adding quantities with incompatible dimensions (e.g., meters + seconds) returns
 the expression unevaluated.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="multiplication-and-division">Multiplication and Division<a href="#multiplication-and-division" class="hash-link" aria-label="Direct link to Multiplication and Division" title="Direct link to Multiplication and Division" translate="no">​</a></h3>
 <p>Units combine when multiplying or dividing quantities:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;Multiply&#x27;, [&#x27;Quantity&#x27;, 5, &#x27;m&#x27;], [&#x27;Quantity&#x27;, 3, &#x27;s&#x27;]]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;Multiply&#x27;, [&#x27;Quantity&#x27;, 5, &#x27;m&#x27;], [&#x27;Quantity&#x27;, 3, &#x27;s&#x27;]]));
 <!-- -->// → [&quot;Quantity&quot;, 15, [&quot;Multiply&quot;, &quot;m&quot;, &quot;s&quot;]]
 <!-- -->
-<!-- -->evaluate([&#x27;Divide&#x27;, [&#x27;Quantity&#x27;, 100, &#x27;m&#x27;], [&#x27;Quantity&#x27;, 10, &#x27;s&#x27;]]).print();
+<!-- -->console.log(evaluate([&#x27;Divide&#x27;, [&#x27;Quantity&#x27;, 100, &#x27;m&#x27;], [&#x27;Quantity&#x27;, 10, &#x27;s&#x27;]]));
 <!-- -->// → [&quot;Quantity&quot;, 10, [&quot;Divide&quot;, &quot;m&quot;, &quot;s&quot;]]
 </div></code-playground>
 <p>Scalar multiplication works naturally:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;Multiply&#x27;, 2, [&#x27;Quantity&#x27;, 5, &#x27;kg&#x27;]]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;Multiply&#x27;, 2, [&#x27;Quantity&#x27;, 5, &#x27;kg&#x27;]]));
 <!-- -->// → [&quot;Quantity&quot;, 10, &quot;kg&quot;]
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="exponentiation">Exponentiation<a href="#exponentiation" class="hash-link" aria-label="Direct link to Exponentiation" title="Direct link to Exponentiation" translate="no">​</a></h3>
 <p>The unit is raised to the power:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;Power&#x27;, [&#x27;Quantity&#x27;, 3, &#x27;m&#x27;], 2]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;Power&#x27;, [&#x27;Quantity&#x27;, 3, &#x27;m&#x27;], 2]));
 <!-- -->// → [&quot;Quantity&quot;, 9, [&quot;Power&quot;, &quot;m&quot;, 2]]
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="unit-conversion">Unit Conversion<a href="#unit-conversion" class="hash-link" aria-label="Direct link to Unit Conversion" title="Direct link to Unit Conversion" translate="no">​</a></h2>
 <p>Use <code>UnitConvert</code> to convert a quantity to a different compatible unit:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 1500, &#x27;m&#x27;], &#x27;km&#x27;]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 1500, &#x27;m&#x27;], &#x27;km&#x27;]));
 <!-- -->// → [&quot;Quantity&quot;, 1.5, &quot;km&quot;]
 <!-- -->
-<!-- -->evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 180, &#x27;deg&#x27;], &#x27;rad&#x27;]).print();
+<!-- -->console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 180, &#x27;deg&#x27;], &#x27;rad&#x27;]));
 <!-- -->// → [&quot;Quantity&quot;, 3.14159..., &quot;rad&quot;]
 </div></code-playground>
 <p>Compound unit conversion is also supported:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitConvert&#x27;,
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitConvert&#x27;,
 <!-- -->  <!-- -->[&#x27;Quantity&#x27;, 36, [&#x27;Divide&#x27;, &#x27;km&#x27;, &#x27;h&#x27;]],
 <!-- -->  <!-- -->[&#x27;Divide&#x27;, &#x27;m&#x27;, &#x27;s&#x27;]
-<!-- -->]).print();
+<!-- -->]));
 <!-- -->// → [&quot;Quantity&quot;, 10, [&quot;Divide&quot;, &quot;m&quot;, &quot;s&quot;]]
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="temperature-conversion">Temperature Conversion<a href="#temperature-conversion" class="hash-link" aria-label="Direct link to Temperature Conversion" title="Direct link to Temperature Conversion" translate="no">​</a></h3>
 <p>Temperature units (<code>degC</code>, <code>degF</code>, <code>K</code>) use affine conversions that correctly
 handle the offset between scales:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 100, &#x27;degC&#x27;], &#x27;degF&#x27;]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 100, &#x27;degC&#x27;], &#x27;degF&#x27;]));
 <!-- -->// → [&quot;Quantity&quot;, 212, &quot;degF&quot;]
 <!-- -->
-<!-- -->evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 32, &#x27;degF&#x27;], &#x27;degC&#x27;]).print();
+<!-- -->console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 32, &#x27;degF&#x27;], &#x27;degC&#x27;]));
 <!-- -->// → [&quot;Quantity&quot;, 0, &quot;degC&quot;]
 <!-- -->
-<!-- -->evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 0, &#x27;K&#x27;], &#x27;degC&#x27;]).print();
+<!-- -->console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 0, &#x27;K&#x27;], &#x27;degC&#x27;]));
 <!-- -->// → [&quot;Quantity&quot;, -273.15, &quot;degC&quot;]
 </div></code-playground>
 <p>Converting incompatible units returns an <code>Error</code> expression:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 5, &#x27;m&#x27;], &#x27;s&#x27;]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitConvert&#x27;, [&#x27;Quantity&#x27;, 5, &#x27;m&#x27;], &#x27;s&#x27;]));
 <!-- -->// → Error
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="unit-simplification">Unit Simplification<a href="#unit-simplification" class="hash-link" aria-label="Direct link to Unit Simplification" title="Direct link to Unit Simplification" translate="no">​</a></h2>
 <p><code>UnitSimplify</code> reduces a compound unit to a named derived unit when one exists:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitSimplify&#x27;,
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitSimplify&#x27;,
 <!-- -->  <!-- -->[&#x27;Quantity&#x27;, 100, [&#x27;Multiply&#x27;, &#x27;kg&#x27;, &#x27;m&#x27;, [&#x27;Power&#x27;, &#x27;s&#x27;, -2]]]
-<!-- -->]).print();
+<!-- -->]));
 <!-- -->// → [&quot;Quantity&quot;, 100, &quot;N&quot;]
 </div></code-playground>
 <p>If no simpler named form exists, the quantity is returned unchanged.</p>
@@ -163,16 +163,16 @@ handle the offset between scales:</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="checking-compatibility">Checking Compatibility<a href="#checking-compatibility" class="hash-link" aria-label="Direct link to Checking Compatibility" title="Direct link to Checking Compatibility" translate="no">​</a></h3>
 <p>Use <code>IsCompatibleUnit</code> to test whether two units have the same dimension.
 Both simple and compound unit expressions are supported:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;IsCompatibleUnit&#x27;, &#x27;m&#x27;, &#x27;km&#x27;]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;IsCompatibleUnit&#x27;, &#x27;m&#x27;, &#x27;km&#x27;]));
 <!-- -->// → True
 <!-- -->
-<!-- -->evaluate([&#x27;IsCompatibleUnit&#x27;, &#x27;m&#x27;, &#x27;s&#x27;]).print();
+<!-- -->console.log(evaluate([&#x27;IsCompatibleUnit&#x27;, &#x27;m&#x27;, &#x27;s&#x27;]));
 <!-- -->// → False
 <!-- -->
-<!-- -->evaluate([&#x27;IsCompatibleUnit&#x27;,
+<!-- -->console.log(evaluate([&#x27;IsCompatibleUnit&#x27;,
 <!-- -->  <!-- -->[&#x27;Divide&#x27;, &#x27;m&#x27;, &#x27;s&#x27;],
 <!-- -->  <!-- -->[&#x27;Divide&#x27;, &#x27;km&#x27;, &#x27;h&#x27;]
-<!-- -->]).print();
+<!-- -->]));
 <!-- -->// → True
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="dimension-vectors">Dimension Vectors<a href="#dimension-vectors" class="hash-link" aria-label="Direct link to Dimension Vectors" title="Direct link to Dimension Vectors" translate="no">​</a></h3>
@@ -180,35 +180,35 @@ Both simple and compound unit expressions are supported:</p>
 <code>[length, mass, time, current, temperature, amount, luminosity]</code>.</p>
 <p>Use <code>UnitDimension</code> to retrieve it. Both simple symbols and compound
 expressions are supported:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;UnitDimension&#x27;, &#x27;m&#x27;]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;UnitDimension&#x27;, &#x27;m&#x27;]));
 <!-- -->// → [1, 0, 0, 0, 0, 0, 0]
 <!-- -->
-<!-- -->evaluate([&#x27;UnitDimension&#x27;, [&#x27;Divide&#x27;, &#x27;m&#x27;, [&#x27;Power&#x27;, &#x27;s&#x27;, 2]]]).print();
+<!-- -->console.log(evaluate([&#x27;UnitDimension&#x27;, [&#x27;Divide&#x27;, &#x27;m&#x27;, [&#x27;Power&#x27;, &#x27;s&#x27;, 2]]]));
 <!-- -->// → [1, 0, -2, 0, 0, 0, 0]
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="angular-units-and-trigonometry">Angular Units and Trigonometry<a href="#angular-units-and-trigonometry" class="hash-link" aria-label="Direct link to Angular Units and Trigonometry" title="Direct link to Angular Units and Trigonometry" translate="no">​</a></h2>
 <p>Trigonometric functions accept <code>Quantity</code> arguments with angular units. The
 angle is automatically converted to radians before evaluation:</p>
-<code-playground><div slot="javascript">evaluate([&#x27;Sin&#x27;, [&#x27;Quantity&#x27;, 90, &#x27;deg&#x27;]]).print();
+<code-playground><div slot="javascript">console.log(evaluate([&#x27;Sin&#x27;, [&#x27;Quantity&#x27;, 90, &#x27;deg&#x27;]]));
 <!-- -->// → 1
 <!-- -->
-<!-- -->evaluate([&#x27;Cos&#x27;, [&#x27;Quantity&#x27;, 200, &#x27;grad&#x27;]]).print();
+<!-- -->console.log(evaluate([&#x27;Cos&#x27;, [&#x27;Quantity&#x27;, 200, &#x27;grad&#x27;]]));
 <!-- -->// → -1
 </div></code-playground>
 <p>Supported angular units: <code>deg</code>, <code>rad</code>, <code>grad</code>, <code>turn</code>, <code>arcmin</code>, <code>arcsec</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="physics-constants">Physics Constants<a href="#physics-constants" class="hash-link" aria-label="Direct link to Physics Constants" title="Direct link to Physics Constants" translate="no">​</a></h2>
 <p>The <code>physics</code> library (loaded by default) provides physical constants as
 <code>Quantity</code> expressions:</p>
-<code-playground><div slot="javascript">evaluate(&#x27;SpeedOfLight&#x27;).print();
+<code-playground><div slot="javascript">console.log(evaluate(&#x27;SpeedOfLight&#x27;));
 <!-- -->// → [&quot;Quantity&quot;, 299792458, [&quot;Divide&quot;, &quot;m&quot;, &quot;s&quot;]]
 <!-- -->
-<!-- -->evaluate(&#x27;PlanckConstant&#x27;).print();
+<!-- -->console.log(evaluate(&#x27;PlanckConstant&#x27;));
 <!-- -->// → [&quot;Quantity&quot;, 6.62607015e-34, [&quot;Multiply&quot;, &quot;J&quot;, &quot;s&quot;]]
 <!-- -->
-<!-- -->evaluate(&#x27;StandardGravity&#x27;).print();
+<!-- -->console.log(evaluate(&#x27;StandardGravity&#x27;));
 <!-- -->// → [&quot;Quantity&quot;, 9.80665, [&quot;Divide&quot;, &quot;m&quot;, [&quot;Power&quot;, &quot;s&quot;, 2]]]
 </div></code-playground>
-<table><thead><tr><th style="text-align:left">Constant</th><th style="text-align:left">Symbol</th><th style="text-align:left">Value</th><th style="text-align:left">Unit</th></tr></thead><tbody><tr><td style="text-align:left">Speed of light</td><td style="text-align:left"><code>SpeedOfLight</code></td><td style="text-align:left">299792458</td><td style="text-align:left">m/s</td></tr><tr><td style="text-align:left">Planck constant</td><td style="text-align:left"><code>PlanckConstant</code></td><td style="text-align:left">6.62607015e-34</td><td style="text-align:left">J s</td></tr><tr><td style="text-align:left">Vacuum permeability</td><td style="text-align:left"><code>Mu0</code></td><td style="text-align:left">1.25663706212e-6</td><td style="text-align:left">N/A^2</td></tr><tr><td style="text-align:left">Standard gravity</td><td style="text-align:left"><code>StandardGravity</code></td><td style="text-align:left">9.80665</td><td style="text-align:left">m/s^2</td></tr><tr><td style="text-align:left">Elementary charge</td><td style="text-align:left"><code>ElementaryCharge</code></td><td style="text-align:left">1.602176634e-19</td><td style="text-align:left">C</td></tr><tr><td style="text-align:left">Boltzmann constant</td><td style="text-align:left"><code>BoltzmannConstant</code></td><td style="text-align:left">1.380649e-23</td><td style="text-align:left">J/K</td></tr><tr><td style="text-align:left">Avogadro constant</td><td style="text-align:left"><code>AvogadroConstant</code></td><td style="text-align:left">6.02214076e23</td><td style="text-align:left">mol^-1</td></tr><tr><td style="text-align:left">Vacuum permittivity</td><td style="text-align:left"><code>VacuumPermittivity</code></td><td style="text-align:left">8.8541878128e-12</td><td style="text-align:left">F/m</td></tr><tr><td style="text-align:left">Gravitational constant</td><td style="text-align:left"><code>GravitationalConstant</code></td><td style="text-align:left">6.67430e-11</td><td style="text-align:left">m^3/(kg s^2)</td></tr><tr><td style="text-align:left">Stefan-Boltzmann</td><td style="text-align:left"><code>StefanBoltzmannConstant</code></td><td style="text-align:left">5.670374419e-8</td><td style="text-align:left">W/(m^2 K^4)</td></tr><tr><td style="text-align:left">Gas constant</td><td style="text-align:left"><code>GasConstant</code></td><td style="text-align:left">8.314462618</td><td style="text-align:left">J/(mol K)</td></tr></tbody></table>
+<table><thead><tr><th style="text-align:left">Symbol</th><th style="text-align:left">Value</th><th style="text-align:left">Unit</th></tr></thead><tbody><tr><td style="text-align:left"><code>SpeedOfLight</code></td><td style="text-align:left">299792458</td><td style="text-align:left">m/s</td></tr><tr><td style="text-align:left"><code>PlanckConstant</code></td><td style="text-align:left">6.62607015e-34</td><td style="text-align:left">J s</td></tr><tr><td style="text-align:left"><code>Mu0</code> (Vacuum permeability)</td><td style="text-align:left">1.25663706212e-6</td><td style="text-align:left">N/A^2</td></tr><tr><td style="text-align:left"><code>StandardGravity</code></td><td style="text-align:left">9.80665</td><td style="text-align:left">m/s^2</td></tr><tr><td style="text-align:left"><code>ElementaryCharge</code></td><td style="text-align:left">1.602176634e-19</td><td style="text-align:left">C</td></tr><tr><td style="text-align:left"><code>BoltzmannConstant</code></td><td style="text-align:left">1.380649e-23</td><td style="text-align:left">J/K</td></tr><tr><td style="text-align:left"><code>AvogadroConstant</code></td><td style="text-align:left">6.02214076e23</td><td style="text-align:left">mol^-1</td></tr><tr><td style="text-align:left"><code>VacuumPermittivity</code></td><td style="text-align:left">8.8541878128e-12</td><td style="text-align:left">F/m</td></tr><tr><td style="text-align:left"><code>GravitationalConstant</code></td><td style="text-align:left">6.67430e-11</td><td style="text-align:left">m^3/(kg s^2)</td></tr><tr><td style="text-align:left"><code>StefanBoltzmannConstant</code></td><td style="text-align:left">5.670374419e-8</td><td style="text-align:left">W/(m^2 K^4)</td></tr><tr><td style="text-align:left"><code>GasConstant</code></td><td style="text-align:left">8.314462618</td><td style="text-align:left">J/(mol K)</td></tr></tbody></table>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="supported-units">Supported Units<a href="#supported-units" class="hash-link" aria-label="Direct link to Supported Units" title="Direct link to Supported Units" translate="no">​</a></h2>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="si-base-units">SI Base Units<a href="#si-base-units" class="hash-link" aria-label="Direct link to SI Base Units" title="Direct link to SI Base Units" translate="no">​</a></h3>
 <p><code>m</code>, <code>kg</code>, <code>s</code>, <code>A</code>, <code>K</code>, <code>mol</code>, <code>cd</code></p>
@@ -225,7 +225,7 @@ Energy: <code>eV</code>, <code>cal</code>, <code>kWh</code> | Pressure: <code>at
 Area: <code>ha</code> | Temperature: <code>degC</code>, <code>degF</code> |
 Angle: <code>deg</code>, <code>rad</code>, <code>grad</code>, <code>turn</code>, <code>arcmin</code>, <code>arcsec</code> |
 Other: <code>percent</code>, <code>ppm</code>, <code>dB</code>, <code>Np</code></p>
-<div class="readMore_KWn8"><a href="/compute-engine/reference/units/"><p>See the <strong>Units Reference</strong> for the complete list of functions<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/types/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Types</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/simplify/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Simplify</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#quick-start" class="table-of-contents__link toc-highlight">Quick Start</a></li><li><a href="#creating-quantities" class="table-of-contents__link toc-highlight">Creating Quantities</a><ul><li><a href="#simple-units" class="table-of-contents__link toc-highlight">Simple Units</a></li><li><a href="#compound-units" class="table-of-contents__link toc-highlight">Compound Units</a></li><li><a href="#dsl-string-shorthand" class="table-of-contents__link toc-highlight">DSL String Shorthand</a></li></ul></li><li><a href="#parsing-latex-with-units" class="table-of-contents__link toc-highlight">Parsing LaTeX with Units</a><ul><li><a href="#siunitx-commands" class="table-of-contents__link toc-highlight">siunitx Commands</a></li><li><a href="#serialization" class="table-of-contents__link toc-highlight">Serialization</a></li></ul></li><li><a href="#arithmetic-on-quantities" class="table-of-contents__link toc-highlight">Arithmetic on Quantities</a><ul><li><a href="#addition-and-subtraction" class="table-of-contents__link toc-highlight">Addition and Subtraction</a></li><li><a href="#multiplication-and-division" class="table-of-contents__link toc-highlight">Multiplication and Division</a></li><li><a href="#exponentiation" class="table-of-contents__link toc-highlight">Exponentiation</a></li></ul></li><li><a href="#unit-conversion" class="table-of-contents__link toc-highlight">Unit Conversion</a><ul><li><a href="#temperature-conversion" class="table-of-contents__link toc-highlight">Temperature Conversion</a></li></ul></li><li><a href="#unit-simplification" class="table-of-contents__link toc-highlight">Unit Simplification</a></li><li><a href="#dimensional-analysis" class="table-of-contents__link toc-highlight">Dimensional Analysis</a><ul><li><a href="#checking-compatibility" class="table-of-contents__link toc-highlight">Checking Compatibility</a></li><li><a href="#dimension-vectors" class="table-of-contents__link toc-highlight">Dimension Vectors</a></li></ul></li><li><a href="#angular-units-and-trigonometry" class="table-of-contents__link toc-highlight">Angular Units and Trigonometry</a></li><li><a href="#physics-constants" class="table-of-contents__link toc-highlight">Physics Constants</a></li><li><a href="#supported-units" class="table-of-contents__link toc-highlight">Supported Units</a><ul><li><a href="#si-base-units" class="table-of-contents__link toc-highlight">SI Base Units</a></li><li><a href="#named-derived-si-units" class="table-of-contents__link toc-highlight">Named Derived SI Units</a></li><li><a href="#si-prefixes" class="table-of-contents__link toc-highlight">SI Prefixes</a></li><li><a href="#non-si-units" class="table-of-contents__link toc-highlight">Non-SI Units</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+<div class="readMore_KWn8"><a href="/compute-engine/reference/units/"><p>See the <strong>Units Reference</strong> for the complete list of functions<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/types/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Types</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/simplify/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Simplify</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#quick-start" class="table-of-contents__link toc-highlight">Quick Start</a></li><li><a href="#creating-quantities" class="table-of-contents__link toc-highlight">Creating Quantities</a><ul><li><a href="#simple-units" class="table-of-contents__link toc-highlight">Simple Units</a></li><li><a href="#compound-units" class="table-of-contents__link toc-highlight">Compound Units</a></li><li><a href="#dsl-string-shorthand" class="table-of-contents__link toc-highlight">DSL String Shorthand</a></li></ul></li><li><a href="#parsing-latex-with-units" class="table-of-contents__link toc-highlight">Parsing LaTeX with Units</a><ul><li><a href="#siunitx-commands" class="table-of-contents__link toc-highlight">siunitx Commands</a></li><li><a href="#serialization" class="table-of-contents__link toc-highlight">Serialization</a></li></ul></li><li><a href="#arithmetic-on-quantities" class="table-of-contents__link toc-highlight">Arithmetic on Quantities</a><ul><li><a href="#addition-and-subtraction" class="table-of-contents__link toc-highlight">Addition and Subtraction</a></li><li><a href="#multiplication-and-division" class="table-of-contents__link toc-highlight">Multiplication and Division</a></li><li><a href="#exponentiation" class="table-of-contents__link toc-highlight">Exponentiation</a></li></ul></li><li><a href="#unit-conversion" class="table-of-contents__link toc-highlight">Unit Conversion</a><ul><li><a href="#temperature-conversion" class="table-of-contents__link toc-highlight">Temperature Conversion</a></li></ul></li><li><a href="#unit-simplification" class="table-of-contents__link toc-highlight">Unit Simplification</a></li><li><a href="#dimensional-analysis" class="table-of-contents__link toc-highlight">Dimensional Analysis</a><ul><li><a href="#checking-compatibility" class="table-of-contents__link toc-highlight">Checking Compatibility</a></li><li><a href="#dimension-vectors" class="table-of-contents__link toc-highlight">Dimension Vectors</a></li></ul></li><li><a href="#angular-units-and-trigonometry" class="table-of-contents__link toc-highlight">Angular Units and Trigonometry</a></li><li><a href="#physics-constants" class="table-of-contents__link toc-highlight">Physics Constants</a></li><li><a href="#supported-units" class="table-of-contents__link toc-highlight">Supported Units</a><ul><li><a href="#si-base-units" class="table-of-contents__link toc-highlight">SI Base Units</a></li><li><a href="#named-derived-si-units" class="table-of-contents__link toc-highlight">Named Derived SI Units</a></li><li><a href="#si-prefixes" class="table-of-contents__link toc-highlight">SI Prefixes</a></li><li><a href="#non-si-units" class="table-of-contents__link toc-highlight">Non-SI Units</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
