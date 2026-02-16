@@ -19,8 +19,8 @@ that can be evaluated much faster.
 For example this approximation: $ \pi \approx \textstyle\sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} $
 
 ```live
-// import { compile } from '@cortex-js/compute-engine';
-const expr = ce.parse("\\sqrt{6\\sum^{10^2}_{n=1}\\frac{1}{n^2}}");
+// import { parse, compile } from '@cortex-js/compute-engine';
+const expr = parse("\\sqrt{6\\sum^{10^5}_{n=1}\\frac{1}{n^2}}");
 
 // Numerical evaluation using the Compute Engine
 console.time('evaluate');
@@ -42,15 +42,14 @@ console.log(result.run?.());
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse("2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}");
-const result = compile(expr);
+const f = compile("2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}");
 ```
 
 **To evaluate the compiled expression** call the `run` method on the
 `CompilationResult` returned by `compile()`:
 
 ```javascript
-console.log(result.run());
+console.log(f.run());
 // ➔ 3.141592653589793
 ```
 
@@ -71,27 +70,294 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
-## Arguments
+## What Can Be Compiled
 
-The `run` method on the `CompilationResult` can be called with an object literal
-containing the value of the arguments:
+Three kinds of expressions can be compiled, and each produces a `run` function
+with a different calling convention.
+
+### Plain Expressions
+
+A plain expression like `x^2 + 1` has free variables (unknowns). The compiled
+`run` function takes a **vars object** mapping variable names to values:
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
-const expr = ce.parse("n^2");
-const result = compile(expr);
+const f = compile("n^2");
 
-for (let i = 1; i < 10; i++) console.log(result.run({ n: i }));
+for (let i = 1; i < 10; i++) console.log(f.run({ n: i }));
 ```
 
-**To get a list of the unknowns of an expression** use the `expr.unknowns`
-property:
+An expression with no unknowns can be called with no arguments:
 
 ```live
-console.log(ce.parse("n^2").unknowns);
-
-console.log(ce.parse("a^2+b^3").unknowns);
+// import { compile } from '@cortex-js/compute-engine';
+console.log(compile("\\sqrt{6\\sum^{100}_{n=1}\\frac{1}{n^2}}").run());
+// ➔ 3.1320...
 ```
+
+### Lambda Expressions
+
+A lambda expression uses $\mapsto$ (`\mapsto`) to explicitly declare
+parameters. The compiled `run` function takes **positional arguments**:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// Single parameter
+const f = compile("x \\mapsto x^2 + 1");
+console.log(f.run(3));
+// ➔ 10
+
+// Multiple parameters
+const g = compile("(x, y) \\mapsto x^2 + y^2");
+console.log(g.run(3, 4));
+// ➔ 25
+```
+
+Lambdas are useful when the variable name is user-specified rather than assumed
+by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
+parameter explicit, avoiding ambiguity.
+
+### Tuple Expressions
+
+A tuple expression like `(\cos(t), \sin(t))` compiles to a function that returns
+a JavaScript array:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+const f = compile("(\\cos(t), \\sin(t))");
+
+const [x, y] = f.run({ t: Math.PI / 5 });
+console.log(x, y);
+```
+
+This is particularly useful for parametric curves. Both `Tuple` and `List`
+expressions compile to arrays.
+
+### Control Structures
+
+Control structures such as conditionals, loops, and blocks can be compiled to
+JavaScript.
+
+#### `If` and `Which` (Conditionals)
+
+`If` expressions compile to ternary operators and `Which` expressions (used by
+`\begin{cases}`) compile to chained ternaries:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// If expression
+const f = compile("\\text{if } x > 0 \\text{ then } x \\text{ else } -x");
+console.log(f.run({ x: -5 }));
+// ➔ 5
+
+// Which / cases expression
+const g = compile("\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\\\ 0 \\end{cases}");
+console.log(g.run({ x: 3 }));
+// ➔ 9
+```
+
+When no condition matches, `Which` returns `NaN`.
+
+#### `Sum` and `Product`
+
+`Sum` and `Product` with numeric bounds compile to `for` loops with accumulator
+variables:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// Fourier approximation
+const f = compile("\\sum_{k=0}^{5} \\frac{\\sin((2k+1)x)}{2k+1}");
+console.log(f.run({ x: 1.0 }));
+```
+
+#### `Loop`, `Break`, `Continue`, `Return`
+
+`Loop` expressions with a range compile to `for` loops. `Break`, `Continue`,
+and `Return` compile to their JavaScript equivalents:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2");
+console.log(f.run());
+// ➔ 100 (last iteration value)
+```
+
+#### `Block` and `where`
+
+`Block` expressions create scoped variable bindings. The `where` syntax provides
+a convenient way to define local variables:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("r^2 \\text{ where } r \\coloneq x^2 + y^2");
+console.log(f.run({ x: 3, y: 4 }));
+// ➔ 625
+```
+
+## Variable Names
+
+The compiled function expects variable names as they appear in the parsed
+MathJSON expression. Greek letters become their English names:
+
+| LaTeX       | Variable Name |
+|-------------|---------------|
+| `x`, `y`    | `"x"`, `"y"`  |
+| `t`         | `"t"`         |
+| `\theta`    | `"theta"`     |
+| `\alpha`    | `"alpha"`     |
+| `u`, `v`    | `"u"`, `"v"`  |
+
+Use the wrong name and you'll get `NaN` silently:
+
+```javascript
+const f = compile("1 + \\cos(\\theta)");
+
+f.run({ theta: 0.5 }); // ✓ correct → 1.8776
+f.run({ x: 0.5 });     // ✗ wrong key — returns NaN
+```
+
+**To discover the variable names** in an expression, use `expr.unknowns`:
+
+```live
+console.log(parse("n^2").unknowns);
+
+console.log(parse("a^2+b^3").unknowns);
+
+console.log(parse("\\sin(\\theta)").unknowns);
+```
+
+## Complex Numbers
+
+The JavaScript target has full complex arithmetic support. When the compiler
+detects that a subexpression involves complex values, it automatically emits
+complex-aware code for all operations touching that subexpression.
+
+### When Complex Arithmetic Is Used
+
+The compiler decides at compile time whether each subexpression is
+complex-valued. This happens when:
+
+- The expression contains `i` (`ImaginaryUnit`)
+- A symbol has been declared with a complex type
+- An operation is applied to a complex-valued operand
+
+The detection is **static** — based on the expression's structure, not on
+runtime values. So `\sqrt{x}` compiles to real `Math.sqrt` because `x` has no
+declared complex type, even though `Math.sqrt(-1)` returns `NaN` at runtime.
+
+To get complex results from `\sqrt{x}`, you'd need to make the expression
+explicitly complex, e.g., `\sqrt{x + 0i}`.
+
+### Result Format
+
+When an expression _is_ complex-valued, the compiled `run` function returns a
+`{ re: number, im: number }` object instead of a plain number:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// Explicit complex expression — compiler knows it's complex
+const f = compile("(1 + 2i)^2");
+console.log(f.run());
+// ➔ { re: -3, im: 4 }
+```
+
+Complex-aware operations include all the standard arithmetic (`+`, `-`, `*`,
+`/`), trigonometric functions (`sin`, `cos`, `tan`, and their inverses and
+hyperbolic variants), `exp`, `ln`, `sqrt`, `pow`, `abs`, `arg`, `conjugate`,
+`Re`, and `Im`.
+
+### Extracting Real and Imaginary Parts
+
+Use `Re` and `Im` to extract components from a complex expression:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("\\Re((1 + 2i)^2)");
+console.log(f.run());
+// ➔ -3  (a plain number, not an object)
+```
+
+### Mixing Real and Complex Operands
+
+When a complex operand is combined with a real operand, the result is complex:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+const f = compile("x + 2i");
+console.log(f.run({ x: 3 }));
+// ➔ { re: 3, im: 2 }
+```
+
+### GLSL Target
+
+The GLSL target also supports complex arithmetic, but represents complex numbers
+as `vec2` values — the `.x` component is the real part, `.y` is the imaginary
+part:
+
+```glsl
+// Complex literal: 3 + 4i
+vec2(3.0, 4.0)
+
+// Imaginary unit
+vec2(0.0, 1.0)
+```
+
+Simple operations like addition, subtraction, negation, and scalar multiplication
+use native `vec2` operations. More involved operations — complex multiplication,
+division, exponentiation, and transcendentals — use helper functions emitted in
+a **preamble** block:
+
+| Operation | GLSL Helper |
+|-----------|-------------|
+| `z * w`   | `_gpu_cmul(z, w)` |
+| `z / w`   | `_gpu_cdiv(z, w)` |
+| `z ^ w`   | `_gpu_cpow(z, w)` |
+| `sqrt(z)` | `_gpu_csqrt(z)` |
+| `exp(z)`  | `_gpu_cexp(z)` |
+| `ln(z)`   | `_gpu_cln(z)` |
+
+The preamble is **dependency-aware**: each helper declares its prerequisites
+(e.g., `_gpu_cpow` depends on `_gpu_cexp`, `_gpu_cmul`, and `_gpu_cln`), and
+only the needed functions are emitted in topological order. If the expression is
+purely real, no preamble is generated.
+
+Component extraction maps to native swizzle operations:
+
+```glsl
+Re(z)        →  (z).x
+Im(z)        →  (z).y
+Abs(z)       →  length(z)      // built-in
+Arg(z)       →  atan(z.y, z.x)
+Conjugate(z) →  vec2(z.x, -z.y)
+```
+
+The same complex value analysis used by the JavaScript target determines
+whether each subexpression needs complex or real code paths in GLSL.
+
+### Real-Only Mode
+
+If you don't need complex results (e.g., for plotting), pass `{ realOnly: true }`
+to automatically convert complex returns: the real part is returned when the
+imaginary part is zero, and `NaN` is returned otherwise.
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// Without realOnly — returns { re: 5, im: 0 }
+console.log(compile("(1 + 0i) * 5").run());
+
+// With realOnly — returns 5 (plain number)
+console.log(compile("(1 + 0i) * 5", { realOnly: true }).run());
+```
+
+This avoids per-evaluation type checks in calling code.
 
 ## Custom Operators
 
@@ -108,8 +374,7 @@ Override operators by passing an `operators` option to `compile()`:
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse('v + w');
-const result = compile(expr, {
+const result = compile("v + w", {
   operators: {
     Add: ['add', 11],      // Convert + to add() function
     Multiply: ['mul', 12]  // Convert * to mul() function
@@ -136,7 +401,7 @@ You can also use a function to conditionally override operators:
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
 
-const result = compile(expr, {
+const result = compile("v + w", {
   operators: (op) => {
     // Only override Add, let other operators use defaults
     if (op === 'Add') return ['vectorAdd', 11];
@@ -155,8 +420,7 @@ Operator overrides work with complex nested expressions:
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse('(a + b) * c');
-const result = compile(expr, {
+const result = compile("(a + b) * c", {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12]
@@ -190,7 +454,7 @@ console.log(value);
 
 ### Example: Complete Vector Math
 
-```live
+```live 
 // import { compile } from '@cortex-js/compute-engine';
 
 // Define vector operations
@@ -198,8 +462,7 @@ function add(a, b) { return a.map((v, i) => v + b[i]); }
 function mul(a, b) { return a.map((v, i) => v * b[i]); }
 function neg(a) { return a.map(v => -v); }
 
-const expr = ce.parse('u * v + w - z');
-const result = compile(expr, {
+const f = compile("u * v + w - z", {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12],
@@ -208,7 +471,7 @@ const result = compile(expr, {
   functions: { add, mul, neg }
 });
 
-console.log(result.run({
+console.log(f.run({
   u: [2, 3, 4],
   v: [1, 1, 1],
   w: [5, 6, 7],
@@ -258,8 +521,7 @@ const myTarget = {
   indent: 0,
 };
 
-const expr = ce.parse('x + y * 2');
-const code = BaseCompiler.compile(expr, myTarget);
+const code = BaseCompiler.compile("x + y * 2", myTarget);
 console.log(code);
 // → ADD(VAR("x"), MUL(VAR("y"), 2))
 ```
@@ -288,8 +550,7 @@ const sqlTarget = {
   indent: 0,
 };
 
-const whereExpr = ce.parse('x > 10 \\land y \\leq 20');
-const sql = BaseCompiler.compile(whereExpr, sqlTarget);
+const sql = BaseCompiler.compile("x > 10 \\land y \\leq 20", sqlTarget);
 console.log(`SELECT * FROM table WHERE ${sql}`);
 // → SELECT * FROM table WHERE AND("x" > 10, "y" <= 20)
 ```
@@ -315,9 +576,9 @@ The Compute Engine comes with these compilation targets:
 Use the `to` option to specify the target language:
 
 ```javascript
-import { compile } from '@cortex-js/compute-engine';
+import { parse, compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse('x^2 + y^2');
+const expr = parse("x^2 + y^2");
 
 // Compile to JavaScript (default)
 const jsResult = compile(expr);
@@ -338,12 +599,13 @@ import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine'
 const ce = new ComputeEngine();
 
 // Register the Python target with NumPy support
-ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
+ce.registerCompilationTarget(
+    'python', new PythonTarget({ includeImports: true })
+);
 
 // Compile expressions to Python/NumPy code
-const expr = ce.parse('\\sin(x) + \\cos(y)');
-const result = compile(expr, { to: 'python' });
-console.log(result.code);
+const f = compile("\\sin(x) + \\cos(y)", { to: 'python' });
+console.log(f.code);
 // → import numpy as np
 //
 //   np.sin(x) + np.cos(y)
@@ -357,10 +619,9 @@ The `PythonTarget` can generate complete Python functions:
 import { PythonTarget } from '@cortex-js/compute-engine';
 
 const python = new PythonTarget({ includeImports: true });
-const expr = ce.parse('\\sqrt{x^2 + y^2}');
 
 const func = python.compileFunction(
-  expr,
+  "\\sqrt{x^2 + y^2}",
   'euclidean_distance',
   ['x', 'y'],
   'Calculate Euclidean distance between two points'
@@ -394,8 +655,7 @@ The Python target is ideal for:
 Generate Python lambda expressions:
 
 ```javascript
-const expr = ce.parse('x^2 + 2x + 1');
-const lambda = python.compileLambda(expr, ['x']);
+const lambda = python.compileLambda("x^2 + 2x + 1", ['x']);
 console.log(lambda);
 // → lambda x: x ** 2 + 2 * x + 1
 ```
@@ -437,11 +697,10 @@ Interval arithmetic addresses these by:
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse('\\sin(x) / x');
-const result = compile(expr, { to: 'interval-js' });
+const f = compile("\\sin(x) / x", { to: 'interval-js' });
 
 // Call with interval inputs
-const value = result.run({ x: { lo: -0.1, hi: 0.1 } });
+const value = f.run({ x: { lo: -0.1, hi: 0.1 } });
 console.log(value);
 // → { kind: 'singular' }  // Division by interval containing zero
 ```
@@ -467,22 +726,22 @@ The compiled function returns an `IntervalResult` discriminated union:
 import { compile } from '@cortex-js/compute-engine';
 
 // Simple function - normal result
-const sinResult = compile(ce.parse('\\sin(x)'), { to: 'interval-js' });
+const sinResult = compile('\\sin(x)', { to: 'interval-js' });
 sinResult.run({ x: { lo: 0, hi: Math.PI } });
 // → { kind: 'interval', value: { lo: 0, hi: 1 } }
 
 // Singularity detection
-const recipResult = compile(ce.parse('1/x'), { to: 'interval-js' });
+const recipResult = compile('1/x', { to: 'interval-js' });
 recipResult.run({ x: { lo: -1, hi: 1 } });
 // → { kind: 'singular' }
 
 // Partial domain
-const sqrtResult = compile(ce.parse('\\sqrt{x}'), { to: 'interval-js' });
+const sqrtResult = compile('\\sqrt{x}', { to: 'interval-js' });
 sqrtResult.run({ x: { lo: -1, hi: 4 } });
 // → { kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }
 
 // Multi-variable expressions
-const fnResult = compile(ce.parse('x^2 + y'), { to: 'interval-js' });
+const fnResult = compile('x^2 + y', { to: 'interval-js' });
 fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 // → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
 ```
@@ -495,10 +754,9 @@ For GPU-based plotting, compile to GLSL interval arithmetic:
 import { IntervalGLSLTarget } from '@cortex-js/compute-engine';
 
 const target = new IntervalGLSLTarget();
-const expr = ce.parse('\\sin(x) + y^2');
 
 // Generate complete shader code
-const shader = target.compileShaderFunction(expr, {
+const shader = target.compileShaderFunction("\\sin(x) + y^2", {
   functionName: 'evaluateInterval',
   parameters: ['x', 'y'],
   version: '300 es'
@@ -587,7 +845,7 @@ class CustomTarget {
 
 // Register and use
 ce.registerCompilationTarget('custom', new CustomTarget());
-const result = compile(expr, { to: 'custom' });
+const result = compile("x + y * 2", { to: 'custom' });
 console.log(result.code);
 ```
 
@@ -597,8 +855,6 @@ For one-time use, you can provide a `CompileTarget` directly without registratio
 
 ```javascript
 import { compile } from '@cortex-js/compute-engine';
-
-const expr = ce.parse('a + b');
 
 const customTarget = {
   language: 'custom',
@@ -612,7 +868,7 @@ const customTarget = {
   preamble: '',
 };
 
-const result = compile(expr, { target: customTarget });
+const result = compile("a + b", { target: customTarget });
 console.log(result.code); // → A + B
 ```
 
@@ -692,38 +948,53 @@ The benchmarks test the same mathematical expressions across different targets:
 
 ## Limitations
 
-The calculations are only performed using machine precision numbers.
+**Precision:** Compiled functions use machine-precision (64-bit) floating-point
+arithmetic only. Arbitrary-precision and symbolic calculations are not available.
 
-Complex numbers, arbitrary precision numbers, and symbolic calculations are not
-supported.
+**Complex numbers:** The JavaScript target supports complex arithmetic when the
+expression involves complex-valued operands (e.g., `i`, complex-typed symbols).
+Complex results are returned as `{ re, im }` objects. See
+[Complex Numbers](#complex-numbers) for details and
+[Real-Only Mode](#real-only-mode) to convert complex results to `NaN`.
 
-Some functions are not supported.
+**Unsupported functions:** Most standard mathematical functions are supported,
+but some cannot be compiled. When compilation fails, `compile()` returns a
+`CompilationResult` with `success` set to `false`.
 
-If the expression cannot be compiled, `compile()` returns a `CompilationResult`
-with `success` set to `false`. The expression can be numerically evaluated as a
-fallback:
+By default, a fallback `run` function based on the CE's numerical evaluator is
+provided so the expression still produces a result (at lower performance). Set
+`{ fallback: false }` to throw instead.
 
 ```live
-// import { compile, isNumber } from '@cortex-js/compute-engine';
-function compileOrEvaluate(expr) {
-  const result = compile(expr);
+// import { compile, parse } from '@cortex-js/compute-engine';
+function compileOrEvaluate(latex) {
+  const result = compile(latex);
   if (result.success) {
-    return   result.run() + " (compiled)";
+    return result.run() + " (compiled)";
   } else {
-    const evaluated = expr.N();
-    return (isNumber(evaluated) ? evaluated.numericValue : evaluated) + " (evaluated)";
+    const evaluated = parse(latex).N();
+    return evaluated.numericValue + " (evaluated)";
   }
 }
 
-  // `compile()` can handle this expression
-  console.log(compileOrEvaluate(ce.parse("\\frac{\\sqrt{5}+1}{2}")));
+// `compile()` can handle this expression
+console.log(compileOrEvaluate("\\frac{\\sqrt{5}+1}{2}"));
 
-
-  // `compile()` cannot handle complex numbers, so it falls back
-  // and we use numerical evaluation with expr.N()
-  console.log(compileOrEvaluate(ce.parse("-i\\sqrt{-1}")));
-
+// `compile()` cannot handle `Expand`, so it falls back
+// and we use numerical evaluation with expr.N()
+console.log(compileOrEvaluate("\\operatorname{Expand}((x+1)^2)"));
 ```
+
+**Target coverage varies.** Not every function that compiles to JavaScript also
+compiles to GLSL or interval-js. The JavaScript target has the broadest coverage
+(~120 functions including special functions, statistics, Bessel, and color
+operations). The GLSL target supports ~80 functions (basic math, trig,
+hyperbolic, gamma, erf, and color — but not statistics, Bessel, Zeta, LambertW,
+or iterative constructs like Sum/Product). The interval-js target covers ~60
+functions (basic math, trig, hyperbolic, gamma).
+
+When a target fails, callers should fall back to a more capable target (e.g.,
+GLSL → JavaScript, interval-js → JavaScript).
 ---
 title: Execution Constraints
 slug: /compute-engine/guides/execution-constraints/
@@ -8169,6 +8440,8 @@ type SerializeLatexOptions = NumberSerializationFormat & {
   logicStyle: (expr, level) => "word" | "boolean" | "uppercase-word" | "punctuation";
   powerStyle: (expr, level) => "root" | "solidus" | "quotient";
   numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
+  dmsFormat: boolean;
+  angleNormalization: "none" | "0...360" | "-180...180";
 };
 ```
 
@@ -8250,6 +8523,81 @@ missingSymbol: LatexString;
 ```
 
 Serialize the expression `["Error", "'missing'"]`,  with this LaTeX string
+
+#### SerializeLatexOptions.dmsFormat?
+
+```ts
+optional dmsFormat: boolean;
+```
+
+When true, serialize angle quantities in degrees-minutes-seconds format.
+When false (default), use decimal degrees.
+
+##### Default
+
+```ts
+false
+```
+
+##### Example
+
+```typescript
+const ce = new ComputeEngine();
+const angle = ce.box(['Quantity', 9.5, 'deg']);
+
+// DMS format
+angle.latex({ dmsFormat: true });  // "9°30'"
+
+// Decimal format (default)
+angle.latex({ dmsFormat: false }); // "9.5°"
+
+// Full DMS notation
+ce.box(['Quantity', 9.504166, 'deg'])
+  .latex({ dmsFormat: true });     // "9°30'15\""
+```
+
+#### SerializeLatexOptions.angleNormalization?
+
+```ts
+optional angleNormalization: "none" | "0...360" | "-180...180";
+```
+
+Normalize angles to a specific range during serialization.
+Useful for geographic coordinates and rotations.
+
+##### Default
+
+```ts
+'none'
+```
+
+##### Example
+
+```typescript
+const ce = new ComputeEngine();
+
+// No normalization (show exact value)
+ce.box(['Degrees', 370])
+  .latex({ angleNormalization: 'none' });  // "370°"
+
+// Normalize to [0, 360) - useful for bearings
+ce.box(['Degrees', 370])
+  .latex({ angleNormalization: '0...360' }); // "10°"
+
+ce.box(['Degrees', -45])
+  .latex({ angleNormalization: '0...360' }); // "315°"
+
+// Normalize to [-180, 180] - useful for longitude
+ce.box(['Degrees', 190])
+  .latex({ angleNormalization: '-180...180' }); // "-170°"
+
+// Combine with DMS format
+ce.box(['Degrees', 370])
+  .latex({
+    dmsFormat: true,
+    angleNormalization: '0...360'
+  }); // "10°0'0\""
+```
 
 </MemberCard>
 
@@ -11596,6 +11944,18 @@ date: Last Modified
 
 </div>
 
+## Cardinal Sine and Fresnel Functions
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
+
+| Function               |                                                                                                                                                                                                                                                                                                                                                                                     |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Sinc`                 | $$\operatorname{sinc}(x) = \frac{\sin x}{x}$$ with $$\operatorname{sinc}(0) = 1$$. The unnormalized [cardinal sine](https://en.wikipedia.org/wiki/Sinc_function) function. |
+| `FresnelS`             | $$S(x) = \int_0^x \sin\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel S integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$S(\infty) = \tfrac{1}{2}$$. |
+| `FresnelC`             | $$C(x) = \int_0^x \cos\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel C integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$C(\infty) = \tfrac{1}{2}$$. |
+
+</div>
+
 ## Trigonometric Simplification
 
 The `trigSimplify()` method applies the Fu algorithm to simplify trigonometric
@@ -13088,7 +13448,86 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.51.1 _2026-02-15_
+
+### Features
+
+- **#172 Degrees-Minutes-Seconds (DMS) notation**: Parse and serialize
+  geographic angle notation such as `9°30'15"`. The LaTeX parser now recognizes
+  arc-minute (`'`, `\prime`) and arc-second (`"`, `\doubleprime`) symbols when
+  they follow a degree symbol, producing
+  `Add(Quantity(…, deg), Quantity(…, arcmin), …)` expressions that evaluate and
+  simplify through the existing unit system. Negative angles (e.g. `-45°30'`)
+  are fully supported for latitude/longitude coordinates.
+- **`dmsFormat` serialization option**: Set `dmsFormat: true` in
+  `SerializeLatexOptions` to serialize angle quantities as DMS notation (e.g.
+  `Quantity(9.5, deg)` → `9°30'`).
+- **`angleNormalization` serialization option**: Normalize angles during
+  serialization with `'0...360'` (useful for bearings) or `'-180...180'` (useful
+  for longitude). Default is `'none'`.
+- **`realOnly` compilation option**: Pass `{ realOnly: true }` to `compile()` to
+  automatically convert complex `{ re, im }` results to real numbers — returns
+  `re` when `im === 0`, `NaN` otherwise. Useful for plotting and other contexts
+  that only need real-valued output.
+- **`Sinc` function**: Unnormalized cardinal sine `sinc(x) = sin(x)/x` with
+  `sinc(0) = 1`. Includes LaTeX parsing via `\operatorname{sinc}`, JavaScript
+  and interval-arithmetic compilation targets.
+- **Fresnel integrals (`FresnelS`, `FresnelC`)**: Numeric evaluation using
+  Cephes rational Chebyshev approximation, LaTeX parsing via
+  `\operatorname{FresnelS}` / `\operatorname{FresnelC}`, JavaScript and
+  interval-arithmetic compilation targets.
+- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`,
+  `1` for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript
+  and interval-arithmetic compilation with singularity detection at zero.
+
+### LaTeX Syntax
+
+- **`Which` compilation**: `\begin{cases}` expressions now compile to JavaScript
+  and interval-js targets as chained ternary operators with `NaN` fallback when
+  no condition matches.
+- **`Sum`/`Product` compilation**: `\sum_{k=a}^{b}` and `\prod_{k=a}^{b}`
+  expressions with numeric bounds now compile to JavaScript loops with
+  accumulator variables, including complex number support.
+- **`Loop` compilation**: `Loop`, `Break`, `Continue`, and `Return` operators
+  compile to JavaScript `for` loops wrapped in IIFEs with standard control flow
+  keywords.
+- **Inline `If` syntax**: Parse `\text{if } C \text{ then } A \text{ else } B`
+  (or `\operatorname{if}`) to `["If", C, A, B]` expressions.
+- **`where` syntax**: Parse `E \text{ where } x \coloneq V` to `Block`
+  expressions with implicit variable declarations.
+- **Semicolon block syntax**: Semicolons (`;`, `\;`) act as statement
+  separators, building `Block` expressions with auto-declared variables when
+  assignments are present.
+- **`for` loop syntax**: Parse
+  `\text{for } i \text{ from } a \text{ to } b \text{ do } body` to
+  `["Loop", body, ["Element", "i", ["Range", a, b]]]`.
+
+### Bug Fixes
+
+- **Interval-JS compilation for Gamma functions**: Added missing `gamma` and
+  `gammaln` exports and implementations in the interval-arithmetic library.
+- **Interval-JS graceful fallback**: The `interval-js` target no longer throws
+  when encountering unsupported functions. Unsupported operators now produce
+  `{ success: false }` at compile time, and runtime errors return
+  `{ kind: "entire" }` instead of propagating.
+- **`CompilationResult.run` type signature**: The TypeScript type for `run` now
+  correctly reflects the actual calling convention (`(...args: unknown[])`)
+  instead of the previous misleading `(...args: (number | {re, im})[])`.
+- **`Loop` compilation for interval-js target**: Loop counter now uses raw
+  numbers (not `_IA.point()`) for the `for` statement, with loop index
+  references properly wrapped in the body. Conditions in `if`/`break`/
+  `continue` statements inside loops use scalar comparisons instead of
+  interval comparison functions.
+
+### Other Changes
+
+- Updated color palettes
+- Deduplicated runtime helper object (`SYS_HELPERS`) shared between
+  `ComputeEngineFunction` and `ComputeEngineFunctionLiteral` in compilation
+  target
+- Centralized `sinc` implementation in `numerics/special-functions.ts` (shared
+  by library evaluation and JS compilation runtime)
+- Removed dead `args === null` checks in compilation base class
 
 ## 0.51.0 _2026-02-14_
 
@@ -18913,7 +19352,7 @@ The result includes a `run` function that can be called to evaluate the expressi
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
-const result = compile(ce.parse('2\\pi'));
+const result = compile('2\\pi');
 console.log(result.success ? 'compiled' : 'fallback');
 console.log(result.run?.());
 ```
@@ -18933,7 +19372,7 @@ perform some operations asynchronously.
 
 ```js
 try {
-  const fact = ce.parse('(70!)!');
+  const fact = parse('(70!)!');
   const factResult = await fact.evaluateAsync();
   console.log(factResult);
 } catch (e) {
@@ -18945,10 +19384,10 @@ The `expr.evaluateAsync()` method returns a `Promise` that resolves to the resul
 of the evaluation. It accepts the same `numericApproximation` options as `expr.evaluate()`.
 
 It is also possible to interrupt an evaluation, for example by providing the user
-with a pause/cancel button. 
+with a pause/cancel button.
 
 **To make an evaluation interruptible**, use an `AbortController`
-object and a `signal`. 
+object and a `signal`.
 
 For example, to interrupt an evaluation after 500ms:
 
@@ -18957,7 +19396,7 @@ const abort = new AbortController();
 const signal = abort.signal;
 setTimeout(() => abort.abort(), 500);
 try {
-  const fact = ce.parse('(70!)!');
+  const fact = parse('(70!)!');
   const factResult = await fact.evaluateAsync({ signal });
   console.log(factResult);
 } catch (e) {
@@ -24795,6 +25234,58 @@ console.log(ce.box(["Add", ["Power", "x", 3], 2]).latex);
 // ➔  "x^3 + 2"
 ```
 
+## Control Structure Keywords
+
+The Compute Engine parser recognizes keywords inside `\text{...}` and
+`\operatorname{...}` to express control structures in LaTeX.
+
+### Inline Conditionals
+
+Use `\text{if}`, `\text{then}`, and `\text{else}` keywords:
+
+```live
+console.log(ce.parse("\\text{if } x > 0 \\text{ then } x \\text{ else } -x").json);
+// ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
+```
+
+The `\text{else}` branch is optional. When omitted, the result is `Nothing` if
+the condition is false.
+
+### Local Bindings with `where`
+
+The `\text{where}` keyword binds variables to values in an expression:
+
+```live
+console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").json);
+// ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
+//             ["Declare", "b"], ["Assign", "b", 2],
+//             ["Add", "a", "b"]]
+```
+
+### Loops
+
+Use `\text{for}`, `\text{from}`, `\text{to}`, and `\text{do}` keywords:
+
+```live
+console.log(ce.parse("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2").json);
+// ➔ ["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]
+```
+
+### Semicolon Blocks
+
+Semicolons separate statements in a block. When any statement is an assignment,
+the result is wrapped in a `Block` with automatic variable declarations:
+
+```live
+console.log(ce.parse("x \\coloneq 3;\\; x^2 + 1").json);
+// ➔ ["Block", ["Declare", "x"], ["Assign", "x", 3],
+//             ["Add", ["Power", "x", 2], 1]]
+```
+
+<ReadMore path="/compute-engine/reference/control-structures/" >
+Read more about the **control structure** operators.
+</ReadMore>
+
 ## Customizing Parsing
 
 The LaTeX parsing can be customized by providing a `ParseLatexOptions` object as
@@ -24982,9 +25473,11 @@ must be surrounded by curly brackets.
 | `invisiblePlus` | A LaTeX string to use as an invisible plus operator between expressions, for example with mixed numbers. Leave it empty to join the main number and the fraction. Use `"+"` to insert an explicit $ + $ operator between them. Default is `""`. |
 | `multiply` | A LaTeX string to use as a multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `"\times"` $ \times $. |
 | `missingSymbol` | A LaTeX string to use when a symbol is missing. Default is `"\placeholder{}"` $ \placeholder{} $. |
+| `dmsFormat` | When `true`, serialize angle quantities in degrees-minutes-seconds format (e.g., `9°30'`). When `false` (default), use decimal degrees. |
+| `angleNormalization` | Normalize angles during serialization. `"none"` (default): no normalization. `"0...360"`: normalize to $[0, 360)$. `"-180...180"`: normalize to $[-180, 180]$. |
 
 ```live
-console.log(ce.parse("3\\frac{1}{4}").toLatex({ 
+console.log(parse("3\\frac{1}{4}").toLatex({ 
     invisiblePlus: "+"
 }));
 ```
@@ -25009,11 +25502,11 @@ and return a string indicating the desired style.
 For example to always represent fractions with a solidus (forward slash) use:
 
 ```live
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "quotient"
 }));
 
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "inline-solidus"
 }));
 
@@ -25029,7 +25522,7 @@ an inline solidus:
 
 ```live
 
-console.log(ce.parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
+console.log(parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
   fractionStyle: (expr, level) =>
      level > 0 ? "inline-solidus" : "quotient"
 }));
@@ -25041,7 +25534,7 @@ console.log(ce.parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
 `applyFunctionStyle` style option handler.
 
 ```live
-console.log(ce.parse("\\sin x").toLatex({
+console.log(parse("\\sin x").toLatex({
   applyFunctionStyle: () => "big"
 }));
 ```
@@ -25060,7 +25553,7 @@ console.log(ce.parse("\\sin x").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
+console.log(parse("(a+b)", {form: 'raw'}).toLatex({
   groupStyle: () => "big"
 }));
 ```
@@ -25078,7 +25571,7 @@ console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
 handler.
 
 ```live
-console.log(ce.parse("\\sqrt{2}").toLatex({
+console.log(parse("\\sqrt{2}").toLatex({
   rootStyle: () => "solidus"
 }));
 ```
@@ -25095,7 +25588,7 @@ console.log(ce.parse("\\sqrt{2}").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "nice-solidus"
 }));
 ```
@@ -25114,7 +25607,7 @@ console.log(ce.parse("\\frac{3}{5}").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("p\\land q").toLatex({
+console.log(parse("p\\land q").toLatex({
   logicStyle: () => "word"
 }));
 ```
@@ -25132,7 +25625,7 @@ console.log(ce.parse("p\\land q").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("x^2").toLatex({
+console.log(parse("x^2").toLatex({
   powerStyle: () => "solidus"
 }));
 ```
@@ -25149,7 +25642,7 @@ console.log(ce.parse("x^2").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("x \\in \\Z").toLatex({
+console.log(parse("x \\in \\Z").toLatex({
   numericSetStyle: () => "interval"
 }));
 ```
@@ -25206,6 +25699,9 @@ ce.latexDictionary = [
   },
 ];
 
+// NOTE: we use `ce.parse()` in order to use the Compute Engine instance with
+// the custom definitions, not the shared Compute Engine instance that the 
+// free `parse()` function uses.
 ce.parse("\\triple{5}").json;
 // ➔ ["triple", 5]
 ```
@@ -26538,8 +27034,15 @@ color space conversion, and color palettes.
 
 Convert a color string or named color into a canonical sRGB tuple.
 
-The output is a tuple of 3 or 4 numbers between 0 and 1, representing 
+The output is a tuple of 3 or 4 numbers between 0 and 1, representing
 the red, green, blue, and optional alpha components.
+
+Supports various formats:
+- **Hex**: `#rgb`, `#rrggbb`, `#rrggbbaa` (e.g. `'#f00'`, `'#ff0000'`, `'#ff000080'`)
+- **RGB/RGBA**: `rgb(r, g, b)`, `rgba(r, g, b, a)` (e.g. `'rgb(255, 0, 0)'`, `'rgba(255, 0, 0, 0.5)'`)
+- **HSL**: `hsl(h, s%, l%)`, `hsla(h, s%, l%, a)` (e.g. `'hsl(0, 100%, 50%)'`)
+- **OKLCH**: `oklch(l%, c, h)`, `oklch(l%, c, h / a)` (e.g. `'oklch(50% 0.3 240)'`)
+- **Named colors**: From the `NAMED_COLORS` palette (see below)
 
 ```json example
 ["Color", "'#f00'"]
@@ -26548,9 +27051,33 @@ the red, green, blue, and optional alpha components.
 ["Color", "'rgba(255, 0, 0, 0.5)'"]
 // ➔ ["Tuple", 1, 0, 0, 0.5]
 
-["Color", "'rebeccapurple'"]
-// ➔ ["Tuple", 0.4, 0.2, 0.6]
+["Color", "'red'"]
+// ➔ ["Tuple", 0.843, 0.09, 0.043]
+
+["Color", "'blue'"]
+// ➔ ["Tuple", 0.051, 0.502, 0.949]
 ```
+
+### Named Colors
+
+The `Color` function supports a comprehensive palette of named colors from the `NAMED_COLORS` object:
+
+| Color Name | Swatch | Color Name | Swatch |
+| :--- | :--- | :--- | :--- |
+| `red` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d7170b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `orange` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#fe8a2b', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `yellow` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#ffc02b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `lime` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#63b215', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `green` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#21ba3a', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `teal` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#17cfcf', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `cyan` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#13a7ec', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `blue` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#0d80f2', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `indigo` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#63c', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `purple` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#a219e6', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `magenta` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#eb4799', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `black` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#000', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `white` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#ffffff', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `dark-grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#666', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#A6A6A6', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `light-grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d4d5d2', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `brown` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#8c564b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `olive` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#8a8f2a', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `midnight` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#2c4670', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `sky` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d2dce9', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `carbon` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#111111', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `charcoal` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#333333', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `slate` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#555555', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `graphite` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#777777', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `stone` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#999999', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `ash` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#E6E6E6', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `mist` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#F3F3F3', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `snow` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#FFFFFF', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
 
 </FunctionDefinition>
 
@@ -26706,9 +27233,9 @@ Exact values are:
 </div>
 
 ```live
-console.log(ce.parse('1/3 + 1/4').evaluate());
+console.log(parse('1/3 + 1/4').evaluate());
 
-console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
+console.log(parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
 ```
 
 
@@ -26718,8 +27245,8 @@ console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
 **To force the evaluation of an expression to be a numeric approximation**, use `expr.N()`.
 
 ```live
-console.log(ce.parse('1/3 + 1/4').N());
-console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').N());
+console.log(parse('1/3 + 1/4').N());
+console.log(parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').N());
 ```
 
 
@@ -26727,7 +27254,7 @@ When using `expr.evaluate()`, if one of the arguments is not an exact value
 the expression is automatically evaluated as a **numeric approximation**.
 
 ```live
-console.log(ce.parse('1/3 + 1/4 + 1.24').evaluate());
+console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
 ## Angular Units
@@ -26759,7 +27286,7 @@ the `re` (for the real part of the number) and `im` (for the imaginary part)
 properties.
 
 ```js
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().re);
 // ➔ 0.5833333333333334
 ```
@@ -26768,7 +27295,7 @@ Another way to obtain a JavaScript compatible representation of an expression
 is to use the `valueOf()` method of the expression.
 
 ```js
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
@@ -26777,7 +27304,7 @@ The `valueOf()` method of a expression can be used in JavaScript
 expressions.
 
 ```live
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().valueOf() + 1);
 ```
 
@@ -26789,7 +27316,7 @@ Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
 **To get an `Expression` number literal from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
-const expr = ce.box(1.5);
+const expr = box(1.5);
 console.log(expr.valueOf());
 ```
 
@@ -26959,8 +27486,7 @@ function.
 ```js
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse("3x^2+4x+2");
-const result = compile(expr);
+const result = compile("3x^2+4x+2");
 for (const x = 0; x < 1; x += 0.01) console.log(result.run({ x }));
 ```
 
@@ -28334,10 +28860,10 @@ For example:
 - $ \sqrt{a^2 - 2ab + b^2} $ simplifies to $ |a - b| $
 
 ```javascript
-ce.parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
+parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
 // ➔ "|x+1|"
 
-ce.parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
+parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
 // ➔ "|2x+3|"
 ```
 
@@ -28350,15 +28876,14 @@ For more control over polynomial form, use `Factor` and `Expand`:
 
 ```javascript
 // Factor a polynomial
-ce.parse('x^2 + 5x + 6').factor().latex;
+factor('x^2 + 5x + 6').latex;
 // ➔ "(x+2)(x+3)"
 
-ce.parse('x^2 - 4').factor().latex;
+factor('x^2 - 4').latex;
 // ➔ "(x-2)(x+2)"
 
 // Expand a product
-// import { expand } from '@cortex-js/compute-engine';
-expand(ce.parse('(x+1)(x+2)')).latex;
+expand('(x+1)(x+2)').latex;
 // ➔ "x^2+3x+2"
 ```
 
@@ -28424,13 +28949,13 @@ of the indices:
 | `root(root(x, m), n)` | `root(m·n)(x)` |
 
 ```javascript
-ce.box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
+box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
 // ➔ "\\sqrt[4]{x}"
 
-ce.box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
+box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
 // ➔ "\\sqrt[6]{x}"
 
-ce.box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
+box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
 // ➔ "\\sqrt[6]{x}"
 ```
 
@@ -28462,7 +28987,7 @@ There are two ways to apply trigonometric simplification:
 **Option 1: Strategy option with `simplify()`**
 
 ```javascript
-const expr = ce.parse("\\sin^2(x) + \\cos^2(x)");
+const expr = parse("\\sin^2(x) + \\cos^2(x)");
 const simplified = expr.simplify({ strategy: 'fu' });
 // Returns: 1
 ```
@@ -28470,7 +28995,7 @@ const simplified = expr.simplify({ strategy: 'fu' });
 **Option 2: Dedicated `trigSimplify()` method**
 
 ```javascript
-const expr = ce.parse("2\\sin(x)\\cos(x)");
+const expr = parse("2\\sin(x)\\cos(x)");
 const simplified = expr.trigSimplify();
 // Returns: sin(2x)
 ```
@@ -29668,6 +30193,32 @@ console.log(evaluate(['Cos', ['Quantity', 200, 'grad']]));
 ```
 
 Supported angular units: `deg`, `rad`, `grad`, `turn`, `arcmin`, `arcsec`.
+
+### Degrees-Minutes-Seconds (DMS) Notation
+
+Geographic coordinates and angular measurements are often written in
+degrees-minutes-seconds notation. The engine parses DMS notation when
+arc-minute (`'`) and arc-second (`"`) symbols appear after a degree symbol:
+
+```live
+console.log(parse("9°30'15\""));
+// → Add(Quantity(9, deg), Quantity(30, arcmin), Quantity(15, arcsec))
+
+console.log(parse("9°30'"));
+// → Add(Quantity(9, deg), Quantity(30, arcmin))
+```
+
+The `'` and `"` symbols are only interpreted as arc-minutes and arc-seconds
+when they immediately follow a degree value. In other contexts, they retain
+their usual meaning (e.g., prime/derivative notation).
+
+DMS expressions canonicalize to a single angle value, so arithmetic works
+naturally:
+
+```live
+console.log(evaluate("45°30' + 44°30'"));
+// → 90°
+```
 
 
 ## Physics Constants
@@ -34288,9 +34839,56 @@ Read more about the `Product` and `Sum` functions which are specialized version 
 
 <ReadMore path="/compute-engine/reference/collections/" >
 Read more about operations on collection such as `Map` and `Reduce` which are functional
-programming constructs that can be used to replace loops. 
+programming constructs that can be used to replace loops.
 </ReadMore>
 
+## LaTeX Syntax for Control Structures
+
+Control structures can be expressed in LaTeX using keyword syntax with
+`\text{...}` or `\operatorname{...}`.
+
+### Inline `If`
+
+```latex
+\text{if } x > 0 \text{ then } x \text{ else } -x
+```
+
+Parses to `["If", ["Greater", "x", 0], "x", ["Negate", "x"]]`.
+
+The `\text{else}` branch is optional. `\operatorname{if}` can be used instead
+of `\text{if}`.
+
+### `where` Bindings
+
+```latex
+x^2 + y^2 \text{ where } x \coloneq 3,\; y \coloneq 4
+```
+
+Parses to a `["Block"]` with variable declarations, assignments, and the body
+expression as the return value.
+
+### `for` Loops
+
+```latex
+\text{for } i \text{ from } 1 \text{ to } 10 \text{ do } i^2
+```
+
+Parses to `["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]`.
+
+### Semicolon Blocks
+
+Semicolons (`;` or `\;`) act as statement separators to build `Block`
+expressions:
+
+```latex
+x \coloneq 3;\; x^2 + 1
+```
+
+Parses to `["Block", ["Declare", "x"], ["Assign", "x", 3], ["Add", ["Power", "x", 2], 1]]`.
+
+<ReadMore path="/compute-engine/guides/compiling/" >
+Read more about **compiling** control structures to JavaScript.
+</ReadMore>
 
 ## Controlling the Flow of Execution
 
@@ -34784,6 +35382,8 @@ logarithmic and linear scales is not supported in v1.
 | `\SI{5}{kg}` | `["Quantity", 5, "kg"]` |
 | `\unit{m/s}` | `["Divide", "m", "s"]` |
 | `\si{MHz}` | `"MHz"` |
+| `9°30'15"` | `["Add", ["Quantity", 9, "deg"], ["Quantity", 30, "arcmin"], ["Quantity", 15, "arcsec"]]` |
+| `9°30'` | `["Add", ["Quantity", 9, "deg"], ["Quantity", 30, "arcmin"]]` |
 
 ### Unit Parsing Rules
 
@@ -35655,6 +36255,65 @@ $$
 
 - Wikidata: [Q429963](https://www.wikidata.org/wiki/Q429963)
 - NIST: http://dlmf.nist.gov/4.13
+
+</FunctionDefinition>
+
+
+## Fresnel Integrals
+
+The [Fresnel integrals](https://en.wikipedia.org/wiki/Fresnel_integral) arise in
+the description of near-field diffraction and in the geometry of the Cornu
+spiral (Euler spiral).
+
+
+<FunctionDefinition name="FresnelS">
+
+<Signature name="FresnelS">_x_</Signature>
+
+<Latex value="\\operatorname{FresnelS}(x)"/>
+
+The Fresnel S integral:
+
+$$
+S(x) = \int_0^x \sin\!\left(\frac{\pi t^2}{2}\right) dt
+$$
+
+It is an odd function ($S(-x) = -S(x)$) with asymptotic value
+$S(\infty) = \tfrac{1}{2}$.
+
+```json example
+["FresnelS", 1]
+// ➔ 0.4383
+```
+
+- Wikipedia: [Fresnel integral](https://en.wikipedia.org/wiki/Fresnel_integral)
+- NIST: http://dlmf.nist.gov/7.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="FresnelC">
+
+<Signature name="FresnelC">_x_</Signature>
+
+<Latex value="\\operatorname{FresnelC}(x)"/>
+
+The Fresnel C integral:
+
+$$
+C(x) = \int_0^x \cos\!\left(\frac{\pi t^2}{2}\right) dt
+$$
+
+It is an odd function ($C(-x) = -C(x)$) with asymptotic value
+$C(\infty) = \tfrac{1}{2}$.
+
+```json example
+["FresnelC", 1]
+// ➔ 0.7799
+```
+
+- Wikipedia: [Fresnel integral](https://en.wikipedia.org/wiki/Fresnel_integral)
+- NIST: http://dlmf.nist.gov/7.2
 
 </FunctionDefinition>
 
