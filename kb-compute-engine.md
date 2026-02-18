@@ -221,7 +221,10 @@ f.run({ theta: 0.5 }); // ✓ correct → 1.8776
 f.run({ x: 0.5 });     // ✗ wrong key — returns NaN
 ```
 
-**To discover the variable names** in an expression, use `expr.unknowns`:
+**To discover the variable names** in an expression, use `expr.unknowns` (or
+its alias `expr.freeVariables`). These properties return only the free
+variables — symbols that are not constants, operators, or bound by scoping
+constructs like `Sum` or `Product`:
 
 ```live
 console.log(parse("n^2").unknowns);
@@ -3560,7 +3563,11 @@ Applicable to canonical and non-canonical expressions.
 readonly symbols: readonly string[];
 ```
 
-All the symbols in the expression, recursively
+All the symbols in the expression, recursively, including
+bound variables (e.g., summation/product index variables).
+
+Use [unknowns](#unknowns) or [freeVariables](#freevariables) to get only the
+symbols that are free (not bound by a scoping construct).
 
 ```js
 const expr = ce.parse('a + b * c + d');
@@ -3584,6 +3591,22 @@ readonly unknowns: readonly string[];
 
 All the symbols used in the expression that do not have a value
 associated with them, i.e. they are declared but not defined.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.freeVariables
+
+```ts
+readonly freeVariables: readonly string[];
+```
+
+The free variables of the expression: symbols that are not constants,
+not operators, not bound to a value, and not locally scoped (e.g.,
+summation/product index variables are excluded).
+
+This is an alias for [unknowns](#unknowns).
 
 </MemberCard>
 
@@ -4638,9 +4661,21 @@ Note that lazy collections are *not* eagerly evaluated.
 is(other): boolean
 ```
 
-Equivalent to `Expression.isSame()` but the argument can be
-a JavaScript primitive. For example, `expr.is(2)` is equivalent to
-`expr.isSame(ce.number(2))`.
+Smart equality check: structural first, then numeric evaluation fallback.
+
+First tries an exact structural check (same as `isSame()`). If that fails
+and the expression is constant (no free variables), evaluates numerically
+and compares within `engine.tolerance`.
+
+For literal numbers (`BoxedNumber`), behaves identically to `isSame()` —
+no tolerance is applied. Tolerance only applies to expressions that
+require evaluation (e.g., `\\sin(\\pi)`).
+
+```typescript
+ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
+ce.number(1e-17).is(0)                     // false — literal, no tolerance
+ce.parse('x + 1').is(1)                    // false — not constant
+```
 
 ####### other
 
@@ -4658,11 +4693,20 @@ a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 isSame(rhs): boolean
 ```
 
-Structural/symbolic equality (weak equality).
+Fast exact structural/symbolic equality check.
+
+Returns `true` if the expression is structurally identical to `rhs`.
+For symbols with value bindings, follows the binding (e.g., if `one = 1`,
+then `ce.symbol('one').isSame(1)` is `true`).
+
+Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
+
+Does **not** evaluate expressions — purely structural.
 
 `ce.parse('1+x', {form: 'raw'}).isSame(ce.parse('x+1', {form: 'raw'}))` is `false`.
 
-See `expr.isEqual()` for mathematical equality.
+See `expr.is()` for a smart check with numeric evaluation fallback,
+and `expr.isEqual()` for full mathematical equality.
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
@@ -4670,7 +4714,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-[`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -4765,22 +4809,22 @@ changed to be such that the last two digits are ignored.
 
 Evaluating the expressions may be expensive. Other options to consider
 to compare two expressions include:
-- `expr.isSame(other)` for a structural comparison which does not involve
-  evaluating the expressions.
-- `expr.is(other)` for a comparison of a number literal
+- `expr.isSame(other)` for a fast exact structural comparison (no evaluation)
+- `expr.is(other)` for a smart check that tries structural first, then
+  numeric evaluation fallback for constant expressions
 
 **Examples**
 
 ```js
 let expr = ce.parse('2 + 2');
 console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(ce.parse(4))); // false
-console.log(expr.is(4)); // false
+console.log(expr.isSame(4)); // false (structural only)
+console.log(expr.is(4)); // true (evaluates, within tolerance)
 
 expr = ce.parse('4');
 console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(ce.parse(4))); // true
-console.log(expr.is(4)); // true (fastest)
+console.log(expr.isSame(4)); // true
+console.log(expr.is(4)); // true
 
 ```
 
@@ -13448,6 +13492,150 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.52.0 _2026-02-18_
+
+### Features
+
+- **Smart `.is()` / exact `.isSame()` separation**: The `.is()` and `.isSame()`
+  methods on expressions now have distinct roles:
+
+  - **`.isSame(v)`** — Fast exact structural check. No evaluation, no tolerance.
+    Now accepts primitives (`number`, `bigint`, `boolean`, `string`) in addition
+    to `Expression`. This is the method used internally throughout the engine.
+
+  - **`.is(v)`** — Smart check with numeric evaluation fallback. Tries
+    `.isSame()` first; if that fails and the expression is constant (no free
+    variables), evaluates numerically and compares within `engine.tolerance`.
+    For literal numbers, behaves identically to `.isSame()` — tolerance only
+    applies to expressions that require evaluation.
+
+  This resolves a common pain point where `ce.parse('\\cos(\\pi/2)').is(0)`
+  returned `false` because `.is()` was purely structural. Now it returns `true`:
+
+  ```ts
+  ce.parse('\\sin(\\pi)').is(0);            // true  (evaluates, within tolerance)
+  ce.parse('\\cos(\\frac{\\pi}{2})').is(0); // true
+  ce.number(1e-17).is(0);                   // false (literal number, no tolerance)
+  ce.parse('x + 1').is(1);                  // false (not constant, no fallback)
+  ```
+
+- **`numericValue()` convenience helper**: New standalone function that combines
+  the `isNumber()` guard with `.numericValue` access. Returns the numeric value
+  if the expression is a number literal, or `undefined` otherwise. Useful for
+  safely extracting numeric values without verbose ternary patterns:
+
+  ```ts
+  import { numericValue } from '@cortex-js/compute-engine';
+
+  // Before
+  const val = isNumber(expr) ? expr.numericValue : undefined;
+
+  // After
+  const val = numericValue(expr);
+  ```
+
+- **Stochastic equality check for expressions with unknowns**: `expr.isEqual()`
+  now uses a stochastic fallback when symbolic methods (expand + simplify) can't
+  prove equality. Both expressions are evaluated at 50 sample points (9
+  well-known values + 41 random) and compared with relative+absolute tolerance.
+  This detects equivalences like `sin²(x) + cos²(x) = 1`, `(x+y)² = x²+2xy+y²`,
+  and `sin(2x) = 2sin(x)cos(x)` that were previously returned as `undefined`.
+  Singularities (NaN at a sample point) are skipped rather than treated as
+  disagreements. The check also works when the two expressions have different
+  unknowns (e.g. `x - x + y` vs `y`).
+
+- **`expr.freeVariables` property**: New property on `BoxedExpression` that
+  returns the free variables of an expression — symbols that are not constants,
+  not operators, not bound to a value, and not locally scoped by constructs like
+  `Sum` or `Product`. Semantically identical to `expr.unknowns`.
+
+- **New interval-js compilation functions**: Added `Binomial`, `GCD`, `LCM`,
+  `Chop`, `Erf`, `Erfc`, `Exp2`, `Arctan2`, and `Hypot` to the interval-js
+  compilation target, with corresponding interval arithmetic implementations.
+
+- **GLSL/WGSL variable exponent support**: The interval GLSL and WGSL targets
+  now support `Power` with variable exponents (e.g. `(-1)^k`, `x^n`). Previously
+  these threw at compile time. Added `ia_pow_interval()` to both GPU library
+  preambles using four-corner `exp(exp * ln(base))` evaluation with special cases
+  for point-integer exponents and `(-1)^n`.
+
+- **`Factorial`, `Gamma`, `GammaLn` for GLSL/WGSL interval targets**: Added
+  `ia_factorial` (via `ia_gamma(x+1)`) to both GPU targets. Added `ia_gamma`
+  (Lanczos approximation) and `ia_gammaln` (Stirling asymptotic) to the WGSL
+  target, matching existing GLSL implementations.
+
+### Bug Fixes
+
+- **`parse()` with `form: 'structural'` ignored the structural flag**: The
+  `structural` option from `formToInternal()` was dropped in
+  `parseLatexEntrypoint()`, making `ce.parse(s, { form: 'structural' })`
+  behave identically to `{ form: 'raw' }` (unbound, unsorted). Now correctly
+  produces a bound, structural expression.
+
+- **Partial canonicalization with `'Flatten'` form folded numerics**: Using
+  `ce.parse(s, { form: ['Flatten', 'Order'] })` unexpectedly evaluated
+  numeric operands (e.g. `3×2+1` became `7`) because `flattenForm()` used
+  `ce.function()` which defaults to full canonical mode. Now uses `ce._fn()`
+  to preserve operand structure. This enables structural comparison of
+  expressions modulo commutativity and associativity without numeric
+  evaluation — useful for checking the *method* used to solve a problem rather
+  than just the numeric result:
+  ```ts
+  const a = ce.parse('3\\times2+1', { form: ['Flatten', 'Order'] });
+  const b = ce.parse('1+2\\times3', { form: ['Flatten', 'Order'] });
+  a.isSame(b);  // ➔ true  (same structure, different order)
+
+  const c = ce.parse('7', { form: ['Flatten', 'Order'] });
+  a.isSame(c);  // ➔ false (different structure)
+  ```
+
+- **Sum/Product with symbolic bounds compiled incorrectly**: Expressions like
+  `\sum_{k=0}^{n} f(k, x)` where the upper bound is a variable produced loops
+  that iterated 10001 times instead of using the variable `n`. The compilation
+  extracted bounds via `normalizeIndexingSet()` which converted symbolic bounds
+  to `NaN` and fell back to a hardcoded limit. Now bounds are extracted as
+  expressions and compiled to code (e.g. `Math.floor(_.n)` for JS,
+  `Math.floor((_.n).hi)` for interval-js). This fixes Taylor series patterns
+  like `\sum_{k=0}^{n} \frac{(-1)^k x^{2k+1}}{(2k+1)!}` for both JS and
+  interval-js targets.
+
+- **Interval `(-1)^k` returned `empty` instead of correct value**: The
+  `powInterval()` function required positive bases for variable exponents,
+  causing `(-1)^k` patterns in summations (e.g. Taylor series) to fail at
+  runtime. Now correctly delegates to `intPow()` when the exponent is a point
+  interval with an integer value, preserving even/odd parity. Also handles the
+  case where base is `-1` and the exponent spans multiple integers by returning
+  the conservative interval `[-1, 1]`.
+
+- **`Factorial` missing from interval-js compilation target**: Expressions
+  containing `n!` (e.g. `\frac{(-1)^k x^{2k+1}}{(2k+1)!}`) failed interval-js
+  compilation with `success: false`. Added `Factorial` and `Factorial2` interval
+  functions and compilation handlers.
+
+- **`expr.unknowns` included bound variables**: Scoped constructs like `Sum`,
+  `Product`, `Integrate`, and `Block` bind index variables in a local scope, but
+  `expr.unknowns` was reporting them as free unknowns. For example,
+  `\sum_{k=0}^{10} k \cdot x` returned `["k", "x"]` instead of `["x"]`.
+  Now correctly excludes locally bound variables from the result.
+
+- **Symbolic upper bounds missing from `expr.unknowns`**: In expressions like
+  `\sum_{k=0}^{M} k \cdot x`, the symbolic upper bound `M` was incorrectly
+  excluded from `unknowns` because the scope's bindings map captured all symbols
+  referenced during canonicalization. Now extracts bound variables structurally
+  from `Limits`/`Element`/`Assign`/`Declare` expressions, so only true bound
+  variables are excluded. This also fixes `Block` expressions where locally
+  assigned variables (via `Assign` or `Declare`) were reported as unknowns.
+
+- **`Integrate` with symbolic bounds compiled incorrectly**: Same issue as
+  Sum/Product — `compileIntegrate()` used `normalizeIndexingSet()` which
+  converted symbolic bounds to `NaN`. Now uses `extractLimits()` and compiles
+  bounds as expressions.
+
+- **Interval `piecewise` test fix**: Fixed test that incorrectly accessed
+  `result.lo` directly instead of unwrapping the `IntervalResult` envelope
+  (`result.value.lo`). The `piecewise()` function correctly returns
+  `IntervalResult` objects.
+
 ## 0.51.1 _2026-02-15_
 
 ### Features
@@ -13476,9 +13664,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   Cephes rational Chebyshev approximation, LaTeX parsing via
   `\operatorname{FresnelS}` / `\operatorname{FresnelC}`, JavaScript and
   interval-arithmetic compilation targets.
-- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`,
-  `1` for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript
-  and interval-arithmetic compilation with singularity detection at zero.
+- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`, `1`
+  for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript and
+  interval-arithmetic compilation with singularity detection at zero.
 
 ### LaTeX Syntax
 
@@ -13516,8 +13704,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **`Loop` compilation for interval-js target**: Loop counter now uses raw
   numbers (not `_IA.point()`) for the `for` statement, with loop index
   references properly wrapped in the body. Conditions in `if`/`break`/
-  `continue` statements inside loops use scalar comparisons instead of
-  interval comparison functions.
+  `continue` statements inside loops use scalar comparisons instead of interval
+  comparison functions.
 
 ### Other Changes
 
@@ -13781,9 +13969,9 @@ now only accessible after narrowing with a type guard.
 
 | Removed from `Expression`             | Access via                                |
 | :------------------------------------ | :---------------------------------------- |
-| `.symbol`                             | `isSymbol(expr)` then `expr.symbol`       |
+| `.symbol`                             | `isSymbol(expr)` or `isSymbol(expr, 'Pi')` then `expr.symbol` |
 | `.string`                             | `isString(expr)` then `expr.string`       |
-| `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` then `expr.ops` etc.   |
+| `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` or `isFunction(expr, 'Add')` then `expr.ops` etc. |
 | `.numericValue`, `.isNumberLiteral`   | `isNumber(expr)` then `expr.numericValue` |
 | `.tensor`                             | `isTensor(expr)` then `expr.tensor`       |
 
@@ -13795,8 +13983,16 @@ if (expr.symbol !== null) console.log(expr.symbol);
 import { isSymbol, sym } from '@cortex-js/compute-engine';
 
 if (isSymbol(expr)) console.log(expr.symbol);
+// isSymbol() accepts an optional symbol name:
+if (isSymbol(expr, 'Pi')) { /* expr is the Pi symbol */ }
 // or use the convenience helper:
 if (sym(expr) === 'Pi') { /* ... */ }
+
+// isFunction() accepts an optional operator name:
+if (isFunction(expr, 'Add')) {
+  // expr is narrowed to a function AND has operator 'Add'
+  console.log(expr.ops);
+}
 ```
 
 Properties that remain on `Expression`: `.operator`, `.re`/`.im`, `.shape`, all
@@ -23810,7 +24006,7 @@ const matrix = [[1,2,3], [4,5,6], [7,8,9]];
 
 ce.declare("M", {
   subscriptEvaluate: (subscript, { engine }) => {
-    if (isFunction(subscript) && subscript.operator === "Tuple") {
+    if (isFunction(subscript, "Tuple")) {
       const [i, j] = subscript.ops;
       const row = matrix[i.re - 1];  // 1-indexed
       if (row && row[j.re - 1] !== undefined) {
@@ -24249,7 +24445,10 @@ they represent the same mathematical object.
 
 The `lhs.isSame(rhs)` function returns true if `lhs` and `rhs` are structurally
 exactly identical, that is each sub-expression is recursively identical in `lhs`
-and `rhs`.
+and `rhs`. The argument can be an `Expression` or a JavaScript primitive
+(`number`, `bigint`, `boolean`, `string`).
+
+This is a fast, exact check — no evaluation is performed.
 
 - \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
   integers, the other is an integer
@@ -24338,6 +24537,28 @@ console.log('isEqual?', a.isEqual(b));
 ```
 
 
+### Smart Comparison: `is()`
+
+The `lhs.is(rhs)` method provides a convenient middle ground between `isSame()`
+and `isEqual()`. It first tries an exact structural check (like `isSame()`), and
+if that fails and the expression is **constant** (no free variables), it
+evaluates numerically and compares within `engine.tolerance`.
+
+This is useful when checking whether an expression evaluates to a known value
+without the overhead of a full `isEqual()` call:
+
+```live show-line-numbers
+console.log(ce.parse('\\cos(\\frac{\\pi}{2})').is(0));   // true
+console.log(ce.parse('\\sin(\\pi)').is(0));               // true
+console.log(ce.parse('\\cos(0)').is(1));                  // true
+console.log(ce.number(1e-17).is(0));                      // false (literal)
+console.log(ce.parse('x + 1').is(1));                     // false (not constant)
+```
+
+For **literal numbers** (created with `ce.number()`), `is()` behaves identically
+to `isSame()` — no tolerance is applied. Tolerance only kicks in for expressions
+that require evaluation, such as `\sin(\pi)`.
+
 
 ### Other Comparisons
 
@@ -24346,14 +24567,23 @@ console.log('isEqual?', a.isEqual(b));
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.isSame(rhs)`                        | Structural equality                    |
-| `lhs.isEqual(rhs)`                       | Mathematical equality                  |
+| `lhs.isSame(rhs)`                        | Structural equality (fast, exact, no evaluation). Accepts primitives. |
+| `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
+| `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
-| `lhs.is(rhs)`                            | Synonym for `lhs.isSame(rhs)`, but the argument of `is()` can be a boolean or number.                 |
 | `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
 | `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
 
 </div>
+
+:::info[Choosing the Right Comparison]
+- Use **`isSame()`** when you know the exact value you're comparing against
+  (e.g., checking if an operand is `0` or `1` in a simplification rule).
+- Use **`is()`** when the expression might need evaluation to reveal its value
+  (e.g., checking user input like `\cos(\pi/2)` against `0`).
+- Use **`isEqual()`** for full mathematical equality, including symbolic
+  expressions with unknowns.
+:::
 
 ## Replacing a Symbol in an Expression
 
@@ -26608,28 +26838,73 @@ The order in which forms are specified matters. For example, applying `"Number"`
 before `"Power"` ensures that numeric literals are resolved before power
 simplifications are attempted.
 
+## Comparing Expressions Structurally
+
+In some applications — for example checking that a student used the right
+*method* to solve a problem — you want to compare expressions by structure
+rather than by value. The expression \\(3 \times 2 + 1\\) should be equivalent
+to \\(1 + 2 \times 3\\) (same operations, different order), but **not** to
+\\(7\\) (the numeric result) or \\(6 + 1\\) (different operations).
+
+Use `form: ['Flatten', 'Order']` with `isSame()` for this:
+
+```live
+const a = ce.parse('3\\times2+1', { form: ['Flatten', 'Order'] });
+const b = ce.parse('1+2\\times3', { form: ['Flatten', 'Order'] });
+const c = ce.parse('1+(3\\times2)', { form: ['Flatten', 'Order'] });
+const d = ce.parse('7', { form: ['Flatten', 'Order'] });
+
+console.log(a.isSame(b)); // ➔ true  (commutativity)
+console.log(a.isSame(c)); // ➔ true  (parentheses ignored)
+console.log(a.isSame(d)); // ➔ false (different structure)
+```
+
+This partial canonicalization:
+
+- **`Flatten`**: removes parentheses (Delimiters) and flattens associative
+  operations like \\(a + (b + c) \to a + b + c\\)
+- **`Order`**: sorts commutative operands into a consistent order so that
+  \\(a + b\\) and \\(b + a\\) have the same structure
+
+Unlike the full canonical form, it does **not** evaluate numeric expressions:
+\\(3 \times 2\\) stays as `["Multiply", 2, 3]` rather than being folded to `6`.
+
+You can combine this with `isEqual()` to give differentiated feedback:
+
+```js
+const goodAnswer = ce.parse(answerLatex, { form: ['Flatten', 'Order'] });
+const input = ce.parse(inputLatex, { form: ['Flatten', 'Order'] });
+
+if (goodAnswer.isSame(input)) {
+  // Correct method — structurally equivalent
+} else if (goodAnswer.isEqual(input)) {
+  // Right numeric value but wrong method
+} else {
+  // Incorrect
+}
+```
+
+If you only need binding (so that operator definitions are available and
+arithmetic methods like `.add()` and `.mul()` work) without any normalization,
+use `form: 'structural'`. This preserves the original operand order and
+structure.
+
 ## Custom Transformations
 
-You can also define your own transformations to apply to an expression to
-obtain a custom canonical form.
-
-For example, let's say you want to compare the structural form of two expressions
-but ignoring any extra parentheses. You could define a transformation like this:
+You can define your own transformations to apply to an expression to
+obtain a custom form. The `expr.map()` method visits every sub-expression,
+which is useful for structural transforms:
 
 ```js
 import { isFunction } from '@cortex-js/compute-engine';
 
+// Remove all Delimiter wrappers (parentheses)
 const deparenthesize = (expr) =>
-  expr.map((e) => (isFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
-```
-You can then apply this transformation to an expression like this:
+  expr.map((e) => (isFunction(e, 'Delimiter') ? e.op1 : e));
 
-```js
 const expr1 = ce.parse('3+4\\times2', { form: 'raw' });
 const expr2 = ce.parse('3+(4\\times(2))', { form: 'raw' });
-const transformedExpr1 = deparenthesize(expr1);
-const transformedExpr2 = deparenthesize(expr2);
-console.log(transformedExpr1.isSame(transformedExpr2));
+console.log(deparenthesize(expr1).isSame(deparenthesize(expr2)));
 // ➔ true
 ```
 ---
@@ -32430,8 +32705,8 @@ and provide type-safe access to properties specific to that expression type:
 | Kind           | Type Guard                  |
 | :------------- | :---------------------------------- |
 | **Number Literal**     | `isNumber(expr)`              |
-| **Function Expression**   | `isFunction(expr)`         |
-| **Symbol**     | `isSymbol(expr)`         |
+| **Function Expression**   | `isFunction(expr)` or `isFunction(expr, 'Add')`  |
+| **Symbol**     | `isSymbol(expr)` or `isSymbol(expr, 'Pi')`  |
 | **String**     | `isString(expr)`         |
 
 </div>
@@ -32455,6 +32730,11 @@ if (isSymbol(sym)) {
   console.log(sym.symbol);  // Type-safe access to symbol name
 }
 
+// Check for a specific symbol in one step
+if (isSymbol(sym, 'Pi')) {
+  // sym is the Pi symbol
+}
+
 // Check if it's a function and access its operands
 const fn = ce.parse("2 + 3");
 if (isFunction(fn)) {
@@ -32462,17 +32742,27 @@ if (isFunction(fn)) {
   console.log(fn.ops.length); // 2
   console.log(fn.op1, fn.op2); // Access first and second operands
 }
+
+// Check for a specific operator in one step
+if (isFunction(fn, 'Add')) {
+  // fn is a function expression with operator "Add"
+  console.log(fn.op1, fn.op2);
+}
 ```
 
-For convenience, use the `sym()` helper to get a symbol name without explicit type checking:
+For convenience, use the `sym()` and `numericValue()` helpers to skip
+explicit type checking:
 
 ```js
-import { sym } from '@cortex-js/compute-engine';
+import { sym, numericValue } from '@cortex-js/compute-engine';
 
 const expr = ce.parse("Pi");
 if (sym(expr) === 'Pi') {
   // This is the Pi symbol
 }
+
+// Extract the numeric value of an expression, or undefined if not a number literal
+const val = numericValue(ce.parse("3.14"));  // number | NumericValue | undefined
 ```
 
 
@@ -35421,7 +35711,12 @@ n.value = 5;
 console.log("n =", n.value.toString(), ":", n.type);
 ```
 
-**To get a list of all the symbols in an expression** use `expr.symbols`.
+**To get a list of all the symbols in an expression** use `expr.symbols`. This
+includes all symbols, even those bound by scoping constructs like `Sum` or
+`Product`.
+
+**To get only the free variables** (symbols that are not constants, operators, or
+bound by a scoping construct), use `expr.unknowns` or `expr.freeVariables`.
 
 <ReadMore path="/compute-engine/guides/augmenting/" >
 Read more about **adding definitions** for symbols and functions<Icon name="chevron-right-bold" />
@@ -35438,7 +35733,9 @@ Read more about **scopes**<Icon name="chevron-right-bold" />
 ## Unknowns and Constants
 
 A symbol that has been declared, but has no values associated with it, is said
-to be an **unknown**.
+to be an **unknown**. Use `expr.unknowns` or `expr.freeVariables` to get the
+list of unknowns in an expression. Symbols that are bound by scoping constructs
+(e.g., the index variable `k` in `\sum_{k=0}^{10} k \cdot x`) are excluded.
 
 A symbol whose value cannot be changed is a **constant**. Constants are
 identified by a special flag in their definition.

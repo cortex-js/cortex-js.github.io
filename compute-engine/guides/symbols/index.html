@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.44ad2588.css">
-<script src="/assets/js/runtime~main.7e166ca0.js" defer="defer"></script>
-<script src="/assets/js/main.32393aa9.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.f318b81e.js" defer="defer"></script>
+<script src="/assets/js/main.a5280942.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -37,14 +37,20 @@ inferred, the type will be <code>unknown</code>.</p>
 <!-- -->n.value = 5;
 <!-- -->console.log(&quot;n =&quot;, n.value.toString(), &quot;:&quot;, n.type);
 </div></code-playground>
-<p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>.</p>
+<p><strong>To get a list of all the symbols in an expression</strong> use <code>expr.symbols</code>. This
+includes all symbols, even those bound by scoping constructs like <code>Sum</code> or
+<code>Product</code>.</p>
+<p><strong>To get only the free variables</strong> (symbols that are not constants, operators, or
+bound by a scoping construct), use <code>expr.unknowns</code> or <code>expr.freeVariables</code>.</p>
 <div class="readMore_KWn8"><a href="/compute-engine/guides/augmenting/"><p>Read more about <strong>adding definitions</strong> for symbols and functions<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="scope">Scope<a href="#scope" class="hash-link" aria-label="Direct link to Scope" title="Direct link to Scope" translate="no">​</a></h2>
 <p>Symbols are defined within a <strong>lexical scope</strong>.</p>
 <div class="readMore_KWn8"><a href="/compute-engine/guides/evaluate/#lexical-scopes-and-evaluation-contexts"><p>Read more about <strong>scopes</strong><svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="unknowns-and-constants">Unknowns and Constants<a href="#unknowns-and-constants" class="hash-link" aria-label="Direct link to Unknowns and Constants" title="Direct link to Unknowns and Constants" translate="no">​</a></h2>
 <p>A symbol that has been declared, but has no values associated with it, is said
-to be an <strong>unknown</strong>.</p>
+to be an <strong>unknown</strong>. Use <code>expr.unknowns</code> or <code>expr.freeVariables</code> to get the
+list of unknowns in an expression. Symbols that are bound by scoping constructs
+(e.g., the index variable <code>k</code> in <code>\sum_{k=0}^{10} k \cdot x</code>) are excluded.</p>
 <p>A symbol whose value cannot be changed is a <strong>constant</strong>. Constants are
 identified by a special flag in their definition.</p>
 <p><strong>To check if a symbol is a constant</strong>, use the <code>expr.isConstant</code> property.</p>
