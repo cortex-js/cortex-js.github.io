@@ -2415,12 +2415,17 @@ export interface Expression {
      * ```typescript
      * ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
      * ce.number(1e-17).is(0)                     // false — literal, no tolerance
-     * ce.parse('x + 1').is(1)                    // false — not constant
+     * ce.parse('x + 1').is(1)                    // false — has free variables
+     * ce.parse('\\pi').is(3.14, 0.01)            // true — within custom tolerance
      * ```
+     *
+     * @param tolerance - If provided, overrides `engine.tolerance` for the
+     * numeric comparison. Has no effect when the comparison is structural
+     * (i.e., when `isSame()` succeeds or the expression has free variables).
      *
      * @category Primitive Methods
      */
-    is(other: Expression | number | bigint | boolean | string): boolean;
+    is(other: Expression | number | bigint | boolean | string, tolerance?: number): boolean;
     /**
      * If this expression matches `pattern`, return a substitution that makes
      * `pattern` equal to `this`. Otherwise return `null`.
@@ -7214,7 +7219,7 @@ export declare abstract class _BoxedExpression implements Expression {
     get numerator(): Expression;
     get denominator(): Expression;
     get numeratorDenominator(): [Expression, Expression];
-    is(other: Expression | number | bigint | boolean | string): boolean;
+    is(other: Expression | number | bigint | boolean | string, tolerance?: number): boolean;
     isSame(other: Expression | number | bigint | boolean | string): boolean;
     isEqual(other: number | Expression): boolean | undefined;
     isLess(other: number | Expression): boolean | undefined;
@@ -8012,7 +8017,7 @@ export declare class BoxedNumber extends _BoxedExpression implements NumberLiter
     get isInteger(): boolean;
     get isRational(): boolean;
     get isReal(): boolean;
-    is(other: Expression | number | bigint | boolean | string): boolean;
+    is(other: Expression | number | bigint | boolean | string, tolerance?: number): boolean;
     isSame(other: Expression | number | bigint | boolean | string): boolean;
     get canonical(): Expression;
     get isStructural(): boolean;
@@ -8315,7 +8320,7 @@ export declare class BoxedSymbol extends _BoxedExpression implements SymbolInter
     get isCanonical(): boolean;
     set isCanonical(val: boolean);
     get canonical(): Expression;
-    is(other: Expression | number | bigint | boolean | string): boolean;
+    is(other: Expression | number | bigint | boolean | string, tolerance?: number): boolean;
     isSame(other: Expression | number | bigint | boolean | string): boolean;
     toNumericValue(): [NumericValue, Expression];
     neg(): Expression;
@@ -11529,7 +11534,7 @@ export declare function compileGPUMatrix(args: ReadonlyArray<Expression>, compil
  * Uses reflection formula for z < 0.5 and Lanczos for z >= 0.5.
  * Valid for both GLSL and WGSL (uses standard math builtins).
  */
-export declare const GPU_GAMMA_PREAMBLE = "\nfloat _gpu_gamma(float z) {\n  const float PI = 3.14159265358979;\n  if (z < 0.5) {\n    return PI / (sin(PI * z) * _gpu_gamma(1.0 - z));\n  }\n  z -= 1.0;\n  float x = 0.99999999999980993;\n  x += 676.5203681218851 / (z + 1.0);\n  x += -1259.1392167224028 / (z + 2.0);\n  x += 771.32342877765313 / (z + 3.0);\n  x += -176.61502916214059 / (z + 4.0);\n  x += 12.507343278686905 / (z + 5.0);\n  x += -0.13857109526572012 / (z + 6.0);\n  x += 9.9843695780195716e-6 / (z + 7.0);\n  x += 1.5056327351493116e-7 / (z + 8.0);\n  float t = z + 7.5;\n  return sqrt(2.0 * PI) * pow(t, z + 0.5) * exp(-t) * x;\n}\n\nfloat _gpu_gammaln(float z) {\n  // Stirling asymptotic expansion for ln(Gamma(z)), z > 0\n  float z3 = z * z * z;\n  return z * log(z) - z - 0.5 * log(z)\n    + 0.5 * log(2.0 * 3.14159265358979)\n    + 1.0 / (12.0 * z)\n    - 1.0 / (360.0 * z3)\n    + 1.0 / (1260.0 * z3 * z * z);\n}\n";
+export declare const GPU_GAMMA_PREAMBLE = "\nfloat _gpu_gamma(float z) {\n  const float PI = 3.14159265358979;\n  // For z < 0.5, use reflection formula with inlined Lanczos (non-recursive)\n  float w = z;\n  if (z < 0.5) w = 1.0 - z;\n  w -= 1.0;\n  float x = 0.99999999999980993;\n  x += 676.5203681218851 / (w + 1.0);\n  x += -1259.1392167224028 / (w + 2.0);\n  x += 771.32342877765313 / (w + 3.0);\n  x += -176.61502916214059 / (w + 4.0);\n  x += 12.507343278686905 / (w + 5.0);\n  x += -0.13857109526572012 / (w + 6.0);\n  x += 9.9843695780195716e-6 / (w + 7.0);\n  x += 1.5056327351493116e-7 / (w + 8.0);\n  float t = w + 7.5;\n  float g = sqrt(2.0 * PI) * pow(t, w + 0.5) * exp(-t) * x;\n  if (z < 0.5) return PI / (sin(PI * z) * g);\n  return g;\n}\n\nfloat _gpu_gammaln(float z) {\n  // Stirling asymptotic expansion for ln(Gamma(z)), z > 0\n  float z3 = z * z * z;\n  return z * log(z) - z - 0.5 * log(z)\n    + 0.5 * log(2.0 * 3.14159265358979)\n    + 1.0 / (12.0 * z)\n    - 1.0 / (360.0 * z3)\n    + 1.0 / (1260.0 * z3 * z * z);\n}\n";
 /**
  * GPU error function using Abramowitz & Stegun approximation.
  * Maximum error: |epsilon(x)| <= 1.5e-7.
