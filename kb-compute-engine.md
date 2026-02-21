@@ -1626,7 +1626,7 @@ box(expr, options?): Expression
 
 ####### expr
 
-[`NumericValue`](#numericvalue) | [`ExpressionInput`](#expressioninput)
+[`NumericValue`](#abstract-numericvalue) | [`ExpressionInput`](#expressioninput)
 
 ####### options?
 
@@ -1688,7 +1688,7 @@ Register a custom compilation target.
 
 ####### target
 
-`LanguageTarget`\<[`Expression`](#expression-4)\>
+`LanguageTarget`\<[`Expression`](#expression-3)\>
 
 </MemberCard>
 
@@ -1878,7 +1878,7 @@ tuple(...elements): Expression
 
 ####### elements
 
-...readonly [`Expression`](#expression-4)[]
+...readonly [`Expression`](#expression-3)[]
 
 </MemberCard>
 
@@ -2014,20 +2014,6 @@ popScope(): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.lookupContext()
-
-```ts
-lookupContext(id): EvalContext
-```
-
-####### id
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ExpressionComputeEngine.lookupDefinition()
 
 ```ts
@@ -2150,12 +2136,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2197,11 +2183,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2226,12 +2212,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2273,11 +2259,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2320,12 +2306,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2367,11 +2353,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2396,12 +2382,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2443,11 +2429,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2470,7 +2456,7 @@ assume(predicate): AssumeResult
 
 ####### predicate
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2672,7 +2658,7 @@ Look up sequences in OEIS by their terms.
 
 ####### terms
 
-(`number` \| [`Expression`](#expression-4))[]
+(`number` \| [`Expression`](#expression-3))[]
 
 Array of sequence terms to search for
 
@@ -2756,7 +2742,7 @@ ask(pattern): BoxedSubstitution[]
 
 ####### pattern
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2770,7 +2756,7 @@ verify(query): boolean
 
 ####### query
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2797,7 +2783,7 @@ Options for `Expression.simplify()`
 ### EvaluateOptions
 
 ```ts
-type EvaluateOptions = KernelEvaluateOptions<Expression>;
+type EvaluateOptions = KernelEvaluateOptions;
 ```
 
 Options for evaluating boxed expressions.
@@ -3681,7 +3667,7 @@ Addition
 
 ####### rhs
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3697,7 +3683,7 @@ Subtraction
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3713,7 +3699,7 @@ Multiplication
 
 ####### rhs
 
-`number` | [`NumericValue`](#numericvalue) | [`Expression`](#expression-4)
+`number` | [`NumericValue`](#abstract-numericvalue) | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3729,7 +3715,7 @@ Division
 
 ####### rhs
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3745,7 +3731,7 @@ Power
 
 ####### exp
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3761,7 +3747,7 @@ Exponentiation
 
 ####### exp
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3789,7 +3775,7 @@ Logarithm (natural by default)
 
 ####### base?
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3814,6 +3800,60 @@ Return this expression expressed as a denominator.
 ##### Expression.numeratorDenominator
 
 Return this expression expressed as a numerator and denominator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toRational()
+
+```ts
+toRational(): [number, number]
+```
+
+Return the value of this expression as a pair of integer numerator and
+denominator, or `null` if the expression is not a rational number.
+
+- For a `BoxedNumber` with an exact rational value, extracts from the
+  numeric representation.
+- For an integer, returns `[n, 1]`.
+- For a `Divide` or `Rational` function with integer operands, returns
+  `[num, den]`.
+- For everything else, returns `null`.
+
+The returned rational is always in lowest terms.
+
+```typescript
+ce.parse('\\frac{6}{4}').toRational()  // [3, 2]
+ce.parse('7').toRational()              // [7, 1]
+ce.parse('x + 1').toRational()          // null
+ce.number(1.5).toRational()             // null (machine float)
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.factors()
+
+```ts
+factors(): readonly Expression[]
+```
+
+Return the multiplicative factors of this expression as a flat array.
+
+This is a structural decomposition — it does not perform algebraic
+factoring (use `ce.function('Factor', [expr])` for that).
+
+- `Multiply(a, b, c)` returns `[a, b, c]`
+- `Negate(x)` returns `[-1, ...x.factors()]`
+- Anything else returns `[expr]`
+
+```typescript
+ce.parse('2xyz').factors()     // [2, x, y, z]
+ce.parse('-3x').factors()      // [-1, 3, x]
+ce.parse('x + 1').factors()    // [x + 1]
+```
 
 </MemberCard>
 
@@ -3904,7 +3944,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### fn
 
-(`expr`) => [`Expression`](#expression-4)
+(`expr`) => [`Expression`](#expression-3)
 
 ####### options?
 
@@ -4012,11 +4052,11 @@ Applicable to canonical and non-canonical expressions.
 
 ####### pattern
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 ####### options?
 
-`PatternMatchOptions`\<[`Expression`](#expression-4)\>
+`PatternMatchOptions`\<[`Expression`](#expression-3)\>
 
 </MemberCard>
 
@@ -4271,7 +4311,7 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 ####### vars?
 
-`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-4) | `Iterable`\<[`Expression`](#expression-4), `any`, `any`\>
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-3) | `Iterable`\<[`Expression`](#expression-3), `any`, `any`\>
 
 </MemberCard>
 
@@ -4435,7 +4475,7 @@ iterating over the collection.
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4451,7 +4491,7 @@ Check if this collection is a subset of another collection.
 
 ####### other
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 The other collection to check against.
 
@@ -4539,7 +4579,7 @@ If `key` is a `Expression`, it should be a string.
 
 ####### key
 
-`string` | [`Expression`](#expression-4)
+`string` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4662,14 +4702,15 @@ is(other, tolerance?): boolean
 ```
 
 Smart equality check: structural first, then numeric evaluation fallback.
+Symmetric: `a.is(b)` always equals `b.is(a)`.
 
 First tries an exact structural check (same as `isSame()`). If that fails
 and the expression is constant (no free variables), evaluates numerically
 and compares within `engine.tolerance`.
 
-For literal numbers (`BoxedNumber`), behaves identically to `isSame()` —
-no tolerance is applied. Tolerance only applies to expressions that
-require evaluation (e.g., `\\sin(\\pi)`).
+For literal numbers compared to primitives (`number`, `bigint`), behaves
+identically to `isSame()` — no tolerance is applied. Tolerance only
+applies to expressions that require evaluation (e.g., `\\sin(\\pi)`).
 
 ```typescript
 ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
@@ -4678,9 +4719,14 @@ ce.parse('x + 1').is(1)                    // false — has free variables
 ce.parse('\\pi').is(3.14, 0.01)            // true — within custom tolerance
 ```
 
+After the structural check, attempts to expand both sides (distributing
+products, applying the multinomial theorem, etc.) and re-checks
+structural equality. This catches equivalences like `(x+1)^2` vs
+`x^2+2x+1` even when the expression has free variables.
+
 ####### other
 
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
 
 ####### tolerance?
 
@@ -4723,7 +4769,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4741,7 +4787,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4759,7 +4805,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4777,7 +4823,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4795,7 +4841,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4839,7 +4885,7 @@ console.log(expr.is(4)); // true
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -5016,6 +5062,16 @@ Obtained via `isNumber()`.
 
 ```ts
 readonly numericValue: number | NumericValue;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### NumberLiteralInterface.isExact
+
+```ts
+readonly isExact: boolean;
 ```
 
 </MemberCard>
@@ -5234,7 +5290,7 @@ contains(rhs): boolean
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -5248,7 +5304,7 @@ subsetOf(other, strict): boolean
 
 ####### other
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 ####### strict
 
@@ -5448,7 +5504,7 @@ type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
 
 #### Type Parameters
 
-• T = [`Expression`](#expression-4)
+• T = [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -5464,7 +5520,7 @@ Control how a pattern is matched to an expression.
 
 #### Type Parameters
 
-• T = [`Expression`](#expression-4)
+• T = [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -5658,7 +5714,7 @@ Called when evaluating `Subscript(symbol, index)`.
 
 ###### subscript
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 The subscript expression (already evaluated)
 
@@ -6759,12 +6815,12 @@ Some examples:
 ##### BoxedValueDefinition.value
 
 ```ts
-readonly value: Expression;
+value: Expression;
 ```
 
-This is either the initial value of the symbol (i.e. when a new
- evaluation context is created), or its constant value, if a constant.
- Otherwise, the current value is tracked in the evaluation context.
+The current value of the symbol. For constants, this is immutable.
+ The definition object is the single source of truth — there is no
+ separate evaluation-context values map.
 
 </MemberCard>
 
@@ -9147,7 +9203,7 @@ abstract add(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9161,7 +9217,7 @@ abstract sub(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9175,7 +9231,7 @@ abstract mul(other): NumericValue
 
 ####### other
 
-`number` | `Decimal` | [`NumericValue`](#numericvalue)
+`number` | `Decimal` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9189,7 +9245,7 @@ abstract div(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9203,7 +9259,7 @@ abstract pow(n): NumericValue
 
 ####### n
 
-`number` | [`NumericValue`](#numericvalue) | \{
+`number` | [`NumericValue`](#abstract-numericvalue) | \{
 `re`: `number`;
 `im`: `number`;
 \}
@@ -9244,7 +9300,7 @@ abstract gcd(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9322,7 +9378,7 @@ abstract eq(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9336,7 +9392,7 @@ abstract lt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9350,7 +9406,7 @@ abstract lte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9364,7 +9420,7 @@ abstract gt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9378,7 +9434,7 @@ abstract gte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -13501,87 +13557,125 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.53.0 _2026-02-21_
+
+#### Runtime and Scoping
+
+- **True lexical scoping for `Function` expressions**: Functions now capture
+  their defining scope and resolve free variables from that scope chain (not
+  the call site), with a fresh child scope on each call.
+
+- **BigOp scope pollution fixed**: `Sum`, `Product`, and other big operators now
+  only declare their index variable locally. Other names are declared in the
+  enclosing scope via `noAutoDeclare`.
+
+- **Closure capture for nested functions**: Returned functions now correctly
+  capture outer parameters across multiple nesting levels.
+
+- **`EvalContext.values` removed**: Symbol values now live only in
+  `BoxedValueDefinition.value`. The per-frame shadow map and `withArguments`
+  option were removed.
+
+- **`forget()` now resets values set by `assume()`**: `forget('x')` now clears
+  values introduced by `assume('x = ...')` (value reset to `undefined`), in
+  addition to clearing assumptions.
+
+#### Expressions and Equality
+
+- **`expand()` now returns the input expression instead of `null`**: Both the
+  free function and internal `expand()`/`expandAll()` now return the original
+  expression when no expansion is possible.
+
+- **New `.toRational()` method**: Returns `[numerator, denominator]` integers
+  for rational expressions, or `null` otherwise.
+
+- **New `.factors()` method**: Returns multiplicative factors as a flat array by
+  decomposing `Multiply` and `Negate` structurally.
+
+- **`.is()` now tries expansion**: After structural comparison, `.is()` expands
+  both sides before numeric fallback, catching forms like `(x+1)^2` and
+  `x^2+2x+1`.
+
+- **`.is()` is now symmetric**: `a.is(b) === b.is(a)` now holds across all
+  expression types.
+
+#### LaTeX Parsing
+
+- **Parse `\mleft`/`\mright` delimiters**: Alternative delimiters from the
+  `mleftright` package are now treated like `\left`/`\right`.
+
+- **Parse `\color` in math mode**: `\color{...}` is now recognized in math mode;
+  the color argument is consumed so the following math parses normally.
+
+- **Parse `:` and `\colon` as infix operators**: Outside quantifier contexts, a
+  bare `:`/`\colon` now parses as `Colon` (e.g. `f:[a,b]\to\R`), without
+  affecting `:=` assignment or quantifier syntax.
+
+- **Parse `\dfrac`, `\tfrac`, and `\cfrac` as fractions**: These variants now
+  parse the same as `\frac`.
+
+#### Fractals
+
+- **New `Mandelbrot` and `Julia` functions**: Added built-in escape-time fractal
+  operators.
+  `Mandelbrot(c, maxIter)` and `Julia(z, c, maxIter)` return a smooth,
+  normalized value in `[0, 1]` (`1` for interior points, fractional for
+  escaping points via `log₂(log₂(|z|²))` smoothing).
+  Both evaluate in JavaScript and compile to GLSL/WGSL.
+
 ### 0.52.1 _2026-02-19_
 
-- To check if a value is an exact number literal, you can now use
-  `isNumber(expr) && expr.isExact`.
+#### Expressions
 
-- When using the `raw` canonical form, preserve negation, i.e. `x-1` will now
-  parse as `["Subtract", "x", "1"]` rather than `["Add", "x", -1]`.
+- **Exact number literal check**: Use `isNumber(expr) && expr.isExact` to test
+  for exact numeric literals.
 
-- **Fix `;\;` parsing in semicolon blocks**: Semicolons followed by LaTeX visual
-  spacing commands (`\;`, `\,`, `\quad`, etc.) no longer produce spurious
-  `Nothing` nodes in the parse tree. Previously, `a \coloneq x^2;\; (a+1)` would
-  include a `Nothing` operand in the Block, making `isValid` return `false` and
-  causing compilation to fail. The parser now skips visual spacing after
-  semicolon separators.
+- **`raw` form preserves subtraction**: `x-1` now parses as
+  `["Subtract", "x", "1"]` (instead of `["Add", "x", -1]`) when using raw form.
 
-- **Fix `\text{if}` parsing with `\;` spacing**: The
-  `\text{if}\; x \geq 0 \;\text{then}\; 1 \;\text{else}\; 0` pattern now parses
-  correctly as an `If` expression. Previously, `\;` before `\text{then}` or
-  `\text{else}` prevented keyword detection, producing a `Tuple` instead.
+#### Parsing and Blocks
 
-- **Block serializer uses `; ` separator**: The Block serializer now emits `; `
-  instead of `;\; ` between statements, preventing round-trip serialization from
-  reintroducing the `\;` parsing issue.
+- **Fix `;\;` parsing in semicolon blocks**: Spacing commands after semicolons
+  (`\;`, `\,`, `\quad`, etc.) no longer create spurious `Nothing` operands.
 
-- **Block compiler filters `Nothing` operands**: As defense-in-depth, the Block
-  compiler now filters out `Nothing` symbols and empty compilation results
-  before generating the block IIFE.
+- **Fix `\text{if}` parsing with `\;` spacing**:
+  `\text{if}\;...\;\text{then}\;...\;\text{else}\;...` now parses correctly as
+  `If`.
 
-- **Subscripted variable names in blocks**: Subscripted identifiers like `r_1`
-  are now treated as compound symbols (not `Subscript` expressions) when the
-  base is not a known collection. This means `r_1 \coloneq x^2; \frac{1}{r_1}`
-  correctly declares and assigns to a local variable named `r_1`.
+- **Block serializer now uses `; `**: Serialization emits `; ` (not `;\; `) to
+  avoid reintroducing spacing-related parse issues on round-trip.
 
-- **Selective GLSL interval preamble**: The interval-GLSL compilation target now
-  emits only the preamble functions actually used by the compiled expression
-  (plus their transitive dependencies), instead of the full ~29KB library.
-  Typical preambles are 60–80% smaller.
+- **Block compiler filters `Nothing` operands**: The Block compiler now removes
+  `Nothing` symbols and empty compile results before generating code.
 
-- **Selective WGSL interval preamble**: The interval-WGSL compilation target now
-  also emits only the preamble functions actually used by the compiled
-  expression, matching the GLSL target optimization.
+- **Subscripted variable names in blocks**: Names like `r_1` are treated as
+  compound symbols (not `Subscript`) when the base is not a known collection.
 
-- **Fix recursive GLSL gamma function**: The `_gpu_gamma()` preamble in the GPU
-  and interval-GLSL compilation targets used recursion for the reflection
-  formula (z < 0.5), which is illegal in GLSL. Replaced with a non-recursive
-  implementation that inlines the Lanczos approximation for both branches.
+- **Non-strict parser supports exponents on bare functions**: In `strict: false`
+  mode, forms like `sin^2(x)` and `cos^{10}(x)` now parse correctly as powers.
 
-- **Non-strict parser supports exponents on bare functions**: In non-strict mode
-  (`strict: false`), bare function names like `sin`, `cos`, `tan` can now
-  include an exponent before the argument list. For example, `sin^2(x)` and
-  `cos^{10}(x)` are now correctly parsed as `["Power", ["Sin", "x"], 2]`,
-  matching the behavior of their LaTeX counterparts `\sin^2(x)` and
-  `\cos^{10}(x)`.
+- **Unicode superscript/subscript digits supported**: Superscript and subscript
+  Unicode digits now normalize to `^{...}` / `_{...}` in parsing.
 
-- **Unicode superscript and subscript digit support**: The LaTeX parser now
-  recognizes Unicode superscript digits (`⁰¹²³⁴⁵⁶⁷⁸⁹⁻`) and subscript digits
-  (`₀₁₂₃₄₅₆₇₈₉₋`), converting them to `^{...}` and `_{...}` respectively. This
-  works in all parsing modes. For example, `x²` parses as `x^{2}`, `sin²(x)` as
-  `\sin^{2}(x)`, `x⁻²` as `x^{-2}`, and `x₁₂` as `x_{12}`.
+#### Compilation
 
-- **`.is()` now works with assigned variables**: Previously, `.is()` only
-  evaluated expressions made entirely of declared constants (like `Pi`). Now it
-  correctly evaluates any expression with no free variables, including those
-  containing variables with assigned values:
+- **Selective GLSL interval preamble**: `interval-glsl` now emits only used
+  helper functions (plus dependencies), typically reducing preamble size by
+  60-80%.
 
-  ```ts
-  ce.assign('v', 2);
-  ce.parse('1 + 4 / v').is(3);  // true (was false before)
-  ce.parse('1 + 4 / x').is(3);  // false (x is free)
-  ```
+- **Selective WGSL interval preamble**: `interval-wgsl` now applies the same
+  used-only preamble strategy.
 
-- **`.is()` accepts an optional `tolerance` parameter**: When provided, it
-  overrides `engine.tolerance` for the numeric comparison. This applies to both
-  evaluated expressions and literal numbers:
+- **Fix recursive GLSL gamma helper**: Replaced recursive `_gpu_gamma()`
+  reflection logic (illegal in GLSL) with a non-recursive implementation.
 
-  ```ts
-  ce.parse('\\pi').is(3.14, 0.01);   // true  (within custom tolerance)
-  ce.parse('\\pi').is(3.14);          // false (not within engine.tolerance)
-  ce.number(1e-17).is(0, 1e-16);     // true  (explicit tolerance on literal)
-  ce.number(1e-17).is(0);            // false (no tolerance for literals)
-  ```
+#### Equality
+
+- **`.is()` now works with assigned variables**: Numeric fallback now applies to
+  expressions with no free variables, including variables with assigned values.
+
+- **`.is()` now accepts an optional `tolerance`**: A per-call tolerance can
+  override `engine.tolerance` for numeric comparison.
 
 ### 0.52.0 _2026-02-18_
 
@@ -14391,7 +14485,7 @@ ce.simplificationRules.push({
   - `Hom` now evaluates/simplifies its arguments while preserving the symbolic
     `Hom(...)` form.
 
-### LaTeX Parsing
+#### LaTeX Parsing
 
 - **`arguments: 'implicit'` option for function dictionary entries**: Function
   entries in the LaTeX dictionary can now set `arguments: 'implicit'` to accept
