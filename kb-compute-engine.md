@@ -3859,6 +3859,80 @@ ce.parse('x + 1').factors()    // [x + 1]
 
 <MemberCard>
 
+##### Expression.polynomialCoefficients()
+
+```ts
+polynomialCoefficients(variable?): readonly Expression[]
+```
+
+Return the coefficients of this expression as a polynomial in `variable`,
+in descending order of degree. Returns `undefined` if the expression is
+not a polynomial in the given variable.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown. Returns `undefined` if there are zero or multiple unknowns.
+
+```typescript
+ce.parse('x^2 + 2x + 1').polynomialCoefficients('x')  // [1, 2, 1]
+ce.parse('x^3 + 2x + 1').polynomialCoefficients('x')  // [1, 0, 2, 1]
+ce.parse('sin(x)').polynomialCoefficients('x')          // undefined
+ce.parse('x^2 + 5').polynomialCoefficients()            // [1, 0, 5]
+```
+
+Subsumes `isPolynomial`:
+```typescript
+const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
+```
+
+Subsumes `polynomialDegree`:
+```typescript
+const degree = expr.polynomialCoefficients('x')?.length - 1;
+```
+
+When `variable` is an array, the expression must be polynomial in ALL
+listed variables. Coefficients are decomposed by the first variable;
+remaining variables appear as symbolic coefficients.
+
+```typescript
+ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y'])
+// → [y, 3, y²]  (coefficients of x², x¹, x⁰)
+```
+
+####### variable?
+
+`string` | `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.polynomialRoots()
+
+```ts
+polynomialRoots(variable?): readonly Expression[]
+```
+
+Return the roots of this expression treated as a polynomial in `variable`.
+Returns `undefined` if the expression is not a polynomial in the given
+variable. Returns an empty array if no roots can be found.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown.
+
+```typescript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x')  // [2, 3]
+ce.parse('x^2 + 1').polynomialRoots('x')         // [] (no real roots)
+ce.parse('sin(x)').polynomialRoots('x')           // undefined
+```
+
+####### variable?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.isScoped
 
 ```ts
@@ -4044,6 +4118,15 @@ wildcard.
 If this expression matches `pattern` but there are no named wildcards,
 return the empty substitution, `{}`.
 
+`pattern` can be:
+- A **string** (LaTeX): single-character symbols are auto-converted to
+  wildcards (e.g., `'ax^2+bx+c'` treats `a`, `b`, `c` as wildcards).
+  Results use unprefixed keys (`{a: 3}` not `{_a: 3}`) and self-matches
+  are filtered out. `useVariations` and `matchMissingTerms` default to
+  `true`. Unprefixed keys are accepted in `substitution`.
+- A **MathJSON array** (e.g., `['Add', '_a', '_b']`): boxed automatically.
+- A **BoxedExpression**: used directly.
+
 Read more about [**patterns and rules**](/compute-engine/guides/patterns-and-rules/).
 
 :::info[Note]
@@ -4052,7 +4135,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### pattern
 
-[`Expression`](#expression-3)
+[`ExpressionInput`](#expressioninput)
 
 ####### options?
 
@@ -13557,33 +13640,105 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.54.0 _2026-02-26_
+
+- **New `expr.polynomialCoefficients()` method**: Returns the coefficients of a
+  polynomial expression in descending order of degree, or `undefined` if the
+  expression is not a polynomial. Auto-detects the variable when the expression
+  has exactly one unknown. Subsumes `isPolynomial` (check `!== undefined`) and
+  degree computation (`length - 1`).
+
+- **`polynomialCoefficients()` now accepts an array of variables**: Pass
+  `['x', 'y']` to verify the expression is polynomial in all listed variables.
+  Coefficients are decomposed by the first variable.
+
+- **New `expr.polynomialRoots()` method**: Returns the roots of a polynomial
+  expression, or `undefined` if not a polynomial. Handles degree 3+ polynomials
+  with rational roots via the Rational Root Theorem.
+
+- **New `Polynomial` CAS function**: Constructs a polynomial from a coefficient
+  list (descending order) and a variable. Inverse of `CoefficientList`:
+  `Polynomial([1, 0, 2, 1], x)` evaluates to `x³ + 2x + 1`.
+
+- **Improved `Factor` for degree 3+ polynomials**: `Factor` now uses the
+  Rational Root Theorem to factor polynomials with integer coefficients and
+  rational roots. Previously only handled degree ≤ 2.
+
+- **Improved `Factor` with content extraction**: `Factor` now extracts the GCD
+  of integer coefficients before applying other strategies. For example,
+  `Factor(6x² + 12x + 6, x)` now produces `6(x+1)²`.
+
+- **New `PartialFraction` CAS function**: Decomposes rational expressions into
+  partial fractions. Supports distinct and repeated linear factors, irreducible
+  quadratic factors, and improper fractions (polynomial division performed
+  first). Example: `PartialFraction(1/((x+1)(x+2)), x)` → `1/(x+1) - 1/(x+2)`.
+
+- **New `Apart` CAS function**: Alias for `PartialFraction`.
+
+- **New `PolynomialRoots` CAS function**: Returns the roots of a polynomial as a
+  set. Example: `PolynomialRoots(x² - 5x + 6, x)` → `{2, 3}`.
+
+- **New `Discriminant` CAS function**: Returns the discriminant of a polynomial
+  of degree 2, 3, or 4. Supports symbolic coefficients. Example:
+  `Discriminant(x² - 5x + 6, x)` → `1`.
+
+- **`simplify()` auto-decomposes partial fractions**: When a `Divide` expression
+  has a denominator already in factored form (product or power) and the
+  decomposition is simpler, `simplify()` automatically applies partial fraction
+  decomposition.
+
+- **Breaking: `CoefficientList` now returns descending order**: The CAS
+  function `CoefficientList` now returns coefficients from highest to lowest
+  degree (e.g., `[1, 0, 2, 1]` for `x^3 + 2x + 1`), matching the new
+  `polynomialCoefficients()` method and common external conventions. Previously
+  it returned ascending order.
+
+- **`expr.match()` now accepts string patterns with auto-wildcarding**: Pass a
+  LaTeX string like `'ax^2+bx+c'` and single-character symbols are automatically
+  treated as wildcards. Results use clean unprefixed keys (`{a: 3, b: 2, c: 5}`)
+  with self-matches filtered out. `useVariations` and `matchMissingTerms` default
+  to `true` for string patterns.
+
+- **`expr.match()` now accepts MathJSON arrays directly**: Pass a raw MathJSON
+  pattern like `['Add', '_a', '_b']` without calling `ce.box()` first.
+
+- **New `matchMissingTerms` option for `match()`**: When enabled, expressions
+  with fewer operands than the pattern can still match by treating missing terms
+  as identity elements (0 for `Add`, 1 for `Multiply`). For example,
+  `3x^2+5` matches the pattern `ax^2+bx+c` with `b = 0`. Enabled by default
+  for string patterns.
+
+- **Non-strict parsing: implicit superscript for letter+digit**: In non-strict
+  mode, a single letter immediately followed by a digit 2–9 is parsed as an
+  exponent: `x2 + y2` → `x^2 + y^2`. Handles common copy-paste from web pages.
+  Only digits 2–9, only single ASCII letters, and only when adjacent (no space).
+
 ### 0.53.1 _2026-02-25_
 
 - **`timeLimit` now reliably interrupts long-running evaluations**: `Factorial`,
   `Sum`, `Product`, `Loop`, and `Reduce` all respect the `timeLimit` property
   and throw `CancellationError` when the deadline is exceeded. Previously,
   generators yielded too infrequently (every 1,000–50,000 iterations), allowing
-  a single `gen.next()` call to block for longer than the timeout. All generators
-  now yield every iteration. The `Factorial` handler no longer silently swallows
-  `CancellationError`, and `withDeadline`/`withDeadlineAsync` now use
-  `try/finally` to always reset the engine deadline.
+  a single `gen.next()` call to block for longer than the timeout. All
+  generators now yield every iteration. The `Factorial` handler no longer
+  silently swallows `CancellationError`, and `withDeadline`/`withDeadlineAsync`
+  now use `try/finally` to always reset the engine deadline.
 
-- **Fixed GPU compilation of `Sum`, `Product`, `Loop`, and `Function`**:
-  These constructs no longer leak JavaScript-specific syntax (IIFEs, `let`,
-  `while`, arrow functions, `{ re, im }` objects) into GLSL/WGSL output.
-  `Sum`/`Product` with small constant bounds are unrolled inline; larger ranges
-  emit native `for` loops. `Loop` emits a GPU `for` loop with `int`/`i32`
-  index. `Function` (lambda) now throws a clear error for GPU targets.
-  Block-level `Declare` statements infer `vec2`/`vec2f` type from subsequent
-  complex-valued assignments.
+- **Fixed GPU compilation of `Sum`, `Product`, `Loop`, and `Function`**: These
+  constructs no longer leak JavaScript-specific syntax (IIFEs, `let`, `while`,
+  arrow functions, `{ re, im }` objects) into GLSL/WGSL output. `Sum`/`Product`
+  with small constant bounds are unrolled inline; larger ranges emit native
+  `for` loops. `Loop` emits a GPU `for` loop with `int`/`i32` index. `Function`
+  (lambda) now throws a clear error for GPU targets. Block-level `Declare`
+  statements infer `vec2`/`vec2f` type from subsequent complex-valued
+  assignments.
 
-- **Added GLSL/WGSL compilation for `Heaviside`, `Sinc`, `FresnelC`,
-  `FresnelS`, `BesselJ`**: These five special functions now compile to GPU
-  shader targets. `FresnelC`/`FresnelS` use a three-region rational Chebyshev
-  approximation (ported from Cephes/scipy) with a shared `_gpu_polevl` helper.
-  `BesselJ` uses power series, Hankel asymptotic, and Miller's backward
-  recurrence depending on the argument range. Both GLSL and WGSL preambles are
-  emitted on demand.
+- **Added GLSL/WGSL compilation for `Heaviside`, `Sinc`, `FresnelC`, `FresnelS`,
+  `BesselJ`**: These five special functions now compile to GPU shader targets.
+  `FresnelC`/`FresnelS` use a three-region rational Chebyshev approximation
+  (ported from Cephes/scipy) with a shared `_gpu_polevl` helper. `BesselJ` uses
+  power series, Hankel asymptotic, and Miller's backward recurrence depending on
+  the argument range. Both GLSL and WGSL preambles are emitted on demand.
 
 - **Fixed GLSL/WGSL block expression compilation**: Block expressions (produced
   by `\coloneq` / semicolon blocks) now emit valid GPU shader code instead of
