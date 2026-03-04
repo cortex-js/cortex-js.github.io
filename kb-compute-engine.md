@@ -1255,39 +1255,14 @@ This interface is augmented by `types-engine.ts` with the concrete
 
 <MemberCard>
 
-##### ExpressionComputeEngine.latexDictionary
+##### ExpressionComputeEngine.latexSyntax
 
 ```ts
-latexDictionary: readonly OnlyFirst<
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry, {} & 
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry>[];
+readonly latexSyntax: ILatexSyntax;
 ```
 
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.decimalSeparator
-
-```ts
-decimalSeparator: string;
-```
+The LatexSyntax instance used for LaTeX parsing/serialization.
+ `undefined` when no LatexSyntax was provided to the constructor.
 
 </MemberCard>
 
@@ -1488,7 +1463,7 @@ recursionLimit: number;
 ##### ExpressionComputeEngine.bignum()
 
 ```ts
-bignum: (a) => Decimal;
+bignum: (a) => BigDecimal;
 ```
 
 </MemberCard>
@@ -1597,28 +1572,52 @@ chop(n): number
 ###### chop(n)
 
 ```ts
-chop(n): 0 | Decimal
+chop(n): 0 | BigDecimal
 ```
 
 ####### n
 
-`Decimal`
+`BigDecimal`
 
 ###### chop(n)
 
 ```ts
-chop(n): number | Decimal
+chop(n): number | BigDecimal
 ```
 
 ####### n
 
-`number` | `Decimal`
+`number` | `BigDecimal`
 
 </MemberCard>
 
 <MemberCard>
 
-##### ExpressionComputeEngine.box()
+##### ExpressionComputeEngine.expr()
+
+```ts
+expr(expr, options?): Expression
+```
+
+####### expr
+
+[`NumericValue`](#abstract-numericvalue) | [`ExpressionInput`](#expressioninput)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~box()~~
 
 ```ts
 box(expr, options?): Expression
@@ -1637,6 +1636,53 @@ box(expr, options?): Expression
 ####### scope?
 
 `Scope`
+
+###### Deprecated
+
+Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.parse()
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+Parse a LaTeX string and return a boxed expression.
+
+This is a convenience method equivalent to `ce.expr(parse(latex))`,
+but uses the engine's symbol definitions for better parsing accuracy.
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
 
 </MemberCard>
 
@@ -1669,70 +1715,6 @@ readonly [`ExpressionInput`](#expressioninput)[]
 ####### scope?
 
 `Scope`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.registerCompilationTarget()
-
-```ts
-registerCompilationTarget(name, target): void
-```
-
-Register a custom compilation target.
-
-####### name
-
-`string`
-
-####### target
-
-`LanguageTarget`\<[`Expression`](#expression-3)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.getCompilationTarget()
-
-```ts
-getCompilationTarget(name): LanguageTarget<Expression>
-```
-
-Get a registered compilation target by name.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.listCompilationTargets()
-
-```ts
-listCompilationTargets(): string[]
-```
-
-Return the names of all registered compilation targets.
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.unregisterCompilationTarget()
-
-```ts
-unregisterCompilationTarget(name): void
-```
-
-Remove a registered compilation target.
-
-####### name
-
-`string`
 
 </MemberCard>
 
@@ -1927,60 +1909,6 @@ getRuleSet(id?): BoxedRuleSet
 ####### id?
 
 `"harmonization"` | `"solve-univariate"` | `"standard-simplification"`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.parse()
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): null
-```
-
-####### latex
-
-`null`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): Expression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): Expression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
 
 </MemberCard>
 
@@ -2861,12 +2789,12 @@ The following properties are applicable to expressions with a value:
 
 To create a boxed expression:
 
-#### `ce.box()` and `ce.parse()`
+#### `ce.expr()` and `ce.parse()`
 
-Use `ce.box()` or `ce.parse()`.
+Use `ce.expr()` or `ce.parse()`.
 
 Use `ce.parse()` to get a boxed expression from a LaTeX string.
-Use `ce.box()` to get a boxed expression from a MathJSON expression.
+Use `ce.expr()` to get a boxed expression from a MathJSON expression.
 
 By default, the result of these methods is a canonical expression. For
 example, if it is a rational literal, it is reduced to its canonical form.
@@ -2885,7 +2813,7 @@ If it is a function expression:
 
 #### `ce.function()`
 
-This is a specialized version of `ce.box()` for creating a new function
+This is a specialized version of `ce.expr()` for creating a new function
 expression.
 
 The canonical handler of the operator is called.
@@ -3044,7 +2972,7 @@ Otherwise, return `NaN` (not a number).
 ##### Expression.bignumRe
 
 ```ts
-readonly bignumRe: Decimal;
+readonly bignumRe: BigDecimal;
 ```
 
 If the value of this expression is a number, return the real part of the
@@ -3066,7 +2994,7 @@ otherwise as a number or `NaN` if the value is not a number.
 ##### Expression.bignumIm
 
 ```ts
-readonly bignumIm: Decimal;
+readonly bignumIm: BigDecimal;
 ```
 
 If the value of this expression is a number, return the imaginary part as
@@ -3216,52 +3144,17 @@ and functions.
 
 <MemberCard>
 
-##### Expression.toLatex()
-
-```ts
-toLatex(options?): string
-```
-
-Serialize to a LaTeX string.
-
-Note that lazy collections are eagerly evaluated.
-
-Will ignore any LaTeX metadata.
-
-####### options?
-
-`Partial`\<[`SerializeLatexOptions`](#serializelatexoptions)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.latex
-
-LaTeX representation of this expression.
-
-If the expression was parsed from LaTeX, the LaTeX representation is
-the same as the input LaTeX.
-
-To customize the serialization, use `expr.toLatex()`.
-
-Note that lazy collections are eagerly evaluated.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
 ##### Expression.toMathJson()
 
 ```ts
 toMathJson(options?): MathJsonExpression
 ```
 
-Serialize to a MathJSON expression with specified options
+Serialize to a MathJSON expression with specified options.
+
+Use `{ fractionalDigits: 'auto' }` to round arbitrary-precision
+numbers to `ce.precision` significant digits. The default
+(`'max'`) emits all available digits with no rounding.
 
 ####### options?
 
@@ -3291,9 +3184,53 @@ For more control over the serialization, use `expr.toMathJson()`.
 
 Note that lazy collections are *not* eagerly evaluated.
 
+For arbitrary-precision numbers, the full raw `BigDecimal` value is
+emitted with no rounding (same as `toJSON()`). This preserves data
+fidelity for round-tripping but may include trailing digits beyond
+`ce.precision` that are not meaningful. Use
+`toMathJson({ fractionalDigits: 'auto' })` for rounded output.
+
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
 :::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.latex
+
+```ts
+readonly latex: string;
+```
+
+Return a LaTeX representation of this expression.
+
+This is a convenience getter that delegates to the standalone
+`serialize()` function from the `latex-syntax` module.
+
+Numeric values are rounded to `ce.precision` significant digits.
+Noise digits from precision-bounded operations (division,
+transcendentals) are not displayed.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toLatex()
+
+```ts
+toLatex(options?): string
+```
+
+Return a LaTeX representation of this expression with custom
+serialization options.
+
+Numeric values are rounded to `ce.precision` significant digits.
+
+####### options?
+
+`Record`\<`string`, `any`\>
 
 </MemberCard>
 
@@ -4066,7 +4003,7 @@ canonical status. (Canonicalization is opportunistic here, in other words).
 Applicable to canonical and non-canonical expressions.
 
 To match a specific symbol (not a wildcard pattern), the `match` must be
-a `Expression` (e.g., `{ match: ce.box('x'), replace: ... }`).
+a `Expression` (e.g., `{ match: ce.expr('x'), replace: ... }`).
 For simple symbol substitution, consider using `subs()` instead.
 :::
 
@@ -4409,7 +4346,7 @@ set value(value:
   | number
   | boolean
   | number[]
-  | Decimal
+  | BigDecimal
   | OnlyFirst<{
   re: number;
   im: number;
@@ -4756,6 +4693,12 @@ Note that lazy collections are eagerly evaluated.
 
 Used when coercing a `Expression` to a `String`.
 
+For arbitrary-precision numbers (`BigNumericValue`), the output is
+rounded to `BigDecimal.precision` significant digits. Digits beyond the
+working precision are noise from precision-bounded operations (division,
+transcendentals) and are not displayed. Machine-precision numbers use
+their native `Number.toString()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -4773,6 +4716,12 @@ Method version of `expr.json`.
 Based on `Object.toJSON()`.
 
 Note that lazy collections are *not* eagerly evaluated.
+
+The output preserves the full raw `BigDecimal` value with no rounding,
+ensuring lossless round-tripping via `ce.box(expr.json)`. Digits beyond
+`ce.precision` may be present but are not guaranteed to be accurate.
+Use `toMathJson({ fractionalDigits: 'auto' })` for precision-rounded
+MathJSON output.
 
 </MemberCard>
 
@@ -6560,36 +6509,6 @@ optional definitions: Readonly<{}> | Readonly<{}>[];
 ```
 
 Symbol and operator definitions
-
-</MemberCard>
-
-<MemberCard>
-
-##### LibraryDefinition.latexDictionary?
-
-```ts
-optional latexDictionary: readonly Partial<OnlyFirst<
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry, {} & 
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry>>[];
-```
-
-LaTeX dictionary entries for parsing/serialization
 
 </MemberCard>
 
@@ -8735,7 +8654,7 @@ false
 
 ```typescript
 const ce = new ComputeEngine();
-const angle = ce.box(['Quantity', 9.5, 'deg']);
+const angle = ce.expr(['Quantity', 9.5, 'deg']);
 
 // DMS format
 angle.latex({ dmsFormat: true });  // "9°30'"
@@ -8744,7 +8663,7 @@ angle.latex({ dmsFormat: true });  // "9°30'"
 angle.latex({ dmsFormat: false }); // "9.5°"
 
 // Full DMS notation
-ce.box(['Quantity', 9.504166, 'deg'])
+ce.expr(['Quantity', 9.504166, 'deg'])
   .latex({ dmsFormat: true });     // "9°30'15\""
 ```
 
@@ -8769,22 +8688,22 @@ Useful for geographic coordinates and rotations.
 const ce = new ComputeEngine();
 
 // No normalization (show exact value)
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({ angleNormalization: 'none' });  // "370°"
 
 // Normalize to [0, 360) - useful for bearings
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({ angleNormalization: '0...360' }); // "10°"
 
-ce.box(['Degrees', -45])
+ce.expr(['Degrees', -45])
   .latex({ angleNormalization: '0...360' }); // "315°"
 
 // Normalize to [-180, 180] - useful for longitude
-ce.box(['Degrees', 190])
+ce.expr(['Degrees', 190])
   .latex({ angleNormalization: '-180...180' }); // "-170°"
 
 // Combine with DMS format
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({
     dmsFormat: true,
     angleNormalization: '0...360'
@@ -9071,7 +8990,7 @@ The value is equal to `(decimal * rational * sqrt(radical)) + im * i`
 
 ```ts
 type NumericValueData = {
-  re: Decimal | number;
+  re: BigDecimal | number;
   im: number;
 };
 ```
@@ -9228,7 +9147,7 @@ isZeroWithTolerance(_tolerance): boolean
 
 ####### \_tolerance
 
-`number` | `Decimal`
+`number` | `BigDecimal`
 
 </MemberCard>
 
@@ -9314,7 +9233,7 @@ abstract mul(other): NumericValue
 
 ####### other
 
-`number` | `Decimal` | [`NumericValue`](#abstract-numericvalue)
+`number` | `BigDecimal` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -9607,104 +9526,8 @@ a pair of big integers.
 ### BigNum
 
 ```ts
-type BigNum = Decimal;
+type BigNum = BigDecimal;
 ```
-
-</MemberCard>
-
-<MemberCard>
-
-### BigNumFactory()
-
-```ts
-type BigNumFactory = (value) => Decimal;
-```
-
-</MemberCard>
-
-### IBigNum
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_NAN
-
-```ts
-readonly _BIGNUM_NAN: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_ZERO
-
-```ts
-readonly _BIGNUM_ZERO: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_ONE
-
-```ts
-readonly _BIGNUM_ONE: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_TWO
-
-```ts
-readonly _BIGNUM_TWO: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_HALF
-
-```ts
-readonly _BIGNUM_HALF: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_PI
-
-```ts
-readonly _BIGNUM_PI: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_NEGATIVE\_ONE
-
-```ts
-readonly _BIGNUM_NEGATIVE_ONE: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.bignum()
-
-```ts
-bignum(value): Decimal
-```
-
-####### value
-
-`string` | `number` | `bigint` | `Decimal`
 
 </MemberCard>
 
@@ -9843,6 +9666,47 @@ type SymbolTable = {
   ids: {};
 };
 ```
+
+</MemberCard>
+
+### ILatexSyntax
+
+Minimal interface for a LaTeX parser/serializer.
+ Structurally compatible with `LatexSyntax` without importing it.
+
+<MemberCard>
+
+##### ILatexSyntax.parse()
+
+```ts
+parse(latex, options?): MathJsonExpression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### ILatexSyntax.serialize()
+
+```ts
+serialize(expr, options?): string
+```
+
+####### expr
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+####### options?
+
+`Record`\<`string`, `unknown`\>
 
 </MemberCard>
 
@@ -13640,6 +13504,65 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.55.0 _2026-03-04_
+
+#### Breaking
+
+- `ce.box()`/`box()` renamed to `ce.expr()`/`expr()` (`ce.box()` remains as a
+  deprecated wrapper).
+- Removed `ce.latexDictionary` getter/setter; configure dictionaries through
+  `new LatexSyntax({ dictionary: [...] })`.
+- Removed `ComputeEngine.getLatexDictionary()`; import dictionary constants from
+  package exports.
+- Removed deprecated type guard aliases: `isBoxedExpression`, `isBoxedNumber`,
+  `isBoxedSymbol`, `isBoxedFunction`, `isBoxedString`, `isBoxedTensor` (use
+  `isExpression`, `isNumber`, `isSymbol`, `isFunction`, `isString`, `isTensor`).
+- Removed `LibraryDefinition.latexDictionary`; LaTeX dictionaries now live in
+  the `latex-syntax` module.
+
+#### Fixed
+
+- **#295** The `parse()` free function now accepts the form options object, so
+  `parse("\\frac{10}{2}", { form: "raw" })` return `["Divide", "10", "2"]`.
+- Undeclared symbols followed by parenthesized numeric expressions are now
+  interpreted as multiplication, not implicit function calls (for example,
+  `q(2q)` -> `2q^2`). Function-call behavior remains for explicitly declared
+  function symbols and non-numeric argument forms.
+
+#### Added
+
+- Modular package exports for smaller bundles: `@cortex-js/compute-engine/core`,
+  `@cortex-js/compute-engine/compile`, `@cortex-js/compute-engine/latex-syntax`,
+  `@cortex-js/compute-engine/numerics`, and `@cortex-js/compute-engine/interval`
+  (with existing sub-paths still available, including `math-json`).
+- New standalone `LatexSyntax` API (class + `parse()`/`serialize()` helpers) for
+  LaTeX ↔ MathJSON without a `ComputeEngine` instance.
+- New `ILatexSyntax` interface exposed via `IComputeEngine.latexSyntax` to allow
+  custom LaTeX parser/serializer implementations.
+- All 16 LaTeX domain dictionaries are now exported individually, plus the
+  combined `LATEX_DICTIONARY`.
+- `Parser` type is now exported from the main package for typed custom
+  `LatexDictionaryEntry` parse handlers.
+
+#### Changed
+
+- `ComputeEngine` now accepts an injectable `latexSyntax` dependency.
+  - Full package imports still auto-create a LaTeX syntax instance.
+  - Core-only imports do not bundle LaTeX support; `parse()`, `.latex`, and
+    `toLatex()` require an injected `LatexSyntax`.
+  - MathJSON serialization omits optional LaTeX metadata when no LaTeX syntax is
+    present.
+- `decimal.js` has been replaced with a native `bigint`-backed `BigDecimal`
+  implementation, reducing dependency surface and bundle size.
+- `BigDecimal` `add()`, `sub()`, and `mul()` are now exact; rounding is limited
+  to operations that require it (`div()`, non-integer `pow()`, transcendentals).
+- Numeric string/LaTeX serialization now respects precision settings:
+  `.latex`/`.toString()` round to `ce.precision`, while `.json`/`toJSON()`
+  remain lossless.
+- High-precision special functions (`bigGamma`, `bigGammaln`, `bigDigamma`,
+  `bigTrigamma`, `bigPolygamma`, `bigZeta`) now scale with
+  `BigDecimal.precision`; integer Gamma values are exact.
+
 ### 0.54.0 _2026-02-26_
 
 - **New `expr.polynomialCoefficients()` method**: Returns the coefficients of a
@@ -13687,26 +13610,26 @@ import ChangeLog from '@site/src/components/ChangeLog';
   decomposition is simpler, `simplify()` automatically applies partial fraction
   decomposition.
 
-- **Breaking: `CoefficientList` now returns descending order**: The CAS
-  function `CoefficientList` now returns coefficients from highest to lowest
-  degree (e.g., `[1, 0, 2, 1]` for `x^3 + 2x + 1`), matching the new
+- **Breaking: `CoefficientList` now returns descending order**: The CAS function
+  `CoefficientList` now returns coefficients from highest to lowest degree
+  (e.g., `[1, 0, 2, 1]` for `x^3 + 2x + 1`), matching the new
   `polynomialCoefficients()` method and common external conventions. Previously
   it returned ascending order.
 
 - **`expr.match()` now accepts string patterns with auto-wildcarding**: Pass a
   LaTeX string like `'ax^2+bx+c'` and single-character symbols are automatically
   treated as wildcards. Results use clean unprefixed keys (`{a: 3, b: 2, c: 5}`)
-  with self-matches filtered out. `useVariations` and `matchMissingTerms` default
-  to `true` for string patterns.
+  with self-matches filtered out. `useVariations` and `matchMissingTerms`
+  default to `true` for string patterns.
 
 - **`expr.match()` now accepts MathJSON arrays directly**: Pass a raw MathJSON
   pattern like `['Add', '_a', '_b']` without calling `ce.box()` first.
 
 - **New `matchMissingTerms` option for `match()`**: When enabled, expressions
   with fewer operands than the pattern can still match by treating missing terms
-  as identity elements (0 for `Add`, 1 for `Multiply`). For example,
-  `3x^2+5` matches the pattern `ax^2+bx+c` with `b = 0`. Enabled by default
-  for string patterns.
+  as identity elements (0 for `Add`, 1 for `Multiply`). For example, `3x^2+5`
+  matches the pattern `ax^2+bx+c` with `b = 0`. Enabled by default for string
+  patterns.
 
 - **Non-strict parsing: implicit superscript for letter+digit**: In non-strict
   mode, a single letter immediately followed by a digit 2–9 is parsed as an
