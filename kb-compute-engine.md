@@ -13504,6 +13504,126 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.55.6 _2026-03-08_
+
+#### Fixed
+
+- **LaTeX parsing: `\lim` with postfix operators** — `\lim_{x\to 0}\left(x\right)^x`
+  now correctly parses as `Limit(x^x)` instead of `Power(Limit(x), x)`. The
+  `\lim` parser was using `parseArguments('implicit')` which stripped the
+  delimiters and left the `^x` unconsumed; it now uses `parseExpression` so
+  postfix operators are included in the limit body.
+
+- **LaTeX parsing: style, size, and color switch commands** — `\displaystyle`,
+  `\textstyle`, `\scriptstyle`, `\scriptscriptstyle`, `\tiny`..`\Huge` (10 size
+  commands), and `\color{...}` were silently discarded during parsing. They now
+  produce `Annotated` expressions that preserve the styling information and
+  round-trip correctly through serialization. Added `\scriptstyle` /
+  `\scriptscriptstyle` serialization support (previously only `\displaystyle`
+  and `\textstyle` were handled).
+
+- **LaTeX parsing: set-builder notation** — `\{x \in \R \mid x > 0\}` now parses
+  to `["Set", expr, ["Condition", cond]]`. Registered `\mid` as an infix
+  operator (`Divides`, precedence 160). The serializer round-trips set-builder
+  notation correctly.
+
+- **LaTeX serialization: `Complement`** — `["Complement", "A"]` now serializes
+  to `A^\complement` instead of falling back to the generic function form.
+  Removed stale `@todo` comments about a non-existent multi-argument case.
+
+- **LaTeX parsing: spacing commands** — `\hspace{dim}`, `\hspace*{dim}`,
+  `\hskip`, and `\kern` are now consumed during parsing (previously caused
+  "unexpected token" errors). These are treated as visual spacing and skipped.
+
+- **LaTeX serialization: `HorizontalSpacing` math classes** — the 2-argument
+  form `["HorizontalSpacing", expr, "'bin'"]` now serializes to `\mathbin{expr}`
+  (and similarly for `rel`, `op`, `ord`, `open`, `close`, `punct`, `inner`).
+  Previously the second argument was silently dropped.
+
+- **LaTeX serialization: redundant parens on matchfix operators** — `wrap()` no
+  longer adds parentheses around `Abs`, `Floor`, `Ceil`, `Norm`, and other
+  matchfix expressions that already have visible delimiters.
+
+- **LaTeX serialization: tabular environments** — default environment serializer
+  now renders matrix bodies (List of Lists) with `&` column separators and `\\`
+  row separators instead of nested function calls.
+
+- **LaTeX serialization: matchfix delimiter scaling** — default matchfix
+  serializer now respects `groupStyle` to choose between bare delimiters,
+  `\left..\right`, or `\bigl..\bigr` scaling.
+
+- **LaTeX parsing: Greek symbols in string groups** — `\alpha`, `\beta`, etc. in
+  `parseStringGroupContent()` (used by `\begin`/`\end`, color arguments) are now
+  interpreted as their Unicode equivalents instead of passing through as raw
+  LaTeX commands.
+
+### 0.55.5 _2026-03-06_
+
+#### Fixed
+
+- **Deep-zoom fractal precision** — emulated-double (dp) and perturbation (pt)
+  shaders now compute per-pixel coordinates from `v_uv` and viewport uniforms
+  instead of the shader template's single-precision `mix()`, which lost
+  distinguishability at high zoom levels.
+- **Perturbation theory: absolute vs delta coordinates** — the perturbation
+  Mandelbrot/Julia handlers were passing absolute single-precision coordinates
+  to the shader instead of the small delta from the reference center. Fixed by
+  introducing `_pt_delta()` which computes the per-pixel offset from viewport
+  uniforms.
+- **`compile()` free function dropped `hints`** — the `hints` option (viewport
+  center/radius) was accepted but silently not forwarded to the language target.
+  Fixed in `compile-expression.ts`.
+
+#### Added
+
+- **`BigDecimal` export** — the arbitrary-precision decimal class is now
+  exported from the public API for use by plot engines and other consumers that
+  need precision beyond float64.
+- **`HighPrecisionCoord` type** — new union type
+  (`number | string | { hi: number; lo: number }`) for passing
+  extended-precision viewport coordinates through the compile API. The
+  `viewport.center` option now accepts this type instead of plain
+  `[number, number]`.
+
+### 0.55.4 _2026-03-06_
+
+#### Fixed
+
+- **[#254](https://github.com/cortex-js/compute-engine/issues/254) LaTeX
+  parsing: interval notation with `\lbrack`/`\lparen`** — parsing `\lbrack5,7)`
+  or `\left\lbrack5,7\right)` now correctly produces an `Interval` expression.
+  Previously, when the open delimiter was a LaTeX command (e.g., `\lbrack`), the
+  parser incorrectly required the close delimiter to also be a LaTeX command
+  (e.g., `\rparen` instead of `)`), causing mismatched-delimiter intervals to
+  fail.
+- **LaTeX parsing: invalid symbols in `\mathrm{}` and related prefixes** —
+  invalid content inside `\mathrm{}`, `\operatorname{}`, etc. (e.g.,
+  `\mathrm{=}` or `\mathrm{DavidBowie👨🏻‍🎤}`) now produces the correct
+  `invalid-symbol` error instead of cascading parse errors. Also fixed
+  `matchPrefixedSymbol` leaking parser state on failure, and emoji sequences are
+  now properly recognized inside symbol prefixes (e.g.,
+  `\operatorname{😎🤏😳🕶🤏}`).
+
+#### Added
+
+- **High-precision Mandelbrot/Julia compilation** — the GPU compilation targets
+  (GLSL, WGSL) now support three precision tiers for fractal rendering, selected
+  automatically based on viewport hints:
+  - **Single float** (zoom < 10^6x): existing implementation, no overhead
+  - **Emulated double** (zoom 10^6x–10^14x): double-single (float-float)
+    arithmetic using Dekker/Knuth algorithms, ~48-bit mantissa from two 32-bit
+    floats
+  - **Perturbation theory** (zoom > 10^14x): reference orbit computed on CPU at
+    arbitrary precision via `BigDecimal`, GPU iterates only the small delta from
+    the reference, with glitch detection and single-float rebase fallback
+- **Viewport-aware compile API** — `compile()` accepts optional
+  `hints: { viewport: { center, radius } }`. The compiler auto-selects the
+  precision strategy and returns `staleWhen` thresholds for cheap staleness
+  checking by the plot engine.
+- **`CompilationResult` extensions** — new optional fields: `staleWhen` (plain
+  data staleness predicate), `uniforms` (scalar shader uniforms), `textures`
+  (typed texture data with format/dimensions for GPU upload).
+
 ### 0.55.3 _2026-03-05_
 
 #### Improved
@@ -13529,8 +13649,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     integer-typed
   - `Abs` is a no-op when the operand is provably non-negative
   - `Power(x, 2)` only expands to `(x * x)` for simple operands (symbols,
-    literals) — function calls like `Power(Sin(x), 2)` use `pow`/`Math.pow`
-    to avoid duplicate evaluation
+    literals) — function calls like `Power(Sin(x), 2)` use `pow`/`Math.pow` to
+    avoid duplicate evaluation
   - Integer `Mod` with non-negative dividend uses plain `%` instead of the
     Euclidean double-mod formula
   - GPU variable declarations infer `i32`/`int` type for integer-typed locals
