@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-compute-engine/98d-reference-fungrim-orthogonal-polynomials" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Fungrim Identities — Orthogonal polynomials · MathLive</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" property="og:url" content="https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Fungrim Identities — Orthogonal polynomials · MathLive"><meta data-rh="true" name="description" content="Part of the Fungrim Identities reference — 74 identities for orthogonal polynomials."><meta data-rh="true" property="og:description" content="Part of the Fungrim Identities reference — 74 identities for orthogonal polynomials."><link data-rh="true" rel="icon" href="/img/logo.webp"><link data-rh="true" rel="canonical" href="https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials/"><link data-rh="true" rel="alternate" href="https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials/" hreflang="en"><link data-rh="true" rel="alternate" href="https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://Q23Y5RN3UQ-dsn.algolia.net" crossorigin="anonymous"><link rel="search" type="application/opensearchdescription+xml" title="MathLive" href="/opensearch.xml">
+
+<link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
+<script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine","@cortex-js/compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),c="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");m&&(d.type="module"),d.id=c,d.src=o,d.async=!1,t&&n===e.length-1&&(d.onload=t),document.head.appendChild(d)})}()</script>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Bold.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Main-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Math-Italic.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_AMS-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
+<script src="/assets/js/runtime~main.d2cc3d3a.js" defer="defer"></script>
+<script src="/assets/js/main.b81b7866.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>document.documentElement.setAttribute("data-theme",window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),document.documentElement.setAttribute("data-theme-choice","system"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/img/logo.webp"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><div class="shared-header"><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/logo.webp" alt="MathLive Logo" class="themedComponent_mlkZ themedComponent--light_NVdE" height="42" width="42"><img src="/img/logo.webp" alt="MathLive Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU" height="42" width="42"></div><b class="navbar__title text--truncate">MathLive</b></a><a class="navbar__item navbar__link" href="/mathfield/">Mathfield</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/compute-engine/">Compute Engine</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link" icon="github">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="navbarSearchContainer_Bca1"><button type="button" class="DocSearch DocSearch-Button" aria-label="Search (Meta+k)" aria-keyshortcuts="Meta+k"><span class="DocSearch-Button-Container"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="1.4"></circle><path d="m21 21-4.3-4.3" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="DocSearch-Button-Placeholder">Search</span></span><span class="DocSearch-Button-Keys"></span></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav></div><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Orthogonal polynomials</h1></header>
+<p>Part of the <a class="" href="/compute-engine/reference/fungrim/">Fungrim Identities</a> reference — <strong>74 identities</strong> for orthogonal polynomials.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Generated reference</div><div class="admonitionContent_BuS1"><p>This page is generated from the compiled Fungrim artifact by <code>scripts/fungrim/gen-reference-doc.ts</code> (upstream snapshot <code>953c2afd2822</code>, translator <code>grim2mathjson 0.1.0</code>). Do not edit it by hand. The corpus is MIT-licensed; see <code>data/fungrim/LICENSE</code>.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="contents">Contents<a href="#contents" class="hash-link" aria-label="Direct link to Contents" title="Direct link to Contents" translate="no">​</a></h2>
+<ul>
+<li class=""><a href="#chebyshev-polynomials" class="">Chebyshev polynomials</a> (51)</li>
+<li class=""><a href="#gaussian-quadrature" class="">Gaussian quadrature</a> (1)</li>
+<li class=""><a href="#legendre-polynomials" class="">Legendre polynomials</a> (22)</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="chebyshev-polynomials">Chebyshev polynomials<a href="#chebyshev-polynomials" class="hash-link" aria-label="Direct link to Chebyshev polynomials" title="Direct link to Chebyshev polynomials" translate="no">​</a></h2>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/05fe07" target="_blank" rel="noopener noreferrer" class=""><code>05fe07</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\frac{1}{2}(\mathrm{ChebyshevU}(n, x)-\mathrm{ChebyshevU}(n-2, x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/0649c9" target="_blank" rel="noopener noreferrer" class=""><code>0649c9</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x-(x^2-1)^{1/2})}^{n}+{(x+\sqrt{x^2-1})}^{n})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/0cbe75" target="_blank" rel="noopener noreferrer" class=""><code>0cbe75</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=n\mathrm{ChebyshevU}(n-1, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/1a0d11" target="_blank" rel="noopener noreferrer" class=""><code>1a0d11</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, -1)=(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/2760e7" target="_blank" rel="noopener noreferrer" class=""><code>2760e7</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(2n, 0)=(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/2a5337" target="_blank" rel="noopener noreferrer" class=""><code>2a5337</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\cosh(n\mathrm{arcosh}(x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/2fc479" target="_blank" rel="noopener noreferrer" class=""><code>2fc479</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, x)=2x\mathrm{ChebyshevU}(n+1, x)-\mathrm{ChebyshevU}(n+2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/303204" target="_blank" rel="noopener noreferrer" class=""><code>303204</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{(n+1)\mathrm{ChebyshevT}(n+1, x)-x\mathrm{ChebyshevU}(n, x)}{x^2-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/35e13b" target="_blank" rel="noopener noreferrer" class=""><code>35e13b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\mathrm{Hypergeometric2F_1}(-n, n, \frac{1}{2}, \frac{1-x}{2})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/382679" target="_blank" rel="noopener noreferrer" class=""><code>382679</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n+1, 0)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/42102c" target="_blank" rel="noopener noreferrer" class=""><code>42102c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">(x^2-1)\mathrm{ChebyshevU}(n-1, x)^2+\mathrm{ChebyshevT}(n, x)^2=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/42eb01" target="_blank" rel="noopener noreferrer" class=""><code>42eb01</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(0, x)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/48765b" target="_blank" rel="noopener noreferrer" class=""><code>48765b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n, x)=2\mathrm{ChebyshevT}(n, x)^2-1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4b83c6" target="_blank" rel="noopener noreferrer" class=""><code>4b83c6</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\sin(x)\mathrm{ChebyshevU}(n, \cos(x))=\sin(nx)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4c7aeb" target="_blank" rel="noopener noreferrer" class=""><code>4c7aeb</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, \frac{x+\frac{1}{x}}{2})=\frac{1}{2}(x^{n}+x^{-n})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C\setminus\lbrace0\rbrace</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/5bd0ec" target="_blank" rel="noopener noreferrer" class=""><code>5bd0ec</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(2n, x)=\mathrm{ChebyshevU}(n-1, 2x^2-1)+\mathrm{ChebyshevT}(n, 2x^2-1)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/5f09f4" target="_blank" rel="noopener noreferrer" class=""><code>5f09f4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+(x^2-1)^{1/2})}^{n}-{(x-(x^2-1)^{1/2})}^{n})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/61375f" target="_blank" rel="noopener noreferrer" class=""><code>61375f</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{(x-1)^{r}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for expansion.
+<strong>Reference:</strong> <a href="http://functions.wolfram.com/Polynomials/ChebyshevT/20/02/01/0002/" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
+<a href="https://fungrim.org/entry/6582c4" target="_blank" rel="noopener noreferrer" class=""><code>6582c4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, -x)=\mathrm{ChebyshevT}(n, x)\times(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/6a24ab" target="_blank" rel="noopener noreferrer" class=""><code>6a24ab</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(1, x)=2x</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/75eacb" target="_blank" rel="noopener noreferrer" class=""><code>75eacb</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(-n, x)=-\mathrm{ChebyshevU}(n-2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/78f5bb" target="_blank" rel="noopener noreferrer" class=""><code>78f5bb</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=x\mathrm{ChebyshevT}(n-1, x)-(1-x^2)\mathrm{ChebyshevU}(n-2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/7b2c26" target="_blank" rel="noopener noreferrer" class=""><code>7b2c26</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(2n+1, 0)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/7d111e" target="_blank" rel="noopener noreferrer" class=""><code>7d111e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(m, \mathrm{ChebyshevT}(n, x))=\mathrm{ChebyshevT}(mn, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">m\in\Z\land n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/7e882c" target="_blank" rel="noopener noreferrer" class=""><code>7e882c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n, x)=\mathrm{ChebyshevT}(n, 2x^2-1)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/82288c" target="_blank" rel="noopener noreferrer" class=""><code>82288c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\mathrm{ChebyshevU}(n, x)-x\mathrm{ChebyshevU}(n-1, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/844561" target="_blank" rel="noopener noreferrer" class=""><code>844561</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, -x)=\mathrm{ChebyshevU}(n, x)\times(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/88aeb6" target="_blank" rel="noopener noreferrer" class=""><code>88aeb6</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=2x\mathrm{ChebyshevT}(n+1, x)-\mathrm{ChebyshevT}(n+2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/8a785a" target="_blank" rel="noopener noreferrer" class=""><code>8a785a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(-1, x)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9001e6" target="_blank" rel="noopener noreferrer" class=""><code>9001e6</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(-n, x)=\mathrm{ChebyshevT}(n, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9093a3" target="_blank" rel="noopener noreferrer" class=""><code>9093a3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n+1, \sin(x))=\sin(x(2n+1))\times(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9789ee" target="_blank" rel="noopener noreferrer" class=""><code>9789ee</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n, 0)=(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a46d91" target="_blank" rel="noopener noreferrer" class=""><code>a46d91</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(1)=\frac{\mathrm{RisingFactorial}(n, r)\mathrm{RisingFactorial}(n-r+1, r)}{(2r-1)!!}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>RisingFactorial</strong> — Rising factorial.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a68f0e" target="_blank" rel="noopener noreferrer" class=""><code>a68f0e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(1)=\frac{\mathrm{RisingFactorial}(n+1, r+1)\mathrm{RisingFactorial}(n-r+1, r)}{(2r+1)!!}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind; <strong>RisingFactorial</strong> — Rising factorial.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b6b014" target="_blank" rel="noopener noreferrer" class=""><code>b6b014</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n-1, x)\sqrt{1-x^2}=\sin(n\arccos(x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b8fdcd" target="_blank" rel="noopener noreferrer" class=""><code>b8fdcd</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(1, x)=x</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/be5652" target="_blank" rel="noopener noreferrer" class=""><code>be5652</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, -1)=(n+1)\times(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/be9a45" target="_blank" rel="noopener noreferrer" class=""><code>be9a45</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(0, x)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/c76e72" target="_blank" rel="noopener noreferrer" class=""><code>c76e72</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, x)=x\mathrm{ChebyshevU}(n-1, x)+\mathrm{ChebyshevT}(n, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ce5e03" target="_blank" rel="noopener noreferrer" class=""><code>ce5e03</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, x)=(n+1)\mathrm{Hypergeometric2F_1}(-n, n+2, \frac{3}{2}, \frac{1-x}{2})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ce9a39" target="_blank" rel="noopener noreferrer" class=""><code>ce9a39</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, x)=2x\mathrm{ChebyshevU}(n-1, x)-\mathrm{ChebyshevU}(n-2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d1ef91" target="_blank" rel="noopener noreferrer" class=""><code>d1ef91</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(2n+1, x)=2\mathrm{ChebyshevT}(n, x)\mathrm{ChebyshevT}(n+1, x)-x</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/de0968" target="_blank" rel="noopener noreferrer" class=""><code>de0968</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n, 1)=n+1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/e03fa4" target="_blank" rel="noopener noreferrer" class=""><code>e03fa4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{2(x-1)^{r}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
+<strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<strong>Reference:</strong> <a href="http://functions.wolfram.com/Polynomials/ChebyshevU/20/02/01/0002/" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
+<a href="https://fungrim.org/entry/e1797b" target="_blank" rel="noopener noreferrer" class=""><code>e1797b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(m, x)\mathrm{ChebyshevT}(n, x)=\frac{1}{2}(\mathrm{ChebyshevT}(m+n, x)+\mathrm{ChebyshevT}(\vert m-n\vert, x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">m\in\Z\land n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ed5222" target="_blank" rel="noopener noreferrer" class=""><code>ed5222</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, \cos(x))=\cos(nx)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/f4b3fa" target="_blank" rel="noopener noreferrer" class=""><code>f4b3fa</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=2x\mathrm{ChebyshevT}(n-1, x)-\mathrm{ChebyshevT}(n-2, x)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/faeed9" target="_blank" rel="noopener noreferrer" class=""><code>faeed9</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, 1)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fc5d42" target="_blank" rel="noopener noreferrer" class=""><code>fc5d42</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\cos(n\arccos(x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fda800" target="_blank" rel="noopener noreferrer" class=""><code>fda800</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)+\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}={(x+\sqrt{x^2-1})}^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
+<strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fdf80d" target="_blank" rel="noopener noreferrer" class=""><code>fdf80d</code> · Fungrim entry ↗</a></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="gaussian-quadrature">Gaussian quadrature<a href="#gaussian-quadrature" class="hash-link" aria-label="Direct link to Gaussian quadrature" title="Direct link to Gaussian quadrature" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{GaussLegendreWeight}(n, k)=(2)((1-\mathrm{LegendrePolynomialZero}(n, k)^2)t\mapsto\mathrm{LegendrePolynomial}(n, t)^{\prime}(\mathrm{LegendrePolynomialZero}(n, k))^2)^{-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land k\in1..n</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ea4754" target="_blank" rel="noopener noreferrer" class=""><code>ea4754</code> · Fungrim entry ↗</a></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="legendre-polynomials">Legendre polynomials<a href="#legendre-polynomials" class="hash-link" aria-label="Direct link to Legendre polynomials" title="Direct link to Legendre polynomials" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, -z)=\mathrm{LegendrePolynomial}(n, z)\times(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/0010f3" target="_blank" rel="noopener noreferrer" class=""><code>0010f3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(5, z)=\frac{1}{8}(63z^5-70z^3+15z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/13f971" target="_blank" rel="noopener noreferrer" class=""><code>13f971</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(1, z)=z</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/217521" target="_blank" rel="noopener noreferrer" class=""><code>217521</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/27688e" target="_blank" rel="noopener noreferrer" class=""><code>27688e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">-(z(2n+1)\mathrm{LegendrePolynomial}(n, z))+n\mathrm{LegendrePolynomial}(n-1, z)+(n+1)\mathrm{LegendrePolynomial}(n+1, z)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/367ac2" target="_blank" rel="noopener noreferrer" class=""><code>367ac2</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})(\frac{z-1}{2})^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C\setminus\lbrace1\rbrace</code>.
+<strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3c87b9" target="_blank" rel="noopener noreferrer" class=""><code>3c87b9</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, -1)=(-1)^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3df748" target="_blank" rel="noopener noreferrer" class=""><code>3df748</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{Count}(\mathrm{Zeros}(z\mapsto\mathrm{LegendrePolynomial}(n, z), \C))=n</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+<strong>Symbols:</strong> <strong>Zeros</strong> — Zeros (roots) of function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/415911" target="_blank" rel="noopener noreferrer" class=""><code>415911</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{n!\times2^{n}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>  <em>or</em>  <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4cfeac" target="_blank" rel="noopener noreferrer" class=""><code>4cfeac</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, 0)=\frac{\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/674afa" target="_blank" rel="noopener noreferrer" class=""><code>674afa</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+<strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/6cd4a1" target="_blank" rel="noopener noreferrer" class=""><code>6cd4a1</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+<strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/859445" target="_blank" rel="noopener noreferrer" class=""><code>859445</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n+1, 0)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/85eebc" target="_blank" rel="noopener noreferrer" class=""><code>85eebc</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+nz\mathrm{LegendrePolynomial}(n, z)-n\mathrm{LegendrePolynomial}(n-1, z)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/925fdf" target="_blank" rel="noopener noreferrer" class=""><code>925fdf</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, n+1, 1, \frac{1-z}{2})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+<strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9395fc" target="_blank" rel="noopener noreferrer" class=""><code>9395fc</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(3, z)=\frac{1}{2}(5z^3-3z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/9b7f05" target="_blank" rel="noopener noreferrer" class=""><code>9b7f05</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(0, z)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9bdf22" target="_blank" rel="noopener noreferrer" class=""><code>9bdf22</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(4, z)=\frac{1}{8}(35z^4-30z^2+3)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a17386" target="_blank" rel="noopener noreferrer" class=""><code>a17386</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, 1)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a7ac51" target="_blank" rel="noopener noreferrer" class=""><code>a7ac51</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z^\star)=\mathrm{LegendrePolynomial}(n, z)^\star</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/b2d723" target="_blank" rel="noopener noreferrer" class=""><code>b2d723</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2, z)=\frac{1}{2}(3z^2-1)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/d77f0a" target="_blank" rel="noopener noreferrer" class=""><code>d77f0a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})\mathrm{Binomial}(2n, n)(\frac{z}{2})^{n}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C\setminus\lbrace0\rbrace</code>.
+<strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/f55f0a" target="_blank" rel="noopener noreferrer" class=""><code>f55f0a</code> · Fungrim entry ↗</a></p>
+<hr></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#contents" class="table-of-contents__link toc-highlight">Contents</a></li><li><a href="#chebyshev-polynomials" class="table-of-contents__link toc-highlight">Chebyshev polynomials</a></li><li><a href="#gaussian-quadrature" class="table-of-contents__link toc-highlight">Gaussian quadrature</a></li><li><a href="#legendre-polynomials" class="table-of-contents__link toc-highlight">Legendre polynomials</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
+            GitHub
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li><li class="footer__item"><a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>
+            Discord
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li><li class="footer__item"><a href="https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>
+            MathLive GPT
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/about/">About Us</a></li></ul></div></div></div></footer></div></div>
+</body>
+</html>

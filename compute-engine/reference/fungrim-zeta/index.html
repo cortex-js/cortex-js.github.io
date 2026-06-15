@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-compute-engine/98h-reference-fungrim-zeta" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Fungrim Identities — Zeta and L-functions · MathLive</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" property="og:url" content="https://mathlive.io/compute-engine/reference/fungrim-zeta/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Fungrim Identities — Zeta and L-functions · MathLive"><meta data-rh="true" name="description" content="Part of the Fungrim Identities reference — 79 identities for zeta and l-functions."><meta data-rh="true" property="og:description" content="Part of the Fungrim Identities reference — 79 identities for zeta and l-functions."><link data-rh="true" rel="icon" href="/img/logo.webp"><link data-rh="true" rel="canonical" href="https://mathlive.io/compute-engine/reference/fungrim-zeta/"><link data-rh="true" rel="alternate" href="https://mathlive.io/compute-engine/reference/fungrim-zeta/" hreflang="en"><link data-rh="true" rel="alternate" href="https://mathlive.io/compute-engine/reference/fungrim-zeta/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://Q23Y5RN3UQ-dsn.algolia.net" crossorigin="anonymous"><link rel="search" type="application/opensearchdescription+xml" title="MathLive" href="/opensearch.xml">
+
+<link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
+<script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine","@cortex-js/compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),c="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");m&&(d.type="module"),d.id=c,d.src=o,d.async=!1,t&&n===e.length-1&&(d.onload=t),document.head.appendChild(d)})}()</script>
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Bold.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Main-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Math-Italic.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_AMS-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
+<link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
+<script src="/assets/js/runtime~main.d2cc3d3a.js" defer="defer"></script>
+<script src="/assets/js/main.b81b7866.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>document.documentElement.setAttribute("data-theme",window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),document.documentElement.setAttribute("data-theme-choice","system"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/img/logo.webp"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><div class="shared-header"><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/logo.webp" alt="MathLive Logo" class="themedComponent_mlkZ themedComponent--light_NVdE" height="42" width="42"><img src="/img/logo.webp" alt="MathLive Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU" height="42" width="42"></div><b class="navbar__title text--truncate">MathLive</b></a><a class="navbar__item navbar__link" href="/mathfield/">Mathfield</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/compute-engine/">Compute Engine</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link" icon="github">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="navbarSearchContainer_Bca1"><button type="button" class="DocSearch DocSearch-Button" aria-label="Search (Meta+k)" aria-keyshortcuts="Meta+k"><span class="DocSearch-Button-Container"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="1.4"></circle><path d="m21 21-4.3-4.3" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="DocSearch-Button-Placeholder">Search</span></span><span class="DocSearch-Button-Keys"></span></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav></div><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Zeta and L-functions</h1></header>
+<p>Part of the <a class="" href="/compute-engine/reference/fungrim/">Fungrim Identities</a> reference — <strong>79 identities</strong> for zeta and l-functions.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Generated reference</div><div class="admonitionContent_BuS1"><p>This page is generated from the compiled Fungrim artifact by <code>scripts/fungrim/gen-reference-doc.ts</code> (upstream snapshot <code>953c2afd2822</code>, translator <code>grim2mathjson 0.1.0</code>). Do not edit it by hand. The corpus is MIT-licensed; see <code>data/fungrim/LICENSE</code>.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="contents">Contents<a href="#contents" class="hash-link" aria-label="Direct link to Contents" title="Direct link to Contents" translate="no">​</a></h2>
+<ul>
+<li class=""><a href="#dirichlet-characters" class="">Dirichlet characters</a> (15)</li>
+<li class=""><a href="#hurwitz-zeta-function" class="">Hurwitz zeta function</a> (40)</li>
+<li class=""><a href="#multiple-zeta-values" class="">Multiple zeta values</a> (7)</li>
+<li class=""><a href="#riemann-zeta-function" class="">Riemann zeta function</a> (17)</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="dirichlet-characters">Dirichlet characters<a href="#dirichlet-characters" class="hash-link" aria-label="Direct link to Dirichlet characters" title="Direct link to Dirichlet characters" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(4, 3))=\frac{\pi}{4}</code></p>
+<p><strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3b8c97" target="_blank" rel="noopener noreferrer" class=""><code>3b8c97</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletGroup}(q)=\lbrace\mathrm{DirichletCharacter}(q, \ell), \ell\in1..\max(q, 2)-1\in\gcd(\ell, q)=1\rbrace</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletGroup</strong> — Dirichlet characters with given modulus.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/47d430" target="_blank" rel="noopener noreferrer" class=""><code>47d430</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletCharacter}(p^{\mathrm{e_{var}}}, \ell, n)=\exp(\frac{2\imaginaryI\pi\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})}{\mathrm{Totient}(p^{\mathrm{e_{var}}})})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">3\le p\land\gcd(\ell, p^{\mathrm{e_{var}}})=\gcd(n, p^{\mathrm{e_{var}}})=1\land p\in\mathrm{Primes}\land\mathrm{e_{var}}\in\N^*\land n\in\Z\land\ell\in1..p^{\mathrm{e_{var}}}-1</code>.
+<strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator; <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DiscreteLog</strong> — Discrete logarithm.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4cf4e4" target="_blank" rel="noopener noreferrer" class=""><code>4cf4e4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\begin{cases}10&amp;p=40\,487\\7&amp;p=6\,692\,367\,337\\\min(\lbrace a, a\in\N^*\in\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\rbrace)&amp;\top\end{cases}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">3\le p\land p\lt1\,000\,000\,000\,000\land p\in\mathrm{Primes}</code>.
+<strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/540931" target="_blank" rel="noopener noreferrer" class=""><code>540931</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{Count}(\mathrm{DirichletGroup}(q))=\mathrm{Totient}(q)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*</code>.
+<strong>Symbols:</strong> <strong>DirichletGroup</strong> — Dirichlet characters with given modulus.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/62f7d5" target="_blank" rel="noopener noreferrer" class=""><code>62f7d5</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\min(\lbrace a, a\in\N^*\in(\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\land\mathrm{Count}(\lbrace a^{k}\bmod p^2, k\in\N\rbrace)=p(p-1))\rbrace)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">3\le p\land p\in\mathrm{Primes}</code>.
+<strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/75231e" target="_blank" rel="noopener noreferrer" class=""><code>75231e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(0, \mathrm{DirichletCharacter}(q, 1))=\begin{cases}\frac{-1}{2}&amp;q=1\\0&amp;\top\end{cases}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a07d28" target="_blank" rel="noopener noreferrer" class=""><code>a07d28</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(s, \mathrm{DirichletCharacter}(1, 1))=\Zeta(s)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a9337b" target="_blank" rel="noopener noreferrer" class=""><code>a9337b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(5, 4))=\frac{1}{5}(2\sqrt{5}\ln(\varphi))</code></p>
+<p><strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/c9d117" target="_blank" rel="noopener noreferrer" class=""><code>c9d117</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(3, 2))=\frac{\pi\sqrt{3}}{9}</code></p>
+<p><strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d83109" target="_blank" rel="noopener noreferrer" class=""><code>d83109</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletCharacter}(q, 1, n)=\begin{cases}1&amp;\gcd(n, q)=1\\0&amp;\top\end{cases}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*\land n\in\Z</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d8c6d1" target="_blank" rel="noopener noreferrer" class=""><code>d8c6d1</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletCharacter}(q, \ell)\lhd n=\mathrm{DirichletCharacter}(q, \ell, n)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\gcd(\ell, q)=1\land q\in\N^*\land n\in\Z\land\ell\in1..\max(q, 2)-1</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d9a187" target="_blank" rel="noopener noreferrer" class=""><code>d9a187</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{PrimitiveDirichletCharacters}(q)=\lbrace\chi, \chi\in\mathrm{DirichletGroup}(q)\in(\forall d\in1..q-1, (d\mid q)\implies(\exists a\in0..q-1, \mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))\rbrace</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*</code>.
+<strong>Symbols:</strong> <strong>DirichletGroup</strong> — Dirichlet characters with given modulus; <strong>PrimitiveDirichletCharacters</strong> — Primitive Dirichlet characters with given modulus.
+Used by the Compute Engine for simplification.
+<strong>Reference:</strong> T. Apostol (1976), Introduction to Analytic Number Theory, Springer. Chapter 8.7.
+<a href="https://fungrim.org/entry/ed65c8" target="_blank" rel="noopener noreferrer" class=""><code>ed65c8</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletCharacter}(4, 3, n)=\begin{cases}1&amp;\mathrm{CongruentMod}(n, 1, 4)\\-1&amp;\mathrm{CongruentMod}(n, 3, 4)\\0&amp;\top\end{cases}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fc4f6a" target="_blank" rel="noopener noreferrer" class=""><code>fc4f6a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{DirichletL}(s, \mathrm{DirichletCharacter}(2^{n}, 1))=(1-2^{-s})\Zeta(s)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land s\in\C</code>.
+<strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletL</strong> — Dirichlet L-function.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/ff8254" target="_blank" rel="noopener noreferrer" class=""><code>ff8254</code> · Fungrim entry ↗</a></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="hurwitz-zeta-function">Hurwitz zeta function<a href="#hurwitz-zeta-function" class="hash-link" aria-label="Direct link to Hurwitz zeta function" title="Direct link to Hurwitz zeta function" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(0, 0)=\frac{1}{2}</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/150b3e" target="_blank" rel="noopener noreferrer" class=""><code>150b3e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(4, 1)=\frac{\pi^4}{90}</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/2d4828" target="_blank" rel="noopener noreferrer" class=""><code>2d4828</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{1}{6})=2\sqrt{3}\pi^3+91\Zeta(3)</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/2fabeb" target="_blank" rel="noopener noreferrer" class=""><code>2fabeb</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(4, 2)=\frac{\pi^4}{90}-1</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/33690e" target="_blank" rel="noopener noreferrer" class=""><code>33690e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, 1)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3ba544" target="_blank" rel="noopener noreferrer" class=""><code>3ba544</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(0, \frac{1}{2})=0</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3db90c" target="_blank" rel="noopener noreferrer" class=""><code>3db90c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, \frac{1}{4})=8G+\pi^2</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3e82c3" target="_blank" rel="noopener noreferrer" class=""><code>3e82c3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(4, \frac{1}{2})=\frac{\pi^4}{6}</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4064f5" target="_blank" rel="noopener noreferrer" class=""><code>4064f5</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=\mathrm{RisingFactorial}(-r-s+1, r)\mathrm{HurwitzZeta}(r+s, a)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land r+s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function; <strong>RisingFactorial</strong> — Rising factorial.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/40c3e2" target="_blank" rel="noopener noreferrer" class=""><code>40c3e2</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{BernoulliPolynomial}(n, z)=-(n\mathrm{HurwitzZeta}(1-n, z))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land z\in\C</code>.
+<strong>Symbols:</strong> <strong>BernoulliPolynomial</strong> — Bernoulli polynomial; <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4228cd" target="_blank" rel="noopener noreferrer" class=""><code>4228cd</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, \frac{1}{6})+\mathrm{HurwitzZeta}(s, \frac{5}{6})=(2^{s}-1)(3^{s}-1)\Zeta(s)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/4d1f6b" target="_blank" rel="noopener noreferrer" class=""><code>4d1f6b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, 2)=\Zeta(3)-1</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/4dd87c" target="_blank" rel="noopener noreferrer" class=""><code>4dd87c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{\ln(-z)}{2\imaginaryI\pi}+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{2}-\frac{\ln(-z)}{2\imaginaryI\pi})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\notin\N\land z\notin\lbrace0, 1\rbrace\land s\in\C\land z\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/52ea5f" target="_blank" rel="noopener noreferrer" class=""><code>52ea5f</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Gamma(z)=\exp(\mathrm{HurwitzZeta}(0, z, 1))\sqrt{2\pi}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\Z_{\le0}</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/53026a" target="_blank" rel="noopener noreferrer" class=""><code>53026a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(1, a)=\tilde\infty</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\setminus\Z_{\le0}</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/532f31" target="_blank" rel="noopener noreferrer" class=""><code>532f31</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, 1)=\frac{\pi^2}{6}</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/575b8f" target="_blank" rel="noopener noreferrer" class=""><code>575b8f</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(-n, a)=-(\frac{\mathrm{BernoulliPolynomial}(n+1, a)}{n+1})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>BernoulliPolynomial</strong> — Bernoulli polynomial; <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/5bdba2" target="_blank" rel="noopener noreferrer" class=""><code>5bdba2</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, a)=\frac{\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)}{a^2}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\setminus\Z_{\le0}</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/6419ac" target="_blank" rel="noopener noreferrer" class=""><code>6419ac</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, n+\frac{1}{2})=(2^{s}-1)\Zeta(s)-(\sum_{k=0}^{n-1}(2k+1)^{-s})\times2^{s}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C\land n\in\N</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/6c3523" target="_blank" rel="noopener noreferrer" class=""><code>6c3523</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, n)=\Zeta(s)-(\sum_{k=1}^{n-1}k^{-s})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C\land n\in\N^*</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/6e69fc" target="_blank" rel="noopener noreferrer" class=""><code>6e69fc</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(-n, 0)=-(\frac{\mathrm{BernoulliB}(n+1)}{n+1})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+<strong>Symbols:</strong> <strong>BernoulliB</strong> — Bernoulli number; <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/7dab87" target="_blank" rel="noopener noreferrer" class=""><code>7dab87</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=-(s\mathrm{HurwitzZeta}(s+1, a))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(a)\land s\notin\lbrace0, 1\rbrace\land s\in\C\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/83065e" target="_blank" rel="noopener noreferrer" class=""><code>83065e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, \frac{1}{2})=\frac{\pi^2}{2}</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/868061" target="_blank" rel="noopener noreferrer" class=""><code>868061</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=(2^{s}-1)\Zeta(s)\times2^{s}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/8bbb6f" target="_blank" rel="noopener noreferrer" class=""><code>8bbb6f</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{1}{2})=7\Zeta(3)</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/9417f4" target="_blank" rel="noopener noreferrer" class=""><code>9417f4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, \frac{3}{4})=\pi^2-8G</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/951f86" target="_blank" rel="noopener noreferrer" class=""><code>951f86</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, 2)=\frac{\pi^2}{6}-1</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ac8d3c" target="_blank" rel="noopener noreferrer" class=""><code>ac8d3c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, 1)=\Zeta(s)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/af23f7" target="_blank" rel="noopener noreferrer" class=""><code>af23f7</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, \frac{1}{2})=(2^{s}-1)\Zeta(s)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/af7d3d" target="_blank" rel="noopener noreferrer" class=""><code>af7d3d</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{3}{4})=28\Zeta(3)-\pi^3</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b347d3" target="_blank" rel="noopener noreferrer" class=""><code>b347d3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, 1)=\Zeta(3)</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b4ed44" target="_blank" rel="noopener noreferrer" class=""><code>b4ed44</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, 2)=\Zeta(s)-1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b721b4" target="_blank" rel="noopener noreferrer" class=""><code>b721b4</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, \frac{3}{2})=(2^{s}-1)\Zeta(s)-2^{s}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/c6d6e2" target="_blank" rel="noopener noreferrer" class=""><code>c6d6e2</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, r)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d0d03b" target="_blank" rel="noopener noreferrer" class=""><code>d0d03b</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(0, a)=\frac{1}{2}-a</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d99808" target="_blank" rel="noopener noreferrer" class=""><code>d99808</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, a)=\frac{\mathrm{HurwitzZeta}(s, \frac{a}{2})+\mathrm{HurwitzZeta}(s, \frac{a+1}{2})}{2^{s}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ebc49c" target="_blank" rel="noopener noreferrer" class=""><code>ebc49c</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{1}{4})=28\Zeta(3)+\pi^3</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/eda0f3" target="_blank" rel="noopener noreferrer" class=""><code>eda0f3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{5}{6})=91\Zeta(3)-2\sqrt{3}\pi^3</code></p>
+<p><strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/edad97" target="_blank" rel="noopener noreferrer" class=""><code>edad97</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{GammaLn}(z)=\mathrm{HurwitzZeta}(0, z, 1)+\frac{\ln(2\pi)}{2}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\Z_{\le0}</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/f3b870" target="_blank" rel="noopener noreferrer" class=""><code>f3b870</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, 3)=-2^{-s}+\Zeta(s)-1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fc6fe0" target="_blank" rel="noopener noreferrer" class=""><code>fc6fe0</code> · Fungrim entry ↗</a></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="multiple-zeta-values">Multiple zeta values<a href="#multiple-zeta-values" class="hash-link" aria-label="Direct link to Multiple zeta values" title="Direct link to Multiple zeta values" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(3, 3)=\frac{1}{2}(\Zeta(3)^2-\Zeta(6))</code></p>
+<p><strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/3a5167" target="_blank" rel="noopener noreferrer" class=""><code>3a5167</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(2, 2)=\frac{3\Zeta(4)}{4}</code></p>
+<p><strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/62de01" target="_blank" rel="noopener noreferrer" class=""><code>62de01</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(2, 3)=\frac{9\Zeta(5)}{2}-2\Zeta(2)\Zeta(3)</code></p>
+<p><strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/856317" target="_blank" rel="noopener noreferrer" class=""><code>856317</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(3, 2)=3\Zeta(2)\Zeta(3)-\frac{11\Zeta(5)}{2}</code></p>
+<p><strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a5e52e" target="_blank" rel="noopener noreferrer" class=""><code>a5e52e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(b, a)+\mathrm{MultiZetaValue}(a, b)=\Zeta(a)\Zeta(b)-\Zeta(a+b)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in2..\infty\land b\in2..\infty</code>.
+<strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/da71d3" target="_blank" rel="noopener noreferrer" class=""><code>da71d3</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(4, 2)=\Zeta(3)^2-\frac{4\Zeta(6)}{3}</code></p>
+<p><strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ef2c71" target="_blank" rel="noopener noreferrer" class=""><code>ef2c71</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{MultiZetaValue}(s, s)=\frac{1}{2}(\Zeta(s)^2-\Zeta(2s))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in2..\infty</code>.
+<strong>Symbols:</strong> <strong>MultiZetaValue</strong> — Multiple zeta value (MZV).
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/ef8b17" target="_blank" rel="noopener noreferrer" class=""><code>ef8b17</code> · Fungrim entry ↗</a></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="riemann-zeta-function">Riemann zeta function<a href="#riemann-zeta-function" class="hash-link" aria-label="Direct link to Riemann zeta function" title="Direct link to Riemann zeta function" translate="no">​</a></h2>
+<p><code class="language-math math-inline">\mathrm{KeiperLiLambda}(0)=0</code></p>
+<p><strong>Symbols:</strong> <strong>KeiperLiLambda</strong> — Keiper-Li coefficient.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/081205" target="_blank" rel="noopener noreferrer" class=""><code>081205</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{StieltjesGamma}(n, 1)=\mathrm{StieltjesGamma}(n)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+<strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/51206a" target="_blank" rel="noopener noreferrer" class=""><code>51206a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(-n)=\frac{\mathrm{BernoulliB}(n+1)\times(-1)^{n}}{n+1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">0\le n\land n\in\Z</code>.
+<strong>Symbols:</strong> <strong>BernoulliB</strong> — Bernoulli number.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/51fd98" target="_blank" rel="noopener noreferrer" class=""><code>51fd98</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\ne0\land n\in\Z</code>.
+<strong>Symbols:</strong> <strong>RiemannZetaZero</strong> — Nontrivial zero of the Riemann zeta function.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/60c2ec" target="_blank" rel="noopener noreferrer" class=""><code>60c2ec</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, a)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\notin\Z_{\le0}\land s\in\C\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function; <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/60c6da" target="_blank" rel="noopener noreferrer" class=""><code>60c6da</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{StieltjesGamma}(n, a+1)=\mathrm{StieltjesGamma}(n, a)-\frac{\ln(a)^{n}}{a}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\notin\Z_{\le0}\land n\in\N\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/687b4d" target="_blank" rel="noopener noreferrer" class=""><code>687b4d</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(s^\star)=\Zeta(s)^\star</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land s\in\C</code>.
+Used by the Compute Engine for expansion.
+<a href="https://fungrim.org/entry/69348a" target="_blank" rel="noopener noreferrer" class=""><code>69348a</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{StieltjesGamma}(1, \frac{1}{2})=-2\gamma\ln(2)-\ln(2)^2+\mathrm{StieltjesGamma}(1)</code></p>
+<p><strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/70a705" target="_blank" rel="noopener noreferrer" class=""><code>70a705</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(2n)=\frac{\mathrm{BernoulliB}(2n)\times(-1)^{n+1}(2\pi)^{2n}}{2(2n)!}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">1\le n\land n\in\Z</code>.
+<strong>Symbols:</strong> <strong>BernoulliB</strong> — Bernoulli number.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/72ccda" target="_blank" rel="noopener noreferrer" class=""><code>72ccda</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(s)=\sum_{k=1}^{\mathrm{N_{var}}-1}k^{-s}-\int_{\mathrm{N_{var}}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t+\frac{\sum_{k=1}^{M}\frac{\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k)}{(2k)!\mathrm{N_{var}}^{2k-1}}+\frac{1}{2}}{\mathrm{N_{var}}^{s}}+\frac{\mathrm{N_{var}}^{1-s}}{s-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\ne1\land1\le\mathrm{N_{var}}\land1\le M\land0\lt\Re(2M+s-1)\land s\in\C\land\mathrm{N_{var}}\in\Z\land M\in\Z</code>.
+<strong>Symbols:</strong> <strong>BernoulliB</strong> — Bernoulli number; <strong>BernoulliPolynomial</strong> — Bernoulli polynomial; <strong>RisingFactorial</strong> — Rising factorial.
+Used by the Compute Engine for simplification.
+<strong>References:</strong></p>
+<ul>
+<li class="">F. Johansson (2015), Rigorous high-precision computation of the Hurwitz zeta function and its derivatives, Numerical Algorithms 69:253, DOI: 10.1007/s11075-014-9893-1</li>
+<li class="">F. W. J. Olver, Asymptotics and Special Functions, AK Peters, 1997. Chapter 8.
+<a href="https://fungrim.org/entry/792f7b" target="_blank" rel="noopener noreferrer" class=""><code>792f7b</code> · Fungrim entry ↗</a></li>
+</ul>
+<hr>
+<p><code class="language-math math-inline">\mathrm{StieltjesGamma}(0, 1)=\mathrm{StieltjesGamma}(0)=\gamma</code></p>
+<p><strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/8ae153" target="_blank" rel="noopener noreferrer" class=""><code>8ae153</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(2)=\frac{\pi^2}{6}</code></p>
+<p>Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/a01b6e" target="_blank" rel="noopener noreferrer" class=""><code>a01b6e</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(s)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C</code>.
+<strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b1a2e1" target="_blank" rel="noopener noreferrer" class=""><code>b1a2e1</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{StieltjesGamma}(0, a)=-\mathrm{Digamma}(a)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\notin\Z_{\le0}\land a\in\C</code>.
+<strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/b6808d" target="_blank" rel="noopener noreferrer" class=""><code>b6808d</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{KeiperLiLambda}(1)=1-\frac{\ln(4\pi)}{2}+\frac{\gamma}{2}</code></p>
+<p><strong>Symbols:</strong> <strong>KeiperLiLambda</strong> — Keiper-Li coefficient.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/d8d820" target="_blank" rel="noopener noreferrer" class=""><code>d8d820</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\mathrm{KeiperLiLambda}(n)=\frac{1}{n!}(s\mapsto\ln(2\mathrm{RiemannXi}(s/(s-1)))^{\prime}(0))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
+<strong>Symbols:</strong> <strong>KeiperLiLambda</strong> — Keiper-Li coefficient.
+Used by the Compute Engine for simplification.
+<a href="https://fungrim.org/entry/fcab61" target="_blank" rel="noopener noreferrer" class=""><code>fcab61</code> · Fungrim entry ↗</a></p>
+<hr>
+<p><code class="language-math math-inline">\Zeta(-2n)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
+Used by the Compute Engine for simplification.
+<code>zeta-trivial-zeros</code> · <em>curated identity (not in the upstream Fungrim corpus)</em></p>
+<hr></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#contents" class="table-of-contents__link toc-highlight">Contents</a></li><li><a href="#dirichlet-characters" class="table-of-contents__link toc-highlight">Dirichlet characters</a></li><li><a href="#hurwitz-zeta-function" class="table-of-contents__link toc-highlight">Hurwitz zeta function</a></li><li><a href="#multiple-zeta-values" class="table-of-contents__link toc-highlight">Multiple zeta values</a></li><li><a href="#riemann-zeta-function" class="table-of-contents__link toc-highlight">Riemann zeta function</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
+            GitHub
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li><li class="footer__item"><a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>
+            Discord
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li><li class="footer__item"><a href="https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+            <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>
+            MathLive GPT
+            <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>
+          </a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/about/">About Us</a></li></ul></div></div></div></footer></div></div>
+</body>
+</html>

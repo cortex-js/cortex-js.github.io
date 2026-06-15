@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.9588e9c3.js" defer="defer"></script>
-<script src="/assets/js/main.a503959b.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d2cc3d3a.js" defer="defer"></script>
+<script src="/assets/js/main.b81b7866.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -81,7 +81,75 @@ into the expression by substituting the wildcards.</p>
 keys corresponding to the matching named wildcards is returned.</p>
 <p>If no named wildcards are used and there is a match, an empty object literal
 is returned.</p>
-<p>For convenience, the <em>pattern</em> argument can be an unboxed MathJSON expression.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="pattern-formats">Pattern Formats<a href="#pattern-formats" class="hash-link" aria-label="Direct link to Pattern Formats" title="Direct link to Pattern Formats" translate="no">​</a></h3>
+<p>The <code>pattern</code> argument can be provided in three formats:</p>
+<p><strong>String (LaTeX)</strong> — Single-character symbols are automatically treated as
+wildcards. Results use clean unprefixed keys. <code>useVariations</code> and
+<code>matchMissingTerms</code> default to <code>true</code>.</p>
+<code-playground><div slot="javascript">const expr = ce.parse(&#x27;3x^2+2x+5&#x27;);
+<!-- -->console.log(expr.match(&#x27;ax^2+bx+c&#x27;));
+<!-- -->// ➔ { a: 3, b: 2, c: 5 }
+</div></code-playground>
+<p><strong>MathJSON array</strong> — Passed directly, boxed automatically. Use <code>_</code>-prefixed
+wildcard names explicitly.</p>
+<code-playground><div slot="javascript">const expr = ce.parse(&#x27;3x^2+2x+5&#x27;);
+<!-- -->console.log(expr.match([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, [&quot;Power&quot;, &quot;x&quot;, 2]],
+<!-- -->  <!-- -->[&quot;Multiply&quot;, &quot;_b&quot;, &quot;x&quot;], &quot;_c&quot;]));
+<!-- -->// ➔ { _a: 3, _b: 2, _c: 5 }
+</div></code-playground>
+<p><strong>BoxedExpression</strong> — Used directly.</p>
+<code-playground><div slot="javascript">const expr = ce.parse(&#x27;3x^2+2x+5&#x27;);
+<!-- -->const pattern = ce.box([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, [&quot;Power&quot;, &quot;x&quot;, 2]],
+<!-- -->  <!-- -->[&quot;Multiply&quot;, &quot;_b&quot;, &quot;x&quot;], &quot;_c&quot;]);
+<!-- -->console.log(expr.match(pattern));
+<!-- -->// ➔ { _a: 3, _b: 2, _c: 5 }
+</div></code-playground>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="string-patterns">String Patterns<a href="#string-patterns" class="hash-link" aria-label="Direct link to String Patterns" title="Direct link to String Patterns" translate="no">​</a></h3>
+<p>When a string pattern is used, several conveniences are applied:</p>
+<ul>
+<li class="">
+<p><strong>Auto-wildcarding</strong>: All single-character symbols become wildcards. In the
+pattern <code>&#x27;ax^2+bx+c&#x27;</code>, <code>a</code>, <code>b</code>, <code>c</code>, and <code>x</code> all become wildcards. Multi-
+character symbols (like <code>pi</code>) remain literal.</p>
+</li>
+<li class="">
+<p><strong>Clean results</strong>: Only unprefixed keys are returned (<code>{a: 3}</code> not
+<code>{_a: 3}</code>), and self-matches are filtered out (e.g. wildcard <code>x</code> capturing
+symbol <code>x</code> is omitted).</p>
+</li>
+<li class="">
+<p><strong>Flexible defaults</strong>: <code>useVariations</code> and <code>matchMissingTerms</code> default to
+<code>true</code>, enabling matching of structurally equivalent variants and expressions
+with missing terms.</p>
+</li>
+<li class="">
+<p><strong>Unprefixed substitution keys</strong>: The <code>substitution</code> option accepts
+unprefixed keys:</p>
+</li>
+</ul>
+<code-playground><div slot="javascript">const expr = ce.parse(&#x27;3y^2+5&#x27;);
+<!-- -->console.log(expr.match(&#x27;ax^2+bx+c&#x27;, { substitution: { x: ce.box(&#x27;y&#x27;) } }));
+<!-- -->// ➔ { a: 3, b: 0, c: 5 }
+</div></code-playground>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="matching-missing-terms">Matching Missing Terms<a href="#matching-missing-terms" class="hash-link" aria-label="Direct link to Matching Missing Terms" title="Direct link to Matching Missing Terms" translate="no">​</a></h3>
+<p>When <code>matchMissingTerms</code> is enabled (default for string patterns), expressions
+with fewer operands than the pattern can still match. Missing terms in an
+<code>Add</code> are treated as <code>0</code>, and missing factors in a <code>Multiply</code> are treated
+as <code>1</code>.</p>
+<code-playground><div slot="javascript">// 3x^2+5 has no bx term, but still matches with b=0
+<!-- -->const expr = ce.parse(&#x27;3x^2+5&#x27;);
+<!-- -->console.log(expr.match(&#x27;ax^2+bx+c&#x27;));
+<!-- -->// ➔ { a: 3, b: 0, c: 5 }
+<!-- -->
+<!-- -->// Works with MathJSON patterns too (opt in explicitly)
+<!-- -->console.log(expr.match(
+<!-- -->  <!-- -->[&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, [&quot;Power&quot;, &quot;x&quot;, 2]], [&quot;Multiply&quot;, &quot;_b&quot;, &quot;x&quot;], &quot;_c&quot;],
+<!-- -->  <!-- -->{ matchMissingTerms: true }
+<!-- -->));
+<!-- -->// ➔ { _a: 3, _b: 0, _c: 5 }
+</div></code-playground>
+<p>For MathJSON and BoxedExpression patterns, set <code>matchMissingTerms: true</code>
+explicitly to enable this behavior.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commutativity">Commutativity<a href="#commutativity" class="hash-link" aria-label="Direct link to Commutativity" title="Direct link to Commutativity" translate="no">​</a></h3>
 <p>The commutativity of functions is taken into account when matching patterns.</p>
 <code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
@@ -164,11 +232,20 @@ it was derived from, use the <code>subs()</code> function.</p>
 <!-- -->// ➔ [&quot;Add&quot;, 1, &quot;x&quot;]
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="applying-rewrite-rules">Applying Rewrite Rules<a href="#applying-rewrite-rules" class="hash-link" aria-label="Direct link to Applying Rewrite Rules" title="Direct link to Applying Rewrite Rules" translate="no">​</a></h2>
-<p>A rewrite rule is an object with three properties:</p>
+<p>A rewrite rule is an object with these properties:</p>
 <ul>
 <li class=""><code>match</code>: a matching pattern</li>
 <li class=""><code>replace</code>: a substitution pattern</li>
 <li class=""><code>condition</code>: an optional condition predicate</li>
+<li class=""><code>useVariations</code>: an optional boolean (default <code>false</code>); when <code>true</code> the rule
+may match equivalent variants, e.g. matching <code>x</code> against <code>a + x</code></li>
+<li class=""><code>operators</code>: an optional dispatch hint — a list of operators this rule can
+apply to. It does not change the rule&#x27;s semantics (the rule is simply never
+tried against expressions with a different operator), but it lets the engine
+index large rule sets efficiently</li>
+<li class=""><code>purpose</code>: optional, see <a href="#rule-purpose" class=""><strong>Rule Purpose</strong></a> below</li>
+<li class=""><code>id</code>: an optional identifier, surfaced in the <code>because</code> field of simplify
+steps for debugging</li>
 </ul>
 <p><strong>To apply a set of rules to an expression</strong>, call the <code>expr.replace()</code>
 function.</p>
@@ -187,6 +264,14 @@ matches, the expression is replaced by the substitution pattern of the rule.</p>
 until no rules are applicable.</p>
 <p>If <code>expr</code> is not canonical, the result of the replace operation is not
 canonical either.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="rule-purpose">Rule Purpose<a href="#rule-purpose" class="hash-link" aria-label="Direct link to Rule Purpose" title="Direct link to Rule Purpose" translate="no">​</a></h3>
+<p>The optional <code>purpose</code> property controls how <code>simplify()</code> treats a rule. It
+does not affect <code>replace()</code>, which always applies every rule.</p>
+<div class="symbols-table"><table><thead><tr><th style="text-align:left"><code>purpose</code></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:left"><code>&#x27;simplify&#x27;</code></td><td style="text-align:left"><strong>(default)</strong> Subject to the cost gate: the rewrite is kept only if the result is &quot;simpler&quot; (lower cost).</td></tr><tr><td style="text-align:left"><code>&#x27;transform&#x27;</code></td><td style="text-align:left">A mathematically-preferred rewrite that is <strong>exempt</strong> from the cost gate — applied even if it does not lower cost.</td></tr><tr><td style="text-align:left"><code>&#x27;expand&#x27;</code></td><td style="text-align:left">Grows the expression by design (e.g. expanding a definition). <strong>Excluded</strong> from <code>simplify()</code>&#x27;s scan, but still reachable through <code>expr.replace()</code>.</td></tr></tbody></table></div>
+<p>So a rule tagged <code>&#x27;expand&#x27;</code> will fire with <code>expr.replace(rules)</code> but will be
+ignored by <code>expr.simplify()</code> — which is how a rewrite like
+<code>Γ(z+1) → z·Γ(z)</code> (useful on demand, but not a simplification) is kept out of
+the automatic simplifier.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="simplifying-an-expression">Simplifying an Expression<a href="#simplifying-an-expression" class="hash-link" aria-label="Direct link to Simplifying an Expression" title="Direct link to Simplifying an Expression" translate="no">​</a></h3>
 <p>The <code>expr.simplify()</code> function applies a collection of built-in rewrite rules.</p>
 <p>You can define your own rules and apply them using <code>expr.replace()</code>.</p>
@@ -205,7 +290,41 @@ canonical either.</p>
 <!-- -->
 <!-- -->console.log(expr.subs({&quot;a&quot;: 2, &quot;b&quot;: 3}));
 <!-- -->// ➔ 2x + 3
-</div></code-playground></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/assumptions/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Assumptions</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/identities/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Extended Rules — The Identities Library</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#wildcards" class="table-of-contents__link toc-highlight">Wildcards</a></li><li><a href="#patterns" class="table-of-contents__link toc-highlight">Patterns</a><ul><li><a href="#validating-patterns" class="table-of-contents__link toc-highlight">Validating Patterns</a></li></ul></li><li><a href="#matching-an-expression-to-a-pattern" class="table-of-contents__link toc-highlight">Matching an Expression to a Pattern</a><ul><li><a href="#commutativity" class="table-of-contents__link toc-highlight">Commutativity</a></li><li><a href="#exact-matching" class="table-of-contents__link toc-highlight">Exact Matching</a></li><li><a href="#recursive-matching" class="table-of-contents__link toc-highlight">Recursive Matching</a></li><li><a href="#repeated-named-wildcards" class="table-of-contents__link toc-highlight">Repeated Named Wildcards</a></li><li><a href="#capturing-the-head-of-functions" class="table-of-contents__link toc-highlight">Capturing the Head of Functions</a></li></ul></li><li><a href="#substitution" class="table-of-contents__link toc-highlight">Substitution</a></li><li><a href="#applying-rewrite-rules" class="table-of-contents__link toc-highlight">Applying Rewrite Rules</a><ul><li><a href="#simplifying-an-expression" class="table-of-contents__link toc-highlight">Simplifying an Expression</a></li><li><a href="#substituting-symbols" class="table-of-contents__link toc-highlight">Substituting Symbols</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+</div></code-playground>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="extending-solve">Extending <code>solve()</code><a href="#extending-solve" class="hash-link" aria-label="Direct link to extending-solve" title="Direct link to extending-solve" translate="no">​</a></h2>
+<p><code>expr.solve()</code> finds the roots of an equation using two extensible rule sets on
+the engine, both of which follow the same push/replace pattern as
+<code>ce.simplificationRules</code>:</p>
+<ul>
+<li class=""><code>ce.solveRules</code> — <strong>root templates</strong>. Each matches an equation normalized to
+<code>expression = 0</code> and produces a root. By convention the unknown is the
+wildcard <code>_x</code>, and a condition ensures the other wildcards do not themselves
+capture the unknown.</li>
+<li class=""><code>ce.harmonizationRules</code> — rewrites that transform an equation into an
+equivalent, easier-to-solve form <em>before</em> root-finding (for example
+<code>ln(f(x)) = 0 → f(x) − 1 = 0</code>).</li>
+</ul>
+<code-playground><div slot="javascript">const ce = new ComputeEngine();
+<!-- -->
+<!-- -->// sinh(x) + b = 0  →  x = arsinh(−b)
+<!-- -->ce.solveRules.push({
+<!-- -->  <!-- -->match: [&quot;Add&quot;, [&quot;Sinh&quot;, &quot;_x&quot;], &quot;__b&quot;],
+<!-- -->  <!-- -->replace: [&quot;Arsinh&quot;, [&quot;Negate&quot;, &quot;__b&quot;]],
+<!-- -->  <!-- -->condition: (sub) =&gt; !sub.__b.has(&quot;_x&quot;),
+<!-- -->});
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;\\sinh(x) - 3 = 0&quot;).solve(&quot;x&quot;));
+<!-- -->// ➔ [Arsinh(3)]
+</div></code-playground>
+<p>Pushed root templates are <strong>safe</strong>: <code>solve()</code> validates every candidate root
+against the original equation (<code>validateRoots</code>), so an over-broad or incorrect
+template contributes no roots — it degrades to a no-op rather than returning a
+wrong answer.</p>
+<p>The Fungrim-derived
+<a class="" href="/compute-engine/guides/identities/">identities library</a> ships a curated
+set of these templates (LambertW, inverse trigonometric and exponential
+forms); load them with <code>loadIdentities(ce, { solve: true })</code> to solve, e.g.,
+<code>x·eˣ = 3 → W(3)</code>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/assumptions/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Assumptions</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/identities/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Extended Rules — The Identities Library</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#wildcards" class="table-of-contents__link toc-highlight">Wildcards</a></li><li><a href="#patterns" class="table-of-contents__link toc-highlight">Patterns</a><ul><li><a href="#validating-patterns" class="table-of-contents__link toc-highlight">Validating Patterns</a></li></ul></li><li><a href="#matching-an-expression-to-a-pattern" class="table-of-contents__link toc-highlight">Matching an Expression to a Pattern</a><ul><li><a href="#pattern-formats" class="table-of-contents__link toc-highlight">Pattern Formats</a></li><li><a href="#string-patterns" class="table-of-contents__link toc-highlight">String Patterns</a></li><li><a href="#matching-missing-terms" class="table-of-contents__link toc-highlight">Matching Missing Terms</a></li><li><a href="#commutativity" class="table-of-contents__link toc-highlight">Commutativity</a></li><li><a href="#exact-matching" class="table-of-contents__link toc-highlight">Exact Matching</a></li><li><a href="#recursive-matching" class="table-of-contents__link toc-highlight">Recursive Matching</a></li><li><a href="#repeated-named-wildcards" class="table-of-contents__link toc-highlight">Repeated Named Wildcards</a></li><li><a href="#capturing-the-head-of-functions" class="table-of-contents__link toc-highlight">Capturing the Head of Functions</a></li></ul></li><li><a href="#substitution" class="table-of-contents__link toc-highlight">Substitution</a></li><li><a href="#applying-rewrite-rules" class="table-of-contents__link toc-highlight">Applying Rewrite Rules</a><ul><li><a href="#rule-purpose" class="table-of-contents__link toc-highlight">Rule Purpose</a></li><li><a href="#simplifying-an-expression" class="table-of-contents__link toc-highlight">Simplifying an Expression</a></li><li><a href="#substituting-symbols" class="table-of-contents__link toc-highlight">Substituting Symbols</a></li></ul></li><li><a href="#extending-solve" class="table-of-contents__link toc-highlight">Extending <code>solve()</code></a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>

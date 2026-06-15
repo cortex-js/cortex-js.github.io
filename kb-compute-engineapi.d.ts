@@ -12,6 +12,8 @@
  *  - -Infinity: { significand: -1n, exponent: Infinity }
  */
 import { PI_DIGITS } from './utils';
+/** Directed rounding direction: toward −∞ (`floor`) or +∞ (`ceiling`). */
+export type RoundDir = 'floor' | 'ceiling';
 export { PI_DIGITS };
 export declare class BigDecimal {
     /** Working precision (significant digits) for inexact operations like division. */
@@ -29,8 +31,21 @@ export declare class BigDecimal {
     /** PI rounded to working precision */
     private static _piCache;
     private static _piCachePrecision;
+    /** Euler–Mascheroni constant γ, computed on demand (see EULER_GAMMA). */
+    private static _eulerGammaCache;
+    private static _eulerGammaCachePrecision;
     /** PI to current working precision. */
     static get PI(): BigDecimal;
+    /**
+     * The Euler–Mascheroni constant γ to current working precision.
+     *
+     * Computed on demand via the Brent–McMillan algorithm (see
+     * `computeEulerGamma`) and cached at the highest precision requested; lower
+     * requests round the cached value down. Unlike a hardcoded digit literal,
+     * this honors any `BigDecimal.precision` (the prior 858-digit literal capped
+     * γ-dependent results — see ROADMAP B12).
+     */
+    static get EULER_GAMMA(): BigDecimal;
     readonly significand: bigint;
     readonly exponent: number;
     constructor(value: string | number | bigint | BigDecimal);
@@ -76,7 +91,19 @@ export declare class BigDecimal {
     sub(other: BigDecimal | number): BigDecimal;
     /**
      * Multiply this value by another.
-     * Multiplies significands, adds exponents. The result is exact.
+     * Multiplies significands, adds exponents. The result is exact: unlike
+     * `div`/`sqrt`, `mul` does NOT round to `BigDecimal.precision`, so the
+     * product's significand is as wide as the sum of the operands' significands.
+     *
+     * This exactness is relied upon by the integer/rational/polynomial paths
+     * (e.g. `factorial2`, the `MPoly` resultant/GCD work) and must not change.
+     *
+     * Footgun: an *accumulating* product or running power in a
+     * precision-bounded loop (`acc = acc.mul(x)`, `pw = pw.mul(x)`) grows its
+     * significand ~p digits per step, turning an O(n) loop into O(n²). Such
+     * loops MUST round each step with `.toPrecision(p)` (see the Gamma/digamma
+     * series kernels in `numerics/special-functions.ts`). Series whose term
+     * recurrence already ends in `.div()`/`.sqrt()` are rounded for free.
      */
     mul(other: BigDecimal | number): BigDecimal;
     /**
@@ -129,6 +156,20 @@ export declare class BigDecimal {
      * Uses `BigDecimal.precision` for the division.
      */
     inv(): BigDecimal;
+    /**
+     * Division with **directed rounding** to `BigDecimal.precision` significant
+     * digits: `'floor'` rounds toward −∞, `'ceiling'` toward +∞. This is the
+     * rigorous primitive for interval arithmetic — `[a.divToward(b,'floor'),
+     * a.divToward(b,'ceiling')]` brackets the true quotient. (`+`, `−`, `×` are
+     * exact in BigDecimal, so they need no directed variant.)
+     */
+    divToward(other: BigDecimal | number, direction: RoundDir): BigDecimal;
+    /**
+     * Square root with **directed rounding** to `BigDecimal.precision` significant
+     * digits (`'floor'` ≤ true ≤ `'ceiling'`). Computed from an exact integer
+     * `bigintSqrt`, so the bracket is rigorous. Returns NaN for negatives.
+     */
+    sqrtToward(direction: RoundDir): BigDecimal;
     /**
      * Modulo (remainder after truncating division).
      * Defined as: this - trunc(this / other) * other
@@ -225,6 +266,18 @@ declare module './big-decimal' {
         cosh(): BigDecimal;
         /** Hyperbolic tangent. */
         tanh(): BigDecimal;
+        /** Inverse hyperbolic sine. */
+        asinh(): BigDecimal;
+        /** Inverse hyperbolic cosine. Returns NaN for values < 1. */
+        acosh(): BigDecimal;
+        /** Inverse hyperbolic tangent. Returns NaN for |x| > 1, ±Infinity at ±1. */
+        atanh(): BigDecimal;
+        /** exp(this) − 1, accurate for small arguments. */
+        expm1(): BigDecimal;
+        /** ln(1 + this), accurate for small arguments. */
+        log1p(): BigDecimal;
+        /** nth root. Supports negative values for odd n. */
+        nthRoot(n: number): BigDecimal;
     }
     namespace BigDecimal {
         function sqrt(x: BigDecimal): BigDecimal;
@@ -232,6 +285,7 @@ declare module './big-decimal' {
         function exp(x: BigDecimal): BigDecimal;
         function ln(x: BigDecimal): BigDecimal;
         function log10(x: BigDecimal): BigDecimal;
+        function log2(x: BigDecimal): BigDecimal;
         function sin(x: BigDecimal): BigDecimal;
         function cos(x: BigDecimal): BigDecimal;
         function tan(x: BigDecimal): BigDecimal;
@@ -242,33 +296,53 @@ declare module './big-decimal' {
         function sinh(x: BigDecimal): BigDecimal;
         function cosh(x: BigDecimal): BigDecimal;
         function tanh(x: BigDecimal): BigDecimal;
+        function asinh(x: BigDecimal): BigDecimal;
+        function acosh(x: BigDecimal): BigDecimal;
+        function atanh(x: BigDecimal): BigDecimal;
+        function expm1(x: BigDecimal): BigDecimal;
+        function log1p(x: BigDecimal): BigDecimal;
+        function nthRoot(x: BigDecimal, n: number): BigDecimal;
     }
 }
 export {};
 /* 0.59.0 *//**
  * Fixed-point BigInt utilities for internal use by transcendental functions.
  *
- * A "fixed-point BigInt" represents a real number as `value = n / scale`,
- * where `scale = 10^p` for some working precision p. All arithmetic
- * stays in BigInt to preserve arbitrary precision.
- */
-/** Return 10^n as a bigint, caching values for n <= 100. */
-export declare function pow10(n: number): bigint;
-/** Fixed-point multiply: (a * b) / scale */
-export declare function fpmul(a: bigint, b: bigint, scale: bigint): bigint;
-/** Fixed-point divide: (a * scale) / b */
-export declare function fpdiv(a: bigint, b: bigint, scale: bigint): bigint;
-/**
- * Fixed-point square root via Newton/Heron iteration.
+ * A "fixed-point BigInt" represents a real number as `value = n / 2^bits`
+ * (a *binary* grid). Scaling by the radix is therefore a bit-shift
+ * (`>> bits` / `<< bits`) rather than a division by `10^p` — the dominant
+ * cost in the Taylor/Newton inner loops. Benchmarks show this is 2–4× faster
+ * than an equivalent base-10 grid at identical accuracy (ROADMAP item 17.1;
+ * A/B harness in `benchmarks/big-decimal/kernel-base2-experiment.ts`). The
+ * decimal<->binary conversion happens once at the BigDecimal boundary in
+ * `transcendentals.ts` (`toFixedPoint`/`fromFixedPoint`); everything here is
+ * binary. All arithmetic stays in BigInt to preserve arbitrary precision.
  *
- * Input:  `a` is a fixed-point value representing `a / scale`.
- * Output: `sqrt(a / scale) * scale` as a bigint.
+ * Kernels take `bits` (the base-2 exponent of the scale) and internally use
+ * `scale = 1n << BigInt(bits)` for value representation.
+ */
+/** Return 10^n as a bigint, memoized for n <= POW10_CACHE_MAX. */
+export declare function pow10(n: number): bigint;
+/** Bit length of |n| (the number of bits in its binary representation). */
+export declare function bitLength(n: bigint): number;
+/** Fixed-point multiply on the base-2 grid: (a * b) >> bits */
+export declare function fpmul(a: bigint, b: bigint, bits: number): bigint;
+/** Fixed-point divide on the base-2 grid: (a << bits) / b */
+export declare function fpdiv(a: bigint, b: bigint, bits: number): bigint;
+/**
+ * Fixed-point square root via Newton/Heron iteration on the base-2 grid.
+ *
+ * Input:  `a` is a fixed-point value representing `a / 2^bits`.
+ * Output: `sqrt(a / 2^bits) * 2^bits` as a bigint.
+ *
+ * Note `sqrt(a/scale)·scale = sqrt(a·scale) = isqrt(a << bits)`, so the kernel
+ * is just an integer square root of `a << bits`.
  *
  * Algorithm:
- *   x_{n+1} = (x + a * scale / x) / 2
- * Converge until |x_{n+1} - x_n| <= 1 (one ULP in the fixed-point representation).
+ *   x_{n+1} = (x + (a << bits) / x) / 2
+ * Converge until |x_{n+1} - x_n| <= 1 (one ULP in the fixed-point grid).
  */
-export declare function fpsqrt(a: bigint, scale: bigint): bigint;
+export declare function fpsqrt(a: bigint, bits: number): bigint;
 /** Absolute value of a bigint. */
 export declare function bigintAbs(n: bigint): bigint;
 /** Sign of a bigint: -1n, 0n, or 1n. */
@@ -276,34 +350,30 @@ export declare function bigintSign(n: bigint): bigint;
 /** Count the number of decimal digits in a bigint (absolute value). */
 export declare function bigintDigits(n: bigint): number;
 /**
- * Fixed-point exponential: compute exp(x/scale) * scale.
+ * Fixed-point exponential: compute exp(x/2^bits) * 2^bits.
  *
  * Uses Taylor series with argument reduction (halving) and
  * repeated squaring to reconstruct the full result.
  *
- * @param x  Fixed-point input (represents x/scale)
- * @param scale  The fixed-point scale (10^precision)
- * @returns  exp(x/scale) * scale as a bigint
+ * @param x  Fixed-point input (represents x/2^bits)
+ * @param bits  The base-2 scale exponent
+ * @returns  exp(x/2^bits) * 2^bits as a bigint
  */
-export declare function fpexp(x: bigint, scale: bigint): bigint;
-/**
- * Fixed-point natural logarithm: compute ln(x/scale) * scale.
- *
- * Uses Newton's method on f(y) = exp(y) - x, where y = ln(x):
- *   y_{n+1} = y + x/exp(y) - 1
- *
- * Converges quadratically from a double-precision seed.
- *
- * @param x  Fixed-point input (represents x/scale), must be positive
- * @param scale  The fixed-point scale (10^precision)
- * @returns  ln(x/scale) * scale as a bigint
- */
-export declare function fpln(x: bigint, scale: bigint): bigint;
+export declare function fpexp(x: bigint, bits: number): bigint;
+export declare function fpln(x: bigint, bits: number): bigint;
 /** PI digits without decimal point (2370 digits). */
 export declare const PI_DIGITS: string;
+/** π · 2^bits via Chudnovsky (no table-size ceiling). */
+export declare function piChudnovskyBits(bits: number): bigint;
+/** floor(π · 10^digits) via Chudnovsky. */
+export declare function piChudnovskyDecimal(digits: number): bigint;
+/** ln(2) · 2^bits via binary splitting (accurate at any precision). */
+export declare function ln2ChudnovskyBits(bits: number): bigint;
+/** Floor integer square root of a non-negative bigint. */
+export declare function bigintSqrt(n: bigint): bigint;
 /**
- * Compute sin(x/scale) and cos(x/scale) simultaneously, returning
- * [sin * scale, cos * scale] as fixed-point bigints.
+ * Compute sin(x/2^bits) and cos(x/2^bits) simultaneously, returning
+ * [sin * 2^bits, cos * 2^bits] as base-2 fixed-point bigints.
  *
  * Algorithm:
  * 1. Reduce x mod 2π
@@ -312,13 +382,13 @@ export declare const PI_DIGITS: string;
  * 4. Taylor series for small arg
  * 5. Reconstruct via double-angle formulas
  *
- * @param x  Fixed-point input (represents x/scale)
- * @param scale  The fixed-point scale (10^precision)
- * @returns  [sin(x/scale)*scale, cos(x/scale)*scale]
+ * @param x  Fixed-point input (represents x/2^bits)
+ * @param bits  The base-2 scale exponent
+ * @returns  [sin(x/2^bits)*2^bits, cos(x/2^bits)*2^bits]
  */
-export declare function fpsincos(x: bigint, scale: bigint): [bigint, bigint];
+export declare function fpsincos(x: bigint, bits: number): [bigint, bigint];
 /**
- * Compute atan(x/scale) * scale as a fixed-point bigint.
+ * Compute atan(x/2^bits) * 2^bits as a base-2 fixed-point bigint.
  *
  * Algorithm:
  * 1. Handle sign: atan(-x) = -atan(x)
@@ -326,11 +396,11 @@ export declare function fpsincos(x: bigint, scale: bigint): [bigint, bigint];
  * 3. Halving: if |x| > 0.4*scale, use atan(x) = 2·atan(x / (1 + sqrt(scale² + x²)))
  * 4. Taylor series: atan(r) = r - r³/3 + r⁵/5 - ...
  *
- * @param x  Fixed-point input (represents x/scale)
- * @param scale  The fixed-point scale (10^precision)
- * @returns  atan(x/scale) * scale
+ * @param x  Fixed-point input (represents x/2^bits)
+ * @param bits  The base-2 scale exponent
+ * @returns  atan(x/2^bits) * 2^bits
  */
-export declare function fpatan(x: bigint, scale: bigint): bigint;
+export declare function fpatan(x: bigint, bits: number): bigint;
 /* 0.59.0 */export { BigDecimal } from './big-decimal';
 import './transcendentals';
 /* 0.59.0 */export declare const RESET = "\u001B[0m";
@@ -1235,13 +1305,27 @@ export declare function permutations<T>(xs: ReadonlyArray<T>, condition?: (xs: R
 export declare function hidePrivateProperties(obj: any): void;
 /* 0.59.0 */export declare class CancellationError<T = unknown> extends Error {
     cause: unknown;
-    value: T;
+    value?: T;
     constructor({ message, value, cause, }?: {
         message?: string;
         value?: T;
         cause?: unknown;
     });
 }
+/**
+ * Throw a `CancellationError` if `deadline` (an absolute timestamp in
+ * milliseconds, i.e. `engine._deadline`) has passed.
+ *
+ * Call this periodically from long-running loops that cannot be expressed
+ * as generators (where `run()`/`runAsync()` would apply). In tight loops,
+ * amortize the `Date.now()` cost with a stride counter:
+ *
+ *    if ((++count & 0x3ff) === 0) checkDeadline(ce._deadline);
+ */
+export declare function checkDeadline(deadline: number | undefined): void;
+export declare function getAmbientDeadline(): number | undefined;
+/** Run `fn` with the ambient deadline set to `deadline`. */
+export declare function withAmbientDeadline<T>(deadline: number | undefined, fn: () => T): T;
 /**
  * Executes a generator asynchronously with timeout and abort signal support.
  *
@@ -1787,12 +1871,12 @@ interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDefinitio
         scope: Scope | undefined;
     }) => Expression | null;
     evaluate?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
-        engine?: ExpressionComputeEngine;
+        engine: ExpressionComputeEngine;
     }) => Expression | undefined;
-    evaluateAsync?: (ops: ReadonlyArray<Expression>, options?: Partial<EvaluateOptions> & {
-        engine?: ExpressionComputeEngine;
+    evaluateAsync?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
+        engine: ExpressionComputeEngine;
     }) => Promise<Expression | undefined>;
-    evalDimension?: (ops: ReadonlyArray<Expression>, options: {
+    evalDimension?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ExpressionComputeEngine;
     }) => Expression;
     compile?: (expr: Expression) => CompiledExpression;
@@ -1898,7 +1982,7 @@ export interface Tensor<DT extends TensorDataType> extends TensorData<DT> {
     shape: number[];
     rank: number;
     data: DataTypeMap[DT][];
-    readonly field: TensorField<DT>;
+    readonly field: TensorField<DataTypeMap[DT]>;
     readonly expression: Expression;
     readonly array: NestedArray<DataTypeMap[DT]>;
     readonly isSquare: boolean;
@@ -3421,6 +3505,12 @@ export interface Expression {
     /**
      * If this is a collection, return the number of elements in the collection.
      *
+     * Only top-level elements are counted: for a nested collection (e.g. a
+     * matrix represented as a list of lists), this is the number of immediate
+     * elements (the rows), not the total number of scalar entries. For example
+     * the count of `[[2, 3, 4], [6, 7, 9]]` is 2, not 6. This is consistent
+     * with `each()` and `at()`, which iterate over and index the same elements.
+     *
      * If the collection is infinite, return `Infinity`.
      *
      * If the number of elements cannot be determined, return `undefined`, for
@@ -3555,7 +3645,7 @@ export interface IndexedCollectionInterface extends CollectionInterface {
  *
  * @category Boxed Expression
  */
-export type ExpressionInput = number | bigint | string | BigNum | MathJsonNumberObject | MathJsonStringObject | MathJsonSymbolObject | MathJsonFunctionObject | MathJsonDictionaryObject | readonly [MathJsonSymbol, ...ExpressionInput[]] | Expression;
+export type ExpressionInput = number | bigint | boolean | string | BigNum | Complex | MathJsonNumberObject | MathJsonStringObject | MathJsonSymbolObject | MathJsonFunctionObject | MathJsonDictionaryObject | readonly [MathJsonSymbol, ...ExpressionInput[]] | Expression;
 /** Interface for dictionary-like structures.
  * Use `isDictionary()` to check if an expression is a dictionary.
  */
@@ -3944,7 +4034,7 @@ export type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefin
      * a `holdUntil` attribute of `"never"`.
      *
      * The handler should not consider the value or any assumptions about any
-     * of the arguments that are symbols or functions (i.e. `arg.isZero`,
+     * of the arguments that are symbols or functions (i.e. `arg.is(0)`,
      * `arg.isInteger`, etc...) since those may change over time.
      *
      * The result of the handler should be a canonical expression.
@@ -3975,20 +4065,20 @@ export type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefin
      * assumptions about its arguments, return `undefined` or
      * an `["Error"]` expression.
      */
-    evaluate?: ((ops: ReadonlyArray<Expression>, options: EvaluateOptions & {
+    evaluate?: ((ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Expression | undefined) | Expression;
     /**
      * An asynchronous version of `evaluate`.
      *
      */
-    evaluateAsync?: (ops: ReadonlyArray<Expression>, options: EvaluateOptions & {
+    evaluateAsync?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Promise<Expression | undefined>;
     /** Dimensional analysis
      * @experimental
      */
-    evalDimension?: (args: ReadonlyArray<Expression>, options: EvaluateOptions & {
+    evalDimension?: (args: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Expression;
     /** Return a compiled (optimized) expression. */
@@ -4469,12 +4559,12 @@ export interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDe
         scope: Scope | undefined;
     }) => Expression | null;
     evaluate?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
-        engine?: ComputeEngine;
+        engine: ComputeEngine;
     }) => Expression | undefined;
-    evaluateAsync?: (ops: ReadonlyArray<Expression>, options?: Partial<EvaluateOptions> & {
-        engine?: ComputeEngine;
+    evaluateAsync?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
+        engine: ComputeEngine;
     }) => Promise<Expression | undefined>;
-    evalDimension?: (ops: ReadonlyArray<Expression>, options: {
+    evalDimension?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Expression;
     compile?: (expr: Expression) => CompiledExpression;
@@ -4691,7 +4781,7 @@ export type BoxedRuleSet<Expr = unknown, CE = unknown> = {
  *
  * @category Compute Engine
  */
-export type AssignValue<Expr = unknown, SemiExpr = unknown, CE = unknown> = boolean | number | bigint | SemiExpr | ((args: ReadonlyArray<Expr>, options: EvaluateOptions & {
+export type AssignValue<Expr = unknown, SemiExpr = unknown, CE = unknown> = boolean | number | bigint | SemiExpr | ((args: ReadonlyArray<Expr>, options: Partial<EvaluateOptions> & {
     engine: CE;
 }) => Expr) | undefined;
 /** @category Definitions */
@@ -5599,6 +5689,231 @@ export declare function checkSequenceOEIS(ce: IComputeEngine, name: string, coun
     invalidate(cacheName: string): void;
     purgeValues(): void;
 }
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine } from '../global-types';
+import type { Expr as Expression } from './types';
+export declare function toTimesPower(ce: ComputeEngine, e: Expression): Expression;
+/**
+ * Rebuild an expression through the canonical constructors. Pattern
+ * matching binds slots to subtrees of the Times/Power normal form, which
+ * contains synthetic `_fn` nodes that are NOT engine-canonical; anything
+ * flowing into conditions or rule RHSs must be re-canonicalized first or
+ * arithmetic produces unfolded artifacts (e.g. `a + 0·b`).
+ */
+export declare function recanonicalize(ce: ComputeEngine, e: Expression): Expression;
+/* 0.59.0 */import type { Expression as BoxedExpression, FunctionInterface, SymbolInterface, NumberLiteralInterface } from '../types-expression';
+/** A boxed expression with the function/symbol/number member interfaces folded
+ * in as optional. The base `Expression` exposes `.operator` but keeps `.ops`,
+ * `.op1`, `.symbol`, `.re`, … behind `isFunction`/`isSymbol`/`isNumber`
+ * narrowing; the rubi driver reads them structurally (guarding with `if (!x.ops)`
+ * etc.), so it operates on this widened view rather than narrowing at every
+ * site. `.ops`/`.op1`/`.op2`/`.op3` are retyped to `Expr` so the widening
+ * carries recursively through the operand tree. Assignable to and from the base
+ * `Expression` (the extra members are optional). */
+export type Expr = BoxedExpression & Partial<Omit<FunctionInterface, 'ops' | 'op1' | 'op2' | 'op3'>> & Partial<SymbolInterface> & Partial<NumberLiteralInterface> & {
+    readonly ops?: ReadonlyArray<Expr>;
+    readonly op1?: Expr;
+    readonly op2?: Expr;
+    readonly op3?: Expr;
+};
+/** A MathJSON-like value as emitted by the WL → MathJSON translator: a number,
+ * a symbol/string, or a function as `[head, ...args]`. */
+export type Json = number | string | Json[];
+/** A single translated Rubi rule (one integration rule from the corpus). */
+export type RubiRule = {
+    /** 1-based position among the live rules of the file (= priority) */
+    index: number;
+    /** integrand pattern (first argument of `Int`), with Blank/BlankOptional nodes */
+    lhs: Json;
+    /** name of the integration variable (from `x_Symbol`) */
+    variable: string;
+    /** rule body, with conditions and local bindings stripped */
+    rhs: Json;
+    /** outer `/;` condition (over pattern variables), or null */
+    condition: Json | null;
+    /** With/Module local bindings, in order; value null for bare Module locals */
+    bindings: {
+        name: string;
+        value: Json | null;
+    }[];
+    scoped: 'with' | 'module' | null;
+    /** `/;` condition inside the With/Module scope (may reference bindings) */
+    innerCondition: Json | null;
+    /** Original WL cell text. Optional: kept by the build-time tooling (used by
+     * the benchmark/triage `RUBI_DEBUG_FIRE` traces) but stripped from the
+     * shipped bundle, where it is runtime-dead. */
+    source?: string;
+};
+/** One corpus file's worth of translated rules (the unit the compiler
+ * consumes; the bundled corpus is an ordered array of these). */
+export type RubiRuleDoc = {
+    file: string;
+    rules: RubiRule[];
+};
+/* 0.59.0 */import type { Expr as Expression } from './types';
+export type Pat = {
+    kind: 'var';
+} | {
+    kind: 'slot';
+    name: string;
+} | {
+    kind: 'optslot';
+    name: string;
+    default: Expression;
+} | {
+    kind: 'const';
+    value: Expression;
+} | {
+    kind: 'node';
+    op: string;
+    ops: Pat[];
+    ac: boolean;
+};
+export type Env = Map<string, Expression>;
+/**
+ * Match `expr` against `pat`. Returns a binding environment or null.
+ * `x` is the integration variable (matches `var` patterns exactly).
+ */
+export declare function matchPattern(pat: Pat, expr: Expression, x: Expression): Env | null;
+/**
+ * Enumerate ALL binding environments (up to `cap`). Rule conditions
+ * participate in matching à la Mathematica: when a condition rejects one
+ * assignment, the next assignment must be tried — e.g.
+ * `(a+bx)^m (c+dx)^n` factor roles are interchangeable and conditions
+ * often hold for only one orientation.
+ */
+export declare function matchAll(pat: Pat, expr: Expression, x: Expression, cap?: number, deadline?: number): Env[];
+/** Names of all slots in a pattern (for compile-time sanity checks). */
+export declare function slotNames(pat: Pat, out?: Set<string>): Set<string>;
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine } from '../global-types';
+import type { Expr as Expression } from './types';
+import type { CompiledRule } from './compile';
+export type DriverStats = {
+    calls: number;
+    ruleFirings: Record<string, number>;
+    preludeFirings: number;
+    failures: number;
+    /** match attempts that passed the matcher but failed later, with stage */
+    trace: {
+        id: string;
+        stage: string;
+        depth: number;
+    }[];
+};
+export declare class RubiDriver {
+    private readonly ce;
+    private readonly rules;
+    private readonly options;
+    private readonly memo;
+    private deadline;
+    readonly stats: DriverStats;
+    constructor(ce: ComputeEngine, rules: CompiledRule[], options?: {
+        timeLimitMs?: number;
+        trace?: boolean;
+    });
+    /** Integrate `integrand` with respect to `variable`. Returns null when
+     * no rule chain applies (caller decides on inert/fallback).
+     * NOTE: the integrand must be canonical but NOT evaluated — evaluate()
+     * expands products like (a+bx)(c+dx), destroying the structure the
+     * rules match on. */
+    int(integrand: Expression, variable: string): Expression | null;
+    /** Engine-native antiderivative fallback for a rational integrand the Rubi
+     * rule set didn't close (see int()). Returns null when the integrand is
+     * not a rational function of `variable`, the wall-clock budget is spent,
+     * or the native integrator can't close it either (result still inert). */
+    private nativeRationalFallback;
+    private intRec;
+    private intUncached;
+}
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine } from '../global-types';
+export interface IntegrationRulesLoadOptions {
+    /** Per-integral wall-clock budget for the rule driver, in milliseconds.
+     * Default 10000. Bounds each `Integrate` call so a pathological integrand
+     * cannot hang. */
+    timeLimitMs?: number;
+}
+export interface IntegrationRulesLoadReport {
+    /** Number of compiled (match-ready) rules registered. */
+    ruleCount: number;
+    /** Number of corpus rules skipped at compile time. */
+    skipped: number;
+}
+/**
+ * Compile the bundled Rubi rules and register them as the engine's symbolic
+ * integration provider. Idempotent per engine (re-registers the provider,
+ * reusing the cached compiled rules).
+ */
+export declare function loadIntegrationRules(ce: ComputeEngine, options?: IntegrationRulesLoadOptions): IntegrationRulesLoadReport;
+/* 0.59.0 */import type { Expr as Expression, Json } from './types';
+import type { IComputeEngine as ComputeEngine } from '../types-engine';
+import type { Env } from './match';
+export declare class RuleFail extends Error {
+    constructor(reason: string);
+}
+export type Hooks = {
+    /** recursive integration; null = could not integrate */
+    int: (integrand: Expression) => Expression | null;
+};
+export type Ctx = {
+    ce: ComputeEngine;
+    env: Env;
+    /** integration variable name */
+    x: string;
+    hooks: Hooks;
+    /** driver-scoped caches (zeroQ/simplify results recur across rules:
+     * every (a+bx)^m(c+dx)^n rule re-tests the same b·c−a·d expressions) */
+    caches?: {
+        zeroQ: Map<string, boolean>;
+        simplify: Map<string, Expression>;
+    };
+};
+export declare function build(json: Json, ctx: Ctx): Expression;
+export declare function polyDegreeX(u: Expression, x: string): number;
+/** ascending coefficient array, or null if not a polynomial in x */
+export declare function polyCoeffsX(u: Expression, x: string): Expression[] | null;
+/** long division P / L over symbolic coefficients → [quotient, remainder] */
+export declare function polyDivideX(P: Expression, L: Expression, x: string): [Expression, Expression] | null;
+export declare function installCaches(caches: Ctx['caches']): void;
+/** Rubi PossibleZeroQ: canonical zero, simplified zero, or numerically ~0 */
+export declare function zeroQ(d: Expression): boolean;
+export declare function evalCondition(json: Json, ctx: Ctx): boolean;
+/** Identify the first failing conjunct of a condition (for trace census).
+ * Returns a short head-path like "Not(GtQ)" or "IntLinearQ". */
+export declare function findFailingConjunct(json: Json, ctx: Ctx): string;
+/** Rubi RationalFunctionQ — u is a rational function of x */
+export declare function rationalFnQ(u: Expression, x: string): boolean;
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine } from '../global-types';
+import type { Json, RubiRule, RubiRuleDoc } from './types';
+import { Pat } from './match';
+export type CompiledRule = {
+    id: string;
+    priority: number;
+    variable: string;
+    pat: Pat;
+    /** root operator the pattern requires, or null when it can match any
+     * expression (root slot, or a collapsible node) — dispatch pre-screen */
+    rootOp: string | null;
+    bindings: RubiRule['bindings'];
+    condition: Json | null;
+    innerCondition: Json | null;
+    rhs: Json;
+    source: string;
+};
+export type CompileResult = {
+    rules: CompiledRule[];
+    skipped: {
+        id: string;
+        reason: string;
+    }[];
+};
+export declare function compileRule(ce: ComputeEngine, rule: RubiRule, id: string, priority: number): {
+    rule: CompiledRule | null;
+    reason?: string;
+};
+/** Compile an ordered list of corpus rule-docs into match-ready rules,
+ * preserving document/rule order as the dispatch priority. This is the
+ * shippable, fs-free core consumed by both the bundled `loadIntegrationRules`
+ * loader and the Node `compileSection` fs wrapper (`scripts/rubi/compile.ts`). */
+export declare function compileRuleDocs(ce: ComputeEngine, docs: RubiRuleDoc[]): CompileResult;
 /* 0.59.0 */import type { Expression, Sign, SymbolDefinitions, IComputeEngine as ComputeEngine } from '../global-types';
 import { type SubjectPart } from '../boxed-expression/constraint-subject';
 /**
@@ -5606,7 +5921,7 @@ import { type SubjectPart } from '../boxed-expression/constraint-subject';
  * (`Real`, `Imaginary`, `Argument` — and `Abs` in the arithmetic library):
  * when the operand is a symbol with no value, look up assumed bounds for the
  * corresponding subject (e.g. `im:tau` after `assume(Im(tau) > 0)`) and
- * derive the sign from them (FUNGRIM-PLAN-3-ASSUMPTIONS.md §5.1b).
+ * derive the sign from them (docs/fungrim/FUNGRIM-PLAN-3-ASSUMPTIONS.md §5.1b).
  *
  * Reads the fact index directly (never `ask()`), so it works inside
  * `verify()`. Returns `undefined` when the facts don't entail a sign.
@@ -5652,6 +5967,23 @@ export declare function sortedIndices(expr: Expression, fn?: Expression | undefi
 export { type DimensionVector, type UnitExpression, dimensionsEqual, isDimensionless, getUnitDimension, getUnitScale, areCompatibleUnits, convertUnit, getExpressionDimension, getExpressionScale, parseUnitDSL, convertCompoundUnit, findNamedUnit, } from '../numerics/unit-data';
 /* 0.59.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const POLYNOMIALS_LIBRARY: SymbolDefinitions[];
+/* 0.59.0 */import type { SymbolDefinitions } from '../global-types';
+/**
+ * Tier-2 numeric kernels for special functions (ROADMAP item 4).
+ *
+ * These heads appear throughout the Fungrim corpus (and the Rubi rule set)
+ * as "shells": symbolic identities reference them, but until now they had
+ * no numeric `evaluate`. Conventions match the Fungrim corpus
+ * (`data/fungrim/declarations.json`):
+ *
+ * - `EllipticK(m)` / `EllipticE(m)` use the *parameter* m = k²
+ *   (K(m) = ∫₀^{π/2} dθ/√(1 − m·sin²θ), Fungrim e8ae42/723fd0).
+ * - `JacobiTheta(j, z, tau)` uses nome q = e^{iπτ} and period 1 in z
+ *   (Fungrim f96eac). The optional 4ᵗʰ argument (derivative order r) is
+ *   only evaluated for r = 0.
+ * - `DedekindEta(tau)` = e^{iπτ/12}·∏(1 − e^{2πikτ}) (Fungrim 1dc520).
+ */
+export declare const SPECIAL_FUNCTIONS_LIBRARY: SymbolDefinitions[];
 /* 0.59.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const RELOP_LIBRARY: SymbolDefinitions;
 /* 0.59.0 */import type { SymbolDefinitions } from '../global-types';
@@ -6443,6 +6775,25 @@ export type Substitution<T = unknown> = {
  * @category Pattern Matching
  */
 export type BoxedSubstitution<T = unknown> = Substitution<T>;
+/* 0.59.0 *//**
+ * Quadrature for **conditionally-convergent oscillatory** semi-infinite
+ * integrals — `∫ₐ^∞ f(x) dx` where `f` changes sign infinitely often
+ * (`∫₀^∞ sin x/x = π/2`, `∫₀^∞ sin(x²) = √(π/8)`).
+ *
+ * Monte-Carlo importance sampling (the general numeric path) has unbounded
+ * variance on these and returns garbage. The classic remedy (Longman's method)
+ * is used here: integrate `f` over each **lobe** — the interval between two
+ * consecutive zeros — with adaptive Simpson, which yields an alternating series
+ * `∑ Iₖ`, then accelerate its partial sums with **Wynn's ε-algorithm**.
+ *
+ * Returns `{ estimate, error }`, or `null` when the integrand is not oscillatory
+ * (no sign changes — let the general path handle it), the iteration runs out of
+ * budget, or the lobes fail to shrink (a divergent integral such as `∫₀^∞ sin x`).
+ */
+export declare function integrateSemiInfiniteOscillatory(f: (x: number) => number, a: number, deadline?: number): {
+    estimate: number;
+    error: number;
+} | null;
 /* 0.59.0 */export declare function gcd(a: bigint, b: bigint): bigint;
 export declare function lcm(a: bigint, b: bigint): bigint;
 /** Return `[factor, root]` such that
@@ -6706,8 +7057,12 @@ export declare function bigPolygamma(ce: ComputeEngine, n: BigNum, z: BigNum): B
  */
 export declare function bigBeta(ce: ComputeEngine, a: BigNum, b: BigNum): BigNum;
 /**
- * Bignum Riemann zeta function ζ(s)
- * Uses Cohen-Villegas-Zagier acceleration (same algorithm as machine version).
+ * Bignum Riemann zeta function ζ(s).
+ *
+ * The general case uses the Cohen–Villegas–Zagier acceleration of the
+ * alternating Dirichlet eta series (error ~(3+√8)^{−n}, so ~1.3 digits of
+ * accuracy per term); the kernel runs with working-precision guard digits so
+ * the result is accurate to the full requested precision.
  */
 export declare function bigZeta(ce: ComputeEngine, s: BigNum): BigNum;
 /**
@@ -6825,6 +7180,33 @@ export declare function sinc(x: number): number;
  */
 export declare function bigErf(ce: ComputeEngine, x: BigNum): BigNum;
 /**
+ * Imaginary error function erfi(x) = −i·erf(i·x) = (2/√π)∫₀ˣ e^{t²} dt.
+ *
+ * Maclaurin series (all-positive, no subtractive cancellation):
+ *    erfi(x) = (2/√π) Σ_{n≥0} x^{2n+1} / (n!·(2n+1))
+ * with the term recurrence tₙ = tₙ₋₁ · x²·(2n−1) / (n·(2n+1)).
+ * Odd function. Grows like e^{x²}, so it overflows to ±∞ for large |x|.
+ */
+export declare function erfi(x: number): number;
+export declare function bigErfi(ce: ComputeEngine, x: BigNum): BigNum;
+/** Sine integral Si(x) = ∫₀ˣ sin t / t dt. */
+export declare function sinIntegral(x: number): number;
+/** Cosine integral Ci(x) = γ + ln x + ∫₀ˣ (cos t − 1)/t dt (real part). */
+export declare function cosIntegral(x: number): number;
+/**
+ * Exponential integral Ei(x) = PV ∫_{−∞}^x e^t/t dt, for real x ≠ 0.
+ *   Ei(0) = −∞, Ei(+∞) = +∞, Ei(−∞) = 0.
+ * For x > 0: power series Ei(x) = γ + ln x + Σ_{n≥1} xⁿ/(n·n!) for moderate x,
+ * the asymptotic series e^x/x·(1 + 1/x + 2!/x² + …) for large x (Numerical
+ * Recipes §6.3 `ei`). For x < 0: Ei(x) = −E₁(−x).
+ */
+export declare function expIntegralEi(x: number): number;
+/**
+ * Logarithmic integral li(x) = PV ∫₀ˣ dt/ln t, for x > 0, x ≠ 1.
+ * Equivalent to Ei(ln x). li(0) = 0, li(1) = −∞.
+ */
+export declare function logIntegral(x: number): number;
+/**
  * Bignum complementary error function.
  * Precision scales with `BigDecimal.precision`.
  *
@@ -6864,6 +7246,110 @@ export declare function bigFresnelS(x: BigNum): BigNum;
  * Bignum Fresnel cosine integral C(x). Same switchover as `bigFresnelS`.
  */
 export declare function bigFresnelC(x: BigNum): BigNum;
+/**
+ * Arithmetic-geometric mean of two non-negative reals.
+ * Quadratic convergence: ~6 iterations at machine precision.
+ */
+export declare function agm(a: number, b: number): number;
+/**
+ * Bignum arithmetic-geometric mean of two non-negative reals, at the
+ * current `BigDecimal.precision` (callers should raise precision around
+ * this for guard digits).
+ */
+export declare function bigAgm(a: BigNum, b: BigNum): BigNum;
+/**
+ * Complete elliptic integral of the first kind K(m), parameter convention.
+ * Valid for m ≤ 1 (K(1) = ∞; for m > 1 the value is complex — handled by
+ * the complex kernel).
+ */
+export declare function ellipticK(m: number): number;
+/**
+ * Complete elliptic integral of the second kind E(m), parameter convention.
+ * Valid for m ≤ 1 (for m > 1 the value is complex — handled by the complex
+ * kernel). Uses the AGM with the cₙ-sum (Abramowitz & Stegun 17.6.3/17.6.4):
+ * E = K·(1 − Σₙ 2^{n−1}·cₙ²) with c₀² = m, cₙ = (aₙ₋₁ − bₙ₋₁)/2.
+ */
+export declare function ellipticE(m: number): number;
+/** Bignum K(m) for m < 1 (parameter convention). */
+export declare function bigEllipticK(ce: ComputeEngine, m: BigNum): BigNum;
+/** Bignum E(m) for m < 1 (parameter convention). */
+export declare function bigEllipticE(ce: ComputeEngine, m: BigNum): BigNum;
+/** Carlson R_C(x, y) = R_F(x, y, y), machine real, PV for y < 0. */
+export declare function carlsonRC(x: number, y: number): number;
+/** Carlson R_F(x, y, z), machine real. */
+export declare function carlsonRF(x: number, y: number, z: number): number;
+/**
+ * Carlson R_J(x, y, z, p), machine real. For p < 0 returns the Cauchy
+ * principal value (DLMF 19.20.14, as in Boost's ellint_rj).
+ */
+export declare function carlsonRJ(x: number, y: number, z: number, p: number): number;
+/** Carlson R_D(x, y, z) = R_J(x, y, z, z), machine real. */
+export declare function carlsonRD(x: number, y: number, z: number): number;
+/** Incomplete elliptic integral of the first kind F(φ|m). */
+export declare function ellipticF(phi: number, m: number): number;
+/** Incomplete elliptic integral of the second kind E(φ|m). */
+export declare function ellipticEIncomplete(phi: number, m: number): number;
+/** Complete elliptic integral of the third kind Π(n|m). */
+export declare function ellipticPiComplete(n: number, m: number): number;
+/** Incomplete elliptic integral of the third kind Π(n; φ|m). */
+export declare function ellipticPiIncomplete(n: number, phi: number, m: number): number;
+/**
+ * Gauss hypergeometric function ₂F₁(a, b; c; z) for real arguments and
+ * z < 1 (plus the Gauss summation point z = 1 when it converges).
+ *
+ * - a or b a non-positive integer: terminating polynomial, any z.
+ * - z < 0: Pfaff transformation z → z/(z−1).
+ * - 0.5 < z < 1: linear connection at 1−z (generic case; for integer
+ *   c−a−b falls back to the direct series, which converges for z < 1).
+ * - z > 1: on/over the branch cut — complex value, returns NaN (the
+ *   complex kernel handles it when applicable).
+ */
+export declare function hypergeometric2F1(a: number, b: number, c: number, z: number): number;
+/**
+ * Kummer confluent hypergeometric function ₁F₁(a; b; z) for real arguments.
+ * Entire in z; uses the Kummer transformation e^z·₁F₁(b−a; b; −z) for z < 0
+ * to avoid catastrophic cancellation in the alternating series.
+ */
+export declare function hypergeometric1F1(a: number, b: number, z: number): number;
+/**
+ * Appell hypergeometric function F₁(a; b₁, b₂; c; x, y) by the double
+ * Pochhammer series
+ *
+ *   F₁ = Σₘ Σₙ (a)ₘ₊ₙ (b₁)ₘ (b₂)ₙ / ((c)ₘ₊ₙ m! n!) xᵐ yⁿ
+ *
+ * Convergence domain |x| < 1 and |y| < 1, except a series that terminates
+ * in an index (b₁ or b₂ a non-positive integer) converges for any value of
+ * the corresponding variable. Outside the domain returns NaN (the
+ * expression stays symbolic).
+ */
+export declare function appellF1(a: number, b1: number, b2: number, c: number, x: number, y: number): number;
+/**
+ * Bignum ₂F₁(a, b; c; z) for real arguments, z < 1. Same algorithm as the
+ * machine kernel; the degenerate integer-c−a−b connection case returns NaN
+ * (stays symbolic) rather than computing the logarithmic limit.
+ */
+export declare function bigHypergeometric2F1(ce: ComputeEngine, a: BigNum, b: BigNum, c: BigNum, z: BigNum): BigNum;
+/** Bignum ₁F₁(a; b; z) for real arguments. */
+export declare function bigHypergeometric1F1(ce: ComputeEngine, a: BigNum, b: BigNum, z: BigNum): BigNum;
+/* 0.59.0 */import { Complex } from 'complex-esm';
+/**
+ * All complex roots of a polynomial via the Durand–Kerner (Weierstrass)
+ * iteration.
+ *
+ * `coeffs` are in **ascending** order (a₀ … aₙ), with aₙ ≠ 0. Returns `null`
+ * when the iteration does not converge (e.g. badly clustered roots).
+ */
+export declare function durandKernerRoots(coeffs: number[], deadline?: number): Complex[] | null;
+/**
+ * Distinct **real** roots of a polynomial with real coefficients, in ascending
+ * order. `coeffs` are ascending (a₀ … aₙ).
+ *
+ * Zero roots are deflated first, low degrees are solved in closed form, and
+ * degree ≥ 3 goes through {@link durandKernerRoots}; complex roots are dropped
+ * and near-equal real roots are de-duplicated. Returns `null` if the numeric
+ * root finder does not converge.
+ */
+export declare function realPolynomialRoots(coeffs: number[], deadline?: number): number[] | null;
 /* 0.59.0 *//**
  * Shared deterministic-PRNG helpers for Random/Shuffle/Sample.
  *
@@ -6925,7 +7411,7 @@ export declare function bigInterquartileRange(values: Iterable<BigDecimal>): Big
 export declare function bigintValue(expr: MathJsonExpression | null | undefined): bigint | null;
 /** Output a shorthand if possible */
 export declare function numberToExpression(num: number | bigint, fractionalDigits?: string | number): MathJsonExpression;
-/* 0.59.0 */export declare function monteCarloEstimate(f: (x: number) => number, a: number, b: number, n?: number): {
+/* 0.59.0 */export declare function monteCarloEstimate(f: (x: number) => number, a: number, b: number, n?: number, deadline?: number): {
     estimate: number;
     error: number;
 };
@@ -6955,6 +7441,7 @@ export interface ExtrapolateOptions {
     rtol?: number;
     maxeval?: number;
     breaktol?: number;
+    deadline?: number;
 }
 /**
  *
@@ -7062,7 +7549,14 @@ export declare function interval(expr: Expression): Interval | undefined;
 export declare function intervalContains(int: Interval, val: number): boolean;
 /** Return true if int1 is a subset of int2 */
 export declare function intervalSubset(int1: Interval, int2: Interval): boolean;
+/* 0.59.0 */export {};
+declare module 'complex-esm' {
+    interface Complex {
+        equals(a: number | Complex): boolean;
+    }
+}
 /* 0.59.0 */import { Complex } from 'complex-esm';
+import './complex-esm-augment';
 /**
  * Gamma function for a complex argument, via the Lanczos approximation.
  *
@@ -7076,6 +7570,82 @@ export declare function gamma(c: Complex): Complex;
  * branch), via the Lanczos approximation.
  */
 export declare function gammaln(c: Complex): Complex;
+/**
+ * Complex arithmetic-geometric mean using the "optimal" branch choice:
+ * at each step pick the square root with |aₙ₊₁ − bₙ₊₁| ≤ |aₙ₊₁ + bₙ₊₁|.
+ */
+export declare function agmComplex(a: Complex, b: Complex): Complex;
+/** Complex K(m) = π/(2·agm(1, √(1−m))), principal branch. */
+export declare function ellipticKComplex(m: Complex): Complex;
+/**
+ * Complex E(m) via the AGM cₙ-sum (analytic continuation of A&S 17.6.4):
+ * E = K·(1 − Σₙ 2^{n−1}cₙ²), c₀² = m, cₙ = (aₙ₋₁ − bₙ₋₁)/2.
+ */
+export declare function ellipticEComplex(m: Complex): Complex;
+/** Carlson R_C(x, y), complex, principal value for y on (−∞, 0). */
+export declare function carlsonRCComplex(x: Complex, y: Complex): Complex;
+/** Carlson R_F(x, y, z), complex (cut plane). */
+export declare function carlsonRFComplex(x: Complex, y: Complex, z: Complex): Complex;
+/**
+ * Carlson R_J(x, y, z, p), complex, via the duplication theorem. Only the
+ * argument configurations for which the duplication theorem is known to be
+ * valid are evaluated (mpmath's criterion): Re x, Re y, Re z ≥ 0 with
+ * Re p > 0; or p equal to one of x, y, z; or one argument nonnegative real
+ * with the other two complex conjugates and p not on (−∞, 0]. Other
+ * configurations return NaN (mpmath falls back to contour integration
+ * there; we do not).
+ */
+export declare function carlsonRJComplex(x: Complex, y: Complex, z: Complex, p: Complex): Complex;
+/** Carlson R_D(x, y, z) = R_J(x, y, z, z), complex. */
+export declare function carlsonRDComplex(x: Complex, y: Complex, z: Complex): Complex;
+/** Incomplete elliptic integral of the first kind F(φ|m), complex. */
+export declare function ellipticFComplex(phi: Complex, m: Complex): Complex;
+/** Incomplete elliptic integral of the second kind E(φ|m), complex. */
+export declare function ellipticEIncompleteComplex(phi: Complex, m: Complex): Complex;
+/** Complete elliptic integral of the third kind Π(n|m), complex. */
+export declare function ellipticPiCompleteComplex(n: Complex, m: Complex): Complex;
+/** Incomplete elliptic integral of the third kind Π(n; φ|m), complex. */
+export declare function ellipticPiIncompleteComplex(n: Complex, phi: Complex, m: Complex): Complex;
+/**
+ * Complex Gauss hypergeometric ₂F₁(a, b; c; z), analytic continuation over
+ * (almost) the whole plane.
+ *
+ * Picks among the six Kummer transformations the one with the smallest
+ * transformed argument |w| (A&S 15.3.4–15.3.9): direct series, Pfaff
+ * z/(z−1), and the two-term Γ-connection formulas in 1−z, 1/z, 1/(1−z),
+ * and 1−1/z. Degenerate parameter differences (a−b ∈ ℤ for the 1/z and
+ * 1/(1−z) maps, c−a−b ∈ ℤ for the 1−z and 1−1/z maps) are routed to a
+ * non-degenerate map when one converges, otherwise handled by symmetric
+ * parameter perturbation (~9 significant digits).
+ *
+ * On the branch cut z ∈ (1, ∞) the principal branch is the limit from
+ * below (the standard z − i0 convention).
+ *
+ * Returns NaN only near z = e^{±iπ/3} (all maps have |w| ≈ 1 there).
+ */
+export declare function hypergeometric2F1Complex(a: Complex, b: Complex, c: Complex, z: Complex, depth?: number): Complex;
+/**
+ * Complex Kummer confluent hypergeometric ₁F₁(a; b; z). Entire in z;
+ * Kummer transformation for Re(z) < 0 to limit cancellation.
+ */
+export declare function hypergeometric1F1Complex(a: Complex, b: Complex, z: Complex): Complex;
+/**
+ * Complex Appell F₁(a; b₁, b₂; c; x, y) by the double Pochhammer series.
+ * Converges for |x| < 1 and |y| < 1 (or when the corresponding index
+ * terminates); outside returns NaN (the expression stays symbolic).
+ */
+export declare function appellF1Complex(a: Complex, b1: Complex, b2: Complex, c: Complex, x: Complex, y: Complex): Complex;
+/**
+ * Jacobi theta function θⱼ(z, τ), j ∈ {1,2,3,4}, Fungrim convention.
+ * Requires Im(τ) > 0; returns NaN otherwise or if the series does not
+ * converge within the iteration cap (extremely small Im(τ)).
+ */
+export declare function jacobiTheta(j: 1 | 2 | 3 | 4, z: Complex, tau: Complex): Complex;
+/**
+ * Dedekind eta η(τ) = e^{iπτ/12}·∏ₖ≥₁ (1 − e^{2πikτ}), Im(τ) > 0
+ * (Fungrim 1dc520).
+ */
+export declare function dedekindEta(tau: Complex): Complex;
 /* 0.59.0 */export declare const DEFAULT_PRECISION = 21;
 export declare const MACHINE_PRECISION_BITS = 53;
 export declare const MACHINE_PRECISION: number;
@@ -7119,15 +7689,8 @@ export declare function chop(n: number, tolerance?: number): 0 | number;
  *
  * See https://en.wikipedia.org/wiki/Finite_difference_coefficient
  */
-export declare function centeredDiff8thOrder(f: (number: any) => number, x: number, h?: number): number;
-/**
- *
- * @param f
- * @param x
- * @param dir Direction of approach: > 0 for right, < 0 for left, 0 for both
- * @returns
- */
-export declare function limit(f: (x: number) => number, x: number, dir?: number): number;
+export declare function centeredDiff8thOrder(f: (x: number) => number, x: number, h?: number): number;
+export declare function limit(f: (x: number) => number, x: number, dir?: number, deadline?: number): number;
 export declare function cantorEnumerateRationals(): Generator<[number, number]>;
 export declare function cantorEnumeratePositiveRationals(): Generator<[
     number,
@@ -7206,7 +7769,7 @@ import type { BoxedSubstitution } from '../types-serialization';
 export type FungrimMathJson = unknown;
 /**
  * A declarative guard specification, compiled offline from a corpus entry's
- * assumptions (FUNGRIM-PLAN-5-LOADER.md §2.2). The runtime loader turns each
+ * assumptions (docs/fungrim/FUNGRIM-PLAN-5-LOADER.md §2.2). The runtime loader turns each
  * spec into a tri-valued condition closure; every predicate must return a
  * definitive positive for the rule to fire (fail-closed).
  */
@@ -7317,10 +7880,10 @@ export type FungrimRuleData = {
  * Debug hook invoked when a rule's condition fails specifically because a
  * guard predicate returned `undefined` (unknown) — as opposed to a
  * definitive negative. Converts "the rule silently didn't fire" into an
- * actionable trace (FUNGRIM-PLAN-5-LOADER.md §2.8).
+ * actionable trace (docs/fungrim/FUNGRIM-PLAN-5-LOADER.md §2.8).
  */
 export type FungrimGuardUndecidedHandler = (ruleId: string, wildcards: BoxedSubstitution) => void;
-/** Options for `loadIdentities()` (FUNGRIM-PLAN-5-LOADER.md §2.1). */
+/** Options for `loadIdentities()` (docs/fungrim/FUNGRIM-PLAN-5-LOADER.md §2.1). */
 export type FungrimLoadOptions = {
     /** Only load rules tagged with at least one of these corpus topics. */
     topics?: ReadonlyArray<string>;
@@ -7338,7 +7901,7 @@ export type FungrimLoadOptions = {
      *  **Default**: the bundled `FUNGRIM_CORE` artifact. */
     data?: FungrimRuleData;
 };
-/** The report returned by `loadIdentities()` (FUNGRIM-PLAN-5-LOADER.md §2.8). */
+/** The report returned by `loadIdentities()` (docs/fungrim/FUNGRIM-PLAN-5-LOADER.md §2.8). */
 export type FungrimLoadReport = {
     /** Number of rules registered by this call. */
     loaded: number;
@@ -7821,6 +8384,58 @@ export declare function polynomialDivide(dividend: Expression, divisor: Expressi
  */
 export declare function polynomialGCD(a: Expression, b: Expression, variable: string): Expression;
 /**
+ * Compute the resultant of two univariate polynomials `a` and `b` in
+ * `variable`. The resultant is the determinant of the Sylvester matrix; it is
+ * zero iff the polynomials share a common (non-constant) factor.
+ *
+ * Computed by the Euclidean recursion over the coefficient field (exact
+ * rationals / radicals — no floating point), avoiding an explicit Sylvester
+ * determinant. With `m = deg a`, `n = deg b`, and `R = a mod b` of degree `r`:
+ *
+ *   Res(a, b) = (-1)^(m·n) · lc(b)^(m - r) · Res(b, R)
+ *
+ * with base cases Res(a, const c) = c^deg(a) and Res(const, const) = 1.
+ *
+ * Returns `undefined` if either argument is not a polynomial in `variable`.
+ *
+ * Examples:
+ * - `polynomialResultant(x² - 1, x - 1, 'x')` → 0 (common factor x - 1)
+ * - `polynomialResultant(x² + 1, x² - 1, 'x')` → 4
+ * - `polynomialResultant(x² + a, x + b, 'x')` → a + b²
+ */
+export declare function polynomialResultant(a: Expression, b: Expression, variable: string): Expression | undefined;
+/**
+ * Compute the GCD of two or more univariate polynomials — the polynomial
+ * counterpart of the variadic `GCD` operator applied to polynomial operands.
+ *
+ * The common variable is inferred from the operands: every operand must be a
+ * polynomial in the same single variable. Returns a monic polynomial,
+ * consistent with `polynomialGCD` and the `PolynomialGCD` operator.
+ *
+ * Returns `undefined` when the operands are not polynomials in one or two
+ * shared variables (≥3 variables, non-polynomial, or fewer than two operands),
+ * OR when the polynomial GCD is trivial (a constant, degree 0). The trivial
+ * case is deferred so the caller can keep the existing integer-GCD-with-
+ * symbolic-operands behavior: a bare symbol may stand for an unknown integer
+ * (where `GCD(x, 6)` should stay unevaluated) rather than a polynomial
+ * indeterminate over ℚ (where it would be 1). Callers wanting the coprime → 1
+ * answer should use the explicit `PolynomialGCD(p, q, x)`.
+ *
+ * Multivariate operands (≥2 variables) take a "Stage B" path (see
+ * `multivariateBinaryGCD`): Brown's dense modular GCD over ℤ_p, with the result
+ * **verified** by exact division. Large inputs (e.g. the 7-variable Fateman
+ * products) are deferred via a cheap term-count cap; sparse interpolation
+ * (Zippel) for that scale is future work (ROADMAP B11).
+ *
+ * Examples:
+ * - `polynomialGCDMulti([x²-1, x²+2x+1])` → x+1
+ * - `polynomialGCDMulti([x³-1, x²-1])` → x-1
+ * - `polynomialGCDMulti([x²-y², x²+3xy+2y²])` → x+y  (bivariate)
+ * - `polynomialGCDMulti([(x+y+z)(x-z), (x+y+z)(y+2z)])` → x+y+z  (trivariate)
+ * - `polynomialGCDMulti([x, 6])` → undefined (trivial gcd, deferred)
+ */
+export declare function polynomialGCDMulti(ops: ReadonlyArray<Expression>): Expression | undefined;
+/**
  * Cancel common polynomial factors in a rational expression (Divide).
  * Returns the simplified expression.
  *
@@ -7935,7 +8550,7 @@ export declare function spellCheckMessage(expr: Expression): string;
 export declare function match(subject: Expression, pattern: string | ExpressionInput, options?: PatternMatchOptions): BoxedSubstitution | null;
 /* 0.59.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds, Sign } from '../global-types';
 /**
- * Constraint subjects (FUNGRIM-PLAN-3-ASSUMPTIONS.md §2).
+ * Constraint subjects (docs/fungrim/FUNGRIM-PLAN-3-ASSUMPTIONS.md §2).
  *
  * The assumptions system keys facts not just on bare symbols, but on a small
  * algebra of "subjects": a symbol, or one of the four part-extractors
@@ -8084,6 +8699,24 @@ export declare function canonicalNegate(expr: Expression): Expression;
  */
 export declare function negate(expr: Expression): Expression;
 export declare function negateProduct(ce: ComputeEngine, args: ReadonlyArray<Expression>): Expression;
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types';
+/**
+ * Multivariate polynomial GCD over ℤ via **Brown's dense modular algorithm**
+ * (ROADMAP B11, Stage B).
+ *
+ * Strategy: compute the GCD modulo a single large prime `p` using Brown's
+ * recursive evaluation/interpolation over the field ℤ_p (univariate Euclid at
+ * the base, Newton interpolation to climb back up, leading-coefficient scaling
+ * to fix the normalization), lift the symmetric representatives to ℤ, take the
+ * primitive part, and **verify by exact division**. If verification fails (the
+ * prime was too small, or an unlucky evaluation corrupted a step) we retry with
+ * a larger prime, then give up — returning `null`, never a wrong answer.
+ *
+ * Single-prime + retry is used in place of multi-prime CRT: simpler, always
+ * correct, and bounded by the prime size (CRT is the future optimization for
+ * Fateman-power-7-scale coefficient growth).
+ */
+export declare function multivariateGCD(ce: ComputeEngine, a: Expression, b: Expression, vars: string[]): Expression | null;
 /* 0.59.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds } from '../global-types';
 import { type Subject } from './constraint-subject';
 /**
@@ -8456,7 +9089,7 @@ export declare abstract class _BoxedExpression implements Expression {
     get isRational(): boolean | undefined;
     get isReal(): boolean | undefined;
     toSignedFunction(): Expression | undefined;
-    getInterval(symbol: string): import("../types-expression").IntervalBounds;
+    getInterval(symbol: string): import("../types-expression").IntervalBounds | undefined;
     simplify(_options?: Partial<SimplifyOptions>): Expression;
     evaluate(_options?: Partial<EvaluateOptions>): Expression;
     evaluateAsync(_options?: Partial<EvaluateOptions>): Promise<Expression>;
@@ -8546,29 +9179,29 @@ export declare const ConditionParent: {
 };
 export declare const CONDITIONS: {
     boolean: (x: Expression) => boolean;
-    string: (x: Expression) => x is Expression & import("../types-expression").StringInterface;
-    number: (x: Expression) => x is Expression & import("../types-expression").NumberLiteralInterface;
-    symbol: (x: Expression) => x is Expression & import("../types-expression").SymbolInterface;
+    string: (x: Expression) => x is Expression & import("..").StringInterface;
+    number: (x: Expression) => x is Expression & import("..").NumberLiteralInterface;
+    symbol: (x: Expression) => x is Expression & import("..").SymbolInterface;
     expression: (_x: Expression) => boolean;
     numeric: (x: Expression) => boolean;
-    integer: (x: Expression) => boolean;
-    rational: (x: Expression) => boolean;
+    integer: (x: Expression) => boolean | undefined;
+    rational: (x: Expression) => boolean | undefined;
     irrational: (x: Expression) => boolean;
-    real: (x: Expression) => boolean;
+    real: (x: Expression) => boolean | undefined;
     notreal: (x: Expression) => boolean;
     complex: (x: Expression) => boolean;
     imaginary: (x: Expression) => boolean;
-    positive: (x: Expression) => boolean;
-    negative: (x: Expression) => boolean;
-    nonnegative: (x: Expression) => boolean;
-    nonpositive: (x: Expression) => boolean;
-    even: (x: Expression) => boolean;
-    odd: (x: Expression) => boolean;
+    positive: (x: Expression) => boolean | undefined;
+    negative: (x: Expression) => boolean | undefined;
+    nonnegative: (x: Expression) => boolean | undefined;
+    nonpositive: (x: Expression) => boolean | undefined;
+    even: (x: Expression) => boolean | undefined;
+    odd: (x: Expression) => boolean | undefined;
     prime: (x: Expression) => boolean;
     composite: (x: Expression) => boolean;
     notzero: (x: Expression) => boolean;
     notone: (x: Expression) => boolean;
-    finite: (x: Expression) => boolean;
+    finite: (x: Expression) => boolean | undefined;
     infinite: (x: Expression) => boolean;
     constant: (x: Expression) => boolean;
     variable: (x: Expression) => boolean;
@@ -8626,7 +9259,7 @@ export declare function replace(expr: Expression, rules: Rule | (Rule | BoxedRul
 export declare function matchAnyRules(expr: Expression, rules: BoxedRuleSet, sub: BoxedSubstitution, options?: Partial<ReplaceOptions>): Expression[];
 /* 0.59.0 */import type { Type, TypeString } from '../../common/type/types';
 import { BoxedType } from '../../common/type/boxed-type';
-import type { OperatorDefinition, Expression, BoxedOperatorDefinition, CollectionHandlers, CompiledExpression, EvaluateOptions, IComputeEngine as ComputeEngine, Sign } from '../global-types';
+import type { OperatorDefinition, Expression, BoxedOperatorDefinition, CollectionHandlers, CompiledExpression, EvaluateOptions, IComputeEngine as ComputeEngine, Scope, Sign } from '../global-types';
 export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition {
     engine: ComputeEngine;
     name: string;
@@ -8664,14 +9297,15 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
     }) => boolean | undefined;
     canonical?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
+        scope: Scope | undefined;
     }) => Expression | null;
     evaluate?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Expression | undefined;
-    evaluateAsync?: (ops: ReadonlyArray<Expression>, options?: Partial<EvaluateOptions> & {
-        engine?: ComputeEngine;
+    evaluateAsync?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
+        engine: ComputeEngine;
     }) => Promise<Expression | undefined>;
-    evalDimension?: (ops: ReadonlyArray<Expression>, options: {
+    evalDimension?: (ops: ReadonlyArray<Expression>, options: Partial<EvaluateOptions> & {
         engine: ComputeEngine;
     }) => Expression;
     compile?: (expr: Expression) => CompiledExpression;
@@ -8687,6 +9321,21 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
 import { BigDecimal } from '../../big-decimal';
 import type { Expression } from '../global-types';
 export declare function apply(expr: Expression, fn: (x: number) => number | Complex, bigFn?: (x: BigDecimal) => BigDecimal | Complex | number, complexFn?: (x: Complex) => number | Complex): Expression | undefined;
+/**
+ * N-ary kernel dispatcher for special functions.
+ *
+ * Routing:
+ * - any complex operand → `complexFn`
+ * - bignum preferred and `bigFn` available → `bigFn`
+ * - otherwise → machine `fn`; if `fn` returns NaN on finite inputs and a
+ *   `complexFn` is available, retry it (the value may be complex for real
+ *   inputs, e.g. EllipticK(m) for m > 1).
+ *
+ * A NaN result on finite inputs yields `undefined` (the expression stays
+ * symbolic) rather than a NaN literal: the kernels use NaN to signal
+ * "outside the implemented domain", not a mathematical result.
+ */
+export declare function applyN(ops: ReadonlyArray<Expression>, fn: (...xs: number[]) => number | Complex, bigFn?: (...xs: BigDecimal[]) => BigDecimal | Complex | number, complexFn?: (...xs: Complex[]) => Complex): Expression | undefined;
 export declare function apply2(expr1: Expression, expr2: Expression, fn: (x1: number, x2: number) => number | Complex, bigFn?: (x1: BigDecimal, x2: BigDecimal) => BigDecimal | Complex | number, complexFn?: (x1: Complex, x2: number | Complex) => Complex | number): Expression | undefined;
 /* 0.59.0 */import type { Expression } from '../global-types';
 /** Apply the function `f` to each operand of the expression `expr`,
@@ -8745,7 +9394,7 @@ import type { Rational } from '../numerics/types';
 export declare class Product {
     readonly options?: {
         canonical?: boolean;
-    };
+    } | undefined;
     engine: ComputeEngine;
     coefficient: NumericValue;
     terms: {
@@ -8756,7 +9405,7 @@ export declare class Product {
     static from(expr: Expression): Product;
     constructor(ce: ComputeEngine, xs?: ReadonlyArray<Expression>, options?: {
         canonical?: boolean;
-    });
+    } | undefined);
     /**
      * Add a term to the product.
      *
@@ -8814,6 +9463,24 @@ export declare function div(num: Expression, denom: number | Expression): Expres
  */
 export declare function canonicalMultiply(ce: ComputeEngine, ops: ReadonlyArray<Expression>): Expression;
 export declare function expandProducts(ce: ComputeEngine, ops: ReadonlyArray<Expression>): Expression | null;
+/**
+ * Multiply expressions, **expanding** products over sums.
+ *
+ * Unlike a canonical `Multiply` node (built via `ce.function('Multiply', …)`
+ * or `ce.box(['Multiply', …])`, which leaves `k·(a + b)` as-is), `mul()` runs
+ * {@link expandProducts} first, so a factor is distributed across any sum
+ * operand:
+ *
+ * ```
+ * mul(2, ce.box(['Add', 'a', 'b']))            // => 2a + 2b   (an Add)
+ * ce.box(['Multiply', 2, ['Add', 'a', 'b']])   // => 2(a + b)  (a Multiply)
+ * ```
+ *
+ * Use `mul()` when you want the expanded/normalized product (the usual case in
+ * canonicalization). Do **not** use it to build a deliberately *factored*
+ * result — the distribution will undo the factoring. Use a canonical
+ * `Multiply` node instead (see `factor()`'s Add case).
+ */
 export declare function mul(...xs: ReadonlyArray<Expression>): Expression;
 export declare function mulN(...xs: ReadonlyArray<Expression>): Expression;
 /* 0.59.0 */import type { Expression, IComputeEngine as ComputeEngine, Scope } from '../global-types';
@@ -8821,6 +9488,102 @@ export declare function mulN(...xs: ReadonlyArray<Expression>): Expression;
  * Ensure all expressions in the array are in canonical form
  */
 export declare function canonical(ce: ComputeEngine, xs: ReadonlyArray<Expression>, scope?: Scope): ReadonlyArray<Expression>;
+/* 0.59.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types';
+/**
+ * `MPoly` — a distributed, sparse **multivariate polynomial over ℤ**.
+ *
+ * This is the internal computational kernel underneath the public `GCD` /
+ * `PolynomialGCD` operators for the multivariate case (ROADMAP B11). It is
+ * deliberately engine-free — pure `bigint` arithmetic on a map from
+ * exponent-vectors to coefficients — so the GCD algorithms (`multivariate-gcd.ts`)
+ * can run hot without boxing overhead. Convert to/from `BoxedExpression` only at
+ * the boundary, with {@link mpolyFromBoxed} / {@link mpolyToBoxed}.
+ *
+ * Representation:
+ * - `vars` is a fixed, ordered list of variable names.
+ * - `terms` maps a monomial key (the exponent vector joined by `,`) to its
+ *   nonzero integer coefficient. The zero polynomial has an empty map.
+ *
+ * The empty `vars` list represents constants (the single key is the empty
+ * string). All operations assume operands share the same `vars` list and order.
+ */
+export declare class MPoly {
+    readonly vars: string[];
+    readonly terms: Map<string, bigint>;
+    constructor(vars: string[], terms?: Map<string, bigint>);
+    static zero(vars: string[]): MPoly;
+    static constant(vars: string[], c: bigint): MPoly;
+    /** Monomial key for an exponent vector. */
+    static key(exp: number[]): string;
+    /** Decode a monomial key back to an exponent vector. */
+    static exp(key: string): number[];
+    clone(): MPoly;
+    isZero(): boolean;
+    get nbTerms(): number;
+    /** Constant value if this is a constant polynomial, else `undefined`. */
+    asConstant(): bigint | undefined;
+    /** Add `c·x^exp` in place (collapsing to zero removes the term). */
+    private accumulate;
+    add(o: MPoly): MPoly;
+    sub(o: MPoly): MPoly;
+    neg(): MPoly;
+    mul(o: MPoly): MPoly;
+    /** Multiply every coefficient by an integer scalar. */
+    scaleInt(s: bigint): MPoly;
+    equals(o: MPoly): boolean;
+    /** Largest absolute coefficient (the ∞-norm). */
+    maxNorm(): bigint;
+    /** GCD of all integer coefficients (the integer content); 1 for the zero poly. */
+    contentInteger(): bigint;
+    /** Divide every coefficient by `d` exactly (throws if any is not divisible). */
+    divExactInteger(d: bigint): MPoly;
+    /** Remove the integer content (primitive part with a non-negative leading sign). */
+    primitivePartInteger(): MPoly;
+    /** Degree in variable `i` (the largest exponent of that variable). */
+    degreeIn(i: number): number;
+    totalDegree(): number;
+    /** Leading term under the lexicographic order on exponent vectors. */
+    leadingLex(): {
+        exp: number[];
+        c: bigint;
+    } | undefined;
+    /**
+     * Exact division `a / b` over ℤ. Returns the quotient, or `null` when `b`
+     * does not divide `a` exactly. Used to verify GCD candidates.
+     */
+    static tryDivide(a: MPoly, b: MPoly): MPoly | null;
+    /** Substitute `vars[i] = value`, returning a polynomial over the other vars. */
+    evalVar(i: number, value: bigint): MPoly;
+    /**
+     * Coefficients with respect to variable `i`, as polynomials over the other
+     * variables, indexed by the power of `vars[i]` (index 0 .. degreeIn(i)).
+     */
+    coeffsInVar(i: number): MPoly[];
+    /**
+     * Rebuild a polynomial over `fullVars` from its coefficients with respect to
+     * the variable at `insertIndex` (the inverse of {@link coeffsInVar}). Each
+     * `coeffs[d]` is a polynomial over `fullVars` minus that variable.
+     */
+    static fromVarCoeffs(coeffs: MPoly[], insertIndex: number, fullVars: string[]): MPoly;
+    /** Reduce every coefficient into the symmetric range (−p/2, p/2] modulo `p`. */
+    modP(p: bigint): MPoly;
+}
+/** Euclidean GCD on non-negative `bigint`s (sign-stripped). */
+export declare function igcd(a: bigint, b: bigint): bigint;
+/** Lexicographic `a > b` on equal-length exponent vectors. */
+export declare function lexGreater(a: number[], b: number[]): boolean;
+/**
+ * Convert an expanded boxed polynomial to an {@link MPoly} over `vars`.
+ *
+ * Coefficients must be integers or rationals; rational coefficients are cleared
+ * to integers by multiplying through by the least common multiple of the
+ * denominators (the GCD is unaffected by this rational scaling — the caller
+ * takes the primitive part). Returns `null` if `expr` is not a polynomial in
+ * `vars` with rational coefficients.
+ */
+export declare function mpolyFromBoxed(ce: ComputeEngine, expr: Expression, vars: string[]): MPoly | null;
+/** Convert an {@link MPoly} back to a canonical boxed expression. */
+export declare function mpolyToBoxed(ce: ComputeEngine, poly: MPoly): Expression;
 /* 0.59.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../../big-decimal';
 import type { Rational } from '../numerics/types';
@@ -8879,7 +9642,7 @@ export declare class BoxedTensor<T extends TensorDataType> extends _BoxedExpress
     };
     readonly options?: {
         metadata?: Metadata;
-    };
+    } | undefined;
     readonly _kind = "tensor";
     private _tensor;
     private _expression?;
@@ -8889,7 +9652,7 @@ export declare class BoxedTensor<T extends TensorDataType> extends _BoxedExpress
         dtype: T;
     }, options?: {
         metadata?: Metadata;
-    });
+    } | undefined);
     get structural(): Expression;
     /** Create the tensor on demand */
     get tensor(): Tensor<T>;
@@ -8926,8 +9689,35 @@ export declare class BoxedTensor<T extends TensorDataType> extends _BoxedExpress
     get isCollection(): boolean;
     get isIndexedCollection(): boolean;
     contains(other: Expression): boolean | undefined;
+    /**
+     * The number of elements along the **first axis** — e.g. the number of rows
+     * of a matrix — NOT the total number of scalar entries. A 3×3 matrix has a
+     * count of 3, not 9.
+     *
+     * This is consistent with `each()` and `at()`, which iterate over and index
+     * first-axis slices, and with the count of the equivalent nested `List`.
+     *
+     * For the total number of scalar entries, use
+     * `tensor.shape.reduce((a, b) => a * b, 1)` (or `Flatten` at the expression
+     * level).
+     */
     get count(): number;
+    /**
+     * Iterate over the slices along the **first axis** — e.g. the rows of a
+     * matrix — consistent with `count` and `at()`. A rank-0 (scalar) tensor
+     * yields itself once.
+     */
     each(): Generator<Expression>;
+    /**
+     * Return the nth slice along the **first axis** — e.g. the nth row of a
+     * matrix, as a rank n-1 tensor — consistent with `each()` and `count`.
+     *
+     * The index is 1-based; a negative index counts from the end (like
+     * `List.at()`). Out-of-bounds indices return `undefined`.
+     *
+     * For scalar element access into a matrix, index twice (or use
+     * `At(matrix, i, j)` at the expression level).
+     */
     at(index: number): Expression | undefined;
     match(pattern: Expression, options?: PatternMatchOptions): BoxedSubstitution | null;
     evaluate(options?: Partial<EvaluateOptions>): Expression;
@@ -9471,7 +10261,7 @@ export declare function trigSign(operator: string, x: Expression): Sign | undefi
 export declare function isConstructible(x: string | Expression): boolean;
 export declare function constructibleValues(operator: string, x: Expression | undefined): undefined | Expression;
 /* 0.59.0 *//**
- * Operator-indexed rule dispatch (FUNGRIM-PLAN-2-RULES.md §2.1, Feature A).
+ * Operator-indexed rule dispatch (docs/fungrim/FUNGRIM-PLAN-2-RULES.md §2.1, Feature A).
  *
  * This is an INTERNAL side table: the public `BoxedRuleSet` type is
  * unchanged. The index is keyed (via a `WeakMap`) on the identity of the
@@ -9954,6 +10744,7 @@ export declare abstract class AbstractTensor<DT extends keyof DataTypeMap> imple
 /** @category Tensors */
 export declare function makeTensor<T extends TensorDataType>(ce: ComputeEngine, data: TensorData<T>): AbstractTensor<T>;
 /* 0.59.0 */import { Complex } from 'complex-esm';
+import '../numerics/complex-esm-augment';
 import { Expression, IComputeEngine as ComputeEngine, DataTypeMap, TensorDataType, TensorField } from '../global-types';
 /** @category Tensors */
 export declare function makeTensorField<DT extends keyof DataTypeMap>(ce: ComputeEngine, dtype: DT): TensorField<DataTypeMap[DT]>;
@@ -10242,6 +11033,33 @@ export declare function evaluateWithAssignment(expr: Expression, assignment: Rec
  * Each assignment is a Record mapping variable names to boolean values.
  */
 export declare function generateAssignments(variables: string[]): Generator<Record<string, boolean>>;
+/* 0.59.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types';
+/**
+ * Symbolic limit evaluation.
+ *
+ * A best-effort *symbolic* companion to the numeric (Richardson) limit path:
+ * given the body of a `Limit`, it tries to produce an **exact closed form**
+ * (`lim_{x→2} x²+1 = 5`, `lim_{x→0} sin x/x = 1`, `lim_{x→∞} (3ˣ+5ˣ)^{1/x} = 5`).
+ * It returns `undefined` whenever it cannot determine the limit, so the caller
+ * falls back to the numeric path — the symbolic path is purely additive and
+ * cannot regress existing behavior.
+ *
+ * Strategies, in rough order of application:
+ *  - constant (body free of the variable);
+ *  - finite point: direct substitution (continuous case), then algebraic
+ *    cancellation, then L'Hôpital for 0/0 and ∞/∞ (reuses `differentiate`);
+ *  - infinite point: a "leading-order" rewrite that replaces every sum with its
+ *    asymptotically-dominant term(s) (a Gruntz-lite — `3ˣ+5ˣ → 5ˣ`,
+ *    `sin x+ln x → ln x`), then a structural evaluation of the simplified form
+ *    (polynomial/rational growth, exp/ln, products, `f^g` via `exp(g·ln f)`,
+ *    bounded `sin`/`cos`/`arctan`).
+ *
+ * @param body     the function body, e.g. `Divide(Sin(x), x)`
+ * @param x        the limit variable name
+ * @param point    the limit point (a number, or ±∞)
+ * @param dir      +1 (from the right), −1 (from the left), 0/undefined (both)
+ */
+export declare function symbolicLimit(body: Expression, x: string, point: Expression, dir: number | undefined, ce: ComputeEngine): Expression | undefined;
 /* 0.59.0 *//**
  * Fu Algorithm Transformation Rules
  *
@@ -10509,7 +11327,6 @@ export declare const SIMPLIFY_RULES: Rule[];
 /* 0.59.0 */import type { Expression, RuleStep } from '../global-types';
 export declare function simplifyTrig(x: Expression): RuleStep | undefined;
 /* 0.59.0 */import type { Expression } from '../global-types';
-/** Calculate the antiderivative of fn, as an expression (not a function) */
 export declare function antiderivative(fn: Expression, index: string): Expression;
 /* 0.59.0 */import type { Expression } from '../global-types';
 /**
@@ -10990,7 +11807,7 @@ import { BoxedType } from '../common/type/boxed-type';
 import type { OneOf } from '../common/one-of';
 import type { ConfigurationChangeListener } from '../common/configuration-change';
 import type { MathJsonExpression, MathJsonSymbol, MathJsonNumberObject } from '../math-json/types';
-import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, Expression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, Metadata, Rule, RulePurpose, Scope, EvalContext, ExpressionInput, IComputeEngine, ILatexSyntax, BoxedDefinition, SymbolDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, LibraryDefinition, OperatorInfo, SymbolInfo } from './global-types';
+import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, Expression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, Metadata, Rule, RulePurpose, Scope, EvalContext, ExpressionInput, IComputeEngine, IntegrationProvider, ILatexSyntax, BoxedDefinition, SymbolDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, LibraryDefinition, OperatorInfo, SymbolInfo } from './global-types';
 import type { LibraryCategory, ParseLatexOptions, SerializeLatexOptions } from './latex-syntax/types';
 import type { BigNum, Rational } from './numerics/types';
 import { ExactNumericValueData, NumericValue, NumericValueData } from './numeric-value/types';
@@ -11075,6 +11892,10 @@ export declare class ComputeEngine implements IComputeEngine {
     private _configurationLifecycle;
     /** @internal */
     private _cost?;
+    /** @internal Optional symbolic-integration provider consulted by the
+     * `Integrate` evaluator before the built-in antiderivative. Registered by
+     * the opt-in `loadIntegrationRules()` (Rubi rule driver). */
+    _integrationProvider?: IntegrationProvider;
     /** @internal Backing state for simplificationRules */
     private _simplificationRules;
     /** @internal Backing state for solveRules */
@@ -11969,7 +12790,7 @@ import { chop, factorial, factorial2, gcd, lcm, limit } from '../numerics/numeri
 import { gamma, gammaln, erf, erfc, erfInv, beta, digamma, trigamma, polygamma, zeta, lambertW, besselJ, besselY, besselI, besselK, airyAi, airyBi, fresnelS, fresnelC, sinc } from '../numerics/special-functions';
 import { choose } from '../boxed-expression/expand';
 import { interquartileRange, kurtosis, mean, median, mode, populationStandardDeviation, populationVariance, quartiles, skewness, standardDeviation, variance } from '../numerics/statistics';
-import type { CompileTarget, CompiledOperators, CompiledFunctions, LanguageTarget, CompilationOptions, CompilationResult } from './types';
+import type { CompileTarget, CompiledOperators, CompiledFunctions, LanguageTarget, CompilationOptions, CompilationResult, ComplexResult } from './types';
 /**
  * JavaScript-specific function extension that provides system functions
  */
@@ -12001,7 +12822,7 @@ export declare class ComputeEngineFunction extends Function {
         gamma: typeof gamma;
         gcd: typeof gcd;
         heaviside: (x: number) => 0 | 1 | 0.5;
-        integrate: (f: any, a: any, b: any) => number;
+        integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
         lngamma: typeof gammaln;
         limit: typeof limit;
@@ -12047,113 +12868,113 @@ export declare class ComputeEngineFunction extends Function {
         }, maxIter: number) => number;
         binomial: typeof choose;
         fibonacci: typeof fibonacci;
-        csin: (z: any) => {
+        csin: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccos: (z: any) => {
+        ccos: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ctan: (z: any) => {
+        ctan: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casin: (z: any) => {
+        casin: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacos: (z: any) => {
+        cacos: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        catan: (z: any) => {
+        catan: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csinh: (z: any) => {
+        csinh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccosh: (z: any) => {
+        ccosh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ctanh: (z: any) => {
+        ctanh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csqrt: (z: any) => {
+        csqrt: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cexp: (z: any) => {
+        cexp: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cln: (z: any) => {
+        cln: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cpow: (z: any, w: any) => {
+        cpow: (z: number | ComplexResult, w: number | ComplexResult) => {
             re: number;
             im: number;
         };
-        ccot: (z: any) => {
+        ccot: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csec: (z: any) => {
+        csec: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccsc: (z: any) => {
+        ccsc: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccoth: (z: any) => {
+        ccoth: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csech: (z: any) => {
+        csech: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccsch: (z: any) => {
+        ccsch: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacot: (z: any) => {
+        cacot: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casec: (z: any) => {
+        casec: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacsc: (z: any) => {
+        cacsc: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacoth: (z: any) => {
+        cacoth: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casech: (z: any) => {
+        casech: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacsch: (z: any) => {
+        cacsch: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cabs: (z: any) => any;
-        carg: (z: any) => any;
-        cconj: (z: any) => {
+        cabs: (z: ComplexResult) => number;
+        carg: (z: ComplexResult) => number;
+        cconj: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cneg: (z: any) => {
+        cneg: (z: ComplexResult) => {
             re: number;
             im: number;
         };
@@ -12191,7 +13012,7 @@ export declare class ComputeEngineFunctionLiteral extends Function {
         gamma: typeof gamma;
         gcd: typeof gcd;
         heaviside: (x: number) => 0 | 1 | 0.5;
-        integrate: (f: any, a: any, b: any) => number;
+        integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
         lngamma: typeof gammaln;
         limit: typeof limit;
@@ -12237,113 +13058,113 @@ export declare class ComputeEngineFunctionLiteral extends Function {
         }, maxIter: number) => number;
         binomial: typeof choose;
         fibonacci: typeof fibonacci;
-        csin: (z: any) => {
+        csin: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccos: (z: any) => {
+        ccos: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ctan: (z: any) => {
+        ctan: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casin: (z: any) => {
+        casin: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacos: (z: any) => {
+        cacos: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        catan: (z: any) => {
+        catan: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csinh: (z: any) => {
+        csinh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccosh: (z: any) => {
+        ccosh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ctanh: (z: any) => {
+        ctanh: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csqrt: (z: any) => {
+        csqrt: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cexp: (z: any) => {
+        cexp: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cln: (z: any) => {
+        cln: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cpow: (z: any, w: any) => {
+        cpow: (z: number | ComplexResult, w: number | ComplexResult) => {
             re: number;
             im: number;
         };
-        ccot: (z: any) => {
+        ccot: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csec: (z: any) => {
+        csec: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccsc: (z: any) => {
+        ccsc: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccoth: (z: any) => {
+        ccoth: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        csech: (z: any) => {
+        csech: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        ccsch: (z: any) => {
+        ccsch: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacot: (z: any) => {
+        cacot: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casec: (z: any) => {
+        casec: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacsc: (z: any) => {
+        cacsc: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacoth: (z: any) => {
+        cacoth: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        casech: (z: any) => {
+        casech: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cacsch: (z: any) => {
+        cacsch: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cabs: (z: any) => any;
-        carg: (z: any) => any;
-        cconj: (z: any) => {
+        cabs: (z: ComplexResult) => number;
+        carg: (z: ComplexResult) => number;
+        cconj: (z: ComplexResult) => {
             re: number;
             im: number;
         };
-        cneg: (z: any) => {
+        cneg: (z: ComplexResult) => {
             re: number;
             im: number;
         };
@@ -13452,6 +14273,10 @@ export type SymbolInfo = {
     type: BoxedType;
 };
 /** @internal */
+/** A symbolic-integration provider: given an integrand and the integration
+ * variable, returns a closed-form antiderivative (an expression in `variable`),
+ * or `null` when it cannot integrate it. See `IComputeEngine._integrationProvider`. */
+export type IntegrationProvider = (integrand: Expression, variable: string) => Expression | null;
 export interface IComputeEngine {
     /** The LatexSyntax instance used for LaTeX parsing/serialization.
      *  `undefined` when no LatexSyntax was provided to the constructor.
@@ -13459,6 +14284,13 @@ export interface IComputeEngine {
     readonly latexSyntax: ILatexSyntax | undefined;
     /** @internal Returns the LatexSyntax instance or throws if unavailable. */
     _requireLatexSyntax(): ILatexSyntax;
+    /** @internal An optional symbolic-integration provider. When set, the
+     * `Integrate` evaluator consults it for an indefinite antiderivative before
+     * falling back to the built-in `antiderivative()`. Returns a closed-form
+     * antiderivative (an expression in `variable`), or `null`/an inert
+     * `Integrate` when it cannot integrate the integrand. This is the slot the
+     * opt-in `loadIntegrationRules()` (Rubi rule driver) registers into. */
+    _integrationProvider?: IntegrationProvider;
     /** Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
      *  Merged into every `parse()` and `toLatex()` call between LatexSyntax
      *  defaults and per-call overrides. */
@@ -15519,7 +16351,7 @@ export declare const DEFINITIONS_LINEAR_ALGEBRA: LatexDictionary;
 export declare const DEFINITIONS_TRIGONOMETRY: LatexDictionary;
 /* 0.59.0 */import type { LatexDictionary } from '../types';
 export declare const DEFINITIONS_STATISTICS: LatexDictionary;
-/* 0.59.0 */import { WarningSignal } from '../../../common/signals';
+/* 0.59.0 */import { ErrorSignal, WarningSignal } from '../../../common/signals';
 import { LatexDictionaryEntry } from '../types';
 export type { CommonEntry, IndexedSymbolEntry, IndexedExpressionEntry, IndexedFunctionEntry, IndexedMatchfixEntry, IndexedInfixEntry, IndexedPrefixEntry, IndexedPostfixEntry, IndexedEnvironmentEntry, IndexedLatexDictionaryEntry, IndexedLatexDictionary, } from './indexed-types';
 import type { IndexedSymbolEntry, IndexedExpressionEntry, IndexedFunctionEntry, IndexedMatchfixEntry, IndexedInfixEntry, IndexedPostfixEntry, IndexedEnvironmentEntry, IndexedLatexDictionaryEntry, IndexedLatexDictionary } from './indexed-types';
@@ -15539,13 +16371,13 @@ export declare function isIndexedPrefixedEntry(entry: IndexedLatexDictionaryEntr
 export declare function isIndexedPostfixEntry(entry: IndexedLatexDictionaryEntry): entry is IndexedPostfixEntry;
 /** @internal */
 export declare function isIndexedEnvironmentEntry(entry: IndexedLatexDictionaryEntry): entry is IndexedEnvironmentEntry;
-export declare function indexLatexDictionary(dic: Readonly<Partial<LatexDictionaryEntry>[]>, onError: (sig: WarningSignal) => void): IndexedLatexDictionary;
+export declare function indexLatexDictionary(dic: Readonly<Partial<LatexDictionaryEntry>[]>, onError: (sig: ErrorSignal | WarningSignal) => void): IndexedLatexDictionary;
 /* 0.59.0 */import type { LatexDictionary } from '../types';
 export declare const DEFINITIONS_ALGEBRA: LatexDictionary;
 /* 0.59.0 */import type { LatexDictionary, Parser, Terminator } from '../types';
 import type { MathJsonExpression } from '../../../math-json';
 export declare const DEFINITIONS_LOGIC: LatexDictionary;
-export declare function parseQuantifier(kind: 'NotForAll' | 'NotExists' | 'ForAll' | 'Exists' | 'ExistsUnique'): (parser: Parser, terminator: Readonly<Terminator>) => MathJsonExpression | null;
+export declare function parseQuantifier(kind: 'NotForAll' | 'NotExists' | 'ForAll' | 'Exists' | 'ExistsUnique'): (parser: Parser, terminator?: Readonly<Terminator>) => MathJsonExpression | null;
 /* 0.59.0 *//**
  * Default LaTeX dictionary assembly.
  *
@@ -15786,6 +16618,7 @@ export type * from './compute-engine/types';
 export { LatexSyntax, parse as parseLatex, serialize as serializeLatex, } from './compute-engine/latex-syntax/latex-syntax';
 export { LATEX_DICTIONARY, CORE_DICTIONARY, SYMBOLS_DICTIONARY, ALGEBRA_DICTIONARY, ARITHMETIC_DICTIONARY, COMPLEX_DICTIONARY, TRIGONOMETRY_DICTIONARY, CALCULUS_DICTIONARY, LINEAR_ALGEBRA_DICTIONARY, STATISTICS_DICTIONARY, LOGIC_DICTIONARY, SETS_DICTIONARY, INEQUALITIES_DICTIONARY, UNITS_DICTIONARY, OTHERS_DICTIONARY, PHYSICS_DICTIONARY, } from './compute-engine/latex-syntax/dictionary/default-dictionary';
 export { BigDecimal } from './big-decimal';
+export { CancellationError } from './common/interruptible';
 export type { CompileTarget, CompiledOperators, CompiledFunctions, CompilationOptions, CompilationResult, ExecutableTarget, ComplexResult, CompiledRunner, ExpressionRunner, LambdaRunner, LanguageTarget, TargetSource, CompiledFunction, } from './compute-engine/compilation/types';
 export { JavaScriptTarget } from './compute-engine/compilation/javascript-target';
 export { GPUShaderTarget } from './compute-engine/compilation/gpu-target';
@@ -15804,6 +16637,7 @@ export type { BoxedString } from './compute-engine/boxed-expression/boxed-string
 export type { BoxedTensor } from './compute-engine/boxed-expression/boxed-tensor';
 /* 0.59.0 */export declare const version = "0.59.0";
 export { ComputeEngine } from './compute-engine/index';
+export { CancellationError } from './common/interruptible';
 export type * from './compute-engine/types';
 export type { Interval, IntervalResult, BoolInterval, } from './compute-engine/interval/types';
 export { expr, simplify, evaluate, N, declare, assign, expand, expandAll, factor, solve, getDefaultEngine, } from './compute-engine/free-functions';
@@ -15816,6 +16650,9 @@ export type { BoxedTensor } from './compute-engine/boxed-expression/boxed-tensor
 /* 0.59.0 */export declare const version = "0.59.0";
 export { loadIdentities, FUNGRIM_CORE } from './compute-engine/fungrim/loader';
 export type { IdentitiesLoadOptions, IdentitiesLoadReport, IdentitiesRuleData, IdentitiesGuardUndecidedHandler, FungrimLoadOptions, FungrimLoadReport, FungrimRuleData, FungrimGuardUndecidedHandler, FungrimManifest, FungrimShellDeclaration, FungrimRuleClass, FungrimRuleTarget, FungrimMathJson, CompiledFungrimRule, GuardSpec, } from './compute-engine/fungrim/types';
+/* 0.59.0 */export declare const version = "0.59.0";
+export { loadIntegrationRules } from './compute-engine/rubi/loader';
+export type { IntegrationRulesLoadOptions, IntegrationRulesLoadReport, } from './compute-engine/rubi/loader';
 /* 0.59.0 */export declare const version = "0.59.0";
 export type { Interval, IntervalResult, BoolInterval, } from './compute-engine/interval/types';
 export { ok, point, containsExtremum, unionResults, mergeDomainClip, isPoint, containsZero, isPositive, isNegative, isNonNegative, isNonPositive, width, midpoint, getValue, unwrap, unwrapOrPropagate, } from './compute-engine/interval/util';
