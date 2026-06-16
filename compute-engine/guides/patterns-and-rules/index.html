@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.d2cc3d3a.js" defer="defer"></script>
-<script src="/assets/js/main.b81b7866.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.2b8c75f8.js" defer="defer"></script>
+<script src="/assets/js/main.63b4fd4f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -50,7 +50,7 @@ but they are tailored to deal with MathJSON expressions instead of strings.</p>
 example, consecutive sequence wildcards like <code>[&#x27;Add&#x27;, &#x27;__a&#x27;, &#x27;__b&#x27;]</code> are
 invalid because there&#x27;s no way to determine where <code>__a</code> ends and <code>__b</code> begins.</p>
 <p><strong>To check if a pattern is valid</strong>, use the <code>validatePattern()</code> function:</p>
-<div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> validatePattern </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;compute-engine&#x27;</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">const</span><span class="token plain"> ce </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">new</span><span class="token plain"> </span><span class="token class-name" style="color:var(--base-0a)">ComputeEngine</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">const</span><span class="token plain"> pattern </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> ce</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">box</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&#x27;Add&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;__a&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;__b&#x27;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">try</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token function" style="color:var(--base-0a)">validatePattern</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">pattern</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">catch</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">e</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  console</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">log</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">e</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">message</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token comment" style="color:var(--base-05)">// ➔ &quot;Invalid pattern: consecutive sequence wildcards...&quot;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><br></div></code></pre></div></div>
+<div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> validatePattern </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;compute-engine&#x27;</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">const</span><span class="token plain"> ce </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">new</span><span class="token plain"> </span><span class="token class-name" style="color:var(--base-0a)">ComputeEngine</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">const</span><span class="token plain"> pattern </span><span class="token operator" style="color:var(--base-06)">=</span><span class="token plain"> ce</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">expr</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&#x27;Add&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;__a&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;__b&#x27;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token keyword" style="color:var(--base-0e)">try</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token function" style="color:var(--base-0a)">validatePattern</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">pattern</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">catch</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">e</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  console</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">log</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">e</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">message</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token comment" style="color:var(--base-05)">// ➔ &quot;Invalid pattern: consecutive sequence wildcards...&quot;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><br></div></code></pre></div></div>
 <p>Invalid patterns include:</p>
 <ul>
 <li class=""><code>[&#x27;Add&#x27;, &#x27;__a&#x27;, &#x27;__b&#x27;]</code> - consecutive sequence wildcards</li>
@@ -99,7 +99,7 @@ wildcard names explicitly.</p>
 </div></code-playground>
 <p><strong>BoxedExpression</strong> — Used directly.</p>
 <code-playground><div slot="javascript">const expr = ce.parse(&#x27;3x^2+2x+5&#x27;);
-<!-- -->const pattern = ce.box([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, [&quot;Power&quot;, &quot;x&quot;, 2]],
+<!-- -->const pattern = ce.expr([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, [&quot;Power&quot;, &quot;x&quot;, 2]],
 <!-- -->  <!-- -->[&quot;Multiply&quot;, &quot;_b&quot;, &quot;x&quot;], &quot;_c&quot;]);
 <!-- -->console.log(expr.match(pattern));
 <!-- -->// ➔ { _a: 3, _b: 2, _c: 5 }
@@ -128,7 +128,7 @@ unprefixed keys:</p>
 </li>
 </ul>
 <code-playground><div slot="javascript">const expr = ce.parse(&#x27;3y^2+5&#x27;);
-<!-- -->console.log(expr.match(&#x27;ax^2+bx+c&#x27;, { substitution: { x: ce.box(&#x27;y&#x27;) } }));
+<!-- -->console.log(expr.match(&#x27;ax^2+bx+c&#x27;, { substitution: { x: ce.expr(&#x27;y&#x27;) } }));
 <!-- -->// ➔ { a: 3, b: 0, c: 5 }
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="matching-missing-terms">Matching Missing Terms<a href="#matching-missing-terms" class="hash-link" aria-label="Direct link to Matching Missing Terms" title="Direct link to Matching Missing Terms" translate="no">​</a></h3>
@@ -152,52 +152,52 @@ as <code>1</code>.</p>
 explicitly to enable this behavior.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="commutativity">Commutativity<a href="#commutativity" class="hash-link" aria-label="Direct link to Commutativity" title="Direct link to Commutativity" translate="no">​</a></h3>
 <p>The commutativity of functions is taken into account when matching patterns.</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
-<!-- -->console.log(&quot;x+1 ➔&quot;, ce.box([&quot;Add&quot;, 1, &quot;x&quot;]).match(pattern));
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
+<!-- -->console.log(&quot;x+1 ➔&quot;, ce.expr([&quot;Add&quot;, 1, &quot;x&quot;]).match(pattern));
 <!-- -->// ➔ { } : the expression matches the pattern
 <!-- -->
-<!-- -->console.log(&quot;x+42 ➔&quot;, ce.box([&quot;Add&quot;, &quot;x&quot;, 42]).match(pattern));
+<!-- -->console.log(&quot;x+42 ➔&quot;, ce.expr([&quot;Add&quot;, &quot;x&quot;, 42]).match(pattern));
 <!-- -->// ➔ { } : the expression matches the pattern by commutativity
 <!-- -->
-<!-- -->console.log(&quot;5*x ➔&quot;, ce.box([&quot;Multiply&quot;, 5, &quot;x&quot;]).match(pattern));
+<!-- -->console.log(&quot;5*x ➔&quot;, ce.expr([&quot;Multiply&quot;, 5, &quot;x&quot;]).match(pattern));
 <!-- -->// ➔ null : the expression does not match the pattern
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="exact-matching">Exact Matching<a href="#exact-matching" class="hash-link" aria-label="Direct link to Exact Matching" title="Direct link to Exact Matching" translate="no">​</a></h3>
 <p>By default, the <code>expr.match()</code> method will match some variants of the same
 expression, for example <code>x+_a</code> and <code>x</code> are considered to match (with the
 substitution <code>{_a : 0}</code>).</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;x&quot;, &quot;_a&quot;]);
-<!-- -->const expr = ce.box(&quot;x&quot;);
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, &quot;x&quot;, &quot;_a&quot;]);
+<!-- -->const expr = ce.expr(&quot;x&quot;);
 <!-- -->
 <!-- -->console.log(&quot;x ➔&quot;, expr.match(pattern));
 <!-- -->// ➔ { _a: 0 } : the expression matches the pattern
 </div></code-playground>
 <p><strong>To prevent the matching of variants</strong>, set the <code>exact</code> property to <code>true</code>.</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;x&quot;, &quot;_a&quot;]);
-<!-- -->const expr = ce.box(&quot;x&quot;);
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, &quot;x&quot;, &quot;_a&quot;]);
+<!-- -->const expr = ce.expr(&quot;x&quot;);
 <!-- -->
 <!-- -->console.log(&quot;exact: x ➔&quot;, expr.match(pattern, {exact: true}));
 <!-- -->// ➔ null : the expression does not match the pattern
 </div></code-playground>
 <p>The variants can be applied to the whole expression or to sub-expressions.</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, &quot;x&quot;], &quot;_b&quot;]);
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;_a&quot;, &quot;x&quot;], &quot;_b&quot;]);
 <!-- -->
-<!-- -->console.log(&quot;x ➔&quot;, ce.box(&quot;x&quot;).match(pattern));
+<!-- -->console.log(&quot;x ➔&quot;, ce.expr(&quot;x&quot;).match(pattern));
 <!-- -->// ➔ { _a: 1, _b: 0 } : the expression matches the pattern
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="recursive-matching">Recursive Matching<a href="#recursive-matching" class="hash-link" aria-label="Direct link to Recursive Matching" title="Direct link to Recursive Matching" translate="no">​</a></h3>
 <p>By default, the <code>expr.match()</code> method does not consider sub-expressions:
 it is not recursive.</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
-<!-- -->const expr = ce.box([&quot;Multiply&quot;, 2, [&quot;Add&quot;, 1, &quot;x&quot;]]);
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
+<!-- -->const expr = ce.expr([&quot;Multiply&quot;, 2, [&quot;Add&quot;, 1, &quot;x&quot;]]);
 <!-- -->
 <!-- -->console.log(&quot;2(1+x) ➔&quot;, expr.match(pattern));
 <!-- -->// ➔ null : the expression does not match the pattern
 </div></code-playground>
 <p><strong>To match sub-expressions recursively</strong>, set the <code>recursive</code> property to
 <code>true</code>.</p>
-<code-playground><div slot="javascript">const pattern = ce.box([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
-<!-- -->const expr = ce.box([&quot;Multiply&quot;, 2, [&quot;Add&quot;, 1, &quot;x&quot;]]);
+<code-playground><div slot="javascript">const pattern = ce.expr([&quot;Add&quot;, &quot;_&quot;, &quot;x&quot;]);
+<!-- -->const expr = ce.expr([&quot;Multiply&quot;, 2, [&quot;Add&quot;, 1, &quot;x&quot;]]);
 <!-- -->
 <!-- -->console.log(&quot;recursive: 2(1+x) ➔&quot;, expr.match(pattern, {recursive: true}));
 <!-- -->// ➔ { } : the expression matches the pattern
@@ -205,15 +205,15 @@ it is not recursive.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="repeated-named-wildcards">Repeated Named Wildcards<a href="#repeated-named-wildcards" class="hash-link" aria-label="Direct link to Repeated Named Wildcards" title="Direct link to Repeated Named Wildcards" translate="no">​</a></h3>
 <p>If a named wildcard is referenced multiple times in a pattern, all its values
 must match.</p>
-<code-playground><div slot="javascript">console.log(ce.box([&quot;Add&quot;, 1, &quot;x&quot;]).match(ce.box([&quot;Add&quot;, &#x27;_a&#x27;, &#x27;_a&#x27;])));
+<code-playground><div slot="javascript">console.log(ce.expr([&quot;Add&quot;, 1, &quot;x&quot;]).match(ce.expr([&quot;Add&quot;, &#x27;_a&#x27;, &#x27;_a&#x27;])));
 <!-- -->// ➔ null
 <!-- -->
-<!-- -->console.log(ce.box([&quot;Add&quot;, &quot;x&quot;, &quot;x&quot;]).match(ce.box([&quot;Add&quot;, &#x27;_a&#x27;, &#x27;_a&#x27;])));
+<!-- -->console.log(ce.expr([&quot;Add&quot;, &quot;x&quot;, &quot;x&quot;]).match(ce.expr([&quot;Add&quot;, &#x27;_a&#x27;, &#x27;_a&#x27;])));
 <!-- -->// ➔ { _a: &quot;x&quot; }
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="capturing-the-head-of-functions">Capturing the Head of Functions<a href="#capturing-the-head-of-functions" class="hash-link" aria-label="Direct link to Capturing the Head of Functions" title="Direct link to Capturing the Head of Functions" translate="no">​</a></h3>
 <p>Wildcards can be used to capture the head of functions:</p>
-<code-playground><div slot="javascript">console.log(ce.box([&quot;Add&quot;, 1, &quot;x&quot;]).match(ce.box([&quot;_f&quot;, &quot;__args&quot;])));
+<code-playground><div slot="javascript">console.log(ce.expr([&quot;Add&quot;, 1, &quot;x&quot;]).match(ce.expr([&quot;_f&quot;, &quot;__args&quot;])));
 <!-- -->// ➔ { _f: &quot;Add&quot;, __args: [&quot;Sequence&quot;, [1, &quot;x&quot;]] }
 </div></code-playground>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="substitution">Substitution<a href="#substitution" class="hash-link" aria-label="Direct link to Substitution" title="Direct link to Substitution" translate="no">​</a></h2>
@@ -222,8 +222,8 @@ mapping from wildcards to expressions.</p>
 <p>If there is no match, <code>expr.match()</code> returns <code>null</code>.</p>
 <p><strong>To apply a substitution to a pattern</strong>, and therefore recover the expression
 it was derived from, use the <code>subs()</code> function.</p>
-<code-playground><div slot="javascript">const expr = ce.box([&quot;Add&quot;, 1, &quot;x&quot;]);
-<!-- -->const pattern = ce.box([&quot;Add&quot;, 1, &quot;_a&quot;]);
+<code-playground><div slot="javascript">const expr = ce.expr([&quot;Add&quot;, 1, &quot;x&quot;]);
+<!-- -->const pattern = ce.expr([&quot;Add&quot;, 1, &quot;_a&quot;]);
 <!-- -->const subs = expr.match(pattern);
 <!-- -->console.log(subs);
 <!-- -->// ➔ { _a: &quot;x&quot; }
@@ -256,7 +256,7 @@ matches, the expression is replaced by the substitution pattern of the rule.</p>
 <!-- -->  <!-- -->replace: [&quot;Square&quot;, &quot;_x&quot;],
 <!-- -->};
 <!-- -->
-<!-- -->const expr = ce.box([&quot;Multiply&quot;, 7, 7], { form: &#x27;raw&#x27; });
+<!-- -->const expr = ce.expr([&quot;Multiply&quot;, 7, 7], { form: &#x27;raw&#x27; });
 <!-- -->console.log(expr.replace(squareRule) ?? expr);
 <!-- -->// ➔ [&quot;Square&quot;, 7]
 </div></code-playground>
@@ -278,7 +278,7 @@ the automatic simplifier.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="substituting-symbols">Substituting Symbols<a href="#substituting-symbols" class="hash-link" aria-label="Direct link to Substituting Symbols" title="Direct link to Substituting Symbols" translate="no">​</a></h3>
 <p>If a pattern does not contain any named wildcards and only symbols, the
 <code>expr.subs()</code> function can be used to replace all occurrences of matching symbols.</p>
-<code-playground><div slot="javascript">const expr = ce.box([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;a&quot;, &quot;x&quot;], &quot;b&quot;]);
+<code-playground><div slot="javascript">const expr = ce.expr([&quot;Add&quot;, [&quot;Multiply&quot;, &quot;a&quot;, &quot;x&quot;], &quot;b&quot;]);
 <!-- -->
 <!-- -->console.log(expr.replace([
 <!-- -->    <!-- -->{ match: &quot;a&quot;, replace: 2 },

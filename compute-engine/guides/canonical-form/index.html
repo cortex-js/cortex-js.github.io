@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.d2cc3d3a.js" defer="defer"></script>
-<script src="/assets/js/main.b81b7866.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.2b8c75f8.js" defer="defer"></script>
+<script src="/assets/js/main.63b4fd4f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -53,10 +53,10 @@ the <code>expr.canonical</code> property.</p>
 <code>expr</code>.</p>
 <p>The return value of <code>expr.simplify()</code>, <code>expr.evaluate()</code> and <code>expr.N()</code> are
 canonical expressions.</p>
-<p>The <code>ce.box()</code> and <code>ce.parse()</code> functions return a canonical expression by
+<p>The <code>ce.expr()</code> and <code>ce.parse()</code> functions return a canonical expression by
 default, which is the desirable behavior in most cases.</p>
 <p><strong>To get a non-canonical version of an expression</strong> use
-of <code>ce.parse(s, {form: &#x27;raw&#x27;})</code> or <code>ce.box(expr, {form: &#x27;raw&#x27;})</code>.</p>
+of <code>ce.parse(s, {form: &#x27;raw&#x27;})</code> or <code>ce.expr(expr, {form: &#x27;raw&#x27;})</code>.</p>
 <p>You can further customize the canonical form of an expression by using the
 <a class="" href="/compute-engine/reference/core/#CanonicalForm"><code>[&quot;CanonicalForm&quot;]</code></a> function
 or by specifying the form you want to use. See <a href="#custom-canonical-form" class="">below</a> for more details.</p>
@@ -171,11 +171,11 @@ expression.</li>
 representation for a given application. For example, if you want to check
 the answers from a quiz, you may want to compare the user input with a
 canonical form that is closer to the user input.</p>
-<p><strong>To get the non-canonical form</strong>, use <code>ce.box(expr, { form: &#x27;raw&#x27; })</code> or
+<p><strong>To get the non-canonical form</strong>, use <code>ce.expr(expr, { form: &#x27;raw&#x27; })</code> or
 <code>ce.parse(s, { form: &#x27;raw&#x27; })</code>.</p>
 <code-playground><div slot="javascript">console.log(ce.parse(&quot;2(0+x\\times x-1)&quot;, {form: &#x27;raw&#x27;}).json);
 </div></code-playground>
-<p><strong>To get the full canonical form</strong>, use <code>ce.box(expr, { form: &#x27;canonical&#x27; })</code> or
+<p><strong>To get the full canonical form</strong>, use <code>ce.expr(expr, { form: &#x27;canonical&#x27; })</code> or
 <code>ce.parse(s, { form: &#x27;canonical&#x27; })</code>. The <code>form</code> option can be omitted
 as it defaults to <code>&#x27;canonical&#x27;</code>.</p>
 <code-playground><div slot="javascript">console.log(ce.parse(&quot;2(0+x\\times x-1)&quot;, {form: &#x27;canonical&#x27;}).json);
@@ -184,9 +184,9 @@ as it defaults to <code>&#x27;canonical&#x27;</code>.</p>
 </div></code-playground>
 <p><strong>To get a custom canonical form of an expression</strong>, use the
 <a class="" href="/compute-engine/reference/core/#CanonicalForm"><code>[&quot;CanonicalForm&quot;]</code></a> function
-or specify the form you want to use with the <code>form</code> option of <code>ce.box()</code>
+or specify the form you want to use with the <code>form</code> option of <code>ce.expr()</code>
 and <code>ce.parse()</code>.</p>
-<p><strong>To order the arguments in a canonical order</strong>, use <code>ce.box(expr, { form: &quot;Order&quot; })</code> or <code>ce.parse(s, { form: &quot;Order&quot; })</code>.</p>
+<p><strong>To order the arguments in a canonical order</strong>, use <code>ce.expr(expr, { form: &quot;Order&quot; })</code> or <code>ce.parse(s, { form: &quot;Order&quot; })</code>.</p>
 <code-playground><div slot="javascript">console.log(ce.parse(&quot;0+1+x+2+\\sqrt{5}&quot;,
 <!-- -->  <!-- -->{form: &quot;Order&quot;}
 <!-- -->));
