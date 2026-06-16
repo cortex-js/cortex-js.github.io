@@ -65105,7 +65105,7 @@ $$((n!)!)$$).
 
 <Signature name="Gamma">_z_</Signature>
 
-<Latex value="\\Gamma(n) = (n-1)!"/>
+<Latex value="\Gamma(n) = (n-1)!"/>
 
 The [Gamma Function](https://en.wikipedia.org/wiki/Gamma_function) is an
 extension of the factorial function, with its argument shifted by 1, to real and
@@ -65126,7 +65126,7 @@ $$
 
 <Signature name="Gamma">_s_, _z_</Signature>
 
-<Latex value="\\Gamma(s, z)"/>
+<Latex value="\Gamma(s, z)"/>
 
 With two arguments, `Gamma` is the **upper incomplete Gamma function**. The lower
 limit of the integral is the second argument `z` instead of `0`:
@@ -65154,7 +65154,7 @@ and fractional orders. The two-argument form is evaluated numerically with
 
 <Signature name="GammaLn">_z_</Signature>
 
-<Latex value="\\ln(\\Gamma(z))"/>
+<Latex value="\ln(\Gamma(z))"/>
 
 This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
 Mathematica.
@@ -65166,7 +65166,7 @@ Mathematica.
 
 <Signature name="Zeta">_s_</Signature>
 
-<Latex value="\\zeta(s)"/>
+<Latex value="\zeta(s)"/>
 
 The [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
 defined for complex numbers with real part greater than 1 as:
@@ -65192,7 +65192,7 @@ and extended to other values by analytic continuation.
 
 <Signature name="Beta">_a_, _b_</Signature>
 
-<Latex value="\\Beta(a, b)"/>
+<Latex value="\Beta(a, b)"/>
 
 The [Euler beta function](https://en.wikipedia.org/wiki/Beta_function), defined as:
 
@@ -65221,7 +65221,7 @@ $$
 
 <Signature name="LambertW">_x_</Signature>
 
-<Latex value="\\operatorname{W}(x)"/>
+<Latex value="\operatorname{W}(x)"/>
 
 The [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function),
 also called the product logarithm. It is the inverse function of
@@ -65257,7 +65257,7 @@ spiral (Euler spiral).
 
 <Signature name="FresnelS">_x_</Signature>
 
-<Latex value="\\operatorname{FresnelS}(x)"/>
+<Latex value="\operatorname{FresnelS}(x)"/>
 
 The Fresnel S integral:
 
@@ -65283,7 +65283,7 @@ $S(\infty) = \tfrac{1}{2}$.
 
 <Signature name="FresnelC">_x_</Signature>
 
-<Latex value="\\operatorname{FresnelC}(x)"/>
+<Latex value="\operatorname{FresnelC}(x)"/>
 
 The Fresnel C integral:
 
@@ -65431,7 +65431,7 @@ They arise in physics, particularly in quantum mechanics and optics.
 
 <Signature name="AiryAi">_x_</Signature>
 
-<Latex value="\\operatorname{Ai}(x)"/>
+<Latex value="\operatorname{Ai}(x)"/>
 
 The [Airy function of the first kind](https://en.wikipedia.org/wiki/Airy_function).
 
@@ -65452,7 +65452,7 @@ positive $x$ and oscillates for negative $x$.
 
 <Signature name="AiryBi">_x_</Signature>
 
-<Latex value="\\operatorname{Bi}(x)"/>
+<Latex value="\operatorname{Bi}(x)"/>
 
 The [Airy function of the second kind](https://en.wikipedia.org/wiki/Airy_function).
 
@@ -65542,7 +65542,7 @@ $E(1) = 1$. For $m > 1$ the value is complex.
 
 <Signature name="AGM">_z_</Signature>
 
-<Latex value="\\operatorname{agm}(a, b)"/>
+<Latex value="\operatorname{agm}(a, b)"/>
 
 The [arithmetic-geometric mean](https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean)
 of two numbers: the common limit of the sequences $a_{n+1} = \frac{a_n +
@@ -65634,7 +65634,7 @@ complex $z$.
 
 <Signature name="JacobiTheta">_j_, _z_, _&tau;_</Signature>
 
-<Latex value="\\theta_j(z, \\tau)"/>
+<Latex value="\theta_j(z, \tau)"/>
 
 The [Jacobi theta functions](https://en.wikipedia.org/wiki/Theta_function)
 $\theta_j(z, \tau)$ for $j \in \{1, 2, 3, 4\}$, with nome $q = e^{i\pi\tau}$
@@ -65668,7 +65668,7 @@ respect to $z$; only order 0 currently evaluates numerically.
 
 <Signature name="DedekindEta">_&tau;_</Signature>
 
-<Latex value="\\eta(\\tau)"/>
+<Latex value="\eta(\tau)"/>
 
 The [Dedekind eta function](https://en.wikipedia.org/wiki/Dedekind_eta_function),
 defined on the upper half-plane ($\operatorname{Im}(\tau) > 0$) by:
