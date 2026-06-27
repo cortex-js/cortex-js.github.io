@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.b630ed2c.js" defer="defer"></script>
-<script src="/assets/js/main.f5ddb8d7.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.5253387d.js" defer="defer"></script>
+<script src="/assets/js/main.a08241b4.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -93,6 +93,14 @@ by the <code>ce.precision</code> property of the <code>ComputeEngine</code> inst
 </div></code-playground>
 <p>The default precision is 21.</p>
 <p><strong>To set the precision to the default value</strong>, use <code>ce.precision = &quot;auto&quot;</code>.</p>
+<p><strong>To request a specific precision for a single evaluation</strong>, use the <code>N</code>
+function with a precision argument: <code>[&quot;N&quot;, expr, digits]</code>.</p>
+<code-playground><div slot="javascript">console.log(ce.box([&#x27;N&#x27;, &#x27;Pi&#x27;, 50]).evaluate().toString());
+</div></code-playground>
+<p>If the requested precision is greater than <code>ce.precision</code>, the working precision
+is raised to match and <strong>kept</strong> raised (display precision is global). If it is at
+or below <code>ce.precision</code>, the result is rounded to that many significant digits
+without changing the working precision.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="machine-precision">Machine Precision<a href="#machine-precision" class="hash-link" aria-label="Direct link to Machine Precision" title="Direct link to Machine Precision" translate="no">​</a></h3>
 <p>If the precision is 15 or less, the Compute Engine uses a
 <a href="https://en.wikipedia.org/wiki/IEEE_754" target="_blank" rel="noopener noreferrer" class="">64-bit binary floating point format</a>
