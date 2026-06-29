@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.04437f98.js" defer="defer"></script>
-<script src="/assets/js/main.af42b410.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.400b328e.js" defer="defer"></script>
+<script src="/assets/js/main.3de6f158.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -77,31 +77,50 @@ resulting expression will have its <code>expr.isValid</code> property set to <co
 <code>[&quot;Error&quot;]</code> expression will be produced where a problem was encountered. To get
 the list of all the errors in an expression, use <code>expr.errors</code> which will return
 an array of <code>[&quot;Error&quot;]</code> expressions.</p>
+<p>Common LaTeX variations are also accepted even when not strictly necessary. For
+example, a one-sided delimiter group written with a TeX <em>null delimiter</em> —
+<code>\sin\left(x\right.</code> — parses the same as a closed <code>\sin\left(x\right)</code> group.</p>
 <div class="readMore_KWn8"><a href="/compute-engine/guides/expressions/#errors"><p>Read more about the <strong>errors</strong> that can be returned. <svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="serializing-to-latex">Serializing to LaTeX<a href="#serializing-to-latex" class="hash-link" aria-label="Direct link to Serializing to LaTeX" title="Direct link to Serializing to LaTeX" translate="no">​</a></h2>
 <p><strong>To serialize an expression to a LaTeX string</strong>, read the <code>expr.latex</code>
 property.</p>
 <div class="language-javascript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-javascript codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">console</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">log</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">ce</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">expr</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;Add&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;Power&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;x&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token number" style="color:var(--base-09)">3</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token number" style="color:var(--base-09)">2</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">latex</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token comment" style="color:var(--base-05)">// ➔  &quot;x^3 + 2&quot;</span><br></div></code></pre></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="control-structure-keywords">Control Structure Keywords<a href="#control-structure-keywords" class="hash-link" aria-label="Direct link to Control Structure Keywords" title="Direct link to Control Structure Keywords" translate="no">​</a></h2>
-<p>The Compute Engine parser recognizes keywords inside <code>\text{...}</code> and
-<code>\operatorname{...}</code> to express control structures in LaTeX.</p>
+<p>The Compute Engine parser recognizes a set of keywords (<code>if</code>, <code>then</code>, <code>else</code>,
+<code>for</code>, <code>where</code>, <code>and</code>, <code>or</code>, <code>for all</code>, …) that express control structures and
+logic in LaTeX.</p>
+<p>Each keyword can be written three equivalent ways:</p>
+<ul>
+<li class=""><strong><code>\keyword{if}</code></strong> — the preferred form. It keeps the input in math mode and
+renders with the symmetric spacing expected of a keyword.</li>
+<li class=""><strong><code>\text{if}</code></strong> — the conventional form. It switches to text mode, which is
+awkward to enter inside a formula.</li>
+<li class=""><strong><code>\operatorname{if}</code></strong> (or <code>\mathrm{if}</code>) — the operator-name spelling, with
+the tighter spacing used for function names.</li>
+</ul>
+<p>All three parse to the same expression and may be mixed freely. Multi-word
+keywords are written as a single token, e.g. <code>\keyword{for all}</code> or
+<code>\keyword{such that}</code>.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Note</div><div class="admonitionContent_BuS1"><p><code>\keyword{...}</code> requires the rendering environment (such as MathLive) to define
+the <code>\keyword</code> command. <code>\text{...}</code> and <code>\operatorname{...}</code> render everywhere.
+All three are always accepted on input.</p></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="inline-conditionals">Inline Conditionals<a href="#inline-conditionals" class="hash-link" aria-label="Direct link to Inline Conditionals" title="Direct link to Inline Conditionals" translate="no">​</a></h3>
-<p>Use <code>\text{if}</code>, <code>\text{then}</code>, and <code>\text{else}</code> keywords:</p>
-<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\text{if } x &gt; 0 \\text{ then } x \\text{ else } -x&quot;).json);
+<p>Use the <code>if</code>, <code>then</code>, and <code>else</code> keywords:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\keyword{if} x &gt; 0 \\keyword{then} x \\keyword{else} -x&quot;).json);
 <!-- -->// ➔ [&quot;If&quot;, [&quot;Greater&quot;, &quot;x&quot;, 0], &quot;x&quot;, [&quot;Negate&quot;, &quot;x&quot;]]
 </div></code-playground>
-<p>The <code>\text{else}</code> branch is optional. When omitted, the result is <code>Nothing</code> if
-the condition is false.</p>
+<p>The <code>else</code> branch is optional. When omitted, the result is <code>Nothing</code> if the
+condition is false.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="local-bindings-with-where">Local Bindings with <code>where</code><a href="#local-bindings-with-where" class="hash-link" aria-label="Direct link to local-bindings-with-where" title="Direct link to local-bindings-with-where" translate="no">​</a></h3>
-<p>The <code>\text{where}</code> keyword binds variables to values in an expression:</p>
-<code-playground><div slot="javascript">console.log(ce.parse(&quot;a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2&quot;).json);
+<p>The <code>where</code> keyword binds variables to values in an expression:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;a + b \\keyword{where} a \\coloneq 1,\\; b \\coloneq 2&quot;).json);
 <!-- -->// ➔ [&quot;Block&quot;, [&quot;Declare&quot;, &quot;a&quot;], [&quot;Assign&quot;, &quot;a&quot;, 1],
 <!-- -->//             [&quot;Declare&quot;, &quot;b&quot;], [&quot;Assign&quot;, &quot;b&quot;, 2],
 <!-- -->//             [&quot;Add&quot;, &quot;a&quot;, &quot;b&quot;]]
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="loops">Loops<a href="#loops" class="hash-link" aria-label="Direct link to Loops" title="Direct link to Loops" translate="no">​</a></h3>
-<p>Use <code>\text{for}</code>, <code>\text{from}</code>, <code>\text{to}</code>, and <code>\text{do}</code> keywords:</p>
-<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2&quot;).json);
+<p>Use the <code>for</code>, <code>from</code>, <code>to</code>, and <code>do</code> keywords:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2&quot;).json);
 <!-- -->// ➔ [&quot;Loop&quot;, [&quot;Power&quot;, &quot;i&quot;, 2], [&quot;Element&quot;, &quot;i&quot;, [&quot;Range&quot;, 1, 10]]]
 </div></code-playground>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="semicolon-blocks">Semicolon Blocks<a href="#semicolon-blocks" class="hash-link" aria-label="Direct link to Semicolon Blocks" title="Direct link to Semicolon Blocks" translate="no">​</a></h3>
@@ -394,6 +413,14 @@ option handler.</p>
 <!-- -->}));
 </div></code-playground>
 <table><thead><tr><th style="text-align:left"></th><th style="text-align:left"></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:left"><code>&quot;word&quot;</code></td><td style="text-align:left"><code>a \text{ and } b</code></td><td style="text-align:left"><code class="language-math math-inline">a \text{ and } b</code></td></tr><tr><td style="text-align:left"><code>&quot;boolean&quot;</code></td><td style="text-align:left"></td><td style="text-align:left"></td></tr><tr><td style="text-align:left"><code>&quot;uppercase-word&quot;</code></td><td style="text-align:left"><code>p \text{ AND } q</code></td><td style="text-align:left"><code class="language-math math-inline">p \text{ AND } q</code></td></tr><tr><td style="text-align:left"><code>&quot;punctuation&quot;</code></td><td style="text-align:left"></td><td style="text-align:left"></td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="control-structure-keywords-1">Control Structure Keywords<a href="#control-structure-keywords-1" class="hash-link" aria-label="Direct link to Control Structure Keywords" title="Direct link to Control Structure Keywords" translate="no">​</a></h4>
+<p><strong>To customize how control structure keywords</strong> (<code>if</code>/<code>then</code>/<code>else</code>, <code>for</code>,
+<code>break</code>, <code>return</code>, …) <strong>are serialized</strong>, use the <code>keywordStyle</code> option.</p>
+<code-playground><div slot="javascript">console.log(parse(&quot;\\keyword{if} x &gt; 0 \\keyword{then} 1 \\keyword{else} 0&quot;).toLatex({
+<!-- -->  <!-- -->keywordStyle: &quot;keyword&quot;
+<!-- -->}));
+</div></code-playground>
+<table><thead><tr><th style="text-align:left">Value</th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:left"><code>&quot;text&quot;</code> (default)</td><td style="text-align:left"><code>\text{if } x \text{ then } 1 …</code></td></tr><tr><td style="text-align:left"><code>&quot;keyword&quot;</code></td><td style="text-align:left"><code>\keyword{if} x \keyword{then} 1 …</code></td></tr><tr><td style="text-align:left"><code>&quot;operatorname&quot;</code></td><td style="text-align:left"><code>\operatorname{if} x …</code></td></tr></tbody></table>
 <h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="power">Power<a href="#power" class="hash-link" aria-label="Direct link to Power" title="Direct link to Power" translate="no">​</a></h4>
 <p><strong>To customize how powers are serialized</strong>, use the <code>powerStyle</code> style option
 handler.</p>

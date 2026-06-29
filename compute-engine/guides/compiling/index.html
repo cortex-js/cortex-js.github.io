@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.04437f98.js" defer="defer"></script>
-<script src="/assets/js/main.af42b410.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.400b328e.js" defer="defer"></script>
+<script src="/assets/js/main.3de6f158.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -122,7 +122,7 @@ JavaScript.</p>
 <code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
 <!-- -->
 <!-- -->// If expression
-<!-- -->const f = compile(&quot;\\text{if } x &gt; 0 \\text{ then } x \\text{ else } -x&quot;);
+<!-- -->const f = compile(&quot;\\keyword{if} x &gt; 0 \\keyword{then} x \\keyword{else} -x&quot;);
 <!-- -->console.log(f.run({ x: -5 }));
 <!-- -->// ➔ 5
 <!-- -->
@@ -146,7 +146,7 @@ variables:</p>
 and <code>Return</code> compile to their JavaScript equivalents:</p>
 <code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
 <!-- -->
-<!-- -->const f = compile(&quot;\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2&quot;);
+<!-- -->const f = compile(&quot;\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2&quot;);
 <!-- -->console.log(f.run());
 <!-- -->// ➔ 100 (last iteration value)
 </div></code-playground>

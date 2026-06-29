@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.04437f98.js" defer="defer"></script>
-<script src="/assets/js/main.af42b410.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.400b328e.js" defer="defer"></script>
+<script src="/assets/js/main.3de6f158.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -69,6 +69,11 @@ part of a mathematical expression:</p>
 <p>which would correspond to the LaTeX expression:</p>
 <div class="language-latex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-latex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token function selector" style="color:var(--base-09)">\mathrm</span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain">circumference</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> = 2 </span><span class="token function selector" style="color:var(--base-09)">\cdot</span><span class="token plain"> </span><span class="token function selector" style="color:var(--base-09)">\textcolor</span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain">blue</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token function selector" style="color:var(--base-09)">\pi</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token function selector" style="color:var(--base-09)">\cdot</span><span class="token plain"> r</span><br></div></code></pre></div></div>
 <p>Annotated expressions are similar to attributed strings in other systems.</p>
+<p>When <code>\textcolor</code> (or <code>\color</code>) wraps a bare <strong>operator</strong> rather than an operand
+— for example <code>x \textcolor{red}{=} y</code> — the operator is parsed as usual
+(<code>[&quot;Equal&quot;, &quot;x&quot;, &quot;y&quot;]</code>) and the color is dropped: MathJSON has no way to attach
+an <code>Annotated</code> wrapper to a lone operator glyph. Coloring an operand (such as
+<code>\textcolor{red}{x + 1}</code>) still produces an <code>Annotated</code> expression.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="text-expressions">Text Expressions<a href="#text-expressions" class="hash-link" aria-label="Direct link to Text Expressions" title="Direct link to Text Expressions" translate="no">​</a></h3>
 <p>A <code>[&quot;Text&quot;]</code> expression is a sequence of strings, annotated expressions or
 other <code>[&quot;Text&quot;]</code> expressions. It is used to represent formatted text content,

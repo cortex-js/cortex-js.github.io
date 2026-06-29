@@ -11991,7 +11991,7 @@ JavaScript.
 // import { compile } from '@cortex-js/compute-engine';
 
 // If expression
-const f = compile("\\text{if } x > 0 \\text{ then } x \\text{ else } -x");
+const f = compile("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x");
 console.log(f.run({ x: -5 }));
 // ➔ 5
 
@@ -12024,7 +12024,7 @@ and `Return` compile to their JavaScript equivalents:
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
-const f = compile("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2");
+const f = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
 console.log(f.run());
 // ➔ 100 (last iteration value)
 ```
@@ -15540,7 +15540,7 @@ The symbols that appear in function-application syntax `f(…)` in `latex`
 but are not defined as functions in the current scope (so they parse as
 implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
-such as notebooks; intersect with BoxedExpression.freeVariables
+such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
 
 ####### latex
@@ -20288,6 +20288,7 @@ type SerializeLatexOptions = NumberSerializationFormat & {
   invisiblePlus: LatexString;
   multiply: LatexString;
   missingSymbol: LatexString;
+  keywordStyle: "text" | "keyword" | "operatorname";
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
@@ -20387,6 +20388,30 @@ missingSymbol: LatexString;
 ```
 
 Serialize the expression `["Error", "'missing'"]`,  with this LaTeX string
+
+#### SerializeLatexOptions.keywordStyle
+
+```ts
+keywordStyle: "text" | "keyword" | "operatorname";
+```
+
+How to serialize keyword constructs (`if`/`then`/`else`, `for`, `where`,
+`and`, `or`, the quantifiers, …).
+
+- `'text'` (default): `\text{if }`, `\text{ then }`, … — the conventional
+  spelling. Spacing is encoded manually inside the braces.
+- `'keyword'`: `\keyword{if}`, `\keyword{then}`, … — a math-mode command
+  whose renderer applies symmetric keyword spacing. Requires the rendering
+  environment to define `\keyword`.
+- `'operatorname'`: `\operatorname{if}`, … — operator-name spacing.
+
+All three spellings parse back to the same expression.
+
+##### Default
+
+```ts
+'text'
+```
 
 #### SerializeLatexOptions.indexStyle
 
@@ -22075,7 +22100,7 @@ The symbols that appear in function-application syntax `f(…)` in `latex`
 but are not defined as functions in the current scope (so they parse as
 implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
-such as notebooks; intersect with BoxedExpression.freeVariables
+such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
 
 ####### latex
@@ -29476,12 +29501,141 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.66.0 _2026-06-28_
 
 ### New Features
 
-- **Differential equation solvers.** Two new functions in the calculus library
-  provide an initial slice of ordinary differential equation (ODE) support:
+- **`Multiply` now operates on vectors and matrices.** Previously a product with
+  any list/matrix operand was left unevaluated — even `2 * [1, 2, 3]`.
+  `Multiply` (i.e. `*`, `\cdot`, `\times`, and implicit products) now follows
+  matrix-product / scalar-scaling semantics, matching `Add`'s existing
+  element-wise threading:
+
+  - **Scalar × tensor** scales every element: `2 * [1, 2, 3]` → `[2, 4, 6]`,
+    `2 * \begin{pmatrix}1&2\\3&4\end{pmatrix}` →
+    `\begin{pmatrix}2&4\\6&8\end{pmatrix}` (exact values are preserved, e.g.
+    `\frac12 [2, 4, 6]` → `[1, 2, 3]`).
+  - **Two or more matrices/vectors** form the **matrix product**, folded
+    left-to-right in the written order:
+    `\begin{pmatrix}1&2\\3&4\end{pmatrix}\begin{pmatrix}5&6\\7&8\end{pmatrix}` →
+    `\begin{pmatrix}19&22\\43&50\end{pmatrix}`. The product is **not**
+    commutative — operand order is preserved (including for `matrix·vector` vs
+    `vector·matrix`), and `vector·vector` reduces to the dot product. This
+    reuses the existing `MatrixMultiply` implementation.
+
+  Element-wise (Hadamard) multiplication of two same-shape tensors is therefore
+  **not** what `*` does; tensors of incompatible dimensions are left
+  unevaluated, and symbolic operands of unknown shape are unaffected.
+
+- **Hadamard (element-wise) product `\odot`.** A new `HadamardProduct` operator,
+  written `\odot`, multiplies two vectors or matrices of the same shape entry by
+  entry: `[1,2,3] \odot [4,5,6]` → `[4,10,18]` and
+  `\begin{pmatrix}1&2\\3&4\end{pmatrix} \odot \begin{pmatrix}5&6\\7&8\end{pmatrix}`
+  → `\begin{pmatrix}5&12\\21&32\end{pmatrix}` (compare the matrix product `*`,
+  which gives `\begin{pmatrix}19&22\\43&50\end{pmatrix}`). Operands of
+  incompatible shape report an `incompatible-dimensions` error. It binds like
+  multiplication and round-trips through LaTeX as `\odot`.
+
+### Resolved Issues
+
+- **Mixed chained inequalities keep their middle term.** A chain combining
+  different operators — e.g. `5 \le b \lt 7` — canonicalized to
+  `And(5 \le 7, b \lt 7)`, dropping `b` from the first link (so `3 \le 2 \lt 7`
+  wrongly evaluated to `True`). It now canonicalizes to `And(5 \le b, b \lt 7)`.
+  Uniform chains (`5 \le b \le 7`) and the already-correct `a \lt b \le c` form
+  are unchanged.
+
+- **A transcendental of an exact _constant expression_ stays symbolic.** Per the
+  exactness contract, `evaluate()` of a transcendental of an exact argument
+  returns a symbolic result and only `.N()` numericizes. This held for number
+  literals (`sin(2)` → `sin(2)`) but not for exact constant _expressions_:
+  `sin(\pi^2)` numericized to `-0.4303…` instead of staying `sin(π²)` (and
+  likewise `cos(√2)`, etc.). These now stay symbolic under `evaluate()`; an
+  inexact (float) argument such as `sin(2.5)` still numericizes.
+
+- **An exact real added to the imaginary unit keeps its exact real part.**
+  `\frac12 + i` evaluated to `0.5 + i`, and `\frac34\sqrt3 + i` to `1.299… + i`
+  — the exact real part was floatified when folded with `i`. Exact reals
+  (rationals, radicals) are now preserved alongside the imaginary unit
+  (`1/2 + i`, `3/4·√3 + i`); `.N()` still numericizes, and inexact reals
+  (`1.5 + i`) are unchanged.
+
+- **Matrix/vector arithmetic preserves exact entries.** A tensor with exact
+  rational or radical entries was stored with a `float64` element type, so
+  element-wise operations silently produced floats — e.g.
+  `\begin{pmatrix}½&⅓\end{pmatrix} + \begin{pmatrix}½&⅓\end{pmatrix}` returned
+  `[1, 0.666…]` instead of `[1, ⅔]`, and a matrix of `√2` entries decayed to
+  decimals. Exact entries now use the `expression` element type and stay exact;
+  inexact (machine/decimal) values continue to use `float64`.
+
+- **`A^n` is now the matrix power for an integer exponent.** A power of a matrix
+  was element-wise for non-negative exponents (`A^2` squared each entry, `A^0`
+  gave a matrix of ones) yet `A^{-1}` already returned the inverse, and
+  `\begin{pmatrix}…\end{pmatrix}^2` did not evaluate at all. `A^n` is now the
+  matrix power — repeated matrix multiplication — consistent with `*` being the
+  matrix product: `A^2 = A·A`, `A^0` is the identity, `A^{-1}` the inverse, and
+  `A^{-n} = (A^n)^{-1}`. A non-square base reports `expected-square-matrix`.
+  (Also fixes `MatrixPower(A, n)` for `n < -1`, which previously collapsed to
+  `A^{-1}`.)
+
+- **Element-wise functions now distribute over matrix/vector-valued
+  sub-expressions.** A broadcastable unary function applied to an operand that
+  only becomes a collection _after_ evaluation — e.g. `\sqrt{AB}`, `\sin(AB)`,
+  `|AB|` where `AB` is a matrix product — was left unevaluated, because
+  broadcasting was decided from the raw (un-evaluated) operand. It now also
+  broadcasts over the evaluated operand, so these distribute element-wise like
+  `\sqrt{M}` on a literal matrix already did. (`Add`/`Multiply` keep their
+  dedicated tensor handling.)
+
+- **Juxtaposed matrices now form the matrix product.** Writing two matrices next
+  to each other (`\begin{pmatrix}…\end{pmatrix}\begin{pmatrix}…\end{pmatrix}`),
+  or a scalar next to a matrix (`2\begin{pmatrix}…\end{pmatrix}`), previously
+  produced a `Tuple` instead of a product, because the `Matrix(…)` wrapper is
+  not reported as an indexed collection. The invisible (implicit) operator now
+  treats matrix operands as multiplication, consistent with
+  `*`/`\cdot`/`\times`.
+
+- **`Negate` (and hence `Subtract`) of a matrix-valued product is distributed
+  correctly.** A negation whose operand only became a vector/matrix after
+  evaluation — e.g. `Negate(Multiply(A, B))` from `A B - A B` — was left
+  undistributed, so the following `Add`/`Subtract` misclassified it as a scalar
+  and broadcast it over the other matrix, yielding a bogus higher-rank result.
+  Matrix subtraction (e.g. the commutator `AB - BA`) now evaluates correctly.
+
+- **A `\textcolor` wrapping a bare operator now parses as that operator.** Input
+  such as `x \textcolor{red}{=} y` previously failed — the `=` could not be
+  parsed as a standalone group, producing a `Tuple` around an
+  `expected-closing-delimiter` error. The color command is now transparent in
+  operator position, so `x \textcolor{red}{=} y` parses as `Equal(x, y)` (and
+  likewise for `+`, `<`, `\le`, `\times`, …). Because MathJSON has no way to
+  annotate a lone operator glyph, the operator's color is dropped; coloring an
+  operand (`\textcolor{red}{y}`, `\textcolor{red}{x+1}`) is unchanged and still
+  yields an `Annotated`.
+
+- **One-sided `\left( … \right.` enclosures now parse.** `\right.` (and the
+  `\bigr.`/`\Bigr.`/… variants) is a TeX _null delimiter_: a fence with no
+  visible closing glyph. Previously a one-sided group such as
+  `\sin\left(x\right.` was rejected, leaking the `\left` out as an
+  `unexpected-command` error; it now parses the same as `\sin\left(x\right)` (→
+  `Sin(x)`). The null _open_ form (`\left.…\right|`, used by `EvaluateAt`) and
+  ordinary two-sided delimiters are unchanged.
+
+- **Summation/product indices written as a `\le` range are now recognized.** An
+  index set of the form `\sum_{1 \le i \le 10} i^2` (and the one-sided
+  `\sum_{i \le 10}`) is now turned into the expected `Limits`, so the index `i`
+  is bound by the sum instead of falling through to the imaginary unit. The
+  example above now evaluates to `385` rather than staying symbolic with
+  `i → Complex(0, 1)`. This mirrors the existing handling of `i \ge 1` and
+  `i = 1`; strict `<` chains are not yet treated as index sets.
+
+## 0.65.0 _2026-06-28_
+
+### New Features
+
+- **Differential equation solvers.** (contributed by
+  [KingArth0r](https://github.com/KingArth0r)) Two new functions in the calculus
+  library provide an initial slice of ordinary differential equation (ODE)
+  support:
 
   - **`DSolve(eq, y, x)`** — symbolic solver for **first-order linear scalar**
     equations of the form `y'(x) + p(x)·y(x) = q(x)`. It returns a `List` of
@@ -29496,12 +29650,33 @@ import ChangeLog from '@site/src/components/ChangeLog';
     using a fixed-step fourth-order Runge–Kutta (RK4) method. It returns a
     `List` of `[x, y]` sample pairs over the interval given by `limits` (a
     `Limits` or `Tuple` of `(x, x0, x1)`); the number of steps defaults to 100.
-    It handles integrands with no elementary antiderivative (e.g. a Gaussian
-    IVP whose solution is expressed with `Erf`).
+    It handles integrands with no elementary antiderivative (e.g. a Gaussian IVP
+    whose solution is expressed with `Erf`).
 
   This slice is intentionally narrow so the API and result shape can get
   feedback before broader ODE support (adaptive RK45, systems, higher-order
   reductions, stiff and implicit solvers) is added.
+
+- **`\keyword{…}` command for control-flow and logic keywords.** Keyword
+  constructs — `if`/`then`/`else`, `for`/`from`/`to`/`do`, `where`, `such that`,
+  `and`, `or`, `iff`, `for all`, `there exists`, `break`, `continue`, `return` —
+  can now be written with a dedicated `\keyword{…}` command, for example:
+
+  ```latex
+  \keyword{if} x > 0 \keyword{then} 1 \keyword{else} 0
+  ```
+
+  Unlike `\text{…}`, `\keyword{…}` keeps the input in math mode, and unlike
+  `\operatorname{…}` it is rendered with symmetric keyword spacing. The existing
+  `\text{…}` and `\operatorname{…}` spellings continue to work, and all three
+  parse to the same expression. Multi-word keywords are written as a single
+  token (e.g. `\keyword{for all}`). `\keyword{otherwise}` / `\keyword{else}`
+  also serve as the default-branch marker inside a `cases` environment.
+
+  A new `keywordStyle` serialization option — `"text"` (default), `"keyword"`,
+  or `"operatorname"` — selects which spelling is emitted when serializing `If`,
+  `Loop`, `Break`, `Continue`, and `Return` back to LaTeX. The default preserves
+  the previous `\text{…}` output.
 
 ## 0.64.0 _2026-06-27_
 
@@ -29631,16 +29806,17 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features
 
-- **LaTeX parse errors carry their source location.** The `Error` expressions
-  produced by the LaTeX parser now include a `sourceOffsets: [start, end]`
-  character range identifying where in the input the error occurred, so a
-  consumer can map a parse error back to the offending span — e.g. to highlight
-  an invalid token in a mathfield. Offsets are zero-based and end-exclusive into
-  the serialized LaTeX (`tokensToString`); for input that round-trips through
-  the tokenizer unchanged — editor-generated LaTeX, with no comments, Unicode
-  normalization, or macro expansion — they match the original input string.
-  Missing-operand errors (an empty `\sqrt{}` or `\frac{}{}`) use a zero-width
-  range at the position where the token was expected. The new
+- **LaTeX parse errors carry their source location.** (contributed by
+  [zojize](https://github.com/zojize)) The `Error` expressions produced by the
+  LaTeX parser now include a `sourceOffsets: [start, end]` character range
+  identifying where in the input the error occurred, so a consumer can map a
+  parse error back to the offending span — e.g. to highlight an invalid token in
+  a mathfield. Offsets are zero-based and end-exclusive into the serialized
+  LaTeX (`tokensToString`); for input that round-trips through the tokenizer
+  unchanged — editor-generated LaTeX, with no comments, Unicode normalization,
+  or macro expansion — they match the original input string. Missing-operand
+  errors (an empty `\sqrt{}` or `\frac{}{}`) use a zero-width range at the
+  position where the token was expected. The new
   `Parser.sourceOffsets(startToken, endToken?)` helper lets custom dictionary
   entries attach a range to errors they raise. The raw parser output
   (`LatexSyntax().parse()`) always carries these offsets, so an `Error` node is
@@ -41316,36 +41492,42 @@ ce.parse('2(1,2,3)').evaluate()
 // ➔ ["List", 2, 4, 6]
 ```
 
-### Element-wise vs Matrix Multiplication
+### Matrix Multiplication and the Hadamard Product
 
-**Important**: The `Multiply` function and `*` operator perform **element-wise**
-(Hadamard) multiplication. For matrix multiplication, use the `MatrixMultiply` function.
+The `Multiply` function and the `*`, `\cdot` and `\times` operators — and writing
+two matrices next to each other — perform **matrix multiplication** when their
+operands are vectors or matrices. This is consistent with `*` denoting scalar
+multiplication:
 
-**Element-wise multiplication** (each element multiplied independently):
+- a **scalar × tensor** scales every element;
+- **two or more matrices/vectors** form the [matrix product](#matrixmultiply),
+  folded left to right (a `vector × vector` reduces to the dot product).
 
 ```json example
+// Matrix product
 ["Multiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
+
+// Scalar scaling
+["Multiply", 2, ["List", 1, 2, 3]]
+// ➔ ["List", 2, 4, 6]
+```
+
+Matrix multiplication is **not commutative**, so the operand order is preserved.
+Operands with incompatible dimensions are left unevaluated.
+
+For the **element-wise (Hadamard) product** — multiplying corresponding entries
+of two same-shape tensors — use [`HadamardProduct`](#hadamardproduct), written
+`\odot`:
+
+```json example
+["HadamardProduct",
   ["List", ["List", 1, 2], ["List", 3, 4]],
   ["List", ["List", 5, 6], ["List", 7, 8]]]
 // ➔ ["List", ["List", 5, 12], ["List", 21, 32]]
 // Each position: [1×5, 2×6], [3×7, 4×8]
-```
-
-**Matrix multiplication** (linear algebraic product):
-
-```json example
-["MatrixMultiply",
-  ["List", ["List", 1, 2], ["List", 3, 4]],
-  ["List", ["List", 5, 6], ["List", 7, 8]]]
-// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
-// Matrix product: [[1×5+2×7, 1×6+2×8], [3×5+4×7, 3×6+4×8]]
-```
-
-```typescript example
-const m1 = ce.expr(['List', ['List', 1, 2], ['List', 3, 4]]);
-const m2 = ce.expr(['List', ['List', 5, 6], ['List', 7, 8]]);
-ce.function('MatrixMultiply', [m1, m2]).evaluate()
-// ➔ [[19,22],[43,50]]
 ```
 
 ### LaTeX Matrix Syntax
@@ -42287,14 +42469,13 @@ its arguments.
 Returns the [matrix product](https://en.wikipedia.org/wiki/Matrix_multiplication)
 of two matrices, vectors, or a combination thereof.
 
-:::info[Element-wise vs Matrix Multiplication]
-**Important**: Use `MatrixMultiply` for linear algebraic matrix multiplication.
-The `Multiply` function performs element-wise (Hadamard) multiplication where
-corresponding elements are multiplied: `[1,2,3] * [4,5,6]` → `[4,10,18]`.
-
-For matrix multiplication where the result is computed using row-column dot products,
-always use `MatrixMultiply`. See the [Quick Start](#basic-operations-quick-start)
-section for examples.
+:::info[`MatrixMultiply` vs `Multiply` vs `HadamardProduct`]
+`MatrixMultiply` is the explicit matrix product. The `Multiply` function and the
+`*`, `\cdot`, `\times` operators (and writing matrices next to each other) also
+produce the **matrix product** for tensor operands — they reuse this
+implementation. For the **element-wise (Hadamard) product**, use
+[`HadamardProduct`](#hadamardproduct) (`\odot`): `[1,2,3] \odot [4,5,6]` →
+`[4,10,18]`.
 :::
 
 **Matrix × Matrix**: If _A_ is an m×n matrix and _B_ is an n×p matrix, the result
@@ -42361,6 +42542,39 @@ are incompatible, an `incompatible-dimensions` error is returned.
 </FunctionDefinition>
 
 <nav className="hidden">
+### HadamardProduct
+</nav>
+<FunctionDefinition name="HadamardProduct">
+
+<Signature name="HadamardProduct">_A_, _B_</Signature>
+
+<Latex value="\mathbf{A} \odot \mathbf{B}"/>
+
+Returns the [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices))
+(element-wise product) of two vectors or matrices of the **same shape**: each
+entry is the product of the corresponding entries.
+
+This is distinct from the [matrix product](#matrixmultiply), which `Multiply`
+(`*`, `\cdot`, `\times`) computes for tensor operands.
+
+```json example
+["HadamardProduct", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+// ➔ ["List", 4, 10, 18]
+
+["HadamardProduct",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 5, 12], ["List", 21, 32]]
+```
+
+In LaTeX, the operator is written `\odot` and round-trips as such.
+
+**Dimension Validation**: The operands must have the same shape. Otherwise an
+`incompatible-dimensions` error is returned.
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Matrix Addition (Add)
 </nav>
 <FunctionDefinition name="Add">
@@ -42419,6 +42633,16 @@ single `Add` operation.
   ["List", ["List", "a", "b"], ["List", "c", "d"]],
   ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", ["List", ["Add", "a", 1], ["Add", "b", 2]], ["List", ["Add", "c", 3], ["Add", "d", 4]]]
+```
+
+**Exact Values**: Element-wise matrix and vector arithmetic preserves exact
+entries (rationals, radicals) rather than converting them to decimals.
+
+```json example
+["Add",
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]],
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]]]
+// ➔ ["List", ["List", 1, ["Rational", 2, 3]]]
 ```
 
 **Dimension Validation**: All matrices must have the same shape. If shapes
@@ -42577,13 +42801,21 @@ Returns the [cross product](https://en.wikipedia.org/wiki/Cross_product) of two
 
 Returns the square matrix raised to the integer power _n_, that is the repeated
 matrix product $$\mathbf{A} \cdot \mathbf{A} \cdots$$. A power of `0` returns the
-identity matrix; a negative power raises the inverse to `|n|`.
+identity matrix; a negative power raises the inverse to `|n|`
+($$\mathbf{A}^{-n} = (\mathbf{A}^{n})^{-1}$$). A non-square base returns an
+`expected-square-matrix` error.
 
-This is distinct from `["Power", matrix, n]`, which raises each element to the
-power _n_ (element-wise).
+Writing `A^n` (`["Power", matrix, n]`) with an integer exponent is the **matrix
+power** as well — it routes here — so `\begin{pmatrix}1&2\\3&4\end{pmatrix}^2`
+evaluates to the matrix product, not an element-wise power. For an element-wise
+power of the entries, map `Power` over the matrix.
 
 ```json example
 ["MatrixPower", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
+// ➔ ["List", ["List", 7, 10], ["List", 15, 22]]
+
+// A^n notation routes to MatrixPower:
+["Power", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
 // ➔ ["List", ["List", 7, 10], ["List", 15, 22]]
 ```
 
@@ -49683,6 +49915,10 @@ resulting expression will have its `expr.isValid` property set to `false`. An
 the list of all the errors in an expression, use `expr.errors` which will return
 an array of `["Error"]` expressions.
 
+Common LaTeX variations are also accepted even when not strictly necessary. For
+example, a one-sided delimiter group written with a TeX *null delimiter* —
+`\sin\left(x\right.` — parses the same as a closed `\sin\left(x\right)` group.
+
 <ReadMore path="/compute-engine/guides/expressions/#errors" > 
 Read more about the **errors** that can be returned. <Icon name="chevron-right-bold" />
 </ReadMore>
@@ -49699,27 +49935,47 @@ console.log(ce.expr(["Add", ["Power", "x", 3], 2]).latex);
 
 ## Control Structure Keywords
 
-The Compute Engine parser recognizes keywords inside `\text{...}` and
-`\operatorname{...}` to express control structures in LaTeX.
+The Compute Engine parser recognizes a set of keywords (`if`, `then`, `else`,
+`for`, `where`, `and`, `or`, `for all`, …) that express control structures and
+logic in LaTeX.
+
+Each keyword can be written three equivalent ways:
+
+- **`\keyword{if}`** — the preferred form. It keeps the input in math mode and
+  renders with the symmetric spacing expected of a keyword.
+- **`\text{if}`** — the conventional form. It switches to text mode, which is
+  awkward to enter inside a formula.
+- **`\operatorname{if}`** (or `\mathrm{if}`) — the operator-name spelling, with
+  the tighter spacing used for function names.
+
+All three parse to the same expression and may be mixed freely. Multi-word
+keywords are written as a single token, e.g. `\keyword{for all}` or
+`\keyword{such that}`.
+
+:::info[Note]
+`\keyword{...}` requires the rendering environment (such as MathLive) to define
+the `\keyword` command. `\text{...}` and `\operatorname{...}` render everywhere.
+All three are always accepted on input.
+:::
 
 ### Inline Conditionals
 
-Use `\text{if}`, `\text{then}`, and `\text{else}` keywords:
+Use the `if`, `then`, and `else` keywords:
 
 ```live
-console.log(ce.parse("\\text{if } x > 0 \\text{ then } x \\text{ else } -x").json);
+console.log(ce.parse("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x").json);
 // ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
 ```
 
-The `\text{else}` branch is optional. When omitted, the result is `Nothing` if
-the condition is false.
+The `else` branch is optional. When omitted, the result is `Nothing` if the
+condition is false.
 
 ### Local Bindings with `where`
 
-The `\text{where}` keyword binds variables to values in an expression:
+The `where` keyword binds variables to values in an expression:
 
 ```live
-console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").json);
+console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1,\\; b \\coloneq 2").json);
 // ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
 //             ["Declare", "b"], ["Assign", "b", 2],
 //             ["Add", "a", "b"]]
@@ -49727,10 +49983,10 @@ console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").js
 
 ### Loops
 
-Use `\text{for}`, `\text{from}`, `\text{to}`, and `\text{do}` keywords:
+Use the `for`, `from`, `to`, and `do` keywords:
 
 ```live
-console.log(ce.parse("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2").json);
+console.log(ce.parse("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2").json);
 // ➔ ["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]
 ```
 
@@ -50244,6 +50500,23 @@ console.log(parse("p\\land q").toLatex({
 | `"boolean"`        |                    |                      |
 | `"uppercase-word"` | `p \text{ AND } q`  | $ p \text{ AND } q $                     |
 | `"punctuation"`    |                    |                      |
+
+#### Control Structure Keywords
+
+**To customize how control structure keywords** (`if`/`then`/`else`, `for`,
+`break`, `return`, …) **are serialized**, use the `keywordStyle` option.
+
+```live
+console.log(parse("\\keyword{if} x > 0 \\keyword{then} 1 \\keyword{else} 0").toLatex({
+  keywordStyle: "keyword"
+}));
+```
+
+| Value             |                                       |
+| :---------------- | :------------------------------------ |
+| `"text"` (default) | `\text{if } x \text{ then } 1 …`     |
+| `"keyword"`        | `\keyword{if} x \keyword{then} 1 …`  |
+| `"operatorname"`   | `\operatorname{if} x …`              |
 
 #### Power
 
@@ -52311,29 +52584,34 @@ ce.parse('2(1,2,3)').evaluate();
 // → [2,4,6]
 ```
 
-### Element-wise vs Matrix Multiplication
+### Matrix vs Element-wise Multiplication
 
 **Important distinction:**
-- Use `Multiply` or `*` for **element-wise** multiplication (Hadamard product)
-- Use `MatrixMultiply` for **linear algebraic** matrix multiplication
+- `Multiply` / `*` / `\cdot` / `\times` — and writing two matrices next to each
+  other — perform **matrix multiplication** (the linear-algebraic product),
+  consistent with `*` being scalar multiplication.
+- Use `\odot` (`HadamardProduct`) for **element-wise** (Hadamard) multiplication.
 
 ```js example
-// Element-wise multiplication
+// Matrix multiplication (row-column dot products)
 ce.expr(['Multiply',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]).evaluate();
-// → [[5,12],[21,32]]  (each element multiplied independently)
+// → [[19,22],[43,50]]
 
-// Matrix multiplication (linear algebraic product)
-ce.expr(['MatrixMultiply',
-  ['List', ['List', 1, 2], ['List', 3, 4]],
-  ['List', ['List', 5, 6], ['List', 7, 8]]
-]).evaluate();
-// → [[19,22],[43,50]]  (row-column dot products)
+// Same as writing the matrices next to each other in LaTeX
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}\\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[19,22],[43,50]]
+
+// Element-wise (Hadamard) multiplication
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix} \\odot \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[5,12],[21,32]]  (each element multiplied independently)
 ```
 
-For detailed information on matrix multiplication, see the [Matrix Multiplication](#matrix-multiplication) section below.
+Matrix multiplication is **not commutative** — operand order is preserved, and a
+`vector·vector` product reduces to the dot product. For detailed information,
+see the [Matrix Multiplication](#matrix-multiplication) section below.
 
 ## LaTeX Matrix Notation
 
@@ -52414,6 +52692,10 @@ ce.parse('A^{-1}');
 
 ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
 // → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Integer power: the matrix power (A·A·…), not element-wise
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^2').evaluate();
+// → [[7,10],[15,22]]  (A·A, the matrix product)
 
 // Trace using \operatorname
 ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
@@ -52998,8 +53280,11 @@ if (isFunction(luResult)) {
 
 ## Matrix Multiplication
 
-Use `MatrixMultiply` to perform matrix multiplication. The function supports
-multiple combinations of operands:
+Use `MatrixMultiply` to perform matrix multiplication. The `*`, `\cdot` and
+`\times` operators, and writing two matrices next to each other, also compute the
+matrix product for tensor operands and reuse the same implementation — so
+`A * B`, `A \cdot B`, `AB`, and `MatrixMultiply(A, B)` are equivalent. The
+function supports multiple combinations of operands:
 
 ### Matrix × Matrix
 
@@ -53080,6 +53365,54 @@ const A = ['Matrix', ['List', ['List', 1, 2], ['List', 3, 4]]];
 const B = ['Matrix', ['List', ['List', 5, 6], ['List', 7, 8]]];
 ce.expr(['MatrixMultiply', A, B]).latex;
 // → "\begin{pmatrix}1 & 2\\ 3 & 4\end{pmatrix} \cdot \begin{pmatrix}5 & 6\\ 7 & 8\end{pmatrix}"
+```
+
+## Matrix Power
+
+Raising a square matrix to an integer power `A^n` computes the **matrix power**
+(repeated matrix product), consistent with `*` being the matrix product:
+
+```js example
+// A^2 = A · A
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^2').evaluate();
+// → [[7,10],[15,22]]
+
+// A^0 is the identity matrix
+ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], 0]).evaluate();
+// → [[1,0],[0,1]]
+
+// A^{-1} is the inverse, A^{-n} = (A^n)^{-1}
+ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], -1]).evaluate();
+// → [[-2,1],[1.5,-0.5]]
+```
+
+`A^n` (an integer power) routes to `MatrixPower`. A non-square base returns an
+`expected-square-matrix` error. For an element-wise power of the entries, map
+`Power` over the matrix.
+
+## Hadamard (Element-wise) Product
+
+The `\odot` operator (`HadamardProduct`) multiplies two same-shape tensors entry
+by entry — distinct from the matrix product computed by `*`:
+
+```js example
+ce.parse('[1,2,3] \\odot [4,5,6]').evaluate();
+// → [4,10,18]
+
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix} \\odot \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[5,12],[21,32]]
+```
+
+Operands of incompatible shape return an `incompatible-dimensions` error.
+
+## Matrix Subtraction
+
+Matrices subtract element-wise, including products of matrices — for example the
+commutator `AB − BA`:
+
+```js example
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}\\begin{pmatrix}5&6\\\\7&8\\end{pmatrix} - \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}').evaluate();
+// → [[-4,-12],[12,4]]
 ```
 
 ## Matrix Addition and Scalar Broadcasting
@@ -55737,6 +56070,20 @@ Evaluate to the sum of `body` for each value in `bounds`.
 ```json example
 ["Sum", ["Add", "i", 1], ["Tuple", "i", 1, 10]]
 // ➔ 65
+```
+
+The bounds can also be written as a `\le` (or `\ge`) range in the subscript,
+instead of the `i=1`/superscript form. The chained form gives both bounds; a
+one-sided form supplies a single bound (the other defaults):
+
+```json example
+// \sum_{1 \le i \le 10} i^2
+ce.parse('\\sum_{1 \\le i \\le 10} i^2').evaluate()
+// ➔ 385
+
+// \sum_{i \le 10} i   (lower bound defaults to 1)
+ce.parse('\\sum_{i \\le 10} i').evaluate()
+// ➔ 55
 ```
 
 <Signature name="Sum" returns="number">_body_: function, ..._bounds_: Element</Signature>
@@ -60628,6 +60975,12 @@ which would correspond to the LaTeX expression:
 
 Annotated expressions are similar to attributed strings in other systems.
 
+When `\textcolor` (or `\color`) wraps a bare **operator** rather than an operand
+— for example `x \textcolor{red}{=} y` — the operator is parsed as usual
+(`["Equal", "x", "y"]`) and the color is dropped: MathJSON has no way to attach
+an `Annotated` wrapper to a lone operator glyph. Coloring an operand (such as
+`\textcolor{red}{x + 1}`) still produces an `Annotated` expression.
+
 
 
 ### Text Expressions
@@ -62793,6 +63146,41 @@ the `Which[]` function in Mathematica.
 
 </FunctionDefinition>
 
+<FunctionDefinition name="When">
+
+<Signature name="When">_expr_, _condition_</Signature>
+
+Returns the value of `expr` when `condition` evaluates to `True`, and
+`Undefined` when `condition` evaluates to `False`. When `condition` cannot
+be determined, the expression holds unevaluated.
+
+`["When"]` is the AST head produced by **restriction-brace** syntax:
+`expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
+for masking values where a predicate does not hold.
+
+```json example
+["When", ["Square", "x"], ["Greater", "x", 0]]
+// Evaluates to x^2 when x > 0, Undefined otherwise.
+```
+
+**Stacked restrictions canonicalize** to a single `When` with an `And`
+predicate:
+
+```json example
+["When", ["When", "x", ["Greater", "x", 0]], ["Less", "x", 10]]
+// Canonicalizes to:
+["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
+```
+
+Downstream simplification, interval intersection, and compilation operate on
+the canonical form, so source variants (stacked braces or a single brace
+with `\wedge`) are interchangeable.
+
+When compiled to JavaScript or GLSL, `When(e, cond)` emits a ternary
+`(cond ? e : NaN)`. This makes `When` suitable for plot-domain masking.
+
+</FunctionDefinition>
+
 ## Loops
 
 <FunctionDefinition name="Loop">
@@ -62828,6 +63216,43 @@ expression is the value of the last iteration of the loop, or the value of the
 
 `Loop` with a `body` and `collection` to iterate is equivalent to a `forEach()`
 in JavaScript. It is somewhat similar to a `Do[...]` in Mathematica.
+
+<Signature name="Loop">_body_, _element-1_, _element-2_, ...</Signature>
+
+Iterates over multiple `["Element", _name_, _collection_]` clauses, evaluating
+`body` once per combination and accumulating the results into an
+`indexed_collection`. This is the **list-comprehension** form of `Loop`.
+
+Bindings are evaluated as nested loops, outermost = first `Element` clause.
+Later clauses see earlier bindings in scope, so a clause's collection can
+depend on a name bound by an earlier clause.
+
+When all clauses are independent, the result is the Cartesian product:
+
+```json example
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 2]],
+  ["Element", "y", ["Range", 1, 2]]]
+// ➔ [(1,1), (1,2), (2,1), (2,2)]  — 4 tuples
+```
+
+When a later clause depends on an earlier binding, the iteration follows
+the dependency (and the Cartesian product collapses):
+
+```json example
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 3]],
+  ["Element", "y", ["Range", 1, "x"]]]
+// ➔ [(1,1), (2,1), (2,2), (3,1), (3,2), (3,3)]  — 6 tuples (triangle)
+```
+
+Bound names do not leak into the enclosing scope.
+
+The list-comprehension form of `Loop` is produced by trailing
+`\operatorname{for}` syntax (see **LaTeX Syntax for Control Structures**
+below).
 
 </FunctionDefinition>
 
@@ -62866,24 +63291,32 @@ programming constructs that can be used to replace loops.
 
 ## LaTeX Syntax for Control Structures
 
-Control structures can be expressed in LaTeX using keyword syntax with
-`\text{...}` or `\operatorname{...}`.
+Control structures are expressed in LaTeX using keywords. Each keyword can be
+written three equivalent ways, which may be mixed freely:
+
+- **`\keyword{if}`** — the preferred form: stays in math mode and renders with
+  symmetric keyword spacing.
+- **`\text{if}`** — the conventional form.
+- **`\operatorname{if}`** (or `\mathrm{if}`) — operator-name spelling.
+
+Multi-word keywords are a single token, e.g. `\keyword{for all}`. (`\keyword{...}`
+requires the rendering environment to define the `\keyword` command; `\text{...}`
+and `\operatorname{...}` render everywhere.)
 
 ### Inline `If`
 
 ```latex
-\text{if } x > 0 \text{ then } x \text{ else } -x
+\keyword{if} x > 0 \keyword{then} x \keyword{else} -x
 ```
 
 Parses to `["If", ["Greater", "x", 0], "x", ["Negate", "x"]]`.
 
-The `\text{else}` branch is optional. `\operatorname{if}` can be used instead
-of `\text{if}`.
+The `else` branch is optional.
 
 ### `where` Bindings
 
 ```latex
-x^2 + y^2 \text{ where } x \coloneq 3,\; y \coloneq 4
+x^2 + y^2 \keyword{where} x \coloneq 3,\; y \coloneq 4
 ```
 
 Parses to a `["Block"]` with variable declarations, assignments, and the body
@@ -62892,10 +63325,60 @@ expression as the return value.
 ### `for` Loops
 
 ```latex
-\text{for } i \text{ from } 1 \text{ to } 10 \text{ do } i^2
+\keyword{for} i \keyword{from} 1 \keyword{to} 10 \keyword{do} i^2
 ```
 
 Parses to `["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]`.
+
+### `for` Comprehensions
+
+A trailing `for` clause produces a list comprehension:
+
+```latex
+(x, y) \keyword{for} x = [1...3], y = [1...x]
+```
+
+Parses to:
+
+```json
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 3]],
+  ["Element", "y", ["Range", 1, "x"]]]
+```
+
+The trailing `for` keyword binds looser than `,` and `=`, so the body
+expression (`(x, y)` above) is parsed before the keyword fires, and the
+bindings are parsed as comma-separated `name = expr` pairs after it.
+
+Multiple bindings produce a Cartesian product (or a dependency-shaped
+iteration when later bindings reference earlier ones). See the
+`Loop` definition above for full semantics.
+
+### Restriction Braces
+
+A trailing `\{cond\}` after an expression masks the value by a predicate:
+
+```latex
+f(x)\left\{0 < x < 2\right\}
+```
+
+Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
+
+When the condition is `True`, the expression evaluates to its left operand;
+when `False`, it evaluates to `Undefined`. This is distinct from a set
+literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
+disambiguation is positional — trailing braces after a complete expression
+attach as a `When` restriction.
+
+Stacked restrictions chain and canonicalize:
+
+```latex
+x\left\{x > 0\right\}\left\{x < 10\right\}
+```
+
+Parses to `["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]`.
+The serializer round-trips this canonical form back to stacked braces.
 
 ### Semicolon Blocks
 
