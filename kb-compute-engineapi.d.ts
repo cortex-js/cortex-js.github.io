@@ -48,6 +48,19 @@ export declare class BigDecimal {
     static get EULER_GAMMA(): BigDecimal;
     readonly significand: bigint;
     readonly exponent: number;
+    /** Lazily-cached decimal digit count of |significand| (see `digitCount`). */
+    private _digits?;
+    /**
+     * Number of decimal digits in |significand|, computed once and cached on this
+     * immutable value. `toPrecision`, `cmp`, `div`, `pow`, `ln` etc. all re-derive
+     * the order of magnitude from the (unchanging) significand; caching turns the
+     * O(log n) bigint `bigintDigits` count into an O(1) reuse.
+     *
+     * The frozen static constants (`ZERO`, `ONE`, …) can't take the cache write,
+     * so they recompute — trivially, since they are all single-digit.
+     * @internal
+     */
+    digitCount(): number;
     constructor(value: string | number | bigint | BigDecimal);
     /** True when this value represents NaN. */
     isNaN(): boolean;
