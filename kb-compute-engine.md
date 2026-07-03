@@ -16314,7 +16314,7 @@ assume(predicate): AssumeResult
 
 ####### predicate
 
-[`Expression`](#expression-3)
+`string` \| [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -16616,7 +16616,7 @@ verify(query): boolean | undefined
 
 ####### query
 
-[`Expression`](#expression-3)
+`string` \| [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -22874,7 +22874,7 @@ assume(predicate): AssumeResult
 
 ####### predicate
 
-[`Expression`](#expression-3)
+`string` \| [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -23176,7 +23176,7 @@ verify(query): boolean | undefined
 
 ####### query
 
-[`Expression`](#expression-3)
+`string` \| [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -24857,6 +24857,12 @@ It is possible that the result of `expr.evaluate()` may be the same as
 `expr.simplify()`.
 
 The result is in canonical form.
+
+**Time and recursion limits**: if the evaluation exceeds
+`engine.timeLimit` or the recursion limit, a `CancellationError` is
+thrown (its `cause` is `'timeout'` or `'recursion-depth-exceeded'`).
+Catch it to distinguish an interrupted evaluation from a symbolic
+(inert) result.
 
 ####### options?
 
@@ -27419,7 +27425,6 @@ type PrimitiveType =
   | "set"
   | "dictionary"
   | "record"
-  | "dictionary"
   | "tuple"
   | "value"
   | "scalar"
@@ -27494,18 +27499,22 @@ type NumericPrimitiveType =
   | "non_finite_number";
 ```
 
-- `number`: any numeric value = `complex` + `real` plus `NaN`
-- `complex`: a number with non-zero real and imaginary parts = `finite_complex` plus `ComplexInfinity`
+The numeric tower (D10, 2026-07-02): `integer ⊂ rational ⊂ real ⊂ complex ⊂
+number`, with a parallel `finite_*` tower and a shared `non_finite_number`
+(±∞). `real` is a proper subtype of `complex`; both admit ±∞.
+
+- `number`: any numeric value = `complex` plus `NaN`
+- `complex`: a complex number (`real ⊂ complex`) = `finite_complex` + `non_finite_number`
 - `finite_complex`: a finite complex number = `imaginary` + `finite_real`
 - `imaginary`: a complex number with a real part of 0 (pure imaginary)
 - `finite_number`: a finite numeric value = `finite_complex`
 - `finite_real`: a finite real number = `finite_rational` + `finite_integer`
-- `finite_rational`: a pure rational number
-- `finite_integer`: a whole number
-- `real`: a complex number with an imaginary part of 0 = `finite_real` + `non_finite_number`
+- `finite_rational`: a finite rational number (includes the finite integers)
+- `finite_integer`: a finite whole number
+- `real`: a real number (imaginary part 0), admits ±∞ = `finite_real` + `non_finite_number`
 - `non_finite_number`: `PositiveInfinity`, `NegativeInfinity`
-- `integer`: a whole number = `finite_integer` + `non_finite_number`
-- `rational`: a pure rational number (not an integer) = `finite_rational` + `non_finite_number`
+- `integer`: a whole number, admits ±∞ = `finite_integer` + `non_finite_number`
+- `rational`: a rational number (includes the integers), admits ±∞ = `finite_rational` + `non_finite_number`
 
 </MemberCard>
 
@@ -27845,6 +27854,12 @@ Types are described using the following BNF grammar:
            | <rest_argument>
 
 <list_type> ::= "list<" <type> <dimensions>? ">"
+           | "vector<" (<type> <dimensions>? | <dimensions>) ">"
+           | "matrix<" (<type> <dimensions>? | <dimensions>) ">"
+           | "tensor<" <type> ">"
+  Note: there is no `[type]` bracket shorthand; a list is always written with
+  one of the `list`/`vector`/`matrix`/`tensor` heads. The authoritative
+  grammar lives with the parser in `./parser.ts`.
 
 <dimensions> ::= "^" <fixed_size>
            | "^(" <multi_dimensional_size> ")"
@@ -27852,10 +27867,6 @@ Types are described using the following BNF grammar:
 <fixed_size> ::= <positive-integer_literal>
 
 <multi_dimensional_size> ::= <positive-integer_literal> "x" <positive-integer_literal> ("x" <positive-integer_literal>)*
-
-<map> ::= "map" | "map<" <map_elements> ">"
-
-<map_elements> ::= <name> <type> ("," <name> <type>)*
 
 <set> ::= "set<" <type> ">"
 
@@ -27876,9 +27887,9 @@ Examples of types strings:
 - `"collection<integer>"` -- a collection type where all the elements are integers
 - `"collection<(number, boolean)>"` -- a collection of tuples
 - `"collection<(value:number, seen:boolean)>"` -- a collection of named tuples
-- `"[boolean]^32"` -- a collection type with a fixed size of 32 elements
-- `"[integer]^(2x3)"` -- an integer matrix of 2 columns and 3 rows
-- `"[integer]^(2x3x4)"` -- a tensor of dimensions 2x3x4
+- `"vector<boolean^32>"` -- a list type with a fixed size of 32 elements
+- `"matrix<integer^(2x3)>"` -- an integer matrix of 2 columns and 3 rows
+- `"list<integer^(2x3x4)>"` -- a tensor of dimensions 2x3x4
 - `"number -> number"` -- a signature with a single argument
 - `"(x: number, number) -> number"` -- a signature with a named argument
 - `"(number, y:number?) -> number"` -- a signature with an optional named argument (can have several optional arguments, at the end)
@@ -29531,7 +29542,70 @@ import ChangeLog from '@site/src/components/ChangeLog';
   recurrence with a symbolic order derivative
   `Apply(Derivative(BesselJ, 1, 0), x, x)` instead of staying inert.
 
+- **`verify()` and `assume()` accept strings.** `ce.verify('x > 0')` and
+  `ce.assume('$x > 0$')` parse the predicate (LaTeX) and proceed; unparseable
+  input throws a clear error. In addition, `verify()` of compound predicates
+  now recurses properly: after `assume(x·y > 0)` and `assume(x + y > 0)`,
+  `verify(And(x·y > 0, x + y > 0))` is `true` and `verify(Not(x·y > 0))` is
+  `false` (the Kleene logic recursion was previously unreachable).
+
+- **New default simplification: sine addition.**
+  `sin(x)cos(y) + cos(x)sin(y)` → `sin(x + y)` (and the `−`/`sin(x−y)`
+  variant) now applies in the default `simplify()` path, not just under the
+  `fu` rule set.
+
+- **`\binom` is now supported.** `\binom{n}{k}` (and `\dbinom`/`\tbinom`)
+  parses to `Binomial(n, k)`, and `Binomial` serializes back to `\binom` —
+  previously `\binom` was a parse error.
+
+- **`==` and `!=` now evaluate.** `3 == 3` evaluates to `True` (previously an
+  inert `EqualEqual`) and `3!= 2` is a not-equal comparison (with `3! = 2`,
+  space before `=`, still parsed as a factorial equation). Additional unicode
+  operators are accepted in all modes: `≤ ≥ ≠ × · ∞ √ ½ ¼ ¾ ⅓ ⅔`.
+
+- **Misparse-driven auto-declarations are recoverable.** In strict mode,
+  parsing `gcd(12,8)` (an unknown multi-letter name applied to arguments)
+  auto-declares the applied symbol as a function; that declaration is now
+  marked *inferred*, so a later `ce.assign('d', 5)` overrides it and `d+1`
+  evaluates to `6` instead of erroring forever.
+
+- **`real` is now a subtype of `complex` in the type lattice.** The numeric
+  tower is the chain `integer ⊂ rational ⊂ real ⊂ complex ⊂ number`, so a
+  real-typed symbol now satisfies complex-typed signatures and guards through
+  the ordinary subtype relation (previously `complex` effectively meant
+  "strictly complex" and real-typed arguments needed special-case handling).
+  `meet(real, complex)` is now `real`. The `isReal` predicate is unchanged
+  (real still admits ±∞). In addition, union types now flatten nested unions
+  and canonicalize member order — `integer | string` and `string | integer`
+  produce the same `.type` string — and type negation distinguishes `never`
+  (bottom) from `nothing` (unit): `!any` is `never`, `!never` is `any`.
+
+- **Assumptions are more capable.** `assume(x ∈ PositiveIntegers)` (and the
+  other signed integer/real sets) now decomposes into a type and a sign bound,
+  so `x.isInteger` and `x.isPositive` respond; inequality bounds now reach
+  equality checks (`assume(w > 4)` makes `w.isEqual(2)` false, and
+  `verify(x ≠ 0)` holds after `assume(x > 0)`); two bounded symbols compare
+  (`assume(s > 4); assume(t < 1)` makes `s > t` evaluate to `True`); a
+  contradictory conjunction such as `assume(p > 0 ∧ p < −5)` is now atomic —
+  it is rejected without leaving the earlier conjuncts applied; and a no-arg
+  `forget()` now also clears values installed by `assume('x = 5')` while
+  preserving values set with `assign()`.
+
 ### Performance
+
+- **The Rubi integration pack is much faster on integrals it cannot solve.**
+  A second-level dispatch index (the set of operator heads a rule's pattern
+  requires vs the heads present in the integrand) now screens the ~3,200
+  rules before pattern-matching, cutting candidate scans ~10× on the miss
+  path — integrals that fall through to the built-in integrator spend less
+  than half the previous time in the pack, with byte-identical results
+  verified across the full 4,965-integral Rubi test corpus.
+
+- **Sign queries under assumptions are much faster and sharper.** `.sgn` /
+  `.isPositive` on a symbol constrained by assumptions now consults the
+  indexed bounds store (O(1) after indexing) instead of linearly re-matching
+  every assumption, and derives strictly more: `n ∈ Range(1, 10)` now yields
+  `isPositive === true` (previously undefined), agreeing with `verify(n > 0)`.
 
 - **Faster polynomial equation solving.** Solving a univariate polynomial of
   degree ≥ 2 now goes straight to a coefficient-based closed form (quadratic
@@ -29554,6 +29628,150 @@ import ChangeLog from '@site/src/components/ChangeLog';
   speeds up high-precision `N()`.
 
 ### Resolved Issues
+
+- **Free functions accept the looser AsciiMath/Typst-like syntax they
+  document.** `simplify()`, `evaluate()`, `N()`, `expand()`, `expandAll()`,
+  `factor()`, `solve()`, and `compile()` now parse string input in non-strict
+  mode, so bare function names, multi-letter identifiers, and `**` for
+  exponentiation work — e.g.
+  `simplify("(sin(alpha)**2 + cos(alpha)**2) * (x**2 + 2*x + 1) / (x + 1)")`
+  returns `x + 1` and `N("(1+sqrt(5))/2")` returns the golden ratio.
+  Previously these were parsed as strict LaTeX and silently mangled
+  (`sqrt(5)` became `5·q·r·s·t`, the `i` in `sin` was read as the imaginary
+  unit). Canonical LaTeX input is unaffected. The standalone `parse(latex)`
+  entry point remains strict LaTeX.
+
+- **Hard limits no longer hang.** Nested-exponential (Gruntz-class) limits
+  such as `lim_{x→∞} e^{e^{e^x}}/e^{e^{e^{x-1}}}` burned ~18 minutes of CPU
+  in the limit engine before giving up; the engine now honors the evaluation
+  deadline and probes order-of-growth with machine floats instead of
+  building multi-million-digit intermediates — the same limits return
+  (symbolically inert) in milliseconds. The timeout contract is now
+  documented on `evaluate()`: exceeding `timeLimit` or the recursion limit
+  throws a `CancellationError` (with `cause` `'timeout'` or
+  `'recursion-depth-exceeded'`) — catch it to distinguish an interrupted
+  evaluation from a symbolic result.
+
+- **`subs()` reaches into collections.** `Median([a,b,c]).subs({a: 1})`
+  (and substitution into any list/tensor element) previously returned the
+  expression unchanged — `BoxedTensor` now delegates substitution to its
+  structural form. Explicit `Hold(…)` semantics are unchanged.
+
+- **`0^0` is NaN on every path.** The `.N()` path returned `1` (via
+  `Math.pow`) while `evaluate()` returned NaN; both now agree, matching the
+  compiled-JavaScript alignment from the previous round.
+
+- **`simplify({rules: null})` honors its contract.** It now applies no
+  rules (structural/numeric folding only) as documented, instead of
+  silently using the full default rule set. Also, `ln(a)/ln(b) → k` now
+  verifies `a = bᵏ` with exact bigint arithmetic — `ln(2⁶⁰+1)/ln(2)` no
+  longer falsely reduces to 60 — and the simplification cost-gate
+  exemptions moved from fragile label string-matching to explicit
+  `purpose: 'transform'` tags (no behavior change).
+
+- **Fungrim guards are uniformly finite.** Real/integer-typed rule guards
+  now require the argument not be known-infinite, matching the complex
+  guard: a real-guarded identity like `Im(e^{ix}) → sin(x)` no longer fires
+  for `x = +∞` (which produced NaN). Pack shell declarations also survive
+  scope pops and re-loads, and `Union` no longer collapses inert set-valued
+  operands (e.g. `Interior(…)`) into literal elements.
+
+- **Wester audit grading is honest.** A finite `.N()` value no longer
+  counts as correct for definite integrals and limits — results are graded
+  against an independent numeric reference; `±`-annotated outputs
+  (`PlusMinus`) are unwrapped instead of graded unsolved. (Harness only; no
+  report regenerated yet.)
+
+- **Numeric kernel accuracy.** Arbitrary-precision `log`/`log10`/`log2` now
+  carry guard digits (`log10(10⁻⁷)` is exactly `−7`; `2^(−1/2)` is correctly
+  rounded, was 2.35 ulp); `Zeta` at negative even integers returns exactly
+  `0` (was a ~1e-76 residue); machine `gammaln` was rewritten in Lanczos-log
+  form (~15.7 correct digits, was ~10.5, improving `Gamma`/`Beta` for large
+  arguments); the Fresnel integrals' asymptotic cutoff moved from 36,974 to
+  6×10¹⁵ with an exactly-computed phase (S(40,000) was returned as a flat
+  0.5, an 8.6e-6 error cliff); exact root extraction recognizes perfect
+  powers (`64^(1/3)` → `4`, `(27/8)^(1/3)` → `3/2` exact), no longer drops
+  the radical in products like `(8√3)^(1/3)`, and fixes a wrong half-integer
+  root decomposition; and exact rational×radical values now round to the
+  working precision when numericized (a precision-100 `(7/3)√3` printed 199
+  digits of which only ~103 were correct; machine-precision results are now
+  the correctly-rounded double).
+
+- **Negative fractional powers canonicalize uniformly.** `x^(−1/3)` becomes
+  `1/∛x` (matching `x^(−1/2)` → `1/√x`) instead of the anomalous
+  `Root(x, −3)` rendered as `\sqrt[-3]{x}`; also fixes a crash evaluating
+  numeric negative-index roots such as `8^(−1/3)`.
+
+- **Float coefficients no longer mint exact cancellations.** `(0.3x)/(0.1y)`
+  kept an exact coefficient `3` (binary `0.3/0.1` is not exactly 3); division
+  coefficient extraction now follows the same float-exclusion convention as
+  `Add`/`Multiply` folding.
+
+- **Comparison coherence.** The primitive overload of `isSame` agrees with
+  the boxed path (`Rational(1,2).isSame(0.5)` matches
+  `.isSame(ce.number(0.5))`), and collection `isEqual` uses the same
+  tolerance semantics as scalars (near-equal float vectors compare equal
+  within `ce.tolerance`; NaN-element behavior is now documented).
+
+- **Parse/serialize fidelity.** `x^2^3` is a "double superscript" parse error
+  (previously it silently became `Power(x, List(2,3))` and broadcast to a
+  list); `Sequence(1,2)` no longer serializes to `1 2`, which re-parsed as
+  the number `12`; set-builder notation `\{x \in \R : x > 0\}` attaches the
+  condition to the comprehension instead of nesting it inside the domain; and
+  `toMathJson({exclude: …})` now honors exclusions for number literals
+  (`Rational` → `Divide`, `Sqrt` → `Power`).
+
+- **Compiled code matches the interpreter more closely.** Negative-bound
+  `Sum` unrolls no longer emit `--3` (invalid in GLSL/WGSL); user variables
+  named after GLSL/WGSL reserved words (`sample`, `filter`, `in`, `texture`,
+  …) fail at compile time with a diagnostic instead of emitting invalid
+  shader code; chained relations evaluate their middle operands once
+  (`a < Random() < b` drew twice); dynamic `0^0` returns NaN in compiled
+  JavaScript (matching the interpreter) and non-boolean `Which`/`When`
+  conditions throw as the interpreter does; `realOnly` no longer passes
+  booleans through; and the compiled `Integrate` Monte-Carlo behavior
+  (~1e-4 error, 10⁷ samples) is now documented.
+
+- **Eight Fungrim `Digamma` special values now simplify.** `Digamma(1/2)` →
+  `−2 ln 2 − γ` and seven siblings (1/3, 1/4, 1/6, 1/8, 2/3, 3/4, 5/6) were
+  cost-gated into silent no-ops; they are now tagged as transforms and fire
+  when the Fungrim pack is loaded.
+
+- **High-precision results were silently wrong after increasing `precision`.**
+  The internal table of Bernoulli numbers used by `Gamma`, `Digamma`,
+  `PolyGamma` and `Zeta` at high precision was built once per process and
+  never extended, so raising `ce.precision` after a first computation reused a
+  too-short table: a precision-300 `Gamma(1.23456789)` computed after a
+  precision-20 call diverged from the correct value around digit 170. The
+  table is now rebuilt when more terms are needed (results verified
+  bit-identical to a fresh engine and to mpmath).
+
+- **Finite set operations compute correct results.**
+  `Intersection({1,2}, {2})` returned `EmptySet` (elements were compared
+  against the whole second set rather than tested for membership) and
+  `SymmetricDifference` never evaluated at all. Both now reduce correctly,
+  with `Union`/`SetMinus` verified against value tables.
+
+- **`Reverse` no longer crashes on short lists.** Its iterator's termination
+  test could never be true, so `Reverse([1,2,3]).evaluate()` threw a raw
+  JavaScript error instead of returning `[3,2,1]`.
+
+- **Non-strict mode no longer crashes on missing arguments.** With
+  `ce.strict = false`, expressions missing required arguments — `Negate()`,
+  `Sqrt()`, `Power(2)`, `Arctan()` — threw raw JavaScript errors, and
+  `Sin()` printed `sin([undefined])`. The non-strict fast paths now pad
+  missing required arguments the same way strict mode does, producing
+  identical MathJSON.
+
+- **Rubi integration cleanups.** A rule-driven antiderivative could contain
+  unreduced `ln(e)` factors that `simplify()` couldn't fold inside a quotient
+  (`∫ e²ˣ/x³` now yields a clean `ExpIntegralEi(2x)` form, and
+  `(ln(e)·y)/x` simplifies to `y/x`); an internal re-entrant integration
+  no longer resets the evaluation deadline (a fallback could previously grant
+  the outer integral a fresh time budget); the rule-compilation report now
+  carries per-rule skip reasons and stays honest on cached reloads; and the
+  driver's memo table is cleared per top-level integration instead of growing
+  without bound.
 
 - **Integer-domain functions no longer crash on infinite arguments.**
   `Fibonacci(+∞)`, `BernoulliB(−∞)`, `MoebiusMu(∞)` and the rest of the

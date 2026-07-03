@@ -233,6 +233,17 @@ export declare class BigDecimal {
      */
     toPrecision(n: number): BigDecimal;
     /**
+     * Round to `n` significant digits (round-half-to-even) given a *precomputed*
+     * decimal digit count of |significand|. Precondition: the value is finite and
+     * nonzero and `digits === digitCount() > n` (so it always rounds). Callers
+     * that already know the digit count (e.g. `div`, whose quotient digit count is
+     * derivable from the operand sizes) use this to skip the `bigintDigits` scan
+     * that `toPrecision` would otherwise run. Byte-identical to `toPrecision(n)`
+     * whenever `digits` equals the true digit count.
+     * @internal
+     */
+    private roundToPrecKnownDigits;
+    /**
      * Truncate fractional part and return a bigint.
      * Throws if the value is NaN or Infinity.
      */
@@ -532,20 +543,24 @@ export declare function parseType(s: TypeString | Type | undefined, typeResolver
  *
  *
  */
-export type PrimitiveType = NumericPrimitiveType | 'collection' | 'indexed_collection' | 'list' | 'set' | 'dictionary' | 'record' | 'dictionary' | 'tuple' | 'value' | 'scalar' | 'function' | 'symbol' | 'boolean' | 'string' | 'color' | 'expression' | 'unknown' | 'error' | 'nothing' | 'never' | 'any';
+export type PrimitiveType = NumericPrimitiveType | 'collection' | 'indexed_collection' | 'list' | 'set' | 'dictionary' | 'record' | 'tuple' | 'value' | 'scalar' | 'function' | 'symbol' | 'boolean' | 'string' | 'color' | 'expression' | 'unknown' | 'error' | 'nothing' | 'never' | 'any';
 /**
- * - `number`: any numeric value = `complex` + `real` plus `NaN`
- * - `complex`: a number with non-zero real and imaginary parts = `finite_complex` plus `ComplexInfinity`
+ * The numeric tower (D10, 2026-07-02): `integer ⊂ rational ⊂ real ⊂ complex ⊂
+ * number`, with a parallel `finite_*` tower and a shared `non_finite_number`
+ * (±∞). `real` is a proper subtype of `complex`; both admit ±∞.
+ *
+ * - `number`: any numeric value = `complex` plus `NaN`
+ * - `complex`: a complex number (`real ⊂ complex`) = `finite_complex` + `non_finite_number`
  * - `finite_complex`: a finite complex number = `imaginary` + `finite_real`
  * - `imaginary`: a complex number with a real part of 0 (pure imaginary)
  * - `finite_number`: a finite numeric value = `finite_complex`
  * - `finite_real`: a finite real number = `finite_rational` + `finite_integer`
- * - `finite_rational`: a pure rational number
- * - `finite_integer`: a whole number
- * - `real`: a complex number with an imaginary part of 0 = `finite_real` + `non_finite_number`
+ * - `finite_rational`: a finite rational number (includes the finite integers)
+ * - `finite_integer`: a finite whole number
+ * - `real`: a real number (imaginary part 0), admits ±∞ = `finite_real` + `non_finite_number`
  * - `non_finite_number`: `PositiveInfinity`, `NegativeInfinity`
- * - `integer`: a whole number = `finite_integer` + `non_finite_number`
- * - `rational`: a pure rational number (not an integer) = `finite_rational` + `non_finite_number`
+ * - `integer`: a whole number, admits ±∞ = `finite_integer` + `non_finite_number`
+ * - `rational`: a rational number (includes the integers), admits ±∞ = `finite_rational` + `non_finite_number`
  *
  */
 export type NumericPrimitiveType = 'number' | 'finite_number' | 'complex' | 'finite_complex' | 'imaginary' | 'real' | 'finite_real' | 'rational' | 'finite_rational' | 'integer' | 'finite_integer' | 'non_finite_number';
@@ -722,6 +737,12 @@ export type Type = PrimitiveType | AlgebraicType | NegationType | CollectionType
  *            | <rest_argument>
  *
  * <list_type> ::= "list<" <type> <dimensions>? ">"
+ *            | "vector<" (<type> <dimensions>? | <dimensions>) ">"
+ *            | "matrix<" (<type> <dimensions>? | <dimensions>) ">"
+ *            | "tensor<" <type> ">"
+ *   Note: there is no `[type]` bracket shorthand; a list is always written with
+ *   one of the `list`/`vector`/`matrix`/`tensor` heads. The authoritative
+ *   grammar lives with the parser in `./parser.ts`.
  *
  * <dimensions> ::= "^" <fixed_size>
  *            | "^(" <multi_dimensional_size> ")"
@@ -729,10 +750,6 @@ export type Type = PrimitiveType | AlgebraicType | NegationType | CollectionType
  * <fixed_size> ::= <positive-integer_literal>
  *
  * <multi_dimensional_size> ::= <positive-integer_literal> "x" <positive-integer_literal> ("x" <positive-integer_literal>)*
- *
- * <map> ::= "map" | "map<" <map_elements> ">"
- *
- * <map_elements> ::= <name> <type> ("," <name> <type>)*
  *
  * <set> ::= "set<" <type> ">"
  *
@@ -753,9 +770,9 @@ export type Type = PrimitiveType | AlgebraicType | NegationType | CollectionType
  * - `"collection<integer>"` -- a collection type where all the elements are integers
  * - `"collection<(number, boolean)>"` -- a collection of tuples
  * - `"collection<(value:number, seen:boolean)>"` -- a collection of named tuples
- * - `"[boolean]^32"` -- a collection type with a fixed size of 32 elements
- * - `"[integer]^(2x3)"` -- an integer matrix of 2 columns and 3 rows
- * - `"[integer]^(2x3x4)"` -- a tensor of dimensions 2x3x4
+ * - `"vector<boolean^32>"` -- a list type with a fixed size of 32 elements
+ * - `"matrix<integer^(2x3)>"` -- an integer matrix of 2 columns and 3 rows
+ * - `"list<integer^(2x3x4)>"` -- a tensor of dimensions 2x3x4
  * - `"number -> number"` -- a signature with a single argument
  * - `"(x: number, number) -> number"` -- a signature with a named argument
  * - `"(number, y:number?) -> number"` -- a signature with an optional named argument (can have several optional arguments, at the end)
@@ -1016,7 +1033,7 @@ export declare const SCALAR_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare const PRIMITIVE_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare function isValidPrimitiveType(s: any): s is PrimitiveType;
 export declare function isValidType(t: any): t is Readonly<Type>;
-/* 0.66.0 */import type { PrimitiveType, Type, TypeCompatibility, TypeString } from './types';
+/* 0.66.0 */import type { NumericPrimitiveType, PrimitiveType, Type, TypeCompatibility, TypeString } from './types';
 /** Return true if lhs is a subtype of rhs */
 export declare function isPrimitiveSubtype(lhs: PrimitiveType, rhs: PrimitiveType): boolean;
 /**
@@ -1026,16 +1043,30 @@ export declare function isPrimitiveSubtype(lhs: PrimitiveType, rhs: PrimitiveTyp
  * - If `a ⊑ b` (or `b ⊑ a`), the result is `[a]` (resp. `[b]`).
  * - For incomparable but overlapping types, the result is the set of maximal
  *   common subtypes, e.g. `meet(integer, finite_real)` = `[finite_integer]`
- *   (`integer` admits ±∞, so the overlap is the *finite* integers), and
- *   `meet(real, complex)` = `[finite_real, non_finite_number]` (the lattice
- *   does not place `real` below `complex`, so the overlap is expressed as a
- *   union of maximal common subtypes).
+ *   (`integer` admits ±∞, so the overlap is the *finite* integers). Under D10
+ *   the numeric tower is a chain (`integer ⊂ rational ⊂ real ⊂ complex ⊂
+ *   number`), so `meet(real, complex)` = `[real]` (real is now below complex);
+ *   the union-of-maximals case only arises for genuinely incomparable pairs
+ *   such as `meet(imaginary, finite_real)` = `[]`.
  * - For disjoint types (e.g. `meet(string, integer)`), the result is `[]`.
  *
  * The special types `any`, `unknown`, `never`, `nothing` and `error` must be
  * handled by the caller (they are not meaningful operands here).
  */
 export declare function meetPrimitiveTypes(a: PrimitiveType, b: PrimitiveType): PrimitiveType[];
+/**
+ * The infinity-admitting numeric types, keyed by their *finite* counterpart.
+ *
+ * A union `finite_X | non_finite_number` covers exactly the same values as the
+ * single type `X` (see the numeric tower in `types.ts`: `real = finite_real +
+ * non_finite_number`, `integer = finite_integer + non_finite_number`, etc.).
+ * Such unions still arise (e.g. from `finite_number ∧ real = finite_real`, or
+ * directly-constructed unions), so recognizing the equivalence lets them
+ * collapse to — and be seen as equal to — the single covering type `X`. (Under
+ * D10 `real ⊂ complex`, so `real ∧ complex = real`; the covering-union map is
+ * unchanged and still governs the finite/non-finite collapse.)
+ */
+export declare const COVERING_UNION_MAP: Record<string, NumericPrimitiveType>;
 /** Return true if lhs is a subtype of rhs */
 export declare function isSubtype(lhs: Type | TypeString, rhs: Type | TypeString): boolean;
 export declare function isCompatible(lhs: PrimitiveType, rhs: PrimitiveType, compatibility: TypeCompatibility): boolean;
@@ -3336,6 +3367,12 @@ export interface Expression {
      *
      * The result is in canonical form.
      *
+     * **Time and recursion limits**: if the evaluation exceeds
+     * `engine.timeLimit` or the recursion limit, a `CancellationError` is
+     * thrown (its `cause` is `'timeout'` or `'recursion-depth-exceeded'`).
+     * Catch it to distinguish an interrupted evaluation from a symbolic
+     * (inert) result.
+     *
      */
     evaluate(options?: Partial<EvaluateOptions>): Expression;
     /** Asynchronous version of `evaluate()`.
@@ -3517,6 +3554,15 @@ export interface Expression {
      * console.log(expr.is(4)); // true
      *
      * ```
+     *
+     * **Free variables — "truth under constraints" semantics.** When either
+     * expression has free variables, equality means "could these be equal
+     * under the current (and possible) constraints?": a fact in the
+     * assumptions database (`ce.assume(...)`) can decide it, an identity that
+     * holds for all values (`(x+1)^2` vs `x^2+2x+1`) is `true`, and anything
+     * else — including `x` vs `2`, or `x+1` vs `5`, which an assumption such
+     * as `x = 4` could make true — is `undefined`, never a definitive
+     * `false`.
      *
      * @category Relational Operator
      */
@@ -4711,19 +4757,54 @@ export interface FunctionProperties {
  * Backs `ce.functionProperties(name)`. */
 export declare function getFunctionProperties(ce: IComputeEngine, name: string): FunctionProperties | undefined;
 /**
- * True when `arg` provably lies on a branch cut of `operator`, per the store's
- * `BranchCuts` record (ROADMAP item 7a). Used to block simplification rewrites
- * that would cross a branch cut — e.g. `ln(a) + ln(b) → ln(ab)` is unsound when
- * an operand is on the negative real axis (`ln(-2) + ln(-3) ≠ ln(6)`, they
- * differ by `2πi`).
+ * Three-valued branch-cut test (policy D3). Reports whether `arg` lies on a
+ * branch cut of `operator`, per the store's `BranchCuts` record (ROADMAP
+ * item 7a). Used to block simplification rewrites that would cross a branch
+ * cut — e.g. `ln(a) + ln(b) → ln(ab)` is unsound when an operand is on the
+ * negative real axis (`ln(-2) + ln(-3) ≠ ln(6)`, they differ by `2πi`).
  *
  * A `BranchCuts` value is a `Set` of cut regions (e.g. `Ln` ⇒
  * `Set(Interval(Open(-oo), 0))`); `arg` is on a cut when it is a member of any
- * region. Fail-closed: an undecidable / symbolic membership returns `false`
- * (treated as "not provably on the cut"), so the guard never blocks a rewrite
- * it cannot justify — it only ever stops a provably-unsound one.
+ * region.
+ *
+ * Returns:
+ *   - `true`      — `arg` is provably on a cut region.
+ *   - `false`     — `arg` is provably off *every* cut region (or the operator
+ *                   has no branch cuts at all).
+ *   - `undefined` — membership is undecidable for at least one region.
+ *
+ * IMPORTANT (D3): call sites must compare `=== false` (provably off the cut)
+ * or `=== true` (provably on it) and must never negate the result — the old
+ * two-valued form collapsed "unknown" into "off the cut", which turned
+ * `!onBranchCut(...)` into a fail-*open* guard.
  */
-export declare function onBranchCut(ce: IComputeEngine, operator: string, arg: Expression): boolean;
+export declare function onBranchCut(ce: IComputeEngine, operator: string, arg: Expression): boolean | undefined;
+/**
+ * Eligibility gate for **real-only** simplification rewrites (policy D4).
+ *
+ * Rewrites that are valid only on the reals — `√(x²) → |x|`, `|x²| → x²`,
+ * `|x|² → x²`, `ln(x^{2k}) → 2k·ln|x|` — must not fire when the operand was
+ * *declared* (or provably inferred) a complex or imaginary type. Although
+ * `complex ⊇ real`, an explicit `complex`/`imaginary` declaration signals a
+ * *general* complex value, so these rewrites bail on it (e.g.
+ * `z: complex ⇒ √(z²)` stays `√(z²)`, not `|z|`, since `√(i²) = i ≠ 1`).
+ *
+ * *Unconstrained* symbols (type `unknown`) — and composite expressions of them
+ * (`x·y`, `x+1`, which the engine types `number`/`finite_number`) — keep the
+ * documented generic-real convention and remain eligible.
+ *
+ * Detection is by **type**, not by `isReal`: for composite expressions the
+ * engine currently reports `isReal === false` for merely-*unknown* realness
+ * (the three-valued discipline is repaired for symbols but not yet for
+ * functions — SYM P0-12/P0-14), which would wrongly bail the generic-real
+ * convention on `ln(x)+ln(y) → ln(xy)` and friends. A type that matches
+ * `complex` but not `real` reliably identifies declared/inferred complex
+ * operands, which is what D4 targets.
+ *
+ * @returns `false` (bail) when `x`'s type admits genuinely non-real complex
+ *   values (`complex`/`imaginary`/`finite_complex`); `true` otherwise.
+ */
+export declare function isEligibleRealRewrite(x: Expression): boolean;
 /**
  * Pole-aware numeric evaluation. When `operator(ops...)` is evaluated
  * numerically and an operand lands on a known pole, the value is
@@ -4959,6 +5040,13 @@ export type EvalContext<Expr = unknown, Binding = unknown> = {
     lexicalScope: Scope<Binding>;
     assumptions: ExpressionMapInterface<boolean, Expr>;
     name: undefined | string;
+    /**
+     * Names of symbols in this context whose *value* was installed by
+     * `assume(x = …)` (as opposed to a user `declare()`/`assign()`). No-arg
+     * `forget()` clears these value bindings — but must leave user-assigned
+     * values intact — so their provenance is tracked here (SYM P2-10).
+     */
+    assumptionBindings?: Set<string>;
 };
 /* 0.66.0 */import type { Expression, IComputeEngine } from './global-types';
 export declare function symbolArg(engine: IComputeEngine, arg: Expression | undefined): Expression;
@@ -5079,9 +5167,13 @@ export declare function acosh(x: Interval | IntervalResult): IntervalResult;
  */
 export declare function atanh(x: Interval | IntervalResult): IntervalResult;
 /**
- * Inverse cotangent: acot(x) = atan(1/x).
+ * Inverse cotangent (interval).
  *
- * Has a discontinuity at x = 0.
+ * Uses the continuous (0, π) convention that matches the interpreter
+ * (`Arccot(-2) = 2.678`, `Arccot(0) = π/2`): acot(x) = π/2 − atan(x). This is
+ * monotone DECREASING and continuous over ALL reals — there is NO singularity
+ * at 0 (unlike the `atan(1/x)` form, which is on (−π/2, π/2)\{0} and jumps at
+ * 0). Because it is decreasing, the endpoints swap.
  */
 export declare function acot(x: Interval | IntervalResult): IntervalResult;
 /**
@@ -5305,6 +5397,29 @@ export declare function pow(base: Interval | IntervalResult, exp: number): Inter
  */
 export declare function powInterval(base: Interval | IntervalResult, exp: Interval | IntervalResult): IntervalResult;
 /**
+ * `base^(p/q)` on an interval where `q` is ODD, using the real-root convention
+ * (e.g. `(-8)^(2/3) = 4`, `(-32)^(3/5) = -8`). For a non-negative base this is
+ * identical to `pow(base, p/q)`; the extension only matters when the base is
+ * (partly) negative, where `Math.pow` would return `NaN` even though a real
+ * value exists.
+ *
+ * `x^(p/q)` (q odd) is monotone on each side of 0: increasing everywhere when
+ * `p` is odd; decreasing on `x < 0` and increasing on `x > 0` when `p` is even
+ * (a minimum of 0 at the origin for a positive exponent). The endpoints — plus
+ * the point 0 when it is interior and the exponent is positive — therefore
+ * bracket the range. A negative exponent has a pole at 0.
+ */
+export declare function powRational(base: Interval | IntervalResult, p: number, q: number): IntervalResult;
+/**
+ * Integer nth root on an interval (`Root(x, n)`).
+ *
+ * For ODD `n` the root is real for every real `x` and monotonically increasing,
+ * so `[root(lo), root(hi)]` (matching the interpreter: `Root(-8, 3) = -2`). For
+ * EVEN `n` it reduces to `x^(1/n)`, which requires a non-negative base — a
+ * negative base has no real value (`empty`/`partial`), as with `sqrt`.
+ */
+export declare function nthRoot(base: Interval | IntervalResult, n: number): IntervalResult;
+/**
  * Exponential function (e^x).
  *
  * Always valid, monotonically increasing.
@@ -5344,14 +5459,13 @@ export declare function floor(x: Interval | IntervalResult): IntervalResult;
  */
 export declare function ceil(x: Interval | IntervalResult): IntervalResult;
 /**
- * Round to nearest integer.
+ * Round to nearest integer, half away from zero.
  *
- * Has jump discontinuities at every half-integer.
- *
- * Note: JS `Math.round` uses round-half-up, while GLSL `round()` uses
- * IEEE 754 round-half-to-even. They differ only AT half-integer values.
- * For discontinuity detection this is safe because any interval spanning
- * a half-integer returns `singular` regardless of the rounding convention.
+ * Matches the interpreter (Round(-2.5) = -3, Round(2.5) = 3), NOT JS
+ * `Math.round` (half toward +∞). Round is a step function with jump
+ * discontinuities at every half-integer (±0.5, ±1.5, …) and is continuous
+ * through 0; an interval that stays within one step returns that constant
+ * value, one that spans a half-integer returns `singular`.
  */
 export declare function round(x: Interval | IntervalResult): IntervalResult;
 /**
@@ -5597,13 +5711,13 @@ export declare function unwrapOrPropagate(...inputs: Array<Interval | IntervalRe
  */
 import { ok as _ok, point as _point, containsExtremum as _containsExtremum, unionResults as _unionResults, mergeDomainClip as _mergeDomainClip, isPoint as _isPoint, containsZero as _containsZero, isPositive as _isPositive, isNegative as _isNegative, isNonNegative as _isNonNegative, isNonPositive as _isNonPositive, width as _width, midpoint as _midpoint, getValue as _getValue, unwrap as _unwrap, unwrapOrPropagate as _unwrapOrPropagate } from './util';
 import { add as _add, sub as _sub, mul as _mul, div as _div, negate as _negate } from './arithmetic';
-import { sqrt as _sqrt, square as _square, pow as _pow, powInterval as _powInterval, exp as _exp, ln as _ln, log10 as _log10, log2 as _log2, abs as _abs, floor as _floor, ceil as _ceil, round as _round, fract as _fract, trunc as _trunc, min as _min, max as _max, mod as _mod, remainder as _remainder, heaviside as _heaviside, sign as _sign, gamma as _gamma, gammaln as _gammaln, factorial as _factorial, factorial2 as _factorial2, binomial as _binomial, gcd as _gcd, lcm as _lcm, chop as _chop, erf as _erf, erfc as _erfc, exp2 as _exp2, hypot as _hypot } from './elementary';
+import { sqrt as _sqrt, square as _square, pow as _pow, powInterval as _powInterval, powRational as _powRational, nthRoot as _nthRoot, exp as _exp, ln as _ln, log10 as _log10, log2 as _log2, abs as _abs, floor as _floor, ceil as _ceil, round as _round, fract as _fract, trunc as _trunc, min as _min, max as _max, mod as _mod, remainder as _remainder, heaviside as _heaviside, sign as _sign, gamma as _gamma, gammaln as _gammaln, factorial as _factorial, factorial2 as _factorial2, binomial as _binomial, gcd as _gcd, lcm as _lcm, chop as _chop, erf as _erf, erfc as _erfc, exp2 as _exp2, hypot as _hypot } from './elementary';
 import { sin as _sin, cos as _cos, tan as _tan, cot as _cot, sec as _sec, csc as _csc, asin as _asin, acos as _acos, atan as _atan, atan2 as _atan2, sinh as _sinh, cosh as _cosh, tanh as _tanh, asinh as _asinh, acosh as _acosh, atanh as _atanh, acot as _acot, acsc as _acsc, asec as _asec, coth as _coth, csch as _csch, sech as _sech, acoth as _acoth, acsch as _acsch, asech as _asech, sinc as _sinc, fresnelS as _fresnelS, fresnelC as _fresnelC } from './trigonometric';
 import { less as _less, lessEqual as _lessEqual, greater as _greater, greaterEqual as _greaterEqual, equal as _equal, notEqual as _notEqual, and as _and, or as _or, not as _not, piecewise as _piecewise, clamp as _clamp } from './comparison';
 export type { Interval, IntervalResult, BoolInterval } from './types';
 export { ok, point, containsExtremum, unionResults, mergeDomainClip, isPoint, containsZero, isPositive, isNegative, isNonNegative, isNonPositive, width, midpoint, getValue, unwrap, unwrapOrPropagate, } from './util';
 export { add, sub, mul, div, negate, _mul } from './arithmetic';
-export { sqrt, square, pow, powInterval, exp, ln, log10, log2, abs, floor, ceil, round, fract, trunc, min, max, mod, remainder, heaviside, sign, gamma, gammaln, factorial, factorial2, binomial, gcd, lcm, } from './elementary';
+export { sqrt, square, pow, powInterval, powRational, nthRoot, exp, ln, log10, log2, abs, floor, ceil, round, fract, trunc, min, max, mod, remainder, heaviside, sign, gamma, gammaln, factorial, factorial2, binomial, gcd, lcm, } from './elementary';
 export { sin, cos, tan, cot, sec, csc, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, acot, acsc, asec, coth, csch, sech, acoth, acsch, asech, sinc, fresnelS, fresnelC, } from './trigonometric';
 export { less, lessEqual, greater, greaterEqual, equal, notEqual, and, or, not, piecewise, clamp, } from './comparison';
 /**
@@ -5638,6 +5752,8 @@ export declare const IntervalArithmetic: {
     square: typeof _square;
     pow: typeof _pow;
     powInterval: typeof _powInterval;
+    powRational: typeof _powRational;
+    nthRoot: typeof _nthRoot;
     exp: typeof _exp;
     ln: typeof _ln;
     log10: typeof _log10;
@@ -5978,7 +6094,13 @@ export declare class RubiDriver {
     constructor(ce: ComputeEngine, rules: CompiledRule[], options?: {
         timeLimitMs?: number;
         trace?: boolean;
+        /** @internal Force the legacy full-scan dispatch (root-operator
+         * prescreen only), bypassing the skeleton screen. Overrides the
+         * `RUBI_NO_SKELETON` env default. For the A/B equivalence harness. */
+        noSkeleton?: boolean;
     });
+    private readonly candidateCache;
+    private candidatesFor;
     /** Integrate `integrand` with respect to `variable`. Returns null when
      * no rule chain applies (caller decides on inert/fallback).
      * NOTE: the integrand must be canonical but NOT evaluated — evaluate()
@@ -6027,6 +6149,14 @@ export interface IntegrationRulesLoadReport {
     ruleCount: number;
     /** Number of corpus rules skipped at compile time. */
     skipped: number;
+    /** The skipped corpus rules, each with the reason it could not compile
+     * (e.g. `slots folded away by canonicalization`). Reported honestly on
+     * cached (idempotent re-load) calls too — the compile result is cached, so
+     * the reasons are not lost after the first call. */
+    skippedRules: {
+        id: string;
+        reason: string;
+    }[];
 }
 /**
  * Compile the bundled Rubi rules and register them as the engine's symbolic
@@ -6064,6 +6194,10 @@ export declare function polyCoeffsX(u: Expression, x: string): Expression[] | nu
 /** long division P / L over symbolic coefficients → [quotient, remainder] */
 export declare function polyDivideX(P: Expression, L: Expression, x: string): [Expression, Expression] | null;
 export declare function installCaches(caches: Ctx['caches']): void;
+/** Snapshot the currently-installed caches so a re-entrant driver call can
+ * restore the outer call's warm caches after installing its own (see the
+ * native-rational fallback re-entry in driver.ts). */
+export declare function getActiveCaches(): Ctx['caches'] | undefined;
 /** Rubi PossibleZeroQ: canonical zero, simplified zero, or numerically ~0 */
 export declare function zeroQ(d: Expression): boolean;
 export declare function evalCondition(json: Json, ctx: Ctx): boolean;
@@ -6140,6 +6274,14 @@ export type CompiledRule = {
     /** root operator the pattern requires, or null when it can match any
      * expression (root slot, or a collapsible node) — dispatch pre-screen */
     rootOp: string | null;
+    /** Operator heads that MUST appear somewhere in ANY expression this
+     * pattern can match — the second-level ("integrand-skeleton") dispatch
+     * screen. Computed conservatively from the matcher's guarantees (see
+     * `requiredHeads`): a rule is skipped for an integrand only when one of
+     * these heads is provably absent from the integrand tree, so no rule that
+     * could match is ever excluded. Empty ⇒ the rule is a candidate for every
+     * integrand (root slot / fully-collapsible pattern). */
+    requiredHeads: string[];
     bindings: RubiRule['bindings'];
     condition: Json | null;
     innerCondition: Json | null;
@@ -6153,6 +6295,37 @@ export type CompileResult = {
         reason: string;
     }[];
 };
+/**
+ * The operator heads guaranteed to appear in the matched expression's tree
+ * for EVERY successful match of `pat` — the conservative feature set backing
+ * the second-level dispatch screen (`CompiledRule.requiredHeads`).
+ *
+ * Soundness rests entirely on the Rubi matcher's guarantees (`match.ts`),
+ * which — unlike CE's general matcher — performs NO cross-head synthetic
+ * rebuilds. The only structural flexibility is node *collapse* (a node whose
+ * operands are all optional-default except one may match a non-node
+ * expression by defaulting the optionals) and AC reordering (same operator).
+ * Therefore:
+ *
+ *   - `slot` / `optslot` / `var` / `const` — bind arbitrary subexpressions;
+ *     guarantee no head (a `const` DOES fix its subtree, but requiring its
+ *     heads would only tighten the screen — we conservatively require none).
+ *   - a NON-collapsible `node` with operator O — the matcher requires
+ *     `expr.operator === O` on the only matching branch (`mCollapse` returns
+ *     false for it), so O is guaranteed; each operand pattern is assigned to
+ *     a distinct operand of `expr` (AC) or matched positionally (sequential),
+ *     so every operand's guaranteed heads also appear (as a subtree). An
+ *     `optslot` operand may default away — it contributes nothing regardless.
+ *   - a COLLAPSIBLE `node` (≥1 optslot, exactly one non-optslot operand) —
+ *     may match either structurally (op present) OR by collapsing to match
+ *     its single non-optslot operand pattern against the whole expression.
+ *     The node's own operator is therefore NOT guaranteed, but the surviving
+ *     operand's guaranteed heads appear on BOTH branches, so they carry over.
+ *
+ * The result is a NECESSARY condition on any matching integrand; ANDing it
+ * with the existing root-operator screen keeps both conservative.
+ */
+export declare function requiredHeads(pat: Pat): string[];
 export declare function compileRule(ce: ComputeEngine, rule: RubiRule, id: string, priority: number): {
     rule: CompiledRule | null;
     reason?: string;
@@ -6251,8 +6424,28 @@ export declare const UNITS_LIBRARY: SymbolDefinitions;
 export declare const LINEAR_ALGEBRA_LIBRARY: SymbolDefinitions[];
 /* 0.66.0 */import type { Expression } from '../global-types';
 import type { Type } from '../../common/type/types';
-/** Real inputs → finite_real, otherwise → finite_number. */
+/**
+ * Generic result type for a *total, real-closed* numeric function (sin, cos,
+ * sinh, erf, …): a finite real (or real-symbol) argument maps to a finite real
+ * result.
+ *
+ * A *provably* non-finite (±∞) argument is excluded: such functions can send
+ * ±∞ to ±∞ *or* NaN (`sin(∞) = NaN`, `sinh(∞) = ∞`), neither of which is a
+ * `finite_real`, so the sound claim there is the top type `number`. An
+ * argument of *unknown* finiteness (a bare `real` symbol) keeps the documented
+ * generic-real convention and still yields `finite_real`.
+ *
+ * This is NOT sound for functions with poles or a restricted real domain
+ * (`ln`, `csc`, `arcsin`, …): those use the dedicated handlers below, routed
+ * through `elementaryFunctionType`.
+ */
 export declare function numericTypeHandler(ops: ReadonlyArray<Expression>): Type;
+/**
+ * Result type for the elementary/inverse trig and log functions, dispatched by
+ * operator so that pole-capable and domain-restricted operators do not claim
+ * `finite_real` where their values are complex/infinite/NaN (SYM P0-12).
+ */
+export declare function elementaryFunctionType(operator: string, ops: ReadonlyArray<Expression>): Type;
 /* 0.66.0 */import type { SymbolDefinitions } from '../global-types';
 export declare const STATISTICS_LIBRARY: SymbolDefinitions[];
 /* 0.66.0 */import type { SymbolDefinitions } from '../global-types';
@@ -6274,6 +6467,29 @@ export declare function convertInfiniteSetToLimits(domainSymbol: string): {
     upper: number;
     isFinite: false;
 } | undefined;
+/**
+ * EL-4: Classify a big-op (`Sum`/`Product`) domain to decide how it should be
+ * accumulated under an *exact* `evaluate()` (i.e. not `numericApproximation`).
+ *
+ * An infinite integer domain — `n ∈ ℤ⁺`, `n ∈ ℕ₀`, or a `Limits` range with an
+ * infinite bound — is iterated up to `MAX_ITERATION` terms, so its value is only
+ * a *truncated numeric approximation*, never a closed form. Accumulating it
+ * exactly builds an intractable object that both hangs the thread and is
+ * meaningless:
+ *   - `Σ 1/n²` over ℤ⁺ becomes a rational whose denominator is the LCM of 10⁴
+ *     squares (a bigint with tens of thousands of digits);
+ *   - `Σ xⁿ` becomes a 10⁴-term symbolic polynomial.
+ *
+ * Returns:
+ *   - `'finite'`   — the domain is finite (or non-iterable / symbolic); evaluate
+ *                    normally, preserving exactness.
+ *   - `'numeric'`  — infinite domain with a numeric body; accumulate as floats
+ *                    (fast, and honest about the truncation).
+ *   - `'symbolic'` — infinite domain with a body that has free variables beyond
+ *                    the index (e.g. `Σ xⁿ`); a truncated partial value is
+ *                    meaningless, so keep the expression symbolic.
+ */
+export declare function classifyBigopDomain(body: Expression | undefined, indexes: ReadonlyArray<Expression>, ce: ComputeEngine): 'finite' | 'numeric' | 'symbolic';
 export type IndexingSet = {
     index: string | undefined;
     lower: number;
@@ -6327,17 +6543,6 @@ export declare function canonicalLimitsSequence(ops: ReadonlyArray<Expression>, 
 export declare function canonicalLimits(ops: ReadonlyArray<Expression>, { engine: ce }: {
     engine: ComputeEngine;
 }): Expression | null;
-/** Return a limit/indexing set in canonical form as a `Limits` expression
- * with:
- * - `index` (a symbol), `Nothing` if none is present
- * - `lower` (a number), `Nothing` if none is present
- * - `upper` (a number), `Nothing` if none is present
- *
- * Or, for Element expressions, preserve them in canonical form.
- *
- * Assume we are in the context of a big operator
- * (i.e. `pushScope()` has been called)
- */
 export declare function canonicalIndexingSet(expr: Expression): Expression | undefined;
 export declare function canonicalBigop(bigOp: string, body: Expression, indexingSets: Expression[], scope: Scope | undefined): Expression | null;
 /**
@@ -6811,8 +7016,8 @@ export type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
 /* 0.66.0 */import type { Expression, BoxedSubstitution, IComputeEngine, AssumeResult } from './global-types';
 import type { MathJsonSymbol } from '../math-json/types';
 export declare function ask(ce: IComputeEngine, pattern: Expression): BoxedSubstitution[];
-export declare function verify(ce: IComputeEngine, query: Expression): boolean | undefined;
-export declare function assumeFn(ce: IComputeEngine, predicate: Expression): AssumeResult;
+export declare function verify(ce: IComputeEngine, query: Expression | string): boolean | undefined;
+export declare function assumeFn(ce: IComputeEngine, predicate: Expression | string): AssumeResult;
 export declare function forget(ce: IComputeEngine, symbol: undefined | MathJsonSymbol | MathJsonSymbol[]): void;
 /* 0.66.0 *//** @category Definitions */
 export type Hold = 'none' | 'all' | 'first' | 'rest' | 'last' | 'most';
@@ -7297,7 +7502,7 @@ export declare function bigGamma(ce: ComputeEngine, z: BigNum): BigNum;
  * Since all odd Bernoulli numbers except B_1 = -1/2 are zero, we compute
  * all B_k (k=0,1,2,...,2n) but only return the even ones.
  */
-export declare function computeBernoulliEven(n: number): [bigint, bigint][];
+export declare function computeBernoulliEven(n: number, deadline?: number): [bigint, bigint][];
 /**
  * Bignum Digamma function ψ(z) = d/dz ln(Γ(z))
  * Same algorithm as machine `digamma`: reflection for negative z,
@@ -7357,7 +7562,10 @@ export declare function polygamma(n: number, x: number): number;
 export declare function beta(a: number, b: number): number;
 /**
  * Riemann zeta function ζ(s) = Σ_{n=1}^∞ 1/n^s
- * Uses Borwein's algorithm for convergence acceleration.
+ *
+ * Uses the Cohen–Rodríguez Villegas–Zagier acceleration of the alternating
+ * Dirichlet eta series (same algorithm as `bigZeta`), direct summation for
+ * large s, and the functional equation for s < 0.
  */
 export declare function zeta(s: number): number;
 /**
@@ -7404,21 +7612,21 @@ export declare function besselK(n: number, x: number): number;
 /**
  * Airy function of the first kind Ai(x).
  *
- * For x < 0 and small |x|, uses power series.
- * For large positive x, uses asymptotic: Ai(x) ~ e^{-ξ}/(2√π x^{1/4})
- * For large negative x, uses asymptotic oscillatory form.
- * For moderate x, uses power series with sufficient terms.
+ * - x > 9: asymptotic expansion (DLMF 9.7.5)
+ * - x < −9: oscillatory asymptotic P/Q form (DLMF 9.7.9)
+ * - |x| ≤ 9: Maclaurin series in double-double (DLMF 9.4.1)
  *
- * Reference: NIST DLMF 9.2, 9.7
+ * Reference: NIST DLMF 9.2, 9.4, 9.7
  */
 export declare function airyAi(x: number): number;
 /**
  * Airy function of the second kind Bi(x).
  *
- * Similar structure to Ai(x) but with different coefficients
- * and asymptotic behavior (Bi grows for positive x).
+ * - x > 9: asymptotic expansion (DLMF 9.7.7)
+ * - x < −9: oscillatory asymptotic P/Q form (DLMF 9.7.11)
+ * - |x| ≤ 9: Maclaurin series in double-double (DLMF 9.4.3)
  *
- * Reference: NIST DLMF 9.2, 9.7
+ * Reference: NIST DLMF 9.2, 9.4, 9.7
  */
 export declare function airyBi(x: number): number;
 /**
@@ -7965,6 +8173,17 @@ export declare const MAX_SYMBOLIC_TERMS = 200;
  */
 export declare function nextUp(x: number): number;
 export declare function nextDown(x: number): number;
+/**
+ * Accurate real n-th root of a non-negative machine double.
+ *
+ * `Math.pow(x, 1/n)` is not correctly rounded — the reciprocal `1/n` is itself
+ * rounded, so e.g. `Math.pow(64, 1/3)` = 3.9999999999999996 and
+ * `Math.pow(1000, 1/3)` = 9.999999999999998. Refine with one Newton step on
+ * `f(r) = rⁿ − x`, i.e. `r ← ((n−1)·r + x/r^{n−1}) / n`, then snap to the exact
+ * integer root when `x` is a perfect n-th power (so `Root(64,3).N()` prints 4,
+ * not 3.999…). Callers handle the sign of a negative radicand. (NU-P1-7)
+ */
+export declare function machineNthRoot(x: number, n: number): number;
 /** Return `[factor, root]` such that
  * pow(n, 1/exponent) = factor * pow(root, 1/exponent)
  *
@@ -8008,8 +8227,16 @@ export declare function gcd(a: BigNum, b: BigNum): BigNum;
 export declare function lcm(a: BigNum, b: BigNum): BigNum;
 export declare function factorial2(n: BigNum): Generator<BigNum, BigNum>;
 /**
- * If the BigDecimal can be faithfully represented as a machine number,
- * return true.
+ * If the BigDecimal can be *faithfully* (losslessly) represented as a machine
+ * number, return true.
+ *
+ * This is used to decide whether a value can be serialized as a plain JSON
+ * number without losing information. A ≤17-significant-digit heuristic is NOT
+ * sufficient: only decimals with ≤15 significant digits are guaranteed to
+ * round-trip through float64, and some 16–17 digit values silently change
+ * (e.g. `0.12345678901234567` → `0.12345678901234566`). So we test the exact
+ * round-trip condition: the value must equal the BigDecimal reconstructed from
+ * its own `toNumber()` (via the shortest-string form a JSON number would emit).
  */
 export declare function isInMachineRange(d: BigNum): boolean;
 /* 0.66.0 */import { Rational, SmallInteger } from './types';
@@ -9006,6 +9233,17 @@ export declare function hasAssumptions(ce: ComputeEngine): boolean;
  */
 export declare function decideComparisonFromBounds(bounds: IntervalBounds, k: number, query: 'less' | 'lessEqual' | 'greater' | 'greaterEqual'): boolean | undefined;
 /**
+ * Order two subjects purely from their assumed interval bounds (design
+ * §5.1a, generalized to two bounded subjects).
+ *
+ * Returns a definite relation only when the bounds separate the two values;
+ * `undefined` otherwise. Strict three-valued / fail-closed discipline:
+ * - `'>'`/`'<'` when the separation is strict,
+ * - `'>='`/`'<='` when the values touch at a shared, non-strict endpoint,
+ * - `undefined` when the bounds overlap or don't separate.
+ */
+export declare function compareBounds(a: IntervalBounds, b: IntervalBounds): '<' | '>' | '<=' | '>=' | undefined;
+/**
  * Derive a `Sign` from assumed interval bounds (design §5.1b — the
  * `Real`/`Imaginary`/`Abs`/`Argument` sgn fallbacks).
  *
@@ -9577,6 +9815,13 @@ export declare function applyRule(rule: Readonly<BoxedRule>, expr: Expression, s
  * The `replace` function can be used to apply a rule to a non-canonical
  * expression.
  *
+ * **Error handling contract.** A single misbehaving rule never aborts the
+ * whole pass. An exception thrown while checking a rule's `condition` or while
+ * running its `replace` function is logged and that one rule is skipped; the
+ * remaining rules are still tried (see `applyRule`). Only a
+ * `CancellationError` (deadline/interrupt) propagates out, so timeouts are not
+ * swallowed as "the rule failed".
+ *
  */
 export declare function replace(expr: Expression, rules: Rule | (Rule | BoxedRule)[] | BoxedRuleSet, options?: Partial<ReplaceOptions>): RuleSteps;
 /**
@@ -9647,6 +9892,46 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
 /* 0.66.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../../big-decimal';
 import type { Expression } from '../global-types';
+/**
+ * True if a number literal has no exactness to lose under D2's "inexact
+ * argument numericizes" rule — the counterpart of `NumberLiteralInterface`'s
+ * `isExact`, patched for one architectural wrinkle.
+ *
+ * A *real* number's `isExact` getter is authoritative. A *complex* number
+ * literal, however, is never `isExact`: its `NumericValue` always lives in
+ * the `Big`/`MachineNumericValue` lane (never `ExactNumericValue`),
+ * regardless of whether its real and imaginary parts are individually exact
+ * — `i`, `1+i`, `1/2+i` all report `isExact === false`. Treat a complex
+ * literal with an *integer* real part and an *integer* imaginary part
+ * (a Gaussian integer) as exact too, so exact Gaussian arithmetic
+ * (`(1+i)^3 = 2+11i`, WP-2.16) and symbolic-stay identities keyed on an
+ * exact complex argument (e.g. an Eisenstein series at τ = i) are preserved.
+ * A non-Gaussian complex float (`1.5+2i`) still numericizes — it never was
+ * representable exactly, Gaussian or otherwise.
+ *
+ * Non-number-literal expressions (symbols like `Pi`, unevaluated functions)
+ * are treated as exact here: they have no float to lose, and any exact
+ * reduction for them is the caller's job, not this predicate's.
+ */
+export declare function isExactNumber(x: Expression): boolean;
+/**
+ * Decide whether a numeric `evaluate()` handler should numericize now
+ * (dispatch to `apply`/`apply2`/`applyN`) rather than stay symbolic.
+ *
+ * Per the exactness contract (CLAUDE.md "Evaluate vs. N"): a *numeric
+ * approximation* request (`numericApproximation`, i.e. `.N()`) always
+ * numericizes; otherwise an *inexact* (float) argument has no exactness to
+ * preserve and numericizes even under plain `evaluate()` — mirroring the
+ * `Cos`/`Sqrt`/`Power` convention (policy D2). Exact operands (integers,
+ * rationals, radicals, symbolic constants like `Pi`, Gaussian integers, or
+ * non-number-literal expressions — see `isExactNumber`) do not trigger this
+ * on their own; call sites should still run their own exact-value
+ * reductions (poles, `f(0)`, …) before consulting this.
+ *
+ * Mixing exact and inexact operands numericizes the whole call (float
+ * contagion), matching `Add`/`Multiply`'s numeric-literal folding.
+ */
+export declare function shouldNumericize(numericApproximation: boolean | undefined, ...ops: ReadonlyArray<Expression | undefined | null>): boolean;
 export declare function apply(expr: Expression, fn: (x: number) => number | Complex, bigFn?: (x: BigDecimal) => BigDecimal | Complex | number, complexFn?: (x: Complex) => number | Complex): Expression | undefined;
 /**
  * N-ary kernel dispatcher for special functions.
@@ -9959,7 +10244,7 @@ export declare function toInteger(expr: Expression | undefined): number | null;
  */
 export declare function toBigint(expr: Expression | undefined): bigint | null;
 /* 0.66.0 */import type { MathJsonExpression } from '../../math-json/types';
-import type { IComputeEngine as ComputeEngine, TensorDataType, Metadata, BoxedBaseDefinition, BoxedOperatorDefinition, BoxedSubstitution, EvaluateOptions, Expression, SimplifyOptions, PatternMatchOptions, Tensor, TensorInterface } from '../global-types';
+import type { IComputeEngine as ComputeEngine, TensorDataType, Metadata, BoxedBaseDefinition, BoxedOperatorDefinition, BoxedSubstitution, Substitution, CanonicalOptions, EvaluateOptions, Expression, SimplifyOptions, PatternMatchOptions, Tensor, TensorInterface } from '../global-types';
 import { BoxedType } from '../../common/type/boxed-type';
 import { NumericValue } from '../numeric-value/types';
 import { _BoxedExpression } from './abstract-boxed-expression';
@@ -10024,7 +10309,22 @@ export declare class BoxedTensor<T extends TensorDataType> extends _BoxedExpress
     get rank(): number;
     get type(): BoxedType;
     get json(): MathJsonExpression;
-    /** Mathematical equality */
+    /**
+     * Mathematical (element-wise) equality.
+     *
+     * Unlike `isSame` — which uses the exact, structural `tensor.equals`
+     * (`field.equals`, i.e. `===`/`isSame`) and therefore treats identical `NaN`
+     * patterns as equal — `isEqual` compares elements with the same
+     * engine-tolerance semantics as scalar `isEqual`:
+     *
+     * - near-equal floats within `engine.tolerance` compare **equal**
+     *   (e.g. `[1,2,3]` vs `[1,2,3+1e-11]` → `true`);
+     * - a `NaN` element compares **unequal** (`NaN ≠ NaN`), so a tensor
+     *   containing `NaN` is never `isEqual` to itself — deliberately consistent
+     *   with scalar `isEqual`, and deliberately *inconsistent* with `isSame`/`is`
+     *   (which report structural equality for matching `NaN` patterns) (#16);
+     * - an indeterminate element comparison propagates as `undefined`.
+     */
     isEqual(rhs: number | Expression): boolean | undefined;
     get isCollection(): boolean;
     get isIndexedCollection(): boolean;
@@ -10060,6 +10360,9 @@ export declare class BoxedTensor<T extends TensorDataType> extends _BoxedExpress
      */
     at(index: number): Expression | undefined;
     match(pattern: Expression, options?: PatternMatchOptions): BoxedSubstitution | null;
+    subs(sub: Substitution, options?: {
+        canonical?: CanonicalOptions;
+    }): Expression;
     evaluate(options?: Partial<EvaluateOptions>): Expression;
     simplify(options?: Partial<SimplifyOptions>): Expression;
     N(): Expression;
@@ -10426,6 +10729,23 @@ export type Order = 'lex' | 'dexlex' | 'grevlex' | 'elim';
 import { DEFAULT_COMPLEXITY } from './constants';
 export { DEFAULT_COMPLEXITY };
 /**
+ * Is this operand a matrix/vector (concrete tensor, `Matrix(…)` literal, or a
+ * symbol *declared* matrix/vector)? Products of two or more such operands are
+ * NOT commutative, so they must never be reordered by the canonical sort
+ * (`M·P ≠ P·M`; reordering made `M·P − P·M` collapse to 0 — see
+ * CORRECTNESS_FINDINGS P0-26). The check is type-based: concrete tensors and
+ * `Matrix` literals have matrix/vector types too, and scalar-typed or
+ * unknown symbols do not match, so ordinary products like `x·y` still sort.
+ */
+export declare function isTensorProductOperand(x: Expression): boolean;
+/**
+ * Sort the operands of a product: with two or more matrix/vector operands,
+ * keep the tensors in their written order and sort only the (commutative)
+ * scalar factors, placed before them. With 0 or 1 tensor the product is
+ * order-independent and the normal canonical sort applies.
+ */
+export declare function sortProductOperands(xs: ReadonlyArray<Expression>): Expression[];
+/**
  * The sorting order of arguments of the Add function uses a modified degrevlex:
  * - Sort by total degree (sum of degree)
  * - Sort by max degree.
@@ -10439,7 +10759,7 @@ export { DEFAULT_COMPLEXITY };
  */
 export declare function addOrder(a: Expression, b: Expression): number;
 export declare function equalOrder(a: Expression, b: Expression): number;
-declare const RANKS: readonly ["integer", "rational", "radical", "real", "complex", "constant", "symbol", "multiply", "divide", "add", "trig", "fn", "power", "string", "other"];
+declare const RANKS: readonly ["integer", "rational", "radical", "real", "complex", "nan", "constant", "symbol", "multiply", "divide", "add", "trig", "fn", "power", "string", "other"];
 export type Rank = (typeof RANKS)[number];
 /**
  * Given two expressions `a` and `b`, return:
@@ -11562,6 +11882,17 @@ export declare function applyTRpythagorean(expr: Expression): Expression;
  *
  * IMPORTANT: Do not call .simplify() on results to avoid infinite recursion.
  */
+/**
+ * Public entry point. The cost gate in `simplify.ts` exempts logarithm
+ * rewrites (e.g. `ln(x^n) -> n*ln(x)`) from its "not more than 30% more
+ * expensive" check because they are mathematically preferred even when
+ * structurally larger. That exemption used to be a fragile string match on the
+ * `because` label in the cost gate; it now travels with the step as a
+ * `purpose: 'transform'` tag. The set of exempted steps is preserved exactly:
+ * the same `ln(...)` / `log_...` label prefixes that the cost gate matched. The
+ * `combine ln/log terms`, `e^...`, `c^...` and `log base 0 or 1` steps were not
+ * exempt before and are not tagged now.
+ */
 export declare function simplifyLog(x: Expression): RuleStep | undefined;
 /* 0.66.0 */import type { Expression, RuleStep } from '../global-types';
 export declare function simplifyAbs(x: Expression): RuleStep | undefined;
@@ -11676,6 +12007,32 @@ export declare function dSolve(equation: Expression, dependent: Expression, inde
  *
  * The helper functions below (toNaN, toZero, etc.) avoid creating new
  * expressions and improve performance for common constant replacements.
+ *
+ * ## 5. Sanctioned `.simplify()` calls inside rule-path code
+ *
+ * CLAUDE.md warns against calling `.simplify()` from code reachable by the
+ * simplification pipeline (each nested call opens a fresh context that bypasses
+ * the dedup / step-limit guards). A handful of sites here call `.simplify()`
+ * anyway; every one is a **sanctioned exception** because it recurses only into
+ * a *proper sub-expression* (so it terminates by structural induction) and,
+ * where the rule could otherwise re-fire, is guarded to emit a step only when
+ * the operand actually changes:
+ *
+ *   - Derivative rule (`f.simplify()`): the driver does not recurse into the
+ *     lazy Derivative operand, so this is the only place the body is reduced;
+ *     guarded by an `isSame` re-fire check.
+ *   - Congruent rule (`Mod(...).simplify()` ×2 and the outer `Equal`): operands
+ *     are the congruence arguments/modulus, never the Congruent itself.
+ *   - `simplifyRelationalOperator` (`expr.op1/op2.simplify()`): each side of the
+ *     relation is a proper sub-expression.
+ *   - `simplifySystemOfEquations` (`x.simplify()` per element): each list
+ *     element is a proper sub-expression; guarded by an `isSame` re-fire check.
+ *   - `simplifySum` / `simplifyProduct` (body / limit `.simplify()`): the
+ *     summand/factor body and the numeric limit expressions are proper
+ *     sub-expressions of the Sum/Product.
+ *
+ * The former `sqrt(-n) -> i·sqrt(n)` site was removed: canonicalization already
+ * folds `Sqrt` of the positive numeric operand, so no `.simplify()` was needed.
  */
 /**
  * A set of simplification rules.
@@ -13014,20 +13371,49 @@ export declare class ComputeEngine implements IComputeEngine {
         scope?: Scope;
     }): Expression;
     /**
-     * Return a list of all the assumptions that match a pattern.
+     * Return the assumption bindings that match a pattern.
+     *
+     * The `pattern` typically contains wildcards (symbols starting with `_`).
+     * Each returned substitution maps every wildcard to the value it captured
+     * from a matching assumption. A wildcard bound query (`Greater(x, _k)`)
+     * resolves against the derived bounds for the subject:
      *
      * ```js
-     *  ce.assume(['Element', 'x', 'PositiveIntegers');
-     *  ce.ask(['Greater', 'x', '_val'])
-     *  //  -> [{'val': 0}]
+     *  ce.assume(['Greater', 'x', 4]);
+     *  ce.ask(['Greater', 'x', '_val']);
+     *  //  -> [{ _val: 4 }]
      * ```
+     *
+     * A **closed** (wildcard-free) pattern degrades to an existence check: the
+     * result is a single empty substitution `[{}]` when the predicate is known
+     * to hold, or `[]` otherwise — so `ce.ask(P).length > 0` answers "is `P`
+     * known?". For a definite `true`/`false`/`undefined` answer use
+     * {@link verify} instead.
+     *
+     * @see verify
      */
     ask(pattern: Expression): BoxedSubstitution[];
     /**
-     * Answer a query based on the current assumptions.
+     * Check whether a predicate is entailed by the current assumptions.
      *
+     * Three-valued (Kleene): returns `true` when the predicate is provable,
+     * `false` when its negation is provable, and `undefined` when neither can be
+     * decided. `And`/`Or`/`Not` are combined three-valued.
+     *
+     * The `query` may be a `BoxedExpression`, a MathJSON expression, or a
+     * **string** parsed as LaTeX (`'x > 0'`, `'$x > 0$'`, or `'\\pi > 0'`); an
+     * unparseable string throws.
+     *
+     * ```js
+     *  ce.assume(['Greater', 'x', 0]);
+     *  ce.verify('x > 0');   // -> true
+     *  ce.verify('x < 0');   // -> false
+     *  ce.verify('x > 5');   // -> undefined
+     * ```
+     *
+     * @see ask
      */
-    verify(query: Expression): boolean | undefined;
+    verify(query: Expression | string): boolean | undefined;
     /**
      * Add an assumption.
      *
@@ -13041,7 +13427,7 @@ export declare class ComputeEngine implements IComputeEngine {
      *
      *
      */
-    assume(predicate: Expression): AssumeResult;
+    assume(predicate: Expression | string): AssumeResult;
     /**
      * Remove all assumptions about one or more symbols.
      *
@@ -13176,6 +13562,20 @@ type CompileExpressionOptions<T extends string = string> = {
  * If the expression cannot be compiled, falls back to interpretation
  * (success: false, run: applicableN1) unless `options.fallback` is false,
  * in which case it throws.
+ *
+ * ## Real-only special functions (compile targets)
+ *
+ * The built-in targets implement most special functions (`Erf`, `Gamma`,
+ * `Zeta`, the Bessel/Airy family, …) with **real-only** library helpers
+ * (`_SYS.erf`, `scipy.special.erf`, GLSL `log2`, …). They accept a real scalar
+ * only. Elementary functions that *do* have a complex extension (`Sin`, `Exp`,
+ * `Sqrt`, `Power`, …) dispatch to a complex helper when an argument is
+ * complex-valued; the real-only special functions do not. Rather than hand a
+ * complex value to a real helper — which silently returns garbage (e.g. a
+ * compiled `Erf(z)` returning −1) — the compiler **fails closed** (D6) with the
+ * offending head. Compile such subexpressions numerically, or restrict them to
+ * real arguments. (`Real`/`Imaginary`/`Argument`/`Conjugate` are exempt: they
+ * consume a complex value by design.)
  */
 export declare function compile<T extends string = 'javascript'>(expr: Expression, options: CompileExpressionOptions<T> & {
     realOnly: true;
@@ -13218,6 +13618,8 @@ export declare class ComputeEngineFunction extends Function {
         factorial2: typeof factorial2;
         gamma: typeof gamma;
         gcd: typeof gcd;
+        pow: (base: number, exp: number) => number;
+        cond: (c: unknown) => boolean;
         heaviside: (x: number) => 0 | 1 | 0.5;
         integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
@@ -13422,6 +13824,8 @@ export declare class ComputeEngineFunctionLiteral extends Function {
         factorial2: typeof factorial2;
         gamma: typeof gamma;
         gcd: typeof gcd;
+        pow: (base: number, exp: number) => number;
+        cond: (c: unknown) => boolean;
         heaviside: (x: number) => 0 | 1 | 0.5;
         integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
@@ -13632,17 +14036,27 @@ export declare class PythonTarget implements LanguageTarget<Expression> {
     getFunctions(): CompiledFunctions<Expression>;
     createTarget(options?: Partial<CompileTarget<Expression>>): CompileTarget<Expression>;
     /**
+     * Build a `var` resolver honoring, in order: shadowed parameters (kept bare),
+     * an explicit `vars` mapping (which always wins over folding — a per-call
+     * substitution), mathematical constants, then `undefined` so BaseCompiler
+     * folds an assigned value / emits the bare identifier for a free symbol.
+     */
+    private makeVarResolver;
+    /**
      * Compile to Python source code (not executable in JavaScript)
      *
      * Returns Python code as a string. To execute it, use Python runtime.
      */
     compile(expr: Expression, options?: CompilationOptions<Expression>): CompilationResult<'python'>;
+    /** Prepend the numpy / cmath / scipy imports when `includeImports` is set. */
+    private withImports;
     /**
      * Compile an expression to Python source code
      *
-     * Returns the Python code as a string.
+     * Returns the Python code as a string. Honors `options.vars` (per-call
+     * substitution) and folds assigned symbols.
      */
-    compileToSource(expr: Expression, _options?: CompilationOptions<Expression>): string;
+    compileToSource(expr: Expression, options?: CompilationOptions<Expression>): string;
     /**
      * Create a complete Python function from an expression
      *
@@ -13724,6 +14138,66 @@ export interface CompileTarget<Expr = unknown> {
      *  element is the block's return value (without `return` prefix).
      *  Default: JavaScript IIFE. */
     block?: (statements: string[]) => string;
+    /**
+     * The infix operator used to conjoin the pairs of a chained relational
+     * expression (e.g. `Less(a, b, c)` → `(a < b) && (b < c)`). Default: `'&&'`
+     * (JavaScript / GLSL / WGSL). Word-operator targets set this to their
+     * language keyword (e.g. Python `'and'`), so the emitted source is valid in
+     * that language.
+     */
+    chainOp?: string;
+    /**
+     * Bind one or more values to fresh temporaries in expression position, then
+     * evaluate `body` with those temporaries in scope, returning target source
+     * that is itself an expression. Used to evaluate a sub-expression exactly
+     * once when it would otherwise be spliced in multiple times — e.g. the shared
+     * middle operand of a chained relation `Less(a, m, b)` → `(a < m) && (m < b)`,
+     * where `m` must be drawn once (matching the interpreter) even if it is a
+     * non-deterministic `Random()` call.
+     *
+     * Targets that cannot express a value binding in expression position (GPU
+     * shaders) leave this undefined; the compiler then falls back to inlining the
+     * sub-expression — safe when it is deterministic, the only case those targets
+     * support (their `Random` requires an explicit deterministic seed).
+     *
+     * JavaScript emits an IIFE; Python a `lambda`.
+     */
+    bindExpr?: (bindings: Array<[name: string, value: string]>, body: string) => string;
+    /**
+     * Wrap a compiled `Which`/`When` condition that is **not** provably boolean so
+     * that a non-boolean value (notably `NaN`) fails closed at run time, matching
+     * the interpreter — which throws `Condition must evaluate to "True" or
+     * "False"` rather than silently taking the default branch. Only applied when
+     * the source condition is not a relational/logical/boolean expression (the
+     * common case emits a bare, unwrapped condition, so there is no overhead).
+     *
+     * Targets that cannot throw in expression position (GPU shaders) leave this
+     * undefined; they instead keep the documented fail-closed value (the default
+     * branch / NaN) — see the GPU `Which`/`When` handlers.
+     */
+    assertBoolean?: (code: string) => string;
+    /**
+     * Map a free (declarable) identifier to the source token emitted for it, or
+     * **throw to fail closed (D6)** when the identifier cannot be represented in
+     * the target — e.g. a GLSL/WGSL reserved keyword (`in`, `sample`, `filter`,
+     * `texture`, …) used as a user variable name, which would emit a shader that
+     * fails to compile. Applied by the base compiler only to the bare-symbol
+     * fallback: a genuinely free symbol with no engine value and no `vars`
+     * mapping. Default: identity.
+     */
+    mangleId?: (id: string) => string;
+    /**
+     * When `true`, this target's multi-statement constructs (loop-form
+     * `Sum`/`Product`, `Loop`, `Block`) are emitted as **bare statement
+     * sequences** — valid only at statement position (a function body), never
+     * as a sub-expression. GPU shader languages (GLSL/WGSL) set this: unlike the
+     * JavaScript target, which wraps such constructs in an IIFE (a self-contained
+     * expression), a shader has no expression-level loop or IIFE. The compiler
+     * uses this flag to **fail closed** (D6) rather than splice a bare statement
+     * block into the middle of an expression (which would emit invalid shader
+     * source such as `return _acc; + 1.0`).
+     */
+    bareStatementBlocks?: boolean;
     /** Target language identifier (for debugging/logging) */
     language?: string;
 }
@@ -14138,6 +14612,27 @@ export declare class BaseCompiler {
      */
     private static readonly FOLD_OPERAND_PREC;
     /**
+     * Operator heads that are word-spelled infix/prefix **keywords** in some
+     * targets (Python `and` / `or` / `not`), never function calls. The alphabetic
+     * op-string of these heads must NOT be treated as a function-call name — that
+     * would emit `and(a, b)` (a Python SyntaxError). This is distinct from a user
+     * override that intentionally maps an operator to a function name (e.g.
+     * `Add: ['add', 11]` → `add(x, y)`): those heads are not in this set.
+     */
+    private static readonly WORD_KEYWORD_OPERATORS;
+    /**
+     * Compile `expr` as a **value operand** — a sub-expression spliced into a
+     * surrounding expression. Behaves like `compile`, but on targets whose
+     * multi-statement constructs are bare statement sequences
+     * (`target.bareStatementBlocks`, i.e. GLSL/WGSL), it **fails closed** (D6)
+     * when the operand compiled to such a block. A shader has no expression-level
+     * loop/IIFE, so a loop-form `Sum`/`Product`/`Loop`/`Block` cannot be a
+     * sub-expression; splicing it would emit invalid source (e.g.
+     * `return _acc; + 1.0`). The offending head is named in the error, which the
+     * engine-level `compile()` surfaces via `success: false` + `unsupported`.
+     */
+    static compileValueOperand(expr: Expression | undefined, target: CompileTarget<Expression>, prec?: number): TargetSource;
+    /**
      * Compile an expression to target language source code
      */
     static compile(expr: Expression | undefined, target: CompileTarget<Expression>, prec?: number): TargetSource;
@@ -14145,6 +14640,13 @@ export declare class BaseCompiler {
      * Compile a function expression
      */
     static compileExpr(engine: ComputeEngine, h: string, args: ReadonlyArray<Expression>, prec: number, target: CompileTarget<Expression>): TargetSource;
+    /**
+     * Function heads that consume a complex value and return a real (or complex)
+     * result. These are string-mapped to a complex-aware library routine in some
+     * targets (e.g. Python `Real: 'np.real'`), so — unlike a real-only helper —
+     * a complex argument is expected and must NOT trip the fail-closed guard.
+     */
+    private static readonly COMPLEX_TRANSPARENT_HEADS;
     /**
      * Compile a block expression
      */
@@ -14250,6 +14752,24 @@ export declare class BaseCompiler {
      * return type is unknown.
      */
     static isComplexValued(expr: Expression): boolean;
+    /**
+     * True if the expression provably evaluates to a boolean (`True`/`False`) —
+     * a relational (`Less`, `Equal`, …) or logical (`And`/`Or`/`Not`) form, the
+     * `True`/`False` symbols, or anything declared `boolean`. Used to decide
+     * whether a `Which`/`When` condition needs the fail-closed guard: a provably
+     * boolean condition never diverges from the interpreter, so it is emitted
+     * bare.
+     */
+    static isBooleanValued(expr: Expression): boolean;
+    /**
+     * Compile a `Which`/`When` condition, wrapping it in the target's fail-closed
+     * boolean guard (`target.assertBoolean`) when it is not provably boolean. The
+     * interpreter throws on a non-boolean (e.g. `NaN`) condition rather than
+     * silently taking the default branch; the guard makes the compiled code match
+     * that contract (D6) where the target can express it. A provably boolean
+     * condition — the common case — is emitted bare (no overhead, no churn).
+     */
+    static guardCondition(cond: Expression, target: CompileTarget<Expression>): TargetSource;
     /** True if the expression is provably integer-typed. */
     static isIntegerValued(expr: Expression): boolean;
     /** True if the expression is provably non-negative (sign ≥ 0). */
@@ -14689,6 +15209,8 @@ export declare class ComputeEngineIntervalFunction extends Function {
         square: typeof import("../interval").square;
         pow: typeof import("../interval").pow;
         powInterval: typeof import("../interval").powInterval;
+        powRational: typeof import("../interval").powRational;
+        nthRoot: typeof import("../interval").nthRoot;
         exp: typeof import("../interval").exp;
         ln: typeof import("../interval").ln;
         log10: typeof import("../interval").log10;
@@ -15197,7 +15719,7 @@ export interface IComputeEngine {
     declare(arg1: MathJsonSymbol | {
         [id: MathJsonSymbol]: Type | TypeString | Partial<SymbolDefinition>;
     }, arg2?: Type | TypeString | Partial<SymbolDefinition>, arg3?: Scope): IComputeEngine;
-    assume(predicate: Expression): AssumeResult;
+    assume(predicate: Expression | string): AssumeResult;
     /**
      * Declare a sequence with a recurrence relation.
      *
@@ -15302,7 +15824,7 @@ export interface IComputeEngine {
     }>;
     forget(symbol?: MathJsonSymbol | MathJsonSymbol[]): void;
     ask(pattern: Expression): BoxedSubstitution[];
-    verify(query: Expression): boolean | undefined;
+    verify(query: Expression | string): boolean | undefined;
     /** @internal */
     _shouldContinueExecution(): boolean;
     /** @internal */
@@ -15720,8 +16242,16 @@ export declare class _Parser implements Parser {
     private parseFunction;
     parseSymbol(until?: Readonly<Terminator>): MathJsonExpression | null;
     /**
-     * In non-strict mode, try to parse a bare function name followed by parentheses.
-     * This allows syntax like `sin(x)` instead of requiring `\sin(x)`.
+     * Look ahead (without consuming any tokens) for a run of letters starting at
+     * the current position, skipping leading spaces. Used to detect an upcoming
+     * bare function name so that an implicit function argument stops before it
+     * (e.g. `sin x cos y` groups as `(sin x)(cos y)`).
+     */
+    private peekBareWord;
+    /**
+     * In non-strict mode, try to parse a bare function name, either applied to a
+     * parenthesized argument list (`sin(x)`) or, without parentheses, to an
+     * implicit argument the way `\sin x` works (`sin x`, `cos 2x`, `sqrt4`).
      *
      * Returns the parsed function call or null if not a bare function.
      */
@@ -15740,7 +16270,9 @@ export declare class _Parser implements Parser {
      * - they act mostly like an infix operator, but they are commutative, i.e.
      * `x_a^b` should be parsed identically to `x^b_a`.
      *
-     * - furthermore, in LaTeX `x^a^b` parses the same as `x^a{}^b`.
+     * - a second superscript on the same base (`x^a^b`) is a "Double
+     *   superscript" error in LaTeX; we surface it as an error rather than
+     *   gathering the scripts into a broadcasting `List` (see below).
      *
      */
     private parseSupsub;

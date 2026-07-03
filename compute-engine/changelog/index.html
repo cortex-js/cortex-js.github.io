@@ -17,9 +17,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.88a9e1b0.css">
-<script src="/assets/js/runtime~main.099577bb.js" defer="defer"></script>
-<script src="/assets/js/main.db9d4aae.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
+<script src="/assets/js/runtime~main.747d6bfc.js" defer="defer"></script>
+<script src="/assets/js/main.dae09233.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -47,7 +47,8 @@
     }
   
     </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
-<li class=""><strong>Partial derivatives of unknown multivariate functions.</strong> Differentiating an
+<li class="">
+<p><strong>Partial derivatives of unknown multivariate functions.</strong> Differentiating an
 application of an undefined function of several arguments no longer stays
 inert: <code>D(f(x, y), x)</code> now evaluates to <code>Apply(Derivative(f, 1, 0), x, y)</code>,
 the partial with respect to the first argument. The order argument of
@@ -64,8 +65,81 @@ the mixed partial directly, e.g. <code>Derivative(Function(x^2·y, x, y), 1, 1)<
 <code>(x, y) |-&gt; 2x</code>. This also lets Bessel functions differentiate with respect to
 their <strong>order</strong>: <code>D(BesselJ(x, x), x)</code> now combines the known argument
 recurrence with a symbolic order derivative
-<code>Apply(Derivative(BesselJ, 1, 0), x, x)</code> instead of staying inert.</li>
+<code>Apply(Derivative(BesselJ, 1, 0), x, x)</code> instead of staying inert.</p>
+</li>
+<li class="">
+<p><strong><code>verify()</code> and <code>assume()</code> accept strings.</strong> <code>ce.verify(&#x27;x &gt; 0&#x27;)</code> and
+<code>ce.assume(&#x27;$x &gt; 0$&#x27;)</code> parse the predicate (LaTeX) and proceed; unparseable
+input throws a clear error. In addition, <code>verify()</code> of compound predicates
+now recurses properly: after <code>assume(x·y &gt; 0)</code> and <code>assume(x + y &gt; 0)</code>,
+<code>verify(And(x·y &gt; 0, x + y &gt; 0))</code> is <code>true</code> and <code>verify(Not(x·y &gt; 0))</code> is
+<code>false</code> (the Kleene logic recursion was previously unreachable).</p>
+</li>
+<li class="">
+<p><strong>New default simplification: sine addition.</strong>
+<code>sin(x)cos(y) + cos(x)sin(y)</code> → <code>sin(x + y)</code> (and the <code>−</code>/<code>sin(x−y)</code>
+variant) now applies in the default <code>simplify()</code> path, not just under the
+<code>fu</code> rule set.</p>
+</li>
+<li class="">
+<p><strong><code>\binom</code> is now supported.</strong> <code>\binom{n}{k}</code> (and <code>\dbinom</code>/<code>\tbinom</code>)
+parses to <code>Binomial(n, k)</code>, and <code>Binomial</code> serializes back to <code>\binom</code> —
+previously <code>\binom</code> was a parse error.</p>
+</li>
+<li class="">
+<p><strong><code>==</code> and <code>!=</code> now evaluate.</strong> <code>3 == 3</code> evaluates to <code>True</code> (previously an
+inert <code>EqualEqual</code>) and <code>3!= 2</code> is a not-equal comparison (with <code>3! = 2</code>,
+space before <code>=</code>, still parsed as a factorial equation). Additional unicode
+operators are accepted in all modes: <code>≤ ≥ ≠ × · ∞ √ ½ ¼ ¾ ⅓ ⅔</code>.</p>
+</li>
+<li class="">
+<p><strong>Misparse-driven auto-declarations are recoverable.</strong> In strict mode,
+parsing <code>gcd(12,8)</code> (an unknown multi-letter name applied to arguments)
+auto-declares the applied symbol as a function; that declaration is now
+marked <em>inferred</em>, so a later <code>ce.assign(&#x27;d&#x27;, 5)</code> overrides it and <code>d+1</code>
+evaluates to <code>6</code> instead of erroring forever.</p>
+</li>
+<li class="">
+<p><strong><code>real</code> is now a subtype of <code>complex</code> in the type lattice.</strong> The numeric
+tower is the chain <code>integer ⊂ rational ⊂ real ⊂ complex ⊂ number</code>, so a
+real-typed symbol now satisfies complex-typed signatures and guards through
+the ordinary subtype relation (previously <code>complex</code> effectively meant
+&quot;strictly complex&quot; and real-typed arguments needed special-case handling).
+<code>meet(real, complex)</code> is now <code>real</code>. The <code>isReal</code> predicate is unchanged
+(real still admits ±∞). In addition, union types now flatten nested unions
+and canonicalize member order — <code>integer | string</code> and <code>string | integer</code>
+produce the same <code>.type</code> string — and type negation distinguishes <code>never</code>
+(bottom) from <code>nothing</code> (unit): <code>!any</code> is <code>never</code>, <code>!never</code> is <code>any</code>.</p>
+</li>
+<li class="">
+<p><strong>Assumptions are more capable.</strong> <code>assume(x ∈ PositiveIntegers)</code> (and the
+other signed integer/real sets) now decomposes into a type and a sign bound,
+so <code>x.isInteger</code> and <code>x.isPositive</code> respond; inequality bounds now reach
+equality checks (<code>assume(w &gt; 4)</code> makes <code>w.isEqual(2)</code> false, and
+<code>verify(x ≠ 0)</code> holds after <code>assume(x &gt; 0)</code>); two bounded symbols compare
+(<code>assume(s &gt; 4); assume(t &lt; 1)</code> makes <code>s &gt; t</code> evaluate to <code>True</code>); a
+contradictory conjunction such as <code>assume(p &gt; 0 ∧ p &lt; −5)</code> is now atomic —
+it is rejected without leaving the earlier conjuncts applied; and a no-arg
+<code>forget()</code> now also clears values installed by <code>assume(&#x27;x = 5&#x27;)</code> while
+preserving values set with <code>assign()</code>.</p>
+</li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="performance">Performance<a href="#performance" class="hash-link" aria-label="Direct link to Performance" title="Direct link to Performance" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>The Rubi integration pack is much faster on integrals it cannot solve.</strong>
+A second-level dispatch index (the set of operator heads a rule&#x27;s pattern
+requires vs the heads present in the integrand) now screens the ~3,200
+rules before pattern-matching, cutting candidate scans ~10× on the miss
+path — integrals that fall through to the built-in integrator spend less
+than half the previous time in the pack, with byte-identical results
+verified across the full 4,965-integral Rubi test corpus.</p>
+</li>
+<li class="">
+<p><strong>Sign queries under assumptions are much faster and sharper.</strong> <code>.sgn</code> /
+<code>.isPositive</code> on a symbol constrained by assumptions now consults the
+indexed bounds store (O(1) after indexing) instead of linearly re-matching
+every assumption, and derives strictly more: <code>n ∈ Range(1, 10)</code> now yields
+<code>isPositive === true</code> (previously undefined), agreeing with <code>verify(n &gt; 0)</code>.</p>
+</li>
 <li class="">
 <p><strong>Faster polynomial equation solving.</strong> Solving a univariate polynomial of
 degree ≥ 2 now goes straight to a coefficient-based closed form (quadratic
@@ -90,6 +164,169 @@ value with no trailing decimal zero with a single test, and redundant
 speeds up high-precision <code>N()</code>.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>Free functions accept the looser AsciiMath/Typst-like syntax they
+document.</strong> <code>simplify()</code>, <code>evaluate()</code>, <code>N()</code>, <code>expand()</code>, <code>expandAll()</code>,
+<code>factor()</code>, <code>solve()</code>, and <code>compile()</code> now parse string input in non-strict
+mode, so bare function names, multi-letter identifiers, and <code>**</code> for
+exponentiation work — e.g.
+<code>simplify(&quot;(sin(alpha)**2 + cos(alpha)**2) * (x**2 + 2*x + 1) / (x + 1)&quot;)</code>
+returns <code>x + 1</code> and <code>N(&quot;(1+sqrt(5))/2&quot;)</code> returns the golden ratio.
+Previously these were parsed as strict LaTeX and silently mangled
+(<code>sqrt(5)</code> became <code>5·q·r·s·t</code>, the <code>i</code> in <code>sin</code> was read as the imaginary
+unit). Canonical LaTeX input is unaffected. The standalone <code>parse(latex)</code>
+entry point remains strict LaTeX.</p>
+</li>
+<li class="">
+<p><strong>Hard limits no longer hang.</strong> Nested-exponential (Gruntz-class) limits
+such as <code>lim_{x→∞} e^{e^{e^x}}/e^{e^{e^{x-1}}}</code> burned ~18 minutes of CPU
+in the limit engine before giving up; the engine now honors the evaluation
+deadline and probes order-of-growth with machine floats instead of
+building multi-million-digit intermediates — the same limits return
+(symbolically inert) in milliseconds. The timeout contract is now
+documented on <code>evaluate()</code>: exceeding <code>timeLimit</code> or the recursion limit
+throws a <code>CancellationError</code> (with <code>cause</code> <code>&#x27;timeout&#x27;</code> or
+<code>&#x27;recursion-depth-exceeded&#x27;</code>) — catch it to distinguish an interrupted
+evaluation from a symbolic result.</p>
+</li>
+<li class="">
+<p><strong><code>subs()</code> reaches into collections.</strong> <code>Median([a,b,c]).subs({a: 1})</code>
+(and substitution into any list/tensor element) previously returned the
+expression unchanged — <code>BoxedTensor</code> now delegates substitution to its
+structural form. Explicit <code>Hold(…)</code> semantics are unchanged.</p>
+</li>
+<li class="">
+<p><strong><code>0^0</code> is NaN on every path.</strong> The <code>.N()</code> path returned <code>1</code> (via
+<code>Math.pow</code>) while <code>evaluate()</code> returned NaN; both now agree, matching the
+compiled-JavaScript alignment from the previous round.</p>
+</li>
+<li class="">
+<p><strong><code>simplify({rules: null})</code> honors its contract.</strong> It now applies no
+rules (structural/numeric folding only) as documented, instead of
+silently using the full default rule set. Also, <code>ln(a)/ln(b) → k</code> now
+verifies <code>a = bᵏ</code> with exact bigint arithmetic — <code>ln(2⁶⁰+1)/ln(2)</code> no
+longer falsely reduces to 60 — and the simplification cost-gate
+exemptions moved from fragile label string-matching to explicit
+<code>purpose: &#x27;transform&#x27;</code> tags (no behavior change).</p>
+</li>
+<li class="">
+<p><strong>Fungrim guards are uniformly finite.</strong> Real/integer-typed rule guards
+now require the argument not be known-infinite, matching the complex
+guard: a real-guarded identity like <code>Im(e^{ix}) → sin(x)</code> no longer fires
+for <code>x = +∞</code> (which produced NaN). Pack shell declarations also survive
+scope pops and re-loads, and <code>Union</code> no longer collapses inert set-valued
+operands (e.g. <code>Interior(…)</code>) into literal elements.</p>
+</li>
+<li class="">
+<p><strong>Wester audit grading is honest.</strong> A finite <code>.N()</code> value no longer
+counts as correct for definite integrals and limits — results are graded
+against an independent numeric reference; <code>±</code>-annotated outputs
+(<code>PlusMinus</code>) are unwrapped instead of graded unsolved. (Harness only; no
+report regenerated yet.)</p>
+</li>
+<li class="">
+<p><strong>Numeric kernel accuracy.</strong> Arbitrary-precision <code>log</code>/<code>log10</code>/<code>log2</code> now
+carry guard digits (<code>log10(10⁻⁷)</code> is exactly <code>−7</code>; <code>2^(−1/2)</code> is correctly
+rounded, was 2.35 ulp); <code>Zeta</code> at negative even integers returns exactly
+<code>0</code> (was a ~1e-76 residue); machine <code>gammaln</code> was rewritten in Lanczos-log
+form (~15.7 correct digits, was ~10.5, improving <code>Gamma</code>/<code>Beta</code> for large
+arguments); the Fresnel integrals&#x27; asymptotic cutoff moved from 36,974 to
+6×10¹⁵ with an exactly-computed phase (S(40,000) was returned as a flat
+0.5, an 8.6e-6 error cliff); exact root extraction recognizes perfect
+powers (<code>64^(1/3)</code> → <code>4</code>, <code>(27/8)^(1/3)</code> → <code>3/2</code> exact), no longer drops
+the radical in products like <code>(8√3)^(1/3)</code>, and fixes a wrong half-integer
+root decomposition; and exact rational×radical values now round to the
+working precision when numericized (a precision-100 <code>(7/3)√3</code> printed 199
+digits of which only ~103 were correct; machine-precision results are now
+the correctly-rounded double).</p>
+</li>
+<li class="">
+<p><strong>Negative fractional powers canonicalize uniformly.</strong> <code>x^(−1/3)</code> becomes
+<code>1/∛x</code> (matching <code>x^(−1/2)</code> → <code>1/√x</code>) instead of the anomalous
+<code>Root(x, −3)</code> rendered as <code>\sqrt[-3]{x}</code>; also fixes a crash evaluating
+numeric negative-index roots such as <code>8^(−1/3)</code>.</p>
+</li>
+<li class="">
+<p><strong>Float coefficients no longer mint exact cancellations.</strong> <code>(0.3x)/(0.1y)</code>
+kept an exact coefficient <code>3</code> (binary <code>0.3/0.1</code> is not exactly 3); division
+coefficient extraction now follows the same float-exclusion convention as
+<code>Add</code>/<code>Multiply</code> folding.</p>
+</li>
+<li class="">
+<p><strong>Comparison coherence.</strong> The primitive overload of <code>isSame</code> agrees with
+the boxed path (<code>Rational(1,2).isSame(0.5)</code> matches
+<code>.isSame(ce.number(0.5))</code>), and collection <code>isEqual</code> uses the same
+tolerance semantics as scalars (near-equal float vectors compare equal
+within <code>ce.tolerance</code>; NaN-element behavior is now documented).</p>
+</li>
+<li class="">
+<p><strong>Parse/serialize fidelity.</strong> <code>x^2^3</code> is a &quot;double superscript&quot; parse error
+(previously it silently became <code>Power(x, List(2,3))</code> and broadcast to a
+list); <code>Sequence(1,2)</code> no longer serializes to <code>1 2</code>, which re-parsed as
+the number <code>12</code>; set-builder notation <code>\{x \in \R : x &gt; 0\}</code> attaches the
+condition to the comprehension instead of nesting it inside the domain; and
+<code>toMathJson({exclude: …})</code> now honors exclusions for number literals
+(<code>Rational</code> → <code>Divide</code>, <code>Sqrt</code> → <code>Power</code>).</p>
+</li>
+<li class="">
+<p><strong>Compiled code matches the interpreter more closely.</strong> Negative-bound
+<code>Sum</code> unrolls no longer emit <code>--3</code> (invalid in GLSL/WGSL); user variables
+named after GLSL/WGSL reserved words (<code>sample</code>, <code>filter</code>, <code>in</code>, <code>texture</code>,
+…) fail at compile time with a diagnostic instead of emitting invalid
+shader code; chained relations evaluate their middle operands once
+(<code>a &lt; Random() &lt; b</code> drew twice); dynamic <code>0^0</code> returns NaN in compiled
+JavaScript (matching the interpreter) and non-boolean <code>Which</code>/<code>When</code>
+conditions throw as the interpreter does; <code>realOnly</code> no longer passes
+booleans through; and the compiled <code>Integrate</code> Monte-Carlo behavior
+(~1e-4 error, 10⁷ samples) is now documented.</p>
+</li>
+<li class="">
+<p><strong>Eight Fungrim <code>Digamma</code> special values now simplify.</strong> <code>Digamma(1/2)</code> →
+<code>−2 ln 2 − γ</code> and seven siblings (1/3, 1/4, 1/6, 1/8, 2/3, 3/4, 5/6) were
+cost-gated into silent no-ops; they are now tagged as transforms and fire
+when the Fungrim pack is loaded.</p>
+</li>
+<li class="">
+<p><strong>High-precision results were silently wrong after increasing <code>precision</code>.</strong>
+The internal table of Bernoulli numbers used by <code>Gamma</code>, <code>Digamma</code>,
+<code>PolyGamma</code> and <code>Zeta</code> at high precision was built once per process and
+never extended, so raising <code>ce.precision</code> after a first computation reused a
+too-short table: a precision-300 <code>Gamma(1.23456789)</code> computed after a
+precision-20 call diverged from the correct value around digit 170. The
+table is now rebuilt when more terms are needed (results verified
+bit-identical to a fresh engine and to mpmath).</p>
+</li>
+<li class="">
+<p><strong>Finite set operations compute correct results.</strong>
+<code>Intersection({1,2}, {2})</code> returned <code>EmptySet</code> (elements were compared
+against the whole second set rather than tested for membership) and
+<code>SymmetricDifference</code> never evaluated at all. Both now reduce correctly,
+with <code>Union</code>/<code>SetMinus</code> verified against value tables.</p>
+</li>
+<li class="">
+<p><strong><code>Reverse</code> no longer crashes on short lists.</strong> Its iterator&#x27;s termination
+test could never be true, so <code>Reverse([1,2,3]).evaluate()</code> threw a raw
+JavaScript error instead of returning <code>[3,2,1]</code>.</p>
+</li>
+<li class="">
+<p><strong>Non-strict mode no longer crashes on missing arguments.</strong> With
+<code>ce.strict = false</code>, expressions missing required arguments — <code>Negate()</code>,
+<code>Sqrt()</code>, <code>Power(2)</code>, <code>Arctan()</code> — threw raw JavaScript errors, and
+<code>Sin()</code> printed <code>sin([undefined])</code>. The non-strict fast paths now pad
+missing required arguments the same way strict mode does, producing
+identical MathJSON.</p>
+</li>
+<li class="">
+<p><strong>Rubi integration cleanups.</strong> A rule-driven antiderivative could contain
+unreduced <code>ln(e)</code> factors that <code>simplify()</code> couldn&#x27;t fold inside a quotient
+(<code>∫ e²ˣ/x³</code> now yields a clean <code>ExpIntegralEi(2x)</code> form, and
+<code>(ln(e)·y)/x</code> simplifies to <code>y/x</code>); an internal re-entrant integration
+no longer resets the evaluation deadline (a fallback could previously grant
+the outer integral a fresh time budget); the rule-compilation report now
+carries per-rule skip reasons and stays honest on cached reloads; and the
+driver&#x27;s memo table is cleared per top-level integration instead of growing
+without bound.</p>
+</li>
 <li class="">
 <p><strong>Integer-domain functions no longer crash on infinite arguments.</strong>
 <code>Fibonacci(+∞)</code>, <code>BernoulliB(−∞)</code>, <code>MoebiusMu(∞)</code> and the rest of the
