@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.747d6bfc.js" defer="defer"></script>
-<script src="/assets/js/main.dae09233.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.f0e5d384.js" defer="defer"></script>
+<script src="/assets/js/main.3c89d032.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -38,26 +38,26 @@
 <li class=""><a href="#gauss-hypergeometric-function" class="">Gauss hypergeometric function</a> (16)</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="airy-functions">Airy functions<a href="#airy-functions" class="hash-link" aria-label="Direct link to Airy functions" title="Direct link to Airy functions" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\operatorname{Ai}(z)=z\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})z\mapsto\operatorname{Ai}(z)^{\prime}(0)+\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})</code></p>
+<p><code class="language-math math-inline">\operatorname{Ai}(z)=\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/01bbb6" target="_blank" rel="noopener noreferrer" class=""><code>01bbb6</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\operatorname{Ai}(z)^{\prime}(z)=\frac{1}{2}(\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})z^2)+\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})z\mapsto\operatorname{Ai}(z)^{\prime}(0)</code></p>
+<p><code class="language-math math-inline">z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/20e530" target="_blank" rel="noopener noreferrer" class=""><code>20e530</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\operatorname{Bi}(z)^{\prime}(z)=\frac{1}{2}(\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})z^2)+\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})z\mapsto\operatorname{Bi}(z)^{\prime}(0)</code></p>
+<p><code class="language-math math-inline">z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4d65e5" target="_blank" rel="noopener noreferrer" class=""><code>4d65e5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z))=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land C\in\C\land\mathrm{D_{var}}\in\C</code>.
+<p><code class="language-math math-inline">z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land C\in\C\land D_{var}\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/51b241" target="_blank" rel="noopener noreferrer" class=""><code>51b241</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -71,39 +71,39 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b2e9d0" target="_blank" rel="noopener noreferrer" class=""><code>b2e9d0</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Bi}(z)=z\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})z\mapsto\operatorname{Bi}(z)^{\prime}(0)+\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})</code></p>
+<p><code class="language-math math-inline">\operatorname{Bi}(z)=\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bd319e" target="_blank" rel="noopener noreferrer" class=""><code>bd319e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Ai}(z)z\mapsto\operatorname{Bi}(z)^{\prime}(z)-\operatorname{Bi}(z)z\mapsto\operatorname{Ai}(z)^{\prime}(z)=\frac{1}{\pi}</code></p>
+<p><code class="language-math math-inline">\operatorname{Ai}(z)z\mapsto\operatorname{Bi}(z)^{\prime}(z)-z\mapsto\operatorname{Ai}(z)^{\prime}(z)\operatorname{Bi}(z)=\frac{1}{\pi}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/de9800" target="_blank" rel="noopener noreferrer" class=""><code>de9800</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)=(n-2)z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)+zz\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land C\in\C\land\mathrm{D_{var}}\in\C\land n\in3..\infty</code>.
+<p><code class="language-math math-inline">z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)=zz\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)+(n-2)z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land n\in3..\infty\land C\in\C\land D_{var}\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/eadca2" target="_blank" rel="noopener noreferrer" class=""><code>eadca2</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bessel-functions">Bessel functions<a href="#bessel-functions" class="hash-link" aria-label="Direct link to Bessel functions" title="Direct link to Bessel functions" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{3}{2}}(z)=(\frac{1}{z}+\frac{1}{z^2})\exp(-z)\sqrt{\frac{\pi z}{2}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{\frac{3}{2}}(z)=\sqrt{\frac{\pi z}{2}}\exp(-z)(\frac{1}{z}+\frac{1}{z^2})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0c09cc" target="_blank" rel="noopener noreferrer" class=""><code>0c09cc</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\sin(z)}{\sqrt{\pi}\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/121b21" target="_blank" rel="noopener noreferrer" class=""><code>121b21</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{\sqrt{2}(\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(\imaginaryI((\pi(2\nu+1))/4-z))+\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))\exp(-(\imaginaryI((\pi(2\nu+1))/4-z))))}{2\sqrt{\pi}\sqrt{z}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(z)\land\nu\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{\exp(-(\imaginaryI((\pi(2\nu+1))/4-z)))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))+\exp(\imaginaryI((\pi(2\nu+1))/4-z))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\sqrt{2\pi z}}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\land\Re(z)\gt0</code>.
 <strong>Symbols:</strong> <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/127f05" target="_blank" rel="noopener noreferrer" class=""><code>127f05</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(-n^2+r^2+4r+4)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)+(r+1)(r+2)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)=0</code></p>
+<p><code class="language-math math-inline">((r^2+4r)-n^2+4)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)+(r+1)(r+2)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/15ac84" target="_blank" rel="noopener noreferrer" class=""><code>15ac84</code> · Fungrim entry ↗</a></p>
@@ -135,27 +135,27 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/40aeb6" target="_blank" rel="noopener noreferrer" class=""><code>40aeb6</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/49d754" target="_blank" rel="noopener noreferrer" class=""><code>49d754</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{\sqrt{2}\cos(z)}{\sqrt{\pi}\sqrt{z}})</code></p>
+<p><code class="language-math math-inline">\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}((2^{1/2}\cos(z)z^{1/2})/\pi^{1/2}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4dfd41" target="_blank" rel="noopener noreferrer" class=""><code>4dfd41</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{I}_{\nu}(z)=\frac{z(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4fb391" target="_blank" rel="noopener noreferrer" class=""><code>4fb391</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{-n}(z)=\operatorname{J}_{n}(z)\times(-1)^{n}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{-n}(z)=(-1)^{n}\operatorname{J}_{n}(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/54bce2" target="_blank" rel="noopener noreferrer" class=""><code>54bce2</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Y}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\sin(z)}{\sqrt{\pi}\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5679f2" target="_blank" rel="noopener noreferrer" class=""><code>5679f2</code> · Fungrim entry ↗</a></p>
@@ -170,59 +170,59 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5aceb9" target="_blank" rel="noopener noreferrer" class=""><code>5aceb9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{I}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\cosh(z)}{\sqrt{\pi}\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cosh(z)\sqrt{z})/\sqrt{\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5d9c43" target="_blank" rel="noopener noreferrer" class=""><code>5d9c43</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\cos(z)}{\sqrt{\pi}\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cos(z)\sqrt{z})/\sqrt{\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/621a9b" target="_blank" rel="noopener noreferrer" class=""><code>621a9b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(z^2-\nu^2)\operatorname{Y}_{\nu}(z)+z\mapsto\operatorname{Y}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)=0</code></p>
+<p><code class="language-math math-inline">z^2z\mapsto\operatorname{Y}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)+(z^2-\nu^2)\operatorname{Y}_{\nu}(z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/62f23c" target="_blank" rel="noopener noreferrer" class=""><code>62f23c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{I}_{\frac{3}{2}}(z)=\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\cosh(z)}{z}-\frac{\sinh(z)}{z^2})\sqrt{z})</code></p>
+<p><code class="language-math math-inline">\operatorname{I}_{\frac{3}{2}}(z)=\sqrt{\frac{2z}{\pi}}(\frac{\cosh(z)}{z}-\frac{\sinh(z)}{z^2})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/65647f" target="_blank" rel="noopener noreferrer" class=""><code>65647f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{-1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/685892" target="_blank" rel="noopener noreferrer" class=""><code>685892</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{HankelH_1}(\nu, z)=\imaginaryI\operatorname{Y}_{\nu}(z)+\operatorname{J}_{\nu}(z)</code></p>
+<p><code class="language-math math-inline">\mathrm{HankelH_1}(\nu, z)=\operatorname{J}_{\nu}(z)+\imaginaryI\operatorname{Y}_{\nu}(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>HankelH1</strong> — Hankel function of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6a6a09" target="_blank" rel="noopener noreferrer" class=""><code>6a6a09</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!}-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><code class="language-math math-inline">(\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7377c8" target="_blank" rel="noopener noreferrer" class=""><code>7377c8</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi}}{2\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7ac286" target="_blank" rel="noopener noreferrer" class=""><code>7ac286</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t)\exp(z\cos(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\cosh(t))\, \mathrm{d}t)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(z)\land\nu\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\land\Re(z)\gt0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7ae3ed" target="_blank" rel="noopener noreferrer" class=""><code>7ae3ed</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\nu}(z)=\frac{\sqrt{2}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)\exp(-z)\sqrt{\pi}}{2\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{\nu}(z)=\frac{\exp(-z)}{\sqrt{\frac{2z}{\pi}}}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7efe21" target="_blank" rel="noopener noreferrer" class=""><code>7efe21</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{I}_{\nu}(z)=\mathrm{Hypergeometric0F1Regularized}(\nu+1, \frac{z^2}{4})(\frac{z}{2})^{\nu}</code></p>
+<p><code class="language-math math-inline">\operatorname{I}_{\nu}(z)=\frac{z}{2}^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, \frac{z^2}{4})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\N\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1Regularized</strong> — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
@@ -233,7 +233,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/81ffcd" target="_blank" rel="noopener noreferrer" class=""><code>81ffcd</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Y}_{\frac{3}{2}}(z)=-(\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\sin(z)}{z}+\frac{\cos(z)}{z^2})\sqrt{z}))</code></p>
+<p><code class="language-math math-inline">\operatorname{Y}_{\frac{3}{2}}(z)=-(\sqrt{\frac{2z}{\pi}}(\frac{\cos(z)}{z^2}+\frac{\sin(z)}{z}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8472cc" target="_blank" rel="noopener noreferrer" class=""><code>8472cc</code> · Fungrim entry ↗</a></p>
@@ -243,7 +243,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8b6264" target="_blank" rel="noopener noreferrer" class=""><code>8b6264</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">-((\nu^2+z^2)\operatorname{I}_{\nu}(z))+z\mapsto\operatorname{I}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)=0</code></p>
+<p><code class="language-math math-inline">(z^2z\mapsto\operatorname{I}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))-(z^2+\nu^2)\operatorname{I}_{\nu}(z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/95e561" target="_blank" rel="noopener noreferrer" class=""><code>95e561</code> · Fungrim entry ↗</a></p>
@@ -255,18 +255,18 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/98703d" target="_blank" rel="noopener noreferrer" class=""><code>98703d</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(\frac{z}{2})^{\nu}}{\Gamma(\nu+1)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\N\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\notin-\infty..-1\land\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\N\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land\nu\notin-\infty..-1\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9ad254" target="_blank" rel="noopener noreferrer" class=""><code>9ad254</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C\land r\in\N</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C\land r\in\N</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9b2f38" target="_blank" rel="noopener noreferrer" class=""><code>9b2f38</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{K}_{\nu}(z)=-(\frac{z(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9d98f8" target="_blank" rel="noopener noreferrer" class=""><code>9d98f8</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -275,17 +275,17 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a0ff0b" target="_blank" rel="noopener noreferrer" class=""><code>a0ff0b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{3}{2}}(z)=\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\sin(z)}{z^2}-\frac{\cos(z)}{z})\sqrt{z})</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{\frac{3}{2}}(z)=\sqrt{\frac{2z}{\pi}}(\frac{\sin(z)}{z^2}-\frac{\cos(z)}{z})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a2a294" target="_blank" rel="noopener noreferrer" class=""><code>a2a294</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{I}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\sinh(z)}{\sqrt{\pi}\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sinh(z)\sqrt{z})/\sqrt{\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a59981" target="_blank" rel="noopener noreferrer" class=""><code>a59981</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(z^2-\nu^2)\operatorname{J}_{\nu}(z)+z\mapsto\operatorname{J}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)=0</code></p>
+<p><code class="language-math math-inline">z^2z\mapsto\operatorname{J}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)+(z^2-\nu^2)\operatorname{J}_{\nu}(z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ad9caa" target="_blank" rel="noopener noreferrer" class=""><code>ad9caa</code> · Fungrim entry ↗</a></p>
@@ -302,7 +302,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b049dc" target="_blank" rel="noopener noreferrer" class=""><code>b049dc</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{Y}_{\nu}(z)=\frac{z(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b6d600" target="_blank" rel="noopener noreferrer" class=""><code>b6d600</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -311,52 +311,52 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c0247f" target="_blank" rel="noopener noreferrer" class=""><code>c0247f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{3/2^{2/3}z^{2/3}})</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{((3z)/2)^{2/3}})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c362e8" target="_blank" rel="noopener noreferrer" class=""><code>c362e8</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\sinh(t))\, \mathrm{d}t)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(z)\land\nu\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\land\Re(z)\gt0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cac83e" target="_blank" rel="noopener noreferrer" class=""><code>cac83e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi}}{2\sqrt{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d1f5c5" target="_blank" rel="noopener noreferrer" class=""><code>d1f5c5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d39c46" target="_blank" rel="noopener noreferrer" class=""><code>d39c46</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{z(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d56914" target="_blank" rel="noopener noreferrer" class=""><code>d56914</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{Y}_{n}(z)=-(\frac{1}{\pi}(2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z))))</code></p>
+<p><code class="language-math math-inline">\operatorname{Y}_{n}(z)=\frac{1}{\pi}(-2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z)))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d5b7e8" target="_blank" rel="noopener noreferrer" class=""><code>d5b7e8</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!}-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C\land r\in\N</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><code class="language-math math-inline">(\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\Z\land z\in\C\land r\in\N</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e233b0" target="_blank" rel="noopener noreferrer" class=""><code>e233b0</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2\frac{3}{2}^{\frac{2}{3}}z^{\frac{2}{3}}}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2(\frac{3z}{2})^{\frac{2}{3}}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e72e96" target="_blank" rel="noopener noreferrer" class=""><code>e72e96</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e85dee" target="_blank" rel="noopener noreferrer" class=""><code>e85dee</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(\frac{z^2}{4}))(\frac{z}{2})^{\nu}</code></p>
+<p><code class="language-math math-inline">\operatorname{J}_{\nu}(z)=\frac{z}{2}^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(\frac{z^2}{4}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\N\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1Regularized</strong> — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
@@ -367,145 +367,145 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f1afc0" target="_blank" rel="noopener noreferrer" class=""><code>f1afc0</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(-n^2+r^2+4r+4)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)-(r+1)(r+2)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)=0</code></p>
+<p><code class="language-math math-inline">((r^2+4r)-n^2+4)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)-(r+1)(r+2)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f303c9" target="_blank" rel="noopener noreferrer" class=""><code>f303c9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">-((\nu^2+z^2)\operatorname{K}_{\nu}(z))+z\mapsto\operatorname{K}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)=0</code></p>
+<p><code class="language-math math-inline">(z^2z\mapsto\operatorname{K}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))-(z^2+\nu^2)\operatorname{K}_{\nu}(z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\nu\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fd9add" target="_blank" rel="noopener noreferrer" class=""><code>fd9add</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\operatorname{K}_{\frac{-1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}</code></p>
+<p><code class="language-math math-inline">\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fda595" target="_blank" rel="noopener noreferrer" class=""><code>fda595</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="confluent-hypergeometric-functions">Confluent hypergeometric functions<a href="#confluent-hypergeometric-functions" class="hash-link" aria-label="Direct link to Confluent hypergeometric functions" title="Direct link to Confluent hypergeometric functions" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric0F1Regularized}(a, z)=\operatorname{I}_{a-1}(2\sqrt{z})z^{\frac{1-a}{2}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric0F1Regularized}(a, z)=\sqrt{z}^{1-a}\operatorname{I}_{a-1}(2\sqrt{z})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1Regularized</strong> — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/00dfd1" target="_blank" rel="noopener noreferrer" class=""><code>00dfd1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric0F_1}(a, z)=\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})\exp(-(2\sqrt{z}))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">2a\notin-\infty..1\land a\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric0F_1}(a, z)=\exp(-(2\sqrt{z}))\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land z\in\C\land2a\notin-\infty..1</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function; <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/2df3e3" target="_blank" rel="noopener noreferrer" class=""><code>2df3e3</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric0F1Regularized}(a, z)=\operatorname{J}_{a-1}(2\sqrt{-z})(-z)^{\frac{1-a}{2}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric0F1Regularized}(a, z)=\sqrt{-z}^{1-a}\operatorname{J}_{a-1}(2\sqrt{-z})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1Regularized</strong> — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/325a0e" target="_blank" rel="noopener noreferrer" class=""><code>325a0e</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{Hypergeometric2F_0}(a, a-b+1, -(\frac{1}{z}))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land b\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F0</strong> — Tricomi confluent hypergeometric function, alternative notation; <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4cf1e9" target="_blank" rel="noopener noreferrer" class=""><code>4cf1e9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{HypergeometricU}(a, b, z)=\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})+\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land b\notin\Z\land a\in\C\land b\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function; <strong>HypergeometricU</strong> — Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6cf802" target="_blank" rel="noopener noreferrer" class=""><code>6cf802</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{HypergeometricU}(a, b, z)=\mathrm{HypergeometricU}(a-b+1, 2-b, z)z^{1-b}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land b\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{HypergeometricU}(a, b, z)=z^{1-b}\mathrm{HypergeometricU}((1+a)-b, 2-b, z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>HypergeometricU</strong> — Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9d3147" target="_blank" rel="noopener noreferrer" class=""><code>9d3147</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\mathrm{Hypergeometric1F1Regularized}(b-a, b, -z)\exponentialE^{z}</code></p>
+<p><code class="language-math math-inline">\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F1Regularized}(b-a, b, -z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1Regularized</strong> — Regularized Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a047eb" target="_blank" rel="noopener noreferrer" class=""><code>a047eb</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric1F_1}(a, b, z)=\mathrm{Hypergeometric1F_1}(b-a, b, -z)\exponentialE^{z}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land z\in\C\land b\in\C\setminus\Z_{\le0}</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric1F_1}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F_1}(b-a, b, -z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/be533c" target="_blank" rel="noopener noreferrer" class=""><code>be533c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{HypergeometricU}(a, b, z)z^{a}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land b\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{HypergeometricUStar}(a, b, z)=z^{a}\mathrm{HypergeometricU}(a, b, z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>HypergeometricU</strong> — Tricomi confluent hypergeometric function; <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c8fcc7" target="_blank" rel="noopener noreferrer" class=""><code>c8fcc7</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{HypergeometricUStar}(a, b, z)=\sum_{k=0}^{n-1}\frac{\mathrm{RisingFactorial}(a, k)\mathrm{RisingFactorial}(a-b+1, k)}{k!(-z)^{k}}+\mathrm{HypergeometricUStarRemainder}(n, a, b, z)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land b\in\C\land z\in\C\land n\in\N</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0\land n\in\N</code>.
 <strong>Symbols:</strong> <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function; <strong>HypergeometricUStarRemainder</strong> — Error term in asymptotic expansion of Tricomi confluent hypergeometric function; <strong>RisingFactorial</strong> — Rising factorial.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d1b3b5" target="_blank" rel="noopener noreferrer" class=""><code>d1b3b5</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(\mathrm{HypergeometricUStar}(b-a, b, -z)\exponentialE^{z}z^{a-b})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land a\in\C\land b\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1Regularized</strong> — Regularized Kummer confluent hypergeometric function; <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f7f84e" target="_blank" rel="noopener noreferrer" class=""><code>f7f84e</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coulomb-wave-functions">Coulomb wave functions<a href="#coulomb-wave-functions" class="hash-link" aria-label="Direct link to Coulomb wave functions" title="Direct link to Coulomb wave functions" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\mathrm{CoulombF}(\ell, \eta, z)=\frac{\mathrm{CoulombH}(1, \ell, \eta, z)-\mathrm{CoulombH}(-1, \ell, \eta, z)}{2\imaginaryI}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>CoulombF</strong> — Regular Coulomb wave function; <strong>CoulombH</strong> — Outgoing and ingoing Coulomb wave function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/192a3e" target="_blank" rel="noopener noreferrer" class=""><code>192a3e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CoulombF}(\ell, \eta, z)=(\frac{\mathrm{HypergeometricUStar}(\ell-\imaginaryI\eta+1, 2\ell+2, 2\imaginaryI z)\exp(-(\imaginaryI z))}{\Gamma(\ell+\imaginaryI\eta+1)(-(2\imaginaryI z))^{\ell-\imaginaryI\eta+1}}+\frac{\mathrm{HypergeometricUStar}(\ell+\imaginaryI\eta+1, 2\ell+2, -(2\imaginaryI z))\exp(\imaginaryI z)}{\Gamma(\ell-\imaginaryI\eta+1)(2\imaginaryI z)^{\ell+\imaginaryI\eta+1}})\times2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))z^{\ell+1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><code class="language-math math-inline">\mathrm{CoulombF}(\ell, \eta, z)=2^{\ell}z^{\ell+1}\exp(\frac{1}{2}((\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)+\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta))-\pi\eta))(\frac{\exp(\imaginaryI z)\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))}{(2\imaginaryI z)^{1+\ell+\imaginaryI\eta}\Gamma((1+\ell)-\imaginaryI\eta)}+\frac{\exp(-\imaginaryI z)\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z)}{(-(2\imaginaryI z))^{(1+\ell)-\imaginaryI\eta}\Gamma(1+\ell+\imaginaryI\eta)})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>CoulombF</strong> — Regular Coulomb wave function; <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1976e1" target="_blank" rel="noopener noreferrer" class=""><code>1976e1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\eta}{\ell+1}+\frac{\ell+1}{z})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\ne-1\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
+<p><code class="language-math math-inline">z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CoulombG</strong> — Irregular Coulomb wave function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/2fec14" target="_blank" rel="noopener noreferrer" class=""><code>2fec14</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))}{\Gamma(2\ell+2)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})</code>.
 <strong>Symbols:</strong> <strong>CoulombC</strong> — Coulomb wave function Gamow factor.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4a4739" target="_blank" rel="noopener noreferrer" class=""><code>4a4739</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)-\mathrm{CoulombF}(\ell, \eta, z)z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=1</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
+<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)-z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)\mathrm{CoulombF}(\ell, \eta, z)=1</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CoulombF</strong> — Regular Coulomb wave function; <strong>CoulombG</strong> — Irregular Coulomb wave function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/74274a" target="_blank" rel="noopener noreferrer" class=""><code>74274a</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\mathrm{CoulombH}(1, \ell, \eta, z)+\mathrm{CoulombH}(-1, \ell, \eta, z))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>CoulombG</strong> — Irregular Coulomb wave function; <strong>CoulombH</strong> — Outgoing and ingoing Coulomb wave function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8547ab" target="_blank" rel="noopener noreferrer" class=""><code>8547ab</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\eta}{\ell+1}+\frac{\ell+1}{z})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\ne-1\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
+<p><code class="language-math math-inline">z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CoulombF</strong> — Regular Coulomb wave function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a51a4b" target="_blank" rel="noopener noreferrer" class=""><code>a51a4b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)=\frac{\cos(-(\pi(\ell+1/2))-\mathrm{CoulombSigma}((-1)-\ell, \eta)+\mathrm{CoulombSigma}(\ell, \eta))\mathrm{CoulombF}(\ell, \eta, z)-\mathrm{CoulombF}((-1)-\ell, \eta, z)}{\sin(-(\pi(\ell+1/2))-\mathrm{CoulombSigma}((-1)-\ell, \eta)+\mathrm{CoulombSigma}(\ell, \eta))}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">2\ell\notin\Z\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\imaginaryI\eta-\ell\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land-\ell-\imaginaryI\eta\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)=\frac{\mathrm{CoulombF}(\ell, \eta, z)\cos(\mathrm{CoulombSigma}(\ell, \eta)-\mathrm{CoulombSigma}(-\ell-1, \eta)-(\ell+1/2)\pi)-\mathrm{CoulombF}(-\ell-1, \eta, z)}{\sin(\mathrm{CoulombSigma}(\ell, \eta)-\mathrm{CoulombSigma}(-\ell-1, \eta)-(\ell+1/2)\pi)}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land2\ell\notin\Z\land1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0}\land\imaginaryI\eta-\ell\notin\Z_{\le0}\land-\ell-\imaginaryI\eta\notin\Z_{\le0}\land z\in\C\setminus\lbrace0\rbrace</code>.
 <strong>Symbols:</strong> <strong>CoulombF</strong> — Regular Coulomb wave function; <strong>CoulombG</strong> — Irregular Coulomb wave function; <strong>CoulombSigma</strong> — Coulomb wave function phase shift.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e20938" target="_blank" rel="noopener noreferrer" class=""><code>e20938</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\mathrm{HypergeometricUStar}(\ell+\imaginaryI\eta+1, 2\ell+2, -(2\imaginaryI z))\exp(\imaginaryI((-\pi\ell)/2+z+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}+\mathrm{HypergeometricUStar}(\ell-\imaginaryI\eta+1, 2\ell+2, 2\imaginaryI z)\exp(-(\imaginaryI((-\pi\ell)/2+z+\mathrm{CoulombSigma}(\ell, \eta))))(2z)^{\imaginaryI\eta})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(z)\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><code class="language-math math-inline">\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace\land\Re(z)\gt0</code>.
 <strong>Symbols:</strong> <strong>CoulombG</strong> — Irregular Coulomb wave function; <strong>CoulombSigma</strong> — Coulomb wave function phase shift; <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e2efbf" target="_blank" rel="noopener noreferrer" class=""><code>e2efbf</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CoulombSigma}(\ell, \eta)=\frac{\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)-\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)}{2\imaginaryI}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{CoulombSigma}(\ell, \eta)=\frac{\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)-\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta)}{2\imaginaryI}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})</code>.
 <strong>Symbols:</strong> <strong>CoulombSigma</strong> — Coulomb wave function phase shift.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ed2bf6" target="_blank" rel="noopener noreferrer" class=""><code>ed2bf6</code> · Fungrim entry ↗</a></p>
@@ -523,7 +523,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/603a49" target="_blank" rel="noopener noreferrer" class=""><code>603a49</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Erfc}(z)+\mathrm{Erf}(z)=1</code></p>
+<p><code class="language-math math-inline">\mathrm{Erf}(z)+\mathrm{Erfc}(z)=1</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7f355d" target="_blank" rel="noopener noreferrer" class=""><code>7f355d</code> · Fungrim entry ↗</a></p>
@@ -533,25 +533,25 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/94db18" target="_blank" rel="noopener noreferrer" class=""><code>94db18</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Erf}(z)=\frac{1}{\sqrt{\pi}}(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))</code></p>
+<p><code class="language-math math-inline">\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))/\sqrt{\pi}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/98688d" target="_blank" rel="noopener noreferrer" class=""><code>98688d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Erf}(z)=\frac{1}{\sqrt{\pi}}(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))</code></p>
+<p><code class="language-math math-inline">\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))/\sqrt{\pi}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric1F1</strong> — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/abadc7" target="_blank" rel="noopener noreferrer" class=""><code>abadc7</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Erfc}(z)=\frac{\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)\exp(-z^2)}{z\sqrt{\pi}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(z)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Re(z)\gt0</code>.
 <strong>Symbols:</strong> <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ae3110" target="_blank" rel="noopener noreferrer" class=""><code>ae3110</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{Erf}(z)^{\prime}(z)=\frac{1}{\sqrt{\pi}}(2\exp(-z^2))</code></p>
+<p><code class="language-math math-inline">z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\exp(-z^2))/\sqrt{\pi}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b5bd5d" target="_blank" rel="noopener noreferrer" class=""><code>b5bd5d</code> · Fungrim entry ↗</a></p>
@@ -562,7 +562,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bfc86e" target="_blank" rel="noopener noreferrer" class=""><code>bfc86e</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)\exp(-z^2)}{z\sqrt{\pi}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>HypergeometricUStar</strong> — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cb93ea" target="_blank" rel="noopener noreferrer" class=""><code>cb93ea</code> · Fungrim entry ↗</a></p>
@@ -572,14 +572,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ec0205" target="_blank" rel="noopener noreferrer" class=""><code>ec0205</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{Erf}(z)^{\prime}(z)=\frac{1}{\sqrt{\pi}}(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))</code></p>
+<p><code class="language-math math-inline">z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))/\sqrt{\pi}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fae9d3" target="_blank" rel="noopener noreferrer" class=""><code>fae9d3</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="gauss-hypergeometric-function">Gauss hypergeometric function<a href="#gauss-hypergeometric-function" class="hash-link" aria-label="Direct link to Gauss hypergeometric function" title="Direct link to Gauss hypergeometric function" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(b, a, c, z)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land c\in\C\setminus\Z_{\le0}</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/0e0393" target="_blank" rel="noopener noreferrer" class=""><code>0e0393</code> · Fungrim entry ↗</a></p>
@@ -597,7 +597,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/20bf69" target="_blank" rel="noopener noreferrer" class=""><code>20bf69</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, -a+b+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lbrack0, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/27bc34" target="_blank" rel="noopener noreferrer" class=""><code>27bc34</code> · Fungrim entry ↗</a></p>
@@ -609,13 +609,13 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3d6d7e" target="_blank" rel="noopener noreferrer" class=""><code>3d6d7e</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, b, c, \frac{z}{z-1})}{(1-z)^{b}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack1, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/504717" target="_blank" rel="noopener noreferrer" class=""><code>504717</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c, z)(1-z)^{-a-b+c}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne1\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c, z)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\ne1</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/651a4a" target="_blank" rel="noopener noreferrer" class=""><code>651a4a</code> · Fungrim entry ↗</a></p>
@@ -626,14 +626,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/65693e" target="_blank" rel="noopener noreferrer" class=""><code>65693e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(-a-b+c)}{\Gamma(c-a)\Gamma(c-b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Re(-a-b+c)\land a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}</code>.
+<p><code class="language-math math-inline">\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(c-a-b)}{\Gamma(c-a)\Gamma(c-b)}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land\Re(c-a-b)\gt0</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/659ce8" target="_blank" rel="noopener noreferrer" class=""><code>659ce8</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, -a+b+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lbrack0, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/90ac58" target="_blank" rel="noopener noreferrer" class=""><code>90ac58</code> · Fungrim entry ↗</a></p>
@@ -645,31 +645,31 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a85994" target="_blank" rel="noopener noreferrer" class=""><code>a85994</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, c, \frac{z}{z-1})}{(1-z)^{a}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack1, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b25089" target="_blank" rel="noopener noreferrer" class=""><code>b25089</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a+b-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, -a-b+c+1, 1-1/z)z^{a-c}(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ca9123" target="_blank" rel="noopener noreferrer" class=""><code>ca9123</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, a+b-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, -a-b+c+1, 1-z)(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/db3eb9" target="_blank" rel="noopener noreferrer" class=""><code>db3eb9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(c-z(a+b+1))z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z)-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)+z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)=0</code></p>
+<p><code class="language-math math-inline">(z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f1bd89" target="_blank" rel="noopener noreferrer" class=""><code>f1bd89</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F_1}(a, b, c, z)}{\Gamma(c)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land z\in\C\land c\in\C\setminus\Z_{\le0}</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function; <strong>Hypergeometric2F1Regularized</strong> — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fe6e74" target="_blank" rel="noopener noreferrer" class=""><code>fe6e74</code> · Fungrim entry ↗</a></p>

@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.747d6bfc.js" defer="defer"></script>
-<script src="/assets/js/main.dae09233.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.f0e5d384.js" defer="defer"></script>
+<script src="/assets/js/main.3c89d032.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -48,7 +48,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0d9352" target="_blank" rel="noopener noreferrer" class=""><code>0d9352</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="http://functions.wolfram.com/09.54.20.0001.01" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
@@ -106,7 +106,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/69d0a3" target="_blank" rel="noopener noreferrer" class=""><code>69d0a3</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{AGM}(a, b)=\frac{\pi(a+b)}{4\mathrm{EllipticK}((a-b)/(a+b)^2)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/71a0ff" target="_blank" rel="noopener noreferrer" class=""><code>71a0ff</code> · Fungrim entry ↗</a></p>
@@ -123,7 +123,7 @@ Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/84b888" target="_blank" rel="noopener noreferrer" class=""><code>84b888</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{AGM}(1, b)=b\mathrm{AGM}(1, \frac{1}{b})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\notin\lparen-\infty, 0\rbrack\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">b\in\C\land b\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8e80c6" target="_blank" rel="noopener noreferrer" class=""><code>8e80c6</code> · Fungrim entry ↗</a></p>
@@ -134,14 +134,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8f176c" target="_blank" rel="noopener noreferrer" class=""><code>8f176c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{AGM}(b+1, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})</code></p>
+<p><code class="language-math math-inline">\mathrm{AGM}(1+b, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">b\in\C</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/9d84d8" target="_blank" rel="noopener noreferrer" class=""><code>9d84d8</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a)+(3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a))\mathrm{AGM}(a, b)+2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2=0</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><code class="language-math math-inline">2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="http://functions.wolfram.com/09.54.13.0001.01" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
@@ -154,13 +154,13 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b41bdd" target="_blank" rel="noopener noreferrer" class=""><code>b41bdd</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{AGM}(a, b)=a\mathrm{AGM}(1, \frac{b}{a})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ce2395" target="_blank" rel="noopener noreferrer" class=""><code>ce2395</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d6d836" target="_blank" rel="noopener noreferrer" class=""><code>d6d836</code> · Fungrim entry ↗</a></p>
@@ -177,7 +177,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e3896e" target="_blank" rel="noopener noreferrer" class=""><code>e3896e</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{AGM}(a, b)=b\mathrm{AGM}(1, \frac{a}{b})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ea1d58" target="_blank" rel="noopener noreferrer" class=""><code>ea1d58</code> · Fungrim entry ↗</a></p>
@@ -192,26 +192,26 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f9190b" target="_blank" rel="noopener noreferrer" class=""><code>f9190b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&amp;0\le\Re((a+b)/(2(ab)^{1/2}))\lor(ab)^{1/2}=0\\-1&amp;\top\end{cases}\sqrt{ab})</code></p>
+<p><code class="language-math math-inline">\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&amp;(ab)^{1/2}=0\lor\Re((a+b)/2/(ab)^{1/2})\ge0\\-1&amp;\top\end{cases}\sqrt{ab})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land b\in\C</code>.
 <strong>Symbols:</strong> <strong>AGM</strong> — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fa6ff7" target="_blank" rel="noopener noreferrer" class=""><code>fa6ff7</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="carlson-symmetric-elliptic-integrals">Carlson symmetric elliptic integrals<a href="#carlson-symmetric-elliptic-integrals" class="hash-link" aria-label="Direct link to Carlson symmetric elliptic integrals" title="Direct link to Carlson symmetric elliptic integrals" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/00c331" target="_blank" rel="noopener noreferrer" class=""><code>00c331</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})-\frac{\imaginaryI\pi}{2}}{\sqrt{x+y}}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})+(\frac{-1}{2}\imaginaryI)\pi}{\sqrt{x+y}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/00cdb7" target="_blank" rel="noopener noreferrer" class=""><code>00cdb7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/060366" target="_blank" rel="noopener noreferrer" class=""><code>060366</code> · Fungrim entry ↗</a></p>
@@ -228,7 +228,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/09a494" target="_blank" rel="noopener noreferrer" class=""><code>09a494</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&amp;x\ne w\\\sqrt{x}^{-3}&amp;x=w\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&amp;x\ne w\\x^{-(3/2)}&amp;x=w\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land w\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -252,7 +252,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/120284" target="_blank" rel="noopener noreferrer" class=""><code>120284</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{WeierstrassP}(\mathrm{CarlsonRF}(z-\mathrm{EllipticRootE}(1, \tau), z-\mathrm{EllipticRootE}(2, \tau), z-\mathrm{EllipticRootE}(3, \tau)), \tau)=z</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>WeierstrassP</strong> — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/124339" target="_blank" rel="noopener noreferrer" class=""><code>124339</code> · Fungrim entry ↗</a></p>
@@ -269,12 +269,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/13a092" target="_blank" rel="noopener noreferrer" class=""><code>13a092</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 0, -1)=\infty\imaginaryI</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 0, -1)=\imaginaryI\infty</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/14a365" target="_blank" rel="noopener noreferrer" class=""><code>14a365</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, y+1)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -312,7 +312,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1eaaed" target="_blank" rel="noopener noreferrer" class=""><code>1eaaed</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&amp;x\ne w\\\sqrt{w}^{-3}&amp;x=w\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&amp;x\ne w\\w^{-(3/2)}&amp;x=w\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land w\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -324,7 +324,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/23e0a7" target="_blank" rel="noopener noreferrer" class=""><code>23e0a7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -335,18 +335,18 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/250ff1" target="_blank" rel="noopener noreferrer" class=""><code>250ff1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, -1)=\frac{1}{4}(-\imaginaryI\pi\sqrt{2})+\frac{1}{2}(\sqrt{2}\ln(1+\sqrt{2}))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, -1)=\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2}))-\frac{1}{4}(\pi\sqrt{2}\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/25435b" target="_blank" rel="noopener noreferrer" class=""><code>25435b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, x, -(cx))=\frac{1}{\sqrt{x}}(\begin{cases}\mathrm{EllipticK}(c+1)&amp;0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&amp;\top\end{cases})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&amp;0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&amp;\top\end{cases}/\sqrt{x}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land c\in\lbrack0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/271b73" target="_blank" rel="noopener noreferrer" class=""><code>271b73</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, 1, 2)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, 1, 2)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/28237a" target="_blank" rel="noopener noreferrer" class=""><code>28237a</code> · Fungrim entry ↗</a></p>
@@ -362,45 +362,45 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/2dcf0c" target="_blank" rel="noopener noreferrer" class=""><code>2dcf0c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, -1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, -1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/303827" target="_blank" rel="noopener noreferrer" class=""><code>303827</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3047b1" target="_blank" rel="noopener noreferrer" class=""><code>3047b1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})+(3)((z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})\sqrt{z})^{-1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\ne0\land x\in\C\land y\in\C\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})+(3)(\sqrt{z}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))^{-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land z\in\C\land z\ne0</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/31a3ba" target="_blank" rel="noopener noreferrer" class=""><code>31a3ba</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arccos(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{y^2-x^2}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lbrack0, y\rbrack\land y\in\lparen0, \infty\rparen</code>.
+<p><code class="language-math math-inline">\arccos(\frac{x}{y})=\sqrt{y^2-x^2}\mathrm{CarlsonRC}(x^2, y^2)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\lparen0, \infty\rparen\land x\in\lbrack0, y\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/33e034" target="_blank" rel="noopener noreferrer" class=""><code>33e034</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, -1, -1)=\infty\imaginaryI</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, -1, -1)=\imaginaryI\infty</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3567c5" target="_blank" rel="noopener noreferrer" class=""><code>3567c5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(0, -1)=-(\frac{\imaginaryI\pi}{2})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(0, -1)=-(\frac{\pi\imaginaryI}{2})</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/35cb93" target="_blank" rel="noopener noreferrer" class=""><code>35cb93</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/37ffb7" target="_blank" rel="noopener noreferrer" class=""><code>37ffb7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda})+\mathrm{CarlsonRF}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda})+\mathrm{CarlsonRF}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -417,7 +417,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/398bb7" target="_blank" rel="noopener noreferrer" class=""><code>398bb7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\imaginaryI\pi)}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\pi\imaginaryI)}{2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3a84d6" target="_blank" rel="noopener noreferrer" class=""><code>3a84d6</code> · Fungrim entry ↗</a></p>
@@ -440,7 +440,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3e05c6" target="_blank" rel="noopener noreferrer" class=""><code>3e05c6</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, 2x)=(\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}})\sqrt{x}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, 2x)=\sqrt{x}(\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -458,30 +458,30 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4091ad" target="_blank" rel="noopener noreferrer" class=""><code>4091ad</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, x, y)=\frac{1}{\sqrt{x}}(\mathrm{EllipticK}(1-\frac{y}{x}))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, x, y)=\mathrm{EllipticK}(1-y/x)/\sqrt{x}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/415ff0" target="_blank" rel="noopener noreferrer" class=""><code>415ff0</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(x^2+y^2, y^2)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\lparen0, \infty\rparen</code>.
+<p><code class="language-math math-inline">\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2+x^2, y^2)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\lparen0, \infty\rparen\land x\in\R</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/423b36" target="_blank" rel="noopener noreferrer" class=""><code>423b36</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/42c7f1" target="_blank" rel="noopener noreferrer" class=""><code>42c7f1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}(\pi(9-4\sqrt{3}))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}((9-4\sqrt{3})\pi)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/44d300" target="_blank" rel="noopener noreferrer" class=""><code>44d300</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\begin{cases}\mathrm{EllipticE}(c+1)&amp;0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\\mathrm{EllipticE}(c+1)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&amp;\top\end{cases}\sqrt{x})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\sqrt{x}\begin{cases}\mathrm{EllipticE}(1+c)&amp;\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticE}(1+c)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&amp;\top\end{cases})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land c\in\lbrack0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -503,12 +503,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4c1988" target="_blank" rel="noopener noreferrer" class=""><code>4c1988</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4c1db8" target="_blank" rel="noopener noreferrer" class=""><code>4c1db8</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, x, x, x)=\sqrt{x}^{-3}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, x, x, x)=x^{-(\frac{3}{2})}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -524,7 +524,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4d2c10" target="_blank" rel="noopener noreferrer" class=""><code>4d2c10</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(1, 1, 2)=\frac{\ln(1+\sqrt{2})}{2}+\frac{\sqrt{2}}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(1, 1, 2)=\frac{\sqrt{2}}{2}+\frac{\ln(1+\sqrt{2})}{2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4d7098" target="_blank" rel="noopener noreferrer" class=""><code>4d7098</code> · Fungrim entry ↗</a></p>
@@ -536,23 +536,23 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4e21c7" target="_blank" rel="noopener noreferrer" class=""><code>4e21c7</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&amp;z\ne0\land z\ne y\\\frac{3\pi}{4}&amp;z=y\\\tilde\infty&amp;z=0\end{cases}}{\sqrt{y}^{3}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\vert\arg(y)-\arg(z)\vert\lt\pi\land z\in\C\land y\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4e4380" target="_blank" rel="noopener noreferrer" class=""><code>4e4380</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda}, \mathrm{lamda}+w)+\mathrm{CarlsonRJ}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+w)=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}((\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y)w^2, w(\mathrm{lamda}+w)(\frac{xy}{\mathrm{lamda}}+w))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land w\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4eac3f" target="_blank" rel="noopener noreferrer" class=""><code>4eac3f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{2(2+\sqrt{2})}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{4+2\sqrt{2}}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/522f54" target="_blank" rel="noopener noreferrer" class=""><code>522f54</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, -1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, -1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/534335" target="_blank" rel="noopener noreferrer" class=""><code>534335</code> · Fungrim entry ↗</a></p>
@@ -569,7 +569,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/53d869" target="_blank" rel="noopener noreferrer" class=""><code>53d869</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(1, 1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(1, 1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/545e8b" target="_blank" rel="noopener noreferrer" class=""><code>545e8b</code> · Fungrim entry ↗</a></p>
@@ -579,18 +579,18 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/55cd70" target="_blank" rel="noopener noreferrer" class=""><code>55cd70</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(-1, 0)=-(\infty\imaginaryI)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(-1, 0)=-(\imaginaryI\infty)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/56d1bc" target="_blank" rel="noopener noreferrer" class=""><code>56d1bc</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\arcsin(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2-x^2, y^2)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lbrack-y, y\rbrack\land y\in\lparen0, \infty\rparen</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\lparen0, \infty\rparen\land x\in\lbrack-y, y\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/584a61" target="_blank" rel="noopener noreferrer" class=""><code>584a61</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -602,13 +602,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/5ab6bf" target="_blank" rel="noopener noreferrer" class=""><code>5ab6bf</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&amp;x\lt y\\\frac{1}{\sqrt{x}}&amp;x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&amp;y\lt x\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&amp;x\lt y\\\frac{1}{\sqrt{x}}&amp;x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&amp;x\gt y\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5ada5f" target="_blank" rel="noopener noreferrer" class=""><code>5ada5f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, -1, -2)=-(\frac{\sqrt{2}\imaginaryI\Gamma(1/4)^2}{8\sqrt{\pi}})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, -1, -2)=-(((2^{1/2}/8\imaginaryI)\Gamma(1/4)^2)/\sqrt{\pi})</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5c178f" target="_blank" rel="noopener noreferrer" class=""><code>5c178f</code> · Fungrim entry ↗</a></p>
@@ -684,18 +684,18 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6c4567" target="_blank" rel="noopener noreferrer" class=""><code>6c4567</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)+\mathrm{CarlsonRD}(x, y, z)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\ne0\land y\ne0\land x\in\C\land y\in\C\land z\in\C</code>  <em>or</em>  <code class="language-math math-inline">z\ne0</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, y, z)+\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land z\in\C\land x\ne0\land y\ne0</code>  <em>or</em>  <code class="language-math math-inline">z\ne0</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6dda7a" target="_blank" rel="noopener noreferrer" class=""><code>6dda7a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, 2, 4)=-\pi\frac{\sqrt{2}}{8}+\ln(1+\sqrt{2})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, 2, 4)=\ln(1+\sqrt{2})-\frac{\sqrt{2}\pi}{8}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6e9544" target="_blank" rel="noopener noreferrer" class=""><code>6e9544</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&amp;x\lt y\\\frac{1}{\sqrt{x}}&amp;x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&amp;y\lt x\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&amp;x\lt y\\\frac{1}{\sqrt{x}}&amp;x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&amp;x\gt y\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -707,7 +707,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/72b5bd" target="_blank" rel="noopener noreferrer" class=""><code>72b5bd</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -724,7 +724,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/748131" target="_blank" rel="noopener noreferrer" class=""><code>748131</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&amp;x\ne y\\\sqrt{x}^{-3}&amp;x=y\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&amp;x\ne y\\x^{-(3/2)}&amp;x=y\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -741,8 +741,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/7a168a" target="_blank" rel="noopener noreferrer" class=""><code>7a168a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, x^2+y^2)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\lparen0, \infty\rparen</code>.
+<p><code class="language-math math-inline">\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, y^2+x^2)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\lparen0, \infty\rparen\land x\in\R</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7a9dad" target="_blank" rel="noopener noreferrer" class=""><code>7a9dad</code> · Fungrim entry ↗</a></p>
@@ -753,25 +753,25 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7c50d1" target="_blank" rel="noopener noreferrer" class=""><code>7c50d1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, 0)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{x^{1/2}})&amp;x\ne0\\\tilde\infty&amp;x=0\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, 0)=\begin{cases}\mathrm{sgn}(\frac{1}{x^{1/2}})\infty&amp;x\ne0\\\tilde\infty&amp;x=0\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7cbe17" target="_blank" rel="noopener noreferrer" class=""><code>7cbe17</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\mathrm{EllipticE}(1-\frac{y}{x})\sqrt{x})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-y/x))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7cddc6" target="_blank" rel="noopener noreferrer" class=""><code>7cddc6</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen</code>.
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7ded8f" target="_blank" rel="noopener noreferrer" class=""><code>7ded8f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(-1, 1)=\frac{1}{2}(-\imaginaryI\sqrt{2}\ln(1+\sqrt{2}))+\frac{\pi\sqrt{2}}{4}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(-1, 1)=\frac{\pi\sqrt{2}}{4}-\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2})\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7ea1ad" target="_blank" rel="noopener noreferrer" class=""><code>7ea1ad</code> · Fungrim entry ↗</a></p>
@@ -792,7 +792,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/84ea08" target="_blank" rel="noopener noreferrer" class=""><code>84ea08</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, 1, 2)=\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, 1, 2)=\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/84f403" target="_blank" rel="noopener noreferrer" class=""><code>84f403</code> · Fungrim entry ↗</a></p>
@@ -807,19 +807,19 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8bb972" target="_blank" rel="noopener noreferrer" class=""><code>8bb972</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{x(c-1)}}&amp;1\lt c\\\frac{1}{\sqrt{x}}&amp;c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{x(1-c)}}&amp;c\lt1\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{(c-1)x}}&amp;c\gt1\\\frac{1}{\sqrt{x}}&amp;c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{(1-c)x}}&amp;c\lt1\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land c\in\lparen0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8c9ba1" target="_blank" rel="noopener noreferrer" class=""><code>8c9ba1</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticK}(1-y/z)-\mathrm{EllipticE}(1-y/z))}{1-y/z}&amp;y\ne z\\\frac{3\pi}{4}&amp;y=z\end{cases}}{\sqrt{z}^{3}}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\vert\arg(y)-\arg(z)\vert\lt\pi\land y\in\C\land z\in\C\setminus\lbrace0\rbrace</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace\land y\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8d0629" target="_blank" rel="noopener noreferrer" class=""><code>8d0629</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land z\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -831,7 +831,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8f5d76" target="_blank" rel="noopener noreferrer" class=""><code>8f5d76</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, 0, -1)=-(\infty\imaginaryI)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, 0, -1)=-(\imaginaryI\infty)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/90af98" target="_blank" rel="noopener noreferrer" class=""><code>90af98</code> · Fungrim entry ↗</a></p>
@@ -889,13 +889,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a15c03" target="_blank" rel="noopener noreferrer" class=""><code>a15c03</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(\mathrm{lamda}, \mathrm{lamda}+x, \mathrm{lamda}+y)+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y)=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y})^{-1}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(\mathrm{lamda}, x+\mathrm{lamda}, y+\mathrm{lamda})+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{x+y+\mathrm{lamda}+(xy)/\mathrm{lamda}})^{-1}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a203e9" target="_blank" rel="noopener noreferrer" class=""><code>a203e9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\mathrm{EllipticE}(1-c)\sqrt{x})</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-c))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land c\in\lbrack0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -985,7 +985,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bcc121" target="_blank" rel="noopener noreferrer" class=""><code>bcc121</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c05ed8" target="_blank" rel="noopener noreferrer" class=""><code>c05ed8</code> · Fungrim entry ↗</a></p>
@@ -1000,13 +1000,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c5a9cf" target="_blank" rel="noopener noreferrer" class=""><code>c5a9cf</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&amp;x\ne y\\\sqrt{x}^{-3}&amp;x=y\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&amp;x\ne y\\x^{-(3/2)}&amp;x=y\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c85c2f" target="_blank" rel="noopener noreferrer" class=""><code>c85c2f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, x, x)=\sqrt{x}^{-3}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(x, x, x)=x^{-(\frac{3}{2})}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1023,7 +1023,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cdb587" target="_blank" rel="noopener noreferrer" class=""><code>cdb587</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\imaginaryI\pi}{4}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\pi\imaginaryI}{4}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cdee01" target="_blank" rel="noopener noreferrer" class=""><code>cdee01</code> · Fungrim entry ↗</a></p>
@@ -1033,7 +1033,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cf5caa" target="_blank" rel="noopener noreferrer" class=""><code>cf5caa</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(-(1/2), \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 <strong>Symbols:</strong> <strong>CarlsonHypergeometricR</strong> — Carlson multivariate hypergeometric function; <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1044,18 +1044,18 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d38c27" target="_blank" rel="noopener noreferrer" class=""><code>d38c27</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&amp;y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&amp;x\ne y\land y=w\\\sqrt{x}^{-3}&amp;x=y=w\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&amp;y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&amp;y=w\land x\ne y\\x^{-(3/2)}&amp;x=y=w\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land w\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d4b12e" target="_blank" rel="noopener noreferrer" class=""><code>d4b12e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(1, 2, 2)=\frac{1}{2}+\frac{\pi}{4}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(1, 2, 2)=\frac{\pi}{4}+\frac{1}{2}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d51efc" target="_blank" rel="noopener noreferrer" class=""><code>d51efc</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\imaginaryI\pi}{4}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\pi\imaginaryI}{4}</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d52bda" target="_blank" rel="noopener noreferrer" class=""><code>d52bda</code> · Fungrim entry ↗</a></p>
@@ -1071,8 +1071,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d829be" target="_blank" rel="noopener noreferrer" class=""><code>d829be</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{arcosh}(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{x^2-y^2}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\lbrack y, \infty\rparen\land y\in\lparen0, \infty\rparen</code>.
+<p><code class="language-math math-inline">\mathrm{arcosh}(\frac{x}{y})=\sqrt{x^2-y^2}\mathrm{CarlsonRC}(x^2, y^2)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">y\in\lparen0, \infty\rparen\land x\in\lbrack y, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d9765b" target="_blank" rel="noopener noreferrer" class=""><code>d9765b</code> · Fungrim entry ↗</a></p>
@@ -1088,12 +1088,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/de0638" target="_blank" rel="noopener noreferrer" class=""><code>de0638</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e04867" target="_blank" rel="noopener noreferrer" class=""><code>e04867</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{wz^{1/2}})&amp;z\ne0\land w\ne0\\\tilde\infty&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}w})\infty&amp;z\ne0\land w\ne0\\\tilde\infty&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land w\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1125,7 +1125,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e60205" target="_blank" rel="noopener noreferrer" class=""><code>e60205</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, 1-x))</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, 1-x))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -1141,7 +1141,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/eac389" target="_blank" rel="noopener noreferrer" class=""><code>eac389</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, y+1)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&amp;y\ne0\\1&amp;y=0\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRC}(1, 1+y)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&amp;y\ne0\\1&amp;y=0\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRC</strong> — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1158,7 +1158,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/eda57d" target="_blank" rel="noopener noreferrer" class=""><code>eda57d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\infty\mathrm{sgn}(z^{1/2}^{-3})&amp;z\ne0\\\tilde\infty&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}^{3}})\infty&amp;z\ne0\\\tilde\infty&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1191,13 +1191,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f68409" target="_blank" rel="noopener noreferrer" class=""><code>f68409</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\mathrm{CarlsonRG}(x, y, z)\sqrt{\mathrm{lamda}}</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\sqrt{\mathrm{lamda}}\mathrm{CarlsonRG}(x, y, z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land z\in\C\land\mathrm{lamda}\in\lparen0, \infty\rparen</code>.
 <strong>Symbols:</strong> <strong>CarlsonRG</strong> — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f9ca94" target="_blank" rel="noopener noreferrer" class=""><code>f9ca94</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\infty\imaginaryI)</code></p>
+<p><code class="language-math math-inline">\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\imaginaryI\infty)</code></p>
 <p><strong>Symbols:</strong> <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fd3017" target="_blank" rel="noopener noreferrer" class=""><code>fd3017</code> · Fungrim entry ↗</a></p>
@@ -1231,7 +1231,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/087a7c" target="_blank" rel="noopener noreferrer" class=""><code>087a7c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\sqrt[4]{3}\exp(\frac{\imaginaryI\pi}{12})\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\exp(\frac{\imaginaryI\pi}{12})\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0abbe1" target="_blank" rel="noopener noreferrer" class=""><code>0abbe1</code> · Fungrim entry ↗</a></p>
@@ -1258,13 +1258,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/16612f" target="_blank" rel="noopener noreferrer" class=""><code>16612f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, m))</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, m))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">m\in\C</code>.
 <strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/16d2e1" target="_blank" rel="noopener noreferrer" class=""><code>16d2e1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}(1-\imaginaryI\sqrt{3}))=\frac{\sqrt[4]{3}\exp(-((\imaginaryI\pi)/12))\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}(1-3^{1/2}\imaginaryI))=\frac{\exp(-((\imaginaryI\pi)/12))\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/175b7a" target="_blank" rel="noopener noreferrer" class=""><code>175b7a</code> · Fungrim entry ↗</a></p>
@@ -1297,12 +1297,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/255d81" target="_blank" rel="noopener noreferrer" class=""><code>255d81</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})</code></p>
 <p><strong>Symbols:</strong> <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/2573ba" target="_blank" rel="noopener noreferrer" class=""><code>2573ba</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}((3-2\sqrt{2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}((3-2\times2^{1/2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/2991b5" target="_blank" rel="noopener noreferrer" class=""><code>2991b5</code> · Fungrim entry ↗</a></p>
@@ -1318,7 +1318,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3aed02" target="_blank" rel="noopener noreferrer" class=""><code>3aed02</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticE}(\frac{1}{2})=\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticE}(\frac{1}{2})=\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3b272e" target="_blank" rel="noopener noreferrer" class=""><code>3b272e</code> · Fungrim entry ↗</a></p>
@@ -1328,13 +1328,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3c4979" target="_blank" rel="noopener noreferrer" class=""><code>3c4979</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\pi\sqrt[3]{2}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\sqrt[3]{2}\pi}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/40a376" target="_blank" rel="noopener noreferrer" class=""><code>40a376</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{EllipticE}(m)=\frac{1}{3}((1-m)(\mathrm{CarlsonRD}(0, 1-m, 1)+\mathrm{CarlsonRD}(0, 1, 1-m)))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">m\ne1\land m\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">m\in\C\land m\ne1</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind; <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/41cf8e" target="_blank" rel="noopener noreferrer" class=""><code>41cf8e</code> · Fungrim entry ↗</a></p>
@@ -1350,7 +1350,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/45b157" target="_blank" rel="noopener noreferrer" class=""><code>45b157</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{8}(4-3\sqrt{2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(\frac{1}{8}(4-3\times2^{1/2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4b040d" target="_blank" rel="noopener noreferrer" class=""><code>4b040d</code> · Fungrim entry ↗</a></p>
@@ -1382,8 +1382,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5d8804" target="_blank" rel="noopener noreferrer" class=""><code>5d8804</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticPi}(n, \pi k+\phi, m)=2k\mathrm{EllipticPi}(n, m)+\mathrm{IncompleteEllipticPi}(n, \phi, m)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">n\ne1\land m\ne1\land n\in\C\land\phi\in\C\land m\in\C\land k\in\Z</code>.
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticPi}(n, \phi+k\pi, m)=\mathrm{IncompleteEllipticPi}(n, \phi, m)+2k\mathrm{EllipticPi}(n, m)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\C\land\phi\in\C\land m\in\C\land k\in\Z\land n\ne1\land m\ne1</code>.
 <strong>Symbols:</strong> <strong>EllipticPi</strong> — Legendre complete elliptic integral of the third kind; <strong>IncompleteEllipticPi</strong> — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5f84d9" target="_blank" rel="noopener noreferrer" class=""><code>5f84d9</code> · Fungrim entry ↗</a></p>
@@ -1404,8 +1404,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6520e7" target="_blank" rel="noopener noreferrer" class=""><code>6520e7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\pi k+\phi, m)=2k\mathrm{EllipticK}(m)+\mathrm{IncompleteEllipticF}(\phi, m)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">m\ne1\land\phi\in\C\land m\in\C\land k\in\Z</code>.
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\phi+k\pi, m)=\mathrm{IncompleteEllipticF}(\phi, m)+2k\mathrm{EllipticK}(m)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C\land m\in\C\land k\in\Z\land m\ne1</code>.
 <strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind; <strong>IncompleteEllipticF</strong> — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/685126" target="_blank" rel="noopener noreferrer" class=""><code>685126</code> · Fungrim entry ↗</a></p>
@@ -1416,7 +1416,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/713966" target="_blank" rel="noopener noreferrer" class=""><code>713966</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{3}{2}, 1, m))</code></p>
+<p><code class="language-math math-inline">2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{3}{2}, 1, m))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">m\in\C</code>.
 <strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind; <strong>Hypergeometric2F1</strong> — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -1439,8 +1439,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/8e5c81" target="_blank" rel="noopener noreferrer" class=""><code>8e5c81</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticPi}(n, \phi, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)\sin(\phi)^3)+\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land n\in\C\land\phi\in\C\land m\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{n}{3}\sin(\phi)^3\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\C\land\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind; <strong>IncompleteEllipticPi</strong> — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8f4e31" target="_blank" rel="noopener noreferrer" class=""><code>8f4e31</code> · Fungrim entry ↗</a></p>
@@ -1462,18 +1462,18 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/958a3f" target="_blank" rel="noopener noreferrer" class=""><code>958a3f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}+\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticPi</strong> — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9b0385" target="_blank" rel="noopener noreferrer" class=""><code>9b0385</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticPi}(n, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))+\mathrm{CarlsonRF}(0, 1-m, 1)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">m\ne1\land n\in\C\land m\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{EllipticPi}(n, m)=\mathrm{CarlsonRF}(0, 1-m, 1)+\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">n\in\C\land m\in\C\land m\ne1</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>CarlsonRJ</strong> — Carlson symmetric elliptic integral of the third kind; <strong>EllipticPi</strong> — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9ccaef" target="_blank" rel="noopener noreferrer" class=""><code>9ccaef</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9f3474" target="_blank" rel="noopener noreferrer" class=""><code>9f3474</code> · Fungrim entry ↗</a></p>
@@ -1505,12 +1505,12 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/aac129" target="_blank" rel="noopener noreferrer" class=""><code>aac129</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}</code></p>
 <p><strong>Symbols:</strong> <strong>IncompleteEllipticF</strong> — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ace837" target="_blank" rel="noopener noreferrer" class=""><code>ace837</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(-1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(-1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/afb22a" target="_blank" rel="noopener noreferrer" class=""><code>afb22a</code> · Fungrim entry ↗</a></p>
@@ -1532,13 +1532,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b760d1" target="_blank" rel="noopener noreferrer" class=""><code>b760d1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{\sin(\phi)+1}{\cos(\phi)})&amp;(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\infty\mathrm{sgn}(\phi)&amp;\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{1+\sin(\phi)}{\cos(\phi)})&amp;(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\mathrm{sgn}(\phi)\infty&amp;\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C</code>.
 <strong>Symbols:</strong> <strong>IncompleteEllipticF</strong> — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b7cfb3" target="_blank" rel="noopener noreferrer" class=""><code>b7cfb3</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{\pi\times2^{\frac{10}{3}}}</code></p>
+<p><code class="language-math math-inline">\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{2^{\frac{10}{3}}\pi}</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b95ffa" target="_blank" rel="noopener noreferrer" class=""><code>b95ffa</code> · Fungrim entry ↗</a></p>
@@ -1563,7 +1563,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c0ad12" target="_blank" rel="noopener noreferrer" class=""><code>c0ad12</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\pi k+\phi, m)=2k\mathrm{EllipticE}(m)+\mathrm{IncompleteEllipticE}(\phi, m)</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\phi+k\pi, m)=\mathrm{IncompleteEllipticE}(\phi, m)+2k\mathrm{EllipticE}(m)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C\land m\in\C\land k\in\Z</code>.
 <strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -1608,7 +1608,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/dec0d2" target="_blank" rel="noopener noreferrer" class=""><code>dec0d2</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{IncompleteEllipticF}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}</code>.
 <strong>Symbols:</strong> <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>IncompleteEllipticF</strong> — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e2445d" target="_blank" rel="noopener noreferrer" class=""><code>e2445d</code> · Fungrim entry ↗</a></p>
@@ -1619,7 +1619,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e9c797" target="_blank" rel="noopener noreferrer" class=""><code>e9c797</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(\frac{1}{4}))</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(1/4))</code></p>
 <p><strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind; <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/eba27c" target="_blank" rel="noopener noreferrer" class=""><code>eba27c</code> · Fungrim entry ↗</a></p>
@@ -1630,20 +1630,20 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/efc7a4" target="_blank" rel="noopener noreferrer" class=""><code>efc7a4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))\sqrt{m}</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=\sqrt{m}(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">m\in\C\setminus\lbrace0, 1\rbrace</code>.
 <strong>Symbols:</strong> <strong>EllipticE</strong> — Legendre complete elliptic integral of the second kind; <strong>EllipticK</strong> — Legendre complete elliptic integral of the first kind; <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f0bcb5" target="_blank" rel="noopener noreferrer" class=""><code>f0bcb5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\phi, 1)=2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor+\sin(\phi)\times(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}</code></p>
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\phi, 1)=(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}\sin(\phi)+2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C</code>.
 <strong>Symbols:</strong> <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f35a37" target="_blank" rel="noopener noreferrer" class=""><code>f35a37</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{1}{3}(m\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)\sin(\phi)^3)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{m}{3}\sin(\phi)^3\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}</code>.
 <strong>Symbols:</strong> <strong>CarlsonRD</strong> — Degenerate Carlson symmetric elliptic integral of the third kind; <strong>CarlsonRF</strong> — Carlson symmetric elliptic integral of the first kind; <strong>IncompleteEllipticE</strong> — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f48f54" target="_blank" rel="noopener noreferrer" class=""><code>f48f54</code> · Fungrim entry ↗</a></p>
@@ -1655,79 +1655,79 @@ Used by the Compute Engine for simplification.
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="weierstrass-elliptic-functions">Weierstrass elliptic functions<a href="#weierstrass-elliptic-functions" class="hash-link" aria-label="Direct link to Weierstrass elliptic functions" title="Direct link to Weierstrass elliptic functions" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>JacobiTheta</strong> — Jacobi theta function; <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0207dc" target="_blank" rel="noopener noreferrer" class=""><code>0207dc</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\mathrm{WeierstrassSigma}(z, \tau)^{\prime}(z)=\mathrm{WeierstrassZeta}(z, \tau)\mathrm{WeierstrassSigma}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassSigma</strong> — Weierstrass sigma function; <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0e649f" target="_blank" rel="noopener noreferrer" class=""><code>0e649f</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{WeierstrassP}(-z, \tau)=\mathrm{WeierstrassP}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassP</strong> — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/12a9e8" target="_blank" rel="noopener noreferrer" class=""><code>12a9e8</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(-z, \tau)=-\mathrm{WeierstrassSigma}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0</code>.
 <strong>Symbols:</strong> <strong>WeierstrassSigma</strong> — Weierstrass sigma function.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/23beb5" target="_blank" rel="noopener noreferrer" class=""><code>23beb5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(z+1, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau)))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(z+1, \tau)=-(\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0</code>.
 <strong>Symbols:</strong> <strong>WeierstrassSigma</strong> — Weierstrass sigma function; <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/35403b" target="_blank" rel="noopener noreferrer" class=""><code>35403b</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(-z, \tau)=-\mathrm{WeierstrassZeta}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/72eb69" target="_blank" rel="noopener noreferrer" class=""><code>72eb69</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(\tau+z, \tau)=\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(z+\tau, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a0c85d" target="_blank" rel="noopener noreferrer" class=""><code>a0c85d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassP}(n\tau+m+z, \tau)=\mathrm{WeierstrassP}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land m\in\Z\land n\in\Z</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassP}(z+m+n\tau, \tau)=\mathrm{WeierstrassP}(z, \tau)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)\land m\in\Z\land n\in\Z</code>.
 <strong>Symbols:</strong> <strong>WeierstrassP</strong> — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a95b7e" target="_blank" rel="noopener noreferrer" class=""><code>a95b7e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}((\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4)\pi^2)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}(\pi^2(\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>JacobiTheta</strong> — Jacobi theta function; <strong>WeierstrassP</strong> — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/af0dfc" target="_blank" rel="noopener noreferrer" class=""><code>af0dfc</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0</code>.
 <strong>Symbols:</strong> <strong>JacobiTheta</strong> — Jacobi theta function; <strong>WeierstrassSigma</strong> — Weierstrass sigma function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b96c9d" target="_blank" rel="noopener noreferrer" class=""><code>b96c9d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(\tau+z, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(\frac{\tau}{2}+z)\mathrm{WeierstrassZeta}(\tau/2, \tau)))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassSigma}(z+\tau, \tau)=-(\exp(2(z+\frac{\tau}{2})\mathrm{WeierstrassZeta}(\tau/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0</code>.
 <strong>Symbols:</strong> <strong>WeierstrassSigma</strong> — Weierstrass sigma function; <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/de9f42" target="_blank" rel="noopener noreferrer" class=""><code>de9f42</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\mathrm{WeierstrassZeta}(z, \tau)^{\prime}(z)=-\mathrm{WeierstrassP}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassP</strong> — Weierstrass elliptic function; <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e677fb" target="_blank" rel="noopener noreferrer" class=""><code>e677fb</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C</code>.
+<p><code class="language-math math-inline">\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)</code>.
 <strong>Symbols:</strong> <strong>WeierstrassZeta</strong> — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ffcc0f" target="_blank" rel="noopener noreferrer" class=""><code>ffcc0f</code> · Fungrim entry ↗</a></p>

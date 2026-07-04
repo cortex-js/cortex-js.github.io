@@ -13171,7 +13171,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Exponential function
 
-$$\exponentialE^{z}=\sinh(z)+\cosh(z)$$
+$$\exponentialE^{z}=\cosh(z)+\sinh(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13187,7 +13187,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(2\imaginaryI\pi n+z)=\exponentialE^{z}$$
+$$\exp(z+2n\pi\imaginaryI)=\exponentialE^{z}$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -13219,14 +13219,14 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\exp(\imaginaryI\pi)=-1$$
+$$\exp(\pi\imaginaryI)=-1$$
 
 Used by the Compute Engine for simplification.
 [`54aaf1` · Fungrim entry ↗](https://fungrim.org/entry/54aaf1)
 
 ---
 
-$$\exp(a+\imaginaryI b)=(\imaginaryI\sin(b)+\cos(b))\exponentialE^{a}$$
+$$\exp(a+b\imaginaryI)=\exponentialE^{a}(\cos(b)+\sin(b)\imaginaryI)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -13250,7 +13250,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(\imaginaryI\pi n+z)=(-1)^{n}\exponentialE^{z}$$
+$$\exp(z+n\pi\imaginaryI)=(-1)^{n}\exponentialE^{z}$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -13266,14 +13266,14 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\exp(\frac{\imaginaryI\pi}{2})=\imaginaryI$$
+$$\exp(\frac{\pi\imaginaryI}{2})=\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`a90f35` · Fungrim entry ↗](https://fungrim.org/entry/a90f35)
 
 ---
 
-$$\Re(\exponentialE^{z})=\cos(\Im(z))\exp(\Re(z))$$
+$$\Re(\exponentialE^{z})=\exp(\Re(z))\cos(\Im(z))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13281,7 +13281,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sgn}(\exponentialE^{z})=\exp(\imaginaryI\Im(z))$$
+$$\mathrm{sgn}(\exponentialE^{z})=\exp(\Im(z)\imaginaryI)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13289,7 +13289,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\exponentialE^{z})=\sin(\Im(z))\exp(\Re(z))$$
+$$\Im(\exponentialE^{z})=\exp(\Re(z))\sin(\Im(z))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13314,7 +13314,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\varphi^{n}=\varphi\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(n-1)$$
+$$\varphi^{n}=\mathrm{Fibonacci}(n)\varphi+\mathrm{Fibonacci}(n-1)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -13322,7 +13322,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-1-\varphi+\varphi^2=0$$
+$$\varphi^2-\varphi-1=0$$
 
 Used by the Compute Engine for simplification.
 [`b464d3` · Fungrim entry ↗](https://fungrim.org/entry/b464d3)
@@ -13338,7 +13338,7 @@ Used by the Compute Engine for simplification.
 
 ## Inverse tangent
 
-$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, xy+1)$$
+$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, 1+xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -13354,7 +13354,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\cos(\arctan(z))=\frac{1}{\sqrt{z^2+1}}$$
+$$\cos(\arctan(z))=\frac{1}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
@@ -13370,9 +13370,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\arctan(z)=-(\frac{1}{2}(\imaginaryI\ln((\imaginaryI z+1)/(1-\imaginaryI z))))$$
+$$\arctan(z)=-\frac{\imaginaryI}{2}\ln(\frac{1+\imaginaryI z}{1-\imaginaryI z})$$
 
-**Holds when** $\imaginaryI z\notin\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land z\imaginaryI\notin\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`12765e` · Fungrim entry ↗](https://fungrim.org/entry/12765e)
 
@@ -13393,7 +13393,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&0\lt x\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&x\lt0\land y=0\end{cases}$$
+$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -13401,9 +13401,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x+y)=\arctan(x)+\arctan((y)(x(x+y)+1)^{-1})$$
+$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x(x+y))^{-1})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert x+y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $-1\lt x(x+y)\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x(x+y)\gt-1$.
 Used by the Compute Engine for simplification.
 [`268c9e` · Fungrim entry ↗](https://fungrim.org/entry/268c9e)
 
@@ -13418,15 +13418,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{((z+\imaginaryI)^{-n}-(z-\imaginaryI)^{-n})(n-1)!\times(-1)^{n}}{2\imaginaryI}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(-1)^{n}(n-1)!(\frac{1}{(z+\imaginaryI)^{n}}-\frac{1}{(z-\imaginaryI)^{n}})}{2\imaginaryI}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land n\in\N^*\land z\in\C$.
-Used by the Compute Engine for expansion.
+**Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
+Used by the Compute Engine for simplification.
 [`36171f` · Fungrim entry ↗](https://fungrim.org/entry/36171f)
 
 ---
 
-$$\arctan(\frac{\sqrt{3}}{3})=\frac{\pi}{6}$$
+$$\arctan(\frac{1}{\sqrt{3}})=\frac{\pi}{6}$$
 
 Used by the Compute Engine for simplification.
 [`3c1021` · Fungrim entry ↗](https://fungrim.org/entry/3c1021)
@@ -13435,13 +13435,13 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(x)+\arctan(y)=\arctan(\frac{x+y}{1-xy})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $xy\lt1\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x\vert\lt1\land\vert y\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land xy\lt1$.
 Used by the Compute Engine for simplification.
 [`3ea11b` · Fungrim entry ↗](https://fungrim.org/entry/3ea11b)
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, x(x+y)+1)$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, 1+x(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -13449,17 +13449,17 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\frac{1}{2}(\imaginaryI\ln(\frac{1-\imaginaryI z}{\imaginaryI z+1}))$$
+$$\arctan(z)=\frac{1}{2}(\imaginaryI\ln(\frac{1-\imaginaryI z}{1+\imaginaryI z}))$$
 
-**Holds when** $-(\imaginaryI z)\notin\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land-z\imaginaryI\notin\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`500c0a` · Fungrim entry ↗](https://fungrim.org/entry/500c0a)
 
 ---
 
-$$\arctan(x)-\arctan(y)=\arctan(\frac{x-y}{xy+1})$$
+$$\arctan(x)-\arctan(y)=\arctan(\frac{x-y}{1+xy})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $-1\lt xy\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x\vert\lt1\land\vert y\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land xy\gt-1$.
 Used by the Compute Engine for simplification.
 [`503d4d` · Fungrim entry ↗](https://fungrim.org/entry/503d4d)
 
@@ -13467,7 +13467,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(z^\star)=\arctan(z)^\star$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
 [`632063` · Fungrim entry ↗](https://fungrim.org/entry/632063)
 
@@ -13480,7 +13480,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=2\arctan((z)(\sqrt{z^2+1}+1)^{-1})$$
+$$\arctan(z)=2\arctan((z)(1+\sqrt{1+z^2})^{-1})$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13510,9 +13510,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\arcsin(\frac{z}{\sqrt{z^2+1}})$$
+$$\arctan(z)=\arcsin(\frac{z}{\sqrt{1+z^2}})$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`7954ad` · Fungrim entry ↗](https://fungrim.org/entry/7954ad)
 
@@ -13525,9 +13525,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{1}{z^2+1}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{1}{1+z^2}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`8fbf69` · Fungrim entry ↗](https://fungrim.org/entry/8fbf69)
 
@@ -13535,7 +13535,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/(z^2+1)^{1/2}))}{{(z^2+1)}^{\frac{n+1}{2}}}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land n\in\N^*\land z\in\C$.
+**Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
 **Reference:** M. A. Boutiche and M. Rahmani (2017), On the higher derivatives of the inverse tangent function, [https://arxiv.org/abs/1712.03521,](https://arxiv.org/abs/1712.03521,) Theorem 9
@@ -13543,22 +13543,22 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(-\imaginaryI)=-\infty\imaginaryI$$
+$$\arctan(-\imaginaryI)=-\imaginaryI\infty$$
 
 Used by the Compute Engine for simplification.
 [`9b0994` · Fungrim entry ↗](https://fungrim.org/entry/9b0994)
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=-(\imaginaryI\ln(\mathrm{sgn}(x+\imaginaryI y)))$$
+$$\mathrm{Arctan_2}(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
 
-**Holds when** $x+\imaginaryI y\ne0\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`9dec3e` · Fungrim entry ↗](https://fungrim.org/entry/9dec3e)
 
 ---
 
-$$\arctan(z)=\frac{1}{2}(\imaginaryI(\ln(1-\imaginaryI z)-\ln(\imaginaryI z+1)))$$
+$$\arctan(z)=\frac{1}{2}(\imaginaryI(\ln(1-\imaginaryI z)-\ln(1+\imaginaryI z)))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13566,22 +13566,22 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(\imaginaryI)=\infty\imaginaryI$$
+$$\arctan(\imaginaryI)=\imaginaryI\infty$$
 
 Used by the Compute Engine for simplification.
 [`a2d208` · Fungrim entry ↗](https://fungrim.org/entry/a2d208)
 
 ---
 
-$$z\mapsto\arctan(z)^{\doubleprime}(z)=-(\frac{2z}{(z^2+1)^2})$$
+$$z\mapsto\arctan(z)^{\doubleprime}(z)=-(\frac{2z}{(1+z^2)^2})$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`a4eb86` · Fungrim entry ↗](https://fungrim.org/entry/a4eb86)
 
 ---
 
-$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&0\le x\\\pi&x\lt0\end{cases}$$
+$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -13603,9 +13603,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\arctan(x+\imaginaryI y))=\frac{1}{4}(\ln(\frac{x^2+(y+1)^2}{x^2+(1-y)^2}))$$
+$$\Im(\arctan(x+y\imaginaryI))=\frac{1}{4}(\ln(\frac{x^2+(1+y)^2}{x^2+(1-y)^2}))$$
 
-**Holds when** $x+\imaginaryI y\notin\lbrace-\imaginaryI, \imaginaryI\rbrace\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\notin\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
 [`b65d19` · Fungrim entry ↗](https://fungrim.org/entry/b65d19)
 
@@ -13613,7 +13613,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(\frac{1}{z})=\frac{1}{2}(\pi\mathrm{Csgn}(1/z))-\arctan(z)$$
 
-**Holds when** $\imaginaryI z\notin\lbrace0\rbrace\cup\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lbrace0\rbrace\cup\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **Csgn** — Real-valued sign function for complex numbers.
 Used by the Compute Engine for simplification.
 [`bfc13f` · Fungrim entry ↗](https://fungrim.org/entry/bfc13f)
@@ -13628,7 +13628,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(1+\sqrt{2})=\frac{3\pi}{8}$$
+$$\arctan(\sqrt{2}+1)=\frac{3\pi}{8}$$
 
 Used by the Compute Engine for simplification.
 [`c6c92a` · Fungrim entry ↗](https://fungrim.org/entry/c6c92a)
@@ -13650,7 +13650,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\arctan(z))=\frac{z}{\sqrt{z^2+1}}$$
+$$\sin(\arctan(z))=\frac{z}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
@@ -13658,7 +13658,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\arccos(\frac{1}{\sqrt{z^2+1}})\mathrm{Csgn}(z)$$
+$$\arctan(z)=\mathrm{Csgn}(z)\arccos(\frac{1}{\sqrt{1+z^2}})$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 **Symbols:** **Csgn** — Real-valued sign function for complex numbers.
@@ -13667,9 +13667,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+\imaginaryI y))$$
+$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+y\imaginaryI))$$
 
-**Holds when** $x+\imaginaryI y\ne0\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`eca4ce` · Fungrim entry ↗](https://fungrim.org/entry/eca4ce)
 
@@ -13677,7 +13677,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(\tan(\theta))=\theta$$
 
-**Holds when** $-(\frac{\pi}{2})\lt\Re(\theta)\lt\frac{\pi}{2}\land\theta\in\C$.
+**Holds when** $\theta\in\C\land-(\frac{\pi}{2})\lt\Re(\theta)\lt\frac{\pi}{2}$.
 Used by the Compute Engine for simplification and equation solving.
 [`f516e3` · Fungrim entry ↗](https://fungrim.org/entry/f516e3)
 
@@ -13730,7 +13730,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k+1)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
+$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
 **Symbols:** **LambertWPuiseuxCoefficient** — Coefficient in scaled Puiseux expansion of Lambert W-function.
@@ -13764,7 +13764,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\ln(-1)=\imaginaryI\pi$$
+$$\ln(-1)=\pi\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`2f1f7b` · Fungrim entry ↗](https://fungrim.org/entry/2f1f7b)
@@ -13786,7 +13786,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(\exponentialE^{z})=z-2\imaginaryI\pi\lceil\frac{\Im(z)}{2\pi}-\frac{1}{2}\rceil$$
+$$\ln(\exponentialE^{z})=z-2\pi\imaginaryI\lceil\Im(z)/(2\pi)-1/2\rceil$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -13794,14 +13794,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(\imaginaryI)=\frac{\imaginaryI\pi}{2}$$
+$$\ln(\imaginaryI)=\frac{\pi\imaginaryI}{2}$$
 
 Used by the Compute Engine for simplification.
 [`c331da` · Fungrim entry ↗](https://fungrim.org/entry/c331da)
 
 ---
 
-$$\ln(z)=\imaginaryI\arg(z)+\ln(\vert z\vert)$$
+$$\ln(z)=\ln(\vert z\vert)+\arg(z)\imaginaryI$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -13809,7 +13809,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\ln(z)\vert=\sqrt{\arg(z)^2+\ln(\vert z\vert)^2}$$
+$$\vert\ln(z)\vert=\sqrt{\ln(\vert z\vert)^2+\arg(z)^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -13819,7 +13819,7 @@ Used by the Compute Engine for simplification.
 
 $$\ln(cz)=\ln(c)+\ln(z)$$
 
-**Holds when** $z\in\C\setminus\lbrace0\rbrace\land c\in\lparen0, \infty\rparen$.
+**Holds when** $c\in\lparen0, \infty\rparen\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`f67fa2` · Fungrim entry ↗](https://fungrim.org/entry/f67fa2)
 
@@ -13835,14 +13835,14 @@ Used by the Compute Engine for simplification.
 
 ## Pi
 
-$$1+\exp(\imaginaryI\pi)=0$$
+$$\exp(\pi\imaginaryI)+1=0$$
 
 Used by the Compute Engine for simplification.
 [`271314` · Fungrim entry ↗](https://fungrim.org/entry/271314)
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(\frac{-1}{3}, \frac{1}{3}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(-(1/3), \frac{1}{3}, 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -13850,7 +13850,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{-1}{2}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, -(1/2), 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -13858,7 +13858,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{-1}{2}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(-(1/2), -(1/2), 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -13868,25 +13868,25 @@ Used by the Compute Engine for simplification.
 
 ## Powers
 
-$$(a+\imaginaryI b)^{c+\imaginaryI d}=(\imaginaryI\sin(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))+\cos(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert)))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$(a+b\imaginaryI)^{c+d\imaginaryI}=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))(\cos(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))+\imaginaryI\sin(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert)))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`0aac97` · Fungrim entry ↗](https://fungrim.org/entry/0aac97)
 
 ---
 
-$$\Im((a+\imaginaryI b)^{c+\imaginaryI d})=\sin(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\Im((a+b\imaginaryI)^{c+d\imaginaryI})=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))\sin(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`18873d` · Fungrim entry ↗](https://fungrim.org/entry/18873d)
 
 ---
 
-$$(xy)^{a}=\exp(2\imaginaryI\pi a\lfloor\frac{-\arg(x)-\arg(y)+\pi}{2\pi}\rfloor)x^{a}y^{a}$$
+$$(xy)^{a}=x^{a}y^{a}\exp(2\pi\imaginaryI a\lfloor\frac{\pi-\arg(x)-\arg(y)}{2\pi}\rfloor)$$
 
-**Holds when** $a\in\C\land x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace\land a\in\C$.
 Used by the Compute Engine for simplification.
 [`2090c3` · Fungrim entry ↗](https://fungrim.org/entry/2090c3)
 
@@ -13902,13 +13902,13 @@ Used by the Compute Engine for expansion.
 
 $$a^{b}=\exp(b\ln(a))$$
 
-**Holds when** $b\in\C\land a\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\C\setminus\lbrace0\rbrace\land b\in\C$.
 Used by the Compute Engine for simplification.
 [`4d6416` · Fungrim entry ↗](https://fungrim.org/entry/4d6416)
 
 ---
 
-$$z^{n+1}=zz^{n}$$
+$$z^{n+1}=z^{n}z$$
 
 **Holds when** $z\in\C\land n\in\N$ &nbsp;_or_&nbsp; $z\in R\land R\in\mathrm{Rings}\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -13916,17 +13916,17 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert(a+\imaginaryI b)^{c+\imaginaryI d}\vert=\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\vert(a+b\imaginaryI)^{c+d\imaginaryI}\vert=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`bc4d0a` · Fungrim entry ↗](https://fungrim.org/entry/bc4d0a)
 
 ---
 
-$$\Re((a+\imaginaryI b)^{c+\imaginaryI d})=\cos(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\Re((a+b\imaginaryI)^{c+d\imaginaryI})=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))\cos(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`caf8cf` · Fungrim entry ↗](https://fungrim.org/entry/caf8cf)
 
@@ -13942,15 +13942,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(z)=\frac{\sqrt{2}\operatorname{J}_{\frac{1}{2}}(z)\sqrt{\pi}}{2\sqrt{z}}$$
+$$\mathrm{sinc}(z)=\frac{\operatorname{J}_{\frac{1}{2}}(z)}{\sqrt{\frac{2z}{\pi}}}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for simplification.
 [`19d7d9` · Fungrim entry ↗](https://fungrim.org/entry/19d7d9)
 
 ---
 
-$$z\mapsto\mathrm{sinc}(z)^{\prime}(0)=\begin{cases}\frac{(-1)^{\lfloor n/2\rfloor}}{n+1}&\lnot\mathrm{IsOdd}(n)\\0&\mathrm{IsOdd}(n)\end{cases}$$
+$$z\mapsto\mathrm{sinc}(z)^{\prime}(0)=\begin{cases}\frac{(-1)^{\lfloor n/2\rfloor}}{n+1}&\mathrm{IsEven}(n)\\0&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -14020,7 +14020,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)=\begin{cases}(\frac{2}{z^3}-\frac{1}{z})\sin(z)-\frac{2\cos(z)}{z^2}&z\ne0\\\frac{-1}{3}&z=0\end{cases}$$
+$$z\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)=\begin{cases}(2/z^3-1/z)\sin(z)-\frac{2\cos(z)}{z^2}&z\ne0\\-(\frac{1}{3})&z=0\end{cases}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14045,13 +14045,13 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{sinc}(\imaginaryI z)=\frac{\sinh(z)}{z}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for expansion.
 [`b41d08` · Fungrim entry ↗](https://fungrim.org/entry/b41d08)
 
 ---
 
-$$z\mathrm{sinc}(z)+zz\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)+2z\mapsto\mathrm{sinc}(z)^{\prime}(z)=0$$
+$$zz\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)+2z\mapsto\mathrm{sinc}(z)^{\prime}(z)+z\mathrm{sinc}(z)=0$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14066,7 +14066,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(2z)=\cos(z)\mathrm{sinc}(z)$$
+$$\mathrm{sinc}(2z)=\mathrm{sinc}(z)\cos(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14100,7 +14100,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{sinc}(z)=\frac{\sin(z)}{z}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for simplification.
 [`fa9283` · Fungrim entry ↗](https://fungrim.org/entry/fa9283)
 
@@ -14139,7 +14139,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=\operatorname{J}_{\frac{1}{2}}(z)\sqrt{\frac{\pi z}{2}}$$
+$$\sin(z)=\sqrt{\frac{\pi z}{2}}\operatorname{J}_{\frac{1}{2}}(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14147,7 +14147,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=\frac{\exp(\imaginaryI z)-\exp(-(\imaginaryI z))}{2\imaginaryI}$$
+$$\sin(z)=\frac{\exp(\imaginaryI z)-\exp(-\imaginaryI z)}{2\imaginaryI}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14163,7 +14163,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z+\pi)=-\sin(z)$$
+$$\sin(\pi+z)=-\sin(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -14171,7 +14171,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(z)+z\mapsto\sin(z)^{\doubleprime}(z)=0$$
+$$z\mapsto\sin(z)^{\doubleprime}(z)+\sin(z)=0$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14226,7 +14226,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\pi k+z)=\sin(z)\times(-1)^{k}$$
+$$\sin(z+\pi k)=(-1)^{k}\sin(z)$$
 
 **Holds when** $z\in\C\land k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -14234,7 +14234,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a+\imaginaryI b)=\imaginaryI\cos(a)\sinh(b)+\sin(a)\cosh(b)$$
+$$\sin(a+b\imaginaryI)=\sin(a)\cosh(b)+\imaginaryI\cos(a)\sinh(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -14257,7 +14257,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\pi k+\frac{\pi}{2})=(-1)^{k}$$
+$$\sin(\frac{\pi}{2}+\pi k)=(-1)^{k}$$
 
 **Holds when** $k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -14265,7 +14265,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a-b)=\sin(a)\cos(b)-\sin(b)\cos(a)$$
+$$\sin(a-b)=\sin(a)\cos(b)-\cos(a)\sin(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -14282,7 +14282,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)^{2n}=\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\mathrm{Binomial}(2n, k)\times(-1)^{k+n})}{4^{n}}+\frac{\mathrm{Binomial}(2n, n)}{4^{n}}$$
+$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\binom{2n}{k}\times(-1)^{k+n})}{4^{n}}$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -14304,7 +14304,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\sin(z)^{\prime}(z)=\sin(\frac{\pi r}{2}+z)$$
+$$z\mapsto\sin(z)^{\prime}(z)=\sin(z+\frac{\pi r}{2})$$
 
 **Holds when** $z\in\C\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -14319,7 +14319,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(2\pi k+z)=\sin(z)$$
+$$\sin(z+2\pi k)=\sin(z)$$
 
 **Holds when** $z\in\C\land k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -14351,7 +14351,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a+b)=\sin(b)\cos(a)+\sin(a)\cos(b)$$
+$$\sin(a+b)=\sin(a)\cos(b)+\cos(a)\sin(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -14446,7 +14446,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI\sin(z)+\cos(z)=\exp(\imaginaryI z)$$
+$$\cos(z)+\imaginaryI\sin(z)=\exp(\imaginaryI z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14454,7 +14454,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z+\frac{\pi}{2})=\cos(z)$$
+$$\sin(\frac{\pi}{2}+z)=\cos(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14500,7 +14500,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=-(\imaginaryI\sinh(\imaginaryI z))$$
+$$\sin(z)=-\imaginaryI\sinh(\imaginaryI z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14508,7 +14508,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\imaginaryI\sin(z)+\cos(z))^{n}=\imaginaryI\sin(nz)+\cos(nz)$$
+$$(\cos(z)+\imaginaryI\sin(z))^{n}=\cos(nz)+\imaginaryI\sin(nz)$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -14555,7 +14555,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a)-\sin(b)=2\sin(\frac{a-b}{2})\cos(\frac{a+b}{2})$$
+$$\sin(a)-\sin(b)=2\cos(\frac{a+b}{2})\sin(\frac{a-b}{2})$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -14571,7 +14571,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(a)^2-\cos(b)^2=-(\cos(a+b)\cos(a-b))$$
+$$\sin(a)^2-\cos(b)^2=-\cos(a+b)\cos(a-b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -14597,7 +14597,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{\imaginaryI}=\frac{1}{2}(\sqrt{2}(1+\imaginaryI))$$
+$$\sqrt{\imaginaryI}=\frac{1+\imaginaryI}{\sqrt{2}}$$
 
 Used by the Compute Engine for simplification.
 [`0ad836` · Fungrim entry ↗](https://fungrim.org/entry/0ad836)
@@ -14612,7 +14612,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{r\exp(\imaginaryI\theta)}=\exp(\frac{\imaginaryI\theta}{2})\sqrt{r}$$
+$$\sqrt{r\exp(\imaginaryI\theta)}=\sqrt{r}\exp(\frac{\imaginaryI\theta}{2})$$
 
 **Holds when** $r\in\lbrack0, \infty\rparen\land\theta\in\lparen-\pi, \pi\rbrack$.
 Used by the Compute Engine for simplification.
@@ -14622,7 +14622,7 @@ Used by the Compute Engine for simplification.
 
 $$\sqrt{\frac{z}{c-z}}=\sqrt{z}\sqrt{\frac{1}{c-z}}$$
 
-**Holds when** $c-z\ne0\land z\in\R\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\R\land c\in\lbrack0, \infty\rparen\land c-z\ne0$.
 Used by the Compute Engine for simplification.
 [`185efc` · Fungrim entry ↗](https://fungrim.org/entry/185efc)
 
@@ -14674,7 +14674,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(\sqrt{z})=\sqrt{\frac{\Re(z)+\vert z\vert}{2}}$$
+$$\Re(\sqrt{z})=\sqrt{\frac{\vert z\vert+\Re(z)}{2}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14682,7 +14682,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{\frac{z}{2}}=\frac{\sqrt{2}\sqrt{z}}{2}$$
+$$\sqrt{\frac{z}{2}}=\frac{\sqrt{z}}{\sqrt{2}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -14700,15 +14700,15 @@ Used by the Compute Engine for simplification.
 
 $$\sqrt{\frac{z}{z-c}}=\frac{\sqrt{-z}}{\sqrt{c-z}}$$
 
-**Holds when** $z-c\ne0\land z\in\C\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\C\land c\in\lbrack0, \infty\rparen\land z-c\ne0$.
 Used by the Compute Engine for simplification.
 [`6f63dd` · Fungrim entry ↗](https://fungrim.org/entry/6f63dd)
 
 ---
 
-$$z\mapsto\sqrt{z}^{\prime}(z)=\mathrm{RisingFactorial}(\frac{-1}{2}, r)\times(-1)^{r}z^{r-\frac{1}{2}}$$
+$$z\mapsto\sqrt{z}^{\prime}(z)=(-1)^{r}\mathrm{RisingFactorial}(-(\frac{1}{2}), r)z^{r-\frac{1}{2}}$$
 
-**Holds when** $r\in\N\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack\land r\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`83abff` · Fungrim entry ↗](https://fungrim.org/entry/83abff)
@@ -14762,9 +14762,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{\frac{z}{c+z}}=\frac{\sqrt{z}}{\sqrt{c+z}}$$
+$$\sqrt{\frac{z}{z+c}}=\frac{\sqrt{z}}{\sqrt{z+c}}$$
 
-**Holds when** $c+z\ne0\land z\in\C\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\C\land c\in\lbrack0, \infty\rparen\land z+c\ne0$.
 Used by the Compute Engine for simplification.
 [`d40229` · Fungrim entry ↗](https://fungrim.org/entry/d40229)
 
@@ -14786,10 +14786,10 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{\infty\exp(\imaginaryI\theta)}=\infty\exp(\frac{\imaginaryI\theta}{2})$$
+$$\sqrt{\exp(\imaginaryI\theta)\infty}=\exp(\frac{\imaginaryI\theta}{2})\infty$$
 
 **Holds when** $\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f9f31d` · Fungrim entry ↗](https://fungrim.org/entry/f9f31d)
 
 ---
@@ -20815,10 +20815,20 @@ a function of this type.
 type ExactNumericValueData = {
   rational: Rational;
   radical: number;
+  imRational: Rational;
+  imRadical: number;
 };
 ```
 
-The value is equal to `(decimal * rational * sqrt(radical)) + im * i`
+The value is equal to `rational * sqrt(radical) + imRational * sqrt(imRadical) * i`
+
+Representable set (enforced by `ExactNumericValue`):
+- real values: `rational * sqrt(radical)` (imaginary part 0);
+- Gaussian rationals: both `radical` and `imRadical` are 1 (e.g. `2+3i`, `1/2-5i/3`);
+- pure-imaginary radicals: the real part is 0 (e.g. `√2·i`).
+
+A value needing a radical on both a non-zero real AND a non-zero imaginary
+component (e.g. `√2 + √3·i`) is NOT representable exactly.
 
 </MemberCard>
 
@@ -29519,826 +29529,355 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.67.0 _2026-07-03_
 
-### New Features
+This release improves correctness and predictability across the public Compute
+Engine API: exact complex and integer arithmetic stays exact more often,
+partial derivatives and assumptions are more capable, LaTeX and lenient parsing
+round-trip more reliably, compiled output agrees more closely with interpreted
+evaluation, and arbitrary-precision arithmetic is substantially faster. It also
+fixes many cases where `evaluate()`, `N()`, `simplify()`, `isEqual()`,
+`assume()`, `verify()`, serialization, or compilation could return a wrong
+answer, lose exactness, hang, or silently accept invalid input.
 
-- **Partial derivatives of unknown multivariate functions.** Differentiating an
-  application of an undefined function of several arguments no longer stays
-  inert: `D(f(x, y), x)` now evaluates to `Apply(Derivative(f, 1, 0), x, y)`,
-  the partial with respect to the first argument. The order argument of
-  `Derivative` is now a **multi-index** — one differentiation order per argument
-  of the function, following Mathematica's `Derivative[n₁, n₂, …][f]`
-  convention — so higher-order and mixed partials accumulate on it:
-  `D(D(f(x, y), x), y)` → `Apply(Derivative(f, 1, 1), x, y)`, and mixed partials
-  commute. The multivariate chain, product, power, and quotient rules compose
-  over these, e.g. `D(f(x^2, y), x)` → `2x * Apply(Derivative(f, 1, 0), x^2, y)`.
-  When applied to plain symbols they serialize in Leibniz notation
-  (`\frac{\partial}{\partial x} f(x, y)`); the bare operator serializes as
-  `f^{(1,0)}`. `Derivative` of a **known** multivariate function literal computes
-  the mixed partial directly, e.g. `Derivative(Function(x^2·y, x, y), 1, 1)` →
-  `(x, y) |-> 2x`. This also lets Bessel functions differentiate with respect to
-  their **order**: `D(BesselJ(x, x), x)` now combines the known argument
-  recurrence with a symbolic order derivative
-  `Apply(Derivative(BesselJ, 1, 0), x, x)` instead of staying inert.
+### Exact and Numeric Evaluation
+
+- **Exact complex arithmetic preserves exact values.** Gaussian integer and
+  rational complex values now stay exact through arithmetic: $(1+i)^3$
+  evaluates to $-2+2i$, $(1+i)^{-2}$ to $-\frac{i}{2}$, $\frac{1}{1+i}$ to
+  $\frac{1-i}{2}$, $\sqrt{3+4i}$ to $2+i$, and $\sqrt{-4}$ to $2i$. Exact
+  complex numbers also round-trip through MathJSON as `["Complex", re, im]`
+  with exact components.
+
+- **Integer powers and large integers stay exact.** Integer powers such as
+  $2^{127}$ now evaluate to exact integers, negative integer powers produce
+  exact rationals such as $2^{-2} = \frac14$, and powers of Gaussian integers
+  such as $(1+i)^2$ evaluate exactly. Very large exact integers are no longer
+  rounded when used by `IsPrime`, `IsOdd`, `IsEven`, `FactorInteger`, `Mod`, or
+  `DigitSum`.
+
+- **Exact results are preserved more consistently.** `evaluate()` no longer
+  turns exact arguments into floats in cases such as $\sqrt{-2}$,
+  $\operatorname{Fract}(\frac12)$, $\Re(\frac12)$, $|1+i|$,
+  $\log_2(\pi)$, `Distance`, and statistics functions. For example,
+  $\operatorname{Mean}([1,2,3,4])$ now returns $\frac52$, and
+  $\operatorname{StandardDeviation}([1,2,3,4])$ returns
+  $\frac{\sqrt{15}}{3}$.
+
+- **Special functions are more accurate.** `PolyGamma`, `Zeta`, `BesselI`,
+  `BesselK`, Airy functions, logarithms, roots, trigonometric functions near
+  zeros and poles, `LambertW`, `acos`, `erfInv`, `Hypergeometric2F1`, `Gamma`,
+  `Beta`, Fresnel integrals, and complex elementary functions have improved
+  numeric accuracy, including at high precision.
+
+- **Negative logarithms and complex logarithms are consistent.** Inexact
+  negative arguments now produce the principal complex value under both
+  `evaluate()` and `N()`. Exact negative arguments stay symbolic under
+  `evaluate()` and produce the principal complex value under `N()`. Logarithms
+  with a complex argument and explicit base now agree between `evaluate()` and
+  `N()`.
+
+- **Roots and radicals are more reliable.** Exact perfect powers such as
+  $64^{1/3}$ and $(27/8)^{1/3}$ evaluate exactly, `Root(64, 3).N()` returns
+  exactly $4$, odd roots of negative numbers keep the real-root convention, and
+  `N(\sqrt{4y})` now returns $2\sqrt{y}$ instead of dropping the radical.
+
+- **Sums and infinite sums behave better.** Exact sums such as
+  $\sum_{k=1}^{5}\sqrt{k}$ now remain exact, while sums over infinite index
+  sets such as $\sum_{n \in \mathbb{Z}^+}\frac{1}{n^2}$ evaluate numerically
+  when appropriate, remain symbolic when parameters prevent evaluation, and
+  respect `timeLimit`.
+
+### Differentiation, Integration, and Simplification
+
+- **Partial derivatives of multivariate functions now work symbolically.**
+  `D(f(x, y), x)` now represents the partial derivative with respect to the
+  first argument, mixed partials accumulate correctly, and multivariate chain,
+  product, power, and quotient rules compose as expected. For example,
+  `D(f(x^2, y), x)` returns a symbolic chain-rule result proportional to
+  $2x$.
+
+- **Partial-derivative notation parses and evaluates.** Forms such as
+  $\partial_x f(x,y)$, $\frac{\partial}{\partial x} f(x,y)$,
+  $\frac{\partial^2}{\partial x \partial y} f(x,y)$, and
+  $\frac{\partial^2}{\partial x^2} f(x,y)$ now parse to `D` and evaluate
+  correctly.
+
+- **Derivative notation is more robust.** Compact derivatives such as
+  `d/dx(f(g(x)))` preserve unknown-function chain rules, higher-order
+  derivatives round-trip through LaTeX, and
+  $\frac{d}{dx}[\sin x]$ treats the square brackets as grouping rather than a
+  one-element list.
+
+- **Several derivative rules are corrected.** Variable-degree radicals such as
+  `Root(x, x)` differentiate as $x^{1/x}$, $\frac{d}{dx}\operatorname{Mod}(x,5)$
+  gives $1$ almost everywhere, and
+  $D(\operatorname{arcoth}(x), x)$ returns $\frac{1}{1-x^2}$.
+
+- **Definite integrals no longer return fabricated closed forms.** If no
+  closed-form antiderivative is found, `evaluate()` keeps the definite integral
+  symbolic instead of substituting bounds into the integrand. `N()` still
+  computes a numeric value.
+
+- **Default simplification covers more identities.** The sine addition identity
+  $\sin(x)\cos(y)+\cos(x)\sin(y)=\sin(x+y)$ now applies in the default
+  `simplify()` path. Pythagorean identities such as
+  $\sin^2 x+\cos^2 x$ also simplify inside larger sums.
+
+- **Simplification is more exact and branch-aware.** Combining powers keeps
+  exact exponents, for example $x \cdot x^{\sqrt2}$ becomes
+  $x^{1+\sqrt2}$. The simplification of $\ln(x^2)$ now produces
+  $2\ln(|x|)$ for real $x$, and identities that require real arguments no
+  longer apply to symbols declared as complex.
+
+- **Some unsafe rewrites were removed.** `simplify()` no longer rewrites
+  $|\sin x|$ as $\sin|x|$, `Arctan2` preserves the correct quadrant, rule
+  conditions such as $x \ne 0$ require proof rather than assuming unknown
+  symbols satisfy them, and alternating-binomial sum simplifications now check
+  their validity bounds.
+
+- **Differential equation solvers handle higher-order equations.** (contributed
+  by [KingArth0r](https://github.com/KingArth0r)) `DSolve` now solves **linear
+  constant-coefficient homogeneous** equations of any order via the
+  characteristic polynomial — distinct real, repeated, and complex roots — for
+  example `y''(x) = y(x)` → `[y(x) = c_1·e^x + c_2·e^{-x}]` and
+  `y''(x) + y(x) = 0` → `[y(x) = c_1·cos(x) + c_2·sin(x)]`. Roots are kept exact
+  when the characteristic polynomial factors and fall back to numeric roots
+  otherwise. It also solves **second-order constant-coefficient nonhomogeneous**
+  equations (undetermined coefficients for polynomial forcing, variation of
+  parameters otherwise) and **second-order Cauchy–Euler** equations. Integration
+  constants are now named `c_1`, `c_2`, … (fresh names are chosen if those are
+  already in use). Correspondingly, `NDSolve` now solves explicit **higher-order**
+  initial value problems `y⁽ⁿ⁾(x) = f(x, y, y', …, y⁽ⁿ⁻¹⁾)` by reducing them to a
+  first-order RK4 system, with the initial condition given as a list
+  `[y(x0), y'(x0), …]`. Equations outside these classes remain inert.
+
+### Parsing and Serialization
+
+- **`\binom` is supported.** `\binom{n}{k}`, `\dbinom{n}{k}`, and
+  `\tbinom{n}{k}` parse to `Binomial(n, k)`, and `Binomial` serializes back to
+  `\binom`.
+
+- **LaTeX parsing accepts more common notation.** `N(...)` and `D(...)` parse as
+  numeric evaluation and differentiation outside quantifier scopes, superscripts
+  on `\log`, `\ln`, `\lg`, and `\exp` bind to the applied function, and
+  `==`, `!=`, chained `\ne`, mixed-direction inequality chains, parenthesized
+  relations, and double negation such as `x--y` now parse with the expected
+  meaning.
+
+- **Lenient parsing is more useful.** In lenient mode, digit suffixes parse as
+  subscripts (`x2` as $x_2$), bare known function names apply to the following
+  factor (`sin x`), `log2(8)` means $\log_2 8$, `[1,...,10]` parses as a range,
+  and $\mathbb{Z}^+$ parses as `PositiveIntegers`.
+
+- **The public string helpers accept their documented syntax.** `simplify()`,
+  `evaluate()`, `N()`, `expand()`, `expandAll()`, `factor()`, `solve()`, and
+  `compile()` now parse string input in non-strict mode, so expressions such as
+  `sqrt(5)`, `sin(alpha)`, and `x**2` work as documented.
 
 - **`verify()` and `assume()` accept strings.** `ce.verify('x > 0')` and
-  `ce.assume('$x > 0$')` parse the predicate (LaTeX) and proceed; unparseable
-  input throws a clear error. In addition, `verify()` of compound predicates
-  now recurses properly: after `assume(x·y > 0)` and `assume(x + y > 0)`,
-  `verify(And(x·y > 0, x + y > 0))` is `true` and `verify(Not(x·y > 0))` is
-  `false` (the Kleene logic recursion was previously unreachable).
+  `ce.assume('$x > 0$')` parse the predicate and report clear errors for
+  unparseable input.
 
-- **New default simplification: sine addition.**
-  `sin(x)cos(y) + cos(x)sin(y)` → `sin(x + y)` (and the `−`/`sin(x−y)`
-  variant) now applies in the default `simplify()` path, not just under the
-  `fu` rule set.
+- **MathJSON `.json` serialization is lossless for more numbers.** Exact large
+  integers, 16- and 17-digit values, high-precision complex numbers, exact
+  rational/radical values such as $\frac{\sqrt3}{2}$, and repeating decimals now
+  round-trip without silently changing value.
 
-- **`\binom` is now supported.** `\binom{n}{k}` (and `\dbinom`/`\tbinom`)
-  parses to `Binomial(n, k)`, and `Binomial` serializes back to `\binom` —
-  previously `\binom` was a parse error.
+- **LaTeX round-trips are improved.** Repeating decimals serialize with an
+  overline, sequence expressions no longer serialize as ambiguous adjacent
+  numbers, set-builder notation attaches conditions to the comprehension, and
+  `toMathJson({exclude: ...})` honors exclusions for number literals.
 
-- **`==` and `!=` now evaluate.** `3 == 3` evaluates to `True` (previously an
-  inert `EqualEqual`) and `3!= 2` is a not-equal comparison (with `3! = 2`,
-  space before `=`, still parsed as a factorial equation). Additional unicode
-  operators are accepted in all modes: `≤ ≥ ≠ × · ∞ √ ½ ¼ ¾ ⅓ ⅔`.
+### Assumptions, Types, and Equality
 
-- **Misparse-driven auto-declarations are recoverable.** In strict mode,
-  parsing `gcd(12,8)` (an unknown multi-letter name applied to arguments)
-  auto-declares the applied symbol as a function; that declaration is now
-  marked *inferred*, so a later `ce.assign('d', 5)` overrides it and `d+1`
-  evaluates to `6` instead of erroring forever.
+- **The numeric type hierarchy is more natural.** `real` is now a subtype of
+  `complex`, so real-typed symbols satisfy complex-typed signatures and guards.
+  Union types flatten and canonicalize their member order, and type negation now
+  distinguishes `never` from `nothing`.
 
-- **`real` is now a subtype of `complex` in the type lattice.** The numeric
-  tower is the chain `integer ⊂ rational ⊂ real ⊂ complex ⊂ number`, so a
-  real-typed symbol now satisfies complex-typed signatures and guards through
-  the ordinary subtype relation (previously `complex` effectively meant
-  "strictly complex" and real-typed arguments needed special-case handling).
-  `meet(real, complex)` is now `real`. The `isReal` predicate is unchanged
-  (real still admits ±∞). In addition, union types now flatten nested unions
-  and canonicalize member order — `integer | string` and `string | integer`
-  produce the same `.type` string — and type negation distinguishes `never`
-  (bottom) from `nothing` (unit): `!any` is `never`, `!never` is `any`.
+- **Complex and non-finite type inference is more precise.** Expressions such as
+  $\sqrt2 i$, $i^2$, $i/2$, $i^3$, $e^i$, and $\ln(-1)$ infer more accurate
+  types. Non-finite values such as $\tan(\frac\pi2)$, $\Gamma(0)$, $\zeta(1)$,
+  $\ln(0)$, $0 \cdot \infty$, and $k/0$ no longer claim finite types when that
+  is unsound.
 
-- **Assumptions are more capable.** `assume(x ∈ PositiveIntegers)` (and the
-  other signed integer/real sets) now decomposes into a type and a sign bound,
-  so `x.isInteger` and `x.isPositive` respond; inequality bounds now reach
-  equality checks (`assume(w > 4)` makes `w.isEqual(2)` false, and
-  `verify(x ≠ 0)` holds after `assume(x > 0)`); two bounded symbols compare
-  (`assume(s > 4); assume(t < 1)` makes `s > t` evaluate to `True`); a
-  contradictory conjunction such as `assume(p > 0 ∧ p < −5)` is now atomic —
-  it is rejected without leaving the earlier conjuncts applied; and a no-arg
-  `forget()` now also clears values installed by `assume('x = 5')` while
-  preserving values set with `assign()`.
+- **Assumptions can prove more facts.** Assumptions over signed integer and real
+  sets refine both type and sign. Inequality bounds now affect equality checks,
+  comparisons between bounded symbols, and `verify()`. Chained inequalities and
+  equations with multiple roots are recorded correctly, contradictory
+  assumptions are rejected atomically, and `forget()` clears values introduced
+  by `assume('x = 5')` while preserving values set with `assign()`.
+
+- **Assumptions respect scope.** Assumptions made inside a pushed scope no
+  longer leak into parent scopes or continue to affect expression results after
+  `popScope()`.
+
+- **Equality and ordering are more coherent.** `isSame` is now an equivalence
+  relation, `isEqual` returns `undefined` for indeterminate equality with free
+  variables, equality and ordering share one tolerance, collection equality uses
+  scalar tolerance semantics, and complex numbers are no longer ordered against
+  real numbers.
+
+- **Set, collection, and statistics behavior is corrected.** `Intersection`,
+  `SymmetricDifference`, `Union`, and `SetMinus` produce correct finite-set
+  results, `Reverse([1,2,3])` returns `[3,2,1]`, `Quartiles` consistently uses
+  the Moore-McCabe convention, and single-argument
+  $\operatorname{KroneckerDelta}(0)$ returns $1$.
+
+### Compilation
+
+- **Compiled JavaScript, Python, GLSL, WGSL, and interval output now match the
+  interpreter more closely.** Equality uses the engine tolerance, `Mod` and
+  `Remainder` use consistent conventions, chained relations evaluate middle
+  operands once, dynamic $0^0$ returns `NaN`, non-boolean `Which` and `When`
+  conditions throw, and interval arithmetic matches interpreter conventions for
+  branches, rounding, modulus, and odd roots of negative numbers.
+
+- **Compilation fails closed when a target cannot represent an expression
+  correctly.** Unsupported or unsafe cases such as invalid shader constructs,
+  reserved shader variable names, non-real values in real-only target helpers,
+  multi-index sums or products that a target cannot express, and invalid
+  constant folds now fail at compile time instead of emitting wrong code.
+
+- **The Python target emits valid Python for more expressions.** Conditional
+  expressions, `NaN`, logical operators, chained relations, assigned symbols,
+  `vars`, and target options now compile consistently with the JavaScript target
+  and the interpreter.
+
+### Additional Resolved Issues
+
+- **Evaluation limits are honored more reliably.** Hard limits such as
+  nested-exponential limits, divergent infinite sums, and very large special
+  function inputs now return promptly, remain symbolic, or throw a
+  `CancellationError` when `timeLimit` or the recursion limit is exceeded.
+  Examples include $\lim_{x\to\infty} e^{e^{e^x}}/e^{e^{e^{x-1}}}$,
+  $\Gamma(10^{300})$, $\zeta(\pm 10^{300})$, $\operatorname{Fib}(10^9)$,
+  $\binom{2 \times 10^9}{10^9}$, and
+  $\operatorname{Subfactorial}(10^6)$.
+
+- **`simplify()` honors more of its public contract.** `simplify({rules: null})`
+  now applies no rewrite rules, as documented, and logarithmic simplifications
+  such as $\ln(a)/\ln(b)$ no longer reduce to an integer unless the identity can
+  be verified exactly. `simplify()` also preserves exact exponents when
+  combining powers, so $x \cdot x^{\sqrt2}$ becomes $x^{1+\sqrt2}$ rather than
+  a decimal exponent.
+
+- **Numeric comparison and formatting edge cases are fixed.** Two large
+  15-digit values that previously compared in the wrong order now compare
+  correctly, `toPrecision(15)` no longer corrupts
+  `999999999999999`, NaN has a deterministic place in canonical ordering, and
+  high-precision `toString()`, `.json`, and `toFixed()` avoid long stalls on
+  enormous exponents.
+
+- **Substitution and collection operations are more complete.** `subs()` now
+  reaches into lists and tensors, for example `Median([a,b,c]).subs({a: 1})`.
+  Finite set operations such as `Intersection({1,2}, {2})` and
+  `SymmetricDifference` now evaluate correctly, and `Reverse([1,2,3])` returns
+  `[3,2,1]` instead of throwing.
+
+- **Strict and non-strict validation are more predictable.** In strict mode,
+  user-declared function signatures are enforced for closed arguments, numeric
+  operators reject provably non-numeric operands such as `Sin("hello")`, big-op
+  bounds are type-checked, and `Map([1,2,3], "nf")` is rejected. In non-strict
+  mode, missing required arguments such as `Sqrt()` or `Power(2)` no longer
+  crash.
+
+- **Rule replacement is safer.** Rule guards such as $x \ne 0$ must now be
+  provable before they match, wildcard conditions such as `:notzero` no longer
+  assume unknowns satisfy the condition, and failed sequence-wildcard matches no
+  longer drop operands from the expression being transformed.
+
+- **Special values and combinatorics are corrected.** `Choose` and `Binomial`
+  now share standard conventions, including `Choose(2,3) = 0` and negative
+  upper indices such as `Binomial(-2,3) = -4`. `Argument(1+i)` evaluates to
+  $\pi/4$, several `Digamma` special values simplify when the Fungrim pack is
+  loaded, and integer-domain functions such as `Fibonacci(+Infinity)` and
+  `MoebiusMu(Infinity)` stay symbolic instead of throwing.
+
+- **Modular arithmetic is consistent.** `Mod` is floored everywhere, so
+  `Mod(-7, 3)` returns $2$, while `Remainder` uses round-to-nearest semantics.
+  Exact rational inputs stay exact, for example
+  `Mod(\frac12, \frac13)` returns $\frac16$.
+
+- **Complex and matrix products no longer lose meaning.** Multiplying a scalar
+  by a complex literal such as `["Complex", 1, 1]` preserves both real and
+  imaginary parts, and symbolic matrix products preserve their written order, so
+  a commutator such as $MP - PM$ no longer collapses to $0$ for declared matrix
+  symbols.
+
+- **Parsing rejects or preserves ambiguous forms more reliably.** `x^2^3` is
+  now a parse error instead of an unintended list power, `Sequence(1,2)` no
+  longer serializes as `1 2`, parenthesized relations are treated as atomic
+  operands inside larger chains, and a scalar or matrix next to a function- or
+  matrix-valued symbol is parsed as multiplication rather than a tuple.
+
+- **`0^0` and non-finite values are consistent across paths.** `evaluate()`,
+  `N()`, and compiled JavaScript now agree that $0^0$ is `NaN`. Trigonometric
+  poles such as `N(\cot \pi)` and `N(\csc \pi)` now return complex infinity
+  rather than huge finite artifacts.
 
 ### Performance
 
-- **The Rubi integration pack is much faster on integrals it cannot solve.**
-  A second-level dispatch index (the set of operator heads a rule's pattern
-  requires vs the heads present in the integrand) now screens the ~3,200
-  rules before pattern-matching, cutting candidate scans ~10× on the miss
-  path — integrals that fall through to the built-in integrator spend less
-  than half the previous time in the pack, with byte-identical results
-  verified across the full 4,965-integral Rubi test corpus.
-
-- **Sign queries under assumptions are much faster and sharper.** `.sgn` /
-  `.isPositive` on a symbol constrained by assumptions now consults the
-  indexed bounds store (O(1) after indexing) instead of linearly re-matching
-  every assumption, and derives strictly more: `n ∈ Range(1, 10)` now yields
-  `isPositive === true` (previously undefined), agreeing with `verify(n > 0)`.
-
-- **Faster polynomial equation solving.** Solving a univariate polynomial of
-  degree ≥ 2 now goes straight to a coefficient-based closed form (quadratic
-  formula, then the rational-root theorem plus a numeric fallback for higher
-  degrees), bypassing the commutative pattern-matcher whose
-  operand-permutation search dominated the cost of polynomial solving. Roots
-  are unchanged — irrational roots such as `1 ± √2` stay exact.
-
-- **Faster `Factor`.** Detecting whether a term is a perfect square (for the
-  difference-of-squares and perfect-square factorings) is now computed
-  structurally instead of through a general `simplify()` call, which
-  previously accounted for roughly half of the factoring workload.
-
-- **Faster arbitrary-precision arithmetic.** The decimal digit count of a
-  `BigDecimal` value is now computed once and reused across `cmp`, `div`,
-  `pow`, `ln`, `sqrt`, and precision rounding (an O(log n) recomputation
-  becomes an O(1) reuse), `normalize` short-circuits the common case of a
-  value with no trailing decimal zero with a single test, and redundant
-  `BigDecimal` copies were removed from the binary numeric-function path. This
-  speeds up high-precision `N()`.
-
-### Resolved Issues
-
-- **Free functions accept the looser AsciiMath/Typst-like syntax they
-  document.** `simplify()`, `evaluate()`, `N()`, `expand()`, `expandAll()`,
-  `factor()`, `solve()`, and `compile()` now parse string input in non-strict
-  mode, so bare function names, multi-letter identifiers, and `**` for
-  exponentiation work — e.g.
-  `simplify("(sin(alpha)**2 + cos(alpha)**2) * (x**2 + 2*x + 1) / (x + 1)")`
-  returns `x + 1` and `N("(1+sqrt(5))/2")` returns the golden ratio.
-  Previously these were parsed as strict LaTeX and silently mangled
-  (`sqrt(5)` became `5·q·r·s·t`, the `i` in `sin` was read as the imaginary
-  unit). Canonical LaTeX input is unaffected. The standalone `parse(latex)`
-  entry point remains strict LaTeX.
-
-- **Hard limits no longer hang.** Nested-exponential (Gruntz-class) limits
-  such as `lim_{x→∞} e^{e^{e^x}}/e^{e^{e^{x-1}}}` burned ~18 minutes of CPU
-  in the limit engine before giving up; the engine now honors the evaluation
-  deadline and probes order-of-growth with machine floats instead of
-  building multi-million-digit intermediates — the same limits return
-  (symbolically inert) in milliseconds. The timeout contract is now
-  documented on `evaluate()`: exceeding `timeLimit` or the recursion limit
-  throws a `CancellationError` (with `cause` `'timeout'` or
-  `'recursion-depth-exceeded'`) — catch it to distinguish an interrupted
-  evaluation from a symbolic result.
-
-- **`subs()` reaches into collections.** `Median([a,b,c]).subs({a: 1})`
-  (and substitution into any list/tensor element) previously returned the
-  expression unchanged — `BoxedTensor` now delegates substitution to its
-  structural form. Explicit `Hold(…)` semantics are unchanged.
-
-- **`0^0` is NaN on every path.** The `.N()` path returned `1` (via
-  `Math.pow`) while `evaluate()` returned NaN; both now agree, matching the
-  compiled-JavaScript alignment from the previous round.
-
-- **`simplify({rules: null})` honors its contract.** It now applies no
-  rules (structural/numeric folding only) as documented, instead of
-  silently using the full default rule set. Also, `ln(a)/ln(b) → k` now
-  verifies `a = bᵏ` with exact bigint arithmetic — `ln(2⁶⁰+1)/ln(2)` no
-  longer falsely reduces to 60 — and the simplification cost-gate
-  exemptions moved from fragile label string-matching to explicit
-  `purpose: 'transform'` tags (no behavior change).
-
-- **Fungrim guards are uniformly finite.** Real/integer-typed rule guards
-  now require the argument not be known-infinite, matching the complex
-  guard: a real-guarded identity like `Im(e^{ix}) → sin(x)` no longer fires
-  for `x = +∞` (which produced NaN). Pack shell declarations also survive
-  scope pops and re-loads, and `Union` no longer collapses inert set-valued
-  operands (e.g. `Interior(…)`) into literal elements.
-
-- **Wester audit grading is honest.** A finite `.N()` value no longer
-  counts as correct for definite integrals and limits — results are graded
-  against an independent numeric reference; `±`-annotated outputs
-  (`PlusMinus`) are unwrapped instead of graded unsolved. (Harness only; no
-  report regenerated yet.)
-
-- **Numeric kernel accuracy.** Arbitrary-precision `log`/`log10`/`log2` now
-  carry guard digits (`log10(10⁻⁷)` is exactly `−7`; `2^(−1/2)` is correctly
-  rounded, was 2.35 ulp); `Zeta` at negative even integers returns exactly
-  `0` (was a ~1e-76 residue); machine `gammaln` was rewritten in Lanczos-log
-  form (~15.7 correct digits, was ~10.5, improving `Gamma`/`Beta` for large
-  arguments); the Fresnel integrals' asymptotic cutoff moved from 36,974 to
-  6×10¹⁵ with an exactly-computed phase (S(40,000) was returned as a flat
-  0.5, an 8.6e-6 error cliff); exact root extraction recognizes perfect
-  powers (`64^(1/3)` → `4`, `(27/8)^(1/3)` → `3/2` exact), no longer drops
-  the radical in products like `(8√3)^(1/3)`, and fixes a wrong half-integer
-  root decomposition; and exact rational×radical values now round to the
-  working precision when numericized (a precision-100 `(7/3)√3` printed 199
-  digits of which only ~103 were correct; machine-precision results are now
-  the correctly-rounded double).
-
-- **Negative fractional powers canonicalize uniformly.** `x^(−1/3)` becomes
-  `1/∛x` (matching `x^(−1/2)` → `1/√x`) instead of the anomalous
-  `Root(x, −3)` rendered as `\sqrt[-3]{x}`; also fixes a crash evaluating
-  numeric negative-index roots such as `8^(−1/3)`.
-
-- **Float coefficients no longer mint exact cancellations.** `(0.3x)/(0.1y)`
-  kept an exact coefficient `3` (binary `0.3/0.1` is not exactly 3); division
-  coefficient extraction now follows the same float-exclusion convention as
-  `Add`/`Multiply` folding.
-
-- **Comparison coherence.** The primitive overload of `isSame` agrees with
-  the boxed path (`Rational(1,2).isSame(0.5)` matches
-  `.isSame(ce.number(0.5))`), and collection `isEqual` uses the same
-  tolerance semantics as scalars (near-equal float vectors compare equal
-  within `ce.tolerance`; NaN-element behavior is now documented).
-
-- **Parse/serialize fidelity.** `x^2^3` is a "double superscript" parse error
-  (previously it silently became `Power(x, List(2,3))` and broadcast to a
-  list); `Sequence(1,2)` no longer serializes to `1 2`, which re-parsed as
-  the number `12`; set-builder notation `\{x \in \R : x > 0\}` attaches the
-  condition to the comprehension instead of nesting it inside the domain; and
-  `toMathJson({exclude: …})` now honors exclusions for number literals
-  (`Rational` → `Divide`, `Sqrt` → `Power`).
-
-- **Compiled code matches the interpreter more closely.** Negative-bound
-  `Sum` unrolls no longer emit `--3` (invalid in GLSL/WGSL); user variables
-  named after GLSL/WGSL reserved words (`sample`, `filter`, `in`, `texture`,
-  …) fail at compile time with a diagnostic instead of emitting invalid
-  shader code; chained relations evaluate their middle operands once
-  (`a < Random() < b` drew twice); dynamic `0^0` returns NaN in compiled
-  JavaScript (matching the interpreter) and non-boolean `Which`/`When`
-  conditions throw as the interpreter does; `realOnly` no longer passes
-  booleans through; and the compiled `Integrate` Monte-Carlo behavior
-  (~1e-4 error, 10⁷ samples) is now documented.
-
-- **Eight Fungrim `Digamma` special values now simplify.** `Digamma(1/2)` →
-  `−2 ln 2 − γ` and seven siblings (1/3, 1/4, 1/6, 1/8, 2/3, 3/4, 5/6) were
-  cost-gated into silent no-ops; they are now tagged as transforms and fire
-  when the Fungrim pack is loaded.
-
-- **High-precision results were silently wrong after increasing `precision`.**
-  The internal table of Bernoulli numbers used by `Gamma`, `Digamma`,
-  `PolyGamma` and `Zeta` at high precision was built once per process and
-  never extended, so raising `ce.precision` after a first computation reused a
-  too-short table: a precision-300 `Gamma(1.23456789)` computed after a
-  precision-20 call diverged from the correct value around digit 170. The
-  table is now rebuilt when more terms are needed (results verified
-  bit-identical to a fresh engine and to mpmath).
-
-- **Finite set operations compute correct results.**
-  `Intersection({1,2}, {2})` returned `EmptySet` (elements were compared
-  against the whole second set rather than tested for membership) and
-  `SymmetricDifference` never evaluated at all. Both now reduce correctly,
-  with `Union`/`SetMinus` verified against value tables.
-
-- **`Reverse` no longer crashes on short lists.** Its iterator's termination
-  test could never be true, so `Reverse([1,2,3]).evaluate()` threw a raw
-  JavaScript error instead of returning `[3,2,1]`.
-
-- **Non-strict mode no longer crashes on missing arguments.** With
-  `ce.strict = false`, expressions missing required arguments — `Negate()`,
-  `Sqrt()`, `Power(2)`, `Arctan()` — threw raw JavaScript errors, and
-  `Sin()` printed `sin([undefined])`. The non-strict fast paths now pad
-  missing required arguments the same way strict mode does, producing
-  identical MathJSON.
-
-- **Rubi integration cleanups.** A rule-driven antiderivative could contain
-  unreduced `ln(e)` factors that `simplify()` couldn't fold inside a quotient
-  (`∫ e²ˣ/x³` now yields a clean `ExpIntegralEi(2x)` form, and
-  `(ln(e)·y)/x` simplifies to `y/x`); an internal re-entrant integration
-  no longer resets the evaluation deadline (a fallback could previously grant
-  the outer integral a fresh time budget); the rule-compilation report now
-  carries per-rule skip reasons and stays honest on cached reloads; and the
-  driver's memo table is cleared per top-level integration instead of growing
-  without bound.
-
-- **Integer-domain functions no longer crash on infinite arguments.**
-  `Fibonacci(+∞)`, `BernoulliB(−∞)`, `MoebiusMu(∞)` and the rest of the
-  integer-domain family (a dozen combinatorial/number-theory operators) threw
-  an uncaught `RangeError` from `evaluate()` — `toBigint` converted ±∞/NaN
-  with `BigInt(Math.round(x))`. It now returns `null` for non-finite values
-  per its contract, so these expressions stay symbolic instead of throwing.
-
-- **Pythagorean identities fire inside larger sums.** `sin²x + cos²x + y`
-  simplified to nothing (every pattern in the block required exactly two
-  terms); the identities now scan n-ary sums pairwise, keyed on the trig
-  argument: `sin²x + cos²x + y` → `1 + y`, `3sin²x + 3cos²x + y` → `3 + y`,
-  and the `tan² + 1` / `cot² + 1` siblings likewise.
-
-- **Fungrim complex-domain rules usable with `real`-declared symbols.** A
-  `type: 'complex'` rule guard never discharged for a symbol declared `real`
-  (or `integer`, `rational`) because `real` — which admits ±∞ — is not a
-  subtype of `complex` in the type lattice. This silently blocked 68% of the
-  Fungrim pack under the most natural declaration. The guard now accepts
-  finitely-valued real-family symbols, consistent with the corpus's
-  finite-domain ℝ/ℤ/ℚ convention; guards that genuinely require non-real
-  arguments (e.g. `Im τ > 0`) still do not fire for plain reals.
-
-- **Strict mode validates arguments of numeric operators with custom
-  canonical handlers.** `Sin("hello")` and `Factorial("x")` were `isValid`
-  and evaluated to garbage — a custom canonical handler was the sole gate on
-  argument validity, and most only checked arity. In strict mode, operands of
-  pure-numeric operators are now re-validated after the canonical handler
-  (with the numeric fast-path's leniency: unknowns, lists, tensors are fine —
-  only provably non-numeric operands are rejected). `Factorial`'s signature
-  was aligned with what it computes (`Γ(x+1)` for non-integers).
-
-- **User-declared function signatures are enforced.** After
-  `declare('f', '(integer) -> integer')`, applying `f(0.5)` or `f("a")` was
-  silently valid. Ill-typed *closed* operands (literals, constants) are now
-  rejected in strict mode; operands with free variables defer to runtime.
-
-- **Validation gaps that let wrong results through.** `Sum(x, (x, "lo", 10))`
-  evaluated to 55 (a string bound silently treated as 1) — big-op bounds are
-  now type-checked. `Map([1,2,3], "nf")` broadcast the string — a string is
-  never a function literal. A function literal used as a big-op body
-  (`Sum(Function(_1,_1), …)`) is rejected instead of producing a mistyped
-  lambda, and a function literal's numeric result claim derived from unknown
-  parameters widens to `number` (a lambda applied to ∞ is not `finite_number`).
-
-- **Type lattice: covering unions, expression types, bounded numerics.**
-  `finite_real | non_finite_number` now reduces to `real` (and likewise
-  across the numeric tower), so types produced by `meet` compare equal to
-  what they cover. A bare symbol is no longer a subtype of every
-  `expression<Op>` (only of `expression<Symbol>`). Numeric value literals
-  check against bounded types (`7 ⊑ integer<5..10>`), and the meet of two
-  overlapping ranges is their intersection instead of an unsound `nothing`.
-
-- **`√3/2` MathJSON round-trips to the same number literal.** The `.json` of
-  a radical number literal like `√3/2` (`["Divide",["Sqrt",3],2]`) re-boxed
-  as a Divide *function* — `isSame` false against the value that produced it.
-  Canonicalization now folds exact ÷ exact quotients back to the exact number
-  literal (`Divide(√3, 3)`, `Divide(1/2, 3)` → literals; floats deliberately
-  keep not folding), so `ce.expr(x.json).isSame(x)` holds while the natural
-  Divide-form serialization — which rule patterns written as
-  `\frac{\sqrt3}{3}` match against — is preserved. Dictionaries also gained
-  structural `isSame` (previously always `false` for equal-but-distinct
-  dictionaries), and a stale code comment contradicting the documented
-  lossless-`.json` contract was corrected.
-
-- **Assumptions: chained inequalities, multi-root equations, and the
-  `assume ⇒ verify` identity.** `assume("0 < x < 1")` silently dropped every
-  relation but the first (`verify(x < 1)` was unknown afterward); n-ary
-  relational assumptions now decompose into pairwise conjuncts.
-  `assume("x^2 = 4")` incorrectly returned `'contradiction'` for every
-  multi-root equation (a type comparison tested the roots-*list* type instead
-  of each root); it now succeeds, records the equation as a fact, and leaves
-  the symbol symbolic instead of binding it to a `List` of roots. Facts that
-  the evaluator cannot decide on its own (`x·y > 0`, `x + y > 0`) were
-  write-only — `ask` sometimes found them but `verify` never did; `verify()`
-  now consults the assumption database directly, making
-  `assume(P) ⇒ verify(P)` an identity. `ask()` bound queries also recognize
-  canonically-boxed patterns (`["Greater", "x", "_k"]`, which canonicalizes to
-  `Less(_k, x)`), and the documented `ask` example now actually works.
-
-- **Assumptions no longer mutate parent scopes.** `assume(x > 0)` inside a
-  pushed scope refined the type of `x` on its *parent-scope* definition, so
-  after `popScope()` the assumption was gone but `x` stayed typed `real`. The
-  refinement now shadows into the current scope, like `declare`.
-
-- **Python compilation target emits valid Python.** `If`/`When`/`Which`
-  compiled to JavaScript ternaries with bare `NaN` (a Python `SyntaxError`),
-  logical operators compiled to `and(a, b)` function calls, and relational
-  chains hardcoded `&&`; they now emit conditional expressions
-  (`a if cond else b`), `float('nan')`, and infix `and`/`or`/`not`. The target
-  also honors `vars` and options, folds assigned symbols like the JavaScript
-  target, and the documented `python` target name is registered. A new parity
-  suite executes the emitted source with a real Python interpreter and checks
-  the values against the engine.
-
-- **GPU compilation targets: no more invalid shaders.** A loop-form `Sum` used
-  as a sub-expression spliced a `return` statement mid-expression
-  (`return _acc; + 1.0`) with `success: true`; it now fails at compile time
-  with the offending head. `Loop` counters are converted to float where
-  consumed, WGSL `Argument` uses `select(…)` instead of the unsupported `?:`,
-  and `Min`/`Max` with three or more arguments fold to nested two-argument
-  builtins. Compiling a real-only helper (`Erf`, `Gamma`, Bessel, …) with a
-  complex-typed argument — which silently returned garbage (`Erf(z)` → −1) —
-  now also fails closed at compile time.
-
-- **Compiled `Equal` matches the interpreter's tolerance.** Compiled code
-  compared floats with exact `===`, so `0.1 + 0.2 == 0.3` was `false` compiled
-  but `True` interpreted. JavaScript and Python targets now bake the engine's
-  tolerance into equality comparisons.
-
-- **`Root(x, n).N()` computes a true n-th root.** `Root(64, 3).N()` returned
-  `3.999…9` (computed as `x^(1/n)` with a rounded reciprocal); both the
-  machine and arbitrary-precision paths now use a dedicated n-th-root kernel
-  (Newton-corrected, snapping exact integer roots), so `Root(64, 3).N()` is
-  exactly `4`. Non-integer degrees (`Root(2, 0.5)` = 4) continue to work as
-  powers. `Root(-4, 4).evaluate()` asserted a **NaN literal** where a complex
-  value exists; it now stays symbolic, with `.N()` returning the principal
-  complex root (odd roots of negatives keep the real-root convention:
-  `Root(-8, 3)` = −2).
-
-- **Arbitrary-precision kernels: no more silent digit loss.** `LambertW` read
-  its tolerance from the wrong precision setting and never rounded (printing
-  ~2× the working precision with a garbage tail); `acos` near ±1 lost half its
-  digits to cancellation (now computed via the half-angle identity); `cos` and
-  `tan` near their zeros used a fixed 15-digit guard against unbounded
-  cancellation (now sized dynamically); integer `BigDecimal.pow` accumulated
-  ~n/2 ulp of rounding through its squaring ladder (now carries guard digits,
-  rounding once); machine `erfInv` near ±1 lost all but ~5 digits (Newton now
-  iterates on the complement); and `Hypergeometric2F1` refused arguments near
-  `z = 1` (and their Pfaff images) that its series can in fact deliver at
-  working precision. All repaired paths are pinned against mpmath references.
-
-- **Complex arbitrary-precision results are correct to working precision.**
-  Complex operations mixed machine-double intermediates into full-precision
-  arithmetic — squaring the imaginary part as a double (`1.1²` →
-  `1.2100000000000002`) contaminated every modulus (`ln`, `exp`, `sqrt`,
-  `abs`, powers and roots of complex values), and the phase of a
-  negative-base power used machine `cos`, so `(-4)^{0.25}.N()` at 50 digits
-  printed garbage past digit 16. These now compute in decimal at working
-  precision: `Ln(1.1+1.1i)` at 21 digits agrees with mpmath to all 21,
-  `Sqrt(2+3i)` at 50 digits to all 50. Exact products are rounded back to
-  working precision so no digits beyond it are asserted. (The imaginary part
-  of a complex result remains machine precision by representation — a
-  documented limitation.)
-
-- **Floating-point arguments numericize under `evaluate()` everywhere.**
-  About thirty special functions kept float arguments symbolic
-  (`\Gamma(5.1)`, `e^{5.1}`, `\operatorname{erf}(1.5)`, Bessel, Airy,
-  elliptic, hypergeometric, …) while `\cos(5.1)` numericized — the exactness
-  contract now applies uniformly: an inexact argument yields a numeric
-  result under plain `evaluate()`, at the engine's precision; exact
-  arguments are unaffected (`\Gamma(\frac12)`, `\ln 2` stay symbolic). Mixed
-  sums fold too (`0.5 + \pi` → `3.6415…`). Exact Gaussian-integer complex
-  values (`i`, `2+i`) are correctly treated as exact throughout.
-
-- **Lenient parsing: digit suffixes are subscripts, bare function names
-  apply.** In lenient mode `x2` parsed as `x^2` and `x1` *lost its index*
-  (→ `x`); per the documented recommendation they now parse as subscripts
-  (`x_2`, `x_1`, `x_{12}`). `sin x` without parentheses parsed as the
-  product `i \cdot n \cdot s \cdot x` (complex-valued!); known function
-  names now apply to the following factor, and `log2(8)` means
-  `\log_2 8 = 3`. Also: `[1,...,10]` no longer leaks an internal
-  placeholder (it is a `Range`), and an unbraced superscript on a set
-  symbol (`\Z^+`) now means the signed set (`PositiveIntegers`) — it parsed
-  as the matrix *pseudoinverse*, breaking `\sum_{n \in \Z^+}` —
-  while `M^+` on a matrix still means pseudoinverse.
-
-- **Chained `\ne` is pairwise.** `1 \ne 2 \ne 2` evaluated to True ("first
-  differs from the rest"); it now means `1 \ne 2 \wedge 2 \ne 2` → False,
-  consistent with the other chained relations.
-
-- **A scalar or matrix next to a function-valued or matrix-valued symbol
-  multiplies.** `2f`, `f\,x`, and `M\,P` (declared matrix symbols) silently
-  became `Tuple`s; they are now products.
-
-- **Equality and `isSame` are coherent relations.** `isSame` is now a true
-  equivalence relation (an exact rational no longer spuriously matched a
-  machine-precision decimal one-directionally); expression-valued bindings
-  compare symmetrically (`g := x^2+1` matches `x^2+1` from either side);
-  non-canonical but determinable forms compare correctly
-  (`["Add", 1, 1]` unevaluated `isEqual` 4/2… now `true` vs 2); ordering
-  and equality share one tolerance (a value can no longer be
-  simultaneously "equal to" and "less than" another); and equality with
-  free variables uniformly answers `undefined` unless provable — a sampled
-  counterexample no longer produces a definitive `false` (an assumption
-  could still make the equation true), while identities that hold at all
-  sample points remain `true`.
-
-- **Sums over infinite index sets evaluate (and can be interrupted).**
-  `\sum_{n \in \mathbb{Z}^+} \frac{1}{n^2}` hung indefinitely under
-  `evaluate()` — the set-domain iteration path never yielded to the
-  time-limit check, and exact accumulation over the (truncated-infinite)
-  domain built rationals with tens of thousands of digits. Infinite domains
-  now accumulate numerically (≈1.6449 in ~40 ms), symbolic-parameter bodies
-  (`\sum x^n`) stay symbolic, divergent sums respect the time limit, and
-  finite sums remain exact.
-
-- **Rule conditions no longer discharge vacuously.** A rule guard such as
-  `x \ne 0` was satisfied by *any* unconstrained symbol (the pragmatic
-  unknown→True collapse of `Equal`/`NotEqual` leaked into rule matching);
-  guards now require provability (and a proven `z > 0` does prove
-  `z \ne 0`). The `:notzero`, `:notone`, `:notreal`, `:composite`, and
-  `:irrational` wildcard conditions were similarly fail-open for unknowns
-  and are now three-valued. A rule whose replacement function throws is
-  logged and skipped instead of silently aborting the whole `replace()`
-  pass, and the `\in\Z^+`-family condition shortcuts now work (they threw).
-
-- **`\operatorname{KroneckerDelta}(0)` is `1`.** The single-argument form
-  answered like a boolean test (`0 → 0`); it now implements `\delta_{n,0}`
-  and stays symbolic for undetermined arguments.
-
-- **`Quartiles` follows one convention.** Q1 and Q3 mixed
-  exclusive/inclusive conventions (`[1..9]` gave `(2.5, 5, 7)`, matching no
-  standard); all paths now use Moore–McCabe (median excluded):
-  `(2.5, 5, 7.5)`, with `InterquartileRange` consistent.
-
-- **`\frac{d}{dx}\operatorname{Mod}(x, 5)` is `1`, not `0`** (the sawtooth
-  has slope 1 almost everywhere); a modulus that itself depends on the
-  variable stays symbolic. Two alternating-binomial `\sum \to 0`
-  simplifications also fired outside their validity bounds (wrong at
-  `b = 0` and `b = 1`); they now require the bound to be provable.
-
-- **Five special-function kernels returned wrong digits at every precision —
-  all repaired and verified digit-for-digit against mpmath.**
-  `\operatorname{PolyGamma}(n, x)` for `n \ge 3` was missing a factorial
-  factor in its asymptotic tail (3.7 correct digits at `\psi^{(3)}(2.5)`) and
-  had a sign error for negative arguments; machine-precision `\zeta(s)` used
-  broken series-acceleration coefficients (~7 correct digits everywhere;
-  `\zeta(30)` was on the wrong side of 1 — the compiled target shared the
-  same kernel); `\operatorname{BesselK}` used its small-argument series far
-  past its range (`K_2(20)` was a factor 21 too large);
-  `\operatorname{BesselI}`'s large-argument expansion had flipped signs
-  (2.6 digits at `I_0(100)`); and the Airy functions used a single
-  asymptotic term for negative arguments (1.6 digits at
-  `\operatorname{Ai}(-10)`). All five now agree with mpmath to a few ulp
-  across their ranges. Also fixed along the way: `\zeta(10^9)` crashed with
-  a BigInt overflow (now `1` immediately).
-
-- **High-precision `N()` no longer prints machine-precision values with
-  fake extra digits.** Special functions that only have a machine-precision
-  kernel (e.g. `\operatorname{BesselI}`) returned results dressed as
-  arbitrary-precision numbers — `N(\operatorname{BesselI}(0, 100))` at
-  50-digit precision printed ~43 digits of a 16-digit value. Machine-lane
-  results are now boxed as machine numbers, so downstream arithmetic and
-  printing honestly reflect their precision.
-
-- **`evaluate()` no longer returns floats for exact arguments across the
-  library.** `\sqrt{-2}` numericized to `1.414…i` (it now stays symbolic,
-  while `\sqrt{-4}` gives the exact `2i`); `\operatorname{Fract}(\frac12)`
-  gave `0.5` (now `\frac12`); `\Re(\frac12)` gave `0.5`; `|1+i|` gave
-  `1.414…` (now the exact `\sqrt2`); `\log_2(\pi)` numericized (a symbolic
-  base is exact — it stays symbolic); `\operatorname{Distance}` numericized;
-  and every statistics function numericized exact data —
-  `\operatorname{Mean}([1,2,3,4])` is now `\frac52`,
-  `\operatorname{Variance}` `\frac53`, `\operatorname{StandardDeviation}`
-  `\frac{\sqrt{15}}{3}`, and so on. `N()` behavior is unchanged.
-
-- **Trig poles under `N()` no longer return huge garbage values.**
-  `N(\cot \pi)` returned `-2.6\times10^{24}` (and `\csc \pi`, `\sec \frac\pi2`
-  similar); they now return `\tilde\infty` like `\tan\frac\pi2` already did.
-
-- **Logarithms of negative numbers are consistent between `evaluate()` and
-  `N()`.** `\ln(-0.5)` evaluated to NaN while `N()` gave the complex value;
-  `N(\log_2(-1))` gave NaN while `N(\ln(-1))` gave `i\pi`. Policy now: an
-  inexact negative argument produces the principal complex value under both;
-  an exact negative argument stays symbolic under `evaluate()` and goes
-  complex under `N()` — uniformly across `\ln`, `\lg`, `\lb`, and `\log_b`.
-  Relatedly, `N()` of `\operatorname{Haversine}`/`\operatorname{Hypot}`
-  returned unevaluated symbolic expressions; they now return numbers, and
-  `\operatorname{InverseHaversine}(\frac12)` folds to `\frac\pi2`.
-
-- **Interval arithmetic agrees with the interpreter.** The interval runtime
-  (used by the interval-JS compilation target) computed `\operatorname{arccot}`
-  on the wrong branch for negative arguments, rounded halves toward `+\infty`,
-  mishandled a point exactly on a multiple of a negative modulus, and returned
-  empty intervals for odd roots of negative numbers (`\sqrt[3]{-8}`). All four
-  now match the interpreter's conventions while remaining sound enclosures.
-
-- **`\operatorname{DigitSum}(2^{10^6})` returned after 20+ seconds; printing
-  `\Gamma(10^7)` at high precision took 9 seconds.** The digit functions used
-  an O(digits²) divide loop (now a linear conversion, with a guard that keeps
-  >10⁶-digit inputs symbolic — `DigitSum(2^{10^6})` now answers `1351546` in
-  ~30 ms), and `toFixed` materialized `10^{\text{exponent}}` for a
-  ~65-million-digit exponent (now O(significand); `.toString()`/`.json` in
-  ~25 ms with identical output).
-
-- **Type inference no longer over-claims — `Element`, `isInteger`, `isReal`
-  and friends answer soundly.** A family of type-system fixes: membership
-  checks on symbols with bounded types (`integer<0..10>`) no longer *throw*;
-  `Element(r^s, \mathbb{Z})` is no longer `True` for integer `r, s` (`r^s`
-  can be `1/4`); `\ln(-2)` is no longer typed as a finite real; the
-  difference of two imaginary quantities is no longer excluded from the reals
-  (it can be `0`); `0 \cdot \infty` and `k/0` forms no longer claim
-  finiteness; `assume(q \in \mathbb{Z})` no longer reports a spurious
-  contradiction for a `finite_number` symbol (it narrows the type); negated
-  types (`!string`) answer subtype questions correctly; and
-  `isInteger`/`isRational` on symbols are now three-valued — a `real` symbol
-  answers `undefined` (unknown) rather than a definitive `false`.
-
-- **`\ln(x^2)` simplifies to `2\ln(|x|)`, and real-only rewrites no longer
-  fire on complex symbols.** `\ln(x^2) \to 2\ln(x)` is wrong for every
-  negative `x` (a fail-open branch-cut guard); even powers now produce the
-  `|x|` form, valid for all real `x` (odd and irrational exponents keep the
-  documented generic-real convention for unconstrained symbols, and resolve
-  under `assume`). For symbols *declared* `complex`, identities such as
-  `\sqrt{z^2} \to |z|`, `|z|^2 \to z^2`, and `\ln(z^2) \to 2\ln(z)` no
-  longer apply at all (each is false at `z = i`).
-
-- **A family of non-terminating evaluations now completes.**
-  `\Gamma(10^{300})`, `\operatorname{GammaLn}(10^{300})`,
-  `\zeta(\pm 10^{300})`, `\Gamma(10^7)` at 500-digit precision,
-  `\operatorname{Fib}(10^9)`, `\binom{2 \times 10^9}{10^9}`,
-  `\operatorname{BellNumber}(20000)`, and `\operatorname{Subfactorial}(10^6)`
-  each ran forever, ignoring `timeLimit`. They now return in milliseconds
-  (an exact value, `\pm\infty`, or a symbolic form for astronomically large
-  results) or honor the time limit. Ordinary values are unchanged.
-
-- **Products of huge exact integers no longer collapse to NaN.**
-  `10^{200} \cdot 10^{200}` canonicalized to `NaN` (a machine-overflow check
-  fired before the exact big-integer path); finite inputs now always promote
-  to exact arithmetic.
-
-- **Symbolic matrix products preserve their order.** With `M` and `P`
-  declared `matrix`, canonical sorting commuted the product, so the
-  commutator `M P - P M` evaluated to `0`. Products with two or more
-  matrix/vector operands now keep their written order everywhere
-  (canonicalization, evaluation, negation, serialization); scalar factors
-  still sort.
-
-- **Assumptions no longer outlive their scope.** An expression evaluated
-  under `assume(x > 0)` inside a scope kept its assumption-derived sign and
-  type after `popScope()` (a held `|x^3|` kept simplifying to `x^3`); the
-  per-expression cache is now invalidated when a scope is popped.
-
-- **Radicals with a variable degree now differentiate correctly.** The
-  derivative rule for `Root(base, n)` treated the degree `n` as constant, so
-  `D(Root(x, x), x)` (i.e. `x^{1/x}`) dropped the `(1 - \ln x)` term and
-  `D(Root(2, x), x)` (i.e. `2^{1/x}`) wrongly gave `0`. When the degree depends
-  on the differentiation variable the equivalent `Power(base, 1/n)` is now
-  differentiated, matching the numerical derivative.
-
-- **Partial-derivative notation (`∂`) now parses and evaluates.** The Euler form
-  `\partial_x f(x, y)` and the Leibniz forms `\frac{\partial}{\partial x} f`,
-  `\frac{\partial^2}{\partial x \partial y} f`, and
-  `\frac{\partial^2}{\partial x^2} f` now parse to the `D` operator and
-  differentiate correctly. Previously they produced a malformed
-  `PartialDerivative` expression — e.g. `\frac{\partial}{\partial x} f(x, y)`
-  evaluated to `f(x, y) / x`. The notation-only `PartialDerivative` operator has
-  been removed.
-
-- **Leibniz derivatives now treat single-item square brackets as grouping.**
-  `\frac{d}{\,\mathrm{d}x}[\sin x]` now parses as
-  `["D", ["Sin", "x"], "x"]` and evaluates to `cos(x)` instead of treating
-  `[\sin x]` as a one-element list.
-
-- **Compact derivatives now preserve unknown-function chain rules.**
-  `d/dx(f(g(x)))` now parses as `["D", ["f", ["g", "x"]], "x"]` and
-  evaluates symbolically to `g'(x) * f'(g(x))` instead of collapsing to `0`.
-  Sums with partially unresolved terms now preserve the reducible derivatives,
-  and differentiating symbolic derivative applications increments the
-  derivative order, e.g. `D(D(f(x), x), x)` now returns `f''(x)`.
-
-- **`N(...)` and `D(...)` in LaTeX now parse as their library functions outside
-  quantifier scopes.** Previously `N` (numeric evaluation) and `D` (derivative)
-  were special-cased to always parse as first-order-logic predicates, so
-  `N(\sqrt{10})` parsed as `["Predicate", "N", ["Sqrt", 10]]` and never
-  evaluated. They now parse as ordinary function applications —
-  `N(\sqrt{10})` → `["N", ["Sqrt", 10]]` (evaluates to `3.162…`) and
-  `D(f, x)` → the derivative — matching every other name. Inside a quantifier
-  scope they are still wrapped as predicates (e.g. `\forall x, D(x)` →
-  `["ForAll", "x", ["Predicate", "D", "x"]]`).
-
-- **Definite integrals with no closed-form antiderivative no longer return wrong
-  values.** When the antiderivative could not be found, `evaluate()` substituted
-  the integration bounds *into the integrand* and returned a spurious finite
-  result: `\int_{-1}^{1} \frac{\sqrt{1-x^2}}{1+x^2}\,dx` evaluated to `0` (the
-  true value is `π(√2−1) ≈ 1.3013`, and the integrand is strictly positive),
-  and adding `+ 5` to that integrand returned `10` — the hard part silently
-  vanished. Such integrals now stay symbolic under `evaluate()`; `N()` computes
-  them numerically, as before. Integrals with closed forms, symbolic bounds
-  (`\int_0^a x\,dx` → `a²/2`), and nested integrals are unaffected.
-
-- **`N()` no longer drops square roots of symbolic arguments.**
-  `N(\sqrt{y})` returned `y`, `N(\sqrt{4y})` returned `2y`, and
-  `N(y\sqrt{y})` returned `y^2`. The radical is now applied to the symbolic
-  part too: `N(\sqrt{4y})` → `2\sqrt{y}`, `N(y\sqrt{y})` → `y^{3/2}`.
-
-- **Number theory on large exact integers is now correct.** Integers longer
-  than the working precision (21 digits by default) were silently rounded when
-  operators extracted their integer value, so `IsPrime`, `IsOdd`/`IsEven`,
-  `FactorInteger`, `Mod`, and `DigitSum` could all return wrong answers on
-  values they displayed correctly — e.g. `Mod(10^{21}+3, 10)` returned `0`
-  instead of `3`, and `FactorInteger(10^{21}+3)` factored `10^{21}` instead.
-  The exact integer is now extracted losslessly.
-
-- **Integer powers of exact numbers are computed exactly.** `2^{127}`
-  evaluated to a value rounded to 21 significant digits (so
-  `IsPrime(2^{127}-1)` was wrong even after the fix above); it now evaluates
-  to the exact 39-digit integer. Negative integer exponents give exact
-  rationals (`2^{-2}` → `\frac14`, previously the float `0.25`), and integer
-  powers of Gaussian integers are computed exactly instead of through
-  `exp`/`ln` (`(1+i)^2` → `2i`, previously `-1.36×10^{-21} + 2i`).
-  Astronomically large powers (e.g. `2^{10^{15}}`, whose exact value has
-  ~3×10^{14} digits) now stay symbolic instead of producing a value that
-  crashed serialization — `N()` still returns the overflow.
-
-- **Complex numbers are no longer ordered against reals.** `1.5 < 2+3i`,
-  `i < 2`, and similar comparisons returned `true`/`false` by comparing only
-  the real parts; they now return `undefined` (unknown), and `Max`/`Min` with
-  a complex operand stay symbolic instead of silently absorbing or dropping
-  it (`Max(2, i)` returned `2`; `Max(i, 2)` returned `i`).
-
-- **Logarithms of complex numbers with a base are now correct.** The
-  imaginary part of `\log_b z` was not divided by `\ln b`, so
-  `evaluate()` and `N()` disagreed: `\operatorname{lb}(i)` evaluated to
-  `1.5707i` (= `\ln i`) but `N()` gave the correct `2.2662i`. Both now agree.
-
-- **`Arctan2` returns the correct quadrant under `simplify()`.**
-  `\operatorname{atan2}(1, -1)` simplified to `\arctan(-1)` = `-π/4` (the
-  true value is `3π/4`): the `arctan(y/x)` reduction fired for any `x` though
-  it is only valid for `x > 0`. It is now quadrant-corrected; operands with
-  unknown sign stay symbolic (and resolve under `assume(x > 0)` etc.), and
-  NaN operands yield NaN instead of a definite angle.
-
-- **Mixed-direction inequality chains now mean what they say.**
-  `1 \le 2 > 0` evaluated to **False** (it parsed as `1 ≤ 0 < 2`), and
-  `a > b < c` fabricated the chain `b < c < a`. Chains that mix directions or
-  operators now decompose into the explicit conjunction of their links
-  (`a \le b > c` → `a ≤ b \wedge b > c`); same-direction chains such as
-  `1 < 2 < 3` are unchanged.
-
-- **`--` is no longer parsed as a C-style decrement.** `x--y` parsed as
-  `Multiply(y, Decrement(x))` and `--x` as `PreDecrement(x)`; they now parse
-  as ordinary double negation (`x--y` → `x+y`). The serializer also
-  parenthesizes negated right operands (`x-(-y)`), so raw
-  `["Subtract", "x", ["Negate", "y"]]` no longer round-trips to a different
-  expression.
-
-- **Superscripts on `\log`, `\ln`, `\lg`, and `\exp` bind to the applied
-  function.** `\log_2^2 8` parsed as `8·(\log 2)^2` (silently — the correct
-  value is `(\log_2 8)^2 = 9`), and `\ln^2 x` produced an error expression.
-  They now parse like the trig functions: `\ln^2 x` → `(\ln x)^2`, and
-  `^{-1}` yields the inverse (`\ln^{-1} x` → `e^x`).
-
-- **Pattern matching no longer drops operands.** A failed sequence-wildcard
-  match attempt did not fully roll back its consumption of the subject's
-  operands, so rules applied through `replace()` could silently delete terms:
-  `(w+x+y+z).replace(['...a + b -> a'])` returned `w + y` — `x` vanished. The
-  matcher now restores its state exactly between attempts (the example returns
-  `w+x+y`), and a repeated sequence wildcard (`__a … __a`) whose second
-  occurrence captures a *different* sequence now correctly fails to match
-  instead of proceeding with the inconsistent capture silently dropped.
-
-- **`Mod` and `Remainder` are consistent everywhere.** `Mod(-7, 3)` returned
-  `−1` at the default (bignum) precision but `2` at machine precision, and
-  each compiled target had its own convention (WGSL used the raw truncated
-  `%`; Python's `Remainder` used the floored `np.remainder`). `Mod` is now
-  **floored** (the sign follows the divisor) in both interpreter lanes, in
-  `sgn`, and in every compilation target; `Remainder` is round-to-nearest
-  consistently. `Mod` of exact rationals is now exact
-  (`Mod(\frac12, \frac13)` → `\frac16`, previously a float).
-
-- **MathJSON `.json` serialization is now lossless.** Four independent bugs
-  could silently change a value through a `.json` round-trip: exact big
-  integers emitted as JSON floats (`10^{23}` reconstructed off by 2²³);
-  16–17-digit values altered by one digit; the real part of high-precision
-  complex numbers truncated to machine precision on re-boxing; and the
-  repeating-decimal form `"0.(3)"` re-boxed as a *string*. Values that cannot
-  be represented exactly as a JSON float now emit the `{num: "…"}` form, and
-  the repeating-decimal syntax is accepted by the number parser.
-
-- **Repeating decimals and higher-order derivatives round-trip through
-  LaTeX.** `N(\frac13)` serialized as `0.333\,333` (six digits, no overline —
-  re-parsing lost 3.3×10⁻⁷); it now serializes as `0.\overline{3}`. `f''(x)`
-  serialized to Leibniz notation (`\frac{\mathrm{d}^2}{\mathrm{d}x^2}f(x)`)
-  that the parser could not read back (it re-parsed as a *product of
-  symbols*); degree-carrying Leibniz numerators, including the
-  single-fraction form `\frac{d^2f}{dx^2}`, now parse to properly nested
-  derivatives.
-
-- **NaN no longer corrupts canonical ordering.** Sorting operands with a NaN
-  used a comparator that returned NaN, so the canonical form of a sum or
-  product depended on the order its operands were written in (permutations of
-  `NaN + 0.5 + x + 3.7` produced different canonical forms). NaN now has a
-  deterministic place in the canonical order.
-
-- **`assume(a = b)` between two symbols is no longer silently dropped.** The
-  assumption reported `'ok'` but a type-inference side effect erased the
-  binding, so `a.isEqual(b)` stayed `false`. Additionally, `isEqual` on two
-  distinct *free* symbols returned a definitive `false` — it now consults the
-  assumptions database and returns `undefined` when equality is
-  indeterminate. `.is()` is now symmetric for expression-valued bindings
-  (with `g := x^2+1`, both `g.is(x^2+1)` and `(x^2+1).is(g)` are `true`).
-
-- **Limits of cancelling `\ln`/`\sqrt{}` differences are now exact.**
-  `\lim_{x\to\infty} x(\ln(x+1) - \ln x)` returned `0` (the true value is
-  `1`): the asymptotic ranking saw only the individual — cancelling — leading
-  terms. Such pairs are now combined before ranking (`\ln u - \ln v \to
-  \ln(u/v)`, conjugate quotients for square roots), and these limits evaluate
-  exactly: the example gives `1`, `x(\ln(x+2)-\ln x)` gives `2`,
-  `\sqrt{x}(\sqrt{x+1}-\sqrt{x})` gives `\frac12`, and `\ln(2x)-\ln x` gives
-  `\ln 2`.
-
-- **Compilation fails closed instead of emitting wrong code.** Compiled
-  output disagreed with the interpreter in several ways: `Round` at
-  half-values (three conventions across JS/Python/interpreter),
-  `\operatorname{arccot}` of negative arguments (wrong branch), odd roots of
-  negative numbers (`NaN` instead of `\sqrt[5]{-2} ≈ -1.149`), multi-index
-  `\sum`/`\prod` silently dropping all but the first index (returning NaN
-  with `success: true`), Python emitting `-2 ** x` (which is `-(2^x)`), and
-  missing parentheses when compiling non-canonical `a-(b-c)` / `a/(b/c)`.
-  All now compile to interpreter-matching code — and anything a target
-  *cannot* express correctly (such as constant folds with non-real values)
-  now fails at compile time rather than emitting `NaN` literals. The
-  compilation fallback runner also no longer leaks its argument bindings into
-  the global scope.
-
-- **Parenthesized relations are atomic operands.** In chains mixing
-  parenthesized relations, the canonical form fabricated relations between
-  incidental terms (`(a < b) \le (c > d)` produced a spurious `b \le d`). An
-  explicitly parenthesized relation is now an atomic term of the surrounding
-  chain: `a < (b \le c) > d` means `a < X \wedge d < X` with `X = (b \le c)`.
-
-- **`Choose` and `Binomial` now agree, and handle edge cases.**
-  `Choose(2,3)` returned `NaN` (correct: `0`), `Choose(\frac12, \frac13)`
-  threw an exception, and `Binomial(-2,3)` returned `0` (the standard
-  extension gives `-4`). Both operators now share one implementation:
-  integer cases follow the standard conventions (including negative upper
-  index), exact non-integer arguments stay symbolic under `evaluate()` and
-  numericize via the Gamma function under `N()`. `\binom{n}{k}` with
-  undeclared symbolic arguments also no longer produces an error expression.
-
-- **`Argument` (complex argument) now evaluates.** Due to an internal operator
-  name mismatch, `Argument(1+i)` — and the second element of `AbsArg` —
-  returned an inert, unrecognized expression. It now evaluates exactly
-  (`Argument(1+i)` → `π/4`) and numerically (`N(...)` → `0.7853…`).
-
-- **`|f(x)| → f(|x|)` is no longer applied to periodic or range-limited
-  functions.** `simplify()` rewrote `|\sin x|` to `\sin|x|` (and similarly for
-  `\tan`, `\cot`, `\csc`, and `\operatorname{arccot}`), which is incorrect —
-  e.g. `|\sin 4| = 0.757` but `\sin|4| = −0.757`. The rewrite now applies only
-  to odd functions that keep a fixed sign on the positive axis (`\sinh`,
-  `\arctan`, …). As a consequence, `\int \cot^3 x\,dx` now yields
-  `-\frac12\cot^2 x - \ln(|\sin x|)` instead of the incorrect
-  `\ln(\sin(|x|))` form.
-
-- **Multiplying a scalar by a complex literal like `1+i` no longer drops the
-  real part.** `["Multiply", 2, ["Complex", 1, 1]]` evaluated to `2i` instead
-  of `2+2i` (any complex literal with an imaginary part of exactly 1 was
-  mistaken for the imaginary unit). Parsed LaTeX like `2(1+\imaginaryI)` was
-  not affected.
-
-- **`simplify()` keeps exact exponents when combining powers.** Combining
-  same-base products folded exact irrational exponents to floats:
-  `x \cdot x^{\sqrt{2}}` simplified to `x^{2.4142…}`. It now yields
-  `x^{1+\sqrt{2}}`, and `x^{\sqrt2} \cdot x^{\sqrt3}` yields
-  `x^{\sqrt2+\sqrt3}`, matching the already-exact division direction.
-
-- **`Sum` keeps exact values.** Summing exact but non-combinable terms folded
-  the accumulator to a float: `\sum_{k=1}^{5} \sqrt{k}` evaluated to
-  `8.3823…`. It now evaluates to the exact `3+\sqrt2+\sqrt3+\sqrt5` (`N()`
-  still gives `8.3823…`), matching `Product`'s existing behavior. Purely
-  numeric sums such as `\sum_{k=1}^{100} k` → `5050` are unaffected.
-
-- **The derivative of `arcoth` has the correct sign.**
-  `D(\operatorname{arcoth}(x), x)` returned `-\frac{1}{1-x^2}`; the correct
-  derivative is `\frac{1}{1-x^2}` (at `x=2`: `−1/3`).
+- **LaTeX parsing is 15-28% faster.** Parsing is faster on derivative,
+  polynomial, matrix, and definite-integral inputs, with the same parse results
+  as before.
+
+- **Arbitrary-precision arithmetic is substantially faster.** At 100
+  significant digits, addition, subtraction, multiplication, division, and
+  comparison are now much faster than in 0.66.0, and high-precision `ln`, `exp`,
+  `Gamma`, and related operations also benefit. The improvements are visible in
+  both direct numeric work and symbolic operations that depend on
+  arbitrary-precision arithmetic.
+
+  **Arbitrary-precision arithmetic at 100 significant digits** (ns per
+  operation, lower is better; warm median, distinct operands per call):
+
+  | op     | **CE 0.67.0** | CE 0.66.0 |  math.js¹ | Mathematica² |
+  | ------ | ------------: | --------: | --------: | -----------: |
+  | `add`  |        **75** |       152 |       278 |        1,023 |
+  | `sub`  |        **91** |       167 |       329 |        1,212 |
+  | `mul`  |       **202** |       319 |     7,984 |        1,025 |
+  | `div`  |       **501** |     1,748 |    11,890 |        1,366 |
+  | `cmp`  |        **29** |       198 |        61 |          984 |
+  | `sqrt` |         3,163 |     4,018 |    54,696 |    **1,055** |
+  | `exp`  |         4,795 |     8,698 |   728,876 |    **1,682** |
+  | `ln`   |         5,887 |    32,398 |   670,206 |    **1,353** |
+  | `cos`  |         6,914 |     7,467 | 1,666,292 |    **2,059** |
+
+  <small>¹ math.js `BigNumber` (decimal.js) at precision 100. ² Mathematica 14.3
+  timed inside the kernel with result caches disabled; its ~1 µs per-call
+  dispatch floor dominates its small-op rows. CE and 0.66.0 from
+  `benchmarks/big-decimal/ops-results.json`; reproduce with
+  `node benchmarks/big-decimal/run-ops.mjs` and
+  `wolframscript -file benchmarks/big-decimal/ops-bench.wls`.</small>
+
+  **Symbolic operations** (ms per call, lower is better; warm median, from the
+  cross-library suite in `benchmarks/REPORT.md`):
+
+  | case                    | **CE 0.67.0** | CE 0.66.0 | math.js |   SymPy | Mathematica |
+  | ----------------------- | ------------: | --------: | ------: | ------: | ----------: |
+  | simplify `√(3+2√2)`     |      **0.07** |      0.09 | 🟡 0.92 | 🟡 3.56 |        3.28 |
+  | simplify `√6·x + √2·x`  |      **0.16** |      0.19 |    1.13 |    5.69 |        18.0 |
+  | simplify `(x²−1)/(x−1)` |      **0.10** |      0.15 | 🟡 0.99 |    8.53 |        0.17 |
+  | `d/dx √(1−x²)`          |          0.22 |      0.21 |    2.13 |    5.70 |   **0.008** |
+  | `d/dx xˣ`               |          0.04 |      0.04 |    1.83 |    1.80 |   **0.005** |
+  | `∫ x eˣ dx`             |      **0.08** |      0.09 |       — |    6.53 |        0.57 |
+  | `∫ x/(x²+1) dx`         |      **0.16** |      0.18 |       — |    7.23 |        0.60 |
+  | `lim sin(x)/x`          |      **0.03** |      0.04 |       — |    0.62 |        1.93 |
+  | `lim (1+1/x)ˣ`          |      **0.55** |      1.13 |       — |    2.76 |        5.81 |
+  | solve `x⁴+x²−1 = 0`     |          1.88 |      4.65 |       — |    8.56 |    **0.55** |
+  | solve `x³−x−1 = 0`      |      **0.11** |      1.18 |       — |    5.73 |        0.23 |
+
+  <small>🟡 = value-correct but not fully simplified. — = not supported. SymPy
+  1.14 via `sympify`/`evalf` (per-call parse included, as for every string-based
+  tool). All engines measured warm, per-call from source, same protocol
+  (`benchmarks/REPORT.md`, "Methodology").</small>
+
+- **Integration, assumptions, polynomial solving, and factoring are faster.**
+  Rubi-backed integration spends less time on integrals it cannot solve,
+  sign-related assumption queries respond faster, polynomial equations solve
+  faster, and `Factor` handles common square-pattern cases more efficiently.
 
 ## 0.66.0 _2026-06-28_
 
@@ -40946,9 +40485,11 @@ and its derivative with `D`, for example `["D", ["y", "x"], "x"]`.
 function.
 
 :::info[Note]
-Differential equation support is an initial, deliberately narrow slice:
-`DSolve` handles first-order linear scalar equations, and `NDSolve` handles
-explicit scalar first-order initial value problems. Equations outside these
+Differential equation support is a focused slice. `DSolve` handles first-order
+linear scalar equations, linear constant-coefficient homogeneous equations of
+any order, second-order constant-coefficient nonhomogeneous equations, and
+second-order Cauchy–Euler equations. `NDSolve` handles explicit scalar
+first-order and higher-order initial value problems. Equations outside these
 classes are left unevaluated (returned as-is).
 :::
 
@@ -40968,53 +40509,83 @@ to the independent variable _x_.
 
 ```json example
 ["DSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", "x"]
-// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "C", ["Power", "ExponentialE", "x"]]]]
+// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "c_1", ["Power", "ExponentialE", "x"]]]]
 ```
 
 `DSolve` returns a `List` of solutions, each an `Equal` expression giving
-_y(x)_. An integration constant `C` is introduced (a different name is chosen if
-`C` is already in use).
+_y(x)_. Integration constants are introduced as needed, named `c_1`, `c_2`, …
+(different names are chosen if those are already in use).
 
-Currently `DSolve` solves **first-order linear scalar** equations of the form:
+`DSolve` solves the following classes of equations.
 
-<center>
-$$ y'(x) + p(x)\,y(x) = q(x) $$
-</center>
+**First-order linear scalar** equations of the form
+$y'(x) + p(x)\,y(x) = q(x)$:
 
 | Equation | Solution |
 | :--- | :--- |
-| $y' = y$ | $y = C\,e^{x}$ |
-| $y' = x^2$ | $y = \frac{1}{3}x^3 + C$ |
-| $y' + y = x$ | $y = x - 1 + C\,e^{-x}$ |
-| $y' + 2xy = 0$ | $y = C\,e^{-x^2}$ |
+| $y' = y$ | $y = c_1\,e^{x}$ |
+| $y' = x^2$ | $y = \frac{1}{3}x^3 + c_1$ |
+| $y' + y = x$ | $y = x - 1 + c_1\,e^{-x}$ |
+| $y' + 2xy = 0$ | $y = c_1\,e^{-x^2}$ |
 
-Nonlinear or higher-order equations are not yet supported and are left
-unevaluated (the `DSolve` expression is returned as-is).
+**Linear constant-coefficient homogeneous** equations of any order, solved via
+the characteristic polynomial (distinct real, repeated, and complex roots). Roots
+are kept exact when the characteristic polynomial factors and fall back to
+numeric roots otherwise:
+
+| Equation | Solution |
+| :--- | :--- |
+| $y'' = y$ | $y = c_1\,e^{x} + c_2\,e^{-x}$ |
+| $y'' + y = 0$ | $y = c_1\cos x + c_2\sin x$ |
+| $y'' - 2y' + y = 0$ | $y = (c_1 + c_2\,x)\,e^{x}$ |
+| $y''' - 6y'' + 11y' - 6y = 0$ | $y = c_1\,e^{x} + c_2\,e^{2x} + c_3\,e^{3x}$ |
+
+**Second-order constant-coefficient nonhomogeneous** equations, using
+undetermined coefficients for polynomial forcing and variation of parameters
+otherwise (when the resulting integrals are elementary):
+
+| Equation | Solution |
+| :--- | :--- |
+| $y'' - y = x$ | $y = -x + c_1\,e^{x} + c_2\,e^{-x}$ |
+
+**Second-order Cauchy–Euler** (equidimensional) homogeneous equations
+$a\,x^2 y'' + b\,x\,y' + c\,y = 0$:
+
+| Equation | Solution |
+| :--- | :--- |
+| $x^2 y'' - 2y = 0$ | $y = c_1\,x^2 + c_2\,x^{-1}$ |
+
+Equations outside these classes are not yet supported and are left unevaluated
+(the `DSolve` expression is returned as-is).
 
 </FunctionDefinition>
 
 
 <FunctionDefinition name="NDSolve">
 
-<Signature name="NDSolve" returns="list">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number, _steps_: number?</Signature>
+<Signature name="NDSolve" returns="list">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number | list, _steps_: number?</Signature>
 
 Compute a numerical approximation of the solution of the **initial value
 problem** _eq_ for the function _y_ over the interval given by _limits_, with
 initial value _y0_.
 
-`NDSolve` handles **explicit scalar first-order** initial value problems:
+`NDSolve` handles **explicit scalar** initial value problems, both first-order
+and higher-order:
 
 <center>
 $$ y'(x) = f(x, y), \quad y(x_0) = y_0 $$
+$$ y^{(n)}(x) = f(x, y, y', \ldots, y^{(n-1)}), \quad y(x_0) = y_0,\; y'(x_0) = y_1,\; \ldots $$
 </center>
 
-The equation must isolate the derivative on one side, for example
-`["Equal", ["D", ["y", "x"], "x"], f]`.
+The equation must isolate the highest derivative on one side, for example
+`["Equal", ["D", ["y", "x"], "x"], f]`. Higher-order problems are reduced to a
+first-order system internally.
 
 The _limits_ argument is a `Limits` or `Tuple` of `(x, x0, x1)` giving the
 independent variable and the bounds of the integration interval. _y0_ is the
-value of _y_ at _x0_. The optional _steps_ argument is the number of integration
-steps (default 100).
+value of _y_ at _x0_ for a first-order problem, or a `List` of the initial
+values `[y(x0), y'(x0), …]` for an order-_n_ problem. The optional _steps_
+argument is the number of integration steps (default 100).
 
 ```json example
 ["NDSolve",
@@ -41027,12 +40598,27 @@ steps (default 100).
 // ➔ ["List", ["List", 0, 1], …, ["List", 1, 2.7182818…]]
 ```
 
-`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
-computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. This works
-even when the solution has no elementary closed form.
+For a higher-order problem, pass the initial values as a `List`. For example,
+the second-order IVP $y''(x) = -y(x)$, $y(0) = 0$, $y'(0) = 1$ (whose solution is
+$\sin x$):
 
-Implicit, higher-order, or stiff equations are not yet supported and are left
-unevaluated.
+```json example
+["NDSolve",
+  ["Equal", ["D", ["D", ["y", "x"], "x"], "x"], ["Negate", ["y", "x"]]],
+  "y",
+  ["Tuple", "x", 0, 1],
+  ["List", 0, 1],
+  200
+]
+// ➔ ["List", ["List", 0, 0], …, ["List", 1, 0.8414709…]]
+```
+
+`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
+computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. For a
+higher-order problem, each pair reports the value of _y_ itself (not its
+derivatives). This works even when the solution has no elementary closed form.
+
+Implicit or stiff equations are not yet supported and are left unevaluated.
 
 </FunctionDefinition>
 
@@ -41595,9 +41181,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletCharacter}(p^{\mathrm{e_{var}}}, \ell, n)=\exp(\frac{2\imaginaryI\pi\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})}{\mathrm{Totient}(p^{\mathrm{e_{var}}})})$$
+$$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $3\le p\land\gcd(\ell, p^{\mathrm{e_{var}}})=\gcd(n, p^{\mathrm{e_{var}}})=1\land p\in\mathrm{Primes}\land\mathrm{e_{var}}\in\N^*\land n\in\Z\land\ell\in1..p^{\mathrm{e_{var}}}-1$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..p^{e_{var}}-1\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -41606,7 +41192,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\lbrace a, a\in\N^*\in\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\rbrace)&\top\end{cases}$$
 
-**Holds when** $3\le p\land p\lt1\,000\,000\,000\,000\land p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`540931` · Fungrim entry ↗](https://fungrim.org/entry/540931)
@@ -41624,14 +41210,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\min(\lbrace a, a\in\N^*\in(\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\land\mathrm{Count}(\lbrace a^{k}\bmod p^2, k\in\N\rbrace)=p(p-1))\rbrace)$$
 
-**Holds when** $3\le p\land p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`75231e` · Fungrim entry ↗](https://fungrim.org/entry/75231e)
 
 ---
 
-$$\mathrm{DirichletL}(0, \mathrm{DirichletCharacter}(q, 1))=\begin{cases}\frac{-1}{2}&q=1\\0&\top\end{cases}$$
+$$\mathrm{DirichletL}(0, \mathrm{DirichletCharacter}(q, 1))=\begin{cases}-(\frac{1}{2})&q=1\\0&\top\end{cases}$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
@@ -41649,7 +41235,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(5, 4))=\frac{1}{5}(2\sqrt{5}\ln(\varphi))$$
+$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(5, 4))=\frac{2\ln(\varphi)}{\sqrt{5}}$$
 
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
 Used by the Compute Engine for simplification.
@@ -41657,7 +41243,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(3, 2))=\frac{\pi\sqrt{3}}{9}$$
+$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(3, 2))=\frac{\pi}{\sqrt{27}}$$
 
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
 Used by the Compute Engine for simplification.
@@ -41676,7 +41262,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(q, \ell)\lhd n=\mathrm{DirichletCharacter}(q, \ell, n)$$
 
-**Holds when** $\gcd(\ell, q)=1\land q\in\N^*\land n\in\Z\land\ell\in1..\max(q, 2)-1$.
+**Holds when** $q\in\N^*\land\ell\in1..\max(q, 2)-1\land\gcd(\ell, q)=1\land n\in\Z$.
 **Symbols:** **DirichletCharacter** — Dirichlet character.
 Used by the Compute Engine for simplification.
 [`d9a187` · Fungrim entry ↗](https://fungrim.org/entry/d9a187)
@@ -41729,7 +41315,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(3, \frac{1}{6})=2\sqrt{3}\pi^3+91\Zeta(3)$$
+$$\mathrm{HurwitzZeta}(3, \frac{1}{6})=91\Zeta(3)+2\sqrt{3}\pi^3$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -41747,7 +41333,7 @@ Used by the Compute Engine for simplification.
 
 $$s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, 1)$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land s\ne1\land a\in\C\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`3ba544` · Fungrim entry ↗](https://fungrim.org/entry/3ba544)
@@ -41762,7 +41348,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=8G+\pi^2$$
+$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8G$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -41778,9 +41364,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=\mathrm{RisingFactorial}(-r-s+1, r)\mathrm{HurwitzZeta}(r+s, a)$$
+$$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=\mathrm{RisingFactorial}(1-s-r, r)\mathrm{HurwitzZeta}(s+r, a)$$
 
-**Holds when** $s\ne1\land r+s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N$.
+**Holds when** $s\in\C\land s\ne1\land s+r\ne1\land a\in\C\land\Re(a)\gt0\land r\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`40c3e2` · Fungrim entry ↗](https://fungrim.org/entry/40c3e2)
@@ -41798,7 +41384,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HurwitzZeta}(s, \frac{1}{6})+\mathrm{HurwitzZeta}(s, \frac{5}{6})=(2^{s}-1)(3^{s}-1)\Zeta(s)$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for expansion.
 [`4d1f6b` · Fungrim entry ↗](https://fungrim.org/entry/4d1f6b)
@@ -41813,16 +41399,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{\ln(-z)}{2\imaginaryI\pi}+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{2}-\frac{\ln(-z)}{2\imaginaryI\pi})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
 
-**Holds when** $s\notin\N\land z\notin\lbrace0, 1\rbrace\land s\in\C\land z\in\C$.
+**Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`52ea5f` · Fungrim entry ↗](https://fungrim.org/entry/52ea5f)
 
 ---
 
-$$\Gamma(z)=\exp(\mathrm{HurwitzZeta}(0, z, 1))\sqrt{2\pi}$$
+$$\Gamma(z)=\sqrt{2\pi}\exp(\mathrm{HurwitzZeta}(0, z, 1))$$
 
 **Holds when** $z\in\C\setminus\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -41857,7 +41443,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, a)=\frac{\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)}{a^2}$$
+$$\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)/a^2$$
 
 **Holds when** $a\in\C\setminus\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -41866,7 +41452,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, n+\frac{1}{2})=(2^{s}-1)\Zeta(s)-(\sum_{k=0}^{n-1}(2k+1)^{-s})\times2^{s}$$
+$$\mathrm{HurwitzZeta}(s, \frac{1}{2}+n)=(2^{s}-1)\Zeta(s)-2^{s}(\sum_{k=0}^{n-1}((2k+1)^{s})^{-1})$$
 
 **Holds when** $s\in\C\land n\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -41875,7 +41461,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, n)=\Zeta(s)-(\sum_{k=1}^{n-1}k^{-s})$$
+$$\mathrm{HurwitzZeta}(s, n)=\Zeta(s)-(\sum_{k=1}^{n-1}\frac{1}{k^{s}})$$
 
 **Holds when** $s\in\C\land n\in\N^*$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -41895,7 +41481,7 @@ Used by the Compute Engine for simplification.
 
 $$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=-(s\mathrm{HurwitzZeta}(s+1, a))$$
 
-**Holds when** $0\lt\Re(a)\land s\notin\lbrace0, 1\rbrace\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land s\notin\lbrace0, 1\rbrace\land a\in\C\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`83065e` · Fungrim entry ↗](https://fungrim.org/entry/83065e)
@@ -41910,9 +41496,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=(2^{s}-1)\Zeta(s)\times2^{s}$$
+$$\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=2^{s}(2^{s}-1)\Zeta(s)$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`8bbb6f` · Fungrim entry ↗](https://fungrim.org/entry/8bbb6f)
@@ -41997,7 +41583,7 @@ Used by the Compute Engine for simplification.
 
 $$s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, r)$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N$.
+**Holds when** $s\in\C\land s\ne1\land a\in\C\land\Re(a)\gt0\land r\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`d0d03b` · Fungrim entry ↗](https://fungrim.org/entry/d0d03b)
@@ -42015,7 +41601,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HurwitzZeta}(s, a)=\frac{\mathrm{HurwitzZeta}(s, \frac{a}{2})+\mathrm{HurwitzZeta}(s, \frac{a+1}{2})}{2^{s}}$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land a\in\C\land s\ne1\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`ebc49c` · Fungrim entry ↗](https://fungrim.org/entry/ebc49c)
@@ -42047,7 +41633,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, 3)=-2^{-s}+\Zeta(s)-1$$
+$$\mathrm{HurwitzZeta}(s, 3)=\Zeta(s)-1-\frac{1}{2^{s}}$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -42090,7 +41676,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{MultiZetaValue}(b, a)+\mathrm{MultiZetaValue}(a, b)=\Zeta(a)\Zeta(b)-\Zeta(a+b)$$
+$$\mathrm{MultiZetaValue}(a, b)+\mathrm{MultiZetaValue}(b, a)=\Zeta(a)\Zeta(b)-\Zeta(a+b)$$
 
 **Holds when** $a\in2..\infty\land b\in2..\infty$.
 **Symbols:** **MultiZetaValue** — Multiple zeta value (MZV).
@@ -42135,9 +41721,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\Zeta(-n)=\frac{\mathrm{BernoulliB}(n+1)\times(-1)^{n}}{n+1}$$
+$$\Zeta(-n)=\frac{(-1)^{n}\mathrm{BernoulliB}(n+1)}{n+1}$$
 
-**Holds when** $0\le n\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ge0$.
 **Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`51fd98` · Fungrim entry ↗](https://fungrim.org/entry/51fd98)
@@ -42146,16 +41732,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star$$
 
-**Holds when** $n\ne0\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ne0$.
 **Symbols:** **RiemannZetaZero** — Nontrivial zero of the Riemann zeta function.
 Used by the Compute Engine for simplification.
 [`60c2ec` · Fungrim entry ↗](https://fungrim.org/entry/60c2ec)
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, a)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}$$
+$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})$$
 
-**Holds when** $a\notin\Z_{\le0}\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`60c6da` · Fungrim entry ↗](https://fungrim.org/entry/60c6da)
@@ -42164,7 +41750,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{StieltjesGamma}(n, a+1)=\mathrm{StieltjesGamma}(n, a)-\frac{\ln(a)^{n}}{a}$$
 
-**Holds when** $a\notin\Z_{\le0}\land n\in\N\land a\in\C$.
+**Holds when** $n\in\N\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`687b4d` · Fungrim entry ↗](https://fungrim.org/entry/687b4d)
@@ -42173,13 +41759,13 @@ Used by the Compute Engine for simplification.
 
 $$\Zeta(s^\star)=\Zeta(s)^\star$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 Used by the Compute Engine for expansion.
 [`69348a` · Fungrim entry ↗](https://fungrim.org/entry/69348a)
 
 ---
 
-$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=-2\gamma\ln(2)-\ln(2)^2+\mathrm{StieltjesGamma}(1)$$
+$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\gamma\ln(2)-\ln(2)^2$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -42187,18 +41773,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(2n)=\frac{\mathrm{BernoulliB}(2n)\times(-1)^{n+1}(2\pi)^{2n}}{2(2n)!}$$
+$$\Zeta(2n)=\frac{(-1)^{n+1}\mathrm{BernoulliB}(2n)(2\pi)^{2n}}{2(2n)!}$$
 
-**Holds when** $1\le n\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ge1$.
 **Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`72ccda` · Fungrim entry ↗](https://fungrim.org/entry/72ccda)
 
 ---
 
-$$\Zeta(s)=\sum_{k=1}^{\mathrm{N_{var}}-1}k^{-s}-\int_{\mathrm{N_{var}}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t+\frac{\sum_{k=1}^{M}\frac{\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k)}{(2k)!\mathrm{N_{var}}^{2k-1}}+\frac{1}{2}}{\mathrm{N_{var}}^{s}}+\frac{\mathrm{N_{var}}^{1-s}}{s-1}$$
+$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\sum_{k=1}^{M}(\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k))/((2k)!N_{var}^{2k-1})+\frac{1}{2}}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t$$
 
-**Holds when** $s\ne1\land1\le\mathrm{N_{var}}\land1\le M\land0\lt\Re(2M+s-1)\land s\in\C\land\mathrm{N_{var}}\in\Z\land M\in\Z$.
+**Holds when** $s\in\C\land s\ne1\land N_{var}\in\Z\land M\in\Z\land\Re((s+2M)-1)\gt0\land N_{var}\ge1\land M\ge1$.
 **Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 **References:**
@@ -42223,7 +41809,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}$$
+$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
@@ -42234,14 +41820,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{StieltjesGamma}(0, a)=-\mathrm{Digamma}(a)$$
 
-**Holds when** $a\notin\Z_{\le0}\land a\in\C$.
+**Holds when** $a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`b6808d` · Fungrim entry ↗](https://fungrim.org/entry/b6808d)
 
 ---
 
-$$\mathrm{KeiperLiLambda}(1)=1-\frac{\ln(4\pi)}{2}+\frac{\gamma}{2}$$
+$$\mathrm{KeiperLiLambda}(1)=(\frac{\gamma}{2}+1)-\frac{\ln(4\pi)}{2}$$
 
 **Symbols:** **KeiperLiLambda** — Keiper-Li coefficient.
 Used by the Compute Engine for simplification.
@@ -44234,7 +43820,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sgn}(x)=\begin{cases}1&0\lt x\\-1&x\lt0\\0&x=0\end{cases}$$
+$$\mathrm{sgn}(x)=\begin{cases}1&x\gt0\\-1&x\lt0\\0&x=0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -44258,7 +43844,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert x+\imaginaryI y\vert=\sqrt{x^2+y^2}$$
+$$\vert x+y\imaginaryI\vert=\sqrt{x^2+y^2}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44314,7 +43900,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(x+\imaginaryI y)=x$$
+$$\Re(x+y\imaginaryI)=x$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44337,7 +43923,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x+\imaginaryI y)^\star=x-\imaginaryI y$$
+$$(x+y\imaginaryI)^\star=x-y\imaginaryI$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44345,7 +43931,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arg(x+\imaginaryI y)=\mathrm{Arctan_2}(y, x)$$
+$$\arg(x+y\imaginaryI)=\mathrm{Arctan_2}(y, x)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44353,7 +43939,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(x+\imaginaryI y)=y$$
+$$\Im(x+y\imaginaryI)=y$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44397,7 +43983,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{BernsteinEllipse}(\rho)=\lbrace\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\frac{\exp(-(\imaginaryI\theta))}{\rho}), \theta\in\lbrack0, 2\pi\rparen\rbrace$$
 
-**Holds when** $1\lt\rho\land\rho\in\R$.
+**Holds when** $\rho\in\R\land\rho\gt1$.
 Used by the Compute Engine for simplification.
 [`40baa9` · Fungrim entry ↗](https://fungrim.org/entry/40baa9)
 
@@ -44405,15 +43991,15 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{OpenDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\lt r\rbrace$$
 
-**Holds when** $0\lt r\land z\in\C\land r\in\R$.
+**Holds when** $z\in\C\land r\in\R\land r\gt0$.
 Used by the Compute Engine for simplification.
 [`c98bad` · Fungrim entry ↗](https://fungrim.org/entry/c98bad)
 
 ---
 
-$$\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\le r\rbrace$$
+$$\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in(\vert z-t\vert\le r)\rbrace$$
 
-**Holds when** $0\le r\land z\in\C\land r\in\R$.
+**Holds when** $z\in\C\land r\in\R\land r\ge0$.
 Used by the Compute Engine for simplification.
 [`d1cf0c` · Fungrim entry ↗](https://fungrim.org/entry/d1cf0c)
 
@@ -44428,7 +44014,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^{z}=\imaginaryI\sin(\frac{\pi z}{2})+\cos(\frac{\pi z}{2})$$
+$$\imaginaryI^{z}=\cos(\frac{\pi z}{2})+\sin(\frac{\pi z}{2})\imaginaryI$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -44436,7 +44022,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(2, \imaginaryI)=\imaginaryI G-\frac{\pi^2}{48}$$
+$$\mathrm{PolyLog}(2, \imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)
@@ -44457,7 +44043,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(1+\pi\coth(\pi))$$
+$$\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(\pi\coth(\pi)+1)$$
 
 Used by the Compute Engine for simplification.
 [`3ac0ce` · Fungrim entry ↗](https://fungrim.org/entry/3ac0ce)
@@ -44528,7 +44114,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^{z}=\exp(\frac{\imaginaryI\pi z}{2})$$
+$$\imaginaryI^{z}=\exp(\frac{\pi\imaginaryI z}{2})$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -45224,7 +44810,7 @@ slug: /compute-engine/reference/fungrim-gamma/
 
 # Gamma and related functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **123 identities** for gamma and related functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **135 identities** for gamma and related functions.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -45233,16 +44819,16 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 ## Contents
 
 - [Barnes G-function](#barnes-g-function) (27)
-- [Beta function](#beta-function) (11)
+- [Beta function](#beta-function) (13)
 - [Digamma function](#digamma-function) (39)
-- [Factorials and binomial coefficients](#factorials-and-binomial-coefficients) (22)
+- [Factorials and binomial coefficients](#factorials-and-binomial-coefficients) (32)
 - [Gamma function](#gamma-function) (24)
 
 ## Barnes G-function
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{1}{2}(-(1+\gamma)z^2)+\frac{1}{2}(z(\ln(2\pi)-1))+\sum_{n=3}^{\infty}\frac{1}{n}(\Zeta(n-1)\times(-1)^{n+1}z^{n})$$
+$$\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\gamma)z^2)+\sum_{n=3}^{\infty}\frac{1}{n}(\Zeta(n-1)\times(-1)^{n+1}z^{n})$$
 
-**Holds when** $\vert z\vert\lt1\land z\in\C$.
+**Holds when** $z\in\C\land\vert z\vert\lt1$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`0ad263` · Fungrim entry ↗](https://fungrim.org/entry/0ad263)
@@ -45258,16 +44844,16 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=-(z\ln(2\pi))+\mathrm{LogBarnesG}(z+1)+\begin{cases}\int_{0}^{\imaginaryI}\!\pi x\cot(\pi x)\, \mathrm{d}x+\int_{\imaginaryI}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x&\Re(z)\lt1\land\Im(z)=0\lor0\lt\Im(z)\lor-1\lt\Re(z)\lt1\\\int_{0}^{-\imaginaryI}\!\pi x\cot(\pi x)\, \mathrm{d}x+\int_{-\imaginaryI}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x&-1\lt\Re(z)\land\Im(z)=0\lor\Im(z)\lt0\lor-1\lt\Re(z)\lt1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)-\ln(2\pi)z+\begin{cases}\int_{0}^{\imaginaryI}\!\pi x\cot(\pi x)\, \mathrm{d}x+\int_{\imaginaryI}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x&-1\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\\int_{0}^{-\imaginaryI}\!\pi x\cot(\pi x)\, \mathrm{d}x+\int_{-\imaginaryI}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x&-1\lt\Re(z)\lt1\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
-**Holds when** $z\notin\Z\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`23ed69` · Fungrim entry ↗](https://fungrim.org/entry/23ed69)
 
 ---
 
-$$\mathrm{BarnesG}(n)=\begin{cases}\prod_{k=1}^{n-2}k!&1\le n\\0&n\le0\end{cases}$$
+$$\mathrm{BarnesG}(n)=\begin{cases}\prod_{k=1}^{n-2}k!&n\ge1\\0&n\le0\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -45278,16 +44864,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{LogBarnesG}(z+1)=\mathrm{GammaLn}(z)+\mathrm{LogBarnesG}(z)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`5261e3` · Fungrim entry ↗](https://fungrim.org/entry/5261e3)
 
 ---
 
-$$\mathrm{BarnesG}(1-x)=\mathrm{BarnesG}(x+1)\times(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\exp(\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi})\frac{\vert\sin(\pi x)\vert}{\pi}^{x}$$
+$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi})$$
 
-**Holds when** $x\notin-\infty..-1\land x\in\R$.
+**Holds when** $x\in\R\land x\notin-\infty..-1$.
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1145/384101.384104)
@@ -45295,27 +44881,27 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&0\lt x\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{1}{2}(\imaginaryI\pi(\lfloor x\rfloor-1)\lfloor x\rfloor)&\top\end{cases}$$
+$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{\lfloor x\rfloor}{2}(\lfloor x\rfloor-1)\pi\imaginaryI&\top\end{cases}$$
 
-**Holds when** $x\notin\Z_{\le0}\land x\in\R$.
+**Holds when** $x\in\R\land x\notin\Z_{\le0}$.
 **Symbols:** **BarnesG** — Barnes G-function; **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`5a11eb` · Fungrim entry ↗](https://fungrim.org/entry/5a11eb)
 
 ---
 
-$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(z)=(-z+(z-1)\mathrm{Digamma}(z)+\frac{1}{2}(1+\ln(2\pi)))\mathrm{BarnesG}(z)$$
+$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(z)=\mathrm{BarnesG}(z)((z-1)\mathrm{Digamma}(z)-z+\frac{1}{2}(\ln(2\pi)+1))$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
 [`5babc2` · Fungrim entry ↗](https://fungrim.org/entry/5babc2)
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{z^2}{4}+z\mathrm{GammaLn}(z)-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!\frac{(\frac{-x}{12}-\frac{1}{x}+\frac{1}{1-\exp(-x)}-\frac{1}{2})\exp(-(xz))}{x^2}\, \mathrm{d}x-\frac{1}{2}(\ln(z)\mathrm{BernoulliPolynomial}(2, z))$$
+$$\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(((-x)/12-1/x+1/(1-\exp(-x))-1/2)\exp(-(xz)))/x^2\, \mathrm{d}x$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [arxiv.org](https://arxiv.org/abs/math/0308086)
@@ -45332,9 +44918,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{z^2}{4}-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)+z\mathrm{GammaLn}(z+1)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{\mathrm{N_{var}}-1}\frac{\mathrm{BernoulliB}(2n+2)}{4n(n+1)(2n+1)z^{2n}}+\mathrm{LogBarnesGRemainder}(\mathrm{N_{var}}, z)$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
 
-**Holds when** $z\notin\lparen-\infty, 0\rbrack\land z\in\C\land\mathrm{N_{var}}\in\N^*$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land N_{var}\in\N^*$.
 **Symbols:** **BernoulliB** — Bernoulli number; **LogBarnesG** — Logarithmic Barnes G-function; **LogBarnesGRemainder** — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [dx.doi.org](https://dx.doi.org/10.1098/rspa.2014.0534)
@@ -45342,9 +44928,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(z+1)+\begin{cases}\frac{1}{2}(\imaginaryI\pi(z^2-z+\frac{1}{6}))-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi z))}{2\pi}&\Re(z)\lt1\land\Im(z)=0\lor0\lt\Im(z)\lor0\lt\Re(z)\lt1\\-(\frac{1}{2}(\imaginaryI\pi((-z)^2+z+1/6))+z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(z+1))-\frac{\imaginaryI\mathrm{PolyLog}(2, \exp(-2\imaginaryI\pi z))}{2\pi})&-1\lt\Re(z)\land\Im(z)=0\lor\Im(z)\lt0\lor-1\lt\Re(z)\lt0\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
-**Holds when** $z\notin\Z\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`82b410` · Fungrim entry ↗](https://fungrim.org/entry/82b410)
@@ -45353,14 +44939,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{BarnesG}(z+1)=\Gamma(z)\mathrm{BarnesG}(z)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
 [`86b3ec` · Fungrim entry ↗](https://fungrim.org/entry/86b3ec)
 
 ---
 
-$$\mathrm{BarnesG}(\frac{1}{2})=\frac{\sqrt[24]{2}\sqrt[8]{\exponentialE}}{\sqrt[4]{\pi}\sqrt{\mathrm{ConstGlaisher}}^{3}}$$
+$$\mathrm{BarnesG}(\frac{1}{2})=\frac{\sqrt[24]{2}\exp(\frac{1}{8})}{\sqrt[4]{\pi}\sqrt{\mathrm{ConstGlaisher}}^{3}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -45368,9 +44954,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z)-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
 
-**Holds when** $z\notin\lparen-\infty, -1\rbrack\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [arxiv.org](https://arxiv.org/abs/math/0308086)
@@ -45380,7 +44966,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{LogBarnesG}(z+1)=\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x$$
 
-**Holds when** $z\notin\lparen-\infty, -1\rbrack\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [arxiv.org](https://arxiv.org/abs/math/0308086)
@@ -45388,18 +44974,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\mathrm{LogBarnesG}(x))=\frac{1}{2}(\pi(\lfloor x\rfloor-1)\lfloor x\rfloor)$$
+$$\Im(\mathrm{LogBarnesG}(x))=\frac{1}{2}(\lfloor x\rfloor(\lfloor x\rfloor-1)\pi)$$
 
-**Holds when** $x\lt0\land x\notin\Z\land x\in\R$.
+**Holds when** $x\in\R\land x\lt0\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`a044e1` · Fungrim entry ↗](https://fungrim.org/entry/a044e1)
 
 ---
 
-$$z\mapsto\mathrm{LogBarnesG}(z)^{\prime}(z)=-z+(z-1)\mathrm{Digamma}(z)+\frac{1}{2}(1+\ln(2\pi))$$
+$$z\mapsto\mathrm{LogBarnesG}(z)^{\prime}(z)=(z-1)\mathrm{Digamma}(z)-z+\frac{1}{2}(\ln(2\pi)+1)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`af31ae` · Fungrim entry ↗](https://fungrim.org/entry/af31ae)
@@ -45415,18 +45001,18 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=-(z\ln(2\pi))+\mathrm{LogBarnesG}(z+1)+\int_{0}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)-\ln(2\pi)z+\int_{0}^{z}\!\pi x\cot(\pi x)\, \mathrm{d}x$$
 
-**Holds when** $z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`b6017f` · Fungrim entry ↗](https://fungrim.org/entry/b6017f)
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{1}{4}((2\ln(z)-3)z^2)+\frac{1}{2}(z\ln(2\pi))-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!\frac{x\ln(x^2+z^2)}{\exp(2\pi x)-1}\, \mathrm{d}x+\frac{1}{12}$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{1}{4}(z^2(2\ln(z)-3))+\frac{1}{2}(z\ln(2\pi))+\frac{1}{12})-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!\frac{x\ln(x^2+z^2)}{\exp(2\pi x)-1}\, \mathrm{d}x$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [arxiv.org](https://arxiv.org/abs/math/0308086)
@@ -45434,7 +45020,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(\frac{3}{32}-\frac{G}{4\pi})}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
+$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-G/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -45442,16 +45028,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-x)=x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi}+\mathrm{LogBarnesG}(x+1)+\frac{1}{2}(\imaginaryI\pi(\lfloor x\rfloor+1)\mathrm{sgn}(x)\lfloor x\rfloor)$$
+$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
 
-**Holds when** $x\notin\Z\land x\in\R$.
+**Holds when** $x\in\R\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`d1a0ec` · Fungrim entry ↗](https://fungrim.org/entry/d1a0ec)
 
 ---
 
-$$\mathrm{LogBarnesG}(n)=\begin{cases}\ln(\mathrm{BarnesG}(n))&1\le n\\-\infty&n\le0\end{cases}$$
+$$\mathrm{LogBarnesG}(n)=\begin{cases}\ln(\mathrm{BarnesG}(n))&n\ge1\\-\infty&n\le0\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **BarnesG** — Barnes G-function; **LogBarnesG** — Logarithmic Barnes G-function.
@@ -45460,7 +45046,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{G}{4\pi})\sqrt[4]{\Gamma(1/4)}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
+$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{G}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -45468,16 +45054,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z)=(z-1)\mathrm{GammaLn}(z)+s\mapsto\Zeta(s)^{\prime}(-1)-\mathrm{HurwitzZeta}(-1, z, 1)$$
+$$\mathrm{LogBarnesG}(z)=(z-1)\mathrm{GammaLn}(z)-\mathrm{HurwitzZeta}(-1, z, 1)+s\mapsto\Zeta(s)^{\prime}(-1)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **LogBarnesG** — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 [`e05807` · Fungrim entry ↗](https://fungrim.org/entry/e05807)
 
 ---
 
-$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\((\mathrm{HarmonicNumber}(n-2)-1-\gamma)(n-1)+\frac{1}{2}+\frac{\ln(2\pi)}{2})\mathrm{BarnesG}(n)&2\le n\end{cases}$$
+$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\gamma-1)+\frac{1}{2})&n\ge2\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -45488,7 +45074,7 @@ Used by the Compute Engine for simplification.
 
 ## Beta function
 
-$$\Beta(m, n)=\frac{(m-1)!(n-1)!}{(m+n-1)!}$$
+$$\Beta(m, n)=\frac{(m-1)!(n-1)!}{((m+n)-1)!}$$
 
 **Holds when** $m\in\N^*\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -45507,10 +45093,18 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{IncompleteBetaRegularized}(x, a, b)=1-\mathrm{IncompleteBetaRegularized}(1-x, b, a)$$
 
-**Holds when** $a+b\notin\Z_{\le0}\land x\in\C\land a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}$.
+**Holds when** $x\in\C\land a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}\land a+b\notin\Z_{\le0}$.
 **Symbols:** **IncompleteBetaRegularized** — Regularized incomplete beta function.
 Used by the Compute Engine for simplification.
 [`315b3d` · Fungrim entry ↗](https://fungrim.org/entry/315b3d)
+
+---
+
+$$\Beta(n, b)=\begin{cases}\tilde\infty&-b\in0..n-1\\(n\binom{(n+b)-1}{n})^{-1}&\top\end{cases}$$
+
+**Holds when** $n\in\N^*\land b\in\C$.
+Used by the Compute Engine for simplification.
+[`72db94` · Fungrim entry ↗](https://fungrim.org/entry/72db94)
 
 ---
 
@@ -45519,6 +45113,14 @@ $$\Beta(a, b)=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}$$
 **Holds when** $a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`888581` · Fungrim entry ↗](https://fungrim.org/entry/888581)
+
+---
+
+$$\Beta(-n, b)=\begin{cases}\frac{(-1)^{b}}{b\binom{n}{b}}&b\in1..n\\\tilde\infty&\top\end{cases}$$
+
+**Holds when** $n\in\N\land b\in\C$.
+Used by the Compute Engine for simplification.
+[`a7dbf6` · Fungrim entry ↗](https://fungrim.org/entry/a7dbf6)
 
 ---
 
@@ -45531,7 +45133,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Beta(m, n)=(m\mathrm{Binomial}(m+n-1, m))^{-1}$$
+$$\Beta(m, n)=(m\binom{(m+n)-1}{m})^{-1}$$
 
 **Holds when** $m\in\N^*\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -45549,7 +45151,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{IncompleteBetaRegularized}(x, a, b)=\frac{\mathrm{IncompleteBeta}(x, a, b)}{\Beta(a, b)}$$
 
-**Holds when** $a+b\notin\Z_{\le0}\land x\in\C\land a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}$.
+**Holds when** $x\in\C\land a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}\land a+b\notin\Z_{\le0}$.
 **Symbols:** **IncompleteBeta** — Incomplete beta function; **IncompleteBetaRegularized** — Regularized incomplete beta function.
 Used by the Compute Engine for simplification.
 [`c92da4` · Fungrim entry ↗](https://fungrim.org/entry/c92da4)
@@ -45574,7 +45176,7 @@ Used by the Compute Engine for simplification.
 
 $$\Beta(a, b)\Beta(a+b, c)=\Beta(b, c)\Beta(a, b+c)$$
 
-**Holds when** $a+b\notin\Z_{\le0}\land b+c\notin\Z_{\le0}\land a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}\land c\in\C\setminus\Z_{\le0}$.
+**Holds when** $a\in\C\setminus\Z_{\le0}\land b\in\C\setminus\Z_{\le0}\land c\in\C\setminus\Z_{\le0}\land a+b\notin\Z_{\le0}\land b+c\notin\Z_{\le0}$.
 Used by the Compute Engine for expansion.
 [`fd0e48` · Fungrim entry ↗](https://fungrim.org/entry/fd0e48)
 
@@ -45592,30 +45194,29 @@ Used by the Compute Engine for simplification.
 
 $$\Im(\mathrm{Digamma}(\imaginaryI y))=\frac{1}{2}(\pi\coth(\pi y))+\frac{1}{2y}$$
 
-**Holds when** $y\ne0\land y\in\R$.
+**Holds when** $y\in\R\land y\ne0$.
 Used by the Compute Engine for simplification.
 [`03e2a6` · Fungrim entry ↗](https://fungrim.org/entry/03e2a6)
 
 ---
 
-$$\mathrm{Digamma}(z+1)=\frac{1}{z}+\mathrm{Digamma}(z)$$
+$$\mathrm{Digamma}(z+1)=\mathrm{Digamma}(z)+\frac{1}{z}$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`11dfd2` · Fungrim entry ↗](https://fungrim.org/entry/11dfd2)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{6})=-2\ln(2)-\frac{3\ln(3)}{2}-\gamma-\frac{\pi\sqrt{3}}{2}$$
+$$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
 
-Used by the Compute Engine for simplification.
 [`177de7` · Fungrim entry ↗](https://fungrim.org/entry/177de7)
 
 ---
 
-$$\Im(\mathrm{Digamma}(\imaginaryI y+1))=\frac{1}{2}(\pi\coth(\pi y))-\frac{1}{2y}$$
+$$\Im(\mathrm{Digamma}(1+\imaginaryI y))=\frac{1}{2}(\pi\coth(\pi y))-\frac{1}{2y}$$
 
-**Holds when** $y\ne0\land y\in\R$.
+**Holds when** $y\in\R\land y\ne0$.
 Used by the Compute Engine for simplification.
 [`22a9cd` · Fungrim entry ↗](https://fungrim.org/entry/22a9cd)
 
@@ -45639,7 +45240,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{p}{q})=-\ln(2q)+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{2\pi kp}{q})\ln(\sin((\pi k)/q)))-\frac{1}{2}(\pi\cot(\frac{\pi p}{q}))-\gamma$$
+$$\mathrm{Digamma}(\frac{p}{q})=-\gamma-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))$$
 
 **Holds when** $q\in2..\infty\land p\in1..q-1$.
 Used by the Compute Engine for simplification.
@@ -45655,24 +45256,23 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{2}{3})=\frac{-3\ln(3)}{2}+\frac{\pi\sqrt{3}}{6}-\gamma$$
+$$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\gamma-\frac{3\ln(3)}{2}$$
 
-Used by the Compute Engine for simplification.
 [`45a969` · Fungrim entry ↗](https://fungrim.org/entry/45a969)
 
 ---
 
 $$\mathrm{Digamma}(z)=z\mapsto\mathrm{GammaLn}(z)^{\prime}(z)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`4b6ccb` · Fungrim entry ↗](https://fungrim.org/entry/4b6ccb)
 
 ---
 
-$$\mathrm{Digamma}(z)=-\int_{0}^{\infty}\!(\frac{-1}{t}+\frac{1}{\exponentialE^{t}-1}+\frac{1}{2})\exp(-(tz))\, \mathrm{d}t-\frac{1}{2z}+\ln(z)$$
+$$\mathrm{Digamma}(z)=\ln(z)-\frac{1}{2z}-\int_{0}^{\infty}\!\exp(-(zt))(1/2-1/t+\frac{1}{\exponentialE^{t}-1})\, \mathrm{d}t$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`4f5575` · Fungrim entry ↗](https://fungrim.org/entry/4f5575)
 
@@ -45680,23 +45280,23 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Digamma}(z-n)=\mathrm{Digamma}(z)-(\sum_{k=1}^{n}\frac{1}{z-k})$$
 
-**Holds when** $z-n\notin\Z_{\le0}\land z\in\C\land n\in\N$.
+**Holds when** $z\in\C\land n\in\N\land z-n\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`554ac2` · Fungrim entry ↗](https://fungrim.org/entry/554ac2)
 
 ---
 
-$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}\frac{1}{n+1}-\frac{1}{n+z})-\gamma$$
+$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}1/(n+1)-1/(n+z))-\gamma$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`686524` · Fungrim entry ↗](https://fungrim.org/entry/686524)
 
 ---
 
-$$\Im(\mathrm{Digamma}(\imaginaryI y+\frac{1}{2}))=\frac{1}{2}(\pi\tanh(\pi y))$$
+$$\Im(\mathrm{Digamma}(\frac{1}{2}+\imaginaryI y))=\frac{1}{2}(\pi\tanh(\pi y))$$
 
-**Holds when** $y\ne0\land y\in\R$.
+**Holds when** $y\in\R\land y\ne0$.
 Used by the Compute Engine for simplification.
 [`6f3fec` · Fungrim entry ↗](https://fungrim.org/entry/6f3fec)
 
@@ -45709,60 +45309,55 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{4})=-3\ln(2)-\gamma-\frac{\pi}{2}$$
+$$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\gamma-3\ln(2)$$
 
-Used by the Compute Engine for simplification.
 [`7ec4f0` · Fungrim entry ↗](https://fungrim.org/entry/7ec4f0)
 
 ---
 
 $$\mathrm{Digamma}(z)=\frac{1}{\Gamma(z)}(z\mapsto\Gamma(z)^{\prime}(z))$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`8415c7` · Fungrim entry ↗](https://fungrim.org/entry/8415c7)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{2})=-\gamma-2\ln(2)$$
+$$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\gamma$$
 
-Used by the Compute Engine for simplification.
 [`89bed3` · Fungrim entry ↗](https://fungrim.org/entry/89bed3)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{8})=-4\ln(2)-\frac{1}{2}(\sqrt{2}(\ln(2+2^{1/2})-\ln(2-2^{1/2})))-\gamma-\frac{1}{2}(\pi(1+\sqrt{2}))$$
+$$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\gamma-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
 
-Used by the Compute Engine for simplification.
 [`8c368f` · Fungrim entry ↗](https://fungrim.org/entry/8c368f)
 
 ---
 
-$$\mathrm{Digamma}(\frac{5}{6})=-2\ln(2)-\frac{3\ln(3)}{2}+\frac{\pi\sqrt{3}}{2}-\gamma$$
+$$\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
 
-Used by the Compute Engine for simplification.
 [`967bbb` · Fungrim entry ↗](https://fungrim.org/entry/967bbb)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{3})=\frac{-3\ln(3)}{2}-\gamma-\frac{\pi\sqrt{3}}{6}$$
+$$\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\gamma-\frac{3\ln(3)}{2}$$
 
-Used by the Compute Engine for simplification.
 [`98f642` · Fungrim entry ↗](https://fungrim.org/entry/98f642)
 
 ---
 
-$$\mathrm{Digamma}(n+z)=\sum_{k=0}^{n-1}\frac{1}{k+z}+\mathrm{Digamma}(z)$$
+$$\mathrm{Digamma}(z+n)=\mathrm{Digamma}(z)+\sum_{k=0}^{n-1}\frac{1}{z+k}$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C\land n\in\N$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`9f32fe` · Fungrim entry ↗](https://fungrim.org/entry/9f32fe)
 
 ---
 
-$$\mathrm{Digamma}(z)=\sum_{n=1}^{\infty}\Zeta(n+1)\times(-1)^{n+1}z^{n}-\frac{1}{z}-\gamma$$
+$$\mathrm{Digamma}(z)=-(\frac{1}{z})-\gamma+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}$$
 
-**Holds when** $\vert z\vert\lt1\land z\in\C$.
+**Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
 [`a2675b` · Fungrim entry ↗](https://fungrim.org/entry/a2675b)
 
@@ -45770,7 +45365,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\gamma$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`a4cc3b` · Fungrim entry ↗](https://fungrim.org/entry/a4cc3b)
 
@@ -45778,7 +45373,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Digamma}(z)=-\mathrm{StieltjesGamma}(0, z)$$
 
-**Holds when** $z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`a6bdf5` · Fungrim entry ↗](https://fungrim.org/entry/a6bdf5)
@@ -45800,50 +45395,50 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(1-z)=\pi\cot(\pi z)+\mathrm{Digamma}(z)$$
+$$\mathrm{Digamma}(1-z)=\mathrm{Digamma}(z)+\pi\cot(\pi z)$$
 
-**Holds when** $z\notin\Z\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\Z$.
 Used by the Compute Engine for simplification.
 [`adf5e2` · Fungrim entry ↗](https://fungrim.org/entry/adf5e2)
 
 ---
 
-$$\mathrm{Digamma}(z-n)=\sum_{k=1}^{\infty}(\Zeta(k+1)\times(-1)^{k+1}+\sum_{j=1}^{n}j^{(-1)-k})z^{k}+\mathrm{Digamma}(n+1)-\frac{1}{z}$$
+$$\mathrm{Digamma}(z-n)=\mathrm{Digamma}(n+1)-\frac{1}{z}+\sum_{k=1}^{\infty}((-1)^{k+1}\Zeta(k+1)+\sum_{j=1}^{n}\frac{1}{j^{k+1}})z^{k}$$
 
-**Holds when** $\vert z\vert\lt1\land n\in\N\land z\in\C$.
+**Holds when** $n\in\N\land z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
 [`b4825b` · Fungrim entry ↗](https://fungrim.org/entry/b4825b)
 
 ---
 
-$$\mathrm{Digamma}(z+1)=(\sum_{n=1}^{\infty}\Zeta(n+1)\times(-1)^{n+1}z^{n})-\gamma$$
+$$\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\gamma$$
 
-**Holds when** $\vert z\vert\lt1\land z\in\C$.
+**Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
 [`c76eaf` · Fungrim entry ↗](https://fungrim.org/entry/c76eaf)
 
 ---
 
-$$\mathrm{Digamma}(z)=-(\sum_{n=1}^{\mathrm{N_{var}}-1}\frac{\mathrm{BernoulliB}(2n)}{2nz^{2n}})-\frac{1}{2z}+\ln(z)+z\mapsto\mathrm{StirlingSeriesRemainder}(\mathrm{N_{var}}, z)^{\prime}(z)$$
+$$\mathrm{Digamma}(z)=\ln(z)-\frac{1}{2z}-(\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n)}{2nz^{2n}})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
 
-**Holds when** $\mathrm{N_{var}}\in\N\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N$.
 **Symbols:** **BernoulliB** — Bernoulli number; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
 Used by the Compute Engine for simplification.
 [`cf5355` · Fungrim entry ↗](https://fungrim.org/entry/cf5355)
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!(\frac{1}{t}-\frac{1}{1-\exp(-t)})\exp(-(tz))\, \mathrm{d}t+\ln(z)$$
+$$\mathrm{Digamma}(z)=\ln(z)+\int_{0}^{\infty}\!\exp(-(zt))(\frac{1}{t}-\frac{1}{1-\exp(-t)})\, \mathrm{d}t$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`cfb999` · Fungrim entry ↗](https://fungrim.org/entry/cfb999)
 
 ---
 
-$$\mathrm{Digamma}(z)=-2\int_{0}^{\infty}\!(t)((t^2+z^2)(\exp(2\pi t)-1))^{-1}\, \mathrm{d}t-\frac{1}{2z}+\ln(z)$$
+$$\mathrm{Digamma}(z)=\ln(z)-\frac{1}{2z}-2\int_{0}^{\infty}\!(t)((t^2+z^2)(\exp(2\pi t)-1))^{-1}\, \mathrm{d}t$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`d9c818` · Fungrim entry ↗](https://fungrim.org/entry/d9c818)
 
@@ -45858,7 +45453,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\gamma$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/GammaBetaErf/PolyGamma/26/01/01/0001/)
 [`ee3dc5` · Fungrim entry ↗](https://fungrim.org/entry/ee3dc5)
@@ -45867,22 +45462,21 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(k/n+z))$$
 
-**Holds when** $nz\notin\Z_{\le0}\land n\in\N^*\land z\in\C$.
+**Holds when** $n\in\N^*\land z\in\C\land nz\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`eec21a` · Fungrim entry ↗](https://fungrim.org/entry/eec21a)
 
 ---
 
-$$\mathrm{Digamma}(\frac{3}{4})=-3\ln(2)+\frac{\pi}{2}-\gamma$$
+$$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\gamma-3\ln(2)$$
 
-Used by the Compute Engine for simplification.
 [`f93bae` · Fungrim entry ↗](https://fungrim.org/entry/f93bae)
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(tz))}{1-\exp(-t)}\, \mathrm{d}t-\gamma$$
+$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\gamma$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`f946a5` · Fungrim entry ↗](https://fungrim.org/entry/f946a5)
 
@@ -45890,7 +45484,7 @@ Used by the Compute Engine for simplification.
 
 ## Factorials and binomial coefficients
 
-$$\mathrm{RisingFactorial}(z, k+m)=\mathrm{RisingFactorial}(z, k)\mathrm{RisingFactorial}(k+z, m)$$
+$$\mathrm{RisingFactorial}(z, k+m)=\mathrm{RisingFactorial}(z, k)\mathrm{RisingFactorial}(z+k, m)$$
 
 **Holds when** $z\in\C\land k\in\N\land m\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -45899,7 +45493,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Binomial}(2n, n)=\frac{(2n)!}{n!^2}$$
+$$\binom{z+1}{k+1}=\binom{z}{k}+\binom{z}{k+1}$$
+
+**Holds when** $z\in\C\land k\in\N$.
+Used by the Compute Engine for simplification.
+[`081188` · Fungrim entry ↗](https://fungrim.org/entry/081188)
+
+---
+
+$$\binom{2n}{n}=\frac{(2n)!}{n!^2}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -45916,7 +45518,41 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Binomial}(n, k)=\mathrm{Binomial}(n, n-k)$$
+$$\binom{z}{k}=\frac{\mathrm{FallingFactorial}(z, k)}{k!}$$
+
+**Holds when** $z\in\C\land k\in\N$.
+**Symbols:** **FallingFactorial** — Falling factorial.
+Used by the Compute Engine for simplification.
+[`1d5e92` · Fungrim entry ↗](https://fungrim.org/entry/1d5e92)
+
+---
+
+$$\binom{z}{2}=\frac{z(z-1)}{2}$$
+
+**Holds when** $z\in\C$.
+Used by the Compute Engine for simplification.
+[`1df686` · Fungrim entry ↗](https://fungrim.org/entry/1df686)
+
+---
+
+$$\binom{z}{k+1}=\frac{(z-k)\binom{z}{k}}{k+1}$$
+
+**Holds when** $z\in\C\land k\in\N$.
+Used by the Compute Engine for simplification.
+[`209fc8` · Fungrim entry ↗](https://fungrim.org/entry/209fc8)
+
+---
+
+$$\binom{z}{k}=\frac{1}{k!}(\mathrm{RisingFactorial}(z-k+1, k))$$
+
+**Holds when** $z\in\C\land k\in\N$.
+**Symbols:** **RisingFactorial** — Rising factorial.
+Used by the Compute Engine for simplification.
+[`22ee07` · Fungrim entry ↗](https://fungrim.org/entry/22ee07)
+
+---
+
+$$\binom{n}{k}=\binom{n}{n-k}$$
 
 **Holds when** $n\in\N\land k\in0..n$.
 Used by the Compute Engine for simplification.
@@ -45924,7 +45560,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RisingFactorial}(n, k)=\frac{(k+n-1)!}{(n-1)!}$$
+$$\mathrm{RisingFactorial}(n, k)=\frac{((n+k)-1)!}{(n-1)!}$$
 
 **Holds when** $n\in\N^*\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -45933,7 +45569,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Binomial}(n, k)=(n!)(k!(n-k)!)^{-1}$$
+$$\binom{n}{k}=(n!)(k!(n-k)!)^{-1}$$
 
 **Holds when** $n\in\N\land k\in\N$.
 Used by the Compute Engine for simplification.
@@ -45952,14 +45588,14 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((k+z)\mathrm{RisingFactorial}(z, k))$$
 
-**Holds when** $k\in\N\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $z\in\C\setminus\lbrace0\rbrace\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`41f950` · Fungrim entry ↗](https://fungrim.org/entry/41f950)
 
 ---
 
-$$\mathrm{Binomial}(n, m+n)=0$$
+$$\binom{n}{n+m}=0$$
 
 **Holds when** $n\in\N\land m\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -45975,12 +45611,28 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\binom{z}{k}=(-1)^{k}\binom{k-z-1}{k}$$
+
+**Holds when** $z\in\C\land k\in\N$.
+Used by the Compute Engine for simplification.
+[`56d4ff` · Fungrim entry ↗](https://fungrim.org/entry/56d4ff)
+
+---
+
 $$\mathrm{FallingFactorial}(z, 0)=1$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **FallingFactorial** — Falling factorial.
 Used by the Compute Engine for simplification.
 [`5b414d` · Fungrim entry ↗](https://fungrim.org/entry/5b414d)
+
+---
+
+$$\binom{z}{1}=z$$
+
+**Holds when** $z\in\C$.
+Used by the Compute Engine for simplification.
+[`5b85bf` · Fungrim entry ↗](https://fungrim.org/entry/5b85bf)
 
 ---
 
@@ -45992,7 +45644,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Binomial}(n, n)=1$$
+$$\binom{z+1}{k+1}=\frac{(z+1)\binom{z}{k}}{k+1}$$
+
+**Holds when** $z\in\C\land k\in\N$.
+Used by the Compute Engine for simplification.
+[`6e1f13` · Fungrim entry ↗](https://fungrim.org/entry/6e1f13)
+
+---
+
+$$\binom{n}{n}=1$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -46009,6 +45669,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\binom{n}{0}=1$$
+
+**Holds when** $n\in\C$.
+Used by the Compute Engine for simplification.
+[`988310` · Fungrim entry ↗](https://fungrim.org/entry/988310)
+
+---
+
 $$\mathrm{FallingFactorial}(z, 1)=z$$
 
 **Holds when** $z\in\C$.
@@ -46018,7 +45686,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RisingFactorial}(-z, k)=\mathrm{RisingFactorial}(-k+z+1, k)\times(-1)^{k}$$
+$$\mathrm{RisingFactorial}(-z, k)=(-1)^{k}\mathrm{RisingFactorial}(z-k+1, k)$$
 
 **Holds when** $z\in\C\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -46027,16 +45695,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RisingFactorial}(z, k)=\frac{\Gamma(k+z)}{\Gamma(z)}$$
+$$\mathrm{RisingFactorial}(z, k)=\frac{\Gamma(z+k)}{\Gamma(z)}$$
 
-**Holds when** $k+z\notin\Z_{\le0}\land z\in\C\land k\in\N$.
+**Holds when** $z\in\C\land k\in\N\land z+k\notin\Z_{\le0}$.
 **Symbols:** **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`c733f7` · Fungrim entry ↗](https://fungrim.org/entry/c733f7)
 
 ---
 
-$$\mathrm{RisingFactorial}(z, 2k)=\mathrm{RisingFactorial}(\frac{z}{2}, k)\mathrm{RisingFactorial}(\frac{z+1}{2}, k)\times4^{k}$$
+$$\mathrm{RisingFactorial}(z, 2k)=4^{k}\mathrm{RisingFactorial}(\frac{z}{2}, k)\mathrm{RisingFactorial}(\frac{z+1}{2}, k)$$
 
 **Holds when** $z\in\C\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -46061,7 +45729,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RisingFactorial}(z, k)=\mathrm{FallingFactorial}(k+z-1, k)$$
+$$\mathrm{RisingFactorial}(z, k)=\mathrm{FallingFactorial}((z+k)-1, k)$$
 
 **Holds when** $z\in\C\land k\in\N$.
 **Symbols:** **FallingFactorial** — Falling factorial; **RisingFactorial** — Rising factorial.
@@ -46070,7 +45738,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RisingFactorial}(z, k+1)=(k+z)\mathrm{RisingFactorial}(z, k)$$
+$$\binom{z}{k}=\frac{\Gamma(z+1)}{\Gamma(k+1)\Gamma(z-k+1)}$$
+
+**Holds when** $z\in\C\land k\in\N\land z-k\notin-\infty..-1$.
+Used by the Compute Engine for simplification.
+[`e87c43` · Fungrim entry ↗](https://fungrim.org/entry/e87c43)
+
+---
+
+$$\mathrm{RisingFactorial}(z, k+1)=(z+k)\mathrm{RisingFactorial}(z, k)$$
 
 **Holds when** $z\in\C\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -46089,7 +45765,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\Gamma(\imaginaryI y)\vert=\sqrt{(\pi)(y\sinh(\pi y))^{-1}}$$
+$$\vert\Gamma(y\imaginaryI)\vert=\sqrt{(\pi)(y\sinh(\pi y))^{-1}}$$
 
 **Holds when** $y\in\R\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -46104,9 +45780,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{GammaLn}(z)=-z+(z-\frac{1}{2})\ln(z)+\sum_{k=1}^{n-1}\frac{\mathrm{BernoulliB}(2k)}{2k(2k-1)z^{2k-1}}+\mathrm{StirlingSeriesRemainder}(n, z)+\frac{\ln(2\pi)}{2}$$
+$$\mathrm{GammaLn}(z)=(z-\frac{1}{2})\ln(z)-z+\frac{\ln(2\pi)}{2}+\sum_{k=1}^{n-1}\frac{\mathrm{BernoulliB}(2k)}{2k(2k-1)z^{2k-1}}+\mathrm{StirlingSeriesRemainder}(n, z)$$
 
-**Holds when** $z\notin\lparen-\infty, 0\rbrack\land z\in\C\land n\in\N^*$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land n\in\N^*$.
 **Symbols:** **BernoulliB** — Bernoulli number; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
 Used by the Compute Engine for simplification.
 [`37a95a` · Fungrim entry ↗](https://fungrim.org/entry/37a95a)
@@ -46120,9 +45796,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Gamma(n+z)=\Gamma(z)\mathrm{RisingFactorial}(z, n)$$
+$$\Gamma(z+n)=\mathrm{RisingFactorial}(z, n)\Gamma(z)$$
 
-**Holds when** $n\in\N\land z\in\C\setminus\Z_{\le0}$.
+**Holds when** $z\in\C\setminus\Z_{\le0}\land n\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`56d710` · Fungrim entry ↗](https://fungrim.org/entry/56d710)
@@ -46137,7 +45813,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(\pi z)=\pi((z)(\Gamma(\imaginaryI z+1)\Gamma(1-\imaginaryI z))^{-1}+(\Gamma(\imaginaryI z+\frac{1}{2})\Gamma(1/2-\imaginaryI z))^{-1})$$
+$$\exp(\pi z)=\pi((\Gamma(\frac{1}{2}+\imaginaryI z)\Gamma(1/2-\imaginaryI z))^{-1}+(z)(\Gamma(1+\imaginaryI z)\Gamma(1-\imaginaryI z))^{-1})$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -46145,24 +45821,24 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{GammaLn}(z+1)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\gamma z$$
+$$\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\gamma z$$
 
-**Holds when** $\vert z\vert\lt1\land z\in\C$.
+**Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
 [`661054` · Fungrim entry ↗](https://fungrim.org/entry/661054)
 
 ---
 
-$$\Gamma(z)=\exp(-z)\exp(\sum_{n=1}^{\infty}(n+z-1/2)\ln((n+z)/(n+z-1))-1)z^{z-\frac{1}{2}}\sqrt{2\pi}$$
+$$\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}((z+n)-1/2)\ln((z+n)/((z+n)-1))-1)$$
 
-**Holds when** $z\notin\lparen-\infty, 0\rbrack\land z\in\C$.
+**Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
 **Reference:** B. C. Carlson (1977), Special functions of applied mathematics, Academic Press. Proposition 3.8-1.
 [`6d0a95` · Fungrim entry ↗](https://fungrim.org/entry/6d0a95)
 
 ---
 
-$$\mathrm{GammaLn}(z+1)=\ln(z)+\mathrm{GammaLn}(z)$$
+$$\mathrm{GammaLn}(z+1)=\mathrm{GammaLn}(z)+\ln(z)$$
 
 **Holds when** $z\in\C\setminus\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -46178,7 +45854,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\Gamma(\imaginaryI y+1)\vert=\sqrt{\frac{\pi y}{\sinh(\pi y)}}$$
+$$\vert\Gamma(1+y\imaginaryI)\vert=\sqrt{\frac{\pi y}{\sinh(\pi y)}}$$
 
 **Holds when** $y\in\R\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -46194,9 +45870,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\Gamma(z)\Gamma(z+\frac{1}{2})=\Gamma(2z)\times2^{1-2z}\sqrt{\pi}$$
+$$\Gamma(z)\Gamma(z+\frac{1}{2})=2^{1-2z}\sqrt{\pi}\Gamma(2z)$$
 
-**Holds when** $2z\notin\Z_{\le0}\land z\in\C$.
+**Holds when** $z\in\C\land2z\notin\Z_{\le0}$.
 Used by the Compute Engine for expansion.
 [`a787eb` · Fungrim entry ↗](https://fungrim.org/entry/a787eb)
 
@@ -46210,7 +45886,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\cos(\pi z)=(\pi)(\Gamma(z+\frac{1}{2})\Gamma(1/2-z))^{-1}$$
+$$\cos(\pi z)=(\pi)(\Gamma(\frac{1}{2}+z)\Gamma(1/2-z))^{-1}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -46218,7 +45894,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\Gamma(\imaginaryI y+\frac{1}{2})\vert=\sqrt{\frac{\pi}{\cosh(\pi y)}}$$
+$$\vert\Gamma(\frac{1}{2}+y\imaginaryI)\vert=\sqrt{\frac{\pi}{\cosh(\pi y)}}$$
 
 **Holds when** $y\in\R$.
 Used by the Compute Engine for simplification.
@@ -46226,7 +45902,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(\pi z)=(\Gamma(z+1)\Gamma(1-z))^{-1}$$
+$$\mathrm{sinc}(\pi z)=(\Gamma(1+z)\Gamma(1-z))^{-1}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -46249,7 +45925,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tan(\pi z)=\frac{\Gamma(z+\frac{1}{2})\Gamma(1/2-z)}{\Gamma(z)\Gamma(1-z)}$$
+$$\tan(\pi z)=\frac{\Gamma(\frac{1}{2}+z)\Gamma(1/2-z)}{\Gamma(z)\Gamma(1-z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -46278,7 +45954,7 @@ slug: /compute-engine/reference/fungrim-sequences/
 
 # Combinatorial and integer sequences
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **62 identities** for combinatorial and integer sequences.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **64 identities** for combinatorial and integer sequences.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -46288,7 +45964,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Bell numbers](#bell-numbers) (1)
 - [Bernoulli numbers and polynomials](#bernoulli-numbers-and-polynomials) (9)
-- [Fibonacci numbers](#fibonacci-numbers) (34)
+- [Fibonacci numbers](#fibonacci-numbers) (36)
 - [Integer sequences](#integer-sequences) (8)
 - [Partition function](#partition-function) (6)
 - [Stirling numbers](#stirling-numbers) (4)
@@ -46324,7 +46000,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, 1)=\mathrm{BernoulliB}(n)\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, 1)=(-1)^{n}\mathrm{BernoulliB}(n)$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial.
@@ -46333,7 +46009,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, x+1)=nx^{n-1}+\mathrm{BernoulliPolynomial}(n, x)$$
+$$\mathrm{BernoulliPolynomial}(n, x+1)=\mathrm{BernoulliPolynomial}(n, x)+nx^{n-1}$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -46360,7 +46036,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, 1-x)=\mathrm{BernoulliPolynomial}(n, x)\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, 1-x)=(-1)^{n}\mathrm{BernoulliPolynomial}(n, x)$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -46378,7 +46054,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, -x)=(nx^{n-1}+\mathrm{BernoulliPolynomial}(n, x))\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, -x)=(-1)^{n}(\mathrm{BernoulliPolynomial}(n, x)+nx^{n-1})$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -46389,7 +46065,7 @@ Used by the Compute Engine for simplification.
 
 ## Fibonacci numbers
 
-$$\mathrm{Fibonacci}(n)=\lfloor\frac{1}{5}(\sqrt{5}\varphi^{n})+\frac{1}{2}\rfloor$$
+$$\mathrm{Fibonacci}(n)=\lfloor\frac{\varphi^{n}}{\sqrt{5}}+\frac{1}{2}\rfloor$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -46397,7 +46073,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n-1)\mathrm{Fibonacci}(n+1)-(-1)^{n}$$
+$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n+1)\mathrm{Fibonacci}(n-1)-(-1)^{n}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46405,7 +46081,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n+2)=\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(n+1)$$
+$$\begin{pmatrix}\mathrm{Fibonacci}(n+1)\\ \mathrm{Fibonacci}(n)\end{pmatrix}=\begin{pmatrix}1 & 1\\ 1 & 0\end{pmatrix}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}$$
+
+**Holds when** $n\in\Z$.
+Used by the Compute Engine for simplification.
+[`0e2425` · Fungrim entry ↗](https://fungrim.org/entry/0e2425)
+
+---
+
+$$\mathrm{Fibonacci}(n+2)=\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46413,7 +46097,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\exp(n\ln(\varphi))-\cos(\pi n)\exp(-(n\ln(\varphi)))))$$
+$$\mathrm{Fibonacci}(n)=(\exp(n\ln(\varphi))-\cos(\pi n)\exp(-n\ln(\varphi)))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46431,7 +46115,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n+1)=\frac{1}{\sqrt{5}}(2\mathrm{ChebyshevT}(2n+1, \frac{5^{1/2}}{2}))$$
+$$\mathrm{Fibonacci}(2n+1)=(2\mathrm{ChebyshevT}(2n+1, \frac{5^{1/2}}{2}))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -46440,7 +46124,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(n-2)+\mathrm{Fibonacci}(n-1)$$
+$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(n-1)+\mathrm{Fibonacci}(n-2)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46448,7 +46132,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\varphi^{n}-(-\varphi)^{-n}))$$
+$$\mathrm{Fibonacci}(n)=(\varphi^{n}-(-\varphi)^{-n})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46456,7 +46140,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n)=(\mathrm{Fibonacci}(n-1)+\mathrm{Fibonacci}(n+1))\mathrm{Fibonacci}(n)$$
+$$\mathrm{Fibonacci}(2n)=(\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(n-1))\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46464,7 +46148,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(m+1)=\mathrm{Fibonacci}(m-n)\times(-1)^{n}$$
+$$\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)-\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n)=(-1)^{n}\mathrm{Fibonacci}(m-n)$$
 
 **Holds when** $n\in\Z\land m\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46480,6 +46164,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\begin{pmatrix}\mathrm{Fibonacci}(n+m)\\ \mathrm{Fibonacci}((n+m)-1)\end{pmatrix}=\begin{pmatrix}1 & 1\\ 1 & 0\end{pmatrix}^{m}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}$$
+
+**Holds when** $n\in\Z\land m\in\Z$.
+Used by the Compute Engine for expansion.
+[`3a9c67` · Fungrim entry ↗](https://fungrim.org/entry/3a9c67)
+
+---
+
 $$\mathrm{Count}(\lbrace k, k\in\Z\in(n\mid\mathrm{Fibonacci}(k))\rbrace)=\mathrm{Count}(\Z)$$
 
 **Holds when** $n\in\Z\setminus\lbrace0\rbrace$.
@@ -46488,7 +46180,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n)=-2\mathrm{Fibonacci}(n)^2-\mathrm{Fibonacci}(n+1)^2+\mathrm{Fibonacci}(n+2)^2$$
+$$\mathrm{Fibonacci}(2n)=\mathrm{Fibonacci}(n+2)^2-\mathrm{Fibonacci}(n+1)^2-2\mathrm{Fibonacci}(n)^2$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46496,7 +46188,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(-m+n-1)+\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n-m)$$
+$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n-m)+\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n-m-1)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46512,7 +46204,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m+n-1)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n-1)$$
+$$\mathrm{Fibonacci}((m+n)-1)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n-1)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46544,9 +46236,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(\mathrm{i_{var}}+n)\mathrm{Fibonacci}(j+n)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(\mathrm{i_{var}}+j+n)=\mathrm{Fibonacci}(\mathrm{i_{var}})\mathrm{Fibonacci}(j)\times(-1)^{n}$$
+$$\mathrm{Fibonacci}(n+i_{var})\mathrm{Fibonacci}(n+j)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(n+i_{var}+j)=(-1)^{n}\mathrm{Fibonacci}(i_{var})\mathrm{Fibonacci}(j)$$
 
-**Holds when** $n\in\Z\land\mathrm{i_{var}}\in\Z\land j\in\Z$.
+**Holds when** $n\in\Z\land i_{var}\in\Z\land j\in\Z$.
 Used by the Compute Engine for simplification.
 [`8db61e` · Fungrim entry ↗](https://fungrim.org/entry/8db61e)
 
@@ -46561,7 +46253,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m+n)=\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(m-1)+\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)$$
+$$\mathrm{Fibonacci}(m+n)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46594,7 +46286,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)^2=(-1)^{m+n}\mathrm{Fibonacci}(m)^2+\mathrm{Fibonacci}(m+n)\mathrm{Fibonacci}(n-m)$$
+$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n+m)\mathrm{Fibonacci}(n-m)+(-1)^{n+m}\mathrm{Fibonacci}(m)^2$$
 
 **Holds when** $n\in\Z\land m\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46602,7 +46294,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\varphi^{n}-\frac{\cos(\pi n)}{\varphi^{n}}))$$
+$$\mathrm{Fibonacci}(n)=(\varphi^{n}-\frac{\cos(\pi n)}{\varphi^{n}})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46610,7 +46302,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{ChebyshevU}(n-1, -(\frac{\imaginaryI}{2}))\imaginaryI^{n-1}$$
+$$\mathrm{Fibonacci}(n)=\imaginaryI^{n-1}\mathrm{ChebyshevU}(n-1, -(\frac{\imaginaryI}{2}))$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -46619,7 +46311,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}((1-\cos(\pi n))\cosh(n\ln(\varphi))+(\cos(\pi n)+1)\sinh(n\ln(\varphi))))$$
+$$\mathrm{Fibonacci}(n)=((1+\cos(\pi n))\sinh(n\ln(\varphi))+(1-\cos(\pi n))\cosh(n\ln(\varphi)))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46627,7 +46319,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{\sqrt{5}}(2\sinh(n(\frac{\imaginaryI\pi}{2}+\ln(\varphi)))(-\imaginaryI)^{n})$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n})/\sqrt{5}\sinh(n(\ln(\varphi)+\frac{\pi}{2}\imaginaryI))$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46635,7 +46327,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=2\mathrm{Fibonacci}(n-4)+3\mathrm{Fibonacci}(n-3)$$
+$$\mathrm{Fibonacci}(n)=3\mathrm{Fibonacci}(n-3)+2\mathrm{Fibonacci}(n-4)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46643,7 +46335,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(-n)=\mathrm{Fibonacci}(n)\times(-1)^{n+1}$$
+$$\mathrm{Fibonacci}(-n)=(-1)^{n+1}\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46651,7 +46343,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n+1)=\mathrm{Fibonacci}(n)^2+\mathrm{Fibonacci}(n+1)^2$$
+$$\mathrm{Fibonacci}(2n+1)=\mathrm{Fibonacci}(n+1)^2+\mathrm{Fibonacci}(n)^2$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46659,7 +46351,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{\sqrt{5}}(2\begin{cases}\sinh(n\ln(\varphi))&\lnot\mathrm{IsOdd}(n)\\\cosh(n\ln(\varphi))&\mathrm{IsOdd}(n)\end{cases})$$
+$$\mathrm{Fibonacci}(n)=(2\begin{cases}\sinh(n\ln(\varphi))&\mathrm{IsEven}(n)\\\cosh(n\ln(\varphi))&\mathrm{IsOdd}(n)\end{cases})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -46788,7 +46480,7 @@ Used by the Compute Engine for simplification.
 
 ## Stirling numbers
 
-$$\mathrm{StirlingS_1}(n, k)=\mathrm{StirlingCycle}(n, k)\times(-1)^{k+n}$$
+$$\mathrm{StirlingS_1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)$$
 
 **Holds when** $n\in\N\land k\in\N$.
 **Symbols:** **StirlingCycle** — Unsigned Stirling number of the first kind; **StirlingS1** — Signed Stirling number of the first kind.
@@ -47884,9 +47576,9 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Dedekind eta function
 
-$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau))=0$$
+$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/EllipticFunctions/DedekindEta/13/01/0002/)
@@ -47894,7 +47586,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\times2^{\frac{-113}{64}}\sqrt[4]{2^{1/4}-1}\sqrt{(1+2^{1/2})^{1/2}-2^{5/8}}}{\sqrt[16]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[4]{2^{1/4}-1}\sqrt{(1+2^{1/2})^{1/2}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -47903,25 +47595,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau+1)=\mathrm{DedekindEta}(\tau)\exp(\frac{\imaginaryI\pi}{12})$$
+$$\mathrm{DedekindEta}(\tau+1)=\exp(\frac{\pi\imaginaryI}{12})\mathrm{DedekindEta}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`1bae52` · Fungrim entry ↗](https://fungrim.org/entry/1bae52)
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{\imaginaryI\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)}{2\pi}$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((\frac{1}{2}\imaginaryI)\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`1c25d3` · Fungrim entry ↗](https://fungrim.org/entry/1c25d3)
 
 ---
 
-$$\mathrm{DedekindEta}(\exp(\frac{2\imaginaryI\pi}{3}))=\frac{\sqrt[8]{3}\exp(-((\imaginaryI\pi)/24))\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
+$$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\sqrt[8]{3}\exp(-((1/24\imaginaryI)\pi))\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -47937,16 +47629,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(-(\frac{1}{\tau}))=\mathrm{DedekindEta}(\tau)\sqrt{-(\imaginaryI\tau)}$$
+$$\mathrm{DedekindEta}(-(\frac{1}{\tau}))=\sqrt{-(\imaginaryI\tau)}\mathrm{DedekindEta}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`3b806f` · Fungrim entry ↗](https://fungrim.org/entry/3b806f)
 
 ---
 
-$$\mathrm{DedekindEta}(6\imaginaryI)=\mathrm{DedekindEta}(\imaginaryI)\times6^{\frac{-3}{8}}\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{1}{2}(\sqrt{2}\times3^{3/4})}$$
+$$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{1}{2}(2^{1/2}\times3^{3/4})}}{6^{\frac{3}{8}}}$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -47955,16 +47647,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau)=\mathrm{JacobiTheta}(3, \frac{\tau+1}{2}, 3\tau)\exp(\frac{\imaginaryI\pi\tau}{12})$$
+$$\mathrm{DedekindEta}(\tau)=\exp(\frac{\pi\imaginaryI\tau}{12})\mathrm{JacobiTheta}(3, \frac{\tau+1}{2}, 3\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`737805` · Fungrim entry ↗](https://fungrim.org/entry/737805)
 
 ---
 
-$$\mathrm{DedekindEta}(7\imaginaryI)=\frac{1}{7}(\sqrt{7}\mathrm{DedekindEta}(\imaginaryI)\sqrt[4]{\frac{-7}{2}+\sqrt{7}+\frac{1}{2}((4\times7^{1/2}-7)^{1/2})})$$
+$$\mathrm{DedekindEta}(7\imaginaryI)=\sqrt[4]{7^{1/2}-7/2+\frac{1}{2}((4\times7^{1/2}-7)^{1/2})}/\sqrt{7}\mathrm{DedekindEta}(\imaginaryI)$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -47973,9 +47665,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{EisensteinE}(2, \tau)\mathrm{DedekindEta}(\tau))$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau))\mathrm{EisensteinE}(2, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`871996` · Fungrim entry ↗](https://fungrim.org/entry/871996)
@@ -47990,9 +47682,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEtaEpsilon}(a, b, c, d)=\exp(\imaginaryI\pi(\frac{a+d}{12c}-\mathrm{DedekindSum}(d, c)-\frac{1}{4}))$$
+$$\mathrm{DedekindEtaEpsilon}(a, b, c, d)=\exp(\pi\imaginaryI((a+d)/(12c)-\mathrm{DedekindSum}(d, c)-\frac{1}{4}))$$
 
-**Holds when** $0\lt c\land ad-bc=1\land a\in\Z\land b\in\Z\land c\in\Z\land d\in\Z$.
+**Holds when** $a\in\Z\land b\in\Z\land c\in\Z\land d\in\Z\land ad-bc=1\land c\gt0$.
 **Symbols:** **DedekindEtaEpsilon** — Root of unity in the functional equation of the Dedekind eta function; **DedekindSum** — Dedekind sum.
 Used by the Compute Engine for expansion.
 [`921ef0` · Fungrim entry ↗](https://fungrim.org/entry/921ef0)
@@ -48015,9 +47707,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp(\frac{\imaginaryI\pi}{24})\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
+$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp((1/24\imaginaryI)\pi)\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`a1a3d4` · Fungrim entry ↗](https://fungrim.org/entry/a1a3d4)
@@ -48026,14 +47718,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(\tau+24)=\mathrm{DedekindEta}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`acee1a` · Fungrim entry ↗](https://fungrim.org/entry/acee1a)
 
 ---
 
-$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\times2^{\frac{-41}{32}}\sqrt{2^{1/4}-1}}{\sqrt[8]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt{2^{1/4}-1}}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -48042,7 +47734,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(5\imaginaryI)=\frac{\sqrt{5}\mathrm{DedekindEta}(\imaginaryI)}{5\sqrt{\varphi}}$$
+$$\mathrm{DedekindEta}(5\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)}{\sqrt{5\varphi}}$$
 
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -48051,9 +47743,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-18{\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}^4-28\tau\mapsto\mathrm{DedekindEta}(\tau)^{\tripleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\mathrm{DedekindEta}(\tau)^2+12\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2+(33\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)^2+\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{(4)}(\tau))\mathrm{DedekindEta}(\tau)^2=0$$
+$$(\mathrm{DedekindEta}(\tau)^2(33\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)^2+\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{(4)}(\tau))-18{\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}^4+12\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2)-28\mathrm{DedekindEta}(\tau)^2\tau\mapsto\mathrm{DedekindEta}(\tau)^{\tripleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=0$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/EllipticFunctions/DedekindEta/13/01/0001/)
@@ -48070,7 +47762,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEtaEpsilon}(1, b, 0, 1)=\exp(\frac{\imaginaryI\pi b}{12})$$
+$$\mathrm{DedekindEtaEpsilon}(1, b, 0, 1)=\exp(\frac{\pi\imaginaryI b}{12})$$
 
 **Symbols:** **DedekindEtaEpsilon** — Root of unity in the functional equation of the Dedekind eta function.
 Used by the Compute Engine for simplification.
@@ -48078,9 +47770,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau)=\mathrm{EulerQSeries}(\exp(2\imaginaryI\pi\tau))\exp(\frac{\imaginaryI\pi\tau}{12})$$
+$$\mathrm{DedekindEta}(\tau)=\exp(\frac{\pi\imaginaryI\tau}{12})\mathrm{EulerQSeries}(\exp(2\pi\imaginaryI\tau))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EulerQSeries** — Euler's q-series.
 Used by the Compute Engine for simplification.
 [`ff587a` · Fungrim entry ↗](https://fungrim.org/entry/ff587a)
@@ -48089,9 +47781,9 @@ Used by the Compute Engine for simplification.
 
 ## Illustrations of Eisenstein series
 
-$$\mathrm{EisensteinE}(2, \tau)=-(\frac{12\imaginaryI\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
+$$\mathrm{EisensteinE}(2, \tau)=-(\frac{(12\imaginaryI)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`03ad5a` · Fungrim entry ↗](https://fungrim.org/entry/03ad5a)
@@ -48100,7 +47792,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(8, \tau)=\mathrm{EisensteinE}(4, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`044128` · Fungrim entry ↗](https://fungrim.org/entry/044128)
@@ -48109,16 +47801,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2k, \tau)=\frac{\mathrm{EisensteinG}(2k, \tau)}{2\Zeta(2k)}$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`0a2120` · Fungrim entry ↗](https://fungrim.org/entry/0a2120)
 
 ---
 
-$$\mathrm{EisensteinE}(6, \tau)=-480\mathrm{DedekindEta}(2\tau)^{12}+\frac{8\,192\mathrm{DedekindEta}(4\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}+\frac{\mathrm{DedekindEta}(\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}-\frac{16\,896\mathrm{DedekindEta}(2\tau)^{12}\mathrm{DedekindEta}(4\tau)^8}{\mathrm{DedekindEta}(\tau)^8}$$
+$$\mathrm{EisensteinE}(6, \tau)=\frac{\mathrm{DedekindEta}(\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}-480\mathrm{DedekindEta}(2\tau)^{12}-(16\,896\mathrm{DedekindEta}(2\tau)^{12}\mathrm{DedekindEta}(4\tau)^8)/\mathrm{DedekindEta}(\tau)^8+\frac{8\,192\mathrm{DedekindEta}(4\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** K. Ono (2004), Web of Modularity: Arithmetic of the Coefficients of Modular Forms and q-series, American Mathematical Society. Theorem 1.67.
@@ -48126,7 +47818,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinG}(6, \exp(\frac{2\imaginaryI\pi}{3}))=\frac{\Gamma(1/3)^{18}}{8\,960\pi^6}$$
+$$\mathrm{EisensteinG}(6, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{\Gamma(1/3)^{18}}{8\,960\pi^6}$$
 
 **Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
@@ -48134,9 +47826,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(6, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(3, 0, \tau)^{12}+\mathrm{JacobiTheta}(4, 0, \tau)^{12}-3(\mathrm{JacobiTheta}(3, 0, \tau)^4+\mathrm{JacobiTheta}(4, 0, \tau)^4)\mathrm{JacobiTheta}(2, 0, \tau)^8)$$
+$$\mathrm{EisensteinE}(6, \tau)=\frac{1}{2}((\mathrm{JacobiTheta}(3, 0, \tau)^{12}+\mathrm{JacobiTheta}(4, 0, \tau)^{12})-3\mathrm{JacobiTheta}(2, 0, \tau)^8(\mathrm{JacobiTheta}(3, 0, \tau)^4+\mathrm{JacobiTheta}(4, 0, \tau)^4))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`10f3b2` · Fungrim entry ↗](https://fungrim.org/entry/10f3b2)
@@ -48145,41 +47837,41 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\sum_{m=1}^{\infty}\exp(2\imaginaryI\pi mn\tau)n^{2k-1})}{\mathrm{BernoulliB}(2k)}$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`15b347` · Fungrim entry ↗](https://fungrim.org/entry/15b347)
 
 ---
 
-$$\mathrm{EisensteinE}(6, \tau)=63(\sum_{m=1}^{\infty}\frac{2\cos(\pi m\tau)^4+11\cos(\pi m\tau)^2+2}{\sin(\pi m\tau)^6})+1$$
+$$\mathrm{EisensteinE}(6, \tau)=1+63(\sum_{m=1}^{\infty}\frac{2\cos(\pi m\tau)^4+11\cos(\pi m\tau)^2+2}{\sin(\pi m\tau)^6})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`171724` · Fungrim entry ↗](https://fungrim.org/entry/171724)
 
 ---
 
-$$\mathrm{EisensteinE}(2, \tau)=6(\sum_{m=1}^{\infty}(\sin(\pi m\tau)^2)^{-1})+1$$
+$$\mathrm{EisensteinE}(2, \tau)=1+6(\sum_{m=1}^{\infty}(\sin(\pi m\tau)^2)^{-1})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`18a4d1` · Fungrim entry ↗](https://fungrim.org/entry/18a4d1)
 
 ---
 
-$$\mathrm{EisensteinG}(2k, n+\tau)=\mathrm{EisensteinG}(2k, \tau)$$
+$$\mathrm{EisensteinG}(2k, \tau+n)=\mathrm{EisensteinG}(2k, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*\land n\in\Z$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`23a5e0` · Fungrim entry ↗](https://fungrim.org/entry/23a5e0)
 
 ---
 
-$$\mathrm{EisensteinE}(2, \exp(\frac{2\imaginaryI\pi}{3}))=\frac{2\sqrt{3}}{\pi}$$
+$$\mathrm{EisensteinE}(2, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{2\sqrt{3}}{\pi}$$
 
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
@@ -48187,7 +47879,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinG}(4, \exp(\frac{2\imaginaryI\pi}{3}))=\mathrm{EisensteinE}(4, \exp(\frac{2\imaginaryI\pi}{3}))=0$$
+$$\mathrm{EisensteinG}(4, \exp(\frac{2\pi\imaginaryI}{3}))=\mathrm{EisensteinE}(4, \exp(\frac{2\pi\imaginaryI}{3}))=0$$
 
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
@@ -48195,27 +47887,27 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(12, \tau)=\frac{1}{691}(250\mathrm{EisensteinE}(6, \tau)^2+441\mathrm{EisensteinE}(4, \tau)^3)$$
+$$\mathrm{EisensteinE}(12, \tau)=\frac{1}{691}(441\mathrm{EisensteinE}(4, \tau)^3+250\mathrm{EisensteinE}(6, \tau)^2)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`36fff2` · Fungrim entry ↗](https://fungrim.org/entry/36fff2)
 
 ---
 
-$$\mathrm{EisensteinE}(2, \tau)=\frac{6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)}{\pi^2}$$
+$$\mathrm{EisensteinE}(2, \tau)=(6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))/\pi^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`3bf702` · Fungrim entry ↗](https://fungrim.org/entry/3bf702)
 
 ---
 
-$$\tau\mapsto\mathrm{EisensteinE}(6, \tau)^{\prime}(\tau)=\imaginaryI\pi(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(6, \tau)-\mathrm{EisensteinE}(4, \tau)^2)$$
+$$\tau\mapsto\mathrm{EisensteinE}(6, \tau)^{\prime}(\tau)=\frac{1}{2}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(6, \tau)-\mathrm{EisensteinE}(4, \tau)^2))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
@@ -48223,9 +47915,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(4, \tau)=\frac{256\mathrm{DedekindEta}(2\tau)^{16}}{\mathrm{DedekindEta}(\tau)^8}+\frac{\mathrm{DedekindEta}(\tau)^{16}}{\mathrm{DedekindEta}(2\tau)^8}$$
+$$\mathrm{EisensteinE}(4, \tau)=\frac{\mathrm{DedekindEta}(\tau)^{16}}{\mathrm{DedekindEta}(2\tau)^8}+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^8$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** K. Ono (2004), Web of Modularity: Arithmetic of the Coefficients of Modular Forms and q-series, American Mathematical Society. Theorem 1.67.
@@ -48249,7 +47941,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(6, \exp(\frac{2\imaginaryI\pi}{3}))=\frac{27\Gamma(1/3)^{18}}{512\pi^{12}}$$
+$$\mathrm{EisensteinE}(6, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{27\Gamma(1/3)^{18}}{512\pi^{12}}$$
 
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
@@ -48259,7 +47951,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(8, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(2, 0, \tau)^{16}+\mathrm{JacobiTheta}(3, 0, \tau)^{16}+\mathrm{JacobiTheta}(4, 0, \tau)^{16})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`6d2880` · Fungrim entry ↗](https://fungrim.org/entry/6d2880)
@@ -48268,7 +47960,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{EisensteinE}(2, \tau)=1-12(\sum_{m=1}^{\infty}(\cos(2\pi m\tau)-1)^{-1})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`7b62e4` · Fungrim entry ↗](https://fungrim.org/entry/7b62e4)
@@ -48277,16 +47969,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\imaginaryI\pi n\tau))}{\mathrm{BernoulliB}(2k)}$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`7c00e6` · Fungrim entry ↗](https://fungrim.org/entry/7c00e6)
 
 ---
 
-$$\tau\mapsto\mathrm{EisensteinE}(2, \tau)^{\prime}(\tau)=\frac{1}{6}(\imaginaryI\pi(\mathrm{EisensteinE}(2, \tau)^2-\mathrm{EisensteinE}(4, \tau)))$$
+$$\tau\mapsto\mathrm{EisensteinE}(2, \tau)^{\prime}(\tau)=\frac{1}{12}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)^2-\mathrm{EisensteinE}(4, \tau)))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
@@ -48296,7 +47988,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\exp(2\imaginaryI\pi n\tau)n^{2k-1})/(1-\exp(2\imaginaryI\pi n\tau)))}{\mathrm{BernoulliB}(2k)}$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`848d97` · Fungrim entry ↗](https://fungrim.org/entry/848d97)
@@ -48305,14 +47997,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(4, \tau)\mathrm{EisensteinE}(10, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`9e1f83` · Fungrim entry ↗](https://fungrim.org/entry/9e1f83)
 
 ---
 
-$$\mathrm{EisensteinG}(2, \exp(\frac{2\imaginaryI\pi}{3}))=\frac{2\sqrt{3}\pi}{3}$$
+$$\mathrm{EisensteinG}(2, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{2\pi}{\sqrt{3}}$$
 
 **Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
@@ -48322,7 +48014,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(6, \tau)^2=\frac{1}{8}({(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)}^3-54(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0dff6` · Fungrim entry ↗](https://fungrim.org/entry/a0dff6)
@@ -48345,9 +48037,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(4, \tau)=30(\sum_{m=1}^{\infty}\frac{\cos(\pi m\tau)^2+1}{\sin(\pi m\tau)^4})+1$$
+$$\mathrm{EisensteinE}(4, \tau)=1+30(\sum_{m=1}^{\infty}\frac{\cos(\pi m\tau)^2+1}{\sin(\pi m\tau)^4})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`a92c1a` · Fungrim entry ↗](https://fungrim.org/entry/a92c1a)
@@ -48356,16 +48048,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(10, \tau)=\mathrm{EisensteinE}(4, \tau)\mathrm{EisensteinE}(6, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`adaf5a` · Fungrim entry ↗](https://fungrim.org/entry/adaf5a)
 
 ---
 
-$$\tau\mapsto\mathrm{EisensteinE}(4, \tau)^{\prime}(\tau)=\frac{1}{3}(2\imaginaryI\pi(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(4, \tau)-\mathrm{EisensteinE}(6, \tau)))$$
+$$\tau\mapsto\mathrm{EisensteinE}(4, \tau)^{\prime}(\tau)=\frac{1}{3}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(4, \tau)-\mathrm{EisensteinE}(6, \tau)))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for expansion.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
@@ -48373,9 +48065,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}\sum_{n\in \Z}(m\tau+n)^{-2k})$$
+$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}\sum_{n\in \Z}((m\tau+n)^{2k})^{-1})$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`b07750` · Fungrim entry ↗](https://fungrim.org/entry/b07750)
@@ -48384,7 +48076,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinG}(2, \tau)=2\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`b52b6f` · Fungrim entry ↗](https://fungrim.org/entry/b52b6f)
@@ -48393,7 +48085,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(4, \tau)^3-\mathrm{EisensteinE}(6, \tau)^2=\frac{1}{4}(27(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`bd7d8e` · Fungrim entry ↗](https://fungrim.org/entry/bd7d8e)
@@ -48402,25 +48094,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(4, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cc579c` · Fungrim entry ↗](https://fungrim.org/entry/cc579c)
 
 ---
 
-$$\mathrm{EisensteinE}(2k, n+\tau)=\mathrm{EisensteinE}(2k, \tau)$$
+$$\mathrm{EisensteinE}(2k, \tau+n)=\mathrm{EisensteinE}(2k, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land k\in\N^*\land n\in\Z$.
+**Holds when** $k\in\N^*\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`d56eb6` · Fungrim entry ↗](https://fungrim.org/entry/d56eb6)
 
 ---
 
-$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}(4\imaginaryI\pi\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
+$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}((4\imaginaryI)\pi\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`dbf388` · Fungrim entry ↗](https://fungrim.org/entry/dbf388)
@@ -48435,9 +48127,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(6, \tau)\mathrm{EisensteinE}(4, \tau)^2$$
+$$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(4, \tau)^2\mathrm{EisensteinE}(6, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`e60fd4` · Fungrim entry ↗](https://fungrim.org/entry/e60fd4)
@@ -48446,7 +48138,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(6, \tau)\mathrm{EisensteinE}(8, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`feb95e` · Fungrim entry ↗](https://fungrim.org/entry/feb95e)
@@ -48455,9 +48147,9 @@ Used by the Compute Engine for simplification.
 
 ## Jacobi theta functions
 
-$$\mathrm{JacobiTheta}(3, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(3, z+\frac{1}{8}, \tau)\mathrm{JacobiTheta}(3, z+\frac{3}{8}, \tau)\mathrm{JacobiTheta}(3, 1/8-z, \tau)\mathrm{JacobiTheta}(3, 3/8-z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
+$$\mathrm{JacobiTheta}(3, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(3, 1/8-z, \tau)\mathrm{JacobiTheta}(3, \frac{1}{8}+z, \tau)\mathrm{JacobiTheta}(3, 3/8-z, \tau)\mathrm{JacobiTheta}(3, \frac{3}{8}+z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0096a8` · Fungrim entry ↗](https://fungrim.org/entry/0096a8)
@@ -48466,7 +48158,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0373dc` · Fungrim entry ↗](https://fungrim.org/entry/0373dc)
@@ -48475,43 +48167,43 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 0, \tau, 2r+1)=0$$
 
-**Holds when** $0\lt\Im(\tau)\land r\in\N$.
+**Holds when** $\Im(\tau)\gt0\land r\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`055b0a` · Fungrim entry ↗](https://fungrim.org/entry/055b0a)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, \frac{-1}{\tau})=\mathrm{JacobiTheta}(4, \tau z, \tau)\exp(\imaginaryI\pi\tau z^2)\sqrt{\frac{\tau}{\imaginaryI}}$$
+$$\mathrm{JacobiTheta}(2, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(4, \tau z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`06319a` · Fungrim entry ↗](https://fungrim.org/entry/06319a)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)^2=4(\sum_{n=1}^{\infty}\frac{\exp(\imaginaryI\pi n\tau)}{\exp(2\imaginaryI\pi n\tau)+1})+1$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)^2=1+4(\sum_{n=1}^{\infty}\frac{\exp(\pi\imaginaryI\tau)^{n}}{1+\exp(\pi\imaginaryI\tau)^{2n}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0650f8` · Fungrim entry ↗](https://fungrim.org/entry/0650f8)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`077394` · Fungrim entry ↗](https://fungrim.org/entry/077394)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, \tau)=\mathrm{JacobiTheta}(3, \frac{\tau}{2}+z, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z))$$
+$$\mathrm{JacobiTheta}(2, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(3, z+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0878a4` · Fungrim entry ↗](https://fungrim.org/entry/0878a4)
@@ -48520,16 +48212,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z, \tau)^4+\mathrm{JacobiTheta}(3, z, \tau)^4=\mathrm{JacobiTheta}(2, z, \tau)^4+\mathrm{JacobiTheta}(4, z, \tau)^4$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`08822c` · Fungrim entry ↗](https://fungrim.org/entry/08822c)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z+\frac{1}{4}, \tau)\mathrm{JacobiTheta}(3, 1/4-z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
+$$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, 1/4-z, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}+z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0a9ec2` · Fungrim entry ↗](https://fungrim.org/entry/0a9ec2)
@@ -48538,32 +48230,32 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2=\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0e2635` · Fungrim entry ↗](https://fungrim.org/entry/0e2635)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, \tau+z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\exp(-(\imaginaryI\pi(\tau+2z)))$$
+$$\mathrm{JacobiTheta}(3, z+\tau, \tau)=\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`103bfb` · Fungrim entry ↗](https://fungrim.org/entry/103bfb)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, \tau)=\imaginaryI\mathrm{JacobiTheta}(2, \frac{\tau}{2}+z+\frac{1}{2}, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z))$$
+$$\mathrm{JacobiTheta}(4, z, \tau)=\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(2, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`10ca40` · Fungrim entry ↗](https://fungrim.org/entry/10ca40)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \imaginaryI)=\frac{\sqrt{2}\Gamma(\frac{1}{4})}{2\pi^{\frac{3}{4}}}$$
+$$\mathrm{JacobiTheta}(3, 0, \imaginaryI)=\frac{\Gamma(\frac{1}{4})}{\sqrt{2}\pi^{\frac{3}{4}}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -48571,45 +48263,45 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)=\mathrm{JacobiTheta}(3, w+z, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)-\mathrm{JacobiTheta}(2, w+z, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)-\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1792a9` · Fungrim entry ↗](https://fungrim.org/entry/1792a9)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, 2n+\tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
+$$\mathrm{JacobiTheta}(4, z, \tau+2n)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`19acd8` · Fungrim entry ↗](https://fungrim.org/entry/19acd8)
 
 ---
 
-$$(\mathrm{JacobiTheta}(1, z, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2)\mathrm{JacobiTheta}(2, 0, 2\tau)=(\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2)\mathrm{JacobiTheta}(3, 0, 2\tau)$$
+$$\mathrm{JacobiTheta}(2, 0, 2\tau)(\mathrm{JacobiTheta}(1, z, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2)=\mathrm{JacobiTheta}(3, 0, 2\tau)(\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`1c67c8` · Fungrim entry ↗](https://fungrim.org/entry/1c67c8)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 0, \tau)^4-\mathrm{JacobiTheta}(2, 0, \tau)^4=1-24(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\imaginaryI\pi\tau(2n+1))}{\exp(\imaginaryI\pi\tau(2n+1))+1})$$
+$$\mathrm{JacobiTheta}(4, 0, \tau)^4-\mathrm{JacobiTheta}(2, 0, \tau)^4=1-24(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1cec67` · Fungrim entry ↗](https://fungrim.org/entry/1cec67)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, n+\tau)=\mathrm{JacobiTheta}(1, z, \tau)\exp(\frac{\imaginaryI\pi n}{4})$$
+$$\mathrm{JacobiTheta}(1, z, \tau+n)=\exp(\frac{\pi\imaginaryI n}{4})\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1fa8e7` · Fungrim entry ↗](https://fungrim.org/entry/1fa8e7)
@@ -48618,16 +48310,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau)^4=\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(4, 0, \tau)^4$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1fbc09` · Fungrim entry ↗](https://fungrim.org/entry/1fbc09)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, w+z, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1feda6` · Fungrim entry ↗](https://fungrim.org/entry/1feda6)
@@ -48636,7 +48328,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^4+\mathrm{JacobiTheta}(3, z, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`20d581` · Fungrim entry ↗](https://fungrim.org/entry/20d581)
@@ -48645,7 +48337,7 @@ Used by the Compute Engine for simplification.
 
 $$2\mathrm{JacobiTheta}(2, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2-\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`21c2f7` · Fungrim entry ↗](https://fungrim.org/entry/21c2f7)
@@ -48654,7 +48346,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`21dc98` · Fungrim entry ↗](https://fungrim.org/entry/21dc98)
@@ -48663,16 +48355,16 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`23077c` · Fungrim entry ↗](https://fungrim.org/entry/23077c)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \tau)=\mathrm{JacobiTheta}(1, \frac{\tau}{2}+z+\frac{1}{2}, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z))$$
+$$\mathrm{JacobiTheta}(3, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(1, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`235d0d` · Fungrim entry ↗](https://fungrim.org/entry/235d0d)
@@ -48681,7 +48373,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`265d9c` · Fungrim entry ↗](https://fungrim.org/entry/265d9c)
@@ -48690,16 +48382,16 @@ Used by the Compute Engine for simplification.
 
 $$\frac{\mathrm{JacobiTheta}(1, 0, \tau, 3)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}=\frac{\mathrm{JacobiTheta}(2, 0, \tau, 2)}{\mathrm{JacobiTheta}(2, 0, \tau)}+\frac{\mathrm{JacobiTheta}(3, 0, \tau, 2)}{\mathrm{JacobiTheta}(3, 0, \tau)}+\frac{\mathrm{JacobiTheta}(4, 0, \tau, 2)}{\mathrm{JacobiTheta}(4, 0, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`278274` · Fungrim entry ↗](https://fungrim.org/entry/278274)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(1, z+\frac{1}{4}, \tau)\mathrm{JacobiTheta}(1, 1/4-z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
+$$\mathrm{JacobiTheta}(1, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(1, 1/4-z, \tau)\mathrm{JacobiTheta}(1, \frac{1}{4}+z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`27b169` · Fungrim entry ↗](https://fungrim.org/entry/27b169)
@@ -48708,41 +48400,41 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2853d4` · Fungrim entry ↗](https://fungrim.org/entry/2853d4)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, n+\tau)=\begin{cases}\mathrm{JacobiTheta}(3, z, \tau)&\lnot\mathrm{IsOdd}(n)\\\mathrm{JacobiTheta}(4, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
+$$\mathrm{JacobiTheta}(3, z, \tau+n)=\begin{cases}\mathrm{JacobiTheta}(3, z, \tau)&\mathrm{IsEven}(n)\\\mathrm{JacobiTheta}(4, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`28b4c3` · Fungrim entry ↗](https://fungrim.org/entry/28b4c3)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, \frac{\tau}{2}+z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\exp(-(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(3, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2d2dde` · Fungrim entry ↗](https://fungrim.org/entry/2d2dde)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, n\tau+m+z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\exp(-(\imaginaryI\pi(\tau n^2+2nz)))$$
+$$\mathrm{JacobiTheta}(3, z+m+n\tau, \tau)=\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`2e4da0` · Fungrim entry ↗](https://fungrim.org/entry/2e4da0)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)\times(-1)^{\lfloor n/4\rfloor}&\mathrm{CongruentMod}(n, 2, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times(-1)^{\lfloor n/4\rfloor}\times2^{\frac{-7}{16}}\sqrt{2^{1/2}-1}\sqrt[4]{1+\sqrt{2}}&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -48751,9 +48443,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(1, 2n+z, \tau)=\mathrm{JacobiTheta}(1, z, \tau)$$
+$$\mathrm{JacobiTheta}(1, z+2n, \tau)=\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2faeb9` · Fungrim entry ↗](https://fungrim.org/entry/2faeb9)
@@ -48771,16 +48463,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2}{2\mathrm{JacobiTheta}(2, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`3479be` · Fungrim entry ↗](https://fungrim.org/entry/3479be)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`34d1c6` · Fungrim entry ↗](https://fungrim.org/entry/34d1c6)
@@ -48789,7 +48481,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`378949` · Fungrim entry ↗](https://fungrim.org/entry/378949)
@@ -48798,7 +48490,7 @@ Used by the Compute Engine for simplification.
 
 $$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\imaginaryI\pi)^{r}}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land r\in\N\land s\in\N\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N\land s\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`37e644` · Fungrim entry ↗](https://fungrim.org/entry/37e644)
@@ -48807,7 +48499,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, -z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`380076` · Fungrim entry ↗](https://fungrim.org/entry/380076)
@@ -48825,23 +48517,23 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`3a77e0` · Fungrim entry ↗](https://fungrim.org/entry/3a77e0)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`3cac28` · Fungrim entry ↗](https://fungrim.org/entry/3cac28)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{-7}{16}}\sqrt[4]{1+\sqrt{2}}&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -48850,7 +48542,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[4]{2}\sqrt{\frac{1+\sqrt{2}}{2}}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[4]{2}\sqrt{1+\sqrt{2}})/\sqrt{2}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -48859,54 +48551,54 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, \frac{\tau}{2}+z, \tau)=\imaginaryI\mathrm{JacobiTheta}(1, z, \tau)\exp(-(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(4, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\imaginaryI\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`429093` · Fungrim entry ↗](https://fungrim.org/entry/429093)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, n\tau+m+z, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\times(-1)^{m+n}\exp(-(\imaginaryI\pi(\tau n^2+2nz)))$$
+$$\mathrm{JacobiTheta}(1, z+m+n\tau, \tau)=(-1)^{m+n}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`43fa0e` · Fungrim entry ↗](https://fungrim.org/entry/43fa0e)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, n+z, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
+$$\mathrm{JacobiTheta}(4, z+n, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4448f1` · Fungrim entry ↗](https://fungrim.org/entry/4448f1)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`45165c` · Fungrim entry ↗](https://fungrim.org/entry/45165c)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`45a130` · Fungrim entry ↗](https://fungrim.org/entry/45a130)
 
 ---
 
-$$2\mathrm{JacobiTheta}(4, 0, 2\tau)\mathrm{JacobiTheta}(1, 0, 2\tau, 1)=\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(1, 0, \tau, 1)$$
+$$2\mathrm{JacobiTheta}(1, 0, 2\tau, 1)\mathrm{JacobiTheta}(4, 0, 2\tau)=\mathrm{JacobiTheta}(1, 0, \tau, 1)\mathrm{JacobiTheta}(2, 0, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`46f244` · Fungrim entry ↗](https://fungrim.org/entry/46f244)
@@ -48915,7 +48607,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \tau, 2r+1)=0$$
 
-**Holds when** $0\lt\Im(\tau)\land r\in\N$.
+**Holds when** $\Im(\tau)\gt0\land r\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`474c51` · Fungrim entry ↗](https://fungrim.org/entry/474c51)
@@ -48924,23 +48616,23 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})=\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`476642` · Fungrim entry ↗](https://fungrim.org/entry/476642)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
+$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`47e587` · Fungrim entry ↗](https://fungrim.org/entry/47e587)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \imaginaryI y)=\frac{1}{\sqrt{y}}(\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1))$$
+$$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)/\sqrt{y}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -48951,7 +48643,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, z+\frac{1}{2}, \tau)=-\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`47f6dd` · Fungrim entry ↗](https://fungrim.org/entry/47f6dd)
@@ -48967,25 +48659,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, w+z, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`48a1c6` · Fungrim entry ↗](https://fungrim.org/entry/48a1c6)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \tau)=-(\imaginaryI\mathrm{JacobiTheta}(4, \frac{\tau}{2}+z, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(1, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(4, z+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4c462b` · Fungrim entry ↗](https://fungrim.org/entry/4c462b)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[-4]{2}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -48994,18 +48686,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, 4n+\tau)=\mathrm{JacobiTheta}(2, z, \tau)\times(-1)^{n}$$
+$$\mathrm{JacobiTheta}(2, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`4cf228` · Fungrim entry ↗](https://fungrim.org/entry/4cf228)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 0, \tau)^8=16(\sum_{n=1}^{\infty}\frac{n^3\times(-1)^{n}\exp(\imaginaryI\pi n\tau)}{1-\exp(\imaginaryI\pi n\tau)})+1$$
+$$\mathrm{JacobiTheta}(4, 0, \tau)^8=1+16(\sum_{n=1}^{\infty}\frac{(-1)^{n}n^3\exp(\pi\imaginaryI\tau)^{n}}{1-\exp(\pi\imaginaryI\tau)^{n}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4d26ec` · Fungrim entry ↗](https://fungrim.org/entry/4d26ec)
@@ -49014,14 +48706,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, -z, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4f939e` · Fungrim entry ↗](https://fungrim.org/entry/4f939e)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{3})=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[4]{3+2\sqrt{3}}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{3})=\sqrt[4]{2\sqrt{3}+3}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49041,7 +48733,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, 4\tau)=\frac{1}{2}(\mathrm{JacobiTheta}(3, z, \tau)+\mathrm{JacobiTheta}(4, z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`53fef4` · Fungrim entry ↗](https://fungrim.org/entry/53fef4)
@@ -49050,7 +48742,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)=2\mathrm{DedekindEta}(\tau)^3$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`557b19` · Fungrim entry ↗](https://fungrim.org/entry/557b19)
@@ -49059,25 +48751,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z+\frac{1}{2}, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`563d18` · Fungrim entry ↗](https://fungrim.org/entry/563d18)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, w+z, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5752b8` · Fungrim entry ↗](https://fungrim.org/entry/5752b8)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})\mathrm{JacobiTheta}(1, 0, \frac{\tau}{2}, 1)=2\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, 0, \tau, 1)$$
+$$\mathrm{JacobiTheta}(1, 0, \frac{\tau}{2}, 1)\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})=2\mathrm{JacobiTheta}(1, 0, \tau, 1)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`59184e` · Fungrim entry ↗](https://fungrim.org/entry/59184e)
@@ -49086,7 +48778,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, -z, \tau)=-\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`59f8e1` · Fungrim entry ↗](https://fungrim.org/entry/59f8e1)
@@ -49095,7 +48787,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})^2=2\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`59fd23` · Fungrim entry ↗](https://fungrim.org/entry/59fd23)
@@ -49104,16 +48796,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z, \tau)^4-\mathrm{JacobiTheta}(2, z, \tau)^4=\mathrm{JacobiTheta}(4, z, \tau)^4-\mathrm{JacobiTheta}(3, z, \tau)^4$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`5a3ebf` · Fungrim entry ↗](https://fungrim.org/entry/5a3ebf)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, n+z, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\times(-1)^{n}$$
+$$\mathrm{JacobiTheta}(1, z+n, \tau)=(-1)^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5cdae6` · Fungrim entry ↗](https://fungrim.org/entry/5cdae6)
@@ -49122,16 +48814,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, z, \tau)=\mathrm{JacobiTheta}(3, z+\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5d41b1` · Fungrim entry ↗](https://fungrim.org/entry/5d41b1)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(1, w+z, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)+\mathrm{JacobiTheta}(4, w+z, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(1, z+w, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)+\mathrm{JacobiTheta}(4, z+w, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5f9e54` · Fungrim entry ↗](https://fungrim.org/entry/5f9e54)
@@ -49140,7 +48832,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, 2z, \tau)=\frac{2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5fe58d` · Fungrim entry ↗](https://fungrim.org/entry/5fe58d)
@@ -49149,32 +48841,32 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`64b65d` · Fungrim entry ↗](https://fungrim.org/entry/64b65d)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, n+\tau)=\begin{cases}\mathrm{JacobiTheta}(4, z, \tau)&\lnot\mathrm{IsOdd}(n)\\\mathrm{JacobiTheta}(3, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
+$$\mathrm{JacobiTheta}(4, z, \tau+n)=\begin{cases}\mathrm{JacobiTheta}(4, z, \tau)&\mathrm{IsEven}(n)\\\mathrm{JacobiTheta}(3, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`64f0a5` · Fungrim entry ↗](https://fungrim.org/entry/64f0a5)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`663a02` · Fungrim entry ↗](https://fungrim.org/entry/663a02)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{-4+2\sqrt{2}\times3^{3/4}+2\sqrt{3}+3\sqrt{2}-3^{3/4}+3^{5/4}}}{2\times3^{\frac{3}{8}}\sqrt[6]{2^{1/2}-1}\sqrt[6]{3^{1/2}-1}}$$
+$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{-4+2\sqrt{2}\times3^{3/4}+2\sqrt{3}+3\sqrt{2}-3^{3/4}+3^{5/4}}}{2\times3^{\frac{3}{8}}\sqrt[6]{(2^{1/2}-1)(3^{1/2}-1)}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49185,16 +48877,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z, \frac{\tau}{2})=\frac{2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`66eb8b` · Fungrim entry ↗](https://fungrim.org/entry/66eb8b)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, w+z, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`66efb8` · Fungrim entry ↗](https://fungrim.org/entry/66efb8)
@@ -49212,7 +48904,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`686ce0` · Fungrim entry ↗](https://fungrim.org/entry/686ce0)
@@ -49221,16 +48913,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`69b32e` · Fungrim entry ↗](https://fungrim.org/entry/69b32e)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, \tau)=\mathrm{JacobiTheta}(4, \frac{\tau}{2}+z+\frac{1}{2}, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z))$$
+$$\mathrm{JacobiTheta}(2, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(4, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6a7704` · Fungrim entry ↗](https://fungrim.org/entry/6a7704)
@@ -49246,16 +48938,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \tau+1)=\mathrm{JacobiTheta}(1, z, \tau)\exp(\frac{\imaginaryI\pi}{4})$$
+$$\mathrm{JacobiTheta}(1, z, \tau+1)=\exp(\frac{\pi\imaginaryI}{4})\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6b2078` · Fungrim entry ↗](https://fungrim.org/entry/6b2078)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{-7}{16}}\sqrt[4]{1+\sqrt{2}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}}{2^{\frac{7}{16}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49264,9 +48956,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, \tau)=-(\imaginaryI\mathrm{JacobiTheta}(1, \frac{\tau}{2}+z, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(4, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(1, z+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6d918c` · Fungrim entry ↗](https://fungrim.org/entry/6d918c)
@@ -49275,7 +48967,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2=\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2+\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6fad93` · Fungrim entry ↗](https://fungrim.org/entry/6fad93)
@@ -49284,7 +48976,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(2, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`7131cd` · Fungrim entry ↗](https://fungrim.org/entry/7131cd)
@@ -49293,7 +48985,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2}{2\mathrm{JacobiTheta}(3, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7137a2` · Fungrim entry ↗](https://fungrim.org/entry/7137a2)
@@ -49302,23 +48994,23 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`713b6b` · Fungrim entry ↗](https://fungrim.org/entry/713b6b)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \tau)=\mathrm{JacobiTheta}(2, \frac{\tau}{2}+z, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z))$$
+$$\mathrm{JacobiTheta}(3, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(2, z+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`71d5ee` · Fungrim entry ↗](https://fungrim.org/entry/71d5ee)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{\frac{1}{14}((\sqrt{7+3\times7^{1/2}}+\sqrt{13+7^{1/2}})\sqrt[8]{28})}$$
+$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{(\sqrt{7+3\times7^{1/2}}+\sqrt{13+7^{1/2}})\sqrt[8]{28}})/\sqrt{14}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49327,9 +49019,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(3, w+z, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)-\mathrm{JacobiTheta}(2, w+z, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)-\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`73eb5d` · Fungrim entry ↗](https://fungrim.org/entry/73eb5d)
@@ -49338,25 +49030,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})^2=\mathrm{JacobiTheta}(3, 0, \tau)^2-\mathrm{JacobiTheta}(2, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7527f1` · Fungrim entry ↗](https://fungrim.org/entry/7527f1)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`75cb8c` · Fungrim entry ↗](https://fungrim.org/entry/75cb8c)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, 2n+\tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
+$$\mathrm{JacobiTheta}(3, z, \tau+2n)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`772c88` · Fungrim entry ↗](https://fungrim.org/entry/772c88)
@@ -49365,7 +49057,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`775637` · Fungrim entry ↗](https://fungrim.org/entry/775637)
@@ -49374,7 +49066,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`794106` · Fungrim entry ↗](https://fungrim.org/entry/794106)
@@ -49390,7 +49082,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \imaginaryI)=\mathrm{JacobiTheta}(4, 0, \imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[-4]{2}$$
+$$\mathrm{JacobiTheta}(2, 0, \imaginaryI)=\mathrm{JacobiTheta}(4, 0, \imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49400,14 +49092,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2}{2\mathrm{JacobiTheta}(3, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7e0002` · Fungrim entry ↗](https://fungrim.org/entry/7e0002)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{\sqrt{2}(1+\sqrt[-4]{2})\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{\frac{1+2^{1/2}}{2}}}{\sqrt{1+\sqrt{2}}}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+\frac{1}{\sqrt[4]{2}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{2}}}{\sqrt{1+\sqrt{2}}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49416,7 +49108,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 0, \imaginaryI y+1)=\mathrm{JacobiTheta}(3, 0, \imaginaryI y)$$
+$$\mathrm{JacobiTheta}(4, 0, 1+y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, y\imaginaryI)$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -49425,7 +49117,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 9\imaginaryI)=\frac{1}{3}((1+\sqrt[3]{2(1+\sqrt{3})})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
+$$\mathrm{JacobiTheta}(3, 0, 9\imaginaryI)=\frac{1}{3}((1+\sqrt[3]{2(\sqrt{3}+1)})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49436,7 +49128,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau)=\frac{\mathrm{DedekindEta}((\tau+1)/2)^2}{\mathrm{DedekindEta}(\tau+1)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`85b2ff` · Fungrim entry ↗](https://fungrim.org/entry/85b2ff)
@@ -49445,34 +49137,34 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`89985a` · Fungrim entry ↗](https://fungrim.org/entry/89985a)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, w+z, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`89c9e4` · Fungrim entry ↗](https://fungrim.org/entry/89c9e4)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)^4=8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\imaginaryI\pi\tau(2n+1))}{1-\exp(\imaginaryI\pi\tau(2n+1))})+8(\sum_{n=0}^{\infty}\frac{2n\exp(2\imaginaryI\pi n\tau)}{\exp(2\imaginaryI\pi n\tau)+1})+1$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)^4=1+8(\sum_{n=0}^{\infty}\frac{2n\exp(\pi\imaginaryI\tau)^{2n}}{1+\exp(\pi\imaginaryI\tau)^{2n}})+8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1-\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8a316c` · Fungrim entry ↗](https://fungrim.org/entry/8a316c)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, \tau)=2(\sum_{n=1}^{\infty}\cos(2\pi nz)\times(-1)^{n}\exp(\imaginaryI\pi\tau n^2))+1$$
+$$\mathrm{JacobiTheta}(4, z, \tau)=1+2(\sum_{n=1}^{\infty}(-1)^{n}\exp(\pi\imaginaryI\tau)^{n^2}\cos(2n\pi z))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8a34d1` · Fungrim entry ↗](https://fungrim.org/entry/8a34d1)
@@ -49481,14 +49173,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`8b825c` · Fungrim entry ↗](https://fungrim.org/entry/8b825c)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{-7}{16}}\sqrt[4]{1+\sqrt{2}}&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -49497,9 +49189,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, n\tau+m+z, \tau)=\mathrm{JacobiTheta}(4, z, \tau)\times(-1)^{n}\exp(-(\imaginaryI\pi(\tau n^2+2nz)))$$
+$$\mathrm{JacobiTheta}(4, z+m+n\tau, \tau)=(-1)^{n}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`8d6a1d` · Fungrim entry ↗](https://fungrim.org/entry/8d6a1d)
@@ -49508,7 +49200,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(1, 0, \tau)=0$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8f43ab` · Fungrim entry ↗](https://fungrim.org/entry/8f43ab)
@@ -49517,16 +49209,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`931201` · Fungrim entry ↗](https://fungrim.org/entry/931201)
 
 ---
 
-$$32{(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)}^3+\pi^2(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)^2{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)}^{10}+(30{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)}^3+\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\tripleprime}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)^2-15\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau))^2=0$$
+$$(30{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)}^3-15\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)+\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)^2\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\tripleprime}(\tau))^2+32{(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)}^3+\pi^2(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)^2{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)}^{10}=0$$
 
-**Holds when** $0\lt\Im(\tau)\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`936694` · Fungrim entry ↗](https://fungrim.org/entry/936694)
@@ -49535,7 +49227,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 0, \tau)=\frac{1}{\mathrm{DedekindEta}(\tau)}(\mathrm{DedekindEta}(\tau/2)^2)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9448f2` · Fungrim entry ↗](https://fungrim.org/entry/9448f2)
@@ -49544,7 +49236,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z, \tau)=-\mathrm{JacobiTheta}(2, z+\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`95988c` · Fungrim entry ↗](https://fungrim.org/entry/95988c)
@@ -49553,14 +49245,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`95e508` · Fungrim entry ↗](https://fungrim.org/entry/95e508)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 4\imaginaryI)=\frac{1}{2}((1+\sqrt[-4]{2})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
+$$\mathrm{JacobiTheta}(3, 0, 4\imaginaryI)=\frac{1}{2}((1+2^{-(1/4)})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49569,9 +49261,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(2, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
+$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9973ef` · Fungrim entry ↗](https://fungrim.org/entry/9973ef)
@@ -49580,25 +49272,25 @@ Used by the Compute Engine for simplification.
 
 $$2\mathrm{JacobiTheta}(2, 0, 2\tau)\mathrm{JacobiTheta}(3, 0, 2\tau)=\mathrm{JacobiTheta}(2, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9a2054` · Fungrim entry ↗](https://fungrim.org/entry/9a2054)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(2, w+z, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(3, w+z, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9a9487` · Fungrim entry ↗](https://fungrim.org/entry/9a9487)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, w+z, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9aa437` · Fungrim entry ↗](https://fungrim.org/entry/9aa437)
@@ -49607,7 +49299,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, z, \tau+1)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9c1e9a` · Fungrim entry ↗](https://fungrim.org/entry/9c1e9a)
@@ -49616,7 +49308,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0552b` · Fungrim entry ↗](https://fungrim.org/entry/a0552b)
@@ -49625,7 +49317,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, 4\tau)=\frac{1}{2}(\mathrm{JacobiTheta}(3, z, \tau)-\mathrm{JacobiTheta}(4, z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0a1ee` · Fungrim entry ↗](https://fungrim.org/entry/a0a1ee)
@@ -49634,7 +49326,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau, 2r+1)=0$$
 
-**Holds when** $0\lt\Im(\tau)\land r\in\N$.
+**Holds when** $\Im(\tau)\gt0\land r\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a19141` · Fungrim entry ↗](https://fungrim.org/entry/a19141)
@@ -49643,16 +49335,16 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{JacobiTheta}(j, z, \tau)^{\prime}(z)=\mathrm{JacobiTheta}(j, z, \tau, r)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land r\in\N\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a222ed` · Fungrim entry ↗](https://fungrim.org/entry/a222ed)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(2, z+\frac{1}{8}, \tau)\mathrm{JacobiTheta}(2, z+\frac{3}{8}, \tau)\mathrm{JacobiTheta}(2, 1/8-z, \tau)\mathrm{JacobiTheta}(2, 3/8-z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
+$$\mathrm{JacobiTheta}(2, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(2, 1/8-z, \tau)\mathrm{JacobiTheta}(2, \frac{1}{8}+z, \tau)\mathrm{JacobiTheta}(2, 3/8-z, \tau)\mathrm{JacobiTheta}(2, \frac{3}{8}+z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a255e1` · Fungrim entry ↗](https://fungrim.org/entry/a255e1)
@@ -49661,7 +49353,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a4eecf` · Fungrim entry ↗](https://fungrim.org/entry/a4eecf)
@@ -49670,7 +49362,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, z, \tau+1)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a5c258` · Fungrim entry ↗](https://fungrim.org/entry/a5c258)
@@ -49679,7 +49371,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(j, z^\star, \tau)=\mathrm{JacobiTheta}(j, z, -\tau^\star)^\star$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a891da` · Fungrim entry ↗](https://fungrim.org/entry/a891da)
@@ -49688,7 +49380,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a94b43` · Fungrim entry ↗](https://fungrim.org/entry/a94b43)
@@ -49697,7 +49389,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \tau)=\frac{1}{\mathrm{DedekindEta}(\tau)}(2\mathrm{DedekindEta}(2\tau)^2)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a9c825` · Fungrim entry ↗](https://fungrim.org/entry/a9c825)
@@ -49706,7 +49398,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, z, \frac{\tau}{2})=\frac{2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a9cdda` · Fungrim entry ↗](https://fungrim.org/entry/a9cdda)
@@ -49715,7 +49407,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`aaa582` · Fungrim entry ↗](https://fungrim.org/entry/aaa582)
@@ -49724,16 +49416,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2=\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`abbe42` · Fungrim entry ↗](https://fungrim.org/entry/abbe42)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, 8n+\tau)=\mathrm{JacobiTheta}(1, z, \tau)$$
+$$\mathrm{JacobiTheta}(1, z, \tau+8n)=\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`abc1e7` · Fungrim entry ↗](https://fungrim.org/entry/abc1e7)
@@ -49742,7 +49434,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b1d07b` · Fungrim entry ↗](https://fungrim.org/entry/b1d07b)
@@ -49751,7 +49443,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, 0, \tau, 2r)=0$$
 
-**Holds when** $0\lt\Im(\tau)\land r\in\N$.
+**Holds when** $\Im(\tau)\gt0\land r\in\N$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b3c440` · Fungrim entry ↗](https://fungrim.org/entry/b3c440)
@@ -49760,23 +49452,23 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, z, \tau)=\mathrm{JacobiTheta}(4, z+\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b3fc6d` · Fungrim entry ↗](https://fungrim.org/entry/b3fc6d)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 2n+z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
+$$\mathrm{JacobiTheta}(2, z+2n, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b46534` · Fungrim entry ↗](https://fungrim.org/entry/b46534)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+2\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[-8]{2}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+2\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[8]{2}}$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49785,27 +49477,27 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, \tau+z, \tau)=-(\mathrm{JacobiTheta}(4, z, \tau)\exp(-(\imaginaryI\pi(\tau+2z))))$$
+$$\mathrm{JacobiTheta}(4, z+\tau, \tau)=-\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b83f63` · Fungrim entry ↗](https://fungrim.org/entry/b83f63)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, 2n+\tau)=\mathrm{JacobiTheta}(1, z, \tau)\imaginaryI^{n}$$
+$$\mathrm{JacobiTheta}(1, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`b978f0` · Fungrim entry ↗](https://fungrim.org/entry/b978f0)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, 4n+\tau)=\mathrm{JacobiTheta}(1, z, \tau)\times(-1)^{n}$$
+$$\mathrm{JacobiTheta}(1, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`b9c650` · Fungrim entry ↗](https://fungrim.org/entry/b9c650)
@@ -49814,16 +49506,16 @@ Used by the Compute Engine for expansion.
 
 $$2\mathrm{JacobiTheta}(3, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c3d8c2` · Fungrim entry ↗](https://fungrim.org/entry/c3d8c2)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \frac{-1}{\tau})=\mathrm{JacobiTheta}(3, \tau z, \tau)\exp(\imaginaryI\pi\tau z^2)\sqrt{\frac{\tau}{\imaginaryI}}$$
+$$\mathrm{JacobiTheta}(3, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(3, \tau z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c4b16c` · Fungrim entry ↗](https://fungrim.org/entry/c4b16c)
@@ -49839,9 +49531,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \tau)^4=8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\imaginaryI\pi\tau(2n+1))}{\exp(\imaginaryI\pi\tau(2n+1))+1})+8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\imaginaryI\pi\tau(2n+1))}{1-\exp(\imaginaryI\pi\tau(2n+1))})$$
+$$\mathrm{JacobiTheta}(2, 0, \tau)^4=8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})+8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1-\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c743eb` · Fungrim entry ↗](https://fungrim.org/entry/c743eb)
@@ -49850,16 +49542,16 @@ Used by the Compute Engine for simplification.
 
 $$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\times(-1)^{n}\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})-\tan(\pi z)$$
 
-**Holds when** $\cos(\pi z)\ne0\land0\lt\Im(\tau)\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\cos(\pi z)\ne0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c7f7a5` · Fungrim entry ↗](https://fungrim.org/entry/c7f7a5)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
+$$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c891a1` · Fungrim entry ↗](https://fungrim.org/entry/c891a1)
@@ -49868,7 +49560,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(4, z, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c92a6f` · Fungrim entry ↗](https://fungrim.org/entry/c92a6f)
@@ -49877,7 +49569,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cb493d` · Fungrim entry ↗](https://fungrim.org/entry/cb493d)
@@ -49893,34 +49585,34 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, \frac{\tau}{2}+z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\exp(-(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(2, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cc6d21` · Fungrim entry ↗](https://fungrim.org/entry/cc6d21)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, \tau+z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\exp(-(\imaginaryI\pi(\tau+2z)))$$
+$$\mathrm{JacobiTheta}(2, z+\tau, \tau)=\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cd5f45` · Fungrim entry ↗](https://fungrim.org/entry/cd5f45)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, \tau+1)=\mathrm{JacobiTheta}(2, z, \tau)\exp(\frac{\imaginaryI\pi}{4})$$
+$$\mathrm{JacobiTheta}(2, z, \tau+1)=\exp(\frac{\pi\imaginaryI}{4})\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cde93e` · Fungrim entry ↗](https://fungrim.org/entry/cde93e)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 2\imaginaryI)=\frac{1}{2}(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{2+\sqrt{2}})$$
+$$\mathrm{JacobiTheta}(3, 0, 2\imaginaryI)=\frac{1}{2}(\sqrt{\sqrt{2}+2}\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -49929,7 +49621,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 0, \imaginaryI y)=\mathrm{JacobiTheta}(3, 0, \imaginaryI y+1)$$
+$$\mathrm{JacobiTheta}(4, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, 1+y\imaginaryI)$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -49938,18 +49630,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, n+\tau)=\mathrm{JacobiTheta}(2, z, \tau)\exp(\frac{\imaginaryI\pi n}{4})$$
+$$\mathrm{JacobiTheta}(2, z, \tau+n)=\exp(\frac{\pi\imaginaryI n}{4})\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d0dfba` · Fungrim entry ↗](https://fungrim.org/entry/d0dfba)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, 2n+\tau)=\mathrm{JacobiTheta}(2, z, \tau)\imaginaryI^{n}$$
+$$\mathrm{JacobiTheta}(2, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`d11b7f` · Fungrim entry ↗](https://fungrim.org/entry/d11b7f)
@@ -49964,18 +49656,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, n\tau+m+z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\times(-1)^{m}\exp(-(\imaginaryI\pi(\tau n^2+2nz)))$$
+$$\mathrm{JacobiTheta}(2, z+m+n\tau, \tau)=(-1)^{m}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d29148` · Fungrim entry ↗](https://fungrim.org/entry/d29148)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(4, w+z, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)-\mathrm{JacobiTheta}(1, w+z, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(4, z+w, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)-\mathrm{JacobiTheta}(1, z+w, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d36e97` · Fungrim entry ↗](https://fungrim.org/entry/d36e97)
@@ -49984,25 +49676,25 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d41a95` · Fungrim entry ↗](https://fungrim.org/entry/d41a95)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, \frac{\tau}{2}+z, \tau)=\imaginaryI\mathrm{JacobiTheta}(4, z, \tau)\exp(-(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(1, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\imaginaryI\mathrm{JacobiTheta}(4, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d5a29e` · Fungrim entry ↗](https://fungrim.org/entry/d5a29e)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, \tau+z, \tau)=-(\mathrm{JacobiTheta}(1, z, \tau)\exp(-(\imaginaryI\pi(\tau+2z))))$$
+$$\mathrm{JacobiTheta}(1, z+\tau, \tau)=-\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(1, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d989cd` · Fungrim entry ↗](https://fungrim.org/entry/d989cd)
@@ -50011,23 +49703,23 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2}{2\mathrm{JacobiTheta}(2, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`db4e29` · Fungrim entry ↗](https://fungrim.org/entry/db4e29)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 0, \tau)^4=-8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\imaginaryI\pi\tau(2n+1))}{\exp(\imaginaryI\pi\tau(2n+1))+1})+8(\sum_{n=0}^{\infty}\frac{2n\exp(2\imaginaryI\pi n\tau)}{\exp(2\imaginaryI\pi n\tau)+1})+1$$
+$$\mathrm{JacobiTheta}(4, 0, \tau)^4=(1+8(\sum_{n=0}^{\infty}\frac{2n\exp(\pi\imaginaryI\tau)^{2n}}{1+\exp(\pi\imaginaryI\tau)^{2n}}))-8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dc7c83` · Fungrim entry ↗](https://fungrim.org/entry/dc7c83)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)\times(-1)^{\lfloor(n+1)/4\rfloor}&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times(-1)^{\lfloor(n+1)/4\rfloor}\times2^{\frac{-7}{16}}\sqrt{2^{1/2}-1}\sqrt[4]{1+\sqrt{2}}&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -50038,25 +49730,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})^2=\mathrm{JacobiTheta}(2, 0, \tau)^2+\mathrm{JacobiTheta}(3, 0, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`de7918` · Fungrim entry ↗](https://fungrim.org/entry/de7918)
 
 ---
 
-$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})+\cot(\pi z)$$
+$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})$$
 
-**Holds when** $\sin(\pi z)\ne0\land0\lt\Im(\tau)\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\sin(\pi z)\ne0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dfbddd` · Fungrim entry ↗](https://fungrim.org/entry/dfbddd)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(2, w+z, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
+$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dfea7d` · Fungrim entry ↗](https://fungrim.org/entry/dfea7d)
@@ -50065,7 +49757,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, z, \tau)^4-\mathrm{JacobiTheta}(4, z, \tau)^4=\mathrm{JacobiTheta}(2, z, \tau)^4-\mathrm{JacobiTheta}(3, z, \tau)^4$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`e08bb4` · Fungrim entry ↗](https://fungrim.org/entry/e08bb4)
@@ -50074,14 +49766,14 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(1, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e13fe9` · Fungrim entry ↗](https://fungrim.org/entry/e13fe9)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \imaginaryI y+1)=\frac{\sqrt{2}(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)}{2\sqrt{y}}$$
+$$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{\sqrt{2}(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)}{2\sqrt{y}}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
@@ -50090,7 +49782,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{-7}{8}}\sqrt[8]{16+9\sqrt[4]{8}+12\sqrt{2}+15\sqrt[4]{2}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}}{2^{\frac{7}{8}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -50099,18 +49791,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)=2(\sum_{n=1}^{\infty}\frac{\mathrm{LiouvilleLambda}(n)\exp(\imaginaryI\pi n\tau)}{1-\exp(\imaginaryI\pi n\tau)})+1$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)=1+2(\sum_{n=1}^{\infty}\frac{\mathrm{LiouvilleLambda}(n)\exp(\pi\imaginaryI\tau)^{n}}{1-\exp(\pi\imaginaryI\tau)^{n}})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e4e707` · Fungrim entry ↗](https://fungrim.org/entry/e4e707)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, n+z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
+$$\mathrm{JacobiTheta}(3, z+n, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e56f77` · Fungrim entry ↗](https://fungrim.org/entry/e56f77)
@@ -50119,7 +49811,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e6d333` · Fungrim entry ↗](https://fungrim.org/entry/e6d333)
@@ -50128,34 +49820,34 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(4, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`e6dc09` · Fungrim entry ↗](https://fungrim.org/entry/e6dc09)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \frac{-1}{\tau})=-(\imaginaryI\mathrm{JacobiTheta}(1, \tau z, \tau)\exp(\imaginaryI\pi\tau z^2)\sqrt{\frac{\tau}{\imaginaryI}})$$
+$$\mathrm{JacobiTheta}(1, z, \frac{-1}{\tau})=-\imaginaryI\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(1, \tau z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e8ce0b` · Fungrim entry ↗](https://fungrim.org/entry/e8ce0b)
 
 ---
 
-$$\mathrm{JacobiTheta}(j, z, \tau, 2)-4\imaginaryI\pi\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau)^{\prime}(\tau)=0$$
+$$\mathrm{JacobiTheta}(j, z, \tau, 2)-4\pi\imaginaryI\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau)^{\prime}(\tau)=0$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ebc673` · Fungrim entry ↗](https://fungrim.org/entry/ebc673)
 
 ---
 
-$$\mathrm{JacobiTheta}(1, z, \tau)=-(\imaginaryI\mathrm{JacobiTheta}(3, \frac{\tau}{2}+z+\frac{1}{2}, \tau)\exp(\imaginaryI\pi(\frac{\tau}{4}+z)))$$
+$$\mathrm{JacobiTheta}(1, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(3, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed0756` · Fungrim entry ↗](https://fungrim.org/entry/ed0756)
@@ -50164,34 +49856,34 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^4+\mathrm{JacobiTheta}(4, z, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^3}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed3ff9` · Fungrim entry ↗](https://fungrim.org/entry/ed3ff9)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, z, \frac{-1}{\tau})=\mathrm{JacobiTheta}(2, \tau z, \tau)\exp(\imaginaryI\pi\tau z^2)\sqrt{\frac{\tau}{\imaginaryI}}$$
+$$\mathrm{JacobiTheta}(4, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(2, \tau z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed8ba7` · Fungrim entry ↗](https://fungrim.org/entry/ed8ba7)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(1, w+z, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
+$$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ee8617` · Fungrim entry ↗](https://fungrim.org/entry/ee8617)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, z+\frac{1}{4}, \tau)\mathrm{JacobiTheta}(1, 1/4-z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
+$$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, 1/4-z, \tau)\mathrm{JacobiTheta}(1, \frac{1}{4}+z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f12569` · Fungrim entry ↗](https://fungrim.org/entry/f12569)
@@ -50209,7 +49901,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(4, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f14471` · Fungrim entry ↗](https://fungrim.org/entry/f14471)
@@ -50218,43 +49910,43 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(1, 0, \tau, 1)=\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f2e28a` · Fungrim entry ↗](https://fungrim.org/entry/f2e28a)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \tau)=2(\sum_{n=1}^{\infty}\cos(2\pi nz)\exp(\imaginaryI\pi\tau n^2))+1$$
+$$\mathrm{JacobiTheta}(3, z, \tau)=1+2(\sum_{n=1}^{\infty}\exp(\pi\imaginaryI\tau)^{n^2}\cos(2n\pi z))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f3e75c` · Fungrim entry ↗](https://fungrim.org/entry/f3e75c)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)=\mathrm{JacobiTheta}(3, w+z, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(2, w+z, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
+$$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land w\in\C$.
+**Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f4554f` · Fungrim entry ↗](https://fungrim.org/entry/f4554f)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, n+z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\times(-1)^{n}$$
+$$\mathrm{JacobiTheta}(2, z+n, \tau)=(-1)^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f697d5` · Fungrim entry ↗](https://fungrim.org/entry/f697d5)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \tau)^2=2(\sum_{n=1}^{\infty}\frac{1}{\cos(\pi n\tau)})+1$$
+$$\mathrm{JacobiTheta}(3, 0, \tau)^2=1+2(\sum_{n=1}^{\infty}(\cos(\pi\tau n))^{-1})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f8cd8f` · Fungrim entry ↗](https://fungrim.org/entry/f8cd8f)
@@ -50263,16 +49955,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2=\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fa7251` · Fungrim entry ↗](https://fungrim.org/entry/fa7251)
 
 ---
 
-$$\mathrm{JacobiTheta}(2, z, 8n+\tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
+$$\mathrm{JacobiTheta}(2, z, \tau+8n)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fb4b1b` · Fungrim entry ↗](https://fungrim.org/entry/fb4b1b)
@@ -50281,16 +49973,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, -z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fb55cb` · Fungrim entry ↗](https://fungrim.org/entry/fb55cb)
 
 ---
 
-$$\mathrm{JacobiTheta}(4, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z+\frac{1}{4}, \tau)\mathrm{JacobiTheta}(4, 1/4-z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
+$$\mathrm{JacobiTheta}(4, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 1/4-z, \tau)\mathrm{JacobiTheta}(4, \frac{1}{4}+z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fc3c44` · Fungrim entry ↗](https://fungrim.org/entry/fc3c44)
@@ -50299,7 +49991,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(j, z, -\tau^\star)=\mathrm{JacobiTheta}(j, z^\star, \tau)^\star$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C\land j\in\lbrace1, 2, 3, 4\rbrace$.
+**Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fe1b96` · Fungrim entry ↗](https://fungrim.org/entry/fe1b96)
@@ -50308,7 +50000,7 @@ Used by the Compute Engine for simplification.
 
 ## Modular j-invariant
 
-$$\mathrm{ModularJ}(\sqrt{2}\imaginaryI)=8\,000=8\,000$$
+$$\mathrm{ModularJ}(\sqrt{2}\imaginaryI)=20^3=8\,000$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50324,7 +50016,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(2\imaginaryI)=287\,496=287\,496$$
+$$\mathrm{ModularJ}(2\imaginaryI)=66^3=287\,496$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50332,7 +50024,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{7}\imaginaryI))=-3\,375$$
+$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{7}\imaginaryI))=-15^3$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50348,16 +50040,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=-(\frac{2\imaginaryI\pi\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)})$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{(-2\imaginaryI)\pi\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
 
-**Holds when** $\mathrm{EisensteinE}(4, \tau)\ne0\land0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0\land\mathrm{EisensteinE}(4, \tau)\ne0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`348b26` · Fungrim entry ↗](https://fungrim.org/entry/348b26)
 
 ---
 
-$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{19}\imaginaryI))=-884\,736$$
+$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{19}\imaginaryI))=-96^3$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50367,7 +50059,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularJ}(-(\frac{1}{\tau}))=\mathrm{ModularJ}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`42a909` · Fungrim entry ↗](https://fungrim.org/entry/42a909)
@@ -50383,7 +50075,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{43}\imaginaryI))=-884\,736\,000$$
+$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{43}\imaginaryI))=-960^3$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50391,9 +50083,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\tau)={(\frac{256\mathrm{DedekindEta}(2\tau)^{16}}{\mathrm{DedekindEta}(\tau)^{16}}+\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8)}^3$$
+$$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{16})}^3$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for expansion.
 [`664b4c` · Fungrim entry ↗](https://fungrim.org/entry/664b4c)
@@ -50408,7 +50100,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{67}\imaginaryI))=-147\,197\,952\,000$$
+$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{67}\imaginaryI))=-5\,280^3$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50416,7 +50108,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\exp(\frac{\imaginaryI\pi}{3}))=0$$
+$$\mathrm{ModularJ}(\exp(\frac{\pi\imaginaryI}{3}))=0$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50424,7 +50116,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{11}\imaginaryI))=-32\,768$$
+$$\mathrm{ModularJ}(\frac{1}{2}(1+\sqrt{11}\imaginaryI))=-32^3$$
 
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -50434,7 +50126,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularJ}(\tau+1)=\mathrm{ModularJ}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`a997f2` · Fungrim entry ↗](https://fungrim.org/entry/a997f2)
@@ -50451,7 +50143,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularJ}(\tau)=\frac{32{(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)}^3}{(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`cedcfc` · Fungrim entry ↗](https://fungrim.org/entry/cedcfc)
@@ -50460,16 +50152,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularJ}(\tau)=\frac{\mathrm{EisensteinE}(4, \tau)^3}{\mathrm{DedekindEta}(\tau)^{24}}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for expansion.
 [`dc8251` · Fungrim entry ↗](https://fungrim.org/entry/dc8251)
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=-(\frac{2\imaginaryI\pi\mathrm{EisensteinE}(14, \tau)}{\mathrm{DedekindEta}(\tau)^{24}})$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=((-2\imaginaryI)\pi\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`f0f53b` · Fungrim entry ↗](https://fungrim.org/entry/f0f53b)
@@ -50480,7 +50172,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\mathrm{ModularLambda}(\tau)}=\frac{\mathrm{DedekindEta}(\tau/2)^8}{16\mathrm{DedekindEta}(2\tau)^8}+1$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`033d39` · Fungrim entry ↗](https://fungrim.org/entry/033d39)
@@ -50489,7 +50181,7 @@ Used by the Compute Engine for simplification.
 
 $$1-\mathrm{ModularLambda}(\tau)=\frac{\mathrm{JacobiTheta}(4, 0, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^4}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`04d3a6` · Fungrim entry ↗](https://fungrim.org/entry/04d3a6)
@@ -50506,25 +50198,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(-(\frac{1}{\tau}))=1-\mathrm{ModularLambda}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`07bf27` · Fungrim entry ↗](https://fungrim.org/entry/07bf27)
 
 ---
 
-$$\mathrm{ModularLambda}(\tau)=\frac{\mathrm{WeierstrassP}((\tau+1)/2, \tau)-\mathrm{WeierstrassP}(\tau/2, \tau)}{\mathrm{WeierstrassP}(1/2, \tau)-\mathrm{WeierstrassP}(\tau/2, \tau)}$$
+$$\mathrm{ModularLambda}(\tau)=\frac{\mathrm{WeierstrassP}((1+\tau)/2, \tau)-\mathrm{WeierstrassP}(\tau/2, \tau)}{\mathrm{WeierstrassP}(1/2, \tau)-\mathrm{WeierstrassP}(\tau/2, \tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`166402` · Fungrim entry ↗](https://fungrim.org/entry/166402)
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\imaginaryI\pi(-6\mathrm{EisensteinE}(2, \tau)+8\mathrm{EisensteinE}(2, 2\tau)+\mathrm{EisensteinE}(2, \frac{\tau}{2}))\mathrm{ModularLambda}(\tau))$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau)))\mathrm{ModularLambda}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinE** — Normalized Eisenstein series; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`27b2c7` · Fungrim entry ↗](https://fungrim.org/entry/27b2c7)
@@ -50533,7 +50225,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\frac{1}{1-\tau})=\frac{1}{1-\mathrm{ModularLambda}(\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for expansion.
 [`2ba627` · Fungrim entry ↗](https://fungrim.org/entry/2ba627)
@@ -50550,7 +50242,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\frac{\tau-1}{\tau})=\frac{\mathrm{ModularLambda}(\tau)-1}{\mathrm{ModularLambda}(\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`3a7a0b` · Fungrim entry ↗](https://fungrim.org/entry/3a7a0b)
@@ -50559,7 +50251,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularJ}(\tau)=\frac{256{(-\mathrm{ModularLambda}(\tau)+\mathrm{ModularLambda}(\tau)^2+1)}^3}{(1-\mathrm{ModularLambda}(\tau))^2\mathrm{ModularLambda}(\tau)^2}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`44a529` · Fungrim entry ↗](https://fungrim.org/entry/44a529)
@@ -50576,16 +50268,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\tau)=\frac{\mathrm{JacobiTheta}(2, 0, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^4}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for expansion.
 [`5b9c02` · Fungrim entry ↗](https://fungrim.org/entry/5b9c02)
 
 ---
 
-$$\mathrm{ModularLambda}(\tau)=\frac{16\mathrm{DedekindEta}(2\tau)^{16}\mathrm{DedekindEta}(\tau/2)^8}{\mathrm{DedekindEta}(\tau)^{24}}$$
+$$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(2\tau)^{16}\mathrm{DedekindEta}(\tau/2)^8)/\mathrm{DedekindEta}(\tau)^{24}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **DedekindEta** — Dedekind eta function; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`5dd24a` · Fungrim entry ↗](https://fungrim.org/entry/5dd24a)
@@ -50594,14 +50286,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\tau+2)=\mathrm{ModularLambda}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`6678af` · Fungrim entry ↗](https://fungrim.org/entry/6678af)
 
 ---
 
-$$\mathrm{ModularLambdaFundamentalDomain}=\lbrace\tau, \tau\in\mathrm{HH}\in(1/2\lt\min(\vert\tau-1/2\vert, \vert z+1/2\vert)\land\Re(\tau)\in\lparen-1, 1\rparen\lor\Re(\tau)=-1\lor\vert\tau+1/2\vert=1/2)\rbrace$$
+$$\mathrm{ModularLambdaFundamentalDomain}=\lbrace\tau, \tau\in\mathrm{HH}\in(\Re(\tau)\in\lparen-1, 1\rparen\land\min(\vert\tau-1/2\vert, \vert z+1/2\vert)\gt1/2\lor\Re(\tau)=-1\lor\vert\tau+1/2\vert=1/2)\rbrace$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
 Used by the Compute Engine for simplification.
@@ -50612,7 +50304,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{\mathrm{ModularLambda}(\tau)}{\mathrm{ModularLambda}(\tau)-1}=-(\frac{\mathrm{JacobiTheta}(2, 0, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^4})$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`903962` · Fungrim entry ↗](https://fungrim.org/entry/903962)
@@ -50627,7 +50319,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularLambda}(\exp(\frac{2\imaginaryI\pi}{3}))=-\exp(\frac{2\imaginaryI\pi}{3})$$
+$$\mathrm{ModularLambda}(\exp(\frac{2\pi\imaginaryI}{3}))=-\exp(\frac{2\pi\imaginaryI}{3})$$
 
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
@@ -50635,7 +50327,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau=\frac{\imaginaryI\mathrm{EllipticK}(1-\mathrm{ModularLambda}(\tau))}{\mathrm{EllipticK}(\mathrm{ModularLambda}(\tau))}$$
+$$\tau=\frac{(\imaginaryI)\mathrm{EllipticK}(1-\mathrm{ModularLambda}(\tau))}{\mathrm{EllipticK}(\mathrm{ModularLambda}(\tau))}$$
 
 **Holds when** $\tau\in\mathrm{Interior}(\mathrm{ModularLambdaFundamentalDomain})\cup\lbrace\tau, \tau\in\mathrm{HH}\in\Re(\tau)=1\rbrace$.
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **ModularLambda** — Modular lambda function.
@@ -50646,16 +50338,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\tau+1)=\frac{\mathrm{ModularLambda}(\tau)}{\mathrm{ModularLambda}(\tau)-1}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`bbfb6c` · Fungrim entry ↗](https://fungrim.org/entry/bbfb6c)
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}(2\imaginaryI(-6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+8\mathrm{WeierstrassZeta}(\frac{1}{2}, 2\tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \frac{\tau}{2}))\mathrm{ModularLambda}(\tau))$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((2\imaginaryI)(-6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+8\mathrm{WeierstrassZeta}(\frac{1}{2}, 2\tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \frac{\tau}{2}))\mathrm{ModularLambda}(\tau))$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`c18c95` · Fungrim entry ↗](https://fungrim.org/entry/c18c95)
@@ -50664,7 +50356,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\frac{\tau}{1-\tau})=\frac{1}{\mathrm{ModularLambda}(\tau)}$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`e9f0c8` · Fungrim entry ↗](https://fungrim.org/entry/e9f0c8)
@@ -50673,7 +50365,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ModularLambda}(\frac{\tau}{2\tau+1})=\mathrm{ModularLambda}(\tau)$$
 
-**Holds when** $0\lt\Im(\tau)$.
+**Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`ec5a44` · Fungrim entry ↗](https://fungrim.org/entry/ec5a44)
@@ -55053,7 +54745,7 @@ slug: /compute-engine/reference/fungrim-number-theory/
 
 # Number theory
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **67 identities** for number theory.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **70 identities** for number theory.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -55063,19 +54755,19 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Greatest common divisor](#greatest-common-divisor) (56)
 - [Prime numbers](#prime-numbers) (1)
-- [Totient function](#totient-function) (10)
+- [Totient function](#totient-function) (13)
 
 ## Greatest common divisor
 
 $$\gcd(p, q)=1$$
 
-**Holds when** $p\ne q\land p\in\mathrm{Primes}\land q\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q$.
 Used by the Compute Engine for simplification.
 [`062423` · Fungrim entry ↗](https://fungrim.org/entry/062423)
 
 ---
 
-$$\gcd(bn+a, b)=\gcd(a, b)$$
+$$\gcd(a+nb, b)=\gcd(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55125,7 +54817,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\lcm(a, 2)=(\frac{1-(-1)^{a}}{2}+1)\vert a\vert$$
+$$\lcm(a, 2)=\vert a\vert(1+\frac{1-(-1)^{a}}{2})$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55140,7 +54832,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{XGCD}(-1, b)=(1,-\vert\mathrm{sgn}((b-1)(b+1))\vert,(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1))\mathrm{sgn}(b))$$
+$$\mathrm{XGCD}(-1, b)=(1,-\vert\mathrm{sgn}((b-1)(b+1))\vert,\mathrm{sgn}(b)(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1)))$$
 
 **Holds when** $b\in\Z$.
 **Symbols:** **XGCD** — Extended greatest common divisor.
@@ -55149,9 +54841,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(bn+a, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert bn+a\vert)$$
+$$\lcm(a+nb, b)=\frac{1}{\vert a\vert}(\vert a+nb\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land n\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
 [`1bbdaf` · Fungrim entry ↗](https://fungrim.org/entry/1bbdaf)
 
@@ -55175,7 +54867,7 @@ Used by the Compute Engine for simplification.
 
 $$\lcm(r, s)=\vert rs\vert$$
 
-**Holds when** $\gcd(r, s)=1\land r\in\Z\land s\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land\gcd(r, s)=1$.
 Used by the Compute Engine for expansion.
 [`250a45` · Fungrim entry ↗](https://fungrim.org/entry/250a45)
 
@@ -55206,13 +54898,13 @@ Used by the Compute Engine for expansion.
 
 $$\gcd(p^{m}, q^{n})=1$$
 
-**Holds when** $p\ne q\land p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land m\in\N\land n\in\N$.
+**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q\land m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`499cfc` · Fungrim entry ↗](https://fungrim.org/entry/499cfc)
 
 ---
 
-$$\lcm(a, b)\gcd(a, b)=\vert ab\vert$$
+$$\gcd(a, b)\lcm(a, b)=\vert ab\vert$$
 
 **Holds when** $a\in\Z\land b\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55227,15 +54919,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a+b, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert a+b\vert)$$
+$$\lcm(a+b, b)=\frac{1}{\vert a\vert}(\vert a+b\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z$.
 Used by the Compute Engine for simplification.
 [`5781de` · Fungrim entry ↗](https://fungrim.org/entry/5781de)
 
 ---
 
-$$\gcd(a, 2)=\frac{(-1)^{a}+1}{2}+1$$
+$$\gcd(a, 2)=1+\frac{1+(-1)^{a}}{2}$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for expansion.
@@ -55253,7 +54945,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(a, b)=\frac{\vert ab\vert}{\lcm(a, b)}$$
 
-**Holds when** $a\ne0\land b\ne0\land a\in\Z\land b\in\Z$.
+**Holds when** $a\in\Z\land b\in\Z\land a\ne0\land b\ne0$.
 Used by the Compute Engine for simplification.
 [`6572c5` · Fungrim entry ↗](https://fungrim.org/entry/6572c5)
 
@@ -55284,7 +54976,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-2)=\frac{1}{2}((\frac{1-(-1)^{a}}{2}+1)\vert a(a-2)\vert)$$
+$$\lcm(a, a-2)=\frac{1}{2}(\vert a(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55308,7 +55000,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\gcd(a, a-2)=\frac{(-1)^{a}+1}{2}+1$$
+$$\gcd(a, a-2)=1+\frac{1+(-1)^{a}}{2}$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55318,7 +55010,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(rs, c)=\gcd(r, c)\gcd(s, c)$$
 
-**Holds when** $\gcd(r, s)=1\land r\in\Z\land s\in\Z\land c\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land c\in\Z\land\gcd(r, s)=1$.
 Used by the Compute Engine for simplification.
 [`8621f6` · Fungrim entry ↗](https://fungrim.org/entry/8621f6)
 
@@ -55349,7 +55041,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(an, bn)=\lcm(a, b)\vert n\vert$$
+$$\lcm(na, nb)=\vert n\vert\lcm(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55359,7 +55051,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(a\bmod b, b)=\gcd(a, b)$$
 
-**Holds when** $b\ne0\land a\in\Z\land b\in\Z$.
+**Holds when** $a\in\Z\land b\in\Z\land b\ne0$.
 Used by the Compute Engine for simplification.
 [`959a25` · Fungrim entry ↗](https://fungrim.org/entry/959a25)
 
@@ -55389,7 +55081,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{XGCD}(1, b)=(1,\vert\mathrm{sgn}((b-1)(b+1))\vert,(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1))\mathrm{sgn}(b))$$
+$$\mathrm{XGCD}(1, b)=(1,\vert\mathrm{sgn}((b-1)(b+1))\vert,\mathrm{sgn}(b)(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1)))$$
 
 **Holds when** $b\in\Z$.
 **Symbols:** **XGCD** — Extended greatest common divisor.
@@ -55438,7 +55130,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\gcd(an, bn)=\gcd(a, b)\vert n\vert$$
+$$\gcd(na, nb)=\vert n\vert\gcd(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -55487,9 +55179,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a-b, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert a-b\vert)$$
+$$\lcm(a-b, b)=\frac{1}{\vert a\vert}(\vert a-b\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z$.
 Used by the Compute Engine for simplification.
 [`e74d86` · Fungrim entry ↗](https://fungrim.org/entry/e74d86)
 
@@ -55505,7 +55197,7 @@ Used by the Compute Engine for simplification.
 
 $$\lcm(rs, c)=\frac{1}{\vert c\vert}(\lcm(r, c)\lcm(s, c))$$
 
-**Holds when** $c\ne0\land\gcd(r, s)=1\land r\in\Z\land s\in\Z\land c\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land c\in\Z\land\gcd(r, s)=1\land c\ne0$.
 Used by the Compute Engine for simplification.
 [`fbe121` · Fungrim entry ↗](https://fungrim.org/entry/fbe121)
 
@@ -55521,7 +55213,7 @@ Used by the Compute Engine for simplification.
 
 ## Prime numbers
 
-$$\mathrm{PrimePi}(x)=\mathrm{Count}(\lbrace p, p\in\mathrm{Primes}\in p\le x\rbrace)$$
+$$\mathrm{PrimePi}(x)=\mathrm{Count}(\lbrace p, p\in\mathrm{Primes}\in(p\le x)\rbrace)$$
 
 **Holds when** $x\in\R$.
 **Symbols:** **PrimePi** — Prime counting function.
@@ -55532,7 +55224,7 @@ Used by the Compute Engine for simplification.
 
 ## Totient function
 
-$$\mathrm{Totient}(m^{n})=\mathrm{Totient}(m)m^{n-1}$$
+$$\mathrm{Totient}(m^{n})=m^{n-1}\mathrm{Totient}(m)$$
 
 **Holds when** $m\in\N\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -55564,7 +55256,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(p^{k})=(p-1)p^{k-1}$$
+$$\mathrm{Totient}(p^{k})=p^{k-1}(p-1)$$
 
 **Holds when** $p\in\mathrm{Primes}\land k\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -55572,7 +55264,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(mn)=\frac{\gcd(m, n)\mathrm{Totient}(m)\mathrm{Totient}(n)}{\mathrm{Totient}(\gcd(m, n))}$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{\mathrm{Totient}(n+1)}{\mathrm{Totient}(n)}, \infty)=0$$
+
+**Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
+Used by the Compute Engine for simplification.
+[`33139b` · Fungrim entry ↗](https://fungrim.org/entry/33139b)
+
+---
+
+$$\mathrm{Totient}(mn)=\frac{\mathrm{Totient}(m)\mathrm{Totient}(n)\gcd(m, n)}{\mathrm{Totient}(\gcd(m, n))}$$
 
 **Holds when** $m\in\N^*\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -55580,7 +55280,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(2n)=\begin{cases}2\mathrm{Totient}(n)&\lnot\mathrm{IsOdd}(n)\\\mathrm{Totient}(n)&\mathrm{IsOdd}(n)\end{cases}$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\gamma)$$
+
+**Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
+Used by the Compute Engine for simplification.
+[`acfc1f` · Fungrim entry ↗](https://fungrim.org/entry/acfc1f)
+
+---
+
+$$\mathrm{Totient}(2n)=\begin{cases}2\mathrm{Totient}(n)&\mathrm{IsEven}(n)\\\mathrm{Totient}(n)&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -55609,6 +55317,14 @@ $$\mathrm{Totient}(\lcm(m, n))\mathrm{Totient}(\gcd(m, n))=\mathrm{Totient}(m)\m
 **Holds when** $m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`d1ea57` · Fungrim entry ↗](https://fungrim.org/entry/d1ea57)
+
+---
+
+$$\mathrm{SequenceLimitSuperior}(n\mapsto\frac{\mathrm{Totient}(n+1)}{\mathrm{Totient}(n)}, \infty)=\infty$$
+
+**Symbols:** **SequenceLimitSuperior** — Limit superior of sequence.
+Used by the Compute Engine for simplification.
+[`feb1a0` · Fungrim entry ↗](https://fungrim.org/entry/feb1a0)
 
 ---
 ---
@@ -58133,7 +57849,7 @@ slug: /compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1383 identities** behind the engine's **1388 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1400 identities** behind the engine's **1405 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -58149,9 +57865,9 @@ Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert
 
 Complex parts (21) · Complex plane (3) · Imaginary unit (16)
 
-### [Gamma and related functions](/compute-engine/reference/fungrim-gamma/) (123)
+### [Gamma and related functions](/compute-engine/reference/fungrim-gamma/) (135)
 
-Barnes G-function (27) · Beta function (11) · Digamma function (39) · Factorials and binomial coefficients (22) · Gamma function (24)
+Barnes G-function (27) · Beta function (13) · Digamma function (39) · Factorials and binomial coefficients (32) · Gamma function (24)
 
 ### [Orthogonal polynomials](/compute-engine/reference/fungrim-orthogonal-polynomials/) (74)
 
@@ -58173,13 +57889,13 @@ Dedekind eta function (23) · Illustrations of Eisenstein series (41) · Jacobi 
 
 Dirichlet characters (15) · Hurwitz zeta function (40) · Multiple zeta values (7) · Riemann zeta function (17)
 
-### [Number theory](/compute-engine/reference/fungrim-number-theory/) (67)
+### [Number theory](/compute-engine/reference/fungrim-number-theory/) (70)
 
-Greatest common divisor (56) · Prime numbers (1) · Totient function (10)
+Greatest common divisor (56) · Prime numbers (1) · Totient function (13)
 
-### [Combinatorial and integer sequences](/compute-engine/reference/fungrim-sequences/) (62)
+### [Combinatorial and integer sequences](/compute-engine/reference/fungrim-sequences/) (64)
 
-Bell numbers (1) · Bernoulli numbers and polynomials (9) · Fibonacci numbers (34) · Integer sequences (8) · Partition function (6) · Stirling numbers (4)
+Bell numbers (1) · Bernoulli numbers and polynomials (9) · Fibonacci numbers (36) · Integer sequences (8) · Partition function (6) · Stirling numbers (4)
 ---
 title: Fungrim Identities — Bessel and hypergeometric functions
 slug: /compute-engine/reference/fungrim-bessel-hypergeometric/
@@ -58204,7 +57920,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Airy functions
 
-$$\operatorname{Ai}(z)=z\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})z\mapsto\operatorname{Ai}(z)^{\prime}(0)+\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})$$
+$$\operatorname{Ai}(z)=\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -58213,7 +57929,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=\frac{1}{2}(\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})z^2)+\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})z\mapsto\operatorname{Ai}(z)^{\prime}(0)$$
+$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -58222,7 +57938,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=\frac{1}{2}(\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})z^2)+\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})z\mapsto\operatorname{Bi}(z)^{\prime}(0)$$
+$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -58231,9 +57947,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z))=0$$
+$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0$$
 
-**Holds when** $z\in\C\land C\in\C\land\mathrm{D_{var}}\in\C$.
+**Holds when** $z\in\C\land C\in\C\land D_{var}\in\C$.
 Used by the Compute Engine for simplification.
 [`51b241` · Fungrim entry ↗](https://fungrim.org/entry/51b241)
 
@@ -58255,7 +57971,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Bi}(z)=z\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})z\mapsto\operatorname{Bi}(z)^{\prime}(0)+\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})$$
+$$\operatorname{Bi}(z)=\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -58264,16 +57980,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Ai}(z)z\mapsto\operatorname{Bi}(z)^{\prime}(z)-\operatorname{Bi}(z)z\mapsto\operatorname{Ai}(z)^{\prime}(z)=\frac{1}{\pi}$$
+$$\operatorname{Ai}(z)z\mapsto\operatorname{Bi}(z)^{\prime}(z)-z\mapsto\operatorname{Ai}(z)^{\prime}(z)\operatorname{Bi}(z)=\frac{1}{\pi}$$
 
 Used by the Compute Engine for simplification.
 [`de9800` · Fungrim entry ↗](https://fungrim.org/entry/de9800)
 
 ---
 
-$$z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)=(n-2)z\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)+zz\mapsto C\operatorname{Ai}(z)+\mathrm{D_{var}}\operatorname{Bi}(z)^{\prime}(z)$$
+$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)=zz\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)+(n-2)z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\prime}(z)$$
 
-**Holds when** $z\in\C\land C\in\C\land\mathrm{D_{var}}\in\C\land n\in3..\infty$.
+**Holds when** $z\in\C\land n\in3..\infty\land C\in\C\land D_{var}\in\C$.
 Used by the Compute Engine for simplification.
 [`eadca2` · Fungrim entry ↗](https://fungrim.org/entry/eadca2)
 
@@ -58281,7 +57997,7 @@ Used by the Compute Engine for simplification.
 
 ## Bessel functions
 
-$$\operatorname{K}_{\frac{3}{2}}(z)=(\frac{1}{z}+\frac{1}{z^2})\exp(-z)\sqrt{\frac{\pi z}{2}}$$
+$$\operatorname{K}_{\frac{3}{2}}(z)=\sqrt{\frac{\pi z}{2}}\exp(-z)(\frac{1}{z}+\frac{1}{z^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58289,7 +58005,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\sin(z)}{\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58297,16 +58013,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\sqrt{2}(\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(\imaginaryI((\pi(2\nu+1))/4-z))+\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))\exp(-(\imaginaryI((\pi(2\nu+1))/4-z))))}{2\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{J}_{\nu}(z)=\frac{\exp(-(\imaginaryI((\pi(2\nu+1))/4-z)))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))+\exp(\imaginaryI((\pi(2\nu+1))/4-z))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\sqrt{2\pi z}}$$
 
-**Holds when** $0\lt\Re(z)\land\nu\in\C\land z\in\C$.
+**Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`127f05` · Fungrim entry ↗](https://fungrim.org/entry/127f05)
 
 ---
 
-$$(-n^2+r^2+4r+4)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)+(r+1)(r+2)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)=0$$
+$$((r^2+4r)-n^2+4)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)+(r+1)(r+2)z\mapsto\operatorname{J}_{n}(z)^{\prime}(0)=0$$
 
 **Holds when** $n\in\Z\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -58356,7 +58072,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}$$
+$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58364,7 +58080,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{\sqrt{2}\cos(z)}{\sqrt{\pi}\sqrt{z}})$$
+$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}((2^{1/2}\cos(z)z^{1/2})/\pi^{1/2}))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58374,13 +58090,13 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{I}_{\nu}(z)=\frac{z(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}$$
 
-**Holds when** $z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`4fb391` · Fungrim entry ↗](https://fungrim.org/entry/4fb391)
 
 ---
 
-$$\operatorname{J}_{-n}(z)=\operatorname{J}_{n}(z)\times(-1)^{n}$$
+$$\operatorname{J}_{-n}(z)=(-1)^{n}\operatorname{J}_{n}(z)$$
 
 **Holds when** $n\in\Z\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -58388,7 +58104,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\sin(z)}{\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58412,7 +58128,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\cosh(z)}{\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cosh(z)\sqrt{z})/\sqrt{\pi})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58420,7 +58136,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\cos(z)}{\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cos(z)\sqrt{z})/\sqrt{\pi})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58428,7 +58144,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(z^2-\nu^2)\operatorname{Y}_{\nu}(z)+z\mapsto\operatorname{Y}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)=0$$
+$$z^2z\mapsto\operatorname{Y}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)+(z^2-\nu^2)\operatorname{Y}_{\nu}(z)=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58436,7 +58152,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\frac{3}{2}}(z)=\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\cosh(z)}{z}-\frac{\sinh(z)}{z^2})\sqrt{z})$$
+$$\operatorname{I}_{\frac{3}{2}}(z)=\sqrt{\frac{2z}{\pi}}(\frac{\cosh(z)}{z}-\frac{\sinh(z)}{z^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58444,7 +58160,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{-1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}$$
+$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58452,7 +58168,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HankelH_1}(\nu, z)=\imaginaryI\operatorname{Y}_{\nu}(z)+\operatorname{J}_{\nu}(z)$$
+$$\mathrm{HankelH_1}(\nu, z)=\operatorname{J}_{\nu}(z)+\imaginaryI\operatorname{Y}_{\nu}(z)$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HankelH1** — Hankel function of the first kind.
@@ -58461,15 +58177,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!}-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
 
-**Holds when** $\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
 [`7377c8` · Fungrim entry ↗](https://fungrim.org/entry/7377c8)
 
 ---
 
-$$\operatorname{K}_{\frac{-1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi}}{2\sqrt{z}}$$
+$$\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58479,13 +58195,13 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t)\exp(z\cos(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\cosh(t))\, \mathrm{d}t)$$
 
-**Holds when** $0\lt\Re(z)\land\nu\in\C\land z\in\C$.
+**Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`7ae3ed` · Fungrim entry ↗](https://fungrim.org/entry/7ae3ed)
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=\frac{\sqrt{2}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)\exp(-z)\sqrt{\pi}}{2\sqrt{z}}$$
+$$\operatorname{K}_{\nu}(z)=\frac{\exp(-z)}{\sqrt{\frac{2z}{\pi}}}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -58494,7 +58210,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\nu}(z)=\mathrm{Hypergeometric0F1Regularized}(\nu+1, \frac{z^2}{4})(\frac{z}{2})^{\nu}$$
+$$\operatorname{I}_{\nu}(z)=\frac{z}{2}^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, \frac{z^2}{4})$$
 
 **Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -58511,7 +58227,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\frac{3}{2}}(z)=-(\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\sin(z)}{z}+\frac{\cos(z)}{z^2})\sqrt{z}))$$
+$$\operatorname{Y}_{\frac{3}{2}}(z)=-(\sqrt{\frac{2z}{\pi}}(\frac{\cos(z)}{z^2}+\frac{\sin(z)}{z}))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58527,7 +58243,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-((\nu^2+z^2)\operatorname{I}_{\nu}(z))+z\mapsto\operatorname{I}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)=0$$
+$$(z^2z\mapsto\operatorname{I}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))-(z^2+\nu^2)\operatorname{I}_{\nu}(z)=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58546,7 +58262,7 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{J}_{\nu}(z)=\frac{\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(\frac{z}{2})^{\nu}}{\Gamma(\nu+1)}$$
 
-**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\notin-\infty..-1\land\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..-1\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`9ad254` · Fungrim entry ↗](https://fungrim.org/entry/9ad254)
@@ -58555,7 +58271,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
 
-**Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
 [`9b2f38` · Fungrim entry ↗](https://fungrim.org/entry/9b2f38)
 
@@ -58563,7 +58279,7 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{K}_{\nu}(z)=-(\frac{z(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})$$
 
-**Holds when** $z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`9d98f8` · Fungrim entry ↗](https://fungrim.org/entry/9d98f8)
 
@@ -58577,7 +58293,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{3}{2}}(z)=\frac{1}{\sqrt{\pi}}(\sqrt{2}(\frac{\sin(z)}{z^2}-\frac{\cos(z)}{z})\sqrt{z})$$
+$$\operatorname{J}_{\frac{3}{2}}(z)=\sqrt{\frac{2z}{\pi}}(\frac{\sin(z)}{z^2}-\frac{\cos(z)}{z})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58585,7 +58301,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\sinh(z)}{\sqrt{\pi}\sqrt{z}}$$
+$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sinh(z)\sqrt{z})/\sqrt{\pi})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58593,7 +58309,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(z^2-\nu^2)\operatorname{J}_{\nu}(z)+z\mapsto\operatorname{J}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)=0$$
+$$z^2z\mapsto\operatorname{J}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)+(z^2-\nu^2)\operatorname{J}_{\nu}(z)=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58620,7 +58336,7 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{Y}_{\nu}(z)=\frac{z(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}$$
 
-**Holds when** $z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`b6d600` · Fungrim entry ↗](https://fungrim.org/entry/b6d600)
 
@@ -58634,7 +58350,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{3/2^{2/3}z^{2/3}})$$
+$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{((3z)/2)^{2/3}})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58644,13 +58360,13 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\sinh(t))\, \mathrm{d}t)$$
 
-**Holds when** $0\lt\Re(z)\land\nu\in\C\land z\in\C$.
+**Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`cac83e` · Fungrim entry ↗](https://fungrim.org/entry/cac83e)
 
 ---
 
-$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi}}{2\sqrt{z}}$$
+$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58658,7 +58374,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}$$
+$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58668,13 +58384,13 @@ Used by the Compute Engine for simplification.
 
 $$\operatorname{J}_{\nu}(z)=\frac{z(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}$$
 
-**Holds when** $z\in\C\land\nu\in\Z\setminus\lbrace0\rbrace$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`d56914` · Fungrim entry ↗](https://fungrim.org/entry/d56914)
 
 ---
 
-$$\operatorname{Y}_{n}(z)=-(\frac{1}{\pi}(2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z))))$$
+$$\operatorname{Y}_{n}(z)=\frac{1}{\pi}(-2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z)))$$
 
 **Holds when** $n\in\Z\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58682,15 +58398,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!}-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
 
-**Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
 [`e233b0` · Fungrim entry ↗](https://fungrim.org/entry/e233b0)
 
 ---
 
-$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2\frac{3}{2}^{\frac{2}{3}}z^{\frac{2}{3}}}$$
+$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2(\frac{3z}{2})^{\frac{2}{3}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58700,13 +58416,13 @@ Used by the Compute Engine for simplification.
 
 $$\frac{(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
 
-**Holds when** $\nu\in\C\land r\in\N\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
 [`e85dee` · Fungrim entry ↗](https://fungrim.org/entry/e85dee)
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(\frac{z^2}{4}))(\frac{z}{2})^{\nu}$$
+$$\operatorname{J}_{\nu}(z)=\frac{z}{2}^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(\frac{z^2}{4}))$$
 
 **Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -58723,7 +58439,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(-n^2+r^2+4r+4)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)-(r+1)(r+2)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)=0$$
+$$((r^2+4r)-n^2+4)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)-(r+1)(r+2)z\mapsto\operatorname{I}_{n}(z)^{\prime}(0)=0$$
 
 **Holds when** $n\in\Z\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -58731,7 +58447,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-((\nu^2+z^2)\operatorname{K}_{\nu}(z))+z\mapsto\operatorname{K}_{\nu}(z)^{\doubleprime}(z)z^2+zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)=0$$
+$$(z^2z\mapsto\operatorname{K}_{\nu}(z)^{\doubleprime}(z)+zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))-(z^2+\nu^2)\operatorname{K}_{\nu}(z)=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58739,7 +58455,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{-1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3}{2}}\sqrt[3]{z}}$$
+$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -58749,27 +58465,27 @@ Used by the Compute Engine for simplification.
 
 ## Confluent hypergeometric functions
 
-$$\mathrm{Hypergeometric0F1Regularized}(a, z)=\operatorname{I}_{a-1}(2\sqrt{z})z^{\frac{1-a}{2}}$$
+$$\mathrm{Hypergeometric0F1Regularized}(a, z)=\sqrt{z}^{1-a}\operatorname{I}_{a-1}(2\sqrt{z})$$
 
-**Holds when** $z\ne0\land a\in\C\land z\in\C$.
+**Holds when** $a\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 [`00dfd1` · Fungrim entry ↗](https://fungrim.org/entry/00dfd1)
 
 ---
 
-$$\mathrm{Hypergeometric0F_1}(a, z)=\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})\exp(-(2\sqrt{z}))$$
+$$\mathrm{Hypergeometric0F_1}(a, z)=\exp(-(2\sqrt{z}))\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})$$
 
-**Holds when** $2a\notin-\infty..1\land a\in\C\land z\in\C$.
+**Holds when** $a\in\C\land z\in\C\land2a\notin-\infty..1$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function; **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`2df3e3` · Fungrim entry ↗](https://fungrim.org/entry/2df3e3)
 
 ---
 
-$$\mathrm{Hypergeometric0F1Regularized}(a, z)=\operatorname{J}_{a-1}(2\sqrt{-z})(-z)^{\frac{1-a}{2}}$$
+$$\mathrm{Hypergeometric0F1Regularized}(a, z)=\sqrt{-z}^{1-a}\operatorname{J}_{a-1}(2\sqrt{-z})$$
 
-**Holds when** $z\ne0\land a\in\C\land z\in\C$.
+**Holds when** $a\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 [`325a0e` · Fungrim entry ↗](https://fungrim.org/entry/325a0e)
@@ -58778,32 +58494,32 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{Hypergeometric2F_0}(a, a-b+1, -(\frac{1}{z}))$$
 
-**Holds when** $z\ne0\land a\in\C\land b\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric2F0** — Tricomi confluent hypergeometric function, alternative notation; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`4cf1e9` · Fungrim entry ↗](https://fungrim.org/entry/4cf1e9)
 
 ---
 
-$$\mathrm{HypergeometricU}(a, b, z)=\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})+\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}$$
+$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})$$
 
-**Holds when** $z\ne0\land b\notin\Z\land a\in\C\land b\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z$.
 **Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function; **HypergeometricU** — Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`6cf802` · Fungrim entry ↗](https://fungrim.org/entry/6cf802)
 
 ---
 
-$$\mathrm{HypergeometricU}(a, b, z)=\mathrm{HypergeometricU}(a-b+1, 2-b, z)z^{1-b}$$
+$$\mathrm{HypergeometricU}(a, b, z)=z^{1-b}\mathrm{HypergeometricU}((1+a)-b, 2-b, z)$$
 
-**Holds when** $z\ne0\land a\in\C\land b\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`9d3147` · Fungrim entry ↗](https://fungrim.org/entry/9d3147)
 
 ---
 
-$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\mathrm{Hypergeometric1F1Regularized}(b-a, b, -z)\exponentialE^{z}$$
+$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F1Regularized}(b-a, b, -z)$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C$.
 **Symbols:** **Hypergeometric1F1Regularized** — Regularized Kummer confluent hypergeometric function.
@@ -58812,18 +58528,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric1F_1}(a, b, z)=\mathrm{Hypergeometric1F_1}(b-a, b, -z)\exponentialE^{z}$$
+$$\mathrm{Hypergeometric1F_1}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F_1}(b-a, b, -z)$$
 
-**Holds when** $a\in\C\land z\in\C\land b\in\C\setminus\Z_{\le0}$.
+**Holds when** $a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C$.
 **Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`be533c` · Fungrim entry ↗](https://fungrim.org/entry/be533c)
 
 ---
 
-$$\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{HypergeometricU}(a, b, z)z^{a}$$
+$$\mathrm{HypergeometricUStar}(a, b, z)=z^{a}\mathrm{HypergeometricU}(a, b, z)$$
 
-**Holds when** $z\ne0\land a\in\C\land b\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`c8fcc7` · Fungrim entry ↗](https://fungrim.org/entry/c8fcc7)
@@ -58832,7 +58548,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HypergeometricUStar}(a, b, z)=\sum_{k=0}^{n-1}\frac{\mathrm{RisingFactorial}(a, k)\mathrm{RisingFactorial}(a-b+1, k)}{k!(-z)^{k}}+\mathrm{HypergeometricUStarRemainder}(n, a, b, z)$$
 
-**Holds when** $z\ne0\land a\in\C\land b\in\C\land z\in\C\land n\in\N$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land n\in\N$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function; **HypergeometricUStarRemainder** — Error term in asymptotic expansion of Tricomi confluent hypergeometric function; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`d1b3b5` · Fungrim entry ↗](https://fungrim.org/entry/d1b3b5)
@@ -58841,7 +58557,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(\mathrm{HypergeometricUStar}(b-a, b, -z)\exponentialE^{z}z^{a-b})$$
 
-**Holds when** $z\ne0\land a\in\C\land b\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric1F1Regularized** — Regularized Kummer confluent hypergeometric function; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`f7f84e` · Fungrim entry ↗](https://fungrim.org/entry/f7f84e)
@@ -58852,25 +58568,25 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CoulombF}(\ell, \eta, z)=\frac{\mathrm{CoulombH}(1, \ell, \eta, z)-\mathrm{CoulombH}(-1, \ell, \eta, z)}{2\imaginaryI}$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function; **CoulombH** — Outgoing and ingoing Coulomb wave function.
 Used by the Compute Engine for simplification.
 [`192a3e` · Fungrim entry ↗](https://fungrim.org/entry/192a3e)
 
 ---
 
-$$\mathrm{CoulombF}(\ell, \eta, z)=(\frac{\mathrm{HypergeometricUStar}(\ell-\imaginaryI\eta+1, 2\ell+2, 2\imaginaryI z)\exp(-(\imaginaryI z))}{\Gamma(\ell+\imaginaryI\eta+1)(-(2\imaginaryI z))^{\ell-\imaginaryI\eta+1}}+\frac{\mathrm{HypergeometricUStar}(\ell+\imaginaryI\eta+1, 2\ell+2, -(2\imaginaryI z))\exp(\imaginaryI z)}{\Gamma(\ell-\imaginaryI\eta+1)(2\imaginaryI z)^{\ell+\imaginaryI\eta+1}})\times2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))z^{\ell+1}$$
+$$\mathrm{CoulombF}(\ell, \eta, z)=2^{\ell}z^{\ell+1}\exp(\frac{1}{2}((\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)+\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta))-\pi\eta))(\frac{\exp(\imaginaryI z)\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))}{(2\imaginaryI z)^{1+\ell+\imaginaryI\eta}\Gamma((1+\ell)-\imaginaryI\eta)}+\frac{\exp(-\imaginaryI z)\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z)}{(-(2\imaginaryI z))^{(1+\ell)-\imaginaryI\eta}\Gamma(1+\ell+\imaginaryI\eta)})$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`1976e1` · Fungrim entry ↗](https://fungrim.org/entry/1976e1)
 
 ---
 
-$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\eta}{\ell+1}+\frac{\ell+1}{z})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
 
-**Holds when** $\ell\ne-1\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function.
 Used by the Compute Engine for simplification.
 [`2fec14` · Fungrim entry ↗](https://fungrim.org/entry/2fec14)
@@ -58879,16 +58595,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))}{\Gamma(2\ell+2)}$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})$.
 **Symbols:** **CoulombC** — Coulomb wave function Gamow factor.
 Used by the Compute Engine for simplification.
 [`4a4739` · Fungrim entry ↗](https://fungrim.org/entry/4a4739)
 
 ---
 
-$$\mathrm{CoulombG}(\ell, \eta, z)z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)-\mathrm{CoulombF}(\ell, \eta, z)z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=1$$
+$$\mathrm{CoulombG}(\ell, \eta, z)z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)-z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)\mathrm{CoulombF}(\ell, \eta, z)=1$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function; **CoulombG** — Irregular Coulomb wave function.
 Used by the Compute Engine for simplification.
 [`74274a` · Fungrim entry ↗](https://fungrim.org/entry/74274a)
@@ -58897,43 +58613,43 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\mathrm{CoulombH}(1, \ell, \eta, z)+\mathrm{CoulombH}(-1, \ell, \eta, z))$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function; **CoulombH** — Outgoing and ingoing Coulomb wave function.
 Used by the Compute Engine for simplification.
 [`8547ab` · Fungrim entry ↗](https://fungrim.org/entry/8547ab)
 
 ---
 
-$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\eta}{\ell+1}+\frac{\ell+1}{z})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
 
-**Holds when** $\ell\ne-1\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function.
 Used by the Compute Engine for simplification.
 [`a51a4b` · Fungrim entry ↗](https://fungrim.org/entry/a51a4b)
 
 ---
 
-$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{\cos(-(\pi(\ell+1/2))-\mathrm{CoulombSigma}((-1)-\ell, \eta)+\mathrm{CoulombSigma}(\ell, \eta))\mathrm{CoulombF}(\ell, \eta, z)-\mathrm{CoulombF}((-1)-\ell, \eta, z)}{\sin(-(\pi(\ell+1/2))-\mathrm{CoulombSigma}((-1)-\ell, \eta)+\mathrm{CoulombSigma}(\ell, \eta))}$$
+$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{\mathrm{CoulombF}(\ell, \eta, z)\cos(\mathrm{CoulombSigma}(\ell, \eta)-\mathrm{CoulombSigma}(-\ell-1, \eta)-(\ell+1/2)\pi)-\mathrm{CoulombF}(-\ell-1, \eta, z)}{\sin(\mathrm{CoulombSigma}(\ell, \eta)-\mathrm{CoulombSigma}(-\ell-1, \eta)-(\ell+1/2)\pi)}$$
 
-**Holds when** $2\ell\notin\Z\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\imaginaryI\eta-\ell\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land-\ell-\imaginaryI\eta\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\ell\in\C\land\eta\in\C\land2\ell\notin\Z\land1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0}\land\imaginaryI\eta-\ell\notin\Z_{\le0}\land-\ell-\imaginaryI\eta\notin\Z_{\le0}\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function; **CoulombG** — Irregular Coulomb wave function; **CoulombSigma** — Coulomb wave function phase shift.
 Used by the Compute Engine for simplification.
 [`e20938` · Fungrim entry ↗](https://fungrim.org/entry/e20938)
 
 ---
 
-$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\mathrm{HypergeometricUStar}(\ell+\imaginaryI\eta+1, 2\ell+2, -(2\imaginaryI z))\exp(\imaginaryI((-\pi\ell)/2+z+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}+\mathrm{HypergeometricUStar}(\ell-\imaginaryI\eta+1, 2\ell+2, 2\imaginaryI z)\exp(-(\imaginaryI((-\pi\ell)/2+z+\mathrm{CoulombSigma}(\ell, \eta))))(2z)^{\imaginaryI\eta})$$
+$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))$$
 
-**Holds when** $0\lt\Re(z)\land\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace\land\Re(z)\gt0$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function; **CoulombSigma** — Coulomb wave function phase shift; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`e2efbf` · Fungrim entry ↗](https://fungrim.org/entry/e2efbf)
 
 ---
 
-$$\mathrm{CoulombSigma}(\ell, \eta)=\frac{\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)-\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)}{2\imaginaryI}$$
+$$\mathrm{CoulombSigma}(\ell, \eta)=\frac{\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)-\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta)}{2\imaginaryI}$$
 
-**Holds when** $\ell+\imaginaryI\eta+1\notin\Z_{\le0}\land\ell-\imaginaryI\eta+1\notin\Z_{\le0}\land\ell\in\C\land\eta\in\C$.
+**Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})$.
 **Symbols:** **CoulombSigma** — Coulomb wave function phase shift.
 Used by the Compute Engine for simplification.
 [`ed2bf6` · Fungrim entry ↗](https://fungrim.org/entry/ed2bf6)
@@ -58960,7 +58676,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Erfc}(z)+\mathrm{Erf}(z)=1$$
+$$\mathrm{Erf}(z)+\mathrm{Erfc}(z)=1$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -58976,7 +58692,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Erf}(z)=\frac{1}{\sqrt{\pi}}(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))$$
+$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
@@ -58985,7 +58701,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erf}(z)=\frac{1}{\sqrt{\pi}}(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))$$
+$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
@@ -58996,14 +58712,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Erfc}(z)=\frac{\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
 
-**Holds when** $0\lt\Re(z)\land z\in\C$.
+**Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`ae3110` · Fungrim entry ↗](https://fungrim.org/entry/ae3110)
 
 ---
 
-$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=\frac{1}{\sqrt{\pi}}(2\exp(-z^2))$$
+$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\exp(-z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -59021,7 +58737,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`cb93ea` · Fungrim entry ↗](https://fungrim.org/entry/cb93ea)
@@ -59036,7 +58752,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=\frac{1}{\sqrt{\pi}}(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))$$
+$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -59048,7 +58764,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(b, a, c, z)$$
 
-**Holds when** $a\in\C\land b\in\C\land z\in\C\land c\in\C\setminus\Z_{\le0}$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for expansion.
 [`0e0393` · Fungrim entry ↗](https://fungrim.org/entry/0e0393)
@@ -59075,7 +58791,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, -a+b+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
-**Holds when** $z\notin\lbrack0, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`27bc34` · Fungrim entry ↗](https://fungrim.org/entry/27bc34)
@@ -59093,16 +58809,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, b, c, \frac{z}{z-1})}{(1-z)^{b}}$$
 
-**Holds when** $z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`504717` · Fungrim entry ↗](https://fungrim.org/entry/504717)
 
 ---
 
-$$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c, z)(1-z)^{-a-b+c}$$
+$$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c, z)$$
 
-**Holds when** $z\ne1\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\ne1$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`651a4a` · Fungrim entry ↗](https://fungrim.org/entry/651a4a)
@@ -59118,9 +58834,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(-a-b+c)}{\Gamma(c-a)\Gamma(c-b)}$$
+$$\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(c-a-b)}{\Gamma(c-a)\Gamma(c-b)}$$
 
-**Holds when** $0\lt\Re(-a-b+c)\land a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land\Re(c-a-b)\gt0$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`659ce8` · Fungrim entry ↗](https://fungrim.org/entry/659ce8)
@@ -59129,7 +58845,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, -a+b+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
-**Holds when** $z\notin\lbrack0, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`90ac58` · Fungrim entry ↗](https://fungrim.org/entry/90ac58)
@@ -59147,7 +58863,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, c, \frac{z}{z-1})}{(1-z)^{a}}$$
 
-**Holds when** $z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`b25089` · Fungrim entry ↗](https://fungrim.org/entry/b25089)
@@ -59156,7 +58872,7 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a+b-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, -a-b+c+1, 1-1/z)z^{a-c}(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
 
-**Holds when** $z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`ca9123` · Fungrim entry ↗](https://fungrim.org/entry/ca9123)
@@ -59165,14 +58881,14 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, a+b-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, -a-b+c+1, 1-z)(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
 
-**Holds when** $z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen\land a\in\C\land b\in\C\land c\in\C\land z\in\C$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`db3eb9` · Fungrim entry ↗](https://fungrim.org/entry/db3eb9)
 
 ---
 
-$$(c-z(a+b+1))z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z)-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)+z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)=0$$
+$$(z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -59183,7 +58899,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F_1}(a, b, c, z)}{\Gamma(c)}$$
 
-**Holds when** $a\in\C\land b\in\C\land z\in\C\land c\in\C\setminus\Z_{\le0}$.
+**Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function; **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`fe6e74` · Fungrim entry ↗](https://fungrim.org/entry/fe6e74)
@@ -60277,7 +59993,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x-(x^2-1)^{1/2})}^{n}+{(x+\sqrt{x^2-1})}^{n})$$
+$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-(x^2-1)^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -60358,7 +60074,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x^2-1)\mathrm{ChebyshevU}(n-1, x)^2+\mathrm{ChebyshevT}(n, x)^2=1$$
+$$\mathrm{ChebyshevT}(n, x)^2+(x^2-1)\mathrm{ChebyshevU}(n-1, x)^2=1$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -60385,7 +60101,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(x)\mathrm{ChebyshevU}(n, \cos(x))=\sin(nx)$$
+$$\mathrm{ChebyshevU}(n, \cos(x))\sin(x)=\sin(nx)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -60403,7 +60119,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ChebyshevU}(2n, x)=\mathrm{ChebyshevU}(n-1, 2x^2-1)+\mathrm{ChebyshevT}(n, 2x^2-1)$$
+$$\mathrm{ChebyshevU}(2n, x)=\mathrm{ChebyshevT}(n, 2x^2-1)+\mathrm{ChebyshevU}(n-1, 2x^2-1)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -60431,7 +60147,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, -x)=\mathrm{ChebyshevT}(n, x)\times(-1)^{n}$$
+$$\mathrm{ChebyshevT}(n, -x)=(-1)^{n}\mathrm{ChebyshevT}(n, x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -60503,7 +60219,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n, -x)=\mathrm{ChebyshevU}(n, x)\times(-1)^{n}$$
+$$\mathrm{ChebyshevU}(n, -x)=(-1)^{n}\mathrm{ChebyshevU}(n, x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -60539,7 +60255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(2n+1, \sin(x))=\sin(x(2n+1))\times(-1)^{n}$$
+$$\mathrm{ChebyshevT}(2n+1, \sin(x))=(-1)^{n}\sin((2n+1)x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -60593,7 +60309,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n, -1)=(n+1)\times(-1)^{n}$$
+$$\mathrm{ChebyshevU}(n, -1)=(-1)^{n}(n+1)$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -60638,7 +60354,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(2n+1, x)=2\mathrm{ChebyshevT}(n, x)\mathrm{ChebyshevT}(n+1, x)-x$$
+$$\mathrm{ChebyshevT}(2n+1, x)=2\mathrm{ChebyshevT}(n+1, x)\mathrm{ChebyshevT}(n, x)-x$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -60732,7 +60448,7 @@ Used by the Compute Engine for simplification.
 
 ## Legendre polynomials
 
-$$\mathrm{LegendrePolynomial}(n, -z)=\mathrm{LegendrePolynomial}(n, z)\times(-1)^{n}$$
+$$\mathrm{LegendrePolynomial}(n, -z)=(-1)^{n}\mathrm{LegendrePolynomial}(n, z)$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -60756,7 +60472,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)=0$$
+$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -60764,7 +60480,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-(z(2n+1)\mathrm{LegendrePolynomial}(n, z))+n\mathrm{LegendrePolynomial}(n-1, z)+(n+1)\mathrm{LegendrePolynomial}(n+1, z)=0$$
+$$(n+1)\mathrm{LegendrePolynomial}(n+1, z)-(2n+1)z\mathrm{LegendrePolynomial}(n, z)+n\mathrm{LegendrePolynomial}(n-1, z)=0$$
 
 **Holds when** $n\in\N^*\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -60772,7 +60488,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})(\frac{z-1}{2})^{n}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\frac{z-1}{2}^{n}\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -60806,7 +60522,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -60814,7 +60530,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -60823,7 +60539,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -60840,7 +60556,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+nz\mathrm{LegendrePolynomial}(n, z)-n\mathrm{LegendrePolynomial}(n-1, z)=0$$
+$$((1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+nz\mathrm{LegendrePolynomial}(n, z))-n\mathrm{LegendrePolynomial}(n-1, z)=0$$
 
 **Holds when** $n\in\N^*\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -60905,7 +60621,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})\mathrm{Binomial}(2n, n)(\frac{z}{2})^{n}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\binom{2n}{n}\frac{z}{2}^{n}\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -64833,7 +64549,7 @@ Used by the Compute Engine for simplification.
 
 $$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}$$
 
-**Holds when** $b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.20.0001.01)
@@ -64921,7 +64637,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=\frac{\pi(a+b)}{4\mathrm{EllipticK}((a-b)/(a+b)^2)}$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`71a0ff` · Fungrim entry ↗](https://fungrim.org/entry/71a0ff)
@@ -64947,7 +64663,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{AGM}(1, b)=b\mathrm{AGM}(1, \frac{1}{b})$$
 
-**Holds when** $b\notin\lparen-\infty, 0\rbrack\land b\in\C$.
+**Holds when** $b\in\C\land b\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`8e80c6` · Fungrim entry ↗](https://fungrim.org/entry/8e80c6)
@@ -64963,7 +64679,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{AGM}(b+1, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})$$
+$$\mathrm{AGM}(1+b, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})$$
 
 **Holds when** $b\in\C$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
@@ -64972,9 +64688,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$(a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a)+(3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a))\mathrm{AGM}(a, b)+2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2=0$$
+$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.13.0001.01)
@@ -64993,7 +64709,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=a\mathrm{AGM}(1, \frac{b}{a})$$
 
-**Holds when** $a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ce2395` · Fungrim entry ↗](https://fungrim.org/entry/ce2395)
@@ -65002,7 +64718,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`d6d836` · Fungrim entry ↗](https://fungrim.org/entry/d6d836)
@@ -65028,7 +64744,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=b\mathrm{AGM}(1, \frac{a}{b})$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ea1d58` · Fungrim entry ↗](https://fungrim.org/entry/ea1d58)
@@ -65051,7 +64767,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&0\le\Re((a+b)/(2(ab)^{1/2}))\lor(ab)^{1/2}=0\\-1&\top\end{cases}\sqrt{ab})$$
+$$\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&(ab)^{1/2}=0\lor\Re((a+b)/2/(ab)^{1/2})\ge0\\-1&\top\end{cases}\sqrt{ab})$$
 
 **Holds when** $a\in\C\land b\in\C$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
@@ -65062,7 +64778,7 @@ Used by the Compute Engine for simplification.
 
 ## Carlson symmetric elliptic integrals
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -65071,7 +64787,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})-\frac{\imaginaryI\pi}{2}}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})+(\frac{-1}{2}\imaginaryI)\pi}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -65080,7 +64796,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65106,7 +64822,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\\sqrt{x}^{-3}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65143,7 +64859,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(\mathrm{CarlsonRF}(z-\mathrm{EllipticRootE}(1, \tau), z-\mathrm{EllipticRootE}(2, \tau), z-\mathrm{EllipticRootE}(3, \tau)), \tau)=z$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`124339` · Fungrim entry ↗](https://fungrim.org/entry/124339)
@@ -65168,7 +64884,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 0, -1)=\infty\imaginaryI$$
+$$\mathrm{CarlsonRD}(0, 0, -1)=\imaginaryI\infty$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65176,7 +64892,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, y+1)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
+$$\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
 
 **Holds when** $y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -65235,7 +64951,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\\sqrt{w}^{-3}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65253,7 +64969,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})$$
+$$\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -65270,7 +64986,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, -1)=\frac{1}{4}(-\imaginaryI\pi\sqrt{2})+\frac{1}{2}(\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRC}(1, -1)=\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2}))-\frac{1}{4}(\pi\sqrt{2}\imaginaryI)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65278,7 +64994,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -(cx))=\frac{1}{\sqrt{x}}(\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases})$$
+$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases}/\sqrt{x}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
@@ -65287,7 +65003,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 1, 2)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{CarlsonRF}(0, 1, 2)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65312,7 +65028,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, -1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)$$
+$$\mathrm{CarlsonRJ}(1, -1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65320,7 +65036,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)$$
+$$\mathrm{CarlsonRD}(1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65328,25 +65044,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})+(3)((z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})\sqrt{z})^{-1}$$
+$$\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})+(3)(\sqrt{z}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))^{-1}$$
 
-**Holds when** $z\ne0\land x\in\C\land y\in\C\land z\in\C$.
+**Holds when** $x\in\C\land y\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`31a3ba` · Fungrim entry ↗](https://fungrim.org/entry/31a3ba)
 
 ---
 
-$$\arccos(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{y^2-x^2}$$
+$$\arccos(\frac{x}{y})=\sqrt{y^2-x^2}\mathrm{CarlsonRC}(x^2, y^2)$$
 
-**Holds when** $x\in\lbrack0, y\rbrack\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack0, y\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`33e034` · Fungrim entry ↗](https://fungrim.org/entry/33e034)
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, -1, -1)=\infty\imaginaryI$$
+$$\mathrm{CarlsonRJ}(0, 0, -1, -1)=\imaginaryI\infty$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65354,7 +65070,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(0, -1)=-(\frac{\imaginaryI\pi}{2})$$
+$$\mathrm{CarlsonRC}(0, -1)=-(\frac{\pi\imaginaryI}{2})$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65362,7 +65078,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -65371,7 +65087,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda})+\mathrm{CarlsonRF}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)$$
+$$\mathrm{CarlsonRF}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda})+\mathrm{CarlsonRF}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -65397,7 +65113,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\imaginaryI\pi)}{2}$$
+$$\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\pi\imaginaryI)}{2}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65432,7 +65148,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, 2x)=(\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}})\sqrt{x}$$
+$$\mathrm{CarlsonRG}(0, x, 2x)=\sqrt{x}(\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2})$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -65459,34 +65175,34 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, y)=\frac{1}{\sqrt{x}}(\mathrm{EllipticK}(1-\frac{y}{x}))$$
+$$\mathrm{CarlsonRF}(0, x, y)=\mathrm{EllipticK}(1-y/x)/\sqrt{x}$$
 
-**Holds when** $\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C$.
+**Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`415ff0` · Fungrim entry ↗](https://fungrim.org/entry/415ff0)
 
 ---
 
-$$\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(x^2+y^2, y^2)$$
+$$\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2+x^2, y^2)$$
 
-**Holds when** $x\in\R\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\R$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`423b36` · Fungrim entry ↗](https://fungrim.org/entry/423b36)
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)$$
+$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)$$
 
-**Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen$.
+**Holds when** $x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`42c7f1` · Fungrim entry ↗](https://fungrim.org/entry/42c7f1)
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}(\pi(9-4\sqrt{3}))$$
+$$\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}((9-4\sqrt{3})\pi)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65494,7 +65210,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\begin{cases}\mathrm{EllipticE}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\\mathrm{EllipticE}(c+1)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&\top\end{cases}\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\sqrt{x}\begin{cases}\mathrm{EllipticE}(1+c)&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticE}(1+c)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&\top\end{cases})$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
@@ -65528,7 +65244,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65536,7 +65252,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, x)=\sqrt{x}^{-3}$$
+$$\mathrm{CarlsonRJ}(x, x, x, x)=x^{-(\frac{3}{2})}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65561,7 +65277,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(1, 1, 2)=\frac{\ln(1+\sqrt{2})}{2}+\frac{\sqrt{2}}{2}$$
+$$\mathrm{CarlsonRG}(1, 1, 2)=\frac{\sqrt{2}}{2}+\frac{\ln(1+\sqrt{2})}{2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -65580,14 +65296,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
 
-**Holds when** $\vert\arg(y)-\arg(z)\vert\lt\pi\land z\in\C\land y\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`4e4380` · Fungrim entry ↗](https://fungrim.org/entry/4e4380)
 
 ---
 
-$$\mathrm{CarlsonRJ}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda}, \mathrm{lamda}+w)+\mathrm{CarlsonRJ}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+w)=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}((\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y)w^2, w(\mathrm{lamda}+w)(\frac{xy}{\mathrm{lamda}}+w))$$
+$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land w\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65596,7 +65312,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{2(2+\sqrt{2})}$$
+$$\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{4+2\sqrt{2}}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65604,7 +65320,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, -1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}$$
+$$\mathrm{CarlsonRJ}(1, 1, -1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65630,7 +65346,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(1, 1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}$$
+$$\mathrm{CarlsonRD}(1, 1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65646,7 +65362,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-1, 0)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRC}(-1, 0)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65656,14 +65372,14 @@ Used by the Compute Engine for simplification.
 
 $$\arcsin(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2-x^2, y^2)$$
 
-**Holds when** $x\in\lbrack-y, y\rbrack\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack-y, y\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`584a61` · Fungrim entry ↗](https://fungrim.org/entry/584a61)
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))$$
+$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65681,7 +65397,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&y\lt x\end{cases}$$
+$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&x\gt y\end{cases}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -65690,7 +65406,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -2)=-(\frac{\sqrt{2}\imaginaryI\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{CarlsonRF}(0, -1, -2)=-(((2^{1/2}/8\imaginaryI)\Gamma(1/4)^2)/\sqrt{\pi})$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65808,16 +65524,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)+\mathrm{CarlsonRD}(x, y, z)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}$$
+$$\mathrm{CarlsonRD}(x, y, z)+\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}$$
 
-**Holds when** $x\ne0\land y\ne0\land x\in\C\land y\in\C\land z\in\C$ &nbsp;_or_&nbsp; $z\ne0$.
+**Holds when** $x\in\C\land y\in\C\land z\in\C\land x\ne0\land y\ne0$ &nbsp;_or_&nbsp; $z\ne0$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`6dda7a` · Fungrim entry ↗](https://fungrim.org/entry/6dda7a)
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, 2, 4)=-\pi\frac{\sqrt{2}}{8}+\ln(1+\sqrt{2})$$
+$$\mathrm{CarlsonRJ}(1, 1, 2, 4)=\ln(1+\sqrt{2})-\frac{\sqrt{2}\pi}{8}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -65825,7 +65541,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&y\lt x\end{cases}$$
+$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&x\gt y\end{cases}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -65843,7 +65559,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))$$
+$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -65869,7 +65585,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\\sqrt{x}^{-3}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -65895,9 +65611,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, x^2+y^2)$$
+$$\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, y^2+x^2)$$
 
-**Holds when** $x\in\R\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\R$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`7a9dad` · Fungrim entry ↗](https://fungrim.org/entry/7a9dad)
@@ -65913,7 +65629,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, 0)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{x^{1/2}})&x\ne0\\\tilde\infty&x=0\end{cases}$$
+$$\mathrm{CarlsonRC}(x, 0)=\begin{cases}\mathrm{sgn}(\frac{1}{x^{1/2}})\infty&x\ne0\\\tilde\infty&x=0\end{cases}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -65922,25 +65638,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\mathrm{EllipticE}(1-\frac{y}{x})\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-y/x))$$
 
-**Holds when** $\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C$.
+**Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`7cddc6` · Fungrim entry ↗](https://fungrim.org/entry/7cddc6)
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)$$
+$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)$$
 
-**Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen$.
+**Holds when** $x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`7ded8f` · Fungrim entry ↗](https://fungrim.org/entry/7ded8f)
 
 ---
 
-$$\mathrm{CarlsonRC}(-1, 1)=\frac{1}{2}(-\imaginaryI\sqrt{2}\ln(1+\sqrt{2}))+\frac{\pi\sqrt{2}}{4}$$
+$$\mathrm{CarlsonRC}(-1, 1)=\frac{\pi\sqrt{2}}{4}-\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2})\imaginaryI)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -65973,7 +65689,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, 1, 2)=\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}$$
+$$\mathrm{CarlsonRG}(0, 1, 2)=\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -65997,7 +65713,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{x(c-1)}}&1\lt c\\\frac{1}{\sqrt{x}}&c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{x(1-c)}}&c\lt1\end{cases}$$
+$$\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{(c-1)x}}&c\gt1\\\frac{1}{\sqrt{x}}&c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{(1-c)x}}&c\lt1\end{cases}$$
 
 **Holds when** $x\in\C\land c\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -66008,14 +65724,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticK}(1-y/z)-\mathrm{EllipticE}(1-y/z))}{1-y/z}&y\ne z\\\frac{3\pi}{4}&y=z\end{cases}}{\sqrt{z}^{3}}$$
 
-**Holds when** $\vert\arg(y)-\arg(z)\vert\lt\pi\land y\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $z\in\C\setminus\lbrace0\rbrace\land y\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`8d0629` · Fungrim entry ↗](https://fungrim.org/entry/8d0629)
 
 ---
 
-$$\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}))$$
+$$\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -66033,7 +65749,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 0, -1)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRF}(0, 0, -1)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66124,7 +65840,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(\mathrm{lamda}, \mathrm{lamda}+x, \mathrm{lamda}+y)+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y)=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y})^{-1}$$
+$$\mathrm{CarlsonRD}(\mathrm{lamda}, x+\mathrm{lamda}, y+\mathrm{lamda})+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{x+y+\mathrm{lamda}+(xy)/\mathrm{lamda}})^{-1}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -66133,7 +65849,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\mathrm{EllipticE}(1-c)\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-c))$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
@@ -66271,7 +65987,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -66295,7 +66011,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\\sqrt{x}^{-3}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -66304,7 +66020,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, x)=\sqrt{x}^{-3}$$
+$$\mathrm{CarlsonRD}(x, x, x)=x^{-(\frac{3}{2})}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -66330,7 +66046,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\imaginaryI\pi}{4}$$
+$$\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\pi\imaginaryI}{4}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -66346,7 +66062,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(-(1/2), \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -66363,7 +66079,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\land y=w\\\sqrt{x}^{-3}&x=y=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -66372,7 +66088,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(1, 2, 2)=\frac{1}{2}+\frac{\pi}{4}$$
+$$\mathrm{CarlsonRG}(1, 2, 2)=\frac{\pi}{4}+\frac{1}{2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -66380,7 +66096,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\imaginaryI\pi}{4}$$
+$$\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\pi\imaginaryI}{4}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -66405,9 +66121,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{arcosh}(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{x^2-y^2}$$
+$$\mathrm{arcosh}(\frac{x}{y})=\sqrt{x^2-y^2}\mathrm{CarlsonRC}(x^2, y^2)$$
 
-**Holds when** $x\in\lbrack y, \infty\rparen\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack y, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`d9765b` · Fungrim entry ↗](https://fungrim.org/entry/d9765b)
@@ -66431,7 +66147,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -66439,7 +66155,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{wz^{1/2}})&z\ne0\land w\ne0\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}w})\infty&z\ne0\land w\ne0\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $z\in\C\land w\in\C$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -66489,7 +66205,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, 1-x))$$
+$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -66514,7 +66230,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, y+1)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&y\ne0\\1&y=0\end{cases}$$
+$$\mathrm{CarlsonRC}(1, 1+y)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&y\ne0\\1&y=0\end{cases}$$
 
 **Holds when** $y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -66540,7 +66256,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\infty\mathrm{sgn}(z^{1/2}^{-3})&z\ne0\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}^{3}})\infty&z\ne0\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -66591,7 +66307,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\mathrm{CarlsonRG}(x, y, z)\sqrt{\mathrm{lamda}}$$
+$$\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\sqrt{\mathrm{lamda}}\mathrm{CarlsonRG}(x, y, z)$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C\land\mathrm{lamda}\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -66600,7 +66316,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -66653,7 +66369,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\sqrt[4]{3}\exp(\frac{\imaginaryI\pi}{12})\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\exp(\frac{\imaginaryI\pi}{12})\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66695,7 +66411,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, m))$$
+$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -66704,7 +66420,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}(1-\imaginaryI\sqrt{3}))=\frac{\sqrt[4]{3}\exp(-((\imaginaryI\pi)/12))\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}(1-3^{1/2}\imaginaryI))=\frac{\exp(-((\imaginaryI\pi)/12))\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66755,7 +66471,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})$$
 
 **Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -66763,7 +66479,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}((3-2\sqrt{2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}$$
+$$\mathrm{EllipticK}((3-2\times2^{1/2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66788,7 +66504,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(\frac{1}{2})=\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticE}(\frac{1}{2})=\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -66804,7 +66520,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\pi\sqrt[3]{2}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\sqrt[3]{2}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66814,7 +66530,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(m)=\frac{1}{3}((1-m)(\mathrm{CarlsonRD}(0, 1-m, 1)+\mathrm{CarlsonRD}(0, 1, 1-m)))$$
 
-**Holds when** $m\ne1\land m\in\C$.
+**Holds when** $m\in\C\land m\ne1$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`41cf8e` · Fungrim entry ↗](https://fungrim.org/entry/41cf8e)
@@ -66838,7 +66554,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{8}(4-3\sqrt{2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(\frac{1}{8}(4-3\times2^{1/2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -66888,9 +66604,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \pi k+\phi, m)=2k\mathrm{EllipticPi}(n, m)+\mathrm{IncompleteEllipticPi}(n, \phi, m)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi+k\pi, m)=\mathrm{IncompleteEllipticPi}(n, \phi, m)+2k\mathrm{EllipticPi}(n, m)$$
 
-**Holds when** $n\ne1\land m\ne1\land n\in\C\land\phi\in\C\land m\in\C\land k\in\Z$.
+**Holds when** $n\in\C\land\phi\in\C\land m\in\C\land k\in\Z\land n\ne1\land m\ne1$.
 **Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`5f84d9` · Fungrim entry ↗](https://fungrim.org/entry/5f84d9)
@@ -66922,9 +66638,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\pi k+\phi, m)=2k\mathrm{EllipticK}(m)+\mathrm{IncompleteEllipticF}(\phi, m)$$
+$$\mathrm{IncompleteEllipticF}(\phi+k\pi, m)=\mathrm{IncompleteEllipticF}(\phi, m)+2k\mathrm{EllipticK}(m)$$
 
-**Holds when** $m\ne1\land\phi\in\C\land m\in\C\land k\in\Z$.
+**Holds when** $\phi\in\C\land m\in\C\land k\in\Z\land m\ne1$.
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`685126` · Fungrim entry ↗](https://fungrim.org/entry/685126)
@@ -66940,7 +66656,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{3}{2}, 1, m))$$
+$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{3}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -66975,9 +66691,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)\sin(\phi)^3)+\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{n}{3}\sin(\phi)^3\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land n\in\C\land\phi\in\C\land m\in\C$.
+**Holds when** $n\in\C\land\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`8f4e31` · Fungrim entry ↗](https://fungrim.org/entry/8f4e31)
@@ -67010,7 +66726,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}$$
+$$\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}+\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
 **Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -67018,16 +66734,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticPi}(n, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))+\mathrm{CarlsonRF}(0, 1-m, 1)$$
+$$\mathrm{EllipticPi}(n, m)=\mathrm{CarlsonRF}(0, 1-m, 1)+\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))$$
 
-**Holds when** $m\ne1\land n\in\C\land m\in\C$.
+**Holds when** $n\in\C\land m\in\C\land m\ne1$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9ccaef` · Fungrim entry ↗](https://fungrim.org/entry/9ccaef)
 
 ---
 
-$$\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -67077,7 +66793,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -67085,7 +66801,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(-1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(-1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -67119,7 +66835,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{\sin(\phi)+1}{\cos(\phi)})&(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\infty\mathrm{sgn}(\phi)&\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{1+\sin(\phi)}{\cos(\phi)})&(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\mathrm{sgn}(\phi)\infty&\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $\phi\in\C$.
 **Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
@@ -67128,7 +66844,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{\pi\times2^{\frac{10}{3}}}$$
+$$\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{2^{\frac{10}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -67168,7 +66884,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\pi k+\phi, m)=2k\mathrm{EllipticE}(m)+\mathrm{IncompleteEllipticE}(\phi, m)$$
+$$\mathrm{IncompleteEllipticE}(\phi+k\pi, m)=\mathrm{IncompleteEllipticE}(\phi, m)+2k\mathrm{EllipticE}(m)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land k\in\Z$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -67238,7 +66954,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{IncompleteEllipticF}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C$.
+**Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`e2445d` · Fungrim entry ↗](https://fungrim.org/entry/e2445d)
@@ -67254,7 +66970,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(\frac{1}{4}))$$
+$$\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(1/4))$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -67271,7 +66987,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))\sqrt{m}$$
+$$\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=\sqrt{m}(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))$$
 
 **Holds when** $m\in\C\setminus\lbrace0, 1\rbrace$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -67280,7 +66996,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, 1)=2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor+\sin(\phi)\times(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}$$
+$$\mathrm{IncompleteEllipticE}(\phi, 1)=(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}\sin(\phi)+2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor$$
 
 **Holds when** $\phi\in\C$.
 **Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -67289,9 +67005,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{1}{3}(m\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)\sin(\phi)^3)$$
+$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{m}{3}\sin(\phi)^3\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C$.
+**Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`f48f54` · Fungrim entry ↗](https://fungrim.org/entry/f48f54)
@@ -67310,7 +67026,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0207dc` · Fungrim entry ↗](https://fungrim.org/entry/0207dc)
@@ -67319,7 +67035,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassSigma}(z, \tau)^{\prime}(z)=\mathrm{WeierstrassZeta}(z, \tau)\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0e649f` · Fungrim entry ↗](https://fungrim.org/entry/0e649f)
@@ -67328,7 +67044,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(-z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`12a9e8` · Fungrim entry ↗](https://fungrim.org/entry/12a9e8)
@@ -67337,16 +67053,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(-z, \tau)=-\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for expansion.
 [`23beb5` · Fungrim entry ↗](https://fungrim.org/entry/23beb5)
 
 ---
 
-$$\mathrm{WeierstrassSigma}(z+1, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau)))$$
+$$\mathrm{WeierstrassSigma}(z+1, \tau)=-(\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`35403b` · Fungrim entry ↗](https://fungrim.org/entry/35403b)
@@ -67355,34 +67071,34 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(-z, \tau)=-\mathrm{WeierstrassZeta}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for expansion.
 [`72eb69` · Fungrim entry ↗](https://fungrim.org/entry/72eb69)
 
 ---
 
-$$\mathrm{WeierstrassZeta}(\tau+z, \tau)=\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
+$$\mathrm{WeierstrassZeta}(z+\tau, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`a0c85d` · Fungrim entry ↗](https://fungrim.org/entry/a0c85d)
 
 ---
 
-$$\mathrm{WeierstrassP}(n\tau+m+z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
+$$\mathrm{WeierstrassP}(z+m+n\tau, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)\land m\in\Z\land n\in\Z$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`a95b7e` · Fungrim entry ↗](https://fungrim.org/entry/a95b7e)
 
 ---
 
-$$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}((\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4)\pi^2)$$
+$$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}(\pi^2(\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`af0dfc` · Fungrim entry ↗](https://fungrim.org/entry/af0dfc)
@@ -67391,16 +67107,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for simplification.
 [`b96c9d` · Fungrim entry ↗](https://fungrim.org/entry/b96c9d)
 
 ---
 
-$$\mathrm{WeierstrassSigma}(\tau+z, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(\frac{\tau}{2}+z)\mathrm{WeierstrassZeta}(\tau/2, \tau)))$$
+$$\mathrm{WeierstrassSigma}(z+\tau, \tau)=-(\exp(2(z+\frac{\tau}{2})\mathrm{WeierstrassZeta}(\tau/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`de9f42` · Fungrim entry ↗](https://fungrim.org/entry/de9f42)
@@ -67409,16 +67125,16 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassZeta}(z, \tau)^{\prime}(z)=-\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`e677fb` · Fungrim entry ↗](https://fungrim.org/entry/e677fb)
 
 ---
 
-$$\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
+$$\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`ffcc0f` · Fungrim entry ↗](https://fungrim.org/entry/ffcc0f)

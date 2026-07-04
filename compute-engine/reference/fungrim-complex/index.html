@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.747d6bfc.js" defer="defer"></script>
-<script src="/assets/js/main.dae09233.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.f0e5d384.js" defer="defer"></script>
+<script src="/assets/js/main.3c89d032.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -39,7 +39,7 @@
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/089f85" target="_blank" rel="noopener noreferrer" class=""><code>089f85</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{sgn}(x)=\begin{cases}1&amp;0\lt x\\-1&amp;x\lt0\\0&amp;x=0\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{sgn}(x)=\begin{cases}1&amp;x\gt0\\-1&amp;x\lt0\\0&amp;x=0\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/18d335" target="_blank" rel="noopener noreferrer" class=""><code>18d335</code> · Fungrim entry ↗</a></p>
@@ -54,7 +54,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3866dc" target="_blank" rel="noopener noreferrer" class=""><code>3866dc</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\vert x+\imaginaryI y\vert=\sqrt{x^2+y^2}</code></p>
+<p><code class="language-math math-inline">\vert x+y\imaginaryI\vert=\sqrt{x^2+y^2}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4f0049" target="_blank" rel="noopener noreferrer" class=""><code>4f0049</code> · Fungrim entry ↗</a></p>
@@ -89,7 +89,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8cac46" target="_blank" rel="noopener noreferrer" class=""><code>8cac46</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Re(x+\imaginaryI y)=x</code></p>
+<p><code class="language-math math-inline">\Re(x+y\imaginaryI)=x</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8e6867" target="_blank" rel="noopener noreferrer" class=""><code>8e6867</code> · Fungrim entry ↗</a></p>
@@ -103,17 +103,17 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a8b41c" target="_blank" rel="noopener noreferrer" class=""><code>a8b41c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(x+\imaginaryI y)^\star=x-\imaginaryI y</code></p>
+<p><code class="language-math math-inline">(x+y\imaginaryI)^\star=x-y\imaginaryI</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/acda23" target="_blank" rel="noopener noreferrer" class=""><code>acda23</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arg(x+\imaginaryI y)=\mathrm{Arctan_2}(y, x)</code></p>
+<p><code class="language-math math-inline">\arg(x+y\imaginaryI)=\mathrm{Arctan_2}(y, x)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/b2a880" target="_blank" rel="noopener noreferrer" class=""><code>b2a880</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Im(x+\imaginaryI y)=y</code></p>
+<p><code class="language-math math-inline">\Im(x+y\imaginaryI)=y</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ba6d81" target="_blank" rel="noopener noreferrer" class=""><code>ba6d81</code> · Fungrim entry ↗</a></p>
@@ -140,17 +140,17 @@ Used by the Compute Engine for simplification.
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="complex-plane">Complex plane<a href="#complex-plane" class="hash-link" aria-label="Direct link to Complex plane" title="Direct link to Complex plane" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\mathrm{BernsteinEllipse}(\rho)=\lbrace\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\frac{\exp(-(\imaginaryI\theta))}{\rho}), \theta\in\lbrack0, 2\pi\rparen\rbrace</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">1\lt\rho\land\rho\in\R</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">\rho\in\R\land\rho\gt1</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/40baa9" target="_blank" rel="noopener noreferrer" class=""><code>40baa9</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{OpenDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\lt r\rbrace</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\lt r\land z\in\C\land r\in\R</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land r\in\R\land r\gt0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c98bad" target="_blank" rel="noopener noreferrer" class=""><code>c98bad</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\le r\rbrace</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">0\le r\land z\in\C\land r\in\R</code>.
+<p><code class="language-math math-inline">\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in(\vert z-t\vert\le r)\rbrace</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land r\in\R\land r\ge0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d1cf0c" target="_blank" rel="noopener noreferrer" class=""><code>d1cf0c</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -159,12 +159,12 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/09c107" target="_blank" rel="noopener noreferrer" class=""><code>09c107</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\imaginaryI^{z}=\imaginaryI\sin(\frac{\pi z}{2})+\cos(\frac{\pi z}{2})</code></p>
+<p><code class="language-math math-inline">\imaginaryI^{z}=\cos(\frac{\pi z}{2})+\sin(\frac{\pi z}{2})\imaginaryI</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/15f92d" target="_blank" rel="noopener noreferrer" class=""><code>15f92d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{PolyLog}(2, \imaginaryI)=\imaginaryI G-\frac{\pi^2}{48}</code></p>
+<p><code class="language-math math-inline">\mathrm{PolyLog}(2, \imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/208da7" target="_blank" rel="noopener noreferrer" class=""><code>208da7</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -176,7 +176,7 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/31b0df" target="_blank" rel="noopener noreferrer" class=""><code>31b0df</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(1+\pi\coth(\pi))</code></p>
+<p><code class="language-math math-inline">\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(\pi\coth(\pi)+1)</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3ac0ce" target="_blank" rel="noopener noreferrer" class=""><code>3ac0ce</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -217,7 +217,7 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e0425a" target="_blank" rel="noopener noreferrer" class=""><code>e0425a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\imaginaryI^{z}=\exp(\frac{\imaginaryI\pi z}{2})</code></p>
+<p><code class="language-math math-inline">\imaginaryI^{z}=\exp(\frac{\pi\imaginaryI z}{2})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f8a56f" target="_blank" rel="noopener noreferrer" class=""><code>f8a56f</code> · Fungrim entry ↗</a></p>
