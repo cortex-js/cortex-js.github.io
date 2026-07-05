@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.f0e5d384.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.84314cfc.js" defer="defer"></script>
 <script src="/assets/js/main.3c89d032.js" defer="defer"></script>
 </head>
 <body>
@@ -244,8 +244,15 @@ apply to. It does not change the rule&#x27;s semantics (the rule is simply never
 tried against expressions with a different operator), but it lets the engine
 index large rule sets efficiently</li>
 <li class=""><code>purpose</code>: optional, see <a href="#rule-purpose" class=""><strong>Rule Purpose</strong></a> below</li>
-<li class=""><code>id</code>: an optional identifier, surfaced in the <code>because</code> field of simplify
-steps for debugging</li>
+<li class=""><code>id</code>: an optional identifier. The id is surfaced in the <code>because</code> field of
+simplify steps, and it is <strong>user-facing</strong>: when a rule fires during
+<code>expr.explain()</code>, the id becomes the step&#x27;s stable machine <code>id</code> — the key
+consumers use for localization and custom copy. Choose a descriptive,
+stable id (an arrow-style rewrite like <code>&#x27;x^n * x^m -&gt; x^{n+m}&#x27;</code> or a
+kebab-case slug like <code>&#x27;abs-negate&#x27;</code>), and once published treat it as
+frozen. A curated English description can be associated with an id via
+<code>registerStepLabels()</code>; ids without one get a readable fallback derived
+from the id itself</li>
 </ul>
 <p><strong>To apply a set of rules to an expression</strong>, call the <code>expr.replace()</code>
 function.</p>
