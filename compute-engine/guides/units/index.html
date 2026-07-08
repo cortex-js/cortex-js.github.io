@@ -17,9 +17,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.57509d6b.js" defer="defer"></script>
-<script src="/assets/js/main.eeac570c.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
+<script src="/assets/js/runtime~main.52781abd.js" defer="defer"></script>
+<script src="/assets/js/main.a99cb90d.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -227,6 +227,88 @@ naturally:</p>
 <!-- -->// → [&quot;Quantity&quot;, 9.80665, [&quot;Divide&quot;, &quot;m&quot;, [&quot;Power&quot;, &quot;s&quot;, 2]]]
 </div></code-playground>
 <table><thead><tr><th style="text-align:left">Symbol</th><th style="text-align:left">Value</th><th style="text-align:left">Unit</th></tr></thead><tbody><tr><td style="text-align:left"><code>SpeedOfLight</code></td><td style="text-align:left">299792458</td><td style="text-align:left">m/s</td></tr><tr><td style="text-align:left"><code>PlanckConstant</code></td><td style="text-align:left">6.62607015e-34</td><td style="text-align:left">J s</td></tr><tr><td style="text-align:left"><code>Mu0</code> (Vacuum permeability)</td><td style="text-align:left">1.25663706212e-6</td><td style="text-align:left">N/A^2</td></tr><tr><td style="text-align:left"><code>StandardGravity</code></td><td style="text-align:left">9.80665</td><td style="text-align:left">m/s^2</td></tr><tr><td style="text-align:left"><code>ElementaryCharge</code></td><td style="text-align:left">1.602176634e-19</td><td style="text-align:left">C</td></tr><tr><td style="text-align:left"><code>BoltzmannConstant</code></td><td style="text-align:left">1.380649e-23</td><td style="text-align:left">J/K</td></tr><tr><td style="text-align:left"><code>AvogadroConstant</code></td><td style="text-align:left">6.02214076e23</td><td style="text-align:left">mol^-1</td></tr><tr><td style="text-align:left"><code>VacuumPermittivity</code></td><td style="text-align:left">8.8541878128e-12</td><td style="text-align:left">F/m</td></tr><tr><td style="text-align:left"><code>GravitationalConstant</code></td><td style="text-align:left">6.67430e-11</td><td style="text-align:left">m^3/(kg s^2)</td></tr><tr><td style="text-align:left"><code>StefanBoltzmannConstant</code></td><td style="text-align:left">5.670374419e-8</td><td style="text-align:left">W/(m^2 K^4)</td></tr><tr><td style="text-align:left"><code>GasConstant</code></td><td style="text-align:left">8.314462618</td><td style="text-align:left">J/(mol K)</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="measurements-and-uncertainty">Measurements and Uncertainty<a href="#measurements-and-uncertainty" class="hash-link" aria-label="Direct link to Measurements and Uncertainty" title="Direct link to Measurements and Uncertainty" translate="no">​</a></h2>
+<p>A <strong>measurement</strong> is a value with an associated uncertainty (error bar),
+written with <code>\pm</code>. It parses to a <code>Measurement</code> expression:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;5.1 \\pm 0.2&quot;).json);
+<!-- -->// ➔ [&quot;Measurement&quot;, 5.1, 0.2]
+</div></code-playground>
+<p>The uncertainty <strong>propagates through arithmetic</strong> using standard independent,
+first-order (quadrature) error propagation:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;(5 \\pm 0.2)(3 \\pm 0.1)&quot;).N().toLatex());
+<!-- -->// ➔ 15.00 ± 0.78
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;\\sqrt{4 \\pm 0.2}&quot;).N().toLatex());
+<!-- -->// ➔ 2.000 ± 0.050
+</div></code-playground>
+<p>Elementary functions propagate the error too (trigonometric functions respect
+the engine&#x27;s <a href="#angular-units-and-trigonometry" class="">angular unit</a>):</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\sin(1 \\pm 0.1)&quot;).N().toLatex());
+<!-- -->// ➔ 0.841 ± 0.054
+</div></code-playground>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="measured-quantities">Measured Quantities<a href="#measured-quantities" class="hash-link" aria-label="Direct link to Measured Quantities" title="Direct link to Measured Quantities" translate="no">​</a></h3>
+<p>A measurement can carry a unit. The parenthesized and bare forms are
+equivalent — a unit written on either operand of <code>\pm</code> scopes over the whole
+measurement:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;(5.1 \\pm 0.2)\\,\\mathrm{cm}&quot;).json);
+<!-- -->// ➔ [&quot;Quantity&quot;, [&quot;Measurement&quot;, 5.1, 0.2], &quot;cm&quot;]
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;5.1 \\pm 0.2\\,\\mathrm{cm}&quot;).json);
+<!-- -->// ➔ [&quot;Quantity&quot;, [&quot;Measurement&quot;, 5.1, 0.2], &quot;cm&quot;]
+</div></code-playground>
+<p>To give the value and the error <em>different</em> units, write both explicitly
+(<code>5.1\,\mathrm{cm} \pm 2\,\mathrm{mm}</code>) — that form is kept as written and
+the error is converted during propagation.</p>
+<p>The uncertainty is carried through quantity arithmetic and unit conversion —
+including the unit scaling, so converting <code>cm</code> to <code>m</code> scales the error as well:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;(5 \\pm 0.2)\\,\\mathrm{cm} + (3 \\pm 0.1)\\,\\mathrm{cm}&quot;).N().toLatex());
+<!-- -->// ➔ (8.00 ± 0.22) cm
+<!-- -->
+<!-- -->console.log(
+<!-- -->  <!-- -->ce.box([&quot;UnitConvert&quot;, ce.parse(&quot;(5.1 \\pm 0.2)\\,\\mathrm{cm}&quot;), ce.parse(&quot;\\mathrm{m}&quot;)]).N().toLatex()
+<!-- -->);
+<!-- -->// ➔ (0.0510 ± 0.0020) m
+</div></code-playground>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Note</div><div class="admonitionContent_BuS1"><p>Bare <code>5.1 \pm 0.2\,\mathrm{cm}</code> (without parentheses) does <strong>not</strong> attach the
+unit to the whole measurement — <code>\pm</code> binds looser than unit juxtaposition, so
+it parses as <code>Measurement(5.1, 0.2\,\mathrm{cm})</code>. Use parentheses:
+<code>(5.1 \pm 0.2)\,\mathrm{cm}</code>.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="displaying-measurements">Displaying Measurements<a href="#displaying-measurements" class="hash-link" aria-label="Direct link to Displaying Measurements" title="Direct link to Displaying Measurements" translate="no">​</a></h3>
+<p>By convention the uncertainty is shown to <strong>two significant figures</strong> and the
+value is rounded to the same decimal place, so the two are quoted at matching
+precision:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;5.134 \\pm 0.021&quot;).toLatex());
+<!-- -->// ➔ 5.134 ± 0.021
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;8 \\pm 0.2236&quot;).toLatex());
+<!-- -->// ➔ 8.00 ± 0.22
+</div></code-playground>
+<p>Use the <code>digits</code> serialization option to change this — <code>{ significant: n }</code>
+sets the number of significant figures on the uncertainty, <code>{ fractional: n }</code>
+fixes the number of decimal places, and <code>&quot;max&quot;</code> shows the stored value in full.
+<code>.toMathJson()</code> is always lossless.</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;5.134 \\pm 0.021&quot;).toLatex({ digits: { significant: 1 } }));
+<!-- -->// ➔ 5.13 ± 0.02
+</div></code-playground>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="correctness-and-limitations">Correctness and Limitations<a href="#correctness-and-limitations" class="hash-link" aria-label="Direct link to Correctness and Limitations" title="Direct link to Correctness and Limitations" translate="no">​</a></h3>
+<p>Error propagation is <strong>independent</strong> — it assumes the measurements being
+combined are uncorrelated. This is exact when each measured quantity appears
+<strong>once</strong> in an expression:</p>
+<ul>
+<li class="">Combining <strong>distinct</strong> measurements — <code>A = L·W</code>, <code>F = m·a</code>, <code>\rho = m/V</code> — is
+correct.</li>
+<li class="">A single operation on one measurement — <code>x^2</code>, <code>\sqrt{x}</code> — is correct.</li>
+</ul>
+<p>It <strong>over- or under-estimates</strong> when the <em>same</em> measured variable is reused
+across an expression (<code>x·x</code> written out, <code>x - x</code>, <code>x/(x+1)</code>), because each
+occurrence is treated as independent. For the cases that reduce to a single
+occurrence, simplifying first recovers the correct result:</p>
+<code-playground><div slot="javascript">ce.assign(&quot;x&quot;, ce.parse(&quot;5 \\pm 0.2&quot;));
+<!-- -->console.log(ce.parse(&quot;x + x&quot;).simplify().N().toLatex());  // 2x  ➔ 10.00 ± 0.40
+</div></code-playground>
+<p>This is not a general fix (it cannot help <code>x/(x+1)</code>, and it is deliberately not
+applied automatically). Correlation-aware propagation is a planned future
+enhancement.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="supported-units">Supported Units<a href="#supported-units" class="hash-link" aria-label="Direct link to Supported Units" title="Direct link to Supported Units" translate="no">​</a></h2>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="si-base-units">SI Base Units<a href="#si-base-units" class="hash-link" aria-label="Direct link to SI Base Units" title="Direct link to SI Base Units" translate="no">​</a></h3>
 <p><code>m</code>, <code>kg</code>, <code>s</code>, <code>A</code>, <code>K</code>, <code>mol</code>, <code>cd</code></p>
@@ -243,7 +325,7 @@ Energy: <code>eV</code>, <code>cal</code>, <code>kWh</code> | Pressure: <code>at
 Area: <code>ha</code> | Temperature: <code>degC</code>, <code>degF</code> |
 Angle: <code>deg</code>, <code>rad</code>, <code>grad</code>, <code>turn</code>, <code>arcmin</code>, <code>arcsec</code> |
 Other: <code>percent</code>, <code>ppm</code>, <code>dB</code>, <code>Np</code></p>
-<div class="readMore_KWn8"><a href="/compute-engine/reference/units/"><p>See the <strong>Units Reference</strong> for the complete list of functions<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/types/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Types</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/simplify/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Simplify</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#quick-start" class="table-of-contents__link toc-highlight">Quick Start</a></li><li><a href="#creating-quantities" class="table-of-contents__link toc-highlight">Creating Quantities</a><ul><li><a href="#simple-units" class="table-of-contents__link toc-highlight">Simple Units</a></li><li><a href="#compound-units" class="table-of-contents__link toc-highlight">Compound Units</a></li><li><a href="#dsl-string-shorthand" class="table-of-contents__link toc-highlight">DSL String Shorthand</a></li></ul></li><li><a href="#parsing-latex-with-units" class="table-of-contents__link toc-highlight">Parsing LaTeX with Units</a><ul><li><a href="#siunitx-commands" class="table-of-contents__link toc-highlight">siunitx Commands</a></li><li><a href="#serialization" class="table-of-contents__link toc-highlight">Serialization</a></li></ul></li><li><a href="#arithmetic-on-quantities" class="table-of-contents__link toc-highlight">Arithmetic on Quantities</a><ul><li><a href="#addition-and-subtraction" class="table-of-contents__link toc-highlight">Addition and Subtraction</a></li><li><a href="#multiplication-and-division" class="table-of-contents__link toc-highlight">Multiplication and Division</a></li><li><a href="#exponentiation" class="table-of-contents__link toc-highlight">Exponentiation</a></li></ul></li><li><a href="#unit-conversion" class="table-of-contents__link toc-highlight">Unit Conversion</a><ul><li><a href="#temperature-conversion" class="table-of-contents__link toc-highlight">Temperature Conversion</a></li></ul></li><li><a href="#unit-simplification" class="table-of-contents__link toc-highlight">Unit Simplification</a></li><li><a href="#dimensional-analysis" class="table-of-contents__link toc-highlight">Dimensional Analysis</a><ul><li><a href="#checking-compatibility" class="table-of-contents__link toc-highlight">Checking Compatibility</a></li><li><a href="#dimension-vectors" class="table-of-contents__link toc-highlight">Dimension Vectors</a></li></ul></li><li><a href="#angular-units-and-trigonometry" class="table-of-contents__link toc-highlight">Angular Units and Trigonometry</a><ul><li><a href="#degrees-minutes-seconds-dms-notation" class="table-of-contents__link toc-highlight">Degrees-Minutes-Seconds (DMS) Notation</a></li></ul></li><li><a href="#physics-constants" class="table-of-contents__link toc-highlight">Physics Constants</a></li><li><a href="#supported-units" class="table-of-contents__link toc-highlight">Supported Units</a><ul><li><a href="#si-base-units" class="table-of-contents__link toc-highlight">SI Base Units</a></li><li><a href="#named-derived-si-units" class="table-of-contents__link toc-highlight">Named Derived SI Units</a></li><li><a href="#si-prefixes" class="table-of-contents__link toc-highlight">SI Prefixes</a></li><li><a href="#non-si-units" class="table-of-contents__link toc-highlight">Non-SI Units</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+<div class="readMore_KWn8"><a href="/compute-engine/reference/units/"><p>See the <strong>Units Reference</strong> for the complete list of functions<svg class="icon_qj0s chevronRightBold_bbMj"><use xlink:href="/icons.svg#chevron-right-bold"></use></svg></p></a></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/compute-engine/guides/types/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Types</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/compute-engine/guides/simplify/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Simplify</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#quick-start" class="table-of-contents__link toc-highlight">Quick Start</a></li><li><a href="#creating-quantities" class="table-of-contents__link toc-highlight">Creating Quantities</a><ul><li><a href="#simple-units" class="table-of-contents__link toc-highlight">Simple Units</a></li><li><a href="#compound-units" class="table-of-contents__link toc-highlight">Compound Units</a></li><li><a href="#dsl-string-shorthand" class="table-of-contents__link toc-highlight">DSL String Shorthand</a></li></ul></li><li><a href="#parsing-latex-with-units" class="table-of-contents__link toc-highlight">Parsing LaTeX with Units</a><ul><li><a href="#siunitx-commands" class="table-of-contents__link toc-highlight">siunitx Commands</a></li><li><a href="#serialization" class="table-of-contents__link toc-highlight">Serialization</a></li></ul></li><li><a href="#arithmetic-on-quantities" class="table-of-contents__link toc-highlight">Arithmetic on Quantities</a><ul><li><a href="#addition-and-subtraction" class="table-of-contents__link toc-highlight">Addition and Subtraction</a></li><li><a href="#multiplication-and-division" class="table-of-contents__link toc-highlight">Multiplication and Division</a></li><li><a href="#exponentiation" class="table-of-contents__link toc-highlight">Exponentiation</a></li></ul></li><li><a href="#unit-conversion" class="table-of-contents__link toc-highlight">Unit Conversion</a><ul><li><a href="#temperature-conversion" class="table-of-contents__link toc-highlight">Temperature Conversion</a></li></ul></li><li><a href="#unit-simplification" class="table-of-contents__link toc-highlight">Unit Simplification</a></li><li><a href="#dimensional-analysis" class="table-of-contents__link toc-highlight">Dimensional Analysis</a><ul><li><a href="#checking-compatibility" class="table-of-contents__link toc-highlight">Checking Compatibility</a></li><li><a href="#dimension-vectors" class="table-of-contents__link toc-highlight">Dimension Vectors</a></li></ul></li><li><a href="#angular-units-and-trigonometry" class="table-of-contents__link toc-highlight">Angular Units and Trigonometry</a><ul><li><a href="#degrees-minutes-seconds-dms-notation" class="table-of-contents__link toc-highlight">Degrees-Minutes-Seconds (DMS) Notation</a></li></ul></li><li><a href="#physics-constants" class="table-of-contents__link toc-highlight">Physics Constants</a></li><li><a href="#measurements-and-uncertainty" class="table-of-contents__link toc-highlight">Measurements and Uncertainty</a><ul><li><a href="#measured-quantities" class="table-of-contents__link toc-highlight">Measured Quantities</a></li><li><a href="#displaying-measurements" class="table-of-contents__link toc-highlight">Displaying Measurements</a></li><li><a href="#correctness-and-limitations" class="table-of-contents__link toc-highlight">Correctness and Limitations</a></li></ul></li><li><a href="#supported-units" class="table-of-contents__link toc-highlight">Supported Units</a><ul><li><a href="#si-base-units" class="table-of-contents__link toc-highlight">SI Base Units</a></li><li><a href="#named-derived-si-units" class="table-of-contents__link toc-highlight">Named Derived SI Units</a></li><li><a href="#si-prefixes" class="table-of-contents__link toc-highlight">SI Prefixes</a></li><li><a href="#non-si-units" class="table-of-contents__link toc-highlight">Non-SI Units</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>

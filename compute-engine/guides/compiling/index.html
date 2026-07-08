@@ -17,9 +17,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.49b9cdcd.css">
-<script src="/assets/js/runtime~main.57509d6b.js" defer="defer"></script>
-<script src="/assets/js/main.eeac570c.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
+<script src="/assets/js/runtime~main.52781abd.js" defer="defer"></script>
+<script src="/assets/js/main.a99cb90d.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -142,14 +142,27 @@ variables:</p>
 <!-- -->console.log(f.run({ x: 1.0 }));
 </div></code-playground>
 <h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="loop-break-continue-return"><code>Loop</code>, <code>Break</code>, <code>Continue</code>, <code>Return</code><a href="#loop-break-continue-return" class="hash-link" aria-label="Direct link to loop-break-continue-return" title="Direct link to loop-break-continue-return" translate="no">​</a></h4>
-<p><code>Loop</code> expressions with a range compile to <code>for</code> loops. <code>Break</code>, <code>Continue</code>,
-and <code>Return</code> compile to their JavaScript equivalents:</p>
+<p><code>Loop</code> is imperative control flow, compiled for effect: bare <code>Loop(body)</code>
+compiles to a JavaScript <code>while (true) { ... }</code> loop, and <code>Loop(body, Element(...), ...)</code> compiles to plain <code>for</code>/<code>for-of</code> loops with no result
+collection — the compiled expression&#x27;s value is <code>undefined</code>. <code>Break</code>,
+<code>Continue</code>, and <code>Return</code> compile to their JavaScript equivalents:</p>
 <code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
 <!-- -->
 <!-- -->const f = compile(&quot;\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2&quot;);
 <!-- -->console.log(f.run());
-<!-- -->// ➔ 100 (last iteration value)
+<!-- -->// ➔ undefined (Loop is evaluated for effect)
 </div></code-playground>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="comprehension"><code>Comprehension</code><a href="#comprehension" class="hash-link" aria-label="Direct link to comprehension" title="Direct link to comprehension" translate="no">​</a></h4>
+<p><code>Comprehension</code> compiles to nested <code>for (const x of ...)</code> loops that push
+each computed value into a result array, which is returned:</p>
+<code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
+<!-- -->
+<!-- -->const f = compile(&quot;x^2 \\keyword{for} x = [1...5]&quot;);
+<!-- -->console.log(f.run());
+<!-- -->// ➔ [1, 4, 9, 16, 25]
+</div></code-playground>
+<p><code>Comprehension</code> is not compilable to GLSL or WGSL (shaders have no dynamic
+arrays). Imperative <code>Loop</code> is still compilable to GLSL/WGSL.</p>
 <h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="block-and-where"><code>Block</code> and <code>where</code><a href="#block-and-where" class="hash-link" aria-label="Direct link to block-and-where" title="Direct link to block-and-where" translate="no">​</a></h4>
 <p><code>Block</code> expressions create scoped variable bindings. The <code>where</code> syntax provides
 a convenient way to define local variables:</p>
