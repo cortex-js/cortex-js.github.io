@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
-<script src="/assets/js/runtime~main.52781abd.js" defer="defer"></script>
-<script src="/assets/js/main.a99cb90d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.9fb270cf.js" defer="defer"></script>
+<script src="/assets/js/main.7475d1e4.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -61,6 +61,15 @@ interprets it using the current angular unit. Set it with <code>ce.angularUnit</
 <!-- -->console.log(ce.parse(&quot;\\cos 60&quot;).N());
 <!-- -->// ➔ 0.5
 </div></code-playground>
+<p>The angular unit applies to the trigonometric functions (<code>Sin</code>…<code>Csc</code>,
+<code>Haversine</code>), whose argument is an angle, and to the inverse trigonometric
+functions (<code>Arcsin</code>…<code>Arccsc</code>, <code>Arctan2</code>, <code>InverseHaversine</code>), whose result is
+an angle — in degree mode <code>\arcsin(1)</code> evaluates to the exact value <code>90</code>.
+Hyperbolic functions and their inverses are <strong>not</strong> affected: their argument
+is a dimensionless number, not an angle.</p>
+<p>Compiled functions honor the angular unit as well: with
+<code>ce.angularUnit = &quot;deg&quot;</code>, <code>ce.compile(&quot;\\sin(x)&quot;)</code> returns a function that
+interprets <code>x</code> in degrees, matching <code>evaluate()</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="javascript-interoperability">JavaScript Interoperability<a href="#javascript-interoperability" class="hash-link" aria-label="Direct link to JavaScript Interoperability" title="Direct link to JavaScript Interoperability" translate="no">​</a></h2>
 <p>The result of <code>expr.evaluate()</code> and <code>expr.N()</code> is a expression.</p>
 <p>The <code>numericValue</code> property of this expression is either a machine number

@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
-<script src="/assets/js/runtime~main.52781abd.js" defer="defer"></script>
-<script src="/assets/js/main.a99cb90d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.9fb270cf.js" defer="defer"></script>
+<script src="/assets/js/main.7475d1e4.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -67,7 +67,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5261e3" target="_blank" rel="noopener noreferrer" class=""><code>5261e3</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi})</code></p>
+<p><code class="language-math math-inline">\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin-\infty..-1</code>.
 <strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -106,7 +106,7 @@ Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://dx.doi.org/10.1098/rspa.2014.0534" target="_blank" rel="noopener noreferrer" class="">dx.doi.org</a>
 <a href="https://fungrim.org/entry/6f8e14" target="_blank" rel="noopener noreferrer" class=""><code>6f8e14</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi z)))&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(-2\imaginaryI\pi z)))/\pi)&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\Z</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -173,7 +173,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ce66a9" target="_blank" rel="noopener noreferrer" class=""><code>ce66a9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin\Z</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.

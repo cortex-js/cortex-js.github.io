@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
-<script src="/assets/js/runtime~main.52781abd.js" defer="defer"></script>
-<script src="/assets/js/main.a99cb90d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.9fb270cf.js" defer="defer"></script>
+<script src="/assets/js/main.7475d1e4.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -121,9 +121,11 @@ approximations, use <code>N</code>.</p><p>Read more about <a class="" href="/com
 <section id="Simplify" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Simplify</b>(<em>expression</em>)</p><p>The <code>Simplify</code> function applies a sequence of transformations to an expression
 in order to reduce, simplify and calculate its value.</p></section>
 <nav class="hidden"><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="solve">Solve<a href="#solve" class="hash-link" aria-label="Direct link to Solve" title="Direct link to Solve" translate="no">​</a></h3></nav>
-<section id="Solve" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Solve</b>(<em>equation</em>, <em>unknown</em>)</p><p class="signature_CWyf"><b>Solve</b>(<em>equation</em>, <em>spec-1</em>, <em>spec-2</em>, ...<!-- -->)</p><p>Return a list of the solutions of <em>equation</em> for the given unknowns.</p><p>The <em>equation</em> is an <code>Equal</code> expression, or a bare expression that is solved as
+<section id="Solve" class="functionDefinition_O4AF"><p class="signature_CWyf"><b>Solve</b>(<em>equation</em>)</p><p class="signature_CWyf"><b>Solve</b>(<em>equation</em>, <em>unknown</em>)</p><p class="signature_CWyf"><b>Solve</b>(<em>equation</em>, <em>spec-1</em>, <em>spec-2</em>, ...<!-- -->)</p><p>Return a list of the solutions of <em>equation</em> for the given unknowns.</p><p>The <em>equation</em> is an <code>Equal</code> expression, or a bare expression that is solved as
 if it were equal to zero. Any boolean condition (an inequality, a congruence…)
-also works when a domain is given (see below).</p><p>Each <em>spec</em> describes one unknown, and is either:</p><ul>
+also works when a domain is given (see below).</p><p>When no unknown is given, it defaults to the single free variable of the
+equation, or to <code>x</code> when the equation has several free variables and one of
+them is <code>x</code>. This makes point-free forms such as <code>x^2 = 4 \rhd \operatorname{Solve}</code> work without naming the unknown.</p><p>Each <em>spec</em> describes one unknown, and is either:</p><ul>
 <li class="">a <strong>symbol</strong> — the unknown, solved over its declared type;</li>
 <li class=""><strong><code>[&quot;Element&quot;, _symbol_, _collection_]</code></strong> — the unknown restricted to a
 domain, such as a <code>Range</code> of integers or an <code>Interval</code>;</li>

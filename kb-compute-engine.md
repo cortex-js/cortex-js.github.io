@@ -13170,7 +13170,7 @@ slug: /compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **205 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **208 identities** for elementary functions.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -13181,7 +13181,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Exponential function](#exponential-function) (16)
 - [Golden ratio](#golden-ratio) (5)
 - [Inverse tangent](#inverse-tangent) (44)
-- [Lambert W-function](#lambert-w-function) (8)
+- [Lambert W-function](#lambert-w-function) (11)
 - [Natural logarithm](#natural-logarithm) (11)
 - [Pi](#pi) (4)
 - [Powers](#powers) (8)
@@ -13750,6 +13750,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\operatorname{W}_{-1}(-(\frac{1}{\exponentialE}))=-1$$
+
+Used by the Compute Engine for simplification.
+[`d09380` · Fungrim entry ↗](https://fungrim.org/entry/d09380)
+
+---
+
 $$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
@@ -13763,6 +13770,22 @@ $$\operatorname{W}(-(\frac{\pi}{2}))=\frac{\imaginaryI\pi}{2}$$
 
 Used by the Compute Engine for simplification.
 [`e1dd64` · Fungrim entry ↗](https://fungrim.org/entry/e1dd64)
+
+---
+
+$$\operatorname{W}_{-1}(x\exponentialE^{x})=x$$
+
+**Holds when** $x\in\lparen-\infty, -1\rbrack$.
+Used by the Compute Engine for simplification and equation solving.
+[`ed7dac` · Fungrim entry ↗](https://fungrim.org/entry/ed7dac)
+
+---
+
+$$\operatorname{W}_{k}(0)=-\infty$$
+
+**Holds when** $k\in\Z\setminus\lbrace0\rbrace$.
+Used by the Compute Engine for simplification.
+[`f372e9` · Fungrim entry ↗](https://fungrim.org/entry/f372e9)
 
 ---
 
@@ -16746,7 +16769,8 @@ Options for `Expression.simplify()`
 ```ts
 type ExplainOptions = SimplifyOptions & {
   verbosity: ExplainVerbosity;
-  variable: string;
+  variable: string | string[];
+  order: number;
 };
 ```
 
@@ -16758,7 +16782,13 @@ matches `simplify(options)`):
 
 - `verbosity`: `'default'` returns the curated step chain (bookkeeping
   steps filtered out); `'all'` returns the raw, uncurated chain.
-- `variable`: the unknown, for the `'solve'` and `'D'` operations.
+- `variable`: the unknown, for the `'solve'` and `'D'` operations. For a
+  system of equations (`explain('solve')` on a `List`/`And`), pass the
+  unknowns as an array, in order.
+- `order`: for the `'D'` operation only, the order of the derivative to
+  explain (the n-th derivative with respect to `variable`). Defaults to `1`.
+  Ignored when the receiver is already a `D(…)` expression (which encodes
+  its own differentiation sequence).
 
 </MemberCard>
 
@@ -29376,6 +29406,8 @@ in order to reduce, simplify and calculate its value.
 </nav>
 <FunctionDefinition name="Solve">
 
+<Signature name="Solve">_equation_</Signature>
+
 <Signature name="Solve">_equation_, _unknown_</Signature>
 
 <Signature name="Solve">_equation_, _spec-1_, _spec-2_, ...</Signature>
@@ -29385,6 +29417,11 @@ Return a list of the solutions of _equation_ for the given unknowns.
 The _equation_ is an `Equal` expression, or a bare expression that is solved as
 if it were equal to zero. Any boolean condition (an inequality, a congruence…)
 also works when a domain is given (see below).
+
+When no unknown is given, it defaults to the single free variable of the
+equation, or to `x` when the equation has several free variables and one of
+them is `x`. This makes point-free forms such as `x^2 = 4 \rhd
+\operatorname{Solve}` work without naming the unknown.
 
 Each _spec_ describes one unknown, and is either:
 
@@ -29919,6 +29956,821 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.73.0 _2026-07-09_
+
+### New Operator: `Interpret`
+
+- **`Interpret(expr)` gives formal meaning to elliptical notation.** Evaluating
+  `["Interpret", expr]` turns a continuation-bearing sum or product (the inert
+  notational objects produced by the ellipsis fold barrier, see below) into a
+  formal `Sum`/`Product`: `Interpret(1 + 2 + \dots + n)` → `\sum_{k=1}^{n} k`,
+  `Interpret(2 \cdot 4 \cdot \dots \cdot 2n)` → `\prod_{k=1}^{n} 2k`, and
+  `Interpret(1 + 2 + \dots + 100)` → a `Sum` that evaluates to `5050`.
+  Interpretation is an explicit opt-in — a plain `evaluate()` never guesses —
+  and the gate is strict by design: at least two exact numeric sample terms in
+  arithmetic progression and a single anchor whose implied upper bound is
+  integral (so `1 + 3 + \dots + 2n`, whose even anchor does not belong to the
+  odd progression, stays untouched). Anything the gate cannot prove is returned
+  unchanged.
+- **Polynomial and geometric patterns are recognized too (v2).** Successive
+  finite differences identify polynomial general terms —
+  `Interpret(1 + 4 + 9 + 16 + \dots + n^2)` → `\sum_{k=1}^{n} k^2`, cubes and
+  triangular numbers likewise — and a constant exact ratio identifies geometric
+  ones: `1 + 2 + 4 + \dots + 2^n` → `\sum_{k=1}^{n+1} 2^{k-1}`,
+  `2 \cdot 4 \cdot 8 \cdot \dots \cdot 2^n` → `\prod_{k=1}^{n} 2^k`. Numeric
+  anchors resolve to concrete bounds (`1 + 4 + 9 + \dots + 100` → a sum to 10
+  that evaluates to `385`). An evidence discipline guards against overfitting: a
+  degree-g polynomial needs its constant difference row witnessed twice, or one
+  fewer sample when the anchor structurally confirms the general term — three
+  samples fit _any_ quadratic, so `1 + 2 + 4 + \dots + m` stays untouched.
+- **Linear recurrences are recognized (v3).** An exact-rational Berlekamp–Massey
+  pass finds the minimal constant-coefficient recurrence (order ≥ 2) behind the
+  samples, obtains a verified closed form through `RSolve`, and resolves numeric
+  anchors by iterating the recurrence exactly:
+  `Interpret(1 + 1 + 2 + 3 + 5 + 8 + \dots + 55)` →
+  `\sum_{k=1}^{10} \operatorname{Fibonacci}(k)`, which evaluates exactly to
+  `143`; Pell-number sums likewise (with a Binet-style body). The same evidence
+  discipline applies — a recurrence of order L needs `2L+1` samples (or `2L`
+  with a confirming anchor), so primes and factorials stay untouched. Closed
+  forms are verified against every sample before being trusted.
+- **Subtraction-spelled ellipses are protected too.**
+
+### Number Theory
+
+- **Modular arithmetic reaches common notation.** `Mod` and `Congruent` now
+  reduce integer-valued expressions in ℤ/mℤ without materializing the
+  (potentially astronomically large) intermediate value. Modular exponentiation,
+  sums, products, negations and factorial reduction are all handled, so
+  `2^{3^{20}} \pmod{100}` evaluates to `52` and
+  `2^{3^{20}} \equiv 52 \pmod{100}` evaluates to `True`, where both used to stay
+  inert. The floored-sign convention of `Mod` (the result follows the divisor)
+  is preserved on the new path.
+- **New `ModularInverse(a, m)`** returns the modular multiplicative inverse of
+  `a` modulo `m` — the integer `x` in `[0, m)` with `a·x ≡ 1 (mod m)` — and
+  stays symbolic when `a` and `m` are not coprime.
+- **Linear congruences and CRT systems solve.** `solve` on a linear congruence
+  returns the parametric residue family with a fresh integer parameter `t ∈ ℤ`
+  (`6n \equiv 4 \pmod 7` → `7t + 3`), an empty result when there is no solution
+  (`2x \equiv 1 \pmod 4`), and reduces gcd-divisible congruences
+  (`4x \equiv 2 \pmod 6` → `3t + 2`). A system of simultaneous congruences in
+  one unknown is combined via the Chinese Remainder Theorem — including
+  non-coprime moduli — into a single family (`x \equiv 2 \pmod 3`,
+  `x \equiv 3 \pmod 5`, `x \equiv 2 \pmod 7` → `105t + 23`); an inconsistent
+  system reports no solution.
+- **Huge exact products stay symbolic instead of overflowing.** `Multiply` now
+  applies the same digit-count budget as `Power` when an exact power term
+  (`base^exp`) would be folded into a product's numeric coefficient: if
+  materializing that power would exceed the budget, the factor is kept as a
+  symbolic `Power` term rather than computed eagerly (`2 \cdot 3^{5000000}`
+  stays `2 \cdot 3^{5000000}` instead of building a multi-million-digit
+  `bigint`). This also lets `Mod`/`Congruent` reduce such products —
+  `2 \cdot 3^{5000000} \pmod 7` evaluates to `4` — without ever materializing
+  the giant intermediate value.
+
+### Arithmetic
+
+- **New operator: `PolyLog` — the polylogarithm Liₛ(z).** Numeric evaluation for
+  integer order s ≥ 2 over the whole complex plane (validated against mpmath to
+  ≈5·10⁻¹⁵; branch cut z ∈ (1, ∞) with the below-the-cut convention), and exact
+  reductions for the elementary orders and special points: `Li₁(z) → −ln(1−z)`,
+  `Li₀(z) → z/(1−z)`, `Li₋₁(z) → z/(1−z)²`, `Liₙ(1) → ζ(n)`,
+  `Liₙ(−1) → (2^{1−n}−1)·ζ(n)`, `Liₛ(0) → 0`. Parses and serializes as
+  `\operatorname{Li}_s(z)` (the unsubscripted `\operatorname{Li}`,
+  conventionally the _offset_ logarithmic integral, is deliberately not
+  claimed).
+- **`LogIntegral` now has its standard notation.** `\operatorname{li}(x)` parses
+  to `LogIntegral` and serializes back (previously the fallback
+  `\mathrm{LogIntegral}(x)`).
+- **Repeating decimals box as exact rationals.** A LaTeX repeating-decimal
+  literal — vinculum (`0.\overline{3}`), dots
+  (`0.\overset{.}{1}4285\overset{.}{7}`), parenthetical (`1.54(2345)`), or arc
+  (`0.\wideparen{142857}`) notation — and the MathJSON `{num: "0.(3)"}`
+  shorthand now box directly to the exact `Rational` they represent
+  (`0.\overline{3}` → `["Rational", 1, 3]`, `1.(2345)` →
+  `["Rational", 12344, 9999]`) instead of a truncated decimal float carrying a
+  repeating-decimal marker.
+- **`Norm` accepts point-like `Tuple`s.** `\|(-3, 4)\|` now evaluates to `5`
+  instead of leaving the expression inert.
+- **Double-factorial symbolic reductions.** Under `simplify()`, `(2n)!!` reduces
+  to `2^n \cdot n!` and `(2n+1)!!` reduces to `\frac{(2n+1)!}{2^n \cdot n!}`
+  when `n` is integer-typed.
+
+### Equation Solving
+
+On a 40-case univariate solving benchmark derived from SymPy's own test suite
+(graded by substituting the returned roots back into the equation), this release
+reaches **38/40 — parity with both SymPy and Mathematica** — up from 26/40 for
+the previous release (base engine, without the opt-in solve templates: 33/40, up
+from 24). The two remaining cases (Dottie-style transcendental fixed points) are
+unsolved by SymPy and Mathematica as well. What changed:
+
+- **Inverse trigonometric and hyperbolic equations solve exactly.**
+  `\arcsin x = c`, `\arccos x = c` and `\arctan x = c` return the exact root
+  (`\arcsin x = \frac12` → `\sin\frac12`), with out-of-range constants correctly
+  rejected (`\arctan x = 2` has no solution — `2` is outside arctan's range).
+  `\sinh x = c` and `\tanh x = c` return their single root, and `\cosh x = c`
+  returns **both** roots `\pm\operatorname{arcosh}(c)`.
+- **Exponential-symmetric equations are recognized.** `e^x \pm e^{-x}`
+  harmonizes to `2\cosh x` / `2\sinh x` before solving, so `e^x + e^{-x} = 4`
+  returns both roots `\pm\operatorname{arcosh}(2)`.
+- **Two-absolute-value equations solve.**
+  `a\,\lvert f(x)\rvert = b\,\lvert g(x)\rvert` is squared into
+  `a^2 f^2 - b^2 g^2` (candidates are validated against the original equation,
+  so no extraneous roots): `\lvert x-1\rvert = \lvert x+3\rvert` → `-1`.
+- **Rational equations cancel correctly before solving.** Clearing denominators
+  no longer expands numerators past their common factor (`\frac{2x}{x+2} = 1` →
+  `2`), and pure-number denominators are no longer multiplied through at all —
+  rational constants stay where the solve patterns expect them.
+- **`LambertW` gains the real lower branch W₋₁.** The 2-argument form
+  `["LambertW", z, k]` selects the branch (`k` is `0` or `-1`; other branches
+  stay symbolic): exact evaluation, machine- and arbitrary-precision numerics on
+  the branch domain `[-1/e, 0)`, compilation, and `\operatorname{W}_{-1}(x)`
+  LaTeX serialization. `W(-\frac1{10}, -1)` evaluates symbolically and `.N()`s
+  to `-3.5771520639…`.
+- **The opt-in solve templates now cover Lambert-type equations on both real
+  branches.** With `loadIdentities(ce, { solve: true })` (from the `identities`
+  bundle), equations reducible to `W` solve exactly and return **every real
+  root**: `x e^x = -\frac1{10}` →
+  `\{\operatorname{W}(-\frac1{10}), \operatorname{W}_{-1}(-\frac1{10})\}`,
+  `e^x - x - 2 = 0` →
+  `\{-2 - \operatorname{W}(-e^{-2}), -2 - \operatorname{W}_{-1}(-e^{-2})\}`, and
+  mixed linear-exponential forms like `x + 2^x = 0` →
+  `-\operatorname{W}(\ln 2)/\ln 2`. Exact rational, float, and integer
+  right-hand sides are all handled. The identities library also simplifies
+  `W(x e^x, -1) \to x` under `assume(x \le -1)`.
+
+### Integration (opt-in Rubi rules)
+
+New rule coverage in the `integration-rules` bundle (`loadIntegrationRules`):
+
+- **Polynomial × csc²/sec² integrates by parts.** `\int x\csc^2 x\,dx` →
+  `-x\cot x + \ln \sin x`, and likewise for `P(x)\sec^2(ax+b)` with any
+  polynomial `P` (the recursion reduces the polynomial degree).
+- **Rational × sin/cos of a linear argument reduces to Si/Ci.**
+  `\int \frac{\sin x}{x+1}\,dx` returns the exact
+  `\sin(-1)\operatorname{Ci}(x+1) + \cos(-1)\operatorname{Si}(x+1)` form via
+  partial fractions over linear factors.
+- **Secant-family binomials route through the dedicated secant rules.**
+  Integrands like `\frac{1}{1+\sec x}` now resolve
+  (`x - \frac{\tan x}{\sec x + 1}`) instead of returning unevaluated.
+- **Cotangent integrands reflect onto the tangent rules**, closing forms like
+  `\int \cot^3 x\,dx` → `-\frac{\cot^2 x}{2} - \ln \sin x`.
+
+### Simplification and Exact Arithmetic (Wester round 1)
+
+- **Rational radicands extract perfect-power factors.** `(1029/1000)^{1/3}` now
+  canonicalizes to `\frac{7}{10}\sqrt[3]{3}` (numerator and denominator factored
+  independently), extending the existing integer-radicand extraction. Also fixed
+  an exactness leak where a higher root of an exact literal could evaluate to a
+  float times `Root(1, n)` (e.g. Wester 28's `2^{1/3}` expressions now stay
+  all-exact under `evaluate()`).
+- **Pythagorean factoring in `simplify()`.**
+  `\cos^3 x + \cos x\sin^2 x - \cos x` now simplifies to `0`: a sum with a
+  shared factor times `\cos^2 u` and `\sin^2 u` combines
+  (`g\cos^2 u + g\sin^2 u \to g`), generalizing the bare
+  `\sin^2 x + \cos^2 x \to 1` case.
+- **Rational-function cancellation fires in `simplify()`** (Wester 14):
+  `\frac{x^2-4}{x^2+4x+4}` simplifies to `\frac{x-2}{x+2}`. The cancellation
+  machinery existed but its result was destroyed by a subsequent
+  expand-over-sum-denominator rewrite in the same pass; that split is now
+  suppressed (it never reduces complexity).
+- **`Binomial(n, k)` and `Pochhammer(a, k)` expand for small literal `k`** with
+  a symbolic first argument: `Binomial(n, 3)` evaluates to
+  `\frac{n(n-1)(n-2)}{6}`, `Pochhammer(a, 3)` to `a(a+1)(a+2)` (k ≤ 20).
+  `Pochhammer` is a newly registered operator (it previously had no definition
+  and was fully inert).
+- Six Wester CAS-review tests unskipped in `wester.test.ts` (the skip ledger
+  drops from 27 to 21).
+
+### Linear Algebra
+
+- **`RowReduce` is exact on exact input.** Reduction of an integer or rational
+  matrix now uses exact bigint-fraction elimination — the RREF of an integer
+  matrix has exact `-1`/`3` pivots instead of `-0.999…`/`2.999…` float
+  artifacts. Float matrices use the numeric path unchanged.
+  (`NullSpace`/`MatrixRank`'s float elimination is tracked in the ROADMAP for
+  the same treatment.)
+- **Products of declared matrices type correctly.** A product with a
+  matrix/vector/list-typed operand now carries the collection type instead of
+  collapsing to a numeric type: with `X` and `Y` declared `matrix`, `2Y`, `XY`,
+  `X - Y` and `3X + 2Y` all type as `matrix` (previously `finite_number`, which
+  made `\det(XY)` fail validation as an `incompatible-type` error). `Trace` of a
+  matrix now types as `number`. All-scalar products are unchanged. Note:
+  _undeclared_ symbols in a matrix-expecting argument (`\det(A+2B)` with fresh
+  `A`, `B`) still infer as numbers — declare matrix/vector symbols for symbolic
+  matrix algebra (see the ROADMAP "Matrix-operator typing" item for the planned
+  inference-ordering fix).
+
+### Units
+
+- **Compound units cancel in quantity arithmetic.** Multiplying or dividing
+  quantities now cancels units structurally instead of accumulating them:
+  `18 \text{ in} / (12 \text{ in/ft})` evaluates to `1.5 \text{ ft}` (previously
+  the inscrutable `1.5 \text{ in/in/ft}`). A repeated unit symbol cancels
+  exactly — no conversion factors are introduced — while different units of the
+  same dimension on opposite sides of a fraction bar are converted and folded
+  into the magnitude: `\frac{10 \text{ m} \cdot 1 \text{ s}}{5 \text{ in}}` →
+  `78.74 \text{ s}`. Products of same-dimension units are left as written
+  (`2 \text{ in} \cdot 3 \text{ ft}` stays `6 \text{ in} \cdot \text{ft}`), and
+  simplification to named derived SI units still applies afterwards
+  (`2 \text{ N} \cdot 3 \text{ m}` → `6 \text{ J}`). Works with measurement
+  (uncertainty-carrying) magnitudes as well.
+- **New units: `yd`, `qt`, `pt`, `cup`, `wk`.** Yards, quarts, pints, cups (US
+  liquid convention, consistent with the existing US `gal`) and weeks join the
+  unit registry, with their English word aliases (`5 \text{ yards}` →
+  `5 \text{ yd}`), and convert exactly: `1 \text{ gal} / 1 \text{ qt}` evaluates
+  to `4`.
+- **Currency: dollars and cents.** A new currency dimension backs the `USD` and
+  `cent` units (`18 \text{ dollars}` → `18 \text{ USD}`,
+  `1 \text{ dollar} + 50 \text{ cents}` → `1.5 \text{ USD}`), and currency
+  participates in unit cancellation (`\$6 / (\$2/\text{lb})` → `3 \text{ lb}`).
+  Other currencies are deliberately not modeled: exchange rates are not fixed
+  constants, so cross-currency expressions stay inert rather than silently
+  wrong.
+- **Spaced unit phrases parse.** Multi-word unit text such as
+  `60 \text{ miles per hour}` now parses to `60 \text{ mi/h}` — spaces inside
+  `\text{...}` unit annotations are preserved and `per` reads as division —
+  where previously the words ran together and the unit was not recognized.
+
+### New Notations
+
+- **Base-subscript numerals compute.** A numeral with an integer-literal
+  subscript base, e.g. `10111_2` or `2748_{16}`, now parses to the numeric
+  `BaseForm(value, base)` head (`10111_2` → `["BaseForm", 23, 2]`), so
+  arithmetic on based numerals works: `1011_2 \cdot 101_2` evaluates to `55`,
+  and `11_8 - 3_8 = 6_8` evaluates to `True`. The guard is strict — every digit
+  must be valid for the base (`19_2` stays an inert `Subscript`), subscripted
+  symbols (`x_2`) are unchanged, and values larger than 2⁵³ stay exact. The
+  `BaseForm` LaTeX serializer was also fixed (it emitted an unbalanced
+  parenthesis) and now round-trips: `BaseForm(23, 2)` serializes as `10111_{2}`.
+  A numeral with a **symbol** subscript base, e.g. `161_b` or `161_{b}`, now
+  parses to `BaseForm` of the digit polynomial in that base (`161_b` →
+  `["BaseForm", ["Add", ["Power", "b", 2], ["Multiply", 6, "b"], 1], "b"]`, i.e.
+  `b² + 6b + 1`), so arithmetic works symbolically (`161_b + 134_b` evaluates to
+  `2b² + 9b + 5`) and the numeral round-trips back to `161_{b}`. Base equations
+  solve: `161_b + 134_b = 315_b` reduces to `b² − 8b = 0` and solves to `b = 8`
+  (and `b = 0`).
+- **Sequence-braces notation.** `\{a_n\}_{n=1}^{\infty}` now parses to the new
+  inert `IndexedSequence(term, index, lower, upper)` head instead of an
+  `incompatible-type` error. The term uses the operator-call form
+  (`["a_", "n"]`) so the index binding survives; `_{n\in\mathbb{N}}` subscripts
+  map to the set's least element as the lower bound; the expression is inert
+  under `evaluate()` and `simplify()` and round-trips through LaTeX. Bare
+  `\{a_n\}` remains a `Set`, and the parenthesized form `(a_n)_{n\in\mathbb{N}}`
+  is unchanged.
+
+### Ellipsis Expressions
+
+- **Sums and products no longer fold numeric terms across an ellipsis.** An
+  `Add` or `Multiply` containing an ellipsis (`\dots`, the
+  `ContinuationPlaceholder` symbol) is a notational pattern, not an arithmetic
+  one: it now keeps its operands in source order with their structure intact,
+  and is returned unchanged by `evaluate()`, `N()` and `simplify()`. Previously
+  `1 + 2 + \dots + n` canonicalized to `n + 3 + \ldots` — folding the sample
+  terms and destroying the pattern — and `2 \cdot 4 \cdot \dots \cdot 2n` folded
+  to `16 \cdot \ldots \cdot n`, tearing the coefficient out of the `2n` anchor.
+  Such products also round-trip through LaTeX now (an explicit `\times` is
+  emitted around the ellipsis instead of juxtaposition).
+
+### LaTeX Parsing
+
+Recovery fixes from the Hendrycks-MATH genre sweep (`docs/mathnet/`), taking
+that corpus from 97.09% to 97.38% clean parse:
+
+- **Ordinal superscripts** devolve to the base number: `13^{\text{th}}` now
+  parses as `13` (also `1^{\text{st}}`, `k^\text{th}`, `\mbox` variants). Only
+  an exact ordinal suffix (`st`/`nd`/`rd`/`th`, case-insensitive) is dropped;
+  other superscripts are unchanged.
+- **Empty scripts are dropped:** `x^{}` and `x_{}` now parse as `x` instead of
+  producing an error.
+- **`{,}` thousands separator:** the LaTeX thin-separator idiom `1{,}000` now
+  parses as the number `1000`. Only between digits, and a configured
+  `decimalSeparator: '{,}'` (European convention) takes precedence — `3{,}14`
+  still parses as `3.14` in that mode.
+- **`\cancel`, `\bcancel`, `\xcancel`** unwrap to their body, and
+  **`\cancelto{4}{72}`** parses to the replacement value `4` — matching the
+  worked-solution usage the notation comes from.
+- **`\not`-prefixed relations** compose into the negated relation: `\not=` →
+  `NotEqual`, `\not\in` → `NotElement`, `\not\equiv` (incl. a trailing
+  `\pmod n`) → the negated congruence, `\not\subset` → `NotSubset`, and
+  relations without a dedicated negated head wrap in `Not(…)`.
+- **Standalone `\pmod{7}`** now places the modulus as the second argument of
+  `Mod` (previously the operands were flipped).
+- **`(2n)!!` stays symbolic:** `Factorial2` accepts symbolic arguments (its
+  signature was integer-only and rejected `2n` with an `incompatible-type`
+  error); numeric double factorials are unchanged (`8!! = 384`).
+- **Primed variables type-check as arguments:** `\sin a'` now parses to
+  `Sin(Prime(a))` instead of a type error — `Prime` mirrors the type of its base
+  (a primed value is a value; a primed function is a function). Derivative
+  notation (`f'(x)` → `D(f(x), x)`) is unchanged.
+- **Bare `N`/`D` devolve to variables in all argument positions:**
+  `N \equiv 1 \pmod k` now parses as a congruence over the variable `N`
+  (previously the standard-library `N` operator's function type failed the
+  relation's numeric parameter check; the existing devolution fallback ran only
+  for arithmetic operators). Applied uses (`N(2/3)`) still call the operator.
+- **Congruence chains and fragments:**
+  `3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}` folds into a conjunction of
+  the adjacent congruence steps; a leading `\equiv b \pmod n` with an elided
+  left-hand side recovers with a missing-operand placeholder.
+- **Empty subscripts on multi-letter symbols are dropped:** `\alpha_{}` parses
+  as `alpha` (completing the earlier `x_{}`/`13^{}` fix).
+- **English unit words in `\text{…}` parse as quantities.** `18 \text{ inches}`
+  → `["Quantity", 18, "in"]`: common measurement words (singular and plural —
+  inches, feet, miles, gallons, pounds, minutes, hours, meters, liters, degrees,
+  …) are normalized to their canonical unit symbols at the parse boundary,
+  including inside compound units (`\text{ inches/foot}` → `in/ft`). An exponent
+  _outside_ the text binds to the trailing unit factor:
+  `7.5 \text{ gallons/ft}^3` → `Quantity(7.5, gal/ft³)` (gallons per cubic foot,
+  not `(gal/ft)³`). Strictly gated: the whole text must resolve as a unit, so
+  prose like `9\text{ to }80` is untouched. No `ton(s)` alias (a US short ton is
+  not the metric tonne `t` — mapping it would be a silent 10% error).
+
+### Restriction Braces
+
+- **Comma-separated brace conditions combine as a union (`Or`).**
+  `x^2\{x\ge0, x\le3\}` now parses to `["When", x², ["Or", 0≤x, x≤3]]` — each
+  comma element is piecewise shorthand for `cond: 1` evaluated first-match, so
+  the expression is defined where **any** condition holds. (Previously the
+  condition was a `Tuple`, which is not boolean and could not compile.) Stacked
+  braces (`\{c_1\}\{c_2\}`) still AND-combine, unchanged.
+- **Colon groups parse as piecewise value selectors.** `x\{x>0:1, x<0:-1\}` now
+  parses to `["Multiply", "x", ["Which", 0<x, 1, x<0, −1]]`: a brace group is a
+  first-class piecewise _value_ (`{cond}` ≡ `{cond: 1}`) attached by
+  juxtaposition — i.e. multiplication, the same convention that makes the
+  bare-condition form a restriction. A trailing bare value is the else branch
+  (`\{x>0:1, -1\}` → `…, "True", −1`), and a bare condition inside a colon group
+  means `cond: 1`. (Previously the `cond:val` pairs were parsed as a `When`
+  _gate_ for the body — inverted semantics.)
+- **`When` now masks correctly on the `interval-js` compile target.** The
+  interval comparisons return the tri-state string `'true' | 'false' | 'maybe'`
+  — all truthy — so the previously-emitted JS ternary could never take its
+  masking branch: an input interval entirely outside the restriction returned a
+  normal interval result. `When` now compiles to a tri-state-aware runtime
+  helper (`_IA.restrict`): `'false'` masks (`{kind: 'empty'}`), `'true'` passes
+  the value through, and `'maybe'` — an input straddling the restriction
+  boundary — reports the value range as domain-clipped
+  (`{kind: 'partial', domainClipped: 'both'}`) so adaptive samplers see a domain
+  edge rather than a clean interval. Scalar `javascript` and `glsl` `When`
+  emission is unchanged.
+
+### Pipelines and Held Operands
+
+- **Hold operators reduce transformer heads.** `Solve`, `Integrate`, and `Limit`
+  hold their expression operand (so an equation is not collapsed to a boolean
+  before solving) — but a held operand whose head is an expression _transformer_
+  (`Simplify`, `Expand`, `ExpandAll`, `Factor`, `Together`, `Distribute`,
+  `TrigExpand`) is a computation step and is now reduced before the algorithm
+  runs. `x^2+2x+1 \rhd \operatorname{Simplify} \rhd \operatorname{Solve}` now
+  returns `[-1]` (previously `[]`: the solver found no roots in an expression
+  whose operator was `Simplify`), and `\int \operatorname{Simplify}(x^2)\,dx` /
+  `\lim` of a transformer-wrapped body compute instead of staying inert. Only
+  the curated transformer set is reduced — full evaluation would collapse
+  relations and substitute assigned values into the unknown.
+- **Unknown-inference defers on the pipe topic placeholder.** Operators that
+  infer their variable when omitted (`Solve`, `D`, `Series`, the polynomial
+  operators) no longer run that inference on the pipeline topic placeholder `_`:
+  `ce.box(["Solve", "_"])` stays `["Solve", "_"]` instead of canonicalizing to
+  `["Solve", "_", "_"]`, which baked the placeholder into the unknown slot so a
+  _prefix_ pipeline stage (`\rhd \operatorname{Solve}`) computed
+  `Solve(expr, expr)` → `[0]` where the infix spelling returned `[-1]`. `Solve`
+  re-infers the unknown when the applied stage evaluates; the two spellings now
+  agree. Piping an _equation_ through the prefix form works too, now that an
+  undecidable `Equal` survives the lambda's argument pre-evaluation (see
+  "Undecidable Relations Stay Symbolic" below): `Apply(\rhd Solve, x^2 = 4)` →
+  `[2, -2]`.
+
+### Undecidable Relations Stay Symbolic
+
+- **An equation with free variables is a condition, not a falsity.** `Equal` and
+  `NotEqual` with an undecidable comparison now stay **inert** under
+  `evaluate()`: `x^2 = 4` evaluates to itself instead of `False` (and `x \ne 4`
+  to itself instead of `True`). This matches the inequality operators —
+  `x^2 < 4` already stayed symbolic — and Mathematica's `==`. Decidable
+  comparisons are unchanged (`2+2=4` → `True`, `2=3` → `False`, `x=x` → `True`),
+  list/scalar elementwise comparisons are unchanged, and assumption discharge
+  still applies (`assume(z > 0)` ⇒ `z \ne 0` → `True`). The previous collapse
+  silently ruined stored equations: a notebook cell holding `x^2 = 4` evaluated
+  to `False` at storage time, breaking every answer-referencing `Solve` pipe
+  downstream.
+- **`If` and `Which` stay unevaluated on an undecided condition.** A condition
+  that is boolean-typed but not yet decidable (e.g. `x = 4` with a free `x`)
+  leaves the conditional inert — it may become decidable once the variables are
+  bound — instead of throwing `Condition must evaluate to "True" or "False"`
+  (or, previously for `Equal` conditions, silently taking the else branch).
+  Genuinely non-boolean conditions (a number, a misspelled symbol) still throw
+  with the spell-check hint.
+
+### Issues Resolved
+
+- `toLatex({ digits: <number> })` no longer throws
+  `RangeError: The number NaN cannot be converted to a BigInt` on a
+  bignum-precision engine. A bare number — not part of the documented
+  `DisplayDigits` forms, but the exact shape of a mechanical
+  `fractionalDigits: n` → `digits: n` migration — is accepted with the
+  deprecated numeric convention (`n ≥ 0` = fractional digits, `n < 0` =
+  significant digits), and a genuinely invalid shape reports a clear validation
+  error instead of crashing.
+- The engine no longer trips its own
+  `` `digits` and `fractionalDigits` were both specified `` deprecation warning.
+  The serializer re-entered the public `toMathJson()` boundary — which always
+  carries both (resolved) options — for any dictionary-_typed_ expression; for a
+  symbol bound to a dictionary value this also recursed without bound (a warning
+  flood followed by a stack overflow). Dictionary values now serialize inside
+  the serializer proper; the warning fires only for genuine caller mistakes,
+  once.
+- `BoxedDictionary.toMathJson()` called without options no longer throws
+  (`Cannot read properties of undefined`); it resolves the same defaults as
+  every other expression kind.
+- `.latex` on a dictionary-typed symbol with no value no longer overflows the
+  stack; it serializes as the symbol. (`.latex` on a dictionary _value_ — which
+  crashed in released builds — now returns an empty string: dictionaries have no
+  LaTeX display form yet.)
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.70.0 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |           18 |        12 |   281 |     275 |         6.2 |
+| $\sin 1$           |           34 |        36 |   353 |     945 |         7.1 |
+| $\cos 1$           |           40 |        41 |   351 |   1,315 |          11 |
+| $\ln 2$            |           27 |        24 |   598 |   8,195 |         5.8 |
+| $e^{\pi}$          |           20 |        22 |   376 |   8,984 |         7.5 |
+| $\zeta(3)$         |        2,715 |     2,787 |   494 |       — |         151 |
+| $\Gamma(\tfrac13)$ |        1,452 |     1,424 | 4,843 |       — |         267 |
+| $\psi(\tfrac13)$   |        1,269 |     1,241 | 3,782 |       — |         235 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.70.0** columns to see
+what is _new this release_ (a `—` under `0.70.0` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.70.0 |  SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :-----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |         |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     7.4×     |   3.0×   |   5.0×    |  0.6×   |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     8.3×     |   1.2×   |   7.7×    |  0.08×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     4.3×     |   0.7×   |   3.4×    |  0.3×   |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   2.0×   |     —     |  0.1×   |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   0.9×   |     —     | 0.008×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.2×   |     —     | 0.006×  |    —    |     1×      |
+| **Derivatives**                        |              |          |           |         |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.01×     |  0.02×   |   0.02×   | 0.0009× | 0.002×  |     1×      |
+| **Simplification**                     |              |          |           |         |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     29×      |   23×    |    27×    |    —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     71×      |   36×    |    54×    |  2.8×   |  9.1×   |     1×      |
+| **Evaluation**                         |              |          |           |         |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     43×      |   20×    |    38×    |  2.5×   |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     6.3×     |   4.2×   |   6.0×    |  2.1×   |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    5213×     |  6049×   |   5202×   |   82×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     332×     |   106×   |   279×    |  2.3×   |    —    |     1×      |
+| **Solving**                            |              |          |           |         |         |             |
+| $x^4+x^2-1=0$                          |     0.2×     |   0.2×   |   0.2×    |  0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.2×     |   1.4×   |   1.4×    |  0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 6.3× faster than
+Mathematica** (up to 5213×).
+
+<sub>
+Measured 2026-07-10 · Compute Engine `0.72.0` @ `2cf87db4` (current build) · published `0.70.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
+</sub>
+
+## 0.72.0 _2026-07-09_
+
+### Angular Units
+
+- **Compilation targets honor `ce.angularUnit`.** Compiled code from every
+  built-in target (`javascript`, `interval-js`, `glsl`, `wgsl`, `interval-glsl`,
+  `python`) now reproduces the engine's angular-unit semantics instead of always
+  computing in radians: direct trigonometric arguments (`Sin`…`Csc`,
+  `Haversine`) are scaled by the unit→radian factor and inverse-trigonometric
+  results (`Arcsin`…`Arccsc`, `Arctan2`, `InverseHaversine`) by its reciprocal,
+  for all units (`deg`, `grad`, `turn`). With `ce.angularUnit = 'deg'`,
+  `compile('\\sin(x)')` emits `Math.sin(0.017453… * x)` so `run({x: 90})`
+  returns 1, matching `evaluate()` — previously a degree-mode expression
+  _evaluated_ in degrees but _compiled_ (and therefore plotted) as if radians.
+  Radian mode emits the same code as before.
+
+- **Hyperbolic functions are now unit-independent.** Their argument (and an
+  inverse hyperbolic's result) is a dimensionless real, not an angle, so `sinh`,
+  `cosh`, `tanh`, `coth`, `sech`, `csch` and `arsinh`…`artanh` no longer convert
+  under a non-radian `angularUnit`. Previously in degree mode `\sinh(1)`
+  evaluated to $\sinh(\pi/180) \approx 0.0175$ instead of $1.1752$.
+
+- **Exact inverse-trigonometric values are returned in the current angular
+  unit.** In degree mode `\arcsin(1)` now evaluates to the exact integer `90`
+  (previously the exact _radian_ value $\pi/2$, disagreeing with `.N()`, which
+  returned 90). Similarly `100` in `grad` mode and the exact rational `1/4` in
+  `turn` mode; radian mode still returns $\pi/2$.
+
+- **`Arctan2` honors `angularUnit`,** consistently with `Arctan` (it previously
+  always returned radians): in degree mode `Arctan2(1, 1)` evaluates to the
+  exact `45`, with the quadrant corrections applied in the current unit
+  (`Arctan2(1, -1)` → `135`).
+
+  Symbolic calculus (`D`, `Integrate`) remains radian-based regardless of
+  `angularUnit` (no $\pi/180$ chain-rule factor); this is a known limitation.
+
+### Step-by-Step Explanations
+
+- **`explain('D')` handles higher-order and mixed partial derivatives.** A new
+  `order` option requests the $n$-th derivative
+  (`ce.parse('x \\sin x').explain('D', { variable: 'x', order: 2 })`), and a
+  receiver that is itself a `D` expression — including mixed partials such as
+  `D(f, x, y)` — is traced through its whole differentiation sequence. The
+  explanation differentiates one order at a time: each stage replays the
+  textbook rule applications inside the remaining derivative operators, folds to
+  the simplified derivative, then differentiates again.
+
+- **`explain('solve')` traces systems of equations and alternatives.** A `List`
+  or `And` of equations is traced through the same solvers `solve()` runs:
+  Gaussian elimination shows one step per eliminated variable and per
+  back-substituted variable (`solve.system.eliminate`,
+  `solve.system.back-substitute`, `solve.system.parametric`), and nonlinear 2×2
+  systems show the product–sum or solve-and-substitute strategy
+  (`solve.system.product-sum`, `solve.system.solve-for`,
+  `solve.system.substitute`). An `Or` of univariate equations is solved case by
+  case (`solve.case`) with the roots merged. The solutions are identical to
+  `solve()` — the trace is a pure observation channel. Systems of inequalities
+  and mixed systems are not traced and throw a precise error. To support
+  systems, the `variable` explain option now also accepts an array of unknowns.
+
+### Cortex Language (Experimental)
+
+- **Cortex ships as a new entry point `@cortex-js/compute-engine/cortex`.**
+  Cortex is a text-syntax programming language for scientific computing whose
+  intermediate representation is MathJSON, evaluated by the Compute Engine. The
+  entry point exports `parseCortex()` (Cortex text → MathJSON),
+  `serializeCortex()` (MathJSON → Cortex text), and `executeCortex()` (parse and
+  evaluate a program against a host-created engine):
+
+  ```js
+  import { ComputeEngine, executeCortex } from '@cortex-js/compute-engine/cortex';
+  const ce = new ComputeEngine();
+  const { value } = executeCortex(ce, `
+    let x = 1/2
+    if (x < 1) { x + 1 } else { 0 }
+  `);
+  // value.toString() === '3/2'
+  ```
+
+  **This is experimental**: the syntax and semantics may change between
+  releases.
+
+### Pipeline Operator
+
+- **A pipeline operator applies the expression on its left to the function on
+  its right.** `x \rhd f` (also `x \triangleright f`, `x \vartriangleright f`,
+  `x ⊳ f`, or the plain-text shortcut `x |> f`) parses to `f(x)`. A `\square`
+  topic marker in the right-hand side names the position the piped value fills,
+  so a stage can be a multi-argument call:
+  `x^2 = 4 \rhd \operatorname{Solve}(\square, x)` is `Solve(x^2 = 4, x)`. Stages
+  chain left to right (`4 \rhd \sqrt \rhd \ln` is `ln(√4)`), a bare function
+  command such as `\ln`, `\lb` or `\sqrt` acts as a function reference
+  (`12 \rhd \ln` is `ln(12)`), and the prefix form (`\rhd f`, with no left-hand
+  side) denotes the anonymous unary function `_ ↦ f(_)`.
+
+- **The unknown/variable argument of `Solve`, `D`, `Series` and the polynomial
+  operators may now be omitted.** It defaults to the input's single free
+  variable, or to `x` when there are several free variables and one of them is
+  `x`; with no inferable default the expression stays unevaluated. This enables
+  point-free pipelines such as `x^2 = 4 \rhd \operatorname{Solve}` or
+  `x^2 \rhd \operatorname{D}`. Applies to `Solve`, `D`, `Series`,
+  `PolynomialDegree`, `CoefficientList`, `PolynomialRoots`, `Discriminant`,
+  `PolynomialQuotient`, `PolynomialRemainder`, `PolynomialGCD`, `Resultant`,
+  `Cancel`, `PartialFraction` and `Apart` (`Factor` already inferred its
+  variable). For the two-input polynomial operators the default is inferred from
+  both operands together.
+
+### LaTeX Parsing
+
+Notation coverage driven by a cross-genre corpus sweep (Hendrycks MATH, 15,546
+fragments across all seven subjects including worked solutions; see
+`docs/mathnet/math-genre-sweep.md`), which took the measured clean-parse rate
+from 95.3% to 97.1%:
+
+- **Text-styling commands.** `\textbf`, `\textit`, `\emph`, `\texttt`,
+  `\textsf`, and `\textup` parse their argument as a text run and produce an
+  `Annotated` expression with the matching style (`\textbf{Sizes}` →
+  `["Annotated", "'Sizes'", {dict: {fontWeight: "bold"}}]`) that round-trips
+  back to the same LaTeX. `\textrm` and `\mbox` parse like `\text`. `\bold`,
+  `\boldsymbol`, and `\bm` are synonyms of `\mathbf` (`\bold{v}` → the symbol
+  `v_bold`).
+
+- **Vector-norm bars.** The `\|` command is now recognized as a norm delimiter
+  everywhere `\Vert` is: `\|\mathbf{a}\|`, `\left\| b \right\|`, and `\|a\|^2`
+  all parse to `Norm`.
+
+- **TeX-primitive binomial.** The infix `{n \choose k}` form parses to
+  `Binomial(n, k)`, joining the already supported `\binom`, `\dbinom` and
+  `\tbinom`.
+
+- **Bare mod annotations.** `x \pmod n` with no preceding `\equiv` parses as
+  `Mod(x, n)` (`-811 \pmod{24}` → `["Mod", -811, 24]`), matching the existing
+  `\bmod` behavior. Congruence chains followed by an implication now parse
+  correctly: `a+1 \equiv 4 \pmod 7 \implies a \equiv 3 \pmod 7` is
+  `Implies(Congruent(…), Congruent(…))` (the congruence previously disintegrated
+  when `\implies` followed the modulus). `\equiv` now binds at comparison
+  precedence, tighter than `\implies` (zero snapshot impact).
+
+- **Mixed braced/unbraced fraction and binomial arguments.** `\frac1{-1}`,
+  `\frac{900}7`, `\binom{n}k`, `\binom n{k+1}` parse correctly. Each argument is
+  now independently a group or a single token, per TeX semantics; previously
+  both arguments were forced into the style of the first, and the mixed forms
+  produced a `missing` error.
+
+### Issues Resolved
+
+- Reading `.latex` (or `.toString()`) on the canonical, unevaluated form of a
+  scalar×tuple product — `ce.parse('3(1,2)').latex`,
+  `ce.box(['Multiply', 2, ['Tuple', 1, 2]]).latex` — no longer throws
+  `RangeError: Maximum call stack size exceeded`. The pretty-JSON `Multiply`
+  serializer round-trips through `Product.asRationalExpression()`, and the
+  tuple-aware branch of `canonicalDivide` returned an inert `Divide(expr, 1)`
+  instead of stripping the trivial divisor, sending the serializer into infinite
+  recursion. Trivial `/1` and `/-1` divisors of tuple-typed expressions are now
+  reduced.
+
+- Juxtaposing a scalar with a tuple-**typed** symbol now means scaling, not
+  tuple construction: with `z` declared `tuple<number, number>`, `3z` parses to
+  `["Multiply", 3, "z"]` (previously a spurious `["Tuple", 3, "z"]`). Literal
+  tuples (`3(1,2)`) were already handled; heterogeneous tuples such as
+  `tuple<string, number>` still group as a `Tuple`.
+
+- Compiled broadcasts over a list operand now compute their values. The
+  generated `.map()` callback read its element variable from the vars object
+  instead of the callback parameter, so a compiled `\sin([x, 2x])` returned
+  `[null, null]` for every input. Compiled broadcast results now agree with
+  `evaluate()`.
+
+- `\operatorname{csch}(x)` now parses to the `Csch` function (previously a free
+  symbol named `csch`, silently turning the expression into an implicit
+  multiplication), joining the existing `\csch` command and matching
+  `\operatorname{sech}`.
+
+- Constructing many `ComputeEngine` instances in a synchronous loop no longer
+  balloons memory (~430 KB pinned per engine until the task yielded to the event
+  loop, enough to exhaust the default V8 heap after a few thousand engines).
+  Every constant definition subscribed to configuration changes through a
+  `new WeakRef(...)`, and the ECMAScript kept-objects rule pins each `WeakRef`
+  target until the next microtask checkpoint. The tracker now holds its
+  listeners directly; since it is owned by the engine, the engine and its
+  listeners form a self-contained cycle that is garbage-collected as a unit.
+
+- A bare `\ln` or `\log` — with no argument, as in the pipeline
+  `12 \triangleright \ln` — now parses to the function symbol (`"Ln"`, `"Log"`),
+  consistent with `\cos`, `\lg` and `\lb`. It previously parsed to an empty
+  function application, so piping a value into it produced a `missing` error
+  instead of applying the function:
+  `ce.parse('12 \\triangleright \\ln').evaluate()` now returns $2\ln 2 + \ln 3$.
+  The bare symbols also serialize back to `\ln`, `\log` and `\lg` (previously
+  `\ln()`).
+
+- A bare `\lb` (binary log) now parses to the `Lb` function symbol, so
+  `12 \triangleright \lb` computes $\log_2 12$. It previously parsed to `Log`,
+  silently computing the base-10 logarithm instead.
+
+- A log with a base but no argument (`\log_2`) now parses with the pipeline
+  topic marker `\square` standing in for the argument: `8 \triangleright \log_2`
+  fills the hole and computes $\log_2 8 = 3$ (composing with inverse
+  superscripts too: `9 \triangleright \log_3^{-1}` gives $3^9$), and a
+  standalone `\log_2` displays as $\log_2(\square)$. It previously parsed as
+  $\log_{10} 2$ — the base was read as the _argument_ — so piping into it
+  silently discarded the piped value.
+
+- Likewise, a function with a superscript but no argument (`\cos^2`, `\ln^{-1}`,
+  `\lg^{-1}`) holds a topic-marker hole: `x \triangleright \cos^2` computes
+  $\cos^2 x$, `12 \triangleright \ln^{-1}` computes $e^{12}$, and a standalone
+  `\cos^2` displays as $\cos(\square)^2$. These previously produced a `Power` of
+  the bare function symbol, which failed to type when piped into.
+
+## 0.71.0 _2026-07-08_
+
+### Differential Equations
+
+- **First-order nonlinear equations solve.** (contributed by
+  [KingArth0r](https://github.com/KingArth0r)) `DSolve` now handles four
+  classical first-order classes:
+  - **Separable** equations return an implicit solution when no explicit form is
+    available: $y' = x/y$ gives $\frac12 y(x)^2 = \frac12 x^2 + c_1$.
+  - **Bernoulli** equations $y' = p(x)\,y + q(x)\,y^n$ reduce via the
+    $v = y^{1-n}$ substitution and return explicit solutions.
+  - **Homogeneous** equations of the form $y' = F(y/x)$ solve by the $v = y/x$
+    substitution: $y' = 1 + y/x$ gives $y(x)/x = \ln x + c_1$.
+  - **Exact** equations $M(x,y) + N(x,y)\,y' = 0$ return the implicit potential:
+    $2xy + y^2 + (x^2 + 2xy)\,y' = 0$ gives $x^2\,y(x) + x\,y(x)^2 = c_1$.
+
+  Implicit solutions are expressed in terms of $y(x)$ itself. Equations outside
+  the supported classes (e.g. the Riccati equation $y' = x + y^2$) stay inert.
+
+- **Initial and boundary conditions are applied.** Scalar conditions can be
+  passed in a list alongside the equation:
+  `DSolve([y'' = -y, y(0) = 0, y'(0) = 1], y, x)` returns $y(x) = \sin x$.
+  Derivative conditions are recognized in both the `Apply(Derivative(y, 1), x0)`
+  and flat `D(y(x0), x)` forms. Conditions also apply to supported implicit
+  solutions ($y' = x/y$ with $y(0) = 1$ gives
+  $\frac12 y(x)^2 = \frac12 x^2 + \frac12$), and free parameters survive:
+  $y' = kx/y$ with $y(0) = 2$ gives $\frac12 y(x)^2 = \frac12 k x^2 + 2$ with
+  $k$ untouched. If the conditions cannot be applied to the solution class, the
+  equation stays inert rather than silently dropping them.
+
+- **Nonhomogeneous constant-coefficient equations of any order.** The
+  undetermined-coefficients method now covers **polynomial, exponential, and
+  sinusoidal** forcing at any order (previously polynomial forcing was
+  second-order only), including **resonant** cases, which retry the ansatz with
+  powers of $x$: $y'' - y = e^x$ gives $c_1 e^x + c_2 e^{-x} + \frac12 x e^x$,
+  and $y''' - y = \sin x$ and resonant $y'' + y = \sin x$ both solve.
+
+- **First-order linear homogeneous systems solve.** Pass the equations and
+  dependent functions as lists: `DSolve([y' = z, z' = y], [y, z], x)` returns
+  the general solution built from the eigen-decomposition of the coefficient
+  matrix. Systems with repeated — or numerically indistinguishable — eigenvalues
+  stay inert rather than returning a degenerate basis.
+
+- **`NDSolve` integrates first-order systems.** Fixed-step RK4 now handles
+  systems, including nonlinear ones, with the dependent functions and initial
+  values given as lists:
+  `NDSolve([y' = z, z' = -y], [y, z], Limits(x, 0, 1), [0, 1], 200)` produces
+  samples as `[x, [y, z]]` pairs. Malformed or unsupported systems stay inert
+  rather than returning partial results.
+
+### Recurrence Equations
+
+- **New `RSolve` operator.** (contributed by
+  [KingArth0r](https://github.com/KingArth0r)) `RSolve(equation, a, n)` solves
+  **linear homogeneous constant-coefficient** recurrences via the characteristic
+  polynomial: geometric ($a_{n+1} = 2a_n$ gives $a(n) = c_1\,2^n$),
+  Fibonacci-style, repeated roots with $n^k r^n$ modes
+  ($a_{n+2} + a_n = 2a_{n+1}$ gives $a(n) = c_1 + c_2\,n$), and complex roots
+  ($a_{n+2} = -a_n$ gives $a(n) = c_1\,i^n + c_2\,(-i)^n$). Initial conditions
+  can be given in list form: `RSolve([a(n+1) = 2a(n), a(0) = 3], a, n)` gives
+  $a(n) = 3 \cdot 2^n$. Nonhomogeneous and variable-coefficient recurrences stay
+  inert.
+
+## 0.70.0 _2026-07-08_
+
+### Breaking Changes
+
+- **The published `dist/` directory is reorganized into per-variant
+  subdirectories.** The flat layout — where the variant was encoded in each
+  filename (`compute-engine.min.esm.js`, `compute-engine.umd.cjs`, …) — is
+  replaced by `esm/`, `esm-min/`, `umd/`, `umd-min/`, and the unchanged
+  `types/`. The variant marker moves from the filename into the directory, so a
+  bundle is now `<dir>/<name>.<ext>`. The general mapping is `<name>.esm.js` →
+  `esm/<name>.js`, `<name>.min.esm.js` → `esm-min/<name>.js`, `<name>.umd.cjs` →
+  `umd/<name>.cjs`, and `<name>.min.umd.cjs` → `umd-min/<name>.cjs`; for example
+  `dist/compute-engine.min.esm.js` is now `dist/esm-min/compute-engine.js`.
+  Consumers importing via the bare package specifier
+  (`@cortex-js/compute-engine` and its sub-paths such as
+  `@cortex-js/compute-engine/identities`) are **unaffected** — the package
+  `exports` map absorbs the move. Only deep imports that reach into `…/dist/…`
+  directly, and pinned CDN URLs, need to be updated. Each `esm*/` directory is
+  now fully self-contained, with its own `chunks/` subdirectory holding only
+  that variant's shared chunks, so vendoring a build is now "copy the directory
+  for the variant you use."
+
+- **The non-minified builds are no longer published to npm.** The package now
+  ships `dist/esm-min/`, `dist/umd-min/`, and `dist/types/` only. The
+  non-minified `esm/` and `umd/` directories — about 60% of the unpacked
+  package, and never referenced by the `exports` map — are now build-only
+  artifacts: `npm run build` still produces them locally for development and
+  debugging, but if you need a readable (non-minified) bundle, build from
+  source.
+
+### Improvements
+
+- **The declaration build and typecheck now run on TypeScript 7** (the native
+  compiler), cutting `.d.ts` emission from ~31s to ~5s and the full production
+  build from ~45s to ~29s. TS 7.0 ships no programmatic API, so it is installed
+  side-by-side: the module name `typescript` stays aliased to the TS 6 API
+  (`@typescript/typescript6`) for ts-jest, typedoc, typescript-eslint and madge,
+  while the native compiler (`@typescript/native`) drives the CLI. No
+  consumer-facing change — the published declarations are type-identical; only
+  cosmetic emission differences appear (single-quoted string literals, sorted
+  numeric-literal unions, literal non-ASCII property keys instead of `\uXXXX`
+  escapes).
+
+## 0.69.1 _2026-07-08_
+
+### Issues Resolved
+
+- **#318** Type declarations now resolve correctly in projects using
+  `"module": "nodenext"`/`"node16"`. The published `.d.ts` files used
+  extensionless relative imports, which produced `TS2834` errors (or collapsed
+  every imported type to `any` with `skipLibCheck`). The build now rewrites the
+  emitted declarations with explicit `.js` extensions and validates them against
+  a `nodenext` consumer as part of every release build.
+
 ## 0.69.0 _2026-07-08_
 
 ### Breaking Changes
@@ -30275,9 +31127,35 @@ Measured 2026-07-08 · Compute Engine `0.68.0` @ `5a2abce1` (current build) · p
 
 ### Breaking Changes
 
-- **`\parallel` now parses to the geometric relation `Parallel`, not logical
-  `Or`.** `AB \parallel CD` is the parallelism relation, consistent with `\perp`
-  → `Perpendicular`. Use `\lor` or `\vee` for disjunction (unchanged).
+- **The ESM builds are no longer single-file: they load a shared chunk from
+  `dist/chunks/`.** `compute-engine.esm.js`, `compute-engine.min.esm.js` and the
+  corresponding `integration-rules` bundles are now built with code splitting,
+  so the engine core is emitted once into a `chunks/chunk-*.js` file that both
+  entry points import (this fixes `instanceof` failures when the
+  integration-rules plugin is loaded alongside the main library, which
+  previously carried its own duplicate copy of the engine). If you copy
+  `compute-engine.min.esm.js` out of the package as a standalone file — for
+  example to vendor it or serve it from your own static assets — you must now
+  copy the `chunks/` directory alongside it, preserving the relative layout.
+  Installing the package from npm, importing it from a bundler, or loading it
+  from a CDN that serves the whole package (jsDelivr, unpkg, esm.sh) is
+  unaffected. The `.umd.cjs` builds remain self-contained single files if you
+  need a copyable artifact.
+
+  Note that the chunk is required even if you don't use the integration-rules
+  plugin: it contains the shared engine core, not the rule data. To vendor the
+  Compute Engine _without_ the optional rule corpora, copy
+  `compute-engine.min.esm.js` plus the `chunks/` directory and omit
+  `integration-rules.*` (the Rubi corpus) and `identities.*` (the Fungrim
+  corpus) — neither is loaded unless you import it explicitly. Each entry point
+  imports exactly one chunk, so if you only ship the minified build you only
+  need one of the two chunk files — the smaller one (the minified chunk), or
+  definitively the one named in the entry file's first `import` statement. Just
+  remember the names contain a content hash that changes between releases. All
+  other sub-path bundles (`core`, `latex-syntax`, `numerics`, `compile`,
+  `interval`, `identities`) remain self-contained. `Or`.\*\* `AB \parallel CD`
+  is the parallelism relation, consistent with `\perp` → `Perpendicular`. Use
+  `\lor` or `\vee` for disjunction (unchanged).
 
 - **`\rightarrow` now parses to the mapping arrow `To`, not `Implies`.**
   `f: \mathbb{R} \rightarrow \mathbb{R}` now parses as a function signature,
@@ -38810,9 +39688,7 @@ Read more at
 - Only require Node LTS (16.14.2)
 - Improved documentation, including Dark Mode support
 
-## 0.4.4
-
-**Release Date**: 2022-03-27
+## 0.4.4 _2022-03-27_
 
 ### Improvements
 
@@ -38824,9 +39700,7 @@ Read more at
   environments. The ESM build (`compute-engine.min.esm.js`) targets evergreen
   JavaScript (currently ECMAScript 2020).
 
-## 0.4.3
-
-**Release Date**: 2022-03-21
+## 0.4.3 _2022-03-21_
 
 ### Transition Guide from 0.4.2
 
@@ -38964,9 +39838,7 @@ console.log(expr.isEqual(ce.box(2)));
 | `ce.domain(expr)`                         | `expr.domain`                            |
 | `ce.format(expr...)`                      | `expr.canonical` <br/> `expr.simplify()` |
 
-## 0.3.0
-
-**Release Date**: 2021-06-18
+## 0.3.0 _2021-06-18_
 
 ### Improvements
 
@@ -40298,6 +41170,10 @@ the following differences:
 { "num": "0.(142857)e7" }
 ```
 
+  A repeating-decimal number boxes to the exact `["Rational", …]` it represents
+  (for example `{ "num": "0.(3)" }` boxes to `["Rational", 1, 3]`), rather than
+  a truncated decimal float.
+
 - The following characters in a string representing a number are ignored:
 
 <div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>
@@ -41107,10 +41983,15 @@ The `ND` function is used to calculate a numerical approximation of the derivati
 
 <FunctionDefinition name="D">
 
+<Signature name="D" returns="(number -> number)">_f_: number -> number</Signature>
+
 <Signature name="D" returns="(number -> number)">_f_: number -> number, _var_: symbol</Signature>
 
 The `D` function represents the partial derivative of a function `f` with respect to
 the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `f`, or to
+`x` when `f` has several free variables and one of them is `x`.
 
 :::info[Note on LaTeX Notation]
 The LaTeX notation `D(f, x)` does **not** parse as a derivative. Since `D(f, x)` is
@@ -41692,10 +42573,15 @@ can be simplified, compiled, and plotted), use the `Normal` function.
 
 <FunctionDefinition name="Series">
 
+<Signature name="Series" returns="expression">_f_: expression</Signature>
+
 <Signature name="Series" returns="expression">_f_: expression, _x_: symbol</Signature>
 
 Expand _f_ as a Taylor series in the variable _x_ about $x_0 = 0$, up to and
 including the power $x^5$ (the default order).
+
+When _x_ is omitted, it defaults to the single free variable of _f_, or to
+`x` when there are several free variables and one of them is `x`.
 
 The result is an `Add` of the truncated terms plus an inert
 `["BigO", ...]` remainder.
@@ -42813,7 +43699,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\operatorname{Li}_{s}(z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
 
 **Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -45436,7 +46322,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(2, \imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
+$$\operatorname{Li}_{2}(\imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)
@@ -46285,7 +47171,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi})$$
+$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})$$
 
 **Holds when** $x\in\R\land x\notin-\infty..-1$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -46342,7 +47228,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -46442,7 +47328,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
+$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
 
 **Holds when** $x\in\R\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -48965,6 +49851,30 @@ argument on the left or right respectively.
 ["Apply", "f", ["Apply", "g", "x"]]
 ```
 
+The right-pointing form is a **pipeline operator**: `\rhd` (also
+`\triangleright`, `\vartriangleright`, `⊳`, or the plain-text shortcut `|>`)
+feeds the expression on its left to the function on its right, and stages
+chain left to right.
+
+A `\square` topic marker in the right-hand side names the position the piped
+value fills, so a stage can be a multi-argument call:
+
+<Latex value="x^2 = 4 \rhd \operatorname{Solve}(\square, x)"/>
+
+```json example
+["Solve", ["Equal", ["Power", "x", 2], 4], "x"]
+```
+
+A bare function command such as `\ln`, `\lb` or `\sqrt` acts as a function
+reference (`12 \rhd \ln` is `ln(12)`), and the prefix form (`\rhd f`, with no
+left-hand side) denotes the anonymous unary function that applies `f` to its
+argument.
+
+Operators whose unknown/variable argument is inferable — `Solve`, `D`,
+`Series`, and the polynomial operators such as `Apart` — may be piped into
+without naming the variable: `x^2 = 4 \rhd \operatorname{Solve}` solves for
+`x`.
+
 </FunctionDefinition>
 
 ---
@@ -49956,7 +50866,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[4]{2}\sqrt{1+\sqrt{2}})/\sqrt{2}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=\sqrt{\frac{\sqrt{2}+1}{2}}\sqrt[4]{2}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -50424,7 +51334,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{(\sqrt{7+3\times7^{1/2}}+\sqrt{13+7^{1/2}})\sqrt[8]{28}})/\sqrt{14}$$
+$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=\sqrt{\frac{1}{14}((\sqrt{13+7^{1/2}}+\sqrt{7+3\times7^{1/2}})\sqrt[8]{28})}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -51903,8 +52813,8 @@ semantic representation as an expression ready to be processed.
 | :--- | :--- |
 | <big>$$ \sin 3t + \cos 2t $$ </big><br/>`\sin 3t + \cos 2t`     | `["Add", ["Sin", ["Multiply", 3, "t"]], ["Cos", ["Multiply", 2, "t"]]]` |
 | <big>$$ \int \frac{dx}{x} $$</big><br/>`\int \frac{dx}{x}`     | `["Integrate", ["Divide", 1, "x"], "x"]`                                |
-| <big>$$ 123.4(567) $$ </big><br/>`123.4(567)` | `123.4(567)`   |
-| <big>$$ 123.4\overline{567} $$ </big><br/>`123.4\overline{567}` | `123.4(567)`  |
+| <big>$$ 123.4(567) $$ </big><br/>`123.4(567)` | `["Rational", 45679, 370]`   |
+| <big>$$ 123.4\overline{567} $$ </big><br/>`123.4\overline{567}` | `["Rational", 45679, 370]`  |
 | <big>$$ \vert a+\vert b\vert+c\vert $$ </big><br/>`\|a+\|b\|+c\| `   | `["Abs", ["Add", "a", ["Abs", "b"], "c"]]` |
 | <big>$$ \vert\vert a\vert\vert+\vert b\vert $$ </big><br/>`\|\|a\|\|+\|b\|`   | `["Add", ["Norm", "a"], ["Abs", "b"]]` |
 
@@ -51957,6 +52867,91 @@ ce.parse("x \\rightarrow y").json;
 ce.parse("P \\implies Q").json;
 // ➔ ["Implies", "P", "Q"]
 ```
+
+### Based Numerals
+
+A numeral with an **integer-literal subscript base**, e.g. `10111_2` or
+`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#BaseForm),
+so arithmetic on based numerals works:
+
+```javascript
+ce.parse("10111_2").json;
+// ➔ ["BaseForm", 23, 2]
+
+ce.parse("1011_2 \\cdot 101_2").evaluate();
+// ➔ 55
+```
+
+The guard is strict: every digit must be valid for the base (`19_2` stays an
+inert `Subscript`), and a subscripted symbol (`x_2`) is unchanged. A **symbol**
+subscript base (e.g. `161_b`) parses to `BaseForm` of the digit polynomial in
+that base, so base equations solve symbolically. See
+[`BaseForm`](/compute-engine/reference/strings/#BaseForm) for details.
+
+### Repeating Decimals
+
+A repeating-decimal literal — vinculum (`0.\overline{3}`), dots
+(`0.\overset{.}{1}4285\overset{.}{7}`), parenthetical (`1.54(2345)`), or arc
+(`0.\wideparen{142857}`) notation — boxes directly to the exact `Rational` it
+represents:
+
+```javascript
+ce.parse("0.\\overline{3}").json;
+// ➔ ["Rational", 1, 3]
+
+ce.parse("1.54(2345)").json;
+// ➔ ["Rational", 1542191, 999900]
+```
+
+The MathJSON shorthand `{num: "0.(3)"}` is handled the same way.
+
+### Elliptical Notation
+
+An `Add` or `Multiply` written with an **ellipsis** (`\dots`, which parses to the
+`ContinuationPlaceholder` symbol) is a notational pattern, not an arithmetic one.
+It keeps its operands in source order, and `evaluate()`, `N()`, and `simplify()`
+return it unchanged — no numeric terms are folded across the ellipsis:
+
+```javascript
+ce.parse("1 + 2 + \\dots + n").json;
+// ➔ ["Add", 1, 2, "ContinuationPlaceholder", "n"]
+
+ce.parse("2 \\cdot 4 \\cdot \\dots \\cdot 2n").json;
+// ➔ ["Multiply", 2, 4, "ContinuationPlaceholder", ["Multiply", 2, "n"]]
+```
+
+Subtraction-spelled ellipses (`1 - 2 + 4 - \dots + x`) stay inert too, and such
+products round-trip through LaTeX (an explicit `\times` is emitted around the
+ellipsis). To turn elliptical notation into a formal `Sum` or `Product`, use the
+[`Interpret`](/compute-engine/reference/arithmetic/#Interpret) operator. A
+sequence written with braces, `\{a_n\}_{n=1}^{\infty}`, parses to the inert
+[`IndexedSequence`](/compute-engine/reference/collections/#IndexedSequence) head.
+
+### Notation Recoveries
+
+The parser applies maximum effort to recover common notation that would
+otherwise error:
+
+| LaTeX | MathJSON | Note |
+| :--- | :--- | :--- |
+| `13^{\text{th}}` | `13` | Ordinal superscripts (`st`/`nd`/`rd`/`th`) devolve to the base number |
+| `x^{}`, `x_{}`, `\alpha_{}` | `x`, `x`, `alpha` | Empty scripts are dropped |
+| `1{,}000` | `1000` | The `{,}` thin-separator thousands idiom (between digits) |
+| `\cancel{x}`, `\bcancel{x}`, `\xcancel{x}` | `x` | Unwrap to their body |
+| `\cancelto{4}{72}` | `4` | Parses to the replacement value |
+| `d \not= 0` | `["NotEqual", "d", 0]` | `\not`-prefixed relations compose into the negated relation |
+| `a \not\in B` | `["NotElement", "a", "B"]` | |
+| `a \not\le b` | `["Not", ["LessEqual", "a", "b"]]` | Relations without a dedicated negated head wrap in `Not(…)` |
+| `\pmod{7}` | `["Mod", …, 7]` | Standalone `\pmod` places the modulus as the second argument of `Mod` |
+| `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
+
+`\not\equiv` (optionally with a trailing `\pmod n`) negates a congruence, and a
+chain of congruence steps such as
+`3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}` folds into a conjunction of the
+adjacent steps.
+
+Note that when a European `decimalSeparator: '{,}'` is configured, that
+convention takes precedence, so `3{,}14` parses as `3.14` in that mode.
 
 ## Serializing to LaTeX
 
@@ -52219,7 +53214,7 @@ parsing as for serialization.
 | Key | Description |
 | :--- | :--- |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
-| `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: if the number includes repeating digits (e.g. `1.33(333)`), it will be parsed as a decimal number even if this setting is `"rational"`. **Default**: `"auto"`|
+| `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
 
 ```js
@@ -53982,6 +54977,79 @@ ce.clearSequenceCache('F');
 ce.clearSequenceCache();
 ```
 
+## Interpreting Elliptical Notation
+
+Mathematical writing routinely uses an ellipsis to abbreviate a sum or product:
+$$1 + 2 + \dots + n$$ or $$2 \cdot 4 \cdot \dots \cdot 2n$$. The Compute Engine
+parses such expressions faithfully but does **not** guess what they mean: a
+sum or product containing an ellipsis is an inert notational object (see
+[Elliptical Notation](/compute-engine/guides/latex-syntax/#elliptical-notation)),
+returned unchanged by `evaluate()`.
+
+The `Interpret` operator turns that notation into a formal `Sum` or `Product`:
+
+```javascript
+ce.parse('\\operatorname{Interpret}(1 + 2 + \\dots + n)').evaluate();
+// ➔ \sum_{k=1}^{n} k
+
+ce.parse('\\operatorname{Interpret}(2 \\cdot 4 \\cdot \\dots \\cdot 2n)').evaluate();
+// ➔ \prod_{k=1}^{n} 2k
+
+// A numeric anchor resolves to a concrete bound
+ce.parse('\\operatorname{Interpret}(1 + 2 + \\dots + 100)').evaluate().N();
+// ➔ 5050
+```
+
+Interpretation is an explicit **opt-in**: a plain `evaluate()` never guesses. The
+gate is deliberately strict — an ambiguous or unproven pattern is returned
+unchanged rather than interpreted incorrectly.
+
+### Recognizers
+
+`Interpret` tries a series of recognizers, in order, against the sample terms
+before the ellipsis and the single anchor after it:
+
+- **Arithmetic progression** — the samples share a constant difference
+  $d \neq 0$. The general term is $t(k) = s_1 + (k-1)d$. The anchor must place
+  the upper bound on an integer, so `1 + 3 + \dots + 2n` (whose even anchor does
+  not belong to the odd progression) stays inert.
+- **Polynomial** — successive finite differences identify a polynomial general
+  term:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 4 + 9 + 16 + \\dots + n^2)').evaluate();
+  // ➔ \sum_{k=1}^{n} k^2
+
+  ce.parse('\\operatorname{Interpret}(1 + 4 + 9 + \\dots + 100)').evaluate().N();
+  // ➔ 385
+  ```
+
+- **Geometric** — the samples share a constant exact ratio $r$:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 2 + 4 + \\dots + 2^n)').evaluate();
+  // ➔ \sum_{k=1}^{n+1} 2^{k-1}
+  ```
+
+- **Linear recurrence** — a Berlekamp–Massey pass finds the minimal
+  constant-coefficient recurrence (order $\geq 2$) behind the samples, obtains a
+  verified closed form through `RSolve`, and resolves a numeric anchor by
+  iterating the recurrence exactly:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 1 + 2 + 3 + 5 + 8 + \\dots + 55)').evaluate();
+  // ➔ \sum_{k=1}^{10} \operatorname{Fibonacci}(k)   (evaluates to 143)
+  ```
+
+Each recognizer applies an **evidence discipline** that guards against
+overfitting: a degree-$g$ polynomial needs its constant difference row witnessed
+twice (or one fewer sample when the anchor structurally confirms the term), and
+an order-$L$ recurrence needs $2L+1$ samples (or $2L$ with a confirming anchor).
+Because three samples fit *any* quadratic, `1 + 2 + 4 + \dots + m` stays
+untouched; primes and factorials likewise. A candidate closed form is verified
+against every sample before it is trusted. Anything the gate cannot prove is
+returned unchanged.
+
 ## OEIS Integration
 
 The Compute Engine can look up sequences in the
@@ -54310,6 +55378,17 @@ ce.angularUnit = "deg";
 console.log(ce.parse("\\cos 60").N());
 // ➔ 0.5
 ```
+
+The angular unit applies to the trigonometric functions (`Sin`…`Csc`,
+`Haversine`), whose argument is an angle, and to the inverse trigonometric
+functions (`Arcsin`…`Arccsc`, `Arctan2`, `InverseHaversine`), whose result is
+an angle — in degree mode `\arcsin(1)` evaluates to the exact value `90`.
+Hyperbolic functions and their inverses are **not** affected: their argument
+is a dimensionless number, not an angle.
+
+Compiled functions honor the angular unit as well: with
+`ce.angularUnit = "deg"`, `ce.compile("\\sin(x)")` returns a function that
+interprets `x` in degrees, matching `evaluate()`.
 
 ## JavaScript Interoperability
 
@@ -58004,6 +59083,28 @@ console.log(parse('\\SI{5}{kg}'));
 console.log(parse('\\si{MHz}'));
 ```
 
+### English Unit Words
+
+Common measurement words spelled out in `\text{...}` — singular or plural, such
+as inches, feet, miles, gallons, pounds, minutes, hours, meters, liters, degrees
+— are normalized to their canonical unit symbols at the parse boundary,
+including inside compound units:
+
+```live
+console.log(parse('18 \\text{ inches}'));
+// → ["Quantity", 18, "in"]
+
+console.log(parse('7.5 \\text{ gallons/ft}^3'));
+// → ["Quantity", 7.5, ["Divide", "gal", ["Power", "ft", 3]]]
+```
+
+An exponent *outside* the text binds to the trailing unit factor, so
+`7.5 \text{ gallons/ft}^3` is gallons per **cubic** foot, not `(gal/ft)³`.
+
+Parsing is strictly gated: the whole text must resolve as a unit, so prose like
+`9\text{ to }80` is left untouched. There is no `ton(s)` alias — a US short ton
+is not the metric tonne `t`, and mapping it would be a silent ~10% error.
+
 ### Serialization
 
 Quantities serialize back to LaTeX with a thin space and upright unit:
@@ -58043,6 +59144,36 @@ console.log(evaluate(['Multiply', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]));
 console.log(evaluate(['Divide', ['Quantity', 100, 'm'], ['Quantity', 10, 's']]));
 // → ["Quantity", 10, ["Divide", "m", "s"]]
 ```
+
+Compound units **cancel** structurally rather than accumulating. A repeated unit
+symbol cancels exactly, with no conversion factor introduced:
+
+```live
+console.log(evaluate(['Divide', ['Quantity', 18, 'in'], ['Quantity', 12, ['Divide', 'in', 'ft']]]));
+// → ["Quantity", 1.5, "ft"]
+
+console.log(evaluate(['Divide', ['Quantity', 6, 'm'], ['Quantity', 2, 'm']]));
+// → 3   (dimensionless)
+```
+
+Different units of the same dimension on opposite sides of a fraction bar are
+converted and folded into the magnitude, while products of same-dimension units
+are left as written:
+
+```live
+console.log(evaluate(['Divide',
+  ['Multiply', ['Quantity', 10, 'm'], ['Quantity', 1, 's']],
+  ['Quantity', 5, 'in']
+]));
+// → ["Quantity", 78.74015748031496, "s"]
+
+console.log(evaluate(['Multiply', ['Quantity', 2, 'in'], ['Quantity', 3, 'ft']]));
+// → ["Quantity", 6, ["Multiply", "ft", "in"]]
+```
+
+Simplification to a named derived SI unit still applies afterwards
+(`2 N · 3 m` → `["Quantity", 6, "J"]`). Cancellation works with
+uncertainty-carrying (measurement) magnitudes as well.
 
 Scalar multiplication works naturally:
 
@@ -58662,6 +59793,45 @@ Edge cases:
 </FunctionDefinition>
 
 
+### Interpreting Elliptical Notation
+
+<FunctionDefinition name="Interpret">
+
+<Signature name="Interpret">_expr_</Signature>
+
+Give formal meaning to an **elliptical** sum or product — one written with an
+ellipsis, such as $1 + 2 + \dots + n$ — by turning it into a `Sum` or
+`Product`. A sum or product containing an ellipsis is otherwise an inert
+notational object (see [Elliptical Notation](/compute-engine/guides/latex-syntax/#elliptical-notation)),
+returned unchanged by `evaluate()`.
+
+Interpretation is an explicit **opt-in**: a plain `evaluate()` never guesses.
+The recognizer handles arithmetic progressions, polynomial general terms (via
+finite differences), geometric patterns, and linear recurrences (via
+Berlekamp–Massey and `RSolve`). The gate is strict by design — an ambiguous or
+unproven pattern is returned unchanged rather than interpreted incorrectly.
+
+```json example
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", "n"]]
+// ➔ ["Sum", "k", ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", 100]]
+// ➔ a Sum that evaluates to 5050
+
+["Interpret", ["Multiply", 2, 4, "ContinuationPlaceholder", ["Multiply", 2, "n"]]]
+// ➔ ["Product", ["Multiply", 2, "k"], ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 1, 2, 3, 5, 8, "ContinuationPlaceholder", 55]]
+// ➔ ["Sum", ["Fibonacci", "k"], ["Limits", "k", 1, 10]]  (evaluates to 143)
+```
+
+<ReadMore path="/compute-engine/guides/sequences/#interpreting-elliptical-notation" >
+Read more about **interpreting elliptical notation** and the recognizer families <Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+
 ### Transcendental Functions
 
 <div className="symbols-table first-column-header">
@@ -59112,9 +60282,14 @@ Distribute multiplication over addition in `expr`.
 
 <FunctionDefinition name="PolynomialDegree">
 
+<Signature name="PolynomialDegree">_poly_</Signature>
+
 <Signature name="PolynomialDegree">_poly_, _var_</Signature>
 
 Return the degree of the polynomial `poly` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["PolynomialDegree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
@@ -59125,9 +60300,14 @@ Return the degree of the polynomial `poly` with respect to the variable `var`.
 
 <FunctionDefinition name="CoefficientList">
 
+<Signature name="CoefficientList">_poly_</Signature>
+
 <Signature name="CoefficientList">_poly_, _var_</Signature>
 
 Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from highest to lowest degree.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
@@ -59210,9 +60390,15 @@ $$\operatorname{Polynomial}(\operatorname{CoefficientList}(p, x), x) = p$$
 
 <FunctionDefinition name="PolynomialQuotient">
 
+<Signature name="PolynomialQuotient">_dividend_, _divisor_</Signature>
+
 <Signature name="PolynomialQuotient">_dividend_, _divisor_, _var_</Signature>
 
 Return the quotient of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialQuotient", ["Subtract", ["Power", "x", 3], 1], ["Subtract", "x", 1], "x"]
@@ -59225,9 +60411,15 @@ This represents $$ \frac{x^3 - 1}{x - 1} = x^2 + x + 1 $$.
 
 <FunctionDefinition name="PolynomialRemainder">
 
+<Signature name="PolynomialRemainder">_dividend_, _divisor_</Signature>
+
 <Signature name="PolynomialRemainder">_dividend_, _divisor_, _var_</Signature>
 
 Return the remainder of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialRemainder", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], ["Add", "x", 1], "x"]
@@ -59273,9 +60465,15 @@ Use `PolynomialGCD` with an explicit variable when you want the coprime
 
 <FunctionDefinition name="PolynomialGCD">
 
+<Signature name="PolynomialGCD">_a_, _b_</Signature>
+
 <Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
 
 Return the greatest common divisor of two polynomials `a` and `b` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialGCD", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1], "x"]
@@ -59288,9 +60486,14 @@ This represents $$ \gcd(x^2 - 1, x - 1) = x - 1 $$.
 
 <FunctionDefinition name="Cancel">
 
+<Signature name="Cancel">_expr_</Signature>
+
 <Signature name="Cancel">_expr_, _var_</Signature>
 
 Cancel common polynomial factors in the numerator and denominator of the rational expression `expr` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["Cancel", ["Divide", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1]], "x"]
@@ -59303,9 +60506,15 @@ This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common f
 
 <FunctionDefinition name="PartialFraction">
 
+<Signature name="PartialFraction">_expr_</Signature>
+
 <Signature name="PartialFraction">_expr_, _var_</Signature>
 
 Decompose a rational expression into a sum of simpler fractions (partial fractions) with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x` — so a
+pipeline such as `expr |> Apart` works without naming the variable.
 
 Supports:
 - **Distinct linear factors**: $ \frac{1}{(x+1)(x+2)} \to \frac{1}{x+1} - \frac{1}{x+2} $
@@ -59324,6 +60533,8 @@ Returns the expression unchanged if it is not a rational expression in `var`, or
 
 <FunctionDefinition name="Apart">
 
+<Signature name="Apart">_expr_</Signature>
+
 <Signature name="Apart">_expr_, _var_</Signature>
 
 Alias for `PartialFraction`. Decompose a rational expression into partial fractions.
@@ -59332,9 +60543,14 @@ Alias for `PartialFraction`. Decompose a rational expression into partial fracti
 
 <FunctionDefinition name="PolynomialRoots">
 
+<Signature name="PolynomialRoots">_poly_</Signature>
+
 <Signature name="PolynomialRoots">_poly_, _var_</Signature>
 
 Return the roots of the polynomial `poly` with respect to the variable `var` as a set.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 Returns `undefined` if the expression is not a polynomial or no roots can be found. Supports polynomials up to degree 4 with rational roots, and degree 2 with irrational roots.
 
@@ -59346,6 +60562,8 @@ Returns `undefined` if the expression is not a polynomial or no roots can be fou
 </FunctionDefinition>
 
 <FunctionDefinition name="Discriminant">
+
+<Signature name="Discriminant">_poly_</Signature>
 
 <Signature name="Discriminant">_poly_, _var_</Signature>
 
@@ -59624,7 +60842,7 @@ slug: /compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1400 identities** behind the engine's **1405 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1403 identities** behind the engine's **1413 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -59632,9 +60850,9 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Areas
 
-### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (205)
+### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (208)
 
-Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (8) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (26)
+Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (11) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (26)
 
 ### [Complex numbers](/compute-engine/reference/fungrim-complex/) (40)
 
@@ -61083,6 +62301,51 @@ Modular **congruence** is written $a \equiv b \pmod{n}$, which parses to `Congru
 
 Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#Congruent).
 
+### Reduction of Large Integers
+
+`Mod` and `Congruent` reduce integer-valued expressions in $ℤ/mℤ$ **without materializing** the (potentially astronomically large) intermediate value. Modular exponentiation, sums, products, negations, and factorial reduction are all handled, so an expression that would otherwise require a multi-million-digit integer reduces directly:
+
+```javascript
+ce.parse('2^{3^{20}} \\pmod{100}').evaluate();
+// ➔ 52
+
+ce.parse('2^{3^{20}} \\equiv 52 \\pmod{100}').evaluate();
+// ➔ "True"
+
+ce.parse('2 \\cdot 3^{5000000} \\pmod 7').evaluate();
+// ➔ 4
+```
+
+The floored-sign convention of `Mod` (the result follows the sign of the divisor) is preserved on this path.
+
+### Solving Congruences
+
+Passing a **linear congruence** to `solve` returns the parametric residue family with a fresh integer parameter $t ∈ ℤ$; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
+
+```javascript
+ce.parse('6n \\equiv 4 \\pmod 7').solve('n');
+// ➔ [7t + 3]
+
+ce.parse('2x \\equiv 1 \\pmod 4').solve('x');
+// ➔ []   (no solution)
+
+ce.parse('4x \\equiv 2 \\pmod 6').solve('x');
+// ➔ [3t + 2]
+```
+
+A **system of simultaneous congruences** in one unknown (an `And` of congruences) is combined via the Chinese Remainder Theorem — including non-coprime moduli — into a single family. An inconsistent system reports no solution.
+
+```javascript
+const sol = ce.box(['And',
+  ['Congruent', 'x', 2, 3],
+  ['Congruent', 'x', 3, 5],
+  ['Congruent', 'x', 2, 7]
+]).solve('x');
+// ➔ { x: 105t + 23 }
+```
+
+For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#ChineseRemainder).
+
 
 <nav className="hidden">
 ### PrimeFactors
@@ -61247,6 +62510,28 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 ```json
 ["PowerMod", 2, 10, 1000]
 // ➔ 24
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### ModularInverse
+</nav>
+
+<FunctionDefinition name="ModularInverse">
+<Signature name="ModularInverse" returns="integer">a: integer, m: integer</Signature>
+Returns the modular multiplicative inverse of $a$ modulo $m$: the integer $x$ in $[0, m)$ with $a·x ≡ 1 \pmod m$.
+
+The inverse exists only when $a$ and $m$ are coprime; otherwise the expression stays symbolic.
+
+See also: [Modular multiplicative inverse - Wikipedia](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
+
+```json
+["ModularInverse", 3, 7]
+// ➔ 5
+
+["ModularInverse", 4, 6]
+// ➔ ["ModularInverse", 4, 6]  (4 and 6 are not coprime)
 ```
 </FunctionDefinition>
 
@@ -63957,30 +65242,59 @@ see [Unicode® Standard Annex #29](https://unicode.org/reports/tr29/).
 
 <FunctionDefinition name="BaseForm">
 
-<Signature name="BaseForm" returns="string">_value_:integer</Signature>
+<Signature name="BaseForm" returns="number">_value_:integer</Signature>
 
-<Signature name="BaseForm" returns="string">_value_:integer, _base_:integer</Signature>
+<Signature name="BaseForm" returns="number">_value_:integer, _base_:integer</Signature>
 
-Format an _integer_ in a specific _base_, such as hexadecimal or binary.
+Represent an _integer_ in a specific _base_, such as hexadecimal or binary.
 
-If no _base_ is specified, use base-10.
+If no _base_ is specified, use base-10. _base_ should be an integer from 2 to 36.
 
-The sign of _integer_ is ignored.
-
-- _value_ should be an integer.
-- _base_ should be an integer from 2 to 36.
+`BaseForm` evaluates to the numeric value it represents, so based numerals
+participate in arithmetic:
 
 ```json example
-["Latex", ["BaseForm", 42, 16]]
-
-// ➔ (\text(2a))_{16}
+["BaseForm", 23, 2]
+// ➔ 23
 ```
 
-```cortex
-Latex(BaseForm(42, 16))
-// ➔ (\text(2a))_{16}
-String(BaseForm(42, 16))
-// ➔ "'0x2a'"
+**Parsing.** A numeral with an integer-literal subscript base, e.g. `10111_2` or
+`2748_{16}`, parses to `BaseForm`, provided every digit is valid for the base
+(otherwise it stays an inert `Subscript`):
+
+```javascript
+ce.parse('10111_2').json;
+// ➔ ["BaseForm", 23, 2]
+
+ce.parse('1011_2 \\cdot 101_2').evaluate();
+// ➔ 55
+
+ce.parse('11_8 - 3_8 = 6_8').evaluate();
+// ➔ "True"
+
+ce.parse('19_2').json;
+// ➔ ["Subscript", 19, 2]  (9 is not a valid base-2 digit)
+```
+
+A **symbol** subscript base, e.g. `161_b`, parses to `BaseForm` of the digit
+polynomial in that base, so base equations can be solved symbolically:
+
+```javascript
+ce.parse('161_b').json;
+// ➔ ["BaseForm", ["Add", ["Power", "b", 2], ["Multiply", 6, "b"], 1], "b"]
+
+ce.parse('161_b + 134_b = 315_b').solve('b');
+// ➔ [0, 8]
+```
+
+**Serialization.** `BaseForm` round-trips through LaTeX as `value_{base}`:
+
+```javascript
+ce.box(['BaseForm', 23, 2]).latex;
+// ➔ "10111_{2}"
+
+ce.box(['BaseForm', 42, 16]).latex;
+// ➔ "\mathrm{2a}_{16}"
 ```
 
 </FunctionDefinition>
@@ -64560,6 +65874,44 @@ returned in an arbitrary order, and two successive enumerations may return the
 elements in a different order.
 
 The elements in a set are counted in constant time.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IndexedSequence
+</nav>
+
+<FunctionDefinition name="IndexedSequence">
+
+<Signature name="IndexedSequence">_term_, _index_, _lower_</Signature>
+
+<Signature name="IndexedSequence">_term_, _index_, _lower_, _upper_</Signature>
+
+The **sequence-braces** notation $\{a_n\}_{n=1}^{\infty}$ parses to an
+`IndexedSequence`: the indexed family whose _term_ is $a_n$, with _index_ symbol
+`n` ranging from _lower_ (optionally up to _upper_).
+
+<Latex value="\{a_n\}_{n=1}^{\infty}"/>
+
+```json example
+["IndexedSequence", ["a_", "n"], "n", 1, "PositiveInfinity"]
+```
+
+The _term_ uses the operator-call form (`["a_", "n"]`) so that the index binding
+survives. A set-membership subscript maps the set's least element to the lower
+bound:
+
+```json example
+// \{a_n\}_{n\in\mathbb{N}}
+["IndexedSequence", ["a_", "n"], "n", 0]
+```
+
+`IndexedSequence` is currently **inert**: it is unchanged by `evaluate()` and
+`simplify()`, and round-trips through LaTeX (it does not yet carry collection
+semantics).
+
+Note that the bare braces $\{a_n\}$ remain a [`Set`](#Set), and the
+parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 </FunctionDefinition>
 
@@ -66351,11 +67703,15 @@ unit with the largest scale factor:
 // → ["Quantity", 1.12, "m"]
 ```
 
-`Multiply` and `Divide` combine units:
+`Multiply` and `Divide` combine units, cancelling common unit symbols
+structurally (a repeated unit cancels exactly, with no conversion factor):
 
 ```json example
 ["Multiply", ["Quantity", 5, "m"], ["Quantity", 3, "s"]]
 // → ["Quantity", 15, ["Multiply", "m", "s"]]
+
+["Divide", ["Quantity", 18, "in"], ["Quantity", 12, ["Divide", "in", "ft"]]]
+// → ["Quantity", 1.5, "ft"]
 ```
 
 `Power` raises the unit to the exponent:
