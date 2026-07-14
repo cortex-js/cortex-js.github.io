@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f40e9563.css">
-<script src="/assets/js/runtime~main.52f224fe.js" defer="defer"></script>
-<script src="/assets/js/main.828dbe90.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.95f0bf40.js" defer="defer"></script>
+<script src="/assets/js/main.4e3793e1.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -36,6 +36,12 @@ as <strong>Visual Studio Code (VS Code)</strong>, to provide hints in the editor
 methods and properties available.</p>
 <p>Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.</p>
+<p>When using the Cortex language frontend, <code>%</code> is the infix <code>Mod</code> operator and a
+postfix <code>!</code> is <code>Factorial</code>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">a % b       // Mod(a, b)</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">n!          // Factorial(n)</span><br></div></code></pre></div></div>
+<p>The postfix <code>!</code> must immediately follow its operand. Prefix <code>!x</code> remains
+logical <code>Not</code>, and <code>x != y</code> remains <code>NotEqual</code>. Cortex also supports chained
+collection indexing: <code>m[2][1]</code> is equivalent to <code>m[2, 1]</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="creating-expressions">Creating Expressions<a href="#creating-expressions" class="hash-link" aria-label="Direct link to Creating Expressions" title="Direct link to Creating Expressions" translate="no">​</a></h2>
 <p><strong>To create a Expression from a LaTeX string</strong> use the <code>parse()</code> or <code>ce.parse()</code>
 function. You would use <code>ce.parse()</code> if you want to use a custom instance of

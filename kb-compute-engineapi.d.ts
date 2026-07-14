@@ -1,4 +1,4 @@
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * BigDecimal: an arbitrary-precision decimal type.
  *
  * Value = significand * 10^exponent
@@ -281,7 +281,7 @@ export declare class BigDecimal {
  * Avoids the constructor's string/number parsing overhead.
  */
 export declare function fromRaw(sig: bigint, exp: number): BigDecimal;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Transcendental / irrational operations for BigDecimal.
  *
  * This module attaches `sqrt()` and `cbrt()` to BigDecimal.prototype
@@ -356,7 +356,7 @@ declare module './big-decimal.js' {
     }
 }
 export {};
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Fixed-point BigInt utilities for internal use by transcendental functions.
  *
  * A "fixed-point BigInt" represents a real number as `value = n / 2^bits`
@@ -462,9 +462,9 @@ export declare function fpsincos(x: bigint, bits: number): [bigint, bigint];
  * @returns  atan(x/2^bits) * 2^bits
  */
 export declare function fpatan(x: bigint, bits: number): bigint;
-/* 0.74.0 */export { BigDecimal } from './big-decimal.js';
+/* 0.77.0 */export { BigDecimal } from './big-decimal.js';
 import './transcendentals.js';
-/* 0.74.0 */export declare const RESET = "\u001B[0m";
+/* 0.77.0 */export declare const RESET = "\u001B[0m";
 export declare const DEFAULT_COLOR = "\u001B[39m";
 export declare const DEFAULT_BG = "\u001B[49m";
 export declare const WHITE_BG = "\u001B[47m";
@@ -505,7 +505,7 @@ export declare const HIDDEN = "\u001B[8m";
 export declare const HIDDEN_OFF = "\u001B[28m";
 export declare function ansiFgColor(color: string | number, mode: 'none' | 'basic' | 'full'): number[];
 export declare function ansiBgColor(color: string, mode: 'none' | 'basic' | 'full'): number[];
-/* 0.74.0 */export type StyledSpan = {
+/* 0.77.0 */export type StyledSpan = {
     fg?: string;
     bg?: string;
     weight?: 'bold' | 'normal' | 'thin';
@@ -533,7 +533,7 @@ export type StyledBlock = {
     tag: 'blockquote' | 'note' | 'warning' | 'error';
     blocks: StyledBlock[];
 };
-/* 0.74.0 */import { SignalOrigin } from './signals.js';
+/* 0.77.0 */import { SignalOrigin } from './signals.js';
 export declare class Origin {
     url: string;
     source: string;
@@ -550,7 +550,7 @@ export declare class Origin {
     /** line: 1..., column: 1... */
     sourceAround(line: number, column: number, message?: string): string;
 }
-/* 0.74.0 */export declare class ConfigurationChangeTracker {
+/* 0.77.0 */export declare class ConfigurationChangeTracker {
     private _listeners;
     private _registered;
     private _pending;
@@ -579,9 +579,9 @@ export declare class Origin {
 export interface ConfigurationChangeListener {
     onConfigurationChange?: () => void;
 }
-/* 0.74.0 */import type { Type } from './types.js';
+/* 0.77.0 */import type { Type } from './types.js';
 export declare function typeToString(type: Type, precedence?: number): string;
-/* 0.74.0 */import type { Type, TypeResolver, TypeString } from './types.js';
+/* 0.77.0 */import type { Type, TypeResolver, TypeString } from './types.js';
 export declare function parseType(s: undefined, typeResolver?: TypeResolver): undefined;
 export declare function parseType(s: TypeString | Type, typeResolver?: TypeResolver): Type;
 export declare function parseType(s: TypeString | Type | undefined, typeResolver?: TypeResolver): Type | undefined;
@@ -611,7 +611,7 @@ export declare function parseTypePrefix(source: string, typeResolver?: TypeResol
     type: Type;
     end: number;
 };
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * A primitive type is a simple type that represents a concrete value.
  *
  * - `any`: the top type
@@ -917,7 +917,7 @@ export type TypeResolver = {
  *
  *
  */
-/* 0.74.0 */export type TokenType = 'IDENTIFIER' | 'STRING_LITERAL' | 'NUMBER_LITERAL' | 'VERBATIM_STRING' | 'TRUE' | 'FALSE' | 'NAN' | 'INFINITY' | 'PLUS_INFINITY' | 'MINUS_INFINITY' | '|' | '&' | '!' | '->' | '^' | '(' | ')' | '<' | '>' | '[' | ']' | ',' | ':' | '?' | '*' | '+' | '..' | 'x' | 'EOF' | 'WHITESPACE';
+/* 0.77.0 */export type TokenType = 'IDENTIFIER' | 'STRING_LITERAL' | 'NUMBER_LITERAL' | 'VERBATIM_STRING' | 'TRUE' | 'FALSE' | 'NAN' | 'INFINITY' | 'PLUS_INFINITY' | 'MINUS_INFINITY' | '|' | '&' | '!' | '->' | '^' | '(' | ')' | '<' | '>' | '[' | ']' | ',' | ':' | '?' | '*' | '+' | '..' | 'x' | 'EOF' | 'WHITESPACE';
 export interface Token {
     type: TokenType;
     value: string;
@@ -979,7 +979,7 @@ export declare class Lexer {
     matchToken(type: TokenType): boolean;
     expectToken(type: TokenType): Token;
 }
-/* 0.74.0 */export interface ASTNode {
+/* 0.77.0 */export interface ASTNode {
     kind: string;
     position: number;
     line: number;
@@ -1125,7 +1125,7 @@ export interface ASTVisitor<T> {
     visitValue(node: ValueNode): T;
 }
 export declare function visitNode<T>(node: TypeNode, visitor: ASTVisitor<T>): T;
-/* 0.74.0 */import type { Type } from './types.js';
+/* 0.77.0 */import type { Type } from './types.js';
 /**
  * Reduce the input type
  *
@@ -1137,7 +1137,7 @@ export declare function visitNode<T>(node: TypeNode, visitor: ASTVisitor<T>): T;
  * @returns
  */
 export declare function reduceType(type: Type): Type;
-/* 0.74.0 */import type { NumericPrimitiveType, PrimitiveType, Type } from './types.js';
+/* 0.77.0 */import type { NumericPrimitiveType, PrimitiveType, Type } from './types.js';
 /** All the types representing numeric values */
 export declare const NUMERIC_TYPES: NumericPrimitiveType[];
 export declare const INDEXED_COLLECTION_TYPES: PrimitiveType[];
@@ -1152,7 +1152,7 @@ export declare const SCALAR_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare const PRIMITIVE_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare function isValidPrimitiveType(s: any): s is PrimitiveType;
 export declare function isValidType(t: any): t is Readonly<Type>;
-/* 0.74.0 */import type { NumericPrimitiveType, PrimitiveType, Type, TypeCompatibility, TypeString } from './types.js';
+/* 0.77.0 */import type { NumericPrimitiveType, PrimitiveType, Type, TypeCompatibility, TypeString } from './types.js';
 /** Return true if lhs is a subtype of rhs */
 export declare function isPrimitiveSubtype(lhs: PrimitiveType, rhs: PrimitiveType): boolean;
 /**
@@ -1199,7 +1199,7 @@ export declare function narrow(...types: Readonly<Type>[]): Type;
  *  that encompasses the possible values of the input types.
  */
 export declare function widen(...types: Readonly<Type>[]): Readonly<Type>;
-/* 0.74.0 */import { isValidType } from './primitive.js';
+/* 0.77.0 */import { isValidType } from './primitive.js';
 export { isValidType };
 export { widen, narrow } from './subtype.js';
 import type { Type, FunctionSignature, TypeString } from './types.js';
@@ -1221,7 +1221,18 @@ export declare function isValidTypeName(name: string): boolean;
  * by those operators' own handlers, which see the tensor operand directly.)
  */
 export declare function broadcastResultType(elementType: Readonly<Type>): Type;
-/* 0.74.0 */import { TypeNode, FunctionSignatureNode, UnionTypeNode, IntersectionTypeNode, NegationTypeNode, GroupTypeNode, ListTypeNode, VectorTypeNode, MatrixTypeNode, TensorTypeNode, TupleTypeNode, RecordTypeNode, DictionaryTypeNode, SetTypeNode, CollectionTypeNode, ExpressionTypeNode, SymbolTypeNode, NumericTypeNode, PrimitiveTypeNode, TypeReferenceNode, ValueNode, ASTVisitor } from './ast-nodes.js';
+/**
+ * The scalar element type that a broadcastable operator's result contributes to
+ * its broadcast `list<…>`. A handler may have computed the scalar per-element
+ * type directly (`number`), leaked the collection type (`list<number>` — e.g.
+ * `Negate` returning `x.type`), or — when a collection operand reached a naive
+ * handler such as `Mod`'s or `Remainder`'s `widen(…)` — a `scalar | list<E>`
+ * union. Unwrap any collection branch to its element type and widen the
+ * branches, so the wrapper never nests a list or a union inside the broadcast
+ * result. (For a plain scalar this is the identity.)
+ */
+export declare function broadcastElementType(type: Readonly<Type>): Type;
+/* 0.77.0 */import { TypeNode, FunctionSignatureNode, UnionTypeNode, IntersectionTypeNode, NegationTypeNode, GroupTypeNode, ListTypeNode, VectorTypeNode, MatrixTypeNode, TensorTypeNode, TupleTypeNode, RecordTypeNode, DictionaryTypeNode, SetTypeNode, CollectionTypeNode, ExpressionTypeNode, SymbolTypeNode, NumericTypeNode, PrimitiveTypeNode, TypeReferenceNode, ValueNode, ASTVisitor } from './ast-nodes.js';
 import { Type, TypeResolver } from './types.js';
 export declare class TypeBuilder implements ASTVisitor<Type> {
     private typeResolver;
@@ -1253,7 +1264,7 @@ export declare class TypeBuilder implements ASTVisitor<Type> {
     private isAnyType;
 }
 export declare function buildTypeFromAST(node: TypeNode, typeResolver?: TypeResolver): Type;
-/* 0.74.0 */import { Token } from './lexer.js';
+/* 0.77.0 */import { Token } from './lexer.js';
 import { TypeNode } from './ast-nodes.js';
 import { TypeResolver } from './types.js';
 /**
@@ -1450,7 +1461,7 @@ export declare class Parser {
     private parseValue;
     private parseTypeReference;
 }
-/* 0.74.0 */import type { Type, TypeResolver, TypeString } from './types.js';
+/* 0.77.0 */import type { Type, TypeResolver, TypeString } from './types.js';
 /** @category Type */
 export declare class BoxedType {
     static unknown: BoxedType;
@@ -1472,7 +1483,7 @@ export declare class BoxedType {
     static widen(...types: ReadonlyArray<BoxedType | Type>): BoxedType;
     static narrow(...types: ReadonlyArray<BoxedType | Type>): BoxedType;
     constructor(type: Type | TypeString, typeResolver?: TypeResolver);
-    matches(other: Type | BoxedType): boolean;
+    matches(other: Type | TypeString | BoxedType): boolean;
     is(other: Type): boolean;
     get isUnknown(): boolean;
     toString(): string;
@@ -1480,7 +1491,7 @@ export declare class BoxedType {
     [Symbol.toPrimitive](hint: string): string | null;
     valueOf(): string;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  *
  * <!--
  * !@consider?
@@ -1503,13 +1514,33 @@ export declare class BoxedType {
  */
 export declare function permutations<T>(xs: ReadonlyArray<T>, condition?: (xs: ReadonlyArray<T>) => boolean): ReadonlyArray<ReadonlyArray<T>>;
 export declare function hidePrivateProperties(obj: any): void;
-/* 0.74.0 */export declare class CancellationError<T = unknown> extends Error {
-    cause: unknown;
+/* 0.77.0 *//**
+ * Machine-readable reason a `CancellationError` was thrown.
+ *
+ * These are the engine's own cap-breach codes; the union is intentionally
+ * **extendable** (new caps add a member). An `AbortSignal`-driven cancellation
+ * instead carries the signal's `reason` through `cause`, which may be any
+ * value, so consumers should treat an unrecognized `cause` as opaque.
+ *
+ *  - `'timeout'`: the evaluation deadline (`engine.timeLimit`) was exceeded.
+ *  - `'iteration-limit-exceeded'`: a loop/iterator exceeded
+ *    `engine.iterationLimit`.
+ *  - `'recursion-depth-exceeded'`: user-function recursion exceeded
+ *    `engine.recursionLimit`.
+ */
+export type CancellationCause = 'timeout' | 'iteration-limit-exceeded' | 'recursion-depth-exceeded';
+export declare class CancellationError<T = unknown> extends Error {
+    /**
+     * Machine-readable reason for the cancellation. Engine cap breaches set one
+     * of the {@linkcode CancellationCause} codes; an `AbortSignal` abort carries
+     * the signal's `reason` through instead (arbitrary value).
+     */
+    cause: CancellationCause | unknown;
     value?: T;
     constructor({ message, value, cause, }?: {
         message?: string;
         value?: T;
-        cause?: unknown;
+        cause?: CancellationCause | unknown;
     });
 }
 /**
@@ -1537,15 +1568,7 @@ export declare function withAmbientDeadline<T>(deadline: number | undefined, fn:
  */
 export declare function runAsync<T>(gen: Generator<T>, timeLimitMs: number, signal?: AbortSignal): Promise<T>;
 export declare function run<T>(gen: Generator<T>, timeLimitMs: number): T;
-/* 0.74.0 *//**
- * Escape a string according to the JSON string requirements
- *
- * See https://www.ietf.org/rfc/rfc4627.txt section "2.5.  Strings"
- *
- */
-export declare function escapeJsonString(s: string): string;
-export declare function unescapeJsonString(s: string | any): string;
-/* 0.74.0 */import { StyledBlock, StyledSpan } from './styled-text.js';
+/* 0.77.0 */import { StyledBlock, StyledSpan } from './styled-text.js';
 declare abstract class Terminal {
     width: number | undefined;
     indent: number;
@@ -1564,7 +1587,7 @@ export declare const terminal: Terminal;
  */
 export declare const wrapAnsiString: (string: string, width: number | undefined) => string[];
 export {};
-/* 0.74.0 *//** @category Error Handling */
+/* 0.77.0 *//** @category Error Handling */
 export type RuntimeSignalCode = 'timeout' | 'out-of-memory' | 'recursion-depth-exceeded' | 'iteration-limit-exceeded';
 /** @category Error Handling */
 export type SignalCode = RuntimeSignalCode | ('invalid-name' | 'expected-predicate' | 'expected-symbol' | 'operator-requires-one-operand' | 'postfix-operator-requires-one-operand' | 'prefix-operator-requires-one-operand' | 'unbalanced-symbols' | 'expected-argument' | 'unexpected-command' | 'cyclic-definition' | 'invalid-supersets' | 'expected-supersets' | 'unknown-domain' | 'duplicate-wikidata' | 'invalid-dictionary-entry' | 'syntax-error');
@@ -1660,7 +1683,7 @@ export type WarningSignalHandler = (warnings: WarningSignal[]) => void;
  *
  */
 export type ErrorCode = 'expected-argument' | 'unexpected-argument' | 'expected-operator' | 'expected-operand' | 'invalid-name' | 'invalid-dictionary-entry' | 'unknown-symbol' | 'unknown-operator' | 'unknown-function' | 'unknown-command' | 'unexpected-command' | 'unbalanced-symbols' | 'unexpected-superscript' | 'unexpected-subscript' | 'unexpected-sequence' | 'non-associative-operator' | 'function-has-too-many-arguments' | 'function-has-too-few-arguments' | 'operator-requires-one-operand' | 'infix-operator-requires-two-operands' | 'prefix-operator-requires-one-operand' | 'postfix-operator-requires-one-operand' | 'associative-function-has-too-few-arguments' | 'commutative-function-has-too-few-arguments' | 'threadable-function-has-too-few-arguments' | 'hold-first-function-has-too-few-arguments' | 'hold-rest-function-has-too-few-arguments' | 'base-out-of-range' | 'syntax-error';
-/* 0.74.0 */export declare function stringToCodepoints(string: string): number[];
+/* 0.77.0 */export declare function stringToCodepoints(string: string): number[];
 /**
  * Return a string or an array of graphemes.
  *
@@ -1675,9 +1698,23 @@ export type ErrorCode = 'expected-argument' | 'unexpected-argument' | 'expected-
  * - other combinations (for example, rainbow flag)
  */
 export declare function splitGraphemes(string: string): string | string[];
-/* 0.74.0 *//** Given an invalid word, return the best match amongst validWords */
+/* 0.77.0 *//**
+ * Optimal string alignment distance (restricted Damerau–Levenshtein: handles
+ * substitution, insertion, deletion, and adjacent transposition). Bails out
+ * early, returning `max + 1`, once the distance is known to exceed `max`.
+ */
+export declare function osaDistance(a: string, b: string, max: number): number;
+/**
+ * Given an invalid word, return the best match amongst validWords.
+ *
+ * Permissive by design (distance up to 7): callers use it to *decorate* an
+ * error that has already been raised, where a mediocre suggestion is
+ * harmless. For a matcher whose result decides whether a warning fires at
+ * all, use the conservative `suggestOperatorName` (engine-declarations.ts),
+ * which layers stricter policy over the same `osaDistance` kernel.
+ */
 export declare function fuzzyStringMatch(invalidWord: string, validWords: string[]): string | null;
-/* 0.74.0 */type MergeTypes<TypesArray extends any[], Res = {}> = TypesArray extends [
+/* 0.77.0 */type MergeTypes<TypesArray extends any[], Res = {}> = TypesArray extends [
     infer Head,
     ...infer Rem
 ] ? MergeTypes<Rem, Res & Head> : Res;
@@ -1688,7 +1725,7 @@ type OnlyFirst<F, S> = F & {
     [Key in keyof Omit<S, keyof F>]?: never;
 };
 export {};
-/* 0.74.0 */export declare const version = "0.74.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export { compile } from './compute-engine/compilation/compile-expression.js';
 export { JavaScriptTarget } from './compute-engine/compilation/javascript-target.js';
 export { GPUShaderTarget } from './compute-engine/compilation/gpu-target.js';
@@ -1696,10 +1733,9 @@ export { GLSLTarget } from './compute-engine/compilation/glsl-target.js';
 export { WGSLTarget } from './compute-engine/compilation/wgsl-target.js';
 export { PythonTarget } from './compute-engine/compilation/python-target.js';
 export { IntervalJavaScriptTarget } from './compute-engine/compilation/interval-javascript-target.js';
-export { IntervalGLSLTarget } from './compute-engine/compilation/interval-glsl-target.js';
 export { BaseCompiler } from './compute-engine/compilation/base-compiler.js';
 export type { CompileTarget, CompiledOperators, CompiledFunctions, CompilationOptions, CompilationResult, ExecutableTarget, ComplexResult, CompiledRunner, ExpressionRunner, LambdaRunner, LanguageTarget, TargetSource, CompiledFunction, } from './compute-engine/compilation/types.js';
-/* 0.74.0 */export declare class EngineRuntimeState {
+/* 0.77.0 */export declare class EngineRuntimeState {
     private _timeLimit;
     private _iterationLimit;
     private _recursionLimit;
@@ -1738,7 +1774,8 @@ export type { CompileTarget, CompiledOperators, CompiledFunctions, CompilationOp
     set isVerifying(value: boolean);
     shouldContinueExecution(): boolean;
 }
-/* 0.74.0 */import { Expression, CollectionHandlers } from './global-types.js';
+/* 0.77.0 */import { Type } from '../common/type/types.js';
+import { Expression, CollectionHandlers } from './global-types.js';
 /** If a collection has fewer than this many elements, eagerly evaluate it.
  *
  * For example, evaluate the Union of two sets with 10 elements each will
@@ -1774,6 +1811,32 @@ export declare function isNumericTuple(expr: Expression): boolean;
  */
 export declare function isLinearAlgebraCollection(expr: Expression): boolean;
 /**
+ * True when `expr`'s TYPE is an **unbounded (dimensionless) 1-D** list or
+ * indexed-collection — the exact shape the `Add`/`Multiply` value path folds
+ * into a plain `List` (`broadcastOverIndexedCollections`, and the step-2/4b
+ * broadcast in `_computeValue`) and materializes at evaluation. This is the
+ * *type-level* companion to `isFiniteIndexedCollection` (a value-level check):
+ * it catches operands that are not yet a materialized collection but whose
+ * declared type guarantees they will broadcast once evaluated — a
+ * symbolic-length `Range` (`indexed_collection<…>`, whose `isFiniteCollection`
+ * is `undefined`) or an un-evaluated broadcast result (`R^2`, typed
+ * `list<number>`).
+ *
+ * Fixed-shape tensors (`matrix` = `list` with `dimensions`, `vector<n>` = `[n]`)
+ * are EXCLUDED: they carry dedicated component-wise typing via
+ * `addTensors`/`mulTensors` and their operators' own handlers. Numeric tuples
+ * (points/vectors typed `tuple<…>`) are likewise not matched — they are
+ * handled component-wise by `isNumericTuple`.
+ */
+export declare function isBroadcastCollectionType(expr: Expression): boolean;
+/**
+ * The element type of a broadcast collection operand (see
+ * `isBroadcastCollectionType`), or `undefined` when `expr`'s type is not an
+ * unbounded 1-D list / indexed-collection. Descends into a union (an operand
+ * typed `scalar | list<E>`) and returns the first collection branch's element.
+ */
+export declare function broadcastCollectionElementType(expr: Expression): Type | undefined;
+/**
  * True when `expr` is provably a **scalar** number — a subtype of `number`
  * that is not a numeric tuple — established by one of three shapes:
  *
@@ -1802,6 +1865,24 @@ export declare function numericTupleArity(expr: Expression): number | undefined;
  * tuple-typed *symbol* has no accessible components and must stay symbolic.
  */
 export declare function hasAccessibleComponents(expr: Expression): boolean;
+/**
+ * Broadcast an element-wise `operator` (`Add`/`Multiply`/…) over the finite
+ * indexed-collection operands in `xs` — e.g. the `List` a broadcast `Power`
+ * produced (`L^2`), or a lazy `Range`. Every *other* operand — scalars AND
+ * numeric tuples (which carry point/vector semantics, not collection
+ * semantics) — is kept whole and repeated across the elements. So
+ * `Multiply(Range(-2,2), Tuple(2,3))` broadcasts the range and yields a `List`
+ * of 5 `Tuple`s, mirroring the eager-`List` (`mulTensors`) behavior.
+ *
+ * Returns the eager `List` of per-element results, or `undefined` when there is
+ * no finite indexed collection to broadcast over, or a broadcastable operand's
+ * length is not statically known (the caller then stays inert). This is the
+ * post-evaluation counterpart to the pre-evaluation broadcast in
+ * `BoxedFunction._computeValue` (step 2): the lazy `Add`/`Multiply` operators
+ * only see their collection-shaped operands *after* evaluating them, so their
+ * `evaluate` handlers dispatch through here to keep `evaluate` idempotent.
+ */
+export declare function broadcastOverIndexedCollections(ce: Expression['engine'], operator: string, xs: ReadonlyArray<Expression>, numericApproximation: boolean): Expression | undefined;
 export declare function repeat(value: Expression, count?: number): Iterator<Expression>;
 /**
  * Zips together multiple collections into a single iterator.
@@ -1825,7 +1906,7 @@ export declare function zip(items: ReadonlyArray<Expression>): Iterator<Expressi
  */
 export declare function basicIndexedCollectionHandlers(): CollectionHandlers;
 export declare function defaultCollectionHandlers(def: undefined | CollectionHandlers): CollectionHandlers | undefined;
-/* 0.74.0 */import { BigDecimal } from '../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../big-decimal/index.js';
 import type { AngularUnit } from './types-definitions.js';
 export declare class EngineNumericConfiguration {
     private _precision;
@@ -1855,7 +1936,7 @@ export declare class EngineNumericConfiguration {
     get bignumNegativeOne(): BigDecimal;
     bignum(value: string | number | bigint | BigDecimal): BigDecimal;
 }
-/* 0.74.0 */import type { Expression, LibraryDefinition } from './global-types.js';
+/* 0.77.0 */import type { Expression, LibraryDefinition } from './global-types.js';
 import type { LanguageTarget, CompilationOptions } from './compilation/types.js';
 export declare function assertCompilationTargetName(name: unknown): string;
 export declare function assertLibraryName(name: unknown): string;
@@ -1864,7 +1945,7 @@ export declare function assertLibraryDefinitionContract(library: unknown): asser
 export declare function assertCompilationOptionsContract(options: unknown): asserts options is CompilationOptions<Expression> & {
     fallback?: boolean;
 };
-/* 0.74.0 */import type { Expression, ExpressionInput, AssignValue, SymbolDefinition, IComputeEngine, FormOption, Scope, SimplifyOptions } from './global-types.js';
+/* 0.77.0 */import type { Expression, ExpressionInput, AssignValue, SymbolDefinition, IComputeEngine, FormOption, Scope, SimplifyOptions } from './global-types.js';
 import type { Type, TypeString } from '../common/type/types.js';
 import type { LatexString, ParseLatexOptions } from './latex-syntax/types.js';
 import { compile as compileExpr } from './compilation/compile-expression.js';
@@ -1907,7 +1988,7 @@ export declare function factor(expr: LatexString | ExpressionInput, options?: Fr
 export declare function compile<T extends string = 'javascript'>(expr: LatexString | ExpressionInput, options?: Parameters<typeof compileExpr>[1] & {
     to?: T;
 } & FreeFunctionOptions): ReturnType<typeof compileExpr>;
-/* 0.74.0 */import type { Expression } from './types-expression.js';
+/* 0.77.0 */import type { Expression } from './types-expression.js';
 import type { LanguageTarget } from './compilation/types.js';
 /**
  * Internal registry for compilation targets.
@@ -1924,12 +2005,12 @@ export declare class CompilationTargetRegistry {
     unregister(name: string): void;
     registerDefaults(): void;
 }
-/* 0.74.0 */export type * from './types-expression.js';
+/* 0.77.0 */export type * from './types-expression.js';
 export type * from './types-serialization.js';
 export type { ValueDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, OEISCandidate, InterpretResult, OperatorDefinition, BaseDefinition, SimplifyOptions, ExplainOptions, SymbolDefinition, SymbolDefinitions, LibraryDefinition, AngularUnit, Sign, BaseCollectionHandlers, IndexedCollectionHandlers, CollectionHandlers, TaggedValueDefinition, TaggedOperatorDefinition, BoxedDefinition, BoxedBaseDefinition, BoxedValueDefinition, OperatorDefinitionFlags, BoxedOperatorDefinition, } from './types-definitions.js';
 export type * from './types-evaluation.js';
 export type * from './types-engine.js';
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * OEIS-backed interpretation proposals (the async v4 of the `Interpret`
  * ladder).
  *
@@ -1975,7 +2056,7 @@ import type { OEISOptions } from './oeis.js';
  * ```
  */
 export declare function interpret(ce: ComputeEngine, expr: Expression, options?: OEISOptions): Promise<InterpretResult>;
-/* 0.74.0 */import type { Expression, ExpressionInput } from './types-expression.js';
+/* 0.77.0 */import type { Expression, ExpressionInput } from './types-expression.js';
 import type { BoxedSubstitution as KernelBoxedSubstitution, CanonicalForm, CanonicalOptions, DisplayDigits, FormOption, Hold, JsonSerializationOptions, Metadata, PatternMatchOptions as KernelPatternMatchOptions, ReplaceOptions, Substitution as KernelSubstitution } from './types-kernel-serialization.js';
 export type { Hold, JsonSerializationOptions, DisplayDigits, ReplaceOptions, CanonicalForm, CanonicalOptions, FormOption, Metadata, };
 /**
@@ -1998,8 +2079,11 @@ export type BoxedSubstitution<T = Expression> = KernelBoxedSubstitution<T>;
  * @category Pattern Matching
  */
 export type PatternMatchOptions<T = Expression> = KernelPatternMatchOptions<T>;
-/* 0.74.0 */import { MathJsonSymbol } from '../math-json.js';
-import type { BoxedDefinition, Expression, IComputeEngine as ComputeEngine, Scope } from './global-types.js';
+/* 0.77.0 */import { MathJsonSymbol } from '../math-json.js';
+import type { BoxedDefinition, EvaluateOptions, Expression, IComputeEngine as ComputeEngine, Scope } from './global-types.js';
+import type { Type } from '../common/type/types.js';
+type ValidateArgumentsFn = (ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean, inferredBefore?: ReadonlySet<string>) => ReadonlyArray<Expression> | null;
+export declare function _setValidateArguments(fn: ValidateArgumentsFn): void;
 /***
  * ### THEORY OF OPERATIONS
  *
@@ -2092,7 +2176,7 @@ export declare function canonicalFunctionLiteralArguments(ce: ComputeEngine, ops
  * - a `["Function"]` expression
  * - the symbol for a function, e.g. `Sin`.
  */
-export declare function apply(fn: Expression, args: ReadonlyArray<Expression>): Expression;
+export declare function apply(fn: Expression, args: ReadonlyArray<Expression>, options?: Partial<EvaluateOptions>): Expression;
 /**
  * Evaluate a sequence of statements, handling Return/Break/Continue.
  *
@@ -2106,6 +2190,16 @@ export declare function apply(fn: Expression, args: ReadonlyArray<Expression>): 
  *   before reaching the freshScope where actual param values live.)
  */
 export declare function evaluateStatements(ce: ComputeEngine, ops: Iterable<Expression>): Expression;
+/**
+ * If `expr` is a bare symbol bound to a user-defined function literal (an
+ * operator definition created by `helper(x) = …`), return the underlying
+ * `Function` literal so the function can escape its defining scope as a
+ * first-class value. Otherwise return `expr` unchanged.
+ *
+ * Must be called while the defining call frame is still pushed, so the
+ * operator definition is reachable via `lookupDefinition`.
+ */
+export declare function resolveEscapingLambda(ce: ComputeEngine, expr: Expression): Expression;
 /**
  * Return a lambda function, assuming a scoped environment has been
  * created and there is a single numeric argument
@@ -2121,7 +2215,7 @@ export declare function makeLambdaN1(expr: Expression): ((arg: number) => number
  *
  * return a JS function that can be called with arguments.
  */
-export declare function applicable(fn: Expression): (xs: ReadonlyArray<Expression>) => Expression | undefined;
+export declare function applicable(fn: Expression): (xs: ReadonlyArray<Expression>, options?: Partial<EvaluateOptions>) => Expression | undefined;
 /**
  * Use `applicableN1()` when the function is known to be a function with a
  * single real argument that returns a real value.
@@ -2137,7 +2231,8 @@ export declare function applicableN1(fn: Expression): (x: number) => number;
 export declare function parseFunctionSignature(s: string): [id: string, args: string[] | undefined];
 /** Lookup a definition matching a symbol in a lexical scope chain */
 export declare function lookup(id: MathJsonSymbol, scope: Scope): undefined | BoxedDefinition;
-/* 0.74.0 */import type { Complex } from 'complex-esm';
+export {};
+/* 0.77.0 */import type { Complex } from 'complex-esm';
 import type { OneOf } from '../common/one-of.js';
 import type { MathJsonExpression, MathJsonNumberObject, MathJsonStringObject, MathJsonSymbolObject, MathJsonFunctionObject, MathJsonSymbol, MathJsonDictionaryObject } from '../math-json.js';
 import type { Type, TypeString } from '../common/type/types.js';
@@ -2184,8 +2279,11 @@ interface BoxedBaseDefinition extends Partial<BaseDefinition> {
     collection?: CollectionHandlers;
 }
 interface BoxedValueDefinition extends BoxedBaseDefinition {
+    /** Release resources owned by this definition when its scope is disposed. */
+    dispose(): void;
     holdUntil: 'never' | 'evaluate' | 'N';
     value: Expression | undefined;
+    readonly isSelfReferential: boolean;
     eq?: (a: Expression) => boolean | undefined;
     neq?: (a: Expression) => boolean | undefined;
     cmp?: (a: Expression) => '=' | '>' | '<' | undefined;
@@ -3771,6 +3869,13 @@ export interface Expression {
      */
     get value(): Expression | undefined;
     /**
+     * If this expression is constant (see `isConstant`), return its value,
+     * otherwise `undefined`.
+     *
+     * @category Value Properties
+     */
+    readonly constantValue: number | boolean | string | object | undefined;
+    /**
      * If the expression is a symbol, set the value of the symbol.
      *
      * Will throw a runtime error if either not a symbol, or a symbol with the
@@ -3861,6 +3966,20 @@ export interface Expression {
      * @category Type Properties
      */
     readonly isReal: boolean | undefined;
+    /**
+     * The value of this expression is a function.
+     *
+     * This is equivalent to `this.type.matches("function")`, that is, the
+     * expression evaluates to a function (for example a symbol bound to a
+     * function literal, or a function literal itself).
+     *
+     * This is distinct from `isFunctionExpression`, which is a *structural*
+     * property (`true` when the expression is a function application node such
+     * as `["Add", 1, 2]`).
+     *
+     * @category Type Properties
+     */
+    readonly isFunction: boolean | undefined;
     /** Mathematical equality (strong equality), that is the value
      * of this expression and the value of `other` are numerically equal.
      *
@@ -4066,6 +4185,10 @@ export interface FunctionInterface {
  */
 export interface StringInterface {
     readonly string: string;
+    /** The UTF-8 encoding of the string, as a byte buffer. */
+    readonly buffer: Uint8Array;
+    /** The Unicode scalar values (code points) of the string. */
+    readonly unicodeScalars: number[];
 }
 /**
  * Narrowed interface for tensor expressions.
@@ -4146,7 +4269,7 @@ export type BoxedExpression = Expression;
 /** @deprecated Use `ExpressionInput` instead. */
 export type SemiBoxedExpression = ExpressionInput;
 export {};
-/* 0.74.0 */import type { OneOf } from '../common/one-of.js';
+/* 0.77.0 */import type { OneOf } from '../common/one-of.js';
 import type { Type, TypeString } from '../common/type/types.js';
 import type { BoxedType } from '../common/type/boxed-type.js';
 import type { LatexString } from './latex-syntax/types.js';
@@ -4608,6 +4731,11 @@ export interface BaseDefinition {
      * May contain Markdown.
      */
     description: string | string[];
+    /**
+     * Search keywords (synonyms, alternate names) used by
+     * `ce.searchDefinitions()`. Not shown in documentation.
+     */
+    keywords?: string[];
     /** A list of examples of how to use this symbol or operator.
      *
      * Each example is a string, which can be a MathJSON expression or LaTeX, bracketed by `$` signs.
@@ -4909,6 +5037,8 @@ export interface BoxedBaseDefinition extends Partial<BaseDefinition> {
  * @category Definitions
  */
 export interface BoxedValueDefinition extends BoxedBaseDefinition {
+    /** Release resources owned by this definition when its scope is disposed. */
+    dispose(): void;
     /**
       * If the symbol has a value, it is held as indicated in the table below.
       * A green checkmark indicate that the symbol is substituted.
@@ -4936,6 +5066,15 @@ export interface BoxedValueDefinition extends BoxedBaseDefinition {
      *  separate evaluation-context values map.
      */
     value: Expression | undefined;
+    /**
+     * True if the current value refers to the symbol itself (a degenerate
+     * self-referential binding, e.g. `a := a + 1` over an unbound `a`). Such a
+     * binding forms a cycle: resolving the value would re-resolve the symbol
+     * forever. When set, the symbol is treated as unbound during resolution so
+     * that `evaluate()`/`.N()`/collection queries stay symbolic instead of
+     * overflowing the stack. Computed once when the value is assigned.
+     */
+    readonly isSelfReferential: boolean;
     eq?: (a: Expression) => boolean | undefined;
     neq?: (a: Expression) => boolean | undefined;
     cmp?: (a: Expression) => '=' | '>' | '<' | undefined;
@@ -5105,7 +5244,7 @@ export interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDe
     update(def: OperatorDefinition): void;
 }
 export {};
-/* 0.74.0 */import type { IComputeEngine } from '../types-engine.js';
+/* 0.77.0 */import type { IComputeEngine } from '../types-engine.js';
 import type { Expression, ExpressionInput } from '../types-expression.js';
 /** A single analytic-property record for an operator. The MathJSON fields are
  * raw (as translated from Fungrim); box them with `ce.expr` to query. */
@@ -5209,7 +5348,7 @@ export declare function isEligibleRealRewrite(x: Expression): boolean;
  * `~oo`). Called by `BoxedFunction._computeValue` under `numericApproximation`.
  */
 export declare function applyPoleOverride(ce: IComputeEngine, operator: string, ops: ReadonlyArray<Expression>, result: Expression): Expression;
-/* 0.74.0 */import { type CommonSymbolTable } from './engine-common-symbols.js';
+/* 0.77.0 */import { type CommonSymbolTable } from './engine-common-symbols.js';
 import type { Expression, IComputeEngine as ComputeEngine, LibraryDefinition } from './global-types.js';
 export type CommonNumberBindings = {
     Zero: Expression;
@@ -5237,13 +5376,13 @@ export declare class EngineStartupCoordinator {
     bootstrapLibraries(libraries?: readonly (string | LibraryDefinition)[]): void;
     initializeCommonSymbolBindings(commonSymbols: CommonSymbolTable): CommonSymbolBindings;
 }
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from './global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from './global-types.js';
 export type CommonSymbolTable = {
     [symbol: string]: null | Expression;
 };
 export declare function initializeCommonSymbols(engine: ComputeEngine, commonSymbols: CommonSymbolTable): void;
 export declare function resetCommonSymbols(commonSymbols: CommonSymbolTable): void;
-/* 0.74.0 */import type { MathJsonSymbol } from '../math-json.js';
+/* 0.77.0 */import type { MathJsonSymbol } from '../math-json.js';
 import type { TypeReference } from '../common/type/types.js';
 import type { BoxedType } from '../common/type/boxed-type.js';
 import type { LatexString } from './latex-syntax/types.js';
@@ -5499,7 +5638,7 @@ export type EvalContext<Expr = unknown, Binding = unknown> = {
      */
     assumptionBindings?: Set<string>;
 };
-/* 0.74.0 */import type { Expression, IComputeEngine } from './global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine } from './global-types.js';
 export declare function symbolArg(engine: IComputeEngine, arg: Expression | undefined): Expression;
 export declare function symbolOrListArg(engine: IComputeEngine, arg: Expression | undefined): Expression;
 export declare function isDependentFunction(expr: Expression, dependentName: string, independentName: string): boolean;
@@ -5509,8 +5648,9 @@ export declare function explicitDerivativeRhs(equation: Expression, dependentNam
     order: number;
     rhs: Expression;
 } | undefined;
+export declare function replaceDerivativeOfDependent(expr: Expression, dependentName: string, independentName: string, order: number, replacement: Expression): Expression;
 export declare function nDSolve(equation: Expression, dependent: Expression, limits: Expression, initialValue: Expression, stepsExpr?: Expression): Expression | undefined;
-/* 0.74.0 */export type { OneOf } from '../common/one-of.js';
+/* 0.77.0 */export type { OneOf } from '../common/one-of.js';
 export type { MathJsonExpression, MathJsonAttributes, MathJsonNumberObject, MathJsonSymbolObject, MathJsonStringObject, MathJsonFunctionObject, DictionaryValue, MathJsonDictionaryObject, ExpressionObject, MathJsonSymbol, } from '../math-json/types.js';
 export * from '../common/type/boxed-type.js';
 export * from '../common/type/types.js';
@@ -5518,7 +5658,7 @@ export type * from './latex-syntax/types.js';
 export * from './numerics/types.js';
 export * from './numeric-value/types.js';
 export * from './global-types.js';
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Trigonometric interval functions
  *
  * @module interval/trigonometric
@@ -5696,7 +5836,7 @@ export declare function fresnelS(x: Interval | IntervalResult): IntervalResult;
  * take min/max. C is bounded (|C(x)| ≤ ~0.7799).
  */
 export declare function fresnelC(x: Interval | IntervalResult): IntervalResult;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Interval arithmetic types for reliable function evaluation
  *
  * @module interval/types
@@ -5747,7 +5887,7 @@ export type IntervalResult = {
  * - `maybe`: Indeterminate - intervals overlap
  */
 export type BoolInterval = 'true' | 'false' | 'maybe';
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Comparison and conditional interval operations
  *
  * @module interval/comparison
@@ -5833,7 +5973,7 @@ export declare function restrict(cond: BoolInterval, value: () => Interval | Int
  * clamp(x, lo, hi) returns x clamped to [lo, hi].
  */
 export declare function clamp(x: Interval | IntervalResult, lo: Interval | IntervalResult, hi: Interval | IntervalResult): IntervalResult;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Elementary interval functions (sqrt, pow, exp, ln, abs, floor, ceil, min, max, mod)
  *
  * @module interval/elementary
@@ -6073,7 +6213,7 @@ export declare function exp2(x: Interval | IntervalResult): IntervalResult;
  * Always non-negative, evaluate four corners.
  */
 export declare function hypot(x: Interval | IntervalResult, y: Interval | IntervalResult): IntervalResult;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Utility functions for interval arithmetic
  *
  * @module interval/util
@@ -6172,7 +6312,7 @@ export declare function unwrap(input: Interval | IntervalResult): Interval | und
  * Otherwise returns the unwrapped intervals.
  */
 export declare function unwrapOrPropagate(...inputs: Array<Interval | IntervalResult>): Interval[] | IntervalResult;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Interval arithmetic library for reliable function evaluation
  *
  * This module provides interval versions of mathematical operations
@@ -6296,7 +6436,7 @@ export declare const IntervalArithmetic: {
     restrict: typeof _restrict;
     clamp: typeof _clamp;
 };
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Basic interval arithmetic operations
  *
  * @module interval/arithmetic
@@ -6352,7 +6492,7 @@ export declare function mul(a: Interval | IntervalResult, b: Interval | Interval
  * If inputs are IntervalResults, propagates errors (empty, entire, singular).
  */
 export declare function div(a: Interval | IntervalResult, b: Interval | IntervalResult): IntervalResult;
-/* 0.74.0 */import type { Rule } from './types-evaluation.js';
+/* 0.77.0 */import type { Rule } from './types-evaluation.js';
 /**
  * Internal holder for a rule array and its cache-staleness marker.
  *
@@ -6375,7 +6515,7 @@ export declare class SimplificationRuleStore {
     hasMutatedSinceLastCache(): boolean;
     markCached(): void;
 }
-/* 0.74.0 */import { AssumeResult, Expression, IComputeEngine as ComputeEngine, Sign } from './global-types.js';
+/* 0.77.0 */import { AssumeResult, Expression, IComputeEngine as ComputeEngine, Sign } from './global-types.js';
 import { type Subject } from './boxed-expression/constraint-subject.js';
 /**
  * Add an assumption, in the form of a predicate, for example:
@@ -6426,7 +6566,7 @@ export declare function assume(proposition: Expression): AssumeResult;
 export declare function getSignFromAssumptions(ce: ComputeEngine, subject: string | Subject): Sign | undefined;
 import { getInequalityBoundsFromAssumptions } from './boxed-expression/inequality-bounds.js';
 export { getInequalityBoundsFromAssumptions };
-/* 0.74.0 */import type { Expression, IComputeEngine, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions } from './global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions } from './global-types.js';
 export declare function declareSequence(ce: IComputeEngine, name: string, def: SequenceDefinition): IComputeEngine;
 export declare function getSequenceStatus(ce: IComputeEngine, name: string): SequenceStatus;
 export declare function getSequence(ce: IComputeEngine, name: string): SequenceInfo | undefined;
@@ -6440,13 +6580,13 @@ export declare function checkSequenceOEIS(ce: IComputeEngine, name: string, coun
     matches: OEISSequenceInfo[];
     terms: number[];
 }>;
-/* 0.74.0 */export declare class EngineCacheStore {
+/* 0.77.0 */export declare class EngineCacheStore {
     private _entries;
     getOrBuild<T>(cacheName: string, build: () => T, purge?: (t: T) => T | undefined): T;
     invalidate(cacheName: string): void;
     purgeValues(): void;
 }
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { Expr as Expression } from './types.js';
 export declare function toTimesPower(ce: ComputeEngine, e: Expression): Expression;
 /**
@@ -6457,7 +6597,7 @@ export declare function toTimesPower(ce: ComputeEngine, e: Expression): Expressi
  * arithmetic produces unfolded artifacts (e.g. `a + 0·b`).
  */
 export declare function recanonicalize(ce: ComputeEngine, e: Expression): Expression;
-/* 0.74.0 */import type { Expression as BoxedExpression, FunctionInterface, SymbolInterface, NumberLiteralInterface } from '../types-expression.js';
+/* 0.77.0 */import type { Expression as BoxedExpression, FunctionInterface, SymbolInterface, NumberLiteralInterface } from '../types-expression.js';
 /** A boxed expression with the function/symbol/number member interfaces folded
  * in as optional. The base `Expression` exposes `.operator` but keeps `.ops`,
  * `.op1`, `.symbol`, `.re`, … behind `isFunction`/`isSymbol`/`isNumber`
@@ -6506,7 +6646,7 @@ export type RubiRuleDoc = {
     file: string;
     rules: RubiRule[];
 };
-/* 0.74.0 */import type { Expr as Expression } from './types.js';
+/* 0.77.0 */import type { Expr as Expression } from './types.js';
 export type Pat = {
     kind: 'var';
 } | {
@@ -6541,7 +6681,7 @@ export declare function matchPattern(pat: Pat, expr: Expression, x: Expression):
 export declare function matchAll(pat: Pat, expr: Expression, x: Expression, cap?: number, deadline?: number): Env[];
 /** Names of all slots in a pattern (for compile-time sanity checks). */
 export declare function slotNames(pat: Pat, out?: Set<string>): Set<string>;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
 import type { Expr as Expression } from './types.js';
 import type { CompiledRule } from './compile.js';
 /**
@@ -6678,6 +6818,19 @@ export declare class RubiDriver {
      * difference check on the ACTIVATED antiderivative — PolyLog/complex-log forms
      * evaluate but do not admit a symbolic derivative). Body wrapped try/catch. */
     private singleAngleTrigExpFallback;
+    /** R8: `∫P(x)·R(hyp(w)) dx` for P a nontrivial polynomial in x, w = c+d·x
+     * linear, and R a rational function of same-angle hyperbolic heads with an
+     * additive `(a+b·hyp)`-type denominator — the real-exponential analog of R17,
+     * closed by the single-exponential normalization y = E^{w} (see
+     * `singleAngleHyperbolicExponentialPieces`) plus a linear-factor partial
+     * fraction, routing each `∫P(x)·E^{k·w}/(a+b·E^{w})^s` piece back through the
+     * driver (§2.2 / Chapter-3 / §8.8 PolyLog telescope). Cheap syntactic pre-filter
+     * gates it to a near-zero-cost no-op off its shape. Fail-closed: returns null
+     * unless every piece closes AND D(ΣF) matches the integrand — the BRANCH-SAFE
+     * D-check (mixed-sign x points AND several parameter seeds) rejects a wrong-
+     * branch `√(a²+b²)` residue. Unlike R17, F is already active (hyperbolics are
+     * not inerted), so it is NOT wrapped in `activateTrig`. Body wrapped try/catch. */
+    private singleAngleHyperbolicExpFallback;
     /** R27: `∫P(x)·Sin[u]^m·Cos[u]^k dx` for u = e+f·x linear and P a trig-free
      * factor (typically `x⁻¹`) — closed by reducing the SAME-ANGLE trig product to
      * a real multiple-angle sum (`circularTrigReduce`, see `polyTrigProductPieces`)
@@ -6690,6 +6843,41 @@ export declare class RubiDriver {
      * `/xᵏ` piece needing complex Si/Ci stays cleanly unsolved. Body try/catch →
      * null. */
     private polyTrigProductReduce;
+    /** R28a: `∫ P(x)·x^m·(a+b·xⁿ)^p dx` for p a non-integer half-integer, n ≥ 2,
+     * and the numerator `P(x)·x^m` a Laurent polynomial with ≥ 2 distinct
+     * monomials — closed by the linearity split (`mixedParityRadicalPieces`
+     * distributes the numerator into `cⱼ·xʲ·(a+b·xⁿ)^p` pieces, each of which the
+     * bundled binomial rules integrate) and summing. Supplies Rubi rule 2424,
+     * whose residue-class regrouping RHS uses non-functional Sum/Coeff/Expon
+     * operators and never fires in CE. Fail-closed: returns null unless every
+     * piece closes AND D(ΣF) matches the integrand numerically (the central-
+     * difference check — the same acceptance bar as R15/R27). Body try/catch →
+     * null. */
+    private mixedParityRadicalSplit;
+    /** R29: `∫R(hyp(v)) dx`, algebraic in one hyperbolic family with a common
+     * linear argument `v` — closed by the substitution `u = Sinh[v]` / `Cosh[v]` /
+     * `Tanh[v]` (see `algebraicHyperbolicSubstitutions`): each candidate rewrites
+     * the integrand to a pure algebraic `∫R(u,√(a+b·u²)) du` (reusing `x` as `u`),
+     * routes it through the driver — the bundled 1.1.2 quadratic-radical rules
+     * close it in elementary artanh form — and back-substitutes `u → hyp(v)`. Try
+     * each candidate; accept the first that closes AND passes the BRANCH-SAFE
+     * (mixed-sign, so a wrong `u=Cosh` branch is caught) numeric D-check against
+     * the ORIGINAL hyperbolic integrand. Fail-closed: a double-radical (elliptic)
+     * or non-verifying subproblem → null. Body try/catch → null. */
+    private algebraicHyperbolicSub;
+    /** R30: `∫R(hyp(v)) dx`, R a rational (integer-power) function of hyperbolics
+     * of a common linear argument `v` — closed by the `t = e^v` substitution with
+     * the denominator kept FACTORED as `x^m·(x²+1)^p·(x²−1)^q·S(x)` (see
+     * `hyperbolicRationalFactoredForm`): the bundled partial-fraction rules close
+     * the factored form that the R26B normal-form retry, which expands the
+     * denominator, cannot. Integrate the factored rational (reusing `x` as the exp
+     * variable), back-substitute `x → e^v`, and accept only if the result passes a
+     * BRANCH-SAFE D-check — mixed-sign x points AND several parameter seeds, since
+     * the residual quadratic's `√(β²−4αγ)` arctan/artanh form is branch-hazardous
+     * (a form that verifies on one parameter branch but not another is rejected).
+     * Fail-closed: a non-closing subproblem or a failing D-check → null. Body
+     * try/catch → null. */
+    private hyperbolicRationalFactored;
     /** Clean the exponential-fallback antiderivative: collect like terms via a
      * bounded simplify (the raw expansion repeats `c·x` once per exponential
      * term, which otherwise bloats high-degree results past the verifier's leaf
@@ -6702,7 +6890,7 @@ export declare class RubiDriver {
      * overrun. */
     private cleanExpansionResult;
 }
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 export interface IntegrationRulesLoadOptions {
     /** Per-integral wall-clock budget for the rule driver, in milliseconds.
      * Default 10000. Bounds each `Integrate` call so a pathological integrand
@@ -6729,7 +6917,7 @@ export interface IntegrationRulesLoadReport {
  * reusing the cached compiled rules).
  */
 export declare function loadIntegrationRules(ce: ComputeEngine, options?: IntegrationRulesLoadOptions): IntegrationRulesLoadReport;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
 import type { Expr as Expression } from './types.js';
 type IntStepRecord = {
     node: Expression;
@@ -6747,7 +6935,7 @@ type IntStepRecord = {
  */
 export declare function replayIntRecords(ce: ComputeEngine, records: readonly IntStepRecord[], activate: (e: Expression) => Expression): RuleSteps;
 export {};
-/* 0.74.0 */import type { Expr as Expression, Json } from './types.js';
+/* 0.77.0 */import type { Expr as Expression, Json } from './types.js';
 import type { IComputeEngine as ComputeEngine } from '../types-engine.js';
 import type { Env } from './match.js';
 export declare class RuleFail extends Error {
@@ -6802,7 +6990,7 @@ export declare function findFailingConjunct(json: Json, ctx: Ctx): string;
  * function of x (some expanded side is not a polynomial in x, or the
  * denominator vanishes), so the caller can fall back to the un-normalized form.
  */
-export declare function rationalNormalFormX(e: Expression, x: string): Expression | null;
+export declare function rationalNormalFormX(e: Expression, x: string, clearNegatives?: boolean): Expression | null;
 /** Rubi RationalFunctionQ — u is a rational function of x */
 export declare function rationalFnQ(u: Expression, x: string): boolean;
 /** True if any node carries an ACTIVE trig head (`Sin`/`Cos`/…). Lets the
@@ -7017,6 +7205,27 @@ export declare function singleAngleTrigRationalQ(ce: ComputeEngine, integrand: E
  *  and substitutes y = E^{i·w}. Returns null when the integrand is not in the
  *  single-angle additive-denominator shape. */
 export declare function singleAngleExponentialPieces(ce: ComputeEngine, integrand: Expression, x: string): Expression[] | null;
+/** For an active hyperbolic head, the pair [N(y), D(y)] with `head(w) = N(y)/D(y)`
+ *  at y = E^{w}: `sinh=(y²−1)/(2y)`, `cosh=(y²+1)/(2y)`, `tanh=(y²−1)/(y²+1)`,
+ *  `coth=(y²+1)/(y²−1)`, `sech=2y/(y²+1)`, `csch=2y/(y²−1)`. (Numerically
+ *  verified — no factor of i, unlike the trig `trigHeadYForm`.) */
+export declare function hyperbolicHeadYForm(ce: ComputeEngine, head: string, y: Expression): [Expression, Expression] | null;
+/** Cheap O(nodes) syntactic pre-filter for the R8 single-angle hyperbolic→exp
+ *  fallback: does a genuine additive-hyperbolic DENOMINATOR literally occur — a
+ *  `Power(Add, negative)` whose `Add` base contains a hyperbolic head (the
+ *  `(a+b·sinh)^{−n}` shape), a positive-power `Power(Add, k)` whose `Add` base
+ *  carries a RECIPROCAL head (Tanh/Coth/Sech/Csch, whose own `y²±1` denominator
+ *  denominates even at positive power — e.g. `(a+b·Coth)³`, 6.4.1 #47), or the raw
+ *  `Divide(_, Add-with-hyperbolic)` form? Keeps R8 a near-zero-cost no-op off its
+ *  shape. */
+export declare function hasSingleAngleHyperbolicRationalCandidate(e: Expression): boolean;
+/** R8 support: expand `∫P(x)·R(hyp(w))` into the list of x-integrand pieces
+ *  `P(x)·(c·y^k/(y−r)^s)[y → E^{w}]` — each a Chapter-2 §2.2 / §8.8 shape the
+ *  bundled rules close. Rewrites R to the y-rational tally, builds Q(y), partial-
+ *  fractions it over its linear y-factors (reusing `expandRationalOverLinears`),
+ *  and substitutes y = E^{w}. Returns null when the integrand is not in the
+ *  single-angle additive-denominator shape. */
+export declare function singleAngleHyperbolicExponentialPieces(ce: ComputeEngine, integrand: Expression, x: string): Expression[] | null;
 /** R27 support: `∫ P(x)·Sin[u]^m·Cos[u]^k dx` (u linear in x, P a trig-free
  *  factor) — expand the SAME-ANGLE circular trig product to a real multiple-
  *  angle sum (`circularTrigReduce` — `sin²u·cos u → ¼cos u − ¼cos 3u`, etc.)
@@ -7040,7 +7249,77 @@ export declare function singleAngleExponentialPieces(ce: ComputeEngine, integran
  *  fail-closes on a piece that does not integrate or a failing numeric
  *  D-check. */
 export declare function polyTrigProductPieces(ce: ComputeEngine, integrand: Expression, x: string): Expression[] | null;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
+/** R28a support: `∫ P(x)·x^m·(a+b·xⁿ)^p dx` — the mixed-parity
+ *  polynomial-numerator linearity split. Splits the numerator `P(x)·x^m` into
+ *  Laurent monomials and returns the list of `cⱼ·xʲ·(a+b·xⁿ)^p` pieces, each of
+ *  which the bundled binomial rules integrate on its own (Rubi rule 2424's RHS
+ *  regroups the numerator by residue classes mod n/2 using non-functional
+ *  `Sum`/`Coeff`/`Expon` operators, so the combined integrand never fires in
+ *  CE — but linearity over the monomials is exact and each monomial piece
+ *  closes).
+ *
+ *  Returns null unless the (normal-form) integrand is a product with EXACTLY
+ *  one binomial-radical factor `(a+b·xⁿ)^p` (p non-integer, n ≥ 2), whose other
+ *  factors form a Laurent polynomial in x with ≥ 2 distinct monomials (the
+ *  mixed-parity gate — a single monomial is a bare `xʲ·radical` the bundled
+ *  rules already handle, and admitting it would let an emitted piece re-enter
+ *  this fallback). The caller routes each piece through the driver and
+ *  fail-closes on any piece that does not integrate or a failing numeric
+ *  D-check; each piece has a single-monomial numerator, so it cannot re-match
+ *  this gate. */
+export declare function mixedParityRadicalPieces(ce: ComputeEngine, integrand: Expression, x: string): Expression[] | null;
+/** Fast O(nodes) syntactic pre-filter for the R28a mixed-parity linearity
+ *  split: does the (normal-form) integrand look like `Add-numerator ×
+ *  binomial-radical`? Requires a `Multiply` with (a) a `Power` factor whose
+ *  base is an `Add` and whose exponent is a non-integer number (the radical)
+ *  and (b) an `Add` factor (the polynomial numerator). Purely structural (no
+ *  allocation / factoring) so the fallback stays a near-zero-cost no-op off its
+ *  shape. */
+export declare function hasMixedParityRadicalCandidate(e: Expression): boolean;
+/** Fast O(nodes) syntactic pre-filter for the R29 algebraic-in-hyperbolic
+ *  substitution fallback: does the integrand contain a hyperbolic head AND a
+ *  fractional (non-integer rational) power whose base contains a hyperbolic
+ *  head? That is the algebraic-in-hyperbolic signature — `(a+b·Sinh²)^(p/2)`,
+ *  `√(a+b·Tanh)`, `(a·Sinh⁴)^(3/2)`, `(Sinh·Tanh)^(1/2)`, `(Sech²)^(1/2)`.
+ *  Purely structural (no allocation), so the fallback stays a near-zero-cost
+ *  no-op off its shape. */
+export declare function hasAlgebraicHyperbolicCandidate(e: Expression): boolean;
+/** R29 support: `∫ R(hyp(v)) dx` for an integrand algebraic in a single
+ *  hyperbolic family with a common LINEAR argument `v = c+d·x`. Returns the list
+ *  of `{ g, back }` candidate substitutions `u = Sinh[v]` / `Cosh[v]` /
+ *  `Tanh[v]`, where `g` is the (pure algebraic, in the reused variable `x`)
+ *  integrand `f(x)·dx/du` and `back` is the expression to substitute for `x` in
+ *  the antiderivative (`Sinh[v]` etc.). Empty unless the integrand's ONLY
+ *  x-dependence is through hyperbolic heads of one common linear argument. The
+ *  caller routes each `g` through the driver and fail-closes on a non-closing
+ *  piece or a failing branch-safe (mixed-sign) numeric D-check, so a
+ *  branch-wrong `u=Cosh` result and a double-radical (elliptic) shape are both
+ *  rejected. */
+export declare function algebraicHyperbolicSubstitutions(ce: ComputeEngine, integrand: Expression, x: string): {
+    g: Expression;
+    back: Expression;
+}[];
+/** Fast O(nodes) syntactic pre-filter for the R30 fallback: a hyperbolic head
+ *  occurs and NO fractional (non-integer rational) power occurs anywhere — a
+ *  RATIONAL (integer-power) hyperbolic. Fractional powers are R29's algebraic
+ *  domain (and `rationalNormalFormX` rejects them), so excluding them keeps R30
+ *  a near-zero-cost no-op off its shape. Purely structural. */
+export declare function hasHyperbolicRationalCandidate(e: Expression): boolean;
+/** R30: `∫R(hyp(v)) dx`, R a rational (integer-power) function of hyperbolics of
+ *  a common LINEAR argument `v`. Returns `{ form, ratio, v }` where `form` is the
+ *  substituted rational in the reused variable x (≡ `t = e^v`) with its
+ *  denominator kept FACTORED as `x^m·(x²+1)^p·(x²−1)^q·S(x)` (bundled rules close
+ *  the factored — not the expanded — form), `ratio = v/v′` (x-free) and `v =
+ *  e^(linear)`. Null off-shape (not a function of one exponential, x-dependent
+ *  Jacobian, non-rational normal form, or a denominator that does not reduce).
+ *  The caller integrates `form`, back-substitutes `x → v`, and fail-closes on a
+ *  branch-safe D-check. */
+export declare function hyperbolicRationalFactoredForm(ce: ComputeEngine, integrand: Expression, x: string): {
+    form: Expression;
+    ratio: Expression;
+    v: Expression;
+} | null;
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { Json, RubiRule, RubiRuleDoc } from './types.js';
 import { Pat } from './match.js';
 export type CompiledRule = {
@@ -7112,7 +7391,7 @@ export declare function compileRule(ce: ComputeEngine, rule: RubiRule, id: strin
  * shippable, fs-free core consumed by both the bundled `loadIntegrationRules`
  * loader and the Node `compileSection` fs wrapper (`scripts/rubi/compile.ts`). */
 export declare function compileRuleDocs(ce: ComputeEngine, docs: RubiRuleDoc[]): CompileResult;
-/* 0.74.0 */import type { Expression, Sign, SymbolDefinitions, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, Sign, SymbolDefinitions, IComputeEngine as ComputeEngine } from '../global-types.js';
 import { type SubjectPart } from '../boxed-expression/constraint-subject.js';
 /**
  * Assumption-based sign fallback for the part extractors
@@ -7126,7 +7405,7 @@ import { type SubjectPart } from '../boxed-expression/constraint-subject.js';
  */
 export declare function signFromAssumedPart(ce: ComputeEngine, op: Expression, part: SubjectPart): Sign | undefined;
 export declare const COMPLEX_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Arithmetic helpers for Measurement expressions.
  *
  * A `Measurement(value, error)` carries a nominal `value` and a 1σ absolute
@@ -7202,7 +7481,7 @@ export declare function measurementLog(ce: ComputeEngine, arg: Expression, base:
  * normal trig evaluate path).
  */
 export declare function measurementTrig(ce: ComputeEngine, operator: string, arg: Expression): Expression | undefined;
-/* 0.74.0 */import type { Expression, SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { Expression, SymbolDefinitions } from '../global-types.js';
 export declare const DEFAULT_LINSPACE_COUNT = 50;
 export declare const COLLECTIONS_LIBRARY: SymbolDefinitions;
 /**
@@ -7253,7 +7532,7 @@ export declare function enumerationDeclined(collection: Expression): boolean;
 export declare function reduceCollection<T>(collection: Expression, fn: (acc: T, next: Expression) => T | null, initial: T): Generator<T | undefined>;
 export declare function fromRange(start: number, end: number): number[];
 export declare function sortedIndices(expr: Expression, fn?: Expression | undefined): number[] | undefined;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Re-export the unit registry from its canonical location in numerics/.
  *
  * The unit registry lives in numerics/ so that lower layers (like
@@ -7261,9 +7540,9 @@ export declare function sortedIndices(expr: Expression, fn?: Expression | undefi
  * rules.
  */
 export { type DimensionVector, type UnitExpression, dimensionsEqual, isDimensionless, getUnitDimension, getUnitScale, areCompatibleUnits, convertUnit, getExpressionDimension, getExpressionScale, parseUnitDSL, convertCompoundUnit, findNamedUnit, flattenUnitFactors, cancelUnitFactors, unitExpressionFromFactors, } from '../numerics/unit-data.js';
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const POLYNOMIALS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 /**
  * Tier-2 numeric kernels for special functions (ROADMAP item 4).
  *
@@ -7280,13 +7559,13 @@ export declare const POLYNOMIALS_LIBRARY: SymbolDefinitions[];
  * - `DedekindEta(tau)` = e^{iπτ/12}·∏(1 − e^{2πikτ}) (Fungrim 1dc520).
  */
 export declare const SPECIAL_FUNCTIONS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const RELOP_LIBRARY: SymbolDefinitions;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const NUMBER_THEORY_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const FRACTALS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions, Expression } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions, Expression } from '../global-types.js';
 import { type UnitExpression } from './unit-data.js';
 /**
  * Convert a boxed expression representing a unit into a plain
@@ -7295,9 +7574,9 @@ import { type UnitExpression } from './unit-data.js';
  */
 export declare function boxedToUnitExpression(expr: Expression): UnitExpression | null;
 export declare const UNITS_LIBRARY: SymbolDefinitions;
-/* 0.74.0 */import { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import { SymbolDefinitions } from '../global-types.js';
 export declare const LINEAR_ALGEBRA_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { Type } from '../../common/type/types.js';
 import type { BoxedType } from '../../common/type/boxed-type.js';
 /**
@@ -7362,11 +7641,11 @@ export declare function measurementType(ops: ReadonlyArray<Expression>): Type | 
  * `finite_real` where their values are complex/infinite/NaN (SYM P0-12).
  */
 export declare function elementaryFunctionType(operator: string, ops: ReadonlyArray<Expression>): Type;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const STATISTICS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const CORE_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, Scope } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, Scope } from '../global-types.js';
 /**
  * EL-4: Convert known infinite integer sets to their equivalent Limits bounds.
  * Returns undefined if the set cannot be converted to a Limits form.
@@ -7406,8 +7685,12 @@ export declare function convertInfiniteSetToLimits(domainSymbol: string): {
 export declare function classifyBigopDomain(body: Expression | undefined, indexes: ReadonlyArray<Expression>, ce: ComputeEngine): 'finite' | 'numeric' | 'symbolic';
 /**
  * Attempt a symbolic closed form for `Sum(body, [index, lower, upper])` when the
- * domain is symbolic (free bounds). Currently handles telescoping sums:
- *   Σ_{k=a}^{b} (g(k+1) − g(k)) = g(b+1) − g(a)   (and the mirror orientation).
+ * domain is symbolic (free bounds or a body with free variables beyond the
+ * index). Handles:
+ *   - telescoping sums `Σ_{k=a}^{b} (g(k+1) − g(k)) = g(b+1) − g(a)` (and the
+ *     mirror orientation);
+ *   - the geometric series `Σ_{k=n₀}^∞ c·rᵏ` in a free ratio `r` (infinite upper
+ *     bound), emitting `When(c·r^{n₀}/(1 − r), |r| < 1)`.
  * Returns undefined when no closed form applies (caller keeps it symbolic).
  */
 export declare function symbolicSumClosedForm(body: Expression | undefined, limits: Expression, ce: ComputeEngine): Expression | undefined;
@@ -7423,7 +7706,10 @@ export declare function symbolicProductClosedForm(body: Expression | undefined, 
 /**
  * Attempt a closed form for `Sum(body, [index, lower, +∞])` on an infinite
  * upper domain. Handles:
- *   - p-series `Σ_{k=1}^∞ k^{-s} = ζ(s)` (exact real `s > 1`);
+ *   - p-series `Σ_{k=a}^∞ k^{-s} = ζ(s) − Σ_{k=1}^{a−1} k^{-s}`
+ *     (exact real `s > 1`, positive-integer `a`);
+ *   - geometric series `Σ_{k=n₀}^∞ c·rᵏ = c·r^{n₀}/(1 − r)` for numeric
+ *     `|r| < 1` (divergent numeric ratios stay symbolic);
  *   - term-wise splitting `Σ (f + g) = Σ f + Σ g`, applied ONLY when every
  *     summand individually has a known closed form (each piece's convergence is
  *     then established by that closed form's own validity — absolute
@@ -7458,6 +7744,17 @@ export declare function infiniteProductClosedForm(body: Expression | undefined, 
  * p-series whose expansion is not in integer powers of `1/N`).
  */
 export declare function acceleratedInfiniteSum(body: Expression | undefined, limits: Expression, ce: ComputeEngine): Expression | undefined;
+/**
+ * Accelerated `.N()` of a convergent infinite product
+ * `Π_{k=a}^∞ f(k)`. For positive real factors, accumulate
+ * `L(N) = Σ log(f(k))` and Richardson-extrapolate `L(N)` using the same
+ * doubling schedule as infinite sums, then return `exp(L(∞))`.
+ *
+ * Restricting factors to finite positive reals avoids branch/sign ambiguity
+ * and makes zero-crossing or oscillatory products fail closed to the existing
+ * truncation path.
+ */
+export declare function acceleratedInfiniteProduct(body: Expression | undefined, limits: Expression, ce: ComputeEngine): Expression | undefined;
 export type IndexingSet = {
     index: string | undefined;
     lower: number;
@@ -7565,7 +7862,7 @@ export type ReduceElementResult<T> = {
     status: 'error';
     reason: string;
 };
-/* 0.74.0 */import type { LibraryCategory } from '../latex-syntax/types.js';
+/* 0.77.0 */import type { LibraryCategory } from '../latex-syntax/types.js';
 import type { SymbolDefinitions, IComputeEngine as ComputeEngine, LibraryDefinition } from '../global-types.js';
 /**
  * The standard libraries bundled with the Compute Engine.
@@ -7595,19 +7892,19 @@ export declare function getStandardLibrary(categories?: LibraryCategory[] | Libr
  *
  */
 export declare function setSymbolDefinitions(engine: ComputeEngine, table: SymbolDefinitions): void;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const COMBINATORICS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { Expression, SymbolDefinitions, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, SymbolDefinitions, IComputeEngine as ComputeEngine } from '../global-types.js';
 /** True if `x` is one of the five distribution constructor expressions. */
 export declare function isDistributionExpression(x: Expression): boolean;
 export declare const DISTRIBUTIONS_LIBRARY: SymbolDefinitions[];
 export declare function distributionMean(ce: ComputeEngine, dist: Expression): Expression | undefined;
 export declare function distributionVariance(ce: ComputeEngine, dist: Expression): Expression | undefined;
 export declare function distributionStandardDeviation(ce: ComputeEngine, dist: Expression): Expression | undefined;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const LOGIC_LIBRARY: SymbolDefinitions;
 export declare const LOGIC_FUNCTION_LIBRARY: SymbolDefinitions;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Arithmetic helpers for Quantity expressions.
  *
  * Extracted from arithmetic.ts to keep that file focused on scalar
@@ -7644,17 +7941,17 @@ export declare function quantityDivide(ce: ComputeEngine, num: Expression, den: 
  * Raise a Quantity to a power.
  */
 export declare function quantityPower(ce: ComputeEngine, base: Expression, exp: Expression): Expression | undefined;
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json.js';
 export declare function randomExpression(level?: number): MathJsonExpression;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 import '../symbolic/explain-derivative.js';
 export declare const CALCULUS_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export type CanonicalArithmeticOperators = 'Add' | 'Negate' | 'Multiply' | 'Divide' | 'Power' | 'Sqrt' | 'Root' | 'Ln';
 export declare const ARITHMETIC_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const CONTROL_STRUCTURES_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { Type } from '../../common/type/types.js';
+/* 0.77.0 */import type { Type } from '../../common/type/types.js';
 import type { Expression, SymbolDefinitions } from '../global-types.js';
 /**
  * Three-valued type membership test used by the `contains` handlers of the
@@ -7682,11 +7979,11 @@ import type { Expression, SymbolDefinitions } from '../global-types.js';
  */
 export declare function typeMembership(x: Expression, t: Type): boolean | undefined;
 export declare const SETS_LIBRARY: SymbolDefinitions;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const COLORS_LIBRARY: SymbolDefinitions;
-/* 0.74.0 */import type { SymbolDefinitions } from '../global-types.js';
+/* 0.77.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const TRIGONOMETRY_LIBRARY: SymbolDefinitions[];
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Quantifier domain helpers and boolean analysis functions.
  * Extracted from logic.ts for better code organization.
@@ -7922,7 +8219,7 @@ export declare function minimalDNF(expr: Expression, ce: ComputeEngine): Express
  * @returns The minimal CNF, or null if too many variables
  */
 export declare function minimalCNF(expr: Expression, ce: ComputeEngine): Expression | null;
-/* 0.74.0 */import type { BoxedDefinition } from './types-definitions.js';
+/* 0.77.0 */import type { BoxedDefinition } from './types-definitions.js';
 import type { IComputeEngine as ComputeEngine } from './types-engine.js';
 import type { Expression, ExpressionInput } from './types-expression.js';
 import type { Assumption as KernelAssumption, AssignValue as KernelAssignValue, BoxedRule as KernelBoxedRule, BoxedRuleSet as KernelBoxedRuleSet, EvaluateOptions as KernelEvaluateOptions, EvalContext as KernelEvalContext, ExpressionMapInterface as KernelExpressionMapInterface, Rule as KernelRule, RuleConditionFunction as KernelRuleConditionFunction, RuleFunction as KernelRuleFunction, RuleReplaceFunction as KernelRuleReplaceFunction, RuleStep as KernelRuleStep, RuleSteps as KernelRuleSteps, ExplainStep as KernelExplainStep, Explanation as KernelExplanation, Scope as KernelScope } from './types-kernel-evaluation.js';
@@ -7993,13 +8290,13 @@ export type AssignValue = KernelAssignValue<Expression, ExpressionInput, Compute
 export type Scope = KernelScope<BoxedDefinition>;
 /** Evaluation context specialized to this engine/runtime model. */
 export type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
-/* 0.74.0 */import type { Expression, BoxedSubstitution, IComputeEngine, AssumeResult } from './global-types.js';
+/* 0.77.0 */import type { Expression, BoxedSubstitution, IComputeEngine, AssumeResult } from './global-types.js';
 import type { MathJsonSymbol } from '../math-json/types.js';
 export declare function ask(ce: IComputeEngine, pattern: Expression): BoxedSubstitution[];
 export declare function verify(ce: IComputeEngine, query: Expression | string): boolean | undefined;
 export declare function assumeFn(ce: IComputeEngine, predicate: Expression | string): AssumeResult;
 export declare function forget(ce: IComputeEngine, symbol: undefined | MathJsonSymbol | MathJsonSymbol[]): void;
-/* 0.74.0 *//** @category Definitions */
+/* 0.77.0 *//** @category Definitions */
 export type Hold = 'none' | 'all' | 'first' | 'rest' | 'last' | 'most';
 /**
  * Controls how many digits a number is **displayed** with when serialized.
@@ -8252,7 +8549,7 @@ export type Substitution<T = unknown> = {
  * @category Pattern Matching
  */
 export type BoxedSubstitution<T = unknown> = Substitution<T>;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Quadrature for **conditionally-convergent oscillatory** semi-infinite
  * integrals — `∫ₐ^∞ f(x) dx` where `f` changes sign infinitely often
  * (`∫₀^∞ sin x/x = π/2`, `∫₀^∞ sin(x²) = √(π/8)`).
@@ -8271,7 +8568,7 @@ export declare function integrateSemiInfiniteOscillatory(f: (x: number) => numbe
     estimate: number;
     error: number;
 } | null;
-/* 0.74.0 */export declare function gcd(a: bigint, b: bigint): bigint;
+/* 0.77.0 */export declare function gcd(a: bigint, b: bigint): bigint;
 export declare function lcm(a: bigint, b: bigint): bigint;
 /**
  * Extended Euclidean algorithm: returns `[g, x, y]` with `a·x + b·y = g`,
@@ -8308,7 +8605,7 @@ export declare function reducedInteger(n: bigint): bigint | number;
  * @returns A generator that can be iterated for intermediate values, with the final value returned when the computation completes.
  */
 export declare function factorial(n: bigint): Generator<bigint, bigint>;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Unit registry: dimension vectors, SI base units, prefixes, and conversion.
  *
  * A DimensionVector encodes the exponents for each of the 7 SI base
@@ -8489,7 +8786,7 @@ export declare function parseUnitDSL(s: string): UnitExpression | null;
  * offsets (degC, degF) are handled correctly.
  */
 export declare function convertCompoundUnit(value: number, fromUnit: UnitExpression, toUnit: UnitExpression): number | null;
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 /** @internal */
 type IsInteger<N extends number> = `${N}` extends `${string}.${string}` ? never : `${N}` extends `-${string}.${string}` ? never : number;
 /** A `SmallInteger` is an integer < 1e6
@@ -8509,7 +8806,7 @@ export type Rational = [SmallInteger, SmallInteger] | [bigint, bigint];
 /** @category Numerics */
 export type BigNum = BigDecimal;
 export {};
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { BigNum } from './types.js';
 export declare function gammaln(z: number): number;
 export declare function gamma(z: number): number;
@@ -8969,7 +9266,7 @@ export declare function appellF1(a: number, b1: number, b2: number, c: number, x
 export declare function bigHypergeometric2F1(ce: ComputeEngine, a: BigNum, b: BigNum, c: BigNum, z: BigNum): BigNum;
 /** Bignum ₁F₁(a; b; z) for real arguments. */
 export declare function bigHypergeometric1F1(ce: ComputeEngine, a: BigNum, b: BigNum, z: BigNum): BigNum;
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 /**
  * All complex roots of a polynomial via the Durand–Kerner (Weierstrass)
  * iteration.
@@ -8988,7 +9285,7 @@ export declare function durandKernerRoots(coeffs: number[], deadline?: number): 
  * root finder does not converge.
  */
 export declare function realPolynomialRoots(coeffs: number[], deadline?: number): number[] | null;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Shared deterministic-PRNG helpers for Random/Shuffle/Sample.
  *
  * The hash matches the GLSL/WGSL formula used by the GPU compile target:
@@ -9032,11 +9329,11 @@ export declare function mulberry32(seed: number): () => number;
  * FNV-1a hash. Deterministic across hosts for the same input.
  */
 export declare function hashSeed(seed: number | string): number;
-/* 0.74.0 *//** Calculate the determinant of matrix
+/* 0.77.0 *//** Calculate the determinant of matrix
  *  Test: determinant([[1,3,7],[2,-1,4],[5,0,2]]) === 81
  */
 export declare function determinant(matrix: number[][]): number;
-/* 0.74.0 */export declare const LARGEST_SMALL_PRIME = 7919;
+/* 0.77.0 */export declare const LARGEST_SMALL_PRIME = 7919;
 export declare function primeFactors(n: number): {
     [factor: number]: number;
 };
@@ -9045,7 +9342,7 @@ export declare function isPrimeBigint(n: bigint): boolean;
 /** Modular exponentiation `base^exp mod mod` for `exp ≥ 0`, `mod ≥ 1`. */
 export declare function modPow(base: bigint, exp: bigint, mod: bigint): bigint;
 export declare function bigPrimeFactors(d: bigint): Map<bigint, number>;
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 export declare function mean(values: Iterable<number>): number;
 export declare function bigMean(values: Iterable<BigDecimal>): BigDecimal;
 export declare function median(values: Iterable<number>): number;
@@ -9074,15 +9371,15 @@ export declare function correlation(xsI: Iterable<number>, ysI: Iterable<number>
 export declare function bigCorrelation(xsI: Iterable<BigDecimal>, ysI: Iterable<BigDecimal>): BigDecimal;
 export declare function interquartileRange(values: Iterable<number>): number;
 export declare function bigInterquartileRange(values: Iterable<BigDecimal>): BigDecimal;
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json.js';
 export declare function bigintValue(expr: MathJsonExpression | null | undefined): bigint | null;
 /** Output a shorthand if possible */
 export declare function numberToExpression(num: number | bigint, fractionalDigits?: string | number): MathJsonExpression;
-/* 0.74.0 */export declare function monteCarloEstimate(f: (x: number) => number, a: number, b: number, n?: number, deadline?: number): {
+/* 0.77.0 */export declare function monteCarloEstimate(f: (x: number) => number, a: number, b: number, n?: number, deadline?: number): {
     estimate: number;
     error: number;
 };
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Pure-bigint Diophantine kernels: linear Diophantine systems, generalized
  * Pell equations (`x² − D·y² = N`), and modular square roots.
  *
@@ -9232,7 +9529,7 @@ export declare function solvePell(D: bigint, N: bigint): PellResult;
  * full symmetric box rather than the minimal Robertson window.
  */
 export declare function bruteForcePell(D: bigint, N: bigint, bound?: bigint): [bigint, bigint][];
-/* 0.74.0 *//**
+/* 0.77.0 *//**
 
     Translated from https://github.com/JuliaMath/Richardson.jl/blob/master/src/Richardson.jl
 
@@ -9313,7 +9610,7 @@ you can accelerate convergence by passing `power=2`.
 
  */
 export declare function extrapolate(f: (x: number) => number, x0: number, options?: ExtrapolateOptions): [val: number, err: number];
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Least integer `k ∈ [kMin, kMax]` with `cdf(k) ≥ prob`, found by a monotone
  * search seeded from the normal approximation. `kMax` may be `+∞` (Poisson).
  */
@@ -9322,7 +9619,7 @@ export declare function discreteQuantile(cdf: (k: number) => number, prob: numbe
 export declare function binomialQuantile(n: number, p: number, prob: number, deadline?: number): number;
 /** Quantile of Poisson(λ) at probability `prob` (a non-negative integer). */
 export declare function poissonQuantile(lambda: number, prob: number, deadline?: number): number;
-/* 0.74.0 */import type { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import type { BigDecimal } from '../../big-decimal/index.js';
 import type { DisplayDigits } from '../types-kernel-serialization.js';
 /**
  * Round a value to `n` significant figures, returning a value of the same kind
@@ -9374,7 +9671,7 @@ export declare function roundMeasurementForDisplay(value: number, error: number,
 };
 export declare function fromDigits(s: string, baseInput?: string | number): [result: number, rest: string];
 export declare function numberToString(num: number | bigint, fractionalDigits?: number | string): string;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Exact Bernoulli numbers and exact values of the Riemann zeta function at
  * integers, computed with bigint rationals.
  *
@@ -9413,7 +9710,7 @@ export declare function zetaEvenCoefficient(k: number): [bigint, bigint];
  * the odd Bernoulli numbers B₃, B₅, … vanish).
  */
 export declare function zetaNegativeInteger(n: number): [bigint, bigint];
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /** An interval is a continuous set of real numbers */
 export type Interval = {
     start: number;
@@ -9425,13 +9722,13 @@ export declare function interval(expr: Expression): Interval | undefined;
 export declare function intervalContains(int: Interval, val: number): boolean;
 /** Return true if int1 is a subset of int2 */
 export declare function intervalSubset(int1: Interval, int2: Interval): boolean;
-/* 0.74.0 */export {};
+/* 0.77.0 */export {};
 declare module 'complex-esm' {
     interface Complex {
         equals(a: number | Complex): boolean;
     }
 }
-/* 0.74.0 */export type RK4Options = {
+/* 0.77.0 */export type RK4Options = {
     steps: number;
     deadline?: number;
 };
@@ -9447,7 +9744,7 @@ export declare function rk4(f: (x: number, y: number) => number, x0: number, y0:
  * y' = f(x, y), y(x0) = y0.
  */
 export declare function rk4System(f: (x: number, y: readonly number[]) => readonly number[] | undefined, x0: number, y0: readonly number[], x1: number, options: RK4Options): ODEVectorSample[] | undefined;
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import './complex-esm-augment.js';
 /**
  * Gamma function for a complex argument, via the Lanczos approximation.
@@ -9609,7 +9906,7 @@ export declare function dedekindEta(tau: Complex): Complex;
  * close to 1 to converge at machine precision.
  */
 export declare function eisensteinE(s: number, tau: Complex): Complex;
-/* 0.74.0 */export declare const DEFAULT_PRECISION = 21;
+/* 0.77.0 */export declare const DEFAULT_PRECISION = 21;
 export declare const MACHINE_PRECISION_BITS = 53;
 export declare const MACHINE_PRECISION: number;
 export declare const DEFAULT_TOLERANCE = 1e-10;
@@ -9687,7 +9984,7 @@ export declare function cantorEnumeratePositiveRationals(): Generator<[
 export declare function cantorEnumerateComplexNumbers(): Generator<[number, number]>;
 export declare function cantorEnumerateIntegers(): Generator<number>;
 export declare function cantorEnumerateNaturalNumbers(): Generator<number>;
-/* 0.74.0 */import type { BigNum } from './types.js';
+/* 0.77.0 */import type { BigNum } from './types.js';
 export declare function gcd(a: BigNum, b: BigNum): BigNum;
 export declare function lcm(a: BigNum, b: BigNum): BigNum;
 export declare function factorial2(n: BigNum): Generator<BigNum, BigNum>;
@@ -9704,7 +10001,7 @@ export declare function factorial2(n: BigNum): Generator<BigNum, BigNum>;
  * its own `toNumber()` (via the shortest-string form a JSON number would emit).
  */
 export declare function isInMachineRange(d: BigNum): boolean;
-/* 0.74.0 */import { Rational, SmallInteger } from './types.js';
+/* 0.77.0 */import { Rational, SmallInteger } from './types.js';
 export declare function isRational(x: unknown | null): x is Rational;
 export declare function isMachineRational(x: unknown | null): x is [SmallInteger, SmallInteger];
 export declare function isBigRational(x: unknown | null): x is [bigint, bigint];
@@ -9741,8 +10038,29 @@ export declare function rationalGcd(lhs: Rational, rhs: Rational): Rational;
 export declare function reducedRational(r: [SmallInteger, SmallInteger]): [SmallInteger, SmallInteger];
 export declare function reducedRational(r: [bigint, bigint]): [bigint, bigint];
 export declare function reducedRational(r: Rational): Rational;
+/**
+ * Return `value / denom` as an exact reduced machine rational, or `null` if
+ * no exact representation is reachable.
+ *
+ * `value` may have a short decimal part (e.g. a DMS angle total in seconds
+ * with decimal seconds): it is scaled by a power of ten (up to 10^6) until
+ * it lands on a safe integer. Returns `null` for dirty floats that never
+ * scale to an integer and for magnitudes beyond safe-integer range — callers
+ * should then fall back to float arithmetic rather than feed non-integers to
+ * `reducedRational()`, which would produce NaN.
+ */
+export declare function reducedRationalFromDecimal(value: number, denom: SmallInteger): [SmallInteger, SmallInteger] | null;
 /** Return a rational approximation of x */
-export declare function rationalize(x: number): [n: number, d: number] | number;
+/**
+ * Approximate `x` by a rational `[n, d]` via its continued-fraction
+ * convergents.
+ *
+ * With no `tolerance`, expand to full working precision. With a positive
+ * `tolerance`, stop at the first convergent that approximates `x` to within it
+ * — the rational with the smallest denominator inside the bound
+ * (`rationalize(Math.sqrt(3), 1/500)` → `[26, 15]`).
+ */
+export declare function rationalize(x: number, tolerance?: number): [n: number, d: number] | number;
 /** Return [factor, root] such that factor * sqrt(root) = sqrt(n)
  * when factor and root are rationals
  */
@@ -9763,9 +10081,9 @@ export declare function reduceRationalSquareRoot(n: Rational): [factor: Rational
  * factor magnitudes at/above `Number.MAX_SAFE_INTEGER`.
  */
 export declare function reduceRationalRoot(n: Rational, exponent: number): [factor: Rational, radicand: Rational];
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 export declare function bigint(a: BigDecimal | number | bigint | string): bigint | null;
-/* 0.74.0 */import type { IComputeEngine, Scope } from './global-types.js';
+/* 0.77.0 */import type { IComputeEngine, Scope } from './global-types.js';
 export declare function pushScope(ce: IComputeEngine, scope?: Scope, name?: string): void;
 export declare function popScope(ce: IComputeEngine): void;
 export declare function pushEvalContext(ce: IComputeEngine, scope: Scope, name?: string): void;
@@ -9775,7 +10093,7 @@ export declare function printStack(ce: IComputeEngine, options?: {
     details?: boolean;
     maxDepth?: number;
 }): void;
-/* 0.74.0 */import type { RulePurpose } from '../types-kernel-evaluation.js';
+/* 0.77.0 */import type { RulePurpose } from '../types-kernel-evaluation.js';
 import type { BoxedSubstitution } from '../types-serialization.js';
 /** Raw MathJSON — the artifact is plain JSON. */
 export type FungrimMathJson = unknown;
@@ -9935,7 +10253,7 @@ export type IdentitiesLoadOptions = FungrimLoadOptions;
 export type IdentitiesLoadReport = FungrimLoadReport;
 export type IdentitiesRuleData = FungrimRuleData;
 export type IdentitiesGuardUndecidedHandler = FungrimGuardUndecidedHandler;
-/* 0.74.0 */import type { IComputeEngine } from '../types-engine.js';
+/* 0.77.0 */import type { IComputeEngine } from '../types-engine.js';
 import type { FungrimLoadOptions, FungrimLoadReport, FungrimRuleData } from './types.js';
 /** The compiled artifact (the whole slice, bundled as JSON). */
 export declare const FUNGRIM_CORE: FungrimRuleData;
@@ -9948,16 +10266,16 @@ export declare const FUNGRIM_CORE: FungrimRuleData;
  * symbols that could shadow shell heads.
  */
 export declare function loadIdentities(ce: IComputeEngine, options?: FungrimLoadOptions): FungrimLoadReport;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, LibraryDefinition } from './global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, LibraryDefinition } from './global-types.js';
 export declare function resolveBootstrapLibraries(libraries?: readonly (string | LibraryDefinition)[]): LibraryDefinition[];
 export declare function loadLibraryDefinitions(engine: ComputeEngine, libraries: readonly LibraryDefinition[]): void;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Leaf module for shared constants used across boxed-expression modules.
  * No imports from sibling modules to avoid circular dependencies.
  */
 /** Default complexity for operators that don't specify one */
 export declare const DEFAULT_COMPLEXITY = 100000;
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json/types.js';
 import type { SimplifyOptions, ExplainOperation, ExplainOptions, Explanation, ReplaceOptions, PatternMatchOptions, Expression, BoxedBaseDefinition, BoxedOperatorDefinition, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, EvaluateOptions, IComputeEngine as ComputeEngine, Metadata, Rule, Sign, Substitution, Scope, BoxedValueDefinition, ExpressionInput, FunctionInterface } from '../global-types.js';
 import { Type } from '../../common/type/types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
@@ -10008,7 +10326,6 @@ export declare class BoxedFunction extends _BoxedExpression implements FunctionI
     get isCanonical(): boolean;
     get isPure(): boolean;
     get isConstant(): boolean;
-    get constantValue(): number | boolean | string | object | undefined;
     get json(): MathJsonExpression;
     get operator(): string;
     get ops(): ReadonlyArray<Expression>;
@@ -10041,8 +10358,8 @@ export declare class BoxedFunction extends _BoxedExpression implements FunctionI
     get isNaN(): boolean | undefined;
     get isInfinity(): boolean | undefined;
     get isFinite(): boolean | undefined;
-    get isOne(): boolean | undefined;
-    get isNegativeOne(): boolean | undefined;
+    get _isOne(): boolean | undefined;
+    get _isNegativeOne(): boolean | undefined;
     get isPositive(): boolean | undefined;
     get isNonNegative(): boolean | undefined;
     get isNegative(): boolean | undefined;
@@ -10098,7 +10415,7 @@ export declare class BoxedFunction extends _BoxedExpression implements FunctionI
     _computeValue(options?: Partial<EvaluateOptions>): () => Expression;
     _computeValueAsync(options?: Partial<EvaluateOptions>): () => Promise<Expression>;
 }
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 type ComplexResult = {
     re: number;
     im: number;
@@ -10116,7 +10433,7 @@ export declare function _setCompile(fn: CompileFn): void;
  */
 export declare function stochasticEqual(a: Expression, b: Expression): boolean | undefined;
 export {};
-/* 0.74.0 */import type { Expression, PatternMatchOptions, BoxedSubstitution, IComputeEngine as ComputeEngine, Metadata, DictionaryInterface } from '../global-types.js';
+/* 0.77.0 */import type { Expression, PatternMatchOptions, BoxedSubstitution, IComputeEngine as ComputeEngine, Metadata, DictionaryInterface, EvaluateOptions } from '../global-types.js';
 import { _BoxedExpression } from './abstract-boxed-expression.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 import { DictionaryValue, MathJsonExpression } from '../../math-json/types.js';
@@ -10158,9 +10475,10 @@ export declare class BoxedDictionary extends _BoxedExpression implements Diction
     get keys(): string[];
     get entries(): [string, Expression][];
     get values(): Expression[];
+    evaluate(options?: Partial<EvaluateOptions>): Expression;
     match(pattern: Expression, _options?: PatternMatchOptions): BoxedSubstitution | null;
 }
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json/types.js';
 import type { IComputeEngine as ComputeEngine, Expression, JsonSerializationOptions } from '../global-types.js';
 interface ProductLike {
     asRationalExpression(): Expression;
@@ -10172,7 +10490,7 @@ type ProductConstructor = new (ce: ComputeEngine, xs?: ReadonlyArray<Expression>
 export declare function _setProduct(fn: ProductConstructor): void;
 export declare function serializeJson(ce: ComputeEngine, expr: Expression, options: Readonly<JsonSerializationOptions>): MathJsonExpression;
 export {};
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Reduce a linear congruence `Congruent(lhs, rhs, m)` to a single normalized
  * residue class `x ≡ r (mod m')`.
@@ -10194,7 +10512,46 @@ export declare function congruenceResidue(expr: Expression, x: string): {
  * (not linear, symbolic modulus, non-integer coefficients, …).
  */
 export declare function solveCongruence(ce: ComputeEngine, expr: Expression, x: string): Expression[] | undefined;
-/* 0.74.0 */import type { Expression, PatternMatchOptions, BoxedSubstitution, IComputeEngine as ComputeEngine, Metadata, StringInterface } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/**
+ * Producer-side chokepoint for a conditional value (conditional-values design,
+ * decision 7). Resolves a *decidable* guard against evaluation + the assumption
+ * store:
+ *   - guard evaluates to `True`  → the bare `value` (guard discharged);
+ *   - guard evaluates to `False` → `null` (the caller prunes / declines — the
+ *     solution-set pruning contract, decision 8);
+ *   - otherwise (undecidable)    → `When(value, guard)`, retained until the
+ *     guard becomes decidable.
+ *
+ * A single chokepoint enforces "emit `When` only when genuinely undecidable" in
+ * one place. Every `When`-producer (Solve validity conditions, Sum/Integrate
+ * convergence conditions) routes through here, so decidable guards keep the
+ * pre-conditional behavior exactly.
+ */
+export declare function conditionalValue(ce: ComputeEngine, value: Expression, guard: Expression): Expression | null;
+/* 0.77.0 */import type { Expression } from '../global-types.js';
+import type { Type } from '../../common/type/types.js';
+/** The name of a single `Function` parameter operand, unwrapping a `Typed`
+ * annotation. Returns `''` when the operand is not a symbol (matching the
+ * historical `isSymbol(p) ? p.symbol : ''` idiom). */
+export declare function functionLiteralParameterName(param: Expression): string;
+/** The declared type of a single `Function` parameter operand, or `undefined`
+ * for a bare (unannotated) parameter. */
+export declare function functionLiteralParameterType(param: Expression): Type | undefined;
+/** The parameters of a `Function` literal, as `{ name, type }` records. Bare
+ * parameters have `type: undefined`. */
+export declare function functionLiteralParameters(expr: Expression): {
+    name: string;
+    type: Type | undefined;
+}[];
+/** The ascribed return type of a `Function` literal (the §4.2 marker: a
+ * `Typed` wrapping the body Block's last statement), or `undefined` when the
+ * return type is left to inference. */
+export declare function functionLiteralReturnType(expr: Expression): Type | undefined;
+/** The body of a `Function` literal (the scoped `Block`, return-type marker
+ * included). */
+export declare function functionLiteralBody(expr: Expression): Expression | undefined;
+/* 0.77.0 */import type { Expression, PatternMatchOptions, BoxedSubstitution, IComputeEngine as ComputeEngine, Metadata, StringInterface } from '../global-types.js';
 import { _BoxedExpression } from './abstract-boxed-expression.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 /**
@@ -10222,7 +10579,7 @@ export declare class BoxedString extends _BoxedExpression implements StringInter
     get unicodeScalars(): number[];
     match(pattern: Expression, _options?: PatternMatchOptions): BoxedSubstitution | null;
 }
-/* 0.74.0 */import type { ExpressionInput, Expression, CanonicalOptions, IComputeEngine as ComputeEngine, Metadata, Scope } from '../global-types.js';
+/* 0.77.0 */import type { ExpressionInput, Expression, CanonicalOptions, IComputeEngine as ComputeEngine, Metadata, Scope } from '../global-types.js';
 import type { FormOption } from '../types-serialization.js';
 import type { MathJsonSymbol } from '../../math-json/types.js';
 import { NumericValue } from '../numeric-value/types.js';
@@ -10313,38 +10670,14 @@ export declare function boxFunction(ce: ComputeEngine, name: MathJsonSymbol, ops
     structural?: boolean;
     scope?: Scope;
 }): Expression;
-/**
- * Notes about the boxed form:
- *
- * [1] MathJsonExpression with an operator of `Number`, `String`, `Symbol` and `Dictionary`
- *      are converted to the corresponding atomic expression.
- *
- * [2] Expressions with an operator of `Complex` are converted to a (complex) number
- *     or a `Add`/`Multiply` expression.
- *
- *     The precedence of `Complex` (for serialization) is sometimes the
- *     precedence of `Add` (when re and im != 0), sometimes the precedence of
- *    `Multiply` (when im or re === 0). Using a number or an explicit
- *    `Add`/`Multiply` expression avoids this ambiguity.
- *
- * [3] An expression with a `Rational` operator is converted to a rational
- *    number if possible, to a `Divide` otherwise.
- *
- * [4] A `Negate` function applied to a number literal is converted to a number.
- *
- *     Note that `Negate` is only distributed over addition. In practice, having
- * `Negate` factored on multiply/divide is more useful to detect patterns.
- *
- * Note that this function should only be called from `ce.expr()`
- *
- */
+export declare function beginInferenceTransaction(ce: ComputeEngine): () => void;
 export declare function box(ce: ComputeEngine, expr: null | undefined | NumericValue | ExpressionInput, options?: {
     canonical?: CanonicalOptions;
     structural?: boolean;
     scope?: Scope;
 }): Expression;
 export declare function semiCanonical(ce: ComputeEngine, xs: ReadonlyArray<ExpressionInput>, scope?: Scope): ReadonlyArray<Expression>;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, Rule, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, Rule, RuleSteps } from '../global-types.js';
 /** The candidate roots as equations: `x = r` for a single root, a `List` of
  * `x = rᵢ` equations otherwise.
  * @internal exported for `expr.explain('solve')` (explain.ts) */
@@ -10360,7 +10693,7 @@ export declare function findUnivariateRoots(expr: Expression, x: string, depth?:
 /** Harmonization rules transform an expr into one or more equivalent
  * expressions that are easier to solve */
 export declare const HARMONIZATION_RULES: Rule[];
-/* 0.74.0 */import type { Expression, SimplifyOptions, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { Expression, SimplifyOptions, RuleSteps } from '../global-types.js';
 type InternalSimplifyOptions = SimplifyOptions & {
     useVariations: boolean;
     /** When set (only by `expr.explain()`), `simplifyOperands` records the
@@ -10371,7 +10704,7 @@ type InternalSimplifyOptions = SimplifyOptions & {
 };
 export declare function simplify(expr: Expression, options?: Partial<InternalSimplifyOptions>, steps?: RuleSteps): RuleSteps;
 export {};
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
 /** A validated `Solve` unknown specification. */
 export interface SolveSpec {
     /** The unknown's symbol name. */
@@ -10441,9 +10774,9 @@ export declare function solveOverMultipleDomains(ce: ComputeEngine, ceq: Express
  * is simply not seen here — no explicit teardown is needed.
  */
 export declare function filterRootsByAssumptions(ce: ComputeEngine, roots: ReadonlyArray<Expression>, unknown: string): ReadonlyArray<Expression>;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export declare function isPrime(expr: Expression): boolean | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export { totalDegree, maxDegree, lex, revlex } from './polynomial-degree.js';
 /**
  * Coefficient of a univariate (single variable) polynomial.
@@ -10577,7 +10910,7 @@ export declare function polynomialGCDMulti(ops: ReadonlyArray<Expression>): Expr
  * - `cancelCommonFactors((x+1)/(x^2+3x+2), 'x')` → 1/(x+2)
  */
 export declare function cancelCommonFactors(expr: Expression, variable: string): Expression;
-/* 0.74.0 */import type { Expression, ExplainOperation, ExplainOptions, Explanation, ExplainStep, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { Expression, ExplainOperation, ExplainOptions, Explanation, ExplainStep, RuleSteps } from '../global-types.js';
 /**
  * Build a structured, step-by-step `Explanation` for an operation applied
  * to `expr`. See `BoxedExpression.explain()` for the public contract.
@@ -10599,11 +10932,11 @@ export declare function explainExpression(expr: Expression, operation?: ExplainO
  */
 export declare function curateChain(initial: Expression, trace: RuleSteps, verbosity: 'default' | 'all'): ExplainStep[];
 export {};
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 export declare function canonicalInvisibleOperator(ops: ReadonlyArray<Expression>, { engine: ce }: {
     engine: ComputeEngine;
 }): Expression | null;
-/* 0.74.0 */import { Type } from '../../common/type/types.js';
+/* 0.77.0 */import { Type } from '../../common/type/types.js';
 import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Check that the number of arguments is as expected.
@@ -10659,10 +10992,10 @@ export declare function checkPure(ce: ComputeEngine, arg: Expression | Expressio
  * -->
  *
  */
-export declare function validateArguments(ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean): ReadonlyArray<Expression> | null;
+export declare function validateArguments(ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean, inferredBefore?: ReadonlySet<string>): ReadonlyArray<Expression> | null;
 export declare function spellCheckMessage(expr: Expression): string;
-/* 0.74.0 */export {};
-/* 0.74.0 */import type { BoxedSubstitution, ExpressionInput, PatternMatchOptions, Expression } from '../global-types.js';
+/* 0.77.0 */export {};
+/* 0.77.0 */import type { BoxedSubstitution, ExpressionInput, PatternMatchOptions, Expression } from '../global-types.js';
 /**
  * The function attempts to match a subject expression to a
  * [pattern](/compute-engine/guides/patterns-and-rules/).
@@ -10703,7 +11036,7 @@ export declare function spellCheckMessage(expr: Expression): string;
  *
  */
 export declare function match(subject: Expression, pattern: string | ExpressionInput, options?: PatternMatchOptions): BoxedSubstitution | null;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds, Sign } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds, Sign } from '../global-types.js';
 /**
  * Constraint subjects (docs/fungrim/FUNGRIM-PLAN-3-ASSUMPTIONS.md §2).
  *
@@ -10896,7 +11229,7 @@ export declare function relationFromChains(ce: ComputeEngine, a: string, b: stri
  */
 export declare function signFromChains(ce: ComputeEngine, expr: Expression): Sign | undefined;
 export {};
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Evaluate an integer-valued expression in ℤ/mℤ without materializing
  * intermediate values. `m` must be a positive bigint. Returns the canonical
@@ -10912,7 +11245,7 @@ export {};
  * `3486784401`, so no extra evaluation is needed.
  */
 export declare function reduceModulo(expr: Expression, m: bigint): bigint | null;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 export declare function canonicalNegate(expr: Expression): Expression;
 /**
  * Distribute `Negate` (multiply by -1) if expr is a number literal, an
@@ -10923,7 +11256,7 @@ export declare function canonicalNegate(expr: Expression): Expression;
  */
 export declare function negate(expr: Expression): Expression;
 export declare function negateProduct(ce: ComputeEngine, args: ReadonlyArray<Expression>): Expression;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
 /**
  * Multivariate polynomial GCD over ℤ via **Brown's dense modular algorithm**
  * (ROADMAP B11, Stage B).
@@ -10941,7 +11274,7 @@ export declare function negateProduct(ce: ComputeEngine, args: ReadonlyArray<Exp
  * Fateman-power-7-scale coefficient growth).
  */
 export declare function multivariateGCD(ce: ComputeEngine, a: Expression, b: Expression, vars: string[]): Expression | null;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, IntervalBounds } from '../global-types.js';
 import { type Subject } from './constraint-subject.js';
 /**
  * Extract interval bounds for `symbol` from a condition expression.
@@ -10984,7 +11317,7 @@ export declare function extractIntervalBounds(expr: Expression, symbol: string):
  * @returns The `IntervalBounds` (same shape used by `extractIntervalBounds`).
  */
 export declare function getInequalityBoundsFromAssumptions(ce: ComputeEngine, subject: string | Subject): IntervalBounds;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { Rational } from '../numerics/types.js';
 export declare function asRadical(expr: Expression): Rational | null;
 /**
@@ -11022,7 +11355,7 @@ export declare function pow(x: Expression, exp: number | Expression, { numericAp
 export declare function root(a: Expression, b: Expression, { numericApproximation }: {
     numericApproximation: boolean;
 }): Expression;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * The total degree of an expression is the sum of the
  * positive integer degrees of the factors in the expression:
@@ -11040,7 +11373,7 @@ export declare function totalDegree(expr: Expression): number;
 export declare function maxDegree(expr: Expression): number;
 export declare function lex(expr: Expression): string;
 export declare function revlex(expr: Expression): string;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Labeling layer for `expr.explain()`.
  *
  * Maps the machine ids of rules and algorithmic phases (the `because`
@@ -11080,14 +11413,14 @@ export declare function registerStepLabels(labels: Record<string, string>): void
  * from a prettifier over the id itself.
  */
 export declare function labelFor(because: string): StepLabel;
-/* 0.74.0 */export type CachedValue<T> = {
+/* 0.77.0 */export type CachedValue<T> = {
     value: T | null;
     generation: number | undefined;
 };
 /** The cache v will get updated if necessary */
 export declare function cachedValue<T>(v: CachedValue<T>, generation: number | undefined, fn: () => T): T;
 export declare function cachedValueAsync<T>(v: CachedValue<T>, generation: number | undefined, fn: () => Promise<T>): Promise<T>;
-/* 0.74.0 */import type { Expression, OperatorDefinition, ValueDefinition, IComputeEngine as ComputeEngine, BoxedDefinition, TaggedValueDefinition, TaggedOperatorDefinition, BoxedOperatorDefinition, BoxedValueDefinition, DictionaryInterface } from '../global-types.js';
+/* 0.77.0 */import type { Expression, OperatorDefinition, ValueDefinition, IComputeEngine as ComputeEngine, BoxedDefinition, TaggedValueDefinition, TaggedOperatorDefinition, BoxedOperatorDefinition, BoxedValueDefinition, DictionaryInterface } from '../global-types.js';
 import { Type } from '../../common/type/types.js';
 import { NumericValue } from '../numeric-value/types.js';
 /**
@@ -11169,7 +11502,7 @@ export declare function isValueDef(def: BoxedDefinition | undefined): def is Tag
 export declare function isOperatorDef(def: BoxedDefinition | undefined): def is TaggedOperatorDefinition;
 export declare function updateDef(ce: ComputeEngine, name: string, def: BoxedDefinition, newDef: Partial<OperatorDefinition> | BoxedOperatorDefinition | Partial<ValueDefinition> | BoxedValueDefinition): void;
 export declare function placeholderDef(ce: ComputeEngine, name: string): BoxedDefinition;
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
 import type { Type, TypeString } from '../../common/type/types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
@@ -11368,12 +11701,14 @@ export declare abstract class _BoxedExpression implements Expression {
     reset(): void;
     get value(): Expression | undefined;
     set value(_value: unknown);
+    get constantValue(): number | boolean | string | object | undefined;
     get type(): BoxedType;
     set type(_type: Type | TypeString | BoxedType);
     get isNumber(): boolean | undefined;
     get isInteger(): boolean | undefined;
     get isRational(): boolean | undefined;
     get isReal(): boolean | undefined;
+    get isFunction(): boolean | undefined;
     toSignedFunction(): Expression | undefined;
     getInterval(symbol: string): import("../types-expression.js").IntervalBounds | undefined;
     simplify(_options?: Partial<SimplifyOptions>): Expression;
@@ -11396,9 +11731,9 @@ export declare abstract class _BoxedExpression implements Expression {
 }
 export declare function getSubexpressions(expr: Expression, name: MathJsonSymbol): ReadonlyArray<Expression>;
 export {};
-/* 0.74.0 */import type { Expression, CanonicalOptions, Scope } from '../global-types.js';
+/* 0.77.0 */import type { Expression, CanonicalOptions, Scope } from '../global-types.js';
 export declare function canonicalForm(expr: Expression, forms: CanonicalOptions, scope?: Scope): Expression;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  *
  * Optionally make all the arguments canonical (default).
@@ -11414,7 +11749,7 @@ export declare function canonicalForm(expr: Expression, forms: CanonicalOptions,
  */
 export declare function flatten<T extends ReadonlyArray<Expression> | Expression[]>(ops: T, operator?: string, canonicalize?: boolean): T;
 export declare function flattenSequence(xs: ReadonlyArray<Expression>): ReadonlyArray<Expression>;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
 /**
  * Symbolic diophantine solving for the `Solve` pipeline (Phase 3).
  *
@@ -11476,7 +11811,7 @@ export declare function freshParameters(ce: ComputeEngine, eq: Expression, count
  *   case. An individual `undefined` entry is treated as unbounded ℤ.
  */
 export declare function tryDiophantineSolve(ce: ComputeEngine, eq: Expression, unknowns: string[], domains: ReadonlyArray<Expression | undefined> | undefined): Expression[] | undefined;
-/* 0.74.0 */import type { BoxedRule, BoxedRuleSet, BoxedSubstitution, IComputeEngine as ComputeEngine, Rule, RulePurpose, RuleStep, RuleSteps, Expression, ReplaceOptions } from '../global-types.js';
+/* 0.77.0 */import type { BoxedRule, BoxedRuleSet, BoxedSubstitution, IComputeEngine as ComputeEngine, Rule, RulePurpose, RuleStep, RuleSteps, Expression, ReplaceOptions } from '../global-types.js';
 export declare const ConditionParent: {
     boolean: string;
     string: string;
@@ -11635,13 +11970,14 @@ export declare function matchAnyRulesWithSteps(expr: Expression, rules: BoxedRul
  * @param rules
  */
 export declare function matchAnyRules(expr: Expression, rules: BoxedRuleSet, sub: BoxedSubstitution, options?: Partial<ReplaceOptions>): Expression[];
-/* 0.74.0 */import type { Type, TypeString } from '../../common/type/types.js';
+/* 0.77.0 */import type { Type, TypeString } from '../../common/type/types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 import type { OperatorDefinition, Expression, BoxedOperatorDefinition, CollectionHandlers, CompiledExpression, EvaluateOptions, IComputeEngine as ComputeEngine, Scope, Sign } from '../global-types.js';
 export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition {
     engine: ComputeEngine;
     name: string;
     description?: string | string[];
+    keywords?: string[];
     url?: string;
     wikidata?: string;
     broadcastable: boolean;
@@ -11662,6 +11998,15 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
      * @internal
      */
     _isLambda: boolean;
+    /** When this operator definition was created from a user-defined function
+     * literal (`_isLambda === true`), this holds the boxed `Function` literal
+     * it was built from. Lets a *bare* symbol bound to this definition resolve
+     * to a first-class function value in value position (e.g. returning a
+     * locally-defined `helper` from a function body so it can escape its
+     * defining scope). `undefined` for built-in operators.
+     * @internal
+     */
+    _lambdaLiteral?: Expression;
     type?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
     }) => BoxedType | Type | TypeString | undefined;
@@ -11694,7 +12039,7 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
     infer(sig: Type): void;
     update(def: OperatorDefinition): void;
 }
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { Expression } from '../global-types.js';
 /**
@@ -11755,7 +12100,176 @@ export declare function apply(expr: Expression, fn: (x: number) => number | Comp
  */
 export declare function applyN(ops: ReadonlyArray<Expression>, fn: (...xs: number[]) => number | Complex, bigFn?: (...xs: BigDecimal[]) => BigDecimal | Complex | number, complexFn?: (...xs: Complex[]) => Complex): Expression | undefined;
 export declare function apply2(expr1: Expression, expr2: Expression, fn: (x1: number, x2: number) => number | Complex, bigFn?: (x1: BigDecimal, x2: BigDecimal) => BigDecimal | Complex | number, complexFn?: (x1: Complex, x2: number | Complex) => Complex | number): Expression | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression, EvaluateOptions, IComputeEngine as ComputeEngine } from '../global-types.js';
+/**
+ * `Match` dispatch — Cortex structural pattern matching
+ * (see `docs/plans/2026-07-12-cortex-match-design.md`).
+ *
+ * `["Match", subject, case₁, …, caseₙ]` where each `caseᵢ` is
+ * `["MatchCase", pattern, body]` or `["MatchCase", pattern, guard, body]`.
+ *
+ * Semantics:
+ * - The subject is evaluated **once** (always exactly, even under
+ *   `numericApproximation` — matching is structural), then matched against each
+ *   case pattern in order (first-match-wins).
+ * - Patterns hold engine wildcards (`_x`, `__x`, `___x`, anonymous `_`), matched
+ *   with the generic matcher (`expr.match`).
+ * - `["Pin", expr]` nodes inside a pattern are resolved once per match
+ *   evaluation: `expr` is evaluated in the current lexical scope and its value
+ *   is compared verbatim to the subject.
+ * - `["Alternatives", p₁, …, pₙ]` at the top level of a case pattern behaves
+ *   like `n` consecutive virtual cases sharing the case's guard and body.
+ *   Alternatives are binding-free by contract; a named wildcard inside an
+ *   alternative makes the whole `Match` an error value.
+ * - Each case body (and guard) is canonicalized as a `Function` closure over
+ *   the pattern's capture names and applied to the captured values on
+ *   selection — giving correct lexical shadowing (`e`/`i` bindings) and
+ *   hold-until-selected.
+ * - Guards must evaluate to `True` to select; `False` or undecidable falls
+ *   through to the next case (preserving totality).
+ * - No case matches → `["Error", "'match-no-case'", subject]`.
+ *
+ * ## The classification ladder (§4)
+ *
+ * A `match` whose cases are trivial must never pay for the generic matcher.
+ * Each case is classified **once**, at first evaluation of a canonical `Match`,
+ * into a tier, and the resulting dispatch plan is cached (see `getMatchPlan`):
+ *
+ * - **Tier 0 — constant dispatch.** Integer / string / boolean-or-constant
+ *   symbol literals (and pins of those), no guard, no bindings. A run of
+ *   consecutive tier-0 cases becomes one `Map<string, caseIndex>` probed in
+ *   O(1) on the evaluated subject.
+ * - **Tier 1 — literal chain.** Any literal (incl. floats/rationals), a pin of
+ *   any expression, optionally with a guard. Compared with the matcher's leaf
+ *   equality (`isEqual` for numbers) — see `leafEquals`.
+ * - **Tier 2 — fixed-shape destructuring.** `List`/`Tuple` patterns whose
+ *   elements are bindings, `_`, literals, pins, or nested fixed shapes, with at
+ *   most one `___rest`. Compiled into a flat positional extraction plan.
+ * - **Tier 3 — general.** Everything else falls back to the generic matcher —
+ *   the semantic reference implementation. Tiers 0–2 are observationally
+ *   identical to it (property-tested).
+ *
+ * Cases classify individually; consecutive same-tier cases group into segments
+ * executed in order, so first-match-wins holds across mixed tiers and a single
+ * tier-3 case in the middle never degrades the fast cases before it.
+ */
+type HandlerOptions = Partial<EvaluateOptions> & {
+    engine: ComputeEngine;
+};
+export type Tier = 0 | 1 | 2 | 3;
+/** A tier-0/1 leaf comparison target. */
+export type LeafTest = {
+    kind: 'literal';
+    value: Expression;
+} | {
+    kind: 'pin';
+    expr: Expression;
+};
+/** One positional element of a tier-2 `List`/`Tuple` shape (also the value slot
+ * of a tier-2 `Dictionary` shape). */
+export type ElementPlan = {
+    kind: 'bind';
+    key: string;
+} | {
+    kind: 'ignore';
+} | {
+    kind: 'literal';
+    value: Expression;
+} | {
+    kind: 'pin';
+    expr: Expression;
+} | {
+    kind: 'shape';
+    node: ShapeNode;
+};
+/** A tier-2 sequence shape (`List`/`Tuple`): fixed prefix, optional single rest,
+ * fixed suffix. */
+export interface SeqShapeNode {
+    kind: 'seq';
+    operator: string;
+    prefix: ElementPlan[];
+    rest: {
+        key: string | null;
+    } | undefined;
+    suffix: ElementPlan[];
+}
+/** A tier-2 dictionary shape: an **open** match on a set of named keys, each
+ * with an element-plan value. The subject must have (at least) every listed
+ * key, with each value matching the corresponding value plan; extra subject
+ * keys are ignored (open by default, per §2 pattern rule 7). */
+export interface DictShapeNode {
+    kind: 'dict';
+    entries: {
+        key: string;
+        value: ElementPlan;
+    }[];
+}
+/** A tier-2 fixed shape: a sequence (`List`/`Tuple`) or a dictionary. */
+export type ShapeNode = SeqShapeNode | DictShapeNode;
+export interface CompiledCase {
+    tier: Tier;
+    captureKeys: string[];
+    captureNames: string[];
+    hasGuard: boolean;
+    guard: Expression | undefined;
+    body: Expression;
+    guardClosure: Expression | undefined;
+    bodyClosure: Expression | undefined;
+    dispatchKeys?: {
+        key: string;
+        value: Expression;
+    }[];
+    tests?: LeafTest[];
+    shape?: ShapeNode;
+    rawPatterns?: Expression[];
+}
+export type Segment = {
+    kind: 'dispatch';
+    table: Map<string, number>;
+    constants: {
+        value: Expression;
+        index: number;
+    }[];
+    cases: CompiledCase[];
+} | {
+    kind: 'chain';
+    cases: CompiledCase[];
+};
+export interface MatchPlan {
+    /** Offending alternative if a binding appears inside an `Alternatives`; the
+     * whole `Match` is then an error value regardless of the subject. */
+    errorAlt: Expression | undefined;
+    segments: Segment[];
+}
+/** Evaluate a `["Match", subject, …cases]` expression. */
+export declare function evaluateMatch(ops: ReadonlyArray<Expression>, options: HandlerOptions): Expression;
+/**
+ * The pure tier-3 reference path: classify nothing, run every case through the
+ * generic matcher (the semantic reference implementation). Exported for the
+ * property test that asserts the laddered result equals the tier-3 result.
+ */
+export declare function evaluateMatchReference(ops: ReadonlyArray<Expression>, options: HandlerOptions): Expression;
+/** Build (or fetch from cache) the classification plan for a `Match`'s ops. */
+export declare function getMatchPlan(ce: ComputeEngine, ops: ReadonlyArray<Expression>): MatchPlan;
+/**
+ * The external references a `Match` case pattern contributes, for the compiler's
+ * reference analysis (`analyzeReferences`):
+ * - `captures`: bare names the pattern binds (they shadow the guard/body's free
+ *   symbols; not themselves free).
+ * - `pinExprs`: the operand of every `["Pin", e]` node — `e` is evaluated in the
+ *   enclosing scope at match time, so its free symbols ARE external references.
+ */
+export declare function matchPatternReferences(pattern: Expression): {
+    captures: string[];
+    pinExprs: Expression[];
+};
+/** Testing hooks (not part of the public API). */
+export declare const _forTesting: {
+    getMatchPlan: typeof getMatchPlan;
+    evaluateMatchReference: typeof evaluateMatchReference;
+};
+export {};
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /** Apply the function `f` to each operand of the expression `expr`,
  * account for the 'lazy' property of the operator definition:
  *
@@ -11765,14 +12279,14 @@ export declare function apply2(expr1: Expression, expr2: Expression, fn: (x1: nu
  */
 export declare function holdMap(expr: Expression, f: (x: Expression) => Expression | null): ReadonlyArray<Expression>;
 export declare function holdMapAsync(expr: Expression, f: (x: Expression) => Promise<Expression | null>): Promise<ReadonlyArray<Expression>>;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Rewrite exponentials of an imaginary argument to trigonometric form via
  * Euler's formula, `e^{i theta} -> cos(theta) + i sin(theta)`, throughout the
  * tree.
  */
 export declare function expToTrig(expr: Expression): Expression;
-/* 0.74.0 */import { Type } from '../../common/type/types.js';
+/* 0.77.0 */import { Type } from '../../common/type/types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
@@ -11797,7 +12311,7 @@ export declare class Terms {
     N(): Expression;
     asExpression(): Expression;
 }
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 import { NumericValue } from '../numeric-value/types.js';
 import type { Rational } from '../numerics/types.js';
 /**
@@ -11908,12 +12422,12 @@ export declare function expandProducts(ce: ComputeEngine, ops: ReadonlyArray<Exp
  */
 export declare function mul(...xs: ReadonlyArray<Expression>): Expression;
 export declare function mulN(...xs: ReadonlyArray<Expression>): Expression;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, Scope } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, Scope } from '../global-types.js';
 /**
  * Ensure all expressions in the array are in canonical form
  */
 export declare function canonical(ce: ComputeEngine, xs: ReadonlyArray<Expression>, scope?: Scope): ReadonlyArray<Expression>;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
 /**
  * `MPoly` — a distributed, sparse **multivariate polynomial over ℤ**.
  *
@@ -12009,7 +12523,7 @@ export declare function lexGreater(a: number[], b: number[]): boolean;
 export declare function mpolyFromBoxed(ce: ComputeEngine, expr: Expression, vars: string[]): MPoly | null;
 /** Convert an {@link MPoly} back to a canonical boxed expression. */
 export declare function mpolyToBoxed(ce: ComputeEngine, poly: MPoly): Expression;
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { Rational } from '../numerics/types.js';
 import type { Expression, ExpressionInput } from '../global-types.js';
@@ -12049,7 +12563,7 @@ export declare function toInteger(expr: Expression | undefined): number | null;
  * If the real part is not an integer, it is rounded to the nearest integer.
  */
 export declare function toBigint(expr: Expression | undefined): bigint | null;
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json/types.js';
 import type { IComputeEngine as ComputeEngine, TensorDataType, Metadata, BoxedBaseDefinition, BoxedOperatorDefinition, BoxedSubstitution, Substitution, CanonicalOptions, EvaluateOptions, Expression, SimplifyOptions, ExplainOperation, ExplainOptions, Explanation, PatternMatchOptions, Tensor, TensorInterface } from '../global-types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 import { NumericValue } from '../numeric-value/types.js';
@@ -12180,7 +12694,7 @@ export declare function expressionTensorInfo(operator: string, rows: ReadonlyArr
     shape: number[];
     dtype: TensorDataType;
 } | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /** Combine rational expressions into a single fraction */
 export declare function together(op: Expression): Expression;
 /**
@@ -12269,7 +12783,7 @@ export declare function factor(expr: Expression): Expression;
  * when called from the simplification pipeline.
  */
 export declare function partialFraction(expr: Expression, variable: string): Expression;
-/* 0.74.0 */import type { Expression, DisplayDigits } from '../global-types.js';
+/* 0.77.0 */import type { Expression, DisplayDigits } from '../global-types.js';
 export type AsciiMathSerializer = (expr: Expression, precedence?: number) => string;
 export type AsciiMathOptions = {
     symbols: Record<string, string>;
@@ -12279,7 +12793,7 @@ export type AsciiMathOptions = {
     digits?: DisplayDigits;
 };
 export declare function toAsciiMath(expr: Expression, options?: Partial<AsciiMathOptions>, precedence?: number): string;
-/* 0.74.0 */import type { Expression, ExpressionMapInterface } from '../global-types.js';
+/* 0.77.0 */import type { Expression, ExpressionMapInterface } from '../global-types.js';
 export declare class ExpressionMap<U> implements ExpressionMapInterface<U> {
     readonly _items: Map<Expression, U>;
     constructor(source?: ExpressionMapInterface<U> | readonly (readonly [Expression, U])[]);
@@ -12291,7 +12805,7 @@ export declare class ExpressionMap<U> implements ExpressionMapInterface<U> {
     [Symbol.iterator](): IterableIterator<[Expression, U]>;
     entries(): IterableIterator<[Expression, U]>;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * # Pattern Matching Wildcards
  *
  * Patterns can contain wildcards that match parts of expressions. There are
@@ -12366,7 +12880,7 @@ export { isWildcard, wildcardName, wildcardType };
  * @throws Error if the pattern contains invalid wildcard combinations
  */
 export declare function validatePattern(pattern: Expression): void;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, RuleSteps } from '../global-types.js';
 /** Solve a system of equations or inequalities given as an array of
  * expressions (from List or And). Returns null if no solution found.
  *
@@ -12386,7 +12900,7 @@ export declare function solveOr(operands: ReadonlyArray<Expression>, varNames: s
  * Uses `=== false` instead of `!== true` so that symbolic/parametric
  * solutions (where type predicates return `undefined`) pass through. */
 export declare function filterSolutionByTypes(ce: ComputeEngine, variables: string[], solution: Record<string, Expression>): boolean;
-/* 0.74.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
+/* 0.77.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
 export declare function choose(n: number, k: number): number;
 /** Attempt to transform the expression (h, ops) into a sum */
 export declare function expandFunction(ce: ComputeEngine, h: string, ops: ReadonlyArray<Expression>): Expression | null;
@@ -12405,7 +12919,7 @@ export declare function expand(expr: Expression): Expression;
  * `expand()` only expands the top level of the expression.
  */
 export declare function expandAll(expr: Expression): Expression;
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { MathJsonExpression, MathJsonNumberObject } from '../../math-json.js';
 import type { Rational, SmallInteger } from '../numerics/types.js';
@@ -12513,7 +13027,7 @@ export declare class BoxedNumber extends _BoxedExpression implements NumberLiter
     N(): Expression;
 }
 export declare function canonicalNumber(ce: ComputeEngine, value: number | bigint | string | BigDecimal | Complex | Rational | NumericValue | MathJsonNumberObject): number | NumericValue;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Leaf module for wildcard pattern utility functions.
  *
  * These are extracted from boxed-patterns.ts to break circular dependencies:
@@ -12554,7 +13068,7 @@ export declare function wildcardName(expr: Expression): string | null;
  * - `null` - Not a wildcard
  */
 export declare function wildcardType(expr: Expression | string): 'Wildcard' | 'Sequence' | 'OptionalSequence' | null;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export type Order = 'lex' | 'dexlex' | 'grevlex' | 'elim';
 import { DEFAULT_COMPLEXITY } from './constants.js';
 export { DEFAULT_COMPLEXITY };
@@ -12644,7 +13158,7 @@ export declare function lexicographicOrder(expr: Expression, vars?: ReadonlyArra
 export declare function degreeLexicographicOrder(expr: Expression, vars?: ReadonlyArray<string>): Expression;
 export declare function degreeReverseLexicographicOrder(expr: Expression, vars?: ReadonlyArray<string>): Expression;
 export declare function eliminationOrder(expr: Expression, vars?: ReadonlyArray<string>): Expression;
-/* 0.74.0 */import type { Expression, ValueDefinition, BoxedValueDefinition, CollectionHandlers, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, ValueDefinition, BoxedValueDefinition, CollectionHandlers, IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { Type, TypeString } from '../../common/type/types.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
 import { ConfigurationChangeListener } from '../../common/configuration-change.js';
@@ -12672,10 +13186,13 @@ export declare class _BoxedValueDefinition implements BoxedValueDefinition, Conf
     readonly name: string; /** Used for debugging and error messages */
     wikidata?: string;
     description?: string | string[];
+    keywords?: string[];
     url?: string;
     private _engine;
+    private _unsubscribeFromConfigurationChange?;
     private _defValue?;
     private _value;
+    private _isSelfReferential;
     private _type;
     inferredType: boolean;
     _isConstant: boolean;
@@ -12692,13 +13209,15 @@ export declare class _BoxedValueDefinition implements BoxedValueDefinition, Conf
     /** For debugging */
     toJSON(): Record<string, unknown>;
     get isConstant(): boolean;
+    get isSelfReferential(): boolean;
     get value(): Expression | undefined;
     set value(v: Expression | undefined);
     get type(): BoxedType;
     set type(t: Type | TypeString | BoxedType);
     onConfigurationChange(): void;
+    dispose(): void;
 }
-/* 0.74.0 */import type { Expression, Sign } from '../global-types.js';
+/* 0.77.0 */import type { Expression, Sign } from '../global-types.js';
 export declare function sgn(expr: Expression): Sign | undefined;
 /**
  * Sign `s` is > 0.
@@ -12744,7 +13263,7 @@ export declare function negativeSign(s: Sign | undefined): boolean | undefined;
  * @param s
  */
 export declare function nonPositiveSign(s: Sign | undefined): boolean | undefined;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, Sign } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, Sign } from '../global-types.js';
 /**
  * The exact half-turn angle (π rad) expressed in the engine's current angular
  * unit: `π` (rad), `180` (deg), `200` (grad), or `1/2` (turn). Building exact
@@ -12760,7 +13279,7 @@ export declare function processInverseFunction(ce: ComputeEngine, xs: ReadonlyAr
 export declare function trigSign(operator: string, x: Expression): Sign | undefined;
 export declare function isConstructible(x: string | Expression): boolean;
 export declare function constructibleValues(operator: string, x: Expression | undefined): undefined | Expression;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Operator-indexed rule dispatch (docs/fungrim/FUNGRIM-PLAN-2-RULES.md §2.1, Feature A).
  *
  * This is an INTERNAL side table: the public `BoxedRuleSet` type is
@@ -12883,7 +13402,7 @@ export declare function candidateRules(index: RuleIndex, expr: Expression, fromO
  * folding saves no scaffolding), the input array is returned unchanged.
  */
 export declare function aggregateHotHeadDispatch(rules: ReadonlyArray<BoxedRule>): ReadonlyArray<BoxedRule>;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 type ExpandFn = (expr: Expression) => Expression;
 /** @internal */
 export declare function _setExpand(fn: ExpandFn): void;
@@ -12900,7 +13419,7 @@ export declare function same(a: Expression, b: Expression): boolean;
 export declare function eq(a: Expression, inputB: number | Expression): boolean | undefined;
 export declare function cmp(a: Expression, b: number | Expression): '<' | '=' | '>' | '>=' | '<=' | undefined;
 export {};
-/* 0.74.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
 import type { Type, TypeString } from '../../common/type/types.js';
 import type { OneOf } from '../../common/one-of.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
@@ -13045,7 +13564,6 @@ export declare class BoxedSymbol extends _BoxedExpression implements SymbolInter
     get isNonPositive(): boolean | undefined;
     get isNegative(): boolean | undefined;
     get isNonNegative(): boolean | undefined;
-    get isFunction(): boolean | undefined;
     get isNumber(): boolean | undefined;
     get isInteger(): boolean | undefined;
     get isRational(): boolean | undefined;
@@ -13076,7 +13594,7 @@ export declare class BoxedSymbol extends _BoxedExpression implements SymbolInter
     indexWhere(predicate: (element: Expression) => boolean): number | undefined;
     subsetOf(rhs: Expression, strict: boolean): boolean;
 }
-/* 0.74.0 */import type { Expression, RuleSteps } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleSteps } from '../global-types.js';
 /**
  * Solve a system of linear equations.
  *
@@ -13136,7 +13654,7 @@ export declare function solvePolynomialSystem(equations: Expression[], variables
  * ```
  */
 export declare function solveLinearInequalitySystem(inequalities: Expression[], variables: string[], trace?: RuleSteps): Array<Record<string, Expression>> | null;
-/* 0.74.0 */import type { Expression, DictionaryInterface, NumberLiteralInterface, SymbolInterface, FunctionInterface, StringInterface, TensorInterface, CollectionInterface, IndexedCollectionInterface } from '../global-types.js';
+/* 0.77.0 */import type { Expression, DictionaryInterface, NumberLiteralInterface, SymbolInterface, FunctionInterface, StringInterface, TensorInterface, CollectionInterface, IndexedCollectionInterface } from '../global-types.js';
 import type { NumericValue } from '../numeric-value/types.js';
 /** Preferred guard for runtime expressions. */
 export declare function isExpression(x: unknown): x is Expression;
@@ -13174,7 +13692,7 @@ export declare function numericValue(expr: Expression | null | undefined): numbe
  * `isSymbol(expr, 'Pi')`.
  */
 export declare function sym(expr: Expression | null | undefined): string | undefined;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine, DataTypeMap, TensorData, TensorDataType, NestedArray, Tensor, TensorField } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine, DataTypeMap, TensorData, TensorDataType, NestedArray, Tensor, TensorField } from '../global-types.js';
 /** @category Tensors */
 export declare abstract class AbstractTensor<DT extends keyof DataTypeMap> implements Tensor<DT> {
     private ce;
@@ -13267,7 +13785,7 @@ export declare abstract class AbstractTensor<DT extends keyof DataTypeMap> imple
 }
 /** @category Tensors */
 export declare function makeTensor<T extends TensorDataType>(ce: ComputeEngine, data: TensorData<T>): AbstractTensor<T>;
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import '../numerics/complex-esm-augment.js';
 import { Expression, IComputeEngine as ComputeEngine, DataTypeMap, TensorDataType, TensorField } from '../global-types.js';
 /** @category Tensors */
@@ -13396,7 +13914,7 @@ export declare function getSupertype(t1: TensorDataType | undefined, t2: TensorD
  * @internal
  */
 export declare function getExpressionDatatype(expr: Expression): TensorDataType;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Extracts base + integer offset from an expression.
  * - Symbol `n` → { base: n, offset: 0 }
@@ -13441,7 +13959,7 @@ export declare function simplifyFactorial2(x: Expression): RuleStep | undefined;
  * - (n+1)! + n! → n! * (n + 2)
  */
 export declare function simplifyFactorialAdd(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Rewrite every trig and hyperbolic function in `expr` in terms of the complex
  * exponential. The result is exact for exact input.
@@ -13464,7 +13982,7 @@ export declare function trigExpand(expr: Expression): Expression;
  * (real exponents) of the corresponding multiple angle.
  */
 export declare function trigReduce(expr: Expression): Expression;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export declare function collectSymbols(expr: Expression, symbols?: Set<string>): Set<string>;
 export declare function freshSymbolName(prefix: string, usedSymbols: Set<string>): string;
 export declare function integrationConstants(equation: Expression, count: number): Expression[];
@@ -13483,7 +14001,7 @@ export declare function numericMagnitude(x: Expression): number;
  * handle.
  */
 export declare function solveLinearSystem(ce: Expression['engine'], M: Expression[][], b: Expression[]): Expression[] | null;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Cost functions for the Fu trigonometric simplification algorithm.
  *
  * The primary objective is to minimize the number of trigonometric functions,
@@ -13516,7 +14034,7 @@ export type TrigCostFunction = (expr: Expression) => number;
  * Default cost function for the Fu algorithm
  */
 export declare const DEFAULT_TRIG_COST: TrigCostFunction;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Power simplification rules consolidated from simplify-rules.ts.
  * Handles ~25 patterns for simplifying Power expressions.
@@ -13531,19 +14049,19 @@ export declare const DEFAULT_TRIG_COST: TrigCostFunction;
  * IMPORTANT: Do not call .simplify() on results to avoid infinite recursion.
  */
 export declare function simplifyPower(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Product simplification rules extracted from simplify-rules.ts.
  * Handles 13 patterns for simplifying Product expressions.
  */
 export declare function simplifyProduct(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Sum simplification rules extracted from simplify-rules.ts.
  * Handles 16 patterns for simplifying Sum expressions.
  */
 export declare function simplifySum(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Infinity simplification rules consolidated from simplify-rules.ts.
  * Handles ~20 patterns for simplifying expressions involving infinity.
@@ -13557,7 +14075,7 @@ export declare function simplifySum(x: Expression): RuleStep | undefined;
  * IMPORTANT: Do not call .simplify() on results to avoid infinite recursion.
  */
 export declare function simplifyInfinity(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 export declare function evaluateAnd(args: ReadonlyArray<Expression>, { engine: ce }: {
     engine: ComputeEngine;
 }): Expression | undefined;
@@ -13611,7 +14129,7 @@ export declare function evaluateWithAssignment(expr: Expression, assignment: Rec
  * Each assignment is a Record mapping variable names to boolean values.
  */
 export declare function generateAssignments(variables: string[]): Generator<Record<string, boolean>>;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Symbolic limit evaluation.
  *
@@ -13638,7 +14156,7 @@ export declare function generateAssignments(variables: string[]): Generator<Reco
  * @param dir      +1 (from the right), −1 (from the left), 0/undefined (both)
  */
 export declare function symbolicLimit(body: Expression, x: string, point: Expression, dir: number | undefined, ce: ComputeEngine): Expression | undefined;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Residue of `body` (a function of `varName`) at `varName = point`, or
  * `undefined` when it cannot be determined (the operator then stays symbolic).
@@ -13647,7 +14165,7 @@ export declare function symbolicLimit(body: Expression, x: string, point: Expres
  * infinity: `Res_∞ f = −Res_{s=0} f(1/s)/s²`.
  */
 export declare function residue(body: Expression, varName: string, point: Expression, ce: ComputeEngine): Expression | undefined;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Fu Algorithm Transformation Rules
  *
  * Programmatic implementations of TR1-TR22 from the Fu trigonometric
@@ -13782,7 +14300,7 @@ export declare function TRpythagorean(expr: Expression): Expression | undefined;
  * Apply TRpythagorean to all subexpressions
  */
 export declare function applyTRpythagorean(expr: Expression): Expression;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Logarithm simplification rules consolidated from simplify-rules.ts.
  * Handles ~30 patterns for simplifying Ln and Log expressions.
@@ -13808,7 +14326,7 @@ export declare function applyTRpythagorean(expr: Expression): Expression;
  * exempt before and are not tagged now.
  */
 export declare function simplifyLog(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 export declare function simplifyAbs(x: Expression): RuleStep | undefined;
 /**
  * Simplify expressions where Abs appears as the base of a power.
@@ -13820,7 +14338,7 @@ export declare function simplifyAbsPower(x: Expression): RuleStep | undefined;
  * This rule handles Cos, Sec, Cosh, Sech with Abs argument
  */
 export declare function simplifyEvenFunctionAbs(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Exact local Laurent data of a function about a finite point — the shared
  * accessor behind the limit engine's pole handling and `Residue` (Strategic
@@ -13870,19 +14388,19 @@ export declare function computeSeries(f: Expression, x: string, x0: Expression, 
  * truncated polynomial. Idempotent; a passthrough on `BigO`-free input.
  */
 export declare function normalStrip(expr: Expression): Expression;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 export declare function simplifyHyperbolic(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export declare function simplifyLogicFunction(x: Expression): {
     value: Expression;
     because: string;
 } | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  *
  */
 export declare function distribute(expr: Expression, g?: string, f?: string): Expression;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 /**
  * Division simplification rules consolidated from simplify-rules.ts.
  *
@@ -13899,7 +14417,7 @@ export declare function distribute(expr: Expression, g?: string, f?: string): Ex
  * IMPORTANT: Do not call .simplify() on results to avoid infinite recursion.
  */
 export declare function simplifyDivide(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Solve a small linear ODE subset:
  *
@@ -13911,7 +14429,7 @@ export declare function simplifyDivide(x: Expression): RuleStep | undefined;
  * remain inert.
  */
 export declare function dSolve(equation: Expression, dependent: Expression, independent: Expression): Expression | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Solve linear homogeneous constant-coefficient recurrences.
  *
@@ -13920,7 +14438,7 @@ export declare function dSolve(equation: Expression, dependent: Expression, inde
  * `RSolve([recurrence, a(0)=0, a(1)=1], a, n)`.
  */
 export declare function rSolve(equation: Expression, dependent: Expression, index: Expression): Expression | undefined;
-/* 0.74.0 */import type { Rule } from '../global-types.js';
+/* 0.77.0 */import type { Rule } from '../global-types.js';
 /**
  * # Performance Optimization Notes for Simplification Rules
  *
@@ -14024,7 +14542,7 @@ export declare function rSolve(equation: Expression, dependent: Expression, inde
  * may be necessary as the expression could be simplified by the canonicalization.
  */
 export declare const SIMPLIFY_RULES: Rule[];
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Interpret every continuation-bearing `Add`/`Multiply` in `expr`, descending
  * into subexpressions so that `x + (1 + 2 + \dots + n)` and
@@ -14044,11 +14562,11 @@ export declare function inferContinuationPattern(expr: Expression): Expression |
  * recognizer and performs no I/O.
  */
 export declare function extractContinuationSamples(expr: Expression): Expression[] | null;
-/* 0.74.0 */import type { Expression, RuleStep } from '../global-types.js';
+/* 0.77.0 */import type { Expression, RuleStep } from '../global-types.js';
 export declare function simplifyTrig(x: Expression): RuleStep | undefined;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 export declare function antiderivative(fn: Expression, index: string): Expression;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /** One derivative rule application: differentiating `node` by rule `id`
  * produced `template` (with `D(child, v)` placeholders for the
  * sub-derivatives that the recursion resolves next). */
@@ -14090,7 +14608,7 @@ export declare function derivative(fn: Expression, order: number): Expression | 
  * @returns The derivative expression, or `undefined` if unable to differentiate
  */
 export declare function differentiate(expr: Expression, v: string, depth?: number, trace?: DerivativeTrace): Expression | undefined;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Fu Algorithm for Trigonometric Simplification
  *
  * Implementation of the algorithm by Fu, Zhong, and Zeng:
@@ -14138,8 +14656,8 @@ export declare function fuSimplify(expr: Expression, options?: FuOptions): Expre
 export { hasTrigFunction, hasOperator } from './fu-transforms.js';
 export { trigCost, countTrigFunctions, countLeaves } from './fu-cost.js';
 export type { TrigCostFunction } from './fu-cost.js';
-/* 0.74.0 */export {};
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */export {};
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 import type { SmallInteger } from '../numerics/types.js';
 import { NumericValue, NumericValueData } from './types.js';
 import type { MathJsonExpression } from '../../math-json/types.js';
@@ -14194,7 +14712,7 @@ export declare class MachineNumericValue extends NumericValue {
     gt(other: number | NumericValue): boolean | undefined;
     gte(other: number | NumericValue): boolean | undefined;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  *
  * ## THEORY OF OPERATIONS
  *
@@ -14320,7 +14838,7 @@ export declare abstract class NumericValue {
     toJSON(): unknown;
     print(): void;
 }
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 import type { SmallInteger } from '../numerics/types.js';
 import { NumericValue, NumericValueData } from './types.js';
 import { ExactNumericValue } from './exact-numeric-value.js';
@@ -14392,7 +14910,7 @@ export declare class BigNumericValue extends NumericValue {
     gt(other: number | NumericValue): boolean | undefined;
     gte(other: number | NumericValue): boolean | undefined;
 }
-/* 0.74.0 */import { BigDecimal } from '../../big-decimal/index.js';
+/* 0.77.0 */import { BigDecimal } from '../../big-decimal/index.js';
 import { Rational, SmallInteger } from '../numerics/types.js';
 import { ExactNumericValueData, NumericValue, NumericValueFactory } from './types.js';
 import { MathJsonExpression } from '../../math-json/types.js';
@@ -14505,7 +15023,7 @@ export declare class ExactNumericValue extends NumericValue {
     gte(other: number | NumericValue): boolean | undefined;
     static sum(values: NumericValue[], factory: NumericValueFactory): NumericValue[];
 }
-/* 0.74.0 */import type { Expression } from './global-types.js';
+/* 0.77.0 */import type { Expression } from './global-types.js';
 /**
  * The default cost function, used to determine if a new expression is simpler
  * than the old one.
@@ -14518,7 +15036,7 @@ export declare class ExactNumericValue extends NumericValue {
 export declare function costFunction(expr: Expression): number;
 export declare function leafCount(expr: Expression): number;
 export declare const DEFAULT_COST_FUNCTION: typeof costFunction;
-/* 0.74.0 */import type { TypeReference, TypeResolver } from '../common/type/types.js';
+/* 0.77.0 */import type { TypeReference, TypeResolver } from '../common/type/types.js';
 type ResolverScope = {
     parent: ResolverScope | null;
     types?: Record<string, TypeReference>;
@@ -14530,7 +15048,7 @@ export type TypeResolverHost = {
 };
 export declare function createTypeResolver(host: TypeResolverHost): TypeResolver;
 export {};
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../big-decimal/index.js';
 import type { MathJsonNumberObject, MathJsonSymbol } from '../math-json/types.js';
 import { NumericValue } from './numeric-value/types.js';
@@ -14574,14 +15092,14 @@ export declare function createNumberExpression(engine: NumberHost, commonNumbers
     canonical: CanonicalOptions;
 }): Expression;
 export {};
-/* 0.74.0 */import { Complex } from 'complex-esm';
+/* 0.77.0 */import { Complex } from 'complex-esm';
 import { BigDecimal } from '../big-decimal/index.js';
 import { Type, TypeResolver, TypeString } from '../common/type/types.js';
 import { BoxedType } from '../common/type/boxed-type.js';
 import type { OneOf } from '../common/one-of.js';
 import type { ConfigurationChangeListener } from '../common/configuration-change.js';
 import type { MathJsonExpression, MathJsonSymbol, MathJsonNumberObject } from '../math-json/types.js';
-import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, Expression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, Metadata, Rule, RulePurpose, Scope, EvalContext, ExpressionInput, IComputeEngine, IntegrationProvider, ILatexSyntax, BoxedDefinition, SymbolDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, InterpretResult, LibraryDefinition, OperatorInfo, SymbolInfo } from './global-types.js';
+import type { ValueDefinition, OperatorDefinition, AngularUnit, AssignValue, AssumeResult, Expression, BoxedRule, BoxedRuleSet, BoxedSubstitution, CanonicalOptions, Metadata, Rule, RulePurpose, Scope, EvalContext, ExpressionInput, IComputeEngine, IntegrationProvider, ILatexSyntax, BoxedDefinition, SymbolDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, InterpretResult, LibraryDefinition, OperatorInfo, SymbolInfo, DefinitionSearchResult } from './global-types.js';
 import type { LibraryCategory, ParseLatexOptions, SerializeLatexOptions } from './latex-syntax/types.js';
 import type { BigNum, Rational } from './numerics/types.js';
 import { ExactNumericValueData, NumericValue, NumericValueData } from './numeric-value/types.js';
@@ -14603,7 +15121,7 @@ export { GLSLTarget } from './compilation/glsl-target.js';
 export { PythonTarget } from './compilation/python-target.js';
 export { IntervalJavaScriptTarget } from './compilation/interval-javascript-target.js';
 export { BaseCompiler } from './compilation/base-compiler.js';
-import type { LanguageTarget } from './compilation/types.js';
+import type { LanguageTarget, IntervalJsCompilationTarget, JavaScriptCompilationTarget } from './compilation/types.js';
 import { compile as _compile } from './compilation/compile-expression.js';
 import { fu as _fu } from './symbolic/fu.js';
 export declare class ComputeEngine implements IComputeEngine {
@@ -14752,6 +15270,8 @@ export declare class ComputeEngine implements IComputeEngine {
     /** @internal Compile a boxed expression. */
     _compile(expr: Expression, options?: Parameters<typeof _compile>[1]): ReturnType<typeof _compile>;
     /** @internal Get a registered compilation target by name. */
+    getCompilationTarget(name: 'interval-js'): IntervalJsCompilationTarget<Expression> | undefined;
+    getCompilationTarget(name: 'javascript'): JavaScriptCompilationTarget<Expression> | undefined;
     getCompilationTarget(name: string): LanguageTarget<Expression> | undefined;
     /** @internal Return the names of all registered compilation targets. */
     listCompilationTargets(): string[];
@@ -15093,6 +15613,60 @@ export declare class ComputeEngine implements IComputeEngine {
     operatorInfo(head: string): OperatorInfo | undefined;
     symbolInfo(name: string): SymbolInfo | undefined;
     /**
+     * Reverse library search: map a plain-text concept `query` to a ranked,
+     * deterministic list of matching identifiers drawn from the current scope
+     * chain (the standard library plus any user declarations).
+     *
+     * The query is tokenized on whitespace; a definition matches when **every**
+     * token is a case-insensitive substring of at least one of its searchable
+     * strings, drawn from four axes:
+     * - its **identifier** (e.g. `GCD`, `Floor`),
+     * - its **description** text,
+     * - its curated **keywords** (synonyms and alternate names, e.g. `average`
+     *   → `Mean`, `antiderivative` → `Integrate`, `nCr` → `Binomial`), and
+     * - its **LaTeX triggers** (e.g. `\gcd` → `GCD`, `\lfloor` → `Floor`,
+     *   `\binom` → `Binomial`) — available only when a LaTeX syntax is present.
+     *
+     * Results are `{ id, kind }`, where `kind` matches `operatorInfo()` /
+     * `symbolInfo()` semantics (`'function'`, `'opaque'`, `'constant'`,
+     * `'variable'`). Every returned `id` resolves via `ce.lookupDefinition(id)`;
+     * chain that call for full detail.
+     *
+     * Ranking, best first: exact identifier match, identifier prefix, exact
+     * trigger or exact keyword, identifier substring, trigger substring, then
+     * keyword-substring and description-only matches; ties break by shorter id,
+     * then alphabetically. An empty or whitespace-only query returns `[]`.
+     *
+     * ```ts
+     * ce.searchDefinitions('gcd');       // → [{ id: 'GCD', kind: 'function' }, …]
+     * ce.searchDefinitions('\\lfloor');  // → includes { id: 'Floor', … }
+     * ce.searchDefinitions('golden');    // → includes { id: 'GoldenRatio', kind: 'constant' }
+     * ```
+     *
+     * @param options.limit Maximum number of results (default 10, clamped to
+     * `[1, 100]`).
+     */
+    searchDefinitions(query: string, options?: {
+        limit?: number;
+    }): DefinitionSearchResult[];
+    /**
+     * Given a `name` that is **not** a known operator, return the closest known
+     * operator name — a "did you mean" suggestion — or `undefined` when nothing
+     * is close enough. Powers the Cortex `unknown-function` diagnostic.
+     *
+     * Matching is conservative and applied in priority order (first match wins):
+     * case-insensitive exact match, singular/plural, Damerau–Levenshtein
+     * distance (≤ 2 for names of length ≥ 6, ≤ 1 for length 5, never for
+     * shorter names), then a prefix match against exactly one operator. Ties
+     * prefer the candidate sharing the longest prefix with the query.
+     *
+     * ```ts
+     * ce.suggestOperatorName('Quartile'); // → 'Quartiles'
+     * ce.suggestOperatorName('foo');      // → undefined
+     * ```
+     */
+    suggestOperatorName(name: string): string | undefined;
+    /**
      * Return the known analytic properties of an operator — poles, zeros, branch
      * points/cuts, residues, holomorphic/meromorphic domains — drawn from the
      * Fungrim-derived metadata store, or `undefined` if none are recorded.
@@ -15142,14 +15716,25 @@ export declare class ComputeEngine implements IComputeEngine {
         maxDepth?: number;
     }): void;
     /** Stack of parameter-name sets active while canonicalizing function bodies.
+     * Each frame optionally carries declared types for annotated parameters so
+     * the auto-declaration of a parameter during body canonicalization can
+     * create the binding with the declared (non-inferred) type directly.
      * @internal */
     private _shadowedParameterStack;
     /** @internal */
-    _pushShadowedParameters(names: ReadonlyArray<string>): void;
+    _pushShadowedParameters(names: ReadonlyArray<string>, types?: ReadonlyMap<string, Type>): void;
     /** @internal */
     _popShadowedParameters(): void;
     /** @internal */
     _isShadowedParameter(name: string): boolean;
+    /** The declared type of an active shadowed parameter, if any. @internal */
+    _shadowedParameterType(name: string): Type | undefined;
+    /** The binding already auto-declared for an active shadowed parameter during
+     * this body's canonicalization, if any. @internal */
+    _shadowedParameterDef(name: string): BoxedDefinition | undefined;
+    /** Cache the binding auto-declared for an active shadowed parameter, so later
+     * references reuse it. @internal */
+    _setShadowedParameterDef(name: string, def: BoxedDefinition): void;
     /**
      * Use `ce.expr(name)` instead
      * @internal */
@@ -15386,6 +15971,17 @@ export declare class ComputeEngine implements IComputeEngine {
      *
      * Uses the engine's symbol definitions for accurate parsing
      * (e.g., recognizing `f` as a function).
+     *
+     * Malformed or incomplete LaTeX does **not** throw: it returns a boxed
+     * expression containing `["Error", ...]` nodes (check `expr.isValid`).
+     * Parsing `null` returns `null`.
+     *
+     * @throws Only in edge cases:
+     * - the argument is neither a string nor `null`/`undefined`;
+     * - no LaTeX syntax is available (minimal entry point without a
+     *   `LatexSyntax` instance passed to the `ComputeEngine` constructor);
+     * - an internal parser safety guard trips (e.g. the infinite-loop
+     *   detector), which indicates a bug rather than bad input.
      */
     parse(latex: string, options?: Partial<ParseLatexOptions> & {
         form?: FormOption;
@@ -15556,7 +16152,7 @@ export declare class ComputeEngine implements IComputeEngine {
      * */
     forget(symbol: undefined | MathJsonSymbol | MathJsonSymbol[]): void;
 }
-/* 0.74.0 */import type { Type } from '../common/type/types.js';
+/* 0.77.0 */import type { Type } from '../common/type/types.js';
 import { BoxedType } from '../common/type/boxed-type.js';
 import type { Expression, Metadata, ExpressionInput } from './global-types.js';
 type ValidationHost = {
@@ -15569,7 +16165,7 @@ type ValidationHost = {
 export declare function createErrorExpression(engine: ValidationHost, message: string | string[], where?: string): Expression;
 export declare function createTypeErrorExpression(engine: ValidationHost, expected: Type, actual: undefined | Type | BoxedType, where?: string): Expression;
 export {};
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * OEIS (Online Encyclopedia of Integer Sequences) Integration
  *
  * This module provides functions to look up sequences in the OEIS database
@@ -15656,7 +16252,7 @@ export declare function checkSequence(ce: ComputeEngine, name: string, count?: n
     matches: OEISSequenceInfo[];
     terms: number[];
 }>;
-/* 0.74.0 */import type { MathJsonSymbol } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonSymbol } from '../../math-json/types.js';
 import type { Expression, JSSource } from '../global-types.js';
 import type { CompileTarget, CompilationResult } from './types.js';
 type CompileExpressionOptions<T extends string = string> = {
@@ -15702,7 +16298,7 @@ export declare function compile<T extends string = 'javascript'>(expr: Expressio
 }): CompilationResult<T, number>;
 export declare function compile<T extends string = 'javascript'>(expr: Expression, options?: CompileExpressionOptions<T>): CompilationResult<T>;
 export {};
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import { chop, factorial, factorial2, gcd, lcm, limit } from '../numerics/numeric.js';
 import { gamma, gammaln, erf, erfc, erfInv, beta, digamma, trigamma, polygamma, zeta, lambertW, besselJ, besselY, besselI, besselK, airyAi, airyBi, fresnelS, fresnelC, sinc, sinIntegral, cosIntegral, expIntegralEi, logIntegral, erfi, agm, ellipticK, ellipticE, ellipticEIncomplete, ellipticF, ellipticPiComplete, ellipticPiIncomplete, hypergeometric2F1, hypergeometric1F1, gammaQ, betaRegularized } from '../numerics/special-functions.js';
 import { choose } from '../boxed-expression/expand.js';
@@ -15741,6 +16337,7 @@ export declare class ComputeEngineFunction extends Function {
         pow: (base: number, exp: number) => number;
         cond: (c: unknown) => boolean;
         heaviside: (x: number) => 0 | 0.5 | 1;
+        at: (arr: unknown, i: number) => number;
         integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
         lngamma: typeof gammaln;
@@ -15952,6 +16549,7 @@ export declare class ComputeEngineFunctionLiteral extends Function {
         pow: (base: number, exp: number) => number;
         cond: (c: unknown) => boolean;
         heaviside: (x: number) => 0 | 0.5 | 1;
+        at: (arr: unknown, i: number) => number;
         integrate: (f: (x: number) => number, a: number, b: number) => number;
         lcm: typeof lcm;
         lngamma: typeof gammaln;
@@ -16128,7 +16726,7 @@ export declare class ComputeEngineFunctionLiteral extends Function {
             im: number;
         };
     };
-    constructor(body: string, args: string[]);
+    constructor(body: string, args: string[], preamble?: string);
 }
 /**
  * JavaScript language target implementation
@@ -16144,7 +16742,7 @@ export declare class JavaScriptTarget implements LanguageTarget<Expression> {
  */
 declare function fibonacci(n: number): number;
 export {};
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 /**
  * Rewrite an expression so that compiling it with radian-based math
  * libraries reproduces the engine's `angularUnit` semantics:
@@ -16165,7 +16763,7 @@ export {};
  * float factors keep the emitted GLSL/WGSL/JS free of symbolic constants.
  */
 export declare function rewriteAngularUnit(expr: Expression): Expression;
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { CompileTarget, CompiledOperators, CompiledFunctions, LanguageTarget, CompilationOptions, CompilationResult } from './types.js';
 /**
  * Python/NumPy language target implementation
@@ -16236,7 +16834,8 @@ export declare class PythonTarget implements LanguageTarget<Expression> {
      */
     compileLambda(expr: Expression, parameters: string[]): string;
 }
-/* 0.74.0 */import type { MathJsonSymbol } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonSymbol } from '../../math-json/types.js';
+import type { Interval, IntervalResult } from '../interval/types.js';
 /**
  * Source code in the target language
  */
@@ -16379,11 +16978,40 @@ export interface CompileTarget<Expr = unknown> {
     randomState?: {
         counter: number;
     };
+    /**
+     * Mutable per-compile registry for user-defined functions — a symbol whose
+     * engine definition is a `Function` literal (`f(x) := …`, `x ↦ …`, or an
+     * `ce.assign(name, lambda)`) encountered as an *operator* (`f(2)`). Each such
+     * function is emitted **once** as a named local function
+     * (`const _fn_f = (x) => …;`), collected here and prepended to the compiled
+     * preamble; its call sites compile to `_fn_f(arg)`. Stored as an object so it
+     * survives the `{ ...target }` spreads the compiler makes while recursing.
+     *
+     * A target opts in by providing this registry (the executable JS targets do,
+     * in their `compile()`); a target that leaves it undefined keeps the historic
+     * `Unknown operator` throw for a user-function head (raw direct-target /
+     * GPU / source-only paths). `defs` is keyed by the generated local name, in
+     * insertion order, so a dependency (`f`) is emitted before a dependent
+     * (`g(x) := f(x)+1`). `compiling` is the in-progress stack used to fail
+     * closed (D6) on recursive / mutually-recursive definitions.
+     */
+    userFunctions?: {
+        defs: Map<string, string>;
+        compiling: Set<string>;
+    };
 }
 /**
- * Base interface for language-specific compilation targets
+ * Base interface for language-specific compilation targets.
+ *
+ * `T`/`R`/`V` describe the shape of this target's `compile()` result — its
+ * target name, `run` return type, and `run` variable/argument value type. They
+ * default to the generic `string`/`unknown`/`number`, so `LanguageTarget<Expr>`
+ * keeps its historical meaning; the executable targets bind them concretely
+ * (see the `getCompilationTarget` overloads on the engine) so a caller gets a
+ * precisely-typed runner without a cast — e.g. the `interval-js` target's
+ * `run` is `(vars: Record<string, number | Interval>) => IntervalResult`.
  */
-export interface LanguageTarget<Expr = unknown> {
+export interface LanguageTarget<Expr = unknown, T extends string = string, R = unknown, V = number> {
     /** Get the default operators for this language */
     getOperators(): CompiledOperators;
     /** Get the default functions for this language */
@@ -16391,8 +17019,25 @@ export interface LanguageTarget<Expr = unknown> {
     /** Create a CompileTarget for this language */
     createTarget(options?: Partial<CompileTarget<Expr>>): CompileTarget<Expr>;
     /** Compile an expression to this language */
-    compile(expr: Expr, options?: CompilationOptions<Expr>): CompilationResult<string, unknown>;
+    compile(expr: Expr, options?: CompilationOptions<Expr>): CompilationResult<T, R, V>;
 }
+/**
+ * The `interval-js` target, typed concretely: its compiled `run` accepts
+ * `number | Interval` variables (a plain number is auto-converted to a point
+ * interval) and returns an `IntervalResult`. Returned by
+ * `getCompilationTarget("interval-js")` so callers get this without a cast.
+ *
+ * Defined here (not in a `types-*.ts` file) because the layering rules forbid
+ * the type-definition layer from importing `interval/`; `compilation/` may.
+ */
+export type IntervalJsCompilationTarget<Expr = unknown> = LanguageTarget<Expr, 'interval-js', IntervalResult, number | Interval>;
+/**
+ * The `javascript` target, typed concretely: its compiled `run` accepts
+ * `number | ComplexResult` variables (plain reals or complex domain-coloring
+ * inputs) and returns `number | ComplexResult`. Returned by
+ * `getCompilationTarget("javascript")`.
+ */
+export type JavaScriptCompilationTarget<Expr = unknown> = LanguageTarget<Expr, 'javascript', number | ComplexResult, number | ComplexResult>;
 /**
  * Options for compilation
  */
@@ -16512,7 +17157,7 @@ export type ComplexResult = {
  * result.run({ x: 0.5, y: 1.0 })
  * ```
  */
-export type ExpressionRunner<R = number | ComplexResult> = (vars: Record<string, number>) => R;
+export type ExpressionRunner<R = number | ComplexResult, V = number> = (vars: Record<string, V>) => R;
 /**
  * Runner for compiled lambda (`Function`) expressions — called with
  * positional arguments.
@@ -16521,7 +17166,7 @@ export type ExpressionRunner<R = number | ComplexResult> = (vars: Record<string,
  * result.run(0.5, 1.0)
  * ```
  */
-export type LambdaRunner<R = number | ComplexResult> = (...args: number[]) => R;
+export type LambdaRunner<R = number | ComplexResult, V = number> = (...args: V[]) => R;
 /**
  * Overloaded callable that accepts both calling conventions.
  *
@@ -16531,21 +17176,31 @@ export type LambdaRunner<R = number | ComplexResult> = (...args: number[]) => R;
  *
  * Check `calling` on the `CompilationResult` to know which convention
  * the compiled expression actually uses.
+ *
+ * `V` is the type of the variable/argument values. It defaults to `number`
+ * (the `javascript` target's real-valued convention). Non-`number` targets
+ * bind it to their own value type — e.g. `interval-js` uses
+ * `number | Interval` (a plain number is auto-converted to a point interval),
+ * and a complex domain-coloring runner uses `number | ComplexResult`.
  */
-export interface CompiledRunner<R = number | ComplexResult> {
+export interface CompiledRunner<R = number | ComplexResult, V = number> {
     /** Call with a variables object (for compiled expressions) */
-    (vars: Record<string, number>): R;
+    (vars: Record<string, V>): R;
     /** Call with positional arguments (for compiled lambda expressions) */
-    (...args: number[]): R;
+    (...args: V[]): R;
 }
 /**
  * Result of compiling an expression.
  *
- * Two type parameters control the shape:
+ * Three type parameters control the shape:
  * - `T` — the target name. For executable targets (`'javascript'` |
  *   `'interval-js'`), `run` and `calling` are guaranteed present.
  * - `R` — the return type of `run`. Defaults to `number | ComplexResult`.
  *   Pass `number` when `realOnly: true`.
+ * - `V` — the type of the variable/argument values `run` accepts. Defaults to
+ *   `number`; `interval-js` binds it to `number | Interval`, a complex runner
+ *   to `number | ComplexResult`. (Positioned after `R` so existing
+ *   `CompilationResult<T, R>` uses keep the `number` default.)
  *
  * The `calling` field indicates which convention `run` uses:
  * - `'expression'` — call with a vars object: `run({ x: 0.5 })`
@@ -16571,7 +17226,7 @@ export interface CompiledRunner<R = number | ComplexResult> {
  * py.code; // string
  * ```
  */
-export type CompilationResult<T extends string = string, R = number | ComplexResult> = {
+export type CompilationResult<T extends string = string, R = number | ComplexResult, V = number> = {
     /** Target language name */
     target: T;
     /** Whether compilation succeeded (vs falling back to interpretation) */
@@ -16630,95 +17285,12 @@ export type CompilationResult<T extends string = string, R = number | ComplexRes
      */
     calling?: 'expression' | 'lambda';
     /** Executable function (present for JS-executable targets only). */
-    run?: CompiledRunner<R>;
+    run?: CompiledRunner<R, V>;
 } & (T extends ExecutableTarget ? {
     calling: 'expression' | 'lambda';
-    run: CompiledRunner<R>;
+    run: CompiledRunner<R, V>;
 } : {});
-/* 0.74.0 */import type { Expression } from '../global-types.js';
-import type { CompiledFunctions, CompiledOperators, CompileTarget, CompilationOptions, CompilationResult } from './types.js';
-import { GLSLTarget } from './glsl-target.js';
-/** Options that shape the emitted interval-glsl preamble. */
-export interface IntervalGLSLPreambleOptions {
-    /**
-     * Absolute outward pad (in output units) added to `sin`/`cos` bounds, on top
-     * of the relative transcendental margin. GLSL ES `sin`/`cos` carry an
-     * *absolute*, implementation-defined error (~2⁻¹¹ in the worst case; macOS
-     * ANGLE→Metal differs) that no relative pad can cover. Default `0` (off) —
-     * opt in for a strictly-sound trig oracle without a CPU refine, at the cost of
-     * fatter trig intervals. A value around `5e-4` covers the ES worst case.
-     */
-    trigAbsPad?: number;
-}
-/**
- * Build the `interval-glsl` `_iv_*` preamble. The widen helpers
- * (`_iv_widen`/`_iv_widen_t`/`_iv_widen_pow`/`_iv_widen_sc`) and their epsilons
- * (`IV_EPS`/`IV_EPS_FN`/`IV_EPS_POW`) are a stable, public part of the output: a
- * renderer that boxes its own cell coordinates should outward-round them with
- * `_iv_widen_t` (§13/Q1).
- */
-export declare function intervalGLSLPreamble(options?: IntervalGLSLPreambleOptions): string;
-/** Default preamble (no absolute trig pad). */
-export declare const INTERVAL_GLSL_PREAMBLE: string;
-/**
- * GLSL interval-arithmetic compilation target. Reuses `GLSLTarget`'s shader
- * assembly; swaps in the interval function table, the `vec2` point-interval
- * number/var hooks, and the `_iv_*` preamble.
- */
-export declare class IntervalGLSLTarget extends GLSLTarget {
-    protected readonly languageId = "interval-glsl";
-    getOperators(): CompiledOperators;
-    getFunctions(): CompiledFunctions<Expression>;
-    getConstants(): Record<string, string>;
-    createTarget(options?: Partial<CompileTarget<Expression>>): CompileTarget<Expression>;
-    /**
-     * The `_iv_*` interval-arithmetic preamble, optionally configured (e.g. an
-     * absolute `trigAbsPad`). A renderer that builds its own cell box and calls
-     * `iv.code` directly should inject this and outward-round its box inputs with
-     * the public `_iv_widen_t` helper (§13/Q1).
-     */
-    getPreamble(options?: IntervalGLSLPreambleOptions): string;
-    compile(expr: Expression, options?: CompilationOptions<Expression> & IntervalGLSLPreambleOptions): CompilationResult;
-    /**
-     * Emit a complete, self-contained GLSL fragment shader implementing the
-     * **interval exclusion oracle** for the implicit curve `f = 0` (Phase 4).
-     *
-     * The shader is structured so the core contract — the interval evaluator —
-     * is cleanly separable from the render harness:
-     *
-     * - `vec2 _implicit(<vec2 per free variable>)` evaluates the interval of `f`
-     *   over a cell box (this is the part that matters; it is exactly
-     *   `compile(expr).code` wrapped in a function).
-     * - `main()` is a **reference harness**: it derives each fragment's cell box
-     *   from `gl_FragCoord` and the viewport uniforms, **outward-rounds** that box
-     *   (see below), evaluates `_implicit`, and writes the exclusion result. The
-     *   renderer is free to replace `main()` / the uniforms with its own
-     *   conventions and keep `_implicit`.
-     *
-     * **Box outward-rounding (float32 soundness, §13).** The cell box is built in
-     * float32 (`mix` of the domain uniforms), which rounds to nearest and can land
-     * a few ulp *inside* the true cell edge — enough to flip a grazing tangency's
-     * exclusion verdict, independent of the per-op widening. `main()` therefore
-     * widens each box with `_iv_widen_box(box, extent)` before evaluating. The pad
-     * is scaled to the **domain extent**, not the local edge value, because that is
-     * what bounds the `mix` error — a value-relative pad would vanish for an edge
-     * near 0 in a wide domain. A renderer that builds its own boxes must do the
-     * same (call `_iv_widen_box` per axis).
-     *
-     * The first free variable maps to `u_domainX`, the second to `u_domainY`
-     * (≤ 2 free variables; a 2D implicit curve). The exclusion predicate is
-     * `f.lo > 0 || f.hi < 0` — which also excludes the `empty` (domain-undefined)
-     * interval, since its `lo` is the `+IV_INF` sentinel.
-     *
-     * @throws if the expression has more than two free variables, or cannot be
-     * lowered (an unsupported head propagates from `BaseCompiler.compile`).
-     */
-    compileExclusionShader(expr: Expression, options?: {
-        version?: string;
-        precision?: string;
-    } & IntervalGLSLPreambleOptions): string;
-}
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Constant folding utilities for GPU compilation.
  *
  * These helpers allow compilation handlers to detect compile-time constants,
@@ -16783,7 +17355,7 @@ export declare function tryGetComplexParts(expr: Expression, compile: (e: Expres
     re: string | null;
     im: string | null;
 } | null;
-/* 0.74.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/* 0.77.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { CompileTarget, TargetSource } from './types.js';
 /**
  * Base compiler class containing language-agnostic compilation logic
@@ -16967,11 +17539,92 @@ export declare class BaseCompiler {
      * that contract (D6) where the target can express it. A provably boolean
      * condition — the common case — is emitted bare (no overhead, no churn).
      */
+    /**
+     * A branch condition (`If`/`Which`/`When`) must be a scalar boolean. A
+     * collection-valued condition can never be one — the interpreter throws
+     * ("Condition must evaluate to True or False") rather than silently taking a
+     * branch — so fail closed (D6) at compile time. Uses the declared type (not
+     * `.isCollection`, which is false for a `list<finite_number>`).
+     */
+    static assertScalarCondition(cond: Expression): void;
     static guardCondition(cond: Expression, target: CompileTarget<Expression>): TargetSource;
     /** True if the expression is provably integer-typed. */
     static isIntegerValued(expr: Expression): boolean;
     /** True if the expression is provably non-negative (sign ≥ 0). */
     static isNonNegative(expr: Expression): boolean;
+    /** Above this many integer-constant tier-0 cases, a dispatch run is emitted
+     * as a `switch` (JS engines jump-table dense integer switches) instead of a
+     * chain of `if (s === k)` comparisons. Below it, comparisons are simpler and
+     * JIT-equivalent. */
+    private static readonly MATCH_SWITCH_THRESHOLD;
+    /** True when `cc` is an irrefutable tier-3 case — a bare wildcard (`_` or a
+     * single binding `_n`) with no guard. It matches anything, so it compiles to
+     * the final unconditional branch (binding the subject to the capture). */
+    private static isIrrefutableCase;
+    /** The ordered comparison targets of a tier-0/1 case: a constant to compare
+     * the subject against (`{kind:'literal'}`) or a pin to resolve (`{kind:'pin'}`).
+     * Unifies tier-0 (`dispatchKeys`) and tier-1 (`tests`). */
+    private static matchCaseComparisons;
+    /** Compile one comparison constant/pin of a tier-0/1 case to target source,
+     * throwing (fail closed, D6) when it cannot be represented: a pin of a runtime
+     * value (only `isConstant` symbols and literals fold), or a string on a target
+     * with no string type. */
+    private static compileMatchConstant;
+    /** The OR-chain condition for a tier-0/1 case: `s === c1 || s === c2 || …`. */
+    private static matchLeafCondition;
+    /** Compile a case body, substituting each captured name with its target
+     * accessor code. Bodies with no captures compile directly (the common
+     * tier-0/1 case); bodies with captures compile the shadow-correct canonical
+     * body held on the case's closure, with the capture names rebound to their
+     * accessors. */
+    private static compileMatchBody;
+    /** Compile a case guard the same way as its body (captures rebound to
+     * accessors), or `undefined` when the case has no guard. */
+    private static compileMatchGuard;
+    /** A target that resolves each captured name to its accessor code (e.g.
+     * `a → s[0]`), delegating everything else to the base target. */
+    private static matchCaptureTarget;
+    /**
+     * Compile a `["Match", subject, …cases]` to JavaScript: an arrow-IIFE that
+     * binds the subject once, then a chain of `if (cond) return body;` statements
+     * (tier 0/1 constant comparisons, tier 2 fixed-shape destructuring),
+     * optionally a `switch` for a large integer-constant dispatch run, ending in
+     * a trailing irrefutable case or `return NaN`.
+     */
+    static compileMatchJS(engine: ComputeEngine, args: ReadonlyArray<Expression>, target: CompileTarget<Expression>): TargetSource;
+    /** Emit one non-irrefutable case as a guarded early-return `if`. */
+    private static emitMatchCaseJS;
+    /** Walk a tier-2 fixed shape, appending JS boolean conditions (arity + literal
+     * / pin element checks) and populating `accessors` (capture name → element
+     * access code). Compiled `List`/`Tuple` values are JS arrays, so shapes lower
+     * to `Array.isArray`, `.length`, `[i]`, and `.slice`. */
+    private static walkMatchShape;
+    /** Handle one positional element of a tier-2 shape (see `walkMatchShape`). */
+    private static walkMatchElement;
+    /** True when a tier-0 dispatch segment qualifies for `switch` emission: every
+     * case dispatches only on safe machine integers (`n:` keys) and there are at
+     * least `MATCH_SWITCH_THRESHOLD` of them. */
+    private static matchSwitchable;
+    /** Emit an integer dispatch run as a `switch (s) { case k: … }` (no default —
+     * a non-match falls through to the following statements, preserving
+     * first-match order across segments). Or-alternatives share one body via
+     * `case`-fallthrough; a constant already claimed by an earlier (first-match)
+     * case is skipped to avoid a duplicate `case` label. */
+    private static emitMatchSwitch;
+    /**
+     * Compile a `["Match", …]` to a nested ternary via a target-provided
+     * `ternary` primitive — the path GPU targets use (they have no statement-level
+     * IIFE or `switch`). Only tier 0/1 constant dispatch and a trailing
+     * irrefutable case compile; tier 2 destructuring and refutable tier 3 fail
+     * closed (D6). The subject is compiled once and inlined into each comparison
+     * (safe: compiled shader expressions are deterministic).
+     */
+    static compileMatchTernary(engine: ComputeEngine, args: ReadonlyArray<Expression>, target: CompileTarget<Expression>, opts: {
+        ternary: (cond: string, whenTrue: string, whenFalse: string) => string;
+        eq: string;
+        noMatch: string;
+        allowStrings: boolean;
+    }): TargetSource;
     /**
      * If `id` names a symbol that is *known* to the engine — it has an assigned
      * value (`ce.assign("a", 1.5)`) or is a declared constant — return the
@@ -17002,6 +17655,50 @@ export declare class BaseCompiler {
      * no redundant parentheses are added in the common assigned-number case.
      */
     static tryFoldKnownSymbol(engine: ComputeEngine, id: string, target: CompileTarget<Expression>): string | undefined;
+    /**
+     * If `id` names a symbol whose engine definition is a user-defined function
+     * literal, return that `["Function", body, …params]` literal; otherwise
+     * `undefined`. Covers both storage routes:
+     *  - an operator definition backed by a lambda (`f(x) := …`, `x ↦ …`, or
+     *    `ce.assign(name, lambda)`), where the literal is kept on the operator
+     *    definition as `_lambdaLiteral`; and
+     *  - a plain symbol whose assigned value is itself a `Function` literal.
+     */
+    private static userFunctionLiteral;
+    /**
+     * Generated local-function name for a user-defined function `id`. Prefixed to
+     * avoid colliding with the vars object (`_.<name>`) and with target helpers;
+     * non-identifier characters are folded to `_` so the emitted declaration is a
+     * valid target identifier.
+     */
+    private static userFunctionName;
+    /**
+     * If head `h` names a user-defined function (see `userFunctionLiteral`),
+     * ensure its definition is emitted once into `target.userFunctions.defs` as a
+     * named local function and return the call-site source `_fn_h(arg, …)`.
+     * Returns `undefined` when `h` is a genuinely unknown operator (no such
+     * definition — the caller then throws), or when the target opts out of user
+     * functions by not providing a `userFunctions` registry.
+     *
+     * Recursion (including mutual recursion) is not compiled in this pass: while a
+     * definition's body is being compiled its name sits in `compiling`, so a
+     * (mutually) recursive reference is detected and **fails closed (D6)** with an
+     * explanatory error rather than looping.
+     *
+     * Capture semantics: the body is compiled once, at compile time, through the
+     * *same* `target` var/fold rules as the surrounding expression (only the
+     * parameters are shadowed). Free symbols and constants the body references are
+     * therefore snapshotted exactly like the constant-baking `tryFoldKnownSymbol`
+     * performs elsewhere — a later reassignment of a captured outer symbol does
+     * not affect an already-compiled function.
+     */
+    static tryCompileUserFunction(engine: ComputeEngine, h: string, args: ReadonlyArray<Expression>, target: CompileTarget<Expression>): TargetSource | undefined;
+    /**
+     * Concatenate the user-defined function definitions accumulated in
+     * `target.userFunctions` (see `tryCompileUserFunction`) into a preamble
+     * fragment, in dependency order. Empty string when there are none.
+     */
+    static userFunctionsPreamble(target: CompileTarget<Expression>): string;
     /**
      * Operator heads the compiler lowers directly in `compileExpr`, independent
      * of any target operator/function mapping (control-flow, binding, and
@@ -17052,7 +17749,7 @@ export declare class BaseCompiler {
      */
     static inlineExpression(body: string, x: string): string;
 }
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { CompileTarget, CompiledOperators, CompiledFunctions, LanguageTarget, CompilationOptions, CompilationResult } from './types.js';
 /**
  * GPU shader operators shared by GLSL and WGSL.
@@ -17251,6 +17948,19 @@ export declare const GPU_COLOR_PREAMBLE_GLSL = "\nfloat _gpu_srgb_to_linear(floa
  */
 export declare const GPU_COLOR_PREAMBLE_WGSL = "\nfn _gpu_srgb_to_linear(c: f32) -> f32 {\n  if (c <= 0.04045) { return c / 12.92; }\n  return pow((c + 0.055) / 1.055, 2.4);\n}\n\nfn _gpu_linear_to_srgb(c: f32) -> f32 {\n  if (c <= 0.0031308) { return 12.92 * c; }\n  return 1.055 * pow(c, 1.0 / 2.4) - 0.055;\n}\n\nfn _gpu_srgb_to_oklab(rgb: vec3f) -> vec3f {\n  let r = _gpu_srgb_to_linear(rgb.x);\n  let g = _gpu_srgb_to_linear(rgb.y);\n  let b = _gpu_srgb_to_linear(rgb.z);\n  let l_ = pow(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 1.0 / 3.0);\n  let m_ = pow(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 1.0 / 3.0);\n  let s_ = pow(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b, 1.0 / 3.0);\n  return vec3f(\n    0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,\n    1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_,\n    0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_\n  );\n}\n\nfn _gpu_oklab_to_srgb(lab: vec3f) -> vec3f {\n  let l_ = lab.x + 0.3963377774 * lab.y + 0.2158037573 * lab.z;\n  let m_ = lab.x - 0.1055613458 * lab.y - 0.0638541728 * lab.z;\n  let s_ = lab.x - 0.0894841775 * lab.y - 1.291485548 * lab.z;\n  let l = l_ * l_ * l_;\n  let m = m_ * m_ * m_;\n  let s = s_ * s_ * s_;\n  let r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;\n  let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;\n  let b = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;\n  return clamp(vec3f(_gpu_linear_to_srgb(r), _gpu_linear_to_srgb(g), _gpu_linear_to_srgb(b)), vec3f(0.0), vec3f(1.0));\n}\n\nfn _gpu_oklab_to_oklch(lab: vec3f) -> vec3f {\n  let C = length(lab.yz);\n  var H = atan2(lab.z, lab.y) * (180.0 / 3.14159265359);\n  if (H < 0.0) { H = H + 360.0; }\n  return vec3f(lab.x, C, H);\n}\n\nfn _gpu_oklch_to_oklab(lch: vec3f) -> vec3f {\n  let h_rad = lch.z * (3.14159265359 / 180.0);\n  return vec3f(lch.x, lch.y * cos(h_rad), lch.y * sin(h_rad));\n}\n\nfn _gpu_srgb_to_oklch(rgb: vec3f) -> vec3f {\n  return _gpu_oklab_to_oklch(_gpu_srgb_to_oklab(rgb));\n}\n\nfn _gpu_oklch_to_srgb(lch: vec3f) -> vec3f {\n  return _gpu_oklab_to_srgb(_gpu_oklch_to_oklab(lch));\n}\n\nfn _gpu_hsl_to_rgb(hsl: vec3f) -> vec3f {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  let c = (1.0 - abs(2.0 * l - 1.0)) * s;\n  let h6 = h / 60.0;\n  let x = c * (1.0 - abs((h6 - 2.0 * floor(h6 / 2.0)) - 1.0));\n  var r: f32 = 0.0;\n  var g: f32 = 0.0;\n  var b: f32 = 0.0;\n  if (h6 < 1.0)      { r = c; g = x; b = 0.0; }\n  else if (h6 < 2.0) { r = x; g = c; b = 0.0; }\n  else if (h6 < 3.0) { r = 0.0; g = c; b = x; }\n  else if (h6 < 4.0) { r = 0.0; g = x; b = c; }\n  else if (h6 < 5.0) { r = x; g = 0.0; b = c; }\n  else               { r = c; g = 0.0; b = x; }\n  let m = l - c / 2.0;\n  return vec3f(r + m, g + m, b + m);\n}\n\nfn _gpu_rgb_to_hsl(rgb: vec3f) -> vec3f {\n  let maxc = max(max(rgb.x, rgb.y), rgb.z);\n  let minc = min(min(rgb.x, rgb.y), rgb.z);\n  let l = (maxc + minc) / 2.0;\n  let d = maxc - minc;\n  if (d < 1e-6) { return vec3f(0.0, 0.0, l); }\n  let s = d / (1.0 - abs(2.0 * l - 1.0));\n  var h: f32;\n  if (maxc == rgb.x) {\n    let v = (rgb.y - rgb.z) / d;\n    h = v - 6.0 * floor(v / 6.0);\n  } else if (maxc == rgb.y) {\n    h = (rgb.z - rgb.x) / d + 2.0;\n  } else {\n    h = (rgb.x - rgb.y) / d + 4.0;\n  }\n  h = h * 60.0;\n  if (h < 0.0) { h = h + 360.0; }\n  return vec3f(h, s, l);\n}\n\nfn _gpu_hsv_to_rgb(hsv: vec3f) -> vec3f {\n  let h = hsv.x;\n  let s = hsv.y;\n  let v = hsv.z;\n  let c = v * s;\n  let h6 = h / 60.0;\n  let x = c * (1.0 - abs((h6 - 2.0 * floor(h6 / 2.0)) - 1.0));\n  var r: f32 = 0.0;\n  var g: f32 = 0.0;\n  var b: f32 = 0.0;\n  if (h6 < 1.0)      { r = c; g = x; b = 0.0; }\n  else if (h6 < 2.0) { r = x; g = c; b = 0.0; }\n  else if (h6 < 3.0) { r = 0.0; g = c; b = x; }\n  else if (h6 < 4.0) { r = 0.0; g = x; b = c; }\n  else if (h6 < 5.0) { r = x; g = 0.0; b = c; }\n  else               { r = c; g = 0.0; b = x; }\n  let m = v - c;\n  return vec3f(r + m, g + m, b + m);\n}\n\nfn _gpu_rgb_to_hsv(rgb: vec3f) -> vec3f {\n  let maxc = max(max(rgb.x, rgb.y), rgb.z);\n  let minc = min(min(rgb.x, rgb.y), rgb.z);\n  let v = maxc;\n  let d = maxc - minc;\n  if (d < 1e-6) { return vec3f(0.0, 0.0, v); }\n  var s: f32 = 0.0;\n  if (maxc >= 1e-6) { s = d / maxc; }\n  var h: f32;\n  if (maxc == rgb.x) {\n    let q = (rgb.y - rgb.z) / d;\n    h = q - 6.0 * floor(q / 6.0);\n  } else if (maxc == rgb.y) {\n    h = (rgb.z - rgb.x) / d + 2.0;\n  } else {\n    h = (rgb.x - rgb.y) / d + 4.0;\n  }\n  h = h * 60.0;\n  if (h < 0.0) { h = h + 360.0; }\n  return vec3f(h, s, v);\n}\n\nfn _gpu_color_mix(lch1: vec3f, lch2: vec3f, t: f32) -> vec3f {\n  let L = mix(lch1.x, lch2.x, t);\n  let C = mix(lch1.y, lch2.y, t);\n  let a1 = lch1.y < 1e-6;\n  let a2 = lch2.y < 1e-6;\n  var H: f32;\n  if (a1 && a2) {\n    H = lch1.z;\n  } else if (a1) {\n    H = lch2.z;\n  } else if (a2) {\n    H = lch1.z;\n  } else {\n    var dh = lch2.z - lch1.z;\n    if (dh > 180.0) { dh = dh - 360.0; }\n    if (dh < -180.0) { dh = dh + 360.0; }\n    H = lch1.z + dh * t;\n    if (H < 0.0) { H = H + 360.0; }\n    if (H >= 360.0) { H = H - 360.0; }\n  }\n  return vec3f(L, C, H);\n}\n\nfn _gpu_apca(lch_bg: vec3f, lch_fg: vec3f) -> f32 {\n  let bg = _gpu_oklch_to_srgb(lch_bg);\n  let fg = _gpu_oklch_to_srgb(lch_fg);\n  let bgR = _gpu_srgb_to_linear(bg.x);\n  let bgG = _gpu_srgb_to_linear(bg.y);\n  let bgB = _gpu_srgb_to_linear(bg.z);\n  let fgR = _gpu_srgb_to_linear(fg.x);\n  let fgG = _gpu_srgb_to_linear(fg.y);\n  let fgB = _gpu_srgb_to_linear(fg.z);\n  let bgY = 0.2126729 * bgR + 0.7151522 * bgG + 0.0721750 * bgB;\n  let fgY = 0.2126729 * fgR + 0.7151522 * fgG + 0.0721750 * fgB;\n  let bgC = pow(bgY, 0.56);\n  let fgC = pow(fgY, 0.57);\n  let contrast = (bgC - fgC) * 1.14;\n  return contrast * 100.0;\n}\n";
 /**
+ * Sign-preserving integer power (GLSL syntax). GLSL `pow(x, n)` is
+ * `exp2(n·log2(x))`, undefined for a negative base — it returns `+8` for
+ * `pow(-2.0, 3.0)` (wrong sign) and NaN for even powers of a negative. Compute
+ * the magnitude from `abs(x)` and restore the sign for odd exponents. `n` is a
+ * non-negative integer value; matches JS `Math.pow` for integer exponents
+ * (including `0^0 = 1`). GLSL ES 1.00-compatible (no recursion, no loops).
+ */
+export declare const GPU_POWI_PREAMBLE_GLSL = "\nfloat _gpu_powi(float x, float n) {\n  if (n == 0.0) return 1.0;\n  float r = pow(abs(x), n);\n  if (x < 0.0 && mod(n, 2.0) == 1.0) return -r;\n  return r;\n}\n";
+/**
+ * Sign-preserving integer power (WGSL syntax). See GPU_POWI_PREAMBLE_GLSL.
+ */
+export declare const GPU_POWI_PREAMBLE_WGSL = "\nfn _gpu_powi(x: f32, n: f32) -> f32 {\n  if (n == 0.0) { return 1.0; }\n  let r = pow(abs(x), n);\n  if (x < 0.0 && (n % 2.0) == 1.0) { return -r; }\n  return r;\n}\n";
+/**
  * Format a number as a GPU float literal.
  *
  * Both GLSL and WGSL require float literals to have a decimal point.
@@ -17289,7 +17999,7 @@ export declare abstract class GPUShaderTarget implements LanguageTarget<Expressi
     compile(expr: Expression, options?: CompilationOptions<Expression>): CompilationResult;
     compileToSource(expr: Expression, _options?: CompilationOptions<Expression>): string;
 }
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { CompiledFunctions } from './types.js';
 import { GPUShaderTarget } from './gpu-target.js';
 /**
@@ -17323,7 +18033,7 @@ export declare class GLSLTarget extends GPUShaderTarget {
         }>;
     }): string;
 }
-/* 0.74.0 */import type { Expression } from '../global-types.js';
+/* 0.77.0 */import type { Expression } from '../global-types.js';
 import type { CompiledFunctions } from './types.js';
 import { GPUShaderTarget } from './gpu-target.js';
 /**
@@ -17364,7 +18074,7 @@ export declare class WGSLTarget extends GPUShaderTarget {
         }>;
     }): string;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * JavaScript interval arithmetic compilation target
  *
  * Compiles mathematical expressions to JavaScript code using interval arithmetic
@@ -17489,7 +18199,7 @@ export declare class IntervalJavaScriptTarget implements LanguageTarget<Expressi
     createTarget(options?: Partial<CompileTarget<Expression>>): CompileTarget<Expression>;
     compile(expr: Expression, options?: CompilationOptions<Expression>): CompilationResult<'interval-js', IntervalResult | Interval>;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Utilities for declarative sequence definitions.
  *
  * This module provides functions to create subscriptEvaluate handlers
@@ -17609,7 +18319,7 @@ export declare function getSequenceCache(ce: ComputeEngine, name: string): Map<n
  * ```
  */
 export declare function generateSequenceTerms(ce: ComputeEngine, name: string, start: number, end: number, step?: number): Expression[] | undefined;
-/* 0.74.0 */import type { Complex } from 'complex-esm';
+/* 0.77.0 */import type { Complex } from 'complex-esm';
 import type { OneOf } from '../common/one-of.js';
 import type { MathJsonSymbol, MathJsonNumberObject } from '../math-json.js';
 import type { Type, TypeString, TypeResolver } from '../common/type/types.js';
@@ -17622,7 +18332,7 @@ import type { Expression, ExpressionInput } from './types-expression.js';
 import type { Metadata, CanonicalOptions, FormOption, BoxedSubstitution } from './types-serialization.js';
 import type { AngularUnit, SymbolDefinition, OperatorDefinition, ValueDefinition, BoxedDefinition, SequenceDefinition, SequenceStatus, SequenceInfo, OEISSequenceInfo, OEISOptions, InterpretResult } from './types-definitions.js';
 import type { AssumeResult, Rule as KernelRule, BoxedRule as KernelBoxedRule, BoxedRuleSet as KernelBoxedRuleSet, RulePurpose, RuleStep as KernelRuleStep, AssignValue as KernelAssignValue, Scope as KernelScope, EvalContext as KernelEvalContext } from './types-kernel-evaluation.js';
-import type { LanguageTarget, CompilationResult } from './compilation/types.js';
+import type { LanguageTarget, CompilationResult, IntervalJsCompilationTarget, JavaScriptCompilationTarget } from './compilation/types.js';
 export type { RulePurpose } from './types-kernel-evaluation.js';
 type Rule = KernelRule<Expression, ExpressionInput, IComputeEngine>;
 type BoxedRule = KernelBoxedRule<Expression, IComputeEngine>;
@@ -17636,6 +18346,13 @@ type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
 export interface ILatexSyntax {
     parse(latex: string, options?: Partial<ParseLatexOptions>): import('../math-json/types.js').MathJsonExpression | null;
     serialize(expr: import('../math-json/types.js').MathJsonExpression, options?: Record<string, unknown>): string;
+    /** Named dictionary entries with their LaTeX trigger strings, for reverse
+     *  library search (`ce.searchDefinitions()`). Optional: MathJSON-only
+     *  builds and minimal injected syntaxes may not implement it. */
+    getNamedTriggers?(): ReadonlyArray<{
+        name: string;
+        triggers: string[];
+    }>;
 }
 export type OperatorInfo = {
     kind: 'function' | 'opaque';
@@ -17658,6 +18375,20 @@ export type OperatorInfo = {
 export type SymbolInfo = {
     kind: 'constant' | 'variable';
     type: BoxedType;
+};
+/** One result of `ce.searchDefinitions()`. */
+export type DefinitionSearchResult = {
+    /** The canonical identifier, e.g. `'GCD'`. Always resolvable via
+     * `ce.lookupDefinition(id)`. */
+    id: MathJsonSymbol;
+    /** The kind of definition, using the same semantics as
+     * `operatorInfo()`/`symbolInfo()`:
+     * - `'function'` — an operator with an `evaluate` or `collection` handler
+     * - `'opaque'` — a registered-but-inert operator head
+     * - `'constant'` — a constant value symbol (e.g. `Pi`)
+     * - `'variable'` — a declared, non-constant value symbol
+     */
+    kind: 'function' | 'opaque' | 'constant' | 'variable';
 };
 /** @internal */
 /** A symbolic-integration provider: given an integrand and the integration
@@ -17821,7 +18552,18 @@ export interface IComputeEngine {
     }): Expression;
     /** @internal Compile a boxed expression. */
     _compile(expr: Expression, options?: Record<string, unknown>): CompilationResult;
-    /** @internal Get a registered compilation target by name. */
+    /**
+     * @internal Get a registered compilation target by name.
+     *
+     * The two built-in executable targets are typed concretely so their compiled
+     * `run` needs no cast: `interval-js` accepts `number | Interval` variables
+     * and returns `IntervalResult`; `javascript` accepts `number | ComplexResult`
+     * variables (plain reals or complex domain-coloring inputs) and returns
+     * `number | ComplexResult`. Any other name (source-only or custom targets)
+     * falls back to the generic `LanguageTarget<Expression>`.
+     */
+    getCompilationTarget(name: 'interval-js'): IntervalJsCompilationTarget<Expression> | undefined;
+    getCompilationTarget(name: 'javascript'): JavaScriptCompilationTarget<Expression> | undefined;
     getCompilationTarget(name: string): LanguageTarget<Expression> | undefined;
     /** @internal Return the names of all registered compilation targets. */
     listCompilationTargets(): string[];
@@ -17905,13 +18647,23 @@ export interface IComputeEngine {
     /**
      * Push a set of parameter names that, while canonicalizing a function body,
      * shadow any same-named constant (`i`, `e`, ...) so they resolve as ordinary
-     * local variables. Balanced with `_popShadowedParameters`.
+     * local variables. Balanced with `_popShadowedParameters`. Optional `types`
+     * carry declared types for annotated parameters so the auto-declaration
+     * during body canonicalization uses the declared (non-inferred) type.
      * @internal */
-    _pushShadowedParameters(names: ReadonlyArray<string>): void;
+    _pushShadowedParameters(names: ReadonlyArray<string>, types?: ReadonlyMap<string, Type>): void;
     /** @internal */
     _popShadowedParameters(): void;
     /** True if `name` is an active shadowed parameter (see above). @internal */
     _isShadowedParameter(name: string): boolean;
+    /** The declared type of an active shadowed parameter, if any. @internal */
+    _shadowedParameterType(name: string): Type | undefined;
+    /** The binding already auto-declared for an active shadowed parameter during
+     * the current body's canonicalization, if any. @internal */
+    _shadowedParameterDef(name: string): BoxedDefinition | undefined;
+    /** Cache the binding auto-declared for an active shadowed parameter so later
+     * references reuse it. @internal */
+    _setShadowedParameterDef(name: string, def: BoxedDefinition): void;
     /** Enter a user-function application, throwing a `CancellationError`
      * (`cause: 'recursion-depth-exceeded'`) when `recursionLimit` is exceeded.
      * Balanced with `_exitRecursion`. @internal */
@@ -18126,6 +18878,17 @@ export interface IComputeEngine {
      * two methods are non-overlapping).
      */
     symbolInfo(name: string): SymbolInfo | undefined;
+    /**
+     * Reverse library search: map a plain-text concept query to a ranked list
+     * of matching identifiers in the current scope chain (standard library plus
+     * any user declarations).
+     *
+     * Every returned `id` resolves via `ce.lookupDefinition(id)`; chain that
+     * call for full detail.
+     */
+    searchDefinitions(query: string, options?: {
+        limit?: number;
+    }): DefinitionSearchResult[];
 }
 declare module './types-expression.js' {
     interface ExpressionComputeEngine extends IComputeEngine {
@@ -18135,7 +18898,7 @@ declare module './types-definitions.js' {
     interface ComputeEngine extends IComputeEngine {
     }
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * DMS (Degrees-Minutes-Seconds) serialization utilities.
  */
 export interface DMSComponents {
@@ -18157,7 +18920,7 @@ export declare function degreesToDMS(totalDegrees: number): DMSComponents;
  * Used by both Degrees and Quantity serializers.
  */
 export declare function formatDMS(degrees: number): string;
-/* 0.74.0 */import type { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../../math-json/types.js';
 import { LatexString, SerializeLatexOptions, DelimiterScale } from './types.js';
 import type { IndexedLatexDictionary, IndexedLatexDictionaryEntry } from './dictionary/definitions.js';
 export declare class Serializer {
@@ -18197,7 +18960,7 @@ export declare class Serializer {
 }
 export declare function appendLatex(src: string, s: string): string;
 export declare function serializeLatex(expr: MathJsonExpression | null, dict: IndexedLatexDictionary, options: Readonly<SerializeLatexOptions>): string;
-/* 0.74.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
 import { ParseLatexOptions, LatexToken, Terminator, Parser, SymbolTable } from './types.js';
 import type { IndexedLatexDictionary, IndexedLatexDictionaryEntry, IndexedInfixEntry, IndexedPostfixEntry, IndexedPrefixEntry, IndexedSymbolEntry, IndexedExpressionEntry, IndexedFunctionEntry } from './dictionary/definitions.js';
 import { BoxedType } from '../../common/type/boxed-type.js';
@@ -18244,6 +19007,7 @@ export declare class _Parser implements Parser {
     pushSymbolTable(): void;
     popSymbolTable(): void;
     addSymbol(id: string, type: BoxedType | TypeString): void;
+    private _reversedIntervalDepth;
     private _quantifierScopeDepth;
     get inQuantifierScope(): boolean;
     enterQuantifierScope(): void;
@@ -18631,7 +19395,7 @@ export declare class _Parser implements Parser {
     getDefs(kind: string): Iterable<IndexedLatexDictionaryEntry>;
 }
 export declare function parse(latex: string, dictionary: IndexedLatexDictionary, options: Readonly<ParseLatexOptions>): MathJsonExpression | null;
-/* 0.74.0 */import { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import { MathJsonExpression } from '../../math-json/types.js';
 import { DelimiterScale } from './types.js';
 export declare function getApplyFunctionStyle(_expr: MathJsonExpression, _level: number): DelimiterScale;
 export declare function getGroupStyle(_expr: MathJsonExpression, _level: number): DelimiterScale;
@@ -18642,7 +19406,7 @@ export declare function getPowerStyle(_expr: MathJsonExpression, _level: number)
 export declare function getNumericSetStyle(_expr: MathJsonExpression, _level: number): 'compact' | 'regular' | 'interval' | 'set-builder';
 export declare function getIndexStyle(_expr: MathJsonExpression, _level: number): 'subscript' | 'bracket';
 export declare function latexTemplate(s: string, lhs: string, rhs: string): string;
-/* 0.74.0 */import type { OneOf } from '../../common/one-of.js';
+/* 0.77.0 */import type { OneOf } from '../../common/one-of.js';
 import type { MathJsonExpression, MathJsonSymbol } from '../../math-json/types.js';
 import type { TypeString } from '../../common/type/types.js';
 import type { DisplayDigits } from '../types-kernel-serialization.js';
@@ -19753,7 +20517,7 @@ export interface Serializer {
  *
  */
 export type SerializeHandler = (serializer: Serializer, expr: MathJsonExpression) => string;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * ## Reference
  * TeX source code:
  * {@link  http://tug.org/texlive/devsrc/Build/source/texk/web2c/tex.web | Tex.web}
@@ -19771,7 +20535,7 @@ export declare function countTokens(s: string): number;
 export declare function joinLatex(segments: Iterable<string>): string;
 export declare function supsub(c: '_' | '^', body: string, x: string): string;
 export declare function tokensToString(tokens: Token | Token[] | [Token[] | Token][]): string;
-/* 0.74.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json.js';
+/* 0.77.0 */import type { MathJsonExpression, MathJsonSymbol } from '../../math-json.js';
 import { Parser } from './types.js';
 /** For error handling, if we have a symbol prefix, assume
  * the symbol is invalid (it would have been captured by
@@ -19792,12 +20556,12 @@ export declare function parseInvalidSymbol(parser: Parser): MathJsonExpression |
  *    - `\mathit{speed\unicode{"2012}of\unicode{"2012}sound}`
  */
 export declare function parseSymbol(parser: Parser): MathJsonSymbol | null;
-/* 0.74.0 */export declare function isLatexString(s: unknown): s is string;
+/* 0.77.0 */export declare function isLatexString(s: unknown): s is string;
 export declare function asLatexString(s: unknown): string | null;
 export declare function isRelationalOperator(name: string | undefined): boolean;
 export declare function isInequalityOperator(operator: string | undefined): boolean;
 export declare function isEquationOperator(operator: string | undefined): boolean;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Number parsing extracted from the _Parser class for modularity.
  *
  * All functions take a `Parser` interface and a `NumberFormatTokens` config
@@ -19825,10 +20589,10 @@ export declare function parseRepeatingDecimal(parser: Parser, fmt: NumberFormatT
  * repeating decimals, etc.
  */
 export declare function parseNumber(parser: Parser, fmt: NumberFormatTokens): MathJsonExpression | null;
-/* 0.74.0 */import type { LatexDictionary } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary } from '../types.js';
 export declare const SYMBOLS: [string, string, number][];
 export declare const DEFINITIONS_SYMBOLS: LatexDictionary;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * LaTeX dictionary entries for parsing and serializing physical quantities
  * with units.
  *
@@ -19851,7 +20615,7 @@ export declare const DEFINITIONS_SYMBOLS: LatexDictionary;
  */
 import type { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_UNITS: LatexDictionary;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Type definitions for the indexed LaTeX dictionary.
  *
  * These are separated from definitions.ts to break a circular dependency:
@@ -19946,11 +20710,11 @@ export type IndexedLatexDictionary = {
     symbolTriggerDefs: Map<string, Map<string, IndexedLatexDictionaryEntry[]>>;
     triggerStartMax: Map<string, number>;
 };
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_ARITHMETIC: LatexDictionary;
-/* 0.74.0 */import type { LatexDictionary } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_OTHERS: LatexDictionary;
-/* 0.74.0 */import type { LatexDictionary } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary } from '../types.js';
 /**
  * LaTeX dictionary for color constructors and conversions.
  *
@@ -19960,17 +20724,17 @@ export declare const DEFINITIONS_OTHERS: LatexDictionary;
  * branches on the operator name.
  */
 export declare const DEFINITIONS_COLORS: LatexDictionary;
-/* 0.74.0 */import { LatexDictionaryEntry } from '../types.js';
+/* 0.77.0 */import { LatexDictionaryEntry } from '../types.js';
 export declare const DEFINITIONS_INEQUALITIES: LatexDictionaryEntry[];
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_SETS: LatexDictionary;
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_LINEAR_ALGEBRA: LatexDictionary;
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_TRIGONOMETRY: LatexDictionary;
-/* 0.74.0 */import type { LatexDictionary } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_STATISTICS: LatexDictionary;
-/* 0.74.0 */import { ErrorSignal, WarningSignal } from '../../../common/signals.js';
+/* 0.77.0 */import { ErrorSignal, WarningSignal } from '../../../common/signals.js';
 import { LatexDictionaryEntry } from '../types.js';
 export type { CommonEntry, IndexedSymbolEntry, IndexedExpressionEntry, IndexedFunctionEntry, IndexedMatchfixEntry, IndexedInfixEntry, IndexedPrefixEntry, IndexedPostfixEntry, IndexedEnvironmentEntry, IndexedLatexDictionaryEntry, IndexedLatexDictionary, } from './indexed-types.js';
 import type { IndexedSymbolEntry, IndexedExpressionEntry, IndexedFunctionEntry, IndexedMatchfixEntry, IndexedInfixEntry, IndexedPostfixEntry, IndexedEnvironmentEntry, IndexedLatexDictionaryEntry, IndexedLatexDictionary } from './indexed-types.js';
@@ -19991,13 +20755,13 @@ export declare function isIndexedPostfixEntry(entry: IndexedLatexDictionaryEntry
 /** @internal */
 export declare function isIndexedEnvironmentEntry(entry: IndexedLatexDictionaryEntry): entry is IndexedEnvironmentEntry;
 export declare function indexLatexDictionary(dic: Readonly<Partial<LatexDictionaryEntry>[]>, onError: (sig: ErrorSignal | WarningSignal) => void): IndexedLatexDictionary;
-/* 0.74.0 */import type { LatexDictionary } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_ALGEBRA: LatexDictionary;
-/* 0.74.0 */import type { LatexDictionary, Parser, Terminator } from '../types.js';
+/* 0.77.0 */import type { LatexDictionary, Parser, Terminator } from '../types.js';
 import type { MathJsonExpression } from '../../../math-json.js';
 export declare const DEFINITIONS_LOGIC: LatexDictionary;
 export declare function parseQuantifier(kind: 'NotForAll' | 'NotExists' | 'ForAll' | 'Exists' | 'ExistsUnique'): (parser: Parser, terminator?: Readonly<Terminator>) => MathJsonExpression | null;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Default LaTeX dictionary assembly.
  *
  * This file imports all individual domain dictionaries and assembles them
@@ -20035,9 +20799,9 @@ export { DEFINITIONS_PHYSICS as PHYSICS_DICTIONARY };
  * This is used as the default dictionary when no custom dictionary is provided.
  */
 export declare const LATEX_DICTIONARY: LatexDictionary;
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_CALCULUS: LatexDictionary;
-/* 0.74.0 */import { MathJsonExpression } from '../../../math-json/types.js';
+/* 0.77.0 */import { MathJsonExpression } from '../../../math-json/types.js';
 import { LatexDictionary, Parser } from '../types.js';
 export declare const PIPE_TOPIC_MARKER = "topic_marker";
 export declare const DEFINITIONS_CORE: LatexDictionary;
@@ -20096,9 +20860,9 @@ export declare const DELIMITERS_SHORTHAND: {
     '⎱': string;
 };
 export declare function latexToDelimiterShorthand(s: string): string | undefined;
-/* 0.74.0 */import { LatexDictionary } from '../types.js';
+/* 0.77.0 */import { LatexDictionary } from '../types.js';
 export declare const DEFINITIONS_COMPLEX: LatexDictionary;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Standalone LaTeX <-> MathJSON parsing and serialization.
  *
  * This module provides a `LatexSyntax` class and free-standing `parse()` /
@@ -20164,6 +20928,7 @@ export interface LatexSyntaxOptions {
 export declare class LatexSyntax {
     private _options;
     private _indexed;
+    private _namedTriggers;
     constructor(options?: LatexSyntaxOptions);
     /** Lazily built indexed dictionary. */
     private get indexed();
@@ -20184,6 +20949,18 @@ export declare class LatexSyntax {
      * @returns The resulting LaTeX string
      */
     serialize(expr: MathJsonExpression, options?: Partial<SerializeLatexOptions>): string;
+    /**
+     * Named dictionary entries with their LaTeX trigger strings, for reverse
+     * library search (`ce.searchDefinitions()`).
+     *
+     * Multiple dictionary entries can share a name; their triggers are merged.
+     * The flattened array is cached, since the indexed dictionary is immutable
+     * once built.
+     */
+    getNamedTriggers(): ReadonlyArray<{
+        name: string;
+        triggers: string[];
+    }>;
 }
 /**
  * Parse a LaTeX string into a MathJSON expression using the default
@@ -20211,7 +20988,7 @@ export declare function parse(latex: string): MathJsonExpression | null;
  * ```
  */
 export declare function serialize(expr: MathJsonExpression): string;
-/* 0.74.0 */import { MathJsonExpression } from '../../math-json/types.js';
+/* 0.77.0 */import { MathJsonExpression } from '../../math-json/types.js';
 import { NumberSerializationFormat } from './types.js';
 /**
  * @param expr - A number, can be represented as a string
@@ -20230,11 +21007,36 @@ export declare function serializeNumber(expr: MathJsonExpression | null, options
  * Does not handle integer and non-finite values.
  */
 export declare function serializeHexFloat(value: number): string;
-/* 0.74.0 */import type { Type, TypeString } from '../common/type/types.js';
+/* 0.77.0 */import type { Type, TypeString } from '../common/type/types.js';
 import { BoxedType } from '../common/type/boxed-type.js';
 import type { MathJsonSymbol } from '../math-json/types.js';
-import type { ValueDefinition, OperatorDefinition, AssignValue, Expression, BoxedDefinition, SymbolDefinition, IComputeEngine, Scope } from './global-types.js';
+import type { ValueDefinition, OperatorDefinition, AssignValue, Expression, BoxedDefinition, DefinitionSearchResult, SymbolDefinition, IComputeEngine, Scope } from './global-types.js';
 export declare function lookupDefinition(ce: IComputeEngine, id: MathJsonSymbol): undefined | BoxedDefinition;
+/**
+ * Reverse library search: map a plain-text concept query to a ranked list of
+ * matching identifiers. See `ComputeEngine.searchDefinitions`.
+ */
+export declare function searchDefinitions(ce: IComputeEngine, query: string, options?: {
+    limit?: number;
+}): DefinitionSearchResult[];
+/**
+ * Given a name that is *not* a known operator, return the closest known
+ * operator name (a "did you mean" suggestion), or `undefined` when nothing is
+ * close enough. Matching is conservative and applied in priority order, the
+ * first tier that yields a match wins:
+ *
+ *  1. case-insensitive exact match (`arg` → `Arg`),
+ *  2. singular/plural (`Quartile` → `Quartiles`, or vice-versa),
+ *  3. Damerau–Levenshtein distance ≤ 2 for names of length ≥ 6, ≤ 1 for
+ *     length 5, never for length < 5 (short names produce junk suggestions:
+ *     `vec` → `Sec`, `rand` → `And`, `print` → `Prime`),
+ *  4. the name is a prefix (≥ 3 chars) of exactly one known operator.
+ *
+ * Within a tier, ties break to the candidate sharing the longest prefix with
+ * the query (`integral` → `Integrate`, not `Interval`), then the shortest,
+ * then alphabetically.
+ */
+export declare function suggestOperatorName(ce: IComputeEngine, name: string): string | undefined;
 export declare function declareSymbolValue(ce: IComputeEngine, name: MathJsonSymbol, def: Partial<ValueDefinition>, scope?: Scope): BoxedDefinition;
 export declare function declareSymbolOperator(ce: IComputeEngine, name: string, def: OperatorDefinition, scope?: Scope): BoxedDefinition;
 export declare function getSymbolValue(ce: IComputeEngine, id: MathJsonSymbol): Expression | undefined;
@@ -20248,7 +21050,7 @@ export declare function declareFn(ce: IComputeEngine, arg1: string | {
 export declare function assignFn(ce: IComputeEngine, arg1: string | {
     [id: string]: AssignValue;
 }, arg2?: AssignValue): IComputeEngine;
-/* 0.74.0 */import { type ConfigurationChangeListener } from '../common/configuration-change.js';
+/* 0.77.0 */import { type ConfigurationChangeListener } from '../common/configuration-change.js';
 type ResetHooks = {
     refreshNumericConstants: () => void;
     resetCommonSymbols: () => void;
@@ -20263,13 +21065,14 @@ export declare class EngineConfigurationLifecycle {
     listen(listener: ConfigurationChangeListener): () => void;
 }
 export {};
-/* 0.74.0 */export declare const version = "0.74.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export { ComputeEngine } from './compute-engine/index.js';
 export type * from './compute-engine/types.js';
 export { LatexSyntax, parse as parseLatex, serialize as serializeLatex, } from './compute-engine/latex-syntax/latex-syntax.js';
 export { LATEX_DICTIONARY, CORE_DICTIONARY, SYMBOLS_DICTIONARY, ALGEBRA_DICTIONARY, ARITHMETIC_DICTIONARY, COMPLEX_DICTIONARY, TRIGONOMETRY_DICTIONARY, CALCULUS_DICTIONARY, LINEAR_ALGEBRA_DICTIONARY, STATISTICS_DICTIONARY, LOGIC_DICTIONARY, SETS_DICTIONARY, INEQUALITIES_DICTIONARY, UNITS_DICTIONARY, OTHERS_DICTIONARY, PHYSICS_DICTIONARY, } from './compute-engine/latex-syntax/dictionary/default-dictionary.js';
 export { BigDecimal } from './big-decimal/index.js';
 export { CancellationError } from './common/interruptible.js';
+export type { CancellationCause } from './common/interruptible.js';
 export type { CompileTarget, CompiledOperators, CompiledFunctions, CompilationOptions, CompilationResult, ExecutableTarget, ComplexResult, CompiledRunner, ExpressionRunner, LambdaRunner, LanguageTarget, TargetSource, CompiledFunction, } from './compute-engine/compilation/types.js';
 export { JavaScriptTarget } from './compute-engine/compilation/javascript-target.js';
 export { GPUShaderTarget } from './compute-engine/compilation/gpu-target.js';
@@ -20283,16 +21086,17 @@ export { parse, expr, simplify, evaluate, N, declare, assign, expand, expandAll,
 export type { FreeFunctionOptions } from './compute-engine/free-functions.js';
 export { registerStepLabels, labelFor, } from './compute-engine/boxed-expression/explain-labels.js';
 export type { StepLabel } from './compute-engine/boxed-expression/explain-labels.js';
-export { isExpression, isNumber, isSymbol, isFunction, isString, isTensor, isDictionary, isCollection, isIndexedCollection, numericValue, } from './compute-engine/boxed-expression/type-guards.js';
+export { isExpression, isNumber, isSymbol, isFunction, isString, isTensor, isDictionary, isCollection, isIndexedCollection, numericValue, sym, } from './compute-engine/boxed-expression/type-guards.js';
 export type { BoxedNumber } from './compute-engine/boxed-expression/boxed-number.js';
 export type { BoxedSymbol } from './compute-engine/boxed-expression/boxed-symbol.js';
 export type { BoxedFunction } from './compute-engine/boxed-expression/boxed-function.js';
 export type { BoxedString } from './compute-engine/boxed-expression/boxed-string.js';
 export type { BoxedTensor } from './compute-engine/boxed-expression/boxed-tensor.js';
 export type { FunctionProperties, FunctionPropertyRecord, } from './compute-engine/function-properties/index.js';
-/* 0.74.0 */export declare const version = "0.74.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export { ComputeEngine } from './compute-engine/index.js';
 export { CancellationError } from './common/interruptible.js';
+export type { CancellationCause } from './common/interruptible.js';
 export type * from './compute-engine/types.js';
 export type { Interval, IntervalResult, BoolInterval, } from './compute-engine/interval/types.js';
 export { expr, simplify, evaluate, N, declare, assign, expand, expandAll, factor, solve, getDefaultEngine, } from './compute-engine/free-functions.js';
@@ -20302,7 +21106,7 @@ export type { BoxedSymbol } from './compute-engine/boxed-expression/boxed-symbol
 export type { BoxedFunction } from './compute-engine/boxed-expression/boxed-function.js';
 export type { BoxedString } from './compute-engine/boxed-expression/boxed-string.js';
 export type { BoxedTensor } from './compute-engine/boxed-expression/boxed-tensor.js';
-/* 0.74.0 */import { NumberSerializationFormat } from '../compute-engine/latex-syntax/types.js';
+/* 0.77.0 */import { NumberSerializationFormat } from '../compute-engine/latex-syntax/types.js';
 import { MathJsonExpression } from '../math-json/types.js';
 import { FormattingOptions } from './formatter.js';
 export declare const NUMBER_FORMATTING_OPTIONS: NumberSerializationFormat;
@@ -20316,8 +21120,8 @@ export declare const NUMBER_FORMATTING_OPTIONS: NumberSerializationFormat;
 export declare function serializeCortex(expr: MathJsonExpression, options?: FormattingOptions & {
     fancySymbols?: boolean;
 }): string;
-/* 0.74.0 */export declare const RESERVED_WORDS: Set<string>;
-/* 0.74.0 */import { MathJsonSymbol } from '../math-json/types.js';
+/* 0.77.0 */export declare const RESERVED_WORDS: Set<string>;
+/* 0.77.0 */import { MathJsonSymbol } from '../math-json/types.js';
 export interface OperatorDef {
     /** The MathJSON operator this spelling maps to, e.g. `'Add'`. */
     name: MathJsonSymbol;
@@ -20345,9 +21149,11 @@ export declare const OPERATORS: OperatorDef[];
 export declare function infixOperatorForSymbol(symbol: string): OperatorDef | undefined;
 /** The prefix operator for a (canonical, ASCII) spelling, if any. */
 export declare function prefixOperatorForSymbol(symbol: string): OperatorDef | undefined;
+/** The postfix operator for a (canonical, ASCII) spelling, if any. */
+export declare function postfixOperatorForSymbol(symbol: string): OperatorDef | undefined;
 /** The canonical operator definition for a MathJSON operator name (serializer). */
 export declare function operatorDefByName(name: string): OperatorDef | undefined;
-/* 0.74.0 */export declare const ESCAPED_CHARS: Map<number, string>;
+/* 0.77.0 */export declare const ESCAPED_CHARS: Map<number, string>;
 export declare const REVERSED_ESCAPED_CHARS: Map<number, number>;
 export declare const HEX_DIGITS: Map<number, number>;
 export declare const DIGITS: Map<number, number>;
@@ -20372,7 +21178,7 @@ export declare function isIdentifierContinueProhibited(c: number): boolean;
 export declare function isIdentifierStartProhibited(c: number): boolean;
 export declare function isInvisible(c: number): boolean;
 export declare function codePointLength(code: number): number;
-/* 0.74.0 */import { Token } from './tokens.js';
+/* 0.77.0 */import { Token } from './tokens.js';
 export declare class Lexer {
     readonly source: string;
     private pos;
@@ -20472,7 +21278,7 @@ export declare class Lexer {
 }
 /** Convenience: tokenize `source` into a `Token[]` (never throws). */
 export declare function tokenize(source: string): Token[];
-/* 0.74.0 */import { MathJsonExpression } from '../math-json/types.js';
+/* 0.77.0 */import { MathJsonExpression } from '../math-json/types.js';
 import { ParsingDiagnostic } from './diagnostics.js';
 /** Analyze the reported errors and combine them when possible */
 export declare function analyzeErrors(errors: ParsingDiagnostic[]): ParsingDiagnostic[];
@@ -20493,7 +21299,7 @@ export declare function parseCortex(source: string, url?: string, options?: {
     parseLatex?: (latex: string) => MathJsonExpression;
     allowHostPragmas?: boolean;
 }): [MathJsonExpression, ParsingDiagnostic[]];
-/* 0.74.0 */export type FormattingOptions = {
+/* 0.77.0 */export type FormattingOptions = {
     indentChar: string;
     indentCharWidth: number;
     indentWidth: number;
@@ -20658,13 +21464,13 @@ export declare class Formatter {
     fencedList(open: string, sep: string | FormattingBlock, close: string, blocks: FormattingBlock[]): FormattingBlock;
     list(sep: string | FormattingBlock, blocks: FormattingBlock[]): FormattingBlock;
 }
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Cortex parsing diagnostics.
  *
  * These types were ported from the old combinator library. They are the
  * **canonical** diagnostic types for the Phase 1 lexer/parser rewrite.
  */
-export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'latex-parsing-unavailable' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
+export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'evaluation-canceled' | 'unknown-function' | 'latex-parsing-unavailable' | 'match-case-arrow-expected' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
 export type DiagnosticMessage = DiagnosticCode | [DiagnosticCode, ...any];
 /**
  * The parser will attempt to continue parsing even when an error is
@@ -20685,7 +21491,7 @@ export type ParsingDiagnostic = {
     range: [start: number, end: number, position?: number];
     fixits?: Fixit[];
 };
-/* 0.74.0 */import { DiagnosticMessage } from './diagnostics.js';
+/* 0.77.0 */import { DiagnosticMessage } from './diagnostics.js';
 /**
  * The set of token types produced by the Cortex {@link Lexer}.
  *
@@ -20787,7 +21593,7 @@ export interface Token {
     /** Doc comments recorded in the trivia immediately before this token. */
     docComments?: DocComment[];
 }
-/* 0.74.0 */import { MathJsonExpression } from '../math-json/types.js';
+/* 0.77.0 */import { MathJsonExpression } from '../math-json/types.js';
 import { ParsingDiagnostic } from './diagnostics.js';
 export declare class Parser {
     readonly source: string;
@@ -20813,6 +21619,11 @@ export declare class Parser {
     private pos;
     /** Stack of open-bracket tokens, for bracket-level panic recovery. */
     private brackets;
+    /** Implicit guards accumulated while patternizing a single `match` case:
+     * one `Element(name, type)` per type-annotated binding (`n: integer`). Reset
+     * at the start of each case's pattern parse and conjoined with the explicit
+     * guard. See `parseMatch`. */
+    private matchTypeGuards;
     constructor(source: string, options?: {
         url?: string;
         offset?: number;
@@ -20858,6 +21669,12 @@ export declare class Parser {
      */
     private parseStatement;
     private parseBlock;
+    /** `do { … }`: a statement block in expression position. The `do` keyword
+     * turns the brace-delimited block (otherwise the `{…}` collection grammar)
+     * into a `Block`, so it can appear anywhere an expression can (a lambda body
+     * `x |-> do { … }`, an assignment RHS, an argument). A `do` not followed by
+     * `{` is a diagnostic (with a fix-it suggesting `{`). */
+    private parseDoBlock;
     private parseDeclaration;
     /** Parse the optional `: Type` and `= value` tail of a declaration and build
      * the engine `Declare` node (type positional; `value`/`constant` in a
@@ -20883,25 +21700,110 @@ export declare class Parser {
      * keyword are consumed contextually here, so the `Element` *infix* operator
      * (also spelled `in`) never enters the collection's expression grammar. */
     private parseFor;
+    private parseMatch;
+    /** Parse a single `pattern [if guard] => body` case. Returns the
+     * `["MatchCase", …]` node plus the irrefutability metadata used by the
+     * non-final-irrefutable-case diagnostic, or `null` on an unrecoverable case. */
+    private parseMatchCase;
+    /** Conjoin the implicit type guards with an optional explicit guard into a
+     * single guard node (implicit first, per the design), or `null` when there
+     * are none. */
+    private combineGuards;
+    /** Parse a case pattern, including top-level or-alternatives
+     * (`p₁ | p₂ | …`). Bare `|` is unclaimed by the expression grammar, so it is
+     * consumed here. Alternatives lower to `["Alternatives", …]`; each must be
+     * binding-free. */
+    private parseCasePattern;
+    /** Whether the current token is a bare `|` (an or-alternative separator),
+     * including a maximal-munched pipe such as the `|-` of `1 |-2` (only the
+     * leading `|` is the separator). The real pipe operators (`||`, `|>`,
+     * `|->`, `||>`) are NOT separators — they parse as infix operators. */
+    private isAlternativeSeparator;
+    /** Consume the leading `|` of an or-alternative. When maximal munch glued the
+     * `|` to following operator characters (`|-` in `1 |-2`), rewrite the current
+     * token in place to drop the leading `|`, leaving the remainder (`-2`) to be
+     * parsed as the next alternative. */
+    private consumeAlternativeSeparator;
+    /** A single pattern (no top-level `|` alternatives — the caller handles
+     * those). Handles a leading `==` pin, then an operator-precedence pattern. */
+    private parsePattern;
+    /** `== <operand>` → a pin pattern. The operand grammar is a primary/postfix
+     * expression (`== Pi`, `== limit`, `== f(2)`), NOT patternized: it is an
+     * ordinary expression evaluated at match time in the enclosing scope. A pin
+     * of a literal lowers to the literal verbatim (it matches structurally); a
+     * pin of any other expression — including a bare symbol, whose value is only
+     * known at match time — lowers to `["Pin", expr]`. */
+    private parsePin;
+    /** Operator-precedence pattern parsing: a primary pattern followed by infix
+     * operator patterns (`a + b` → `["Add", _a, _b]`) and postfix (`n!`). */
+    private parsePatternInfix;
+    /** A primary pattern followed by call clauses (`f(p…)`). A prefix sign
+     * (`-2`, `+n`) and `!` are folded first. */
+    private parsePatternPostfix;
+    /** Lower a bare identifier to its pattern leaf: `_` → anonymous wildcard,
+     * boolean/numeric literals → themselves, any other identifier → a binding
+     * `_name` (all plain identifiers bind, including constants like `Pi`/`e`/`i`
+     * — design rule 2). A trailing `: Type` annotation on a binding records an
+     * implicit type guard. */
+    private finishBindingPattern;
+    /** A call pattern `head( p, … )` → `[head, …patternized]`. */
+    private parsePatternCall;
+    /** `...name` / `...` → a sequence-wildcard leaf `___name` / `___`. */
+    private parseRestPattern;
+    /** `[p, …]` → `["List", …patternized]`, at most one `...rest`. */
+    private parseListPattern;
+    /** `(p, …)` → `["Tuple", …]` for 2+ elements; a single element is grouping
+     * (returned bare). At most one `...rest`. */
+    private parseTuplePattern;
+    /** A brace pattern: `{k -> p, …}` → `Dictionary` (keys literal, values
+     * patternized); `{p, …}` → `Set` of patterns; `{}` → empty `Set`. */
+    private parseBracePattern;
+    /** Parse a comma-separated list of pattern elements delimited by the current
+     * opening bracket and `closeType`. Each element is a full pattern (so pins
+     * and nested alternatives-free patterns nest). A `k -> p` element is a
+     * dictionary entry: the key stays literal, the value is patternized. */
+    private parsePatternElements;
+    /** A pattern element inside a collection: either a `key -> value` dictionary
+     * entry (key literal, value patternized) or a plain pattern. The `->`
+     * (KeyValuePair) is an infix operator, so `parsePattern` already folds
+     * `key -> value` into a `KeyValuePair` node with *both* sides patternized;
+     * here the key is reverted to its literal written form. */
+    private parsePatternEntry;
+    /** Emit a `match-multiple-rest` diagnostic if a list/tuple pattern has more
+     * than one `...rest` element (v1 allows at most one). */
+    private checkSingleRest;
     /** Block form `function f(x) { … }` →
      * `["Assign", "f", ["Function", ["Block", …], …params]]`. Typed params
-     * (`function f(x: real) { … }`) and a return type (`… -> real { … }`) are
-     * accepted syntactically; both are held-and-dropped for v0 (the engine
-     * `Function` takes bare symbol params). */
+     * (`function f(x: real) { … }`) are carried inline as `["Typed", sym, type]`
+     * parameters, and a return type (`… -> real { … }`) is ascribed onto the body
+     * as `["Typed", body, type]` (the engine normalizes it into the Block). Both
+     * annotations are then enforced by the engine's typed-function-literal
+     * machinery; no `Declare` side-channel is needed. */
     private parseFunctionDefinition;
     /** Whether the statement at the cursor is a math-style function definition
-     * `f( … ) = …`: a bare symbol, an abutting `(`, its matching `)`, then `=`.
-     * A lookahead only — it consumes nothing. */
+     * `f( … ) = …` or `f( … ) -> Type = …`: a bare symbol, an abutting `(`, its
+     * matching `)`, then either `=` or an `-> Type =` return ascription. A
+     * lookahead only — it consumes nothing. */
     private isMathFunctionDef;
-    /** Math-style `f(x) = expr` (typed params supported) →
-     * `["Assign", "f", ["Function", expr, …params]]`. */
+    /** Math-style `f(x) = expr` →
+     * `["Assign", "f", ["Function", expr, …params]]`. Typed params
+     * (`f(x: integer) = …`) are carried inline as `["Typed", sym, type]`
+     * parameters, and a return type (`f(x: integer) -> real = …`) is ascribed
+     * onto the body as `["Typed", body, type]` (the engine normalizes it). Both
+     * annotations are enforced by the engine's typed-function-literal machinery;
+     * no `Declare` side-channel is needed. */
     private parseMathFunctionDef;
     /** Parse a `( param, … )` parameter list. Each param is a symbol with an
-     * optional `: Type` annotation (parsed and dropped for v0). Returns the bare
-     * param symbol nodes. */
+     * optional `: Type` annotation. An annotated param is emitted as a typed
+     * function-literal parameter `["Typed", sym, {str: type}]` (the engine's
+     * native form); a bare param is the plain symbol node. The `Function` literal
+     * built from these carries its parameter types inline, so no separate
+     * signature side-channel is needed. */
     private parseParameterList;
     /** Consume a `Type` starting at the current token (a return type after
-     * `->`). Parsed and dropped for v0. */
+     * `->`). Returns the held `{str: type}` node (to be ascribed onto the
+     * function body as `["Typed", body, {str: type}]`), or `null` on a malformed
+     * type (the following `{` / `=` expectation reports the problem). */
     private parseHeldType;
     /**
      * A bare type annotation in target position (no `let`/`const` keyword): a
@@ -20966,6 +21868,15 @@ export declare class Parser {
      * (no operator, or a whitespace-vetoed `a +b`).
      */
     private peekInfix;
+    /**
+     * If a postfix operator (`!` Factorial) abuts the current operand, return its
+     * definition. A postfix operator must NOT be preceded by whitespace (`x!`,
+     * never `x !`); a whitespace-preceded `!` is left for the infix/statement
+     * machinery, which is how postfix `!` (Factorial) is kept distinct from prefix
+     * `!` (Not). The `!=`/`!in` operators never reach here: the lexer munches
+     * `!=` into a single token, and `!in` is handled by `peekInfix` first.
+     */
+    private peekPostfix;
     /** The operator spelling a token would contribute in infix position (fancy
      * Unicode translated), or `null` if the token cannot be an operator. */
     private operatorText;
@@ -20976,10 +21887,11 @@ export declare class Parser {
     /** Combine an infix operator with its operands, flattening a run of the same
      * relational operator into an n-ary node (`a < b < c` → `Less(a,b,c)`). */
     private combineInfix;
-    /** Extract the parameter symbols from a mapsto LHS: a bare symbol (one
-     * parameter), or a `Tuple` of symbols (`(x, y) |-> …`). A parenthesized
-     * single symbol arrives here already unwrapped. A non-symbol parameter is a
-     * diagnostic and is dropped. */
+    /** Extract the parameters from a mapsto LHS: a bare symbol (one parameter),
+     * or a `Tuple` of parameters (`(x, y) |-> …`). Each parameter is either a
+     * bare symbol or a typed `["Typed", sym, type]` node (`(x: integer) |-> …`).
+     * A parenthesized single parameter arrives here already unwrapped. A
+     * non-parameter LHS element is a diagnostic and is dropped. */
     private mapstoParams;
     /** End offset (local) of the most recently consumed token. */
     private previousEnd;
@@ -21050,7 +21962,7 @@ export declare class Parser {
      * Absent a `(`, returns an empty list. */
     private parseArgumentClause;
 }
-/* 0.74.0 */import type { MathJsonExpression } from '../math-json/types.js';
+/* 0.77.0 */import type { MathJsonExpression } from '../math-json/types.js';
 import type { BoxedExpression, ComputeEngine } from '../compute-engine.js';
 import { ParsingDiagnostic } from './diagnostics.js';
 export interface ExecuteCortexOptions {
@@ -21092,20 +22004,21 @@ export interface ExecuteCortexResult {
  * they evaluate as ordinary engine primitives — no special handling here.
  */
 export declare function executeCortex(ce: ComputeEngine, source: string, options?: ExecuteCortexOptions): ExecuteCortexResult;
-/* 0.74.0 */export * from './math-json/types.js';
+/* 0.77.0 */export * from './math-json/types.js';
 export { ComputeEngine } from './compute-engine.js';
 export { parseCortex } from './cortex/parse-cortex.js';
 export { serializeCortex } from './cortex/serialize-cortex.js';
 export { executeCortex } from './cortex/execute-cortex.js';
 export type { ExecuteCortexOptions, ExecuteCortexResult, } from './cortex/execute-cortex.js';
-export declare const version = "0.74.0";
-/* 0.74.0 */export declare const version = "0.74.0";
+export type { CancellationCause } from './common/interruptible.js';
+export declare const version = "0.77.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export { loadIdentities, FUNGRIM_CORE, } from './compute-engine/fungrim/loader.js';
 export type { IdentitiesLoadOptions, IdentitiesLoadReport, IdentitiesRuleData, IdentitiesGuardUndecidedHandler, FungrimLoadOptions, FungrimLoadReport, FungrimRuleData, FungrimGuardUndecidedHandler, FungrimManifest, FungrimShellDeclaration, FungrimRuleClass, FungrimRuleTarget, FungrimMathJson, CompiledFungrimRule, GuardSpec, } from './compute-engine/fungrim/types.js';
-/* 0.74.0 */export declare const version = "0.74.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export { loadIntegrationRules } from './compute-engine/rubi/loader.js';
 export type { IntegrationRulesLoadOptions, IntegrationRulesLoadReport, } from './compute-engine/rubi/loader.js';
-/* 0.74.0 */export declare const version = "0.74.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export type { Interval, IntervalResult, BoolInterval, } from './compute-engine/interval/types.js';
 export { ok, point, containsExtremum, unionResults, mergeDomainClip, isPoint, containsZero, isPositive, isNegative, isNonNegative, isNonPositive, width, midpoint, getValue, unwrap, unwrapOrPropagate, } from './compute-engine/interval/util.js';
 export { add, sub, mul, div, negate, _mul, } from './compute-engine/interval/arithmetic.js';
@@ -21113,7 +22026,7 @@ export { sqrt, square, pow, powInterval, exp, ln, log10, log2, abs, floor, ceil,
 export { sin, cos, tan, cot, sec, csc, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, acot, acsc, asec, coth, csch, sech, acoth, acsch, asech, sinc, fresnelS, fresnelC, } from './compute-engine/interval/trigonometric.js';
 export { less, lessEqual, greater, greaterEqual, equal, notEqual, and, or, not, piecewise, clamp, } from './compute-engine/interval/comparison.js';
 export { IntervalArithmetic } from './compute-engine/interval/index.js';
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Entry point for `@cortex-js/compute-engine/latex-syntax`.
  *
  * Provides standalone LaTeX <-> MathJSON parsing and serialization
@@ -21126,8 +22039,8 @@ export type { LatexSyntaxOptions } from './compute-engine/latex-syntax/latex-syn
 export { LATEX_DICTIONARY, CORE_DICTIONARY, SYMBOLS_DICTIONARY, ALGEBRA_DICTIONARY, ARITHMETIC_DICTIONARY, COMPLEX_DICTIONARY, TRIGONOMETRY_DICTIONARY, CALCULUS_DICTIONARY, LINEAR_ALGEBRA_DICTIONARY, STATISTICS_DICTIONARY, LOGIC_DICTIONARY, SETS_DICTIONARY, INEQUALITIES_DICTIONARY, UNITS_DICTIONARY, OTHERS_DICTIONARY, PHYSICS_DICTIONARY, } from './compute-engine/latex-syntax/dictionary/default-dictionary.js';
 export type { LatexDictionaryEntry, LatexDictionary, SerializeLatexOptions, ParseLatexOptions, LatexString, } from './compute-engine/latex-syntax/types.js';
 export type { MathJsonExpression } from './math-json/types.js';
-export declare const version = "0.74.0";
-/* 0.74.0 *//**
+export declare const version = "0.77.0";
+/* 0.77.0 *//**
  * The following properties can be added to any MathJSON expression
  * to provide additional information about the expression.
  *
@@ -21258,7 +22171,7 @@ export type ExpressionObject = MathJsonNumberObject | MathJsonStringObject | Mat
  * @category MathJSON
  */
 export type MathJsonExpression = ExpressionObject | number | MathJsonSymbol | string | readonly [MathJsonSymbol, ...MathJsonExpression[]];
-/* 0.74.0 */import type { MathJsonExpression, ExpressionObject, MathJsonAttributes, MathJsonFunctionObject, MathJsonSymbolObject, MathJsonNumberObject, MathJsonStringObject, MathJsonSymbol, MathJsonDictionaryObject } from './types.js';
+/* 0.77.0 */import type { MathJsonExpression, ExpressionObject, MathJsonAttributes, MathJsonFunctionObject, MathJsonSymbolObject, MathJsonNumberObject, MathJsonStringObject, MathJsonSymbol, MathJsonDictionaryObject } from './types.js';
 export declare const MISSING: MathJsonExpression;
 export declare function isNumberExpression(expr: MathJsonExpression | null): expr is number | string | MathJsonNumberObject;
 export declare function isNumberObject(expr: MathJsonExpression | null): expr is MathJsonNumberObject;
@@ -21345,7 +22258,7 @@ export declare function matchesNumber(s: string): boolean;
 /** True if the string matches the expected pattern for a symbol */
 export declare function matchesSymbol(s: string): boolean;
 export declare function matchesString(s: string): boolean;
-/* 0.74.0 *//**
+/* 0.77.0 *//**
  * Return true if the string is a valid symbol.
  *
  * Check for symbols matching a profile of [Unicode UAX31](https://unicode.org/reports/tr31/)
@@ -21356,10 +22269,10 @@ export declare function matchesString(s: string): boolean;
 export declare function isValidSymbol(s: string): boolean;
 export declare const EMOJIS: RegExp;
 export declare function validateSymbol(s: unknown): 'valid' | 'not-a-string' | 'empty-string' | 'expected-nfc' | 'unexpected-mixed-emoji' | 'unexpected-bidi-marker' | 'unexpected-script' | 'invalid-first-char' | 'invalid-char';
-/* 0.74.0 */export type { MathJsonExpression, MathJsonAttributes, MathJsonNumberObject, MathJsonSymbolObject, MathJsonStringObject, MathJsonFunctionObject, MathJsonDictionaryObject, MathJsonSymbol, } from './math-json/types.js';
+/* 0.77.0 */export type { MathJsonExpression, MathJsonAttributes, MathJsonNumberObject, MathJsonSymbolObject, MathJsonStringObject, MathJsonFunctionObject, MathJsonDictionaryObject, MathJsonSymbol, } from './math-json/types.js';
 export { isSymbolObject, isStringObject, isFunctionObject, stringValue, operator, operand, symbol, mapArgs, dictionaryFromExpression, } from './math-json/utils.js';
-export declare const version = "0.74.0";
-/* 0.74.0 */export declare const version = "0.74.0";
+export declare const version = "0.77.0";
+/* 0.77.0 */export declare const version = "0.77.0";
 export type { SmallInteger, Rational, BigNum, } from './compute-engine/numerics/types.js';
 export type { ExactNumericValueData, NumericValueData, NumericValueFactory, } from './compute-engine/numeric-value/types.js';
 export { NumericValue } from './compute-engine/numeric-value/types.js';
