@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.6fb946d1.css">
-<script src="/assets/js/runtime~main.9515f437.js" defer="defer"></script>
-<script src="/assets/js/main.fcd800e0.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.e92b5c11.js" defer="defer"></script>
+<script src="/assets/js/main.39f98578.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -48,6 +48,20 @@
   
     </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Cortex CLI and interactive REPL.</strong> Installing
+<code>@cortex-js/compute-engine</code> now provides a <code>cortex</code> executable. It evaluates
+inline source (<code>cortex -e &#x27;1 + 2&#x27;</code>), <code>.cx</code>/<code>.cortex</code> files, or a program read
+from standard input; with no input argument in a terminal it starts a
+stateful REPL.</p>
+<p>The REPL retains declarations across inputs, supports multiline programs and
+persistent history, and adds <code>.load</code>, <code>.clear</code>, <code>.ast</code>, and <code>.time</code> commands
+alongside Node&#x27;s standard REPL commands. Non-interactive output can be
+emitted as text, MathJSON (<code>--json</code>), or Cortex source (<code>--cortex</code>).
+Diagnostics include source locations and are written to standard error.
+Evaluations have a 10-second deadline by default; <code>--time-limit</code> changes it
+and <code>--time-limit 0</code> disables it.</p>
+</li>
+<li class="">
 <p><strong><code>JacobianMatrix(fs, vars)</code></strong> — the matrix of partial derivatives ∂fᵢ/∂xⱼ,
 one row per function and one column per variable.</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">ce</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">box</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&#x27;JacobianMatrix&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&#x27;List&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> fs…</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&#x27;List&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;x&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;y&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;z&#x27;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">evaluate</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token comment" style="color:var(--base-05)">// → [[∂f₁/∂x, ∂f₁/∂y, ∂f₁/∂z], …]</span><br></div></code></pre></div></div>
@@ -75,6 +89,15 @@ operand <em>denotes</em>, not its syntax, so a user-defined function returning a
 list and a symbol bound to a list are both treated as systems.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements">Improvements<a href="#improvements" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>The LaTeX/ASCII-math pipeline operators now preserve <code>Pipe</code>.</strong> A bare
+pipeline stage such as <code>x |&gt; f</code> previously lowered immediately to
+<code>[&quot;Apply&quot;, &quot;f&quot;, &quot;x&quot;]</code>; it now produces <code>[&quot;Pipe&quot;, &quot;x&quot;, &quot;f&quot;]</code>, matching the
+Cortex parser and retaining <code>Pipe</code>&#x27;s held-operand semantics. Chained stages
+remain left-associated, prefix stages use <code>Function(Pipe(_, f), _)</code>, and a
+programmatic <code>Pipe</code> serializes with <code>\rhd</code>. Pipeline topic markers remain
+direct substitutions, so <code>x |&gt; f(\square)</code> still becomes <code>f(x)</code>.</p>
+</li>
 <li class="">
 <p><strong><code>simplify()</code> reaches a distributed form when it is cheaper.</strong> Rules tagged
 <code>purpose: &#x27;expand&#x27;</code> are excluded from its scan, because expansion usually
