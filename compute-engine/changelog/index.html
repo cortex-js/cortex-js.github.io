@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.6fb946d1.css">
-<script src="/assets/js/runtime~main.b51d683a.js" defer="defer"></script>
-<script src="/assets/js/main.b264715a.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.9c5cc39e.js" defer="defer"></script>
+<script src="/assets/js/main.b398631b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -5067,19 +5067,19 @@ powers of <code>1/x</code>.</p>
 <code>Series(\arctan x, x, +\infty)</code> →
 <code class="language-math math-inline">\tfrac{\pi}{2} - \tfrac{1}{x} + \tfrac{1}{3x^3} - \dots</code>. Coefficients are
 exact (<code>Series(\sin x, x, \frac{\pi}{6})</code> gives <code class="language-math math-inline">\tfrac12</code>,
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{\sqrt</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">3}{2}</span><br></div></code></pre></div></div>, …), and an undeclared <code>f</code> yields the textbook form
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">f(0) + f&#x27;(0)x +</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\dots</span><br></div></code></pre></div></div>.</li>
+<code class="language-math math-inline">\tfrac{\sqrt 3}{2}</code>, …), and an undeclared <code>f</code> yields the textbook form
+<code class="language-math math-inline">f(0) + f&#x27;(0)x + \dots</code>.</li>
 <li class="">At a <strong>pole</strong> the result is a Laurent expansion with a finite principal
 part: <code>Series(\frac{1}{\sin x}, x)</code> →
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{1}{x} + \tfrac{x}{6} +</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{7x^3}{360} + O(x^7)</span><br></div></code></pre></div></div>,
+<code class="language-math math-inline">\tfrac{1}{x} + \tfrac{x}{6} + \tfrac{7x^3}{360} + O(x^7)</code>,
 <code>Series(\cot x, x)</code> →
 <code class="language-math math-inline">\tfrac{1}{x} - \tfrac{x}{3} - \tfrac{x^3}{45} + \dots</code>, and the special
 functions expand at their poles with exact coefficients —
 <code>Series(\Gamma(x), x)</code> →
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{1}{x} - \gamma + (\tfrac{\gamma^2}{2} +</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{\pi^2}{12})x + \dots</span><br></div></code></pre></div></div>,
+<code class="language-math math-inline">\tfrac{1}{x} - \gamma + (\tfrac{\gamma^2}{2} + \tfrac{\pi^2}{12})x + \dots</code>,
 <code>Series(\zeta(x), x, 1)</code> → <code class="language-math math-inline">\tfrac{1}{x-1} + \gamma + O(x-1)</code>. Poles at <code>±∞</code>
 are handled too (<code>Series(\frac{x^2}{x-1}, x, +\infty)</code> →
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">x + 1 + \tfrac1x + \tfrac1{x^2} +</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\dots</span><br></div></code></pre></div></div>). An essential singularity or
+<code class="language-math math-inline">x + 1 + \tfrac1x + \tfrac1{x^2} + \dots</code>). An essential singularity or
 branch point (e.g. <code>Series(e^{1/x}, x)</code>, <code>Series(\ln x, x)</code>) is still left
 unevaluated rather than expanded incorrectly.</li>
 <li class=""><code>BigO(u)</code> is the inert Landau remainder, serialized <code>O\left(u\right)</code> and
@@ -5088,7 +5088,7 @@ parsed from <code>\mathcal{O}(u)</code> and <code>\operatorname{O}(u)</code>. It
 containing it is <code>NaN</code>.</li>
 <li class=""><code>Normal(expr)</code> strips the <code>BigO</code> terms, yielding the compilable/plottable
 truncated polynomial: <code>Normal(Series(\sin x, x))</code> →
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">x - \tfrac{x^3}{6} +</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{x^5}{120}</span><br></div></code></pre></div></div>.</li>
+<code class="language-math math-inline">x - \tfrac{x^3}{6} + \tfrac{x^5}{120}</code>.</li>
 </ul>
 </li>
 <li class="">
@@ -5288,12 +5288,12 @@ squares) are declined rather than answered partially.</p>
 <li class="">
 <p><strong>Periodic equations expand their root families over a bounded domain.</strong>
 <code>Solve(\sin x = \tfrac12,\; x \in [0, 4\pi])</code> returns all four exact solutions
-</p><div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{\pi}{6}, \tfrac{5\pi}{6}, \tfrac{13\pi}{6},</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac{17\pi}{6}</span><br></div></code></pre></div></div> — not
+<code class="language-math math-inline">\tfrac{\pi}{6}, \tfrac{5\pi}{6}, \tfrac{13\pi}{6}, \tfrac{17\pi}{6}</code> — not
 just the principal values. Scaled arguments work too (<code>\sin 2x = 1</code> over
 <code class="language-math math-inline">[0, 2\pi]</code> → <code class="language-math math-inline">\tfrac{\pi}{4}, \tfrac{5\pi}{4}</code>). Expansion applies when the
 unknown appears only inside trigonometric functions of linear arguments; each
 family member is verified by exact substitution, and unreasonably large
-expansions degrade gracefully to the principal roots.<p></p>
+expansions degrade gracefully to the principal roots.</p>
 </li>
 <li class="">
 <p><strong><code>assume()</code> bounds now filter solutions.</strong> After <code>assume(n &gt; 0)</code>,
@@ -5507,7 +5507,7 @@ honoring the exactness contract (<code class="language-math math-inline">\ln 2</
 <li class=""><strong>3×3 <code>Eigenvalues</code> returned wrong values — fixed.</strong> The analytic solver used
 a sign-flipped term in its depressed cubic, mirroring every eigenvalue about
 <code class="language-math math-inline">\operatorname{tr}/3</code>: e.g. <code class="language-math math-inline">[[5,-3,-7],[-2,1,2],[2,-3,-4]]</code> returned
-<div class="language-math math-inline codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-math codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">\{\tfrac{10}{3}, -\tfrac53,</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">\tfrac13\}</span><br></div></code></pre></div></div> instead of <code class="language-math math-inline">\{1, -2, 3\}</code>. (Spectra
+<code class="language-math math-inline">\{\tfrac{10}{3}, -\tfrac53, \tfrac13\}</code> instead of <code class="language-math math-inline">\{1, -2, 3\}</code>. (Spectra
 symmetric about their mean — like <code class="language-math math-inline">\{1,2,3\}</code> — were unaffected, which is how
 it escaped notice.) Additionally, a complex-conjugate eigenvalue pair was
 returned as its real part twice (<code class="language-math math-inline">\{2, \pm i\}</code> came back <code class="language-math math-inline">\{2, 0, 0\}</code>);
