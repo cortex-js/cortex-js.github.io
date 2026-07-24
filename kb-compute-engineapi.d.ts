@@ -7543,18 +7543,28 @@ export declare class RubiDriver {
      * Fail-closed: a non-closing subproblem or a failing D-check → null. Body
      * try/catch → null. */
     private hyperbolicRationalFactored;
-    /** R31: `∫f(x) dx` for a nested-radical / conjugate-radical integrand. Lever B
-     * conjugate-rationalizes a `(c₁√L₁+c₂√L₂)^(−n)` factor; Lever A iteratively
-     * substitutes `u = (a+b·x)^(1/k)` at the innermost linear radical (see
-     * `fractionalPowerOfLinearSubstitution`), keeping the produced rational's
-     * denominator FACTORED (`factoredRationalPresentation`) and routing single-
-     * quadratic-radical residuals as-is, then back-substitutes and unwinds the
-     * substitution stack. Accept only if the composed antiderivative passes a
+    /** R31/R32: `∫f(x) dx` for a nested-radical / conjugate-radical integrand.
+     * Lever B conjugate-rationalizes a `(c₁√L₁+c₂√L₂)^(−n)` factor; Lever A
+     * iteratively substitutes `u = (a+b·x)^(1/k)` at the innermost linear radical
+     * (see `fractionalPowerOfLinearSubstitution`), and Lever C (R32) performs an
+     * Euler I substitution `t = √a·x + √Q` at a √(quadratic)-nested radical
+     * (`√(x+√(x²+1))`, `eulerQuadraticSubstitution`), leaving a residual √-of-
+     * linear the next Lever A iteration removes. The produced rational's
+     * denominator is kept FACTORED (`factoredRationalPresentation`) and single-
+     * quadratic-radical residuals are routed as-is, then back-substitutes and
+     * unwinds the substitution stack. Accept only if the composed antiderivative
+     * passes a
      * DOMAIN-AWARE numeric D-check against the ORIGINAL integrand (several point-
      * sets probing |x|<1, x>1, and x<0 — the substitutions restrict the domain).
      * Fail-closed: a non-closing subproblem or a failing D-check → null. Body
      * try/catch → null. */
     private nestedRadicalFallback;
+    /** One pass of the R31/R32 substitution loop: iterated Lever A (and, when
+     * `useEuler`, Lever C after Lever A declines within an iteration), then route
+     * the residual (FACTORED if rational, single-quadratic-radical as-is), take its
+     * integral, unwind the substitution stack, and fail-closed on a domain-aware
+     * D-check. Returns the verified antiderivative or null. */
+    private leverSubstitutionLoop;
     /** Clean the exponential-fallback antiderivative: collect like terms via a
      * bounded simplify (the raw expansion repeats `c·x` once per exponential
      * term, which otherwise bloats high-degree results past the verifier's leaf
@@ -8004,8 +8014,11 @@ export declare function hyperbolicRationalFactoredForm(ce: ComputeEngine, integr
  *  the fallback stays a near-zero-cost no-op off its family. Purely structural.
  *  Note: the driver call site normalizes the integrand via `toTimesPower` first
  *  (so `Sqrt`/`Power`/`Root` heads are unified); `asFracPower` still handles a
- *  raw `Root` head directly for callers that skip that normalization. */
-export declare function hasNestedRadicalCandidate(e: Expression, x: string): boolean;
+ *  raw `Root` head directly for callers that skip that normalization.
+ *  `includeEuler` (default true) also admits the R32 Euler-nested shape (a `√B`
+ *  whose base contains a `√(quadratic)`, `√(x+√(x²+1))`); the driver passes
+ *  `!NO_R32` for a clean A/B toggle. */
+export declare function hasNestedRadicalCandidate(e: Expression, x: string, includeEuler?: boolean): boolean;
 /** R31 Lever A: one fractional-power-of-linear substitution. Finds the innermost
  *  `u = (a+b·x)^(1/k)` (or Laurent `u = (a+b/x)^(1/k)`), rewrites `integrand·dx`
  *  as a function of `u` (REUSING `x` as the new variable), and returns `{ g,
@@ -8014,6 +8027,23 @@ export declare function hasNestedRadicalCandidate(e: Expression, x: string): boo
  *  antiderivative. Null when there is no such radical or the substitution would
  *  leave a mixed (non-integer `k·q`) radical of the same base. */
 export declare function fractionalPowerOfLinearSubstitution(ce: ComputeEngine, integrand: Expression, x: string): {
+    g: Expression;
+    back: Expression;
+} | null;
+/** R32 Lever C: one Euler I substitution for a √(quadratic)-nested radical.
+ *  Finds the innermost `√Q`, `Q = a·x²+b·x+c` with `a>0`, and substitutes the
+ *  new variable `t = √a·x + √Q` (REUSING `x` as `t`), under which
+ *
+ *    x = (t²−c)/(2√a·t+b),  √Q = (√a·t²+b·t+√a·c)/(2√a·t+b),
+ *    dx/dt = 2·(√a·t²+b·t+√a·c)/(2√a·t+b)².
+ *
+ *  Returns `{ g, back }` — `g` the substituted integrand (`√Q` replaced by its
+ *  t-form, every bare `x` replaced by `inv`, times the Jacobian) and
+ *  `back = √a·x + √Q` (in the ORIGINAL x) the expression to substitute for the
+ *  reused variable when unwinding the antiderivative. Declines (null) unless Q
+ *  is a genuine quadratic with `a>0` that is not a perfect square (Euler II/III
+ *  are out of scope for R32). */
+export declare function eulerQuadraticSubstitution(ce: ComputeEngine, integrand: Expression, x: string): {
     g: Expression;
     back: Expression;
 } | null;
@@ -12812,6 +12842,23 @@ export declare function getPiTerm(expr: Expression): [k: NumericValue, t: Numeri
 export declare function isValidOperatorDef(def: unknown): def is Partial<OperatorDefinition>;
 export declare function isValidValueDef(def: unknown): def is Partial<ValueDefinition>;
 export declare function isValueDef(def: BoxedDefinition | undefined): def is TaggedValueDefinition;
+/**
+ * Whether `expr` contains a free symbol that carries a USER-ASSIGNED value: a
+ * NON-constant symbol with a value (`x` after `assign('x', 5)`), as opposed to
+ * a built-in constant (`Pi`, `ExponentialE`).
+ *
+ * This is the value-blindness gate for `simplify()`'s numeric folds. A
+ * subexpression with no free *unknowns* still must NOT be folded to a number
+ * when its "constant-ness" comes only from substituting an assigned value:
+ * `9 - w²` with `w := 5` must stay symbolic, not become `-72`. `.simplify()`
+ * does not resolve assigned values — that is `.evaluate()`'s job. A genuine
+ * constant is exempt: folding it is governed by the exactness contract, so
+ * `ln(e) -> 1` and `√(1+2) -> √3` still reduce.
+ *
+ * Reads `def.value.isConstant` (the constness marker on the value definition),
+ * so no boxed symbol is allocated per check.
+ */
+export declare function hasAssignedVariable(expr: Expression): boolean;
 export declare function isOperatorDef(def: BoxedDefinition | undefined): def is TaggedOperatorDefinition;
 export declare function updateDef(ce: ComputeEngine, name: string, def: BoxedDefinition, newDef: Partial<OperatorDefinition> | BoxedOperatorDefinition | Partial<ValueDefinition> | BoxedValueDefinition): void;
 export declare function placeholderDef(ce: ComputeEngine, name: string): BoxedDefinition;

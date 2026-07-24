@@ -18,8 +18,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.6fb946d1.css">
-<script src="/assets/js/runtime~main.9c5cc39e.js" defer="defer"></script>
-<script src="/assets/js/main.b398631b.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.c0db7b87.js" defer="defer"></script>
+<script src="/assets/js/main.64bed85e.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -127,7 +127,8 @@ specified in <a class="" href="/cortex/literals/#strings">Literals</a>.</p>
 <p><em>primary</em> → <em>signed-number</em> | <em>symbol</em> | <em>string</em> | <em>pragma</em> |
 <em>latex-island</em> | <em>parenthesized</em> | <em>list</em> | <em>set</em> | <em>dictionary</em> |
 <em>do-block</em> | <em>if-expression</em> | <em>match-expression</em></p>
-<p><em>call-clause</em> → <strong><code>(</code></strong> [(<em>expression</em>)#<strong><code>,</code></strong>] <strong><code>)</code></strong></p>
+<p><em>call-clause</em> → <strong><code>(</code></strong> [(<em>argument</em>)#<strong><code>,</code></strong>] <strong><code>)</code></strong></p>
+<p><em>argument</em> → [<strong><code>...</code></strong>] <em>expression</em></p>
 <p><em>index-clause</em> → <strong><code>[</code></strong> (<em>expression</em>)#<strong><code>,</code></strong> <strong><code>]</code></strong></p>
 <p><em>postfix-expression</em> → <em>primary</em> (<em>call-clause</em> | <em>index-clause</em> | <strong><code>!</code></strong>)*</p>
 <p><em>expression</em> → <em>primary</em> | <em>prefix-expression</em> | <em>infix-expression</em> |
@@ -138,7 +139,10 @@ specified in <a class="" href="/cortex/literals/#strings">Literals</a>.</p>
 <p><em>parameters</em> → <strong><code>(</code></strong> [(<em>parameter</em>)#<strong><code>,</code></strong>] <strong><code>)</code></strong></p>
 <p><em>declaration</em> → (<strong><code>let</code></strong> | <strong><code>const</code></strong>) <em>symbol</em>
 [<strong><code>:</code></strong> <em>type</em>] [<strong><code>=</code></strong> <em>expression</em>] |
+(<strong><code>let</code></strong> | <strong><code>const</code></strong>) <em>tuple-pattern</em> <strong><code>=</code></strong> <em>expression</em> |
 <em>symbol</em> <strong><code>:</code></strong> <em>type</em> [<strong><code>=</code></strong> <em>expression</em>]</p>
+<p><em>tuple-pattern</em> → <strong><code>(</code></strong> (<em>symbol</em> | <em>tuple-pattern</em>)#<strong><code>,</code></strong> <strong><code>)</code></strong>
+    — at least two elements; <code>_</code> skips a position</p>
 <p><em>function-definition</em> → <em>symbol</em> <em>parameters</em>
 [<strong><code>-&gt;</code></strong> <em>type</em>] <strong><code>=</code></strong> <em>expression</em> |
 <strong><code>function</code></strong> <em>symbol</em> <em>parameters</em> [<strong><code>-&gt;</code></strong> <em>type</em>] <em>block</em></p>
@@ -194,6 +198,10 @@ call/index applies to. The primary forms are:</p>
 <p>A call is a symbol (or another primary) immediately followed — with <strong>no</strong>
 whitespace — by a parenthesized, comma-separated argument list:</p>
 <div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">f(x, y)     // [&quot;f&quot;, &quot;x&quot;, &quot;y&quot;]</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">f()         // [&quot;f&quot;]</span><br></div></code></pre></div></div>
+<p>An argument may be prefixed with <code>...</code> to spread a tuple&#x27;s elements into the
+call&#x27;s arguments (valid only in call argument lists — see
+<a class="" href="/cortex/operators/#spread">Spread</a>):</p>
+<div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">f(...p)      // [&quot;f&quot;, [&quot;Spread&quot;, &quot;p&quot;]]</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">f(1, ...p)   // [&quot;f&quot;, 1, [&quot;Spread&quot;, &quot;p&quot;]]</span><br></div></code></pre></div></div>
 <p>If the callee is not a bare symbol (for example, a parenthesized expression
 or the result of another call), the call lowers to <code>Apply</code>:</p>
 <div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">(getF())(x)   // [&quot;Apply&quot;, [&quot;getF&quot;], &quot;x&quot;]</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">(a + b)(2+1)  // [&quot;Apply&quot;, [&quot;Add&quot;, &quot;a&quot;, &quot;b&quot;], [&quot;Add&quot;, 2, 1]]</span><br></div></code></pre></div></div>
