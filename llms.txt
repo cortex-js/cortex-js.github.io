@@ -1,0 +1,127 @@
+# MathLive
+
+> Scientific Web Computing. Documentation for MathLive (math input for the web), the Compute Engine (symbolic computation in JavaScript) and Cortex (a language for scientific computing).
+
+Every page below is also available as HTML at the same URL without the `.md` suffix.
+
+## Mathfield
+
+- [All Mathfield documentation, concatenated](https://mathlive.io/llms-mathfield.txt)
+- [Introduction](https://mathlive.io/mathfield.md): MathLive is a web component for editing and displaying beautifully typeset math formulas, with LaTeX output and a virtual keyboard, in any web page.
+- [Mathfield Demo](https://mathlive.io/mathfield/demo.md): An interactive mathfield playground: edit a formula and watch its LaTeX, along with the simplified, evaluated and numeric forms, update as you type.
+- [Changelog - Mathfield](https://mathlive.io/mathfield/changelog.md): Release notes for MathLive: new features, behavior changes, deprecations and bug fixes, version by version.
+- [Math Virtual Keyboard](https://mathlive.io/mathfield/virtual-keyboard.md): Typing math requires access to many special symbols. While
+- [Matrix Editor](https://mathlive.io/mathfield/matrix.md): A matrix is a useful way to represent and manipulate linear transformations. They are also used to represent systems of linear equations and many
+- [LaTeX Commands](https://mathlive.io/mathfield/reference/commands.md): Mathfields support over 800 LaTeX commands.
+- [Keyboard Shortcuts](https://mathlive.io/mathfield/reference/keybindings.md): // Substitute a text label for the glyphs
+- [Getting Started](https://mathlive.io/mathfield/guides/getting-started.md): Let's add an editable mathfield to a web page.
+- [Add A Mathfield to Your Project](https://mathlive.io/mathfield/guides/integration.md): As discussed in Getting Started the
+- [Using A Mathfield with React](https://mathlive.io/mathfield/guides/react.md): Add an editable mathfield to a React application: render the <math-field> tag in JSX, get a reference with useRef, and customize it on mount.
+- [Using a Mathfield with Svelte](https://mathlive.io/mathfield/guides/svelte.md): Use a mathfield in a Svelte application with a wrapper component that forwards all attributes to the underlying <math-field> web component.
+- [Interacting with a Mathfield](https://mathlive.io/mathfield/guides/interacting.md): Changing the Content of a Mathfield
+- [Customizing a Mathfield](https://mathlive.io/mathfield/guides/customizing.md): The appearance and behavior of the mathfield is highly customizable.
+- [Menu](https://mathlive.io/mathfield/guides/menu.md): The Mathfield Context Menu provides a set of commands to perform common
+- [Virtual Keyboard](https://mathlive.io/mathfield/guides/virtual-keyboard.md): The Mathfield virtual keyboard is a keyboard displayed on screen that gives
+- [Keybindings and Inline Shortcuts](https://mathlive.io/mathfield/guides/shortcuts.md): Customize mathfield input: override or extend the default keybindings, and define inline shortcuts that expand a typed sequence into a math expression.
+- [Fill-in-the-Blank](https://mathlive.io/mathfield/guides/fill-in-the-blank.md): To have one or more portions of a mathfield editable, while the rest is
+- [Commands](https://mathlive.io/mathfield/guides/commands.md): You can perform editing operations on the mathfield programmatically.
+- [Macros](https://mathlive.io/mathfield/guides/macros.md): Define your own LaTeX macros in a mathfield, override or remove the predefined ones, and control which of the 800+ built-in commands stay available.
+- [Speech](https://mathlive.io/mathfield/guides/speech.md): Speech output for mathfields: keyboard shortcuts to speak a formula or the selection, the speak command, and how to configure the speech engine.
+- [Static Math Formulas](https://mathlive.io/mathfield/guides/static.md): Converting LaTeX to Various Formats
+- [Web Component Lifecycle](https://mathlive.io/mathfield/lifecycle.md): A mathfield web component goes through various stages during its lifecycle.
+- [Security](https://mathlive.io/compute-engine/guides/security.md): Deploy mathfields safely: the Content Security Policy directives MathLive needs, Trusted Types support, and disabling commands that can modify the DOM.
+- [Mathfield API Reference](https://mathlive.io/mathfield/api.md): Complete API reference for MathLive: the MathfieldElement class, its properties, methods and events, and the options that configure a mathfield.
+
+## Compute Engine
+
+- [All Compute Engine documentation, concatenated](https://mathlive.io/llms-compute-engine.txt)
+- [Introduction - Compute Engine](https://mathlive.io/compute-engine.md): The Compute Engine is a JavaScript/TypeScript library for symbolic computing and numeric evaluation of mathematical expressions.
+- [Compute Engine Demo](https://mathlive.io/compute-engine/demo.md): By default expressions are put in canonical form.
+- [Changelog - Compute Engine](https://mathlive.io/compute-engine/changelog.md): Release notes for the Compute Engine: new features, behavior changes, deprecations and bug fixes, version by version.
+- [Expressions](https://mathlive.io/compute-engine/guides/expressions.md): The Compute Engine produces and manipulates
+- [Evaluation of Expressions](https://mathlive.io/compute-engine/guides/evaluate.md): Evaluating an expression is the process of determining the value of the
+- [Symbolic Computing](https://mathlive.io/compute-engine/guides/symbolic-computing.md): The Compute Engine essentially performs computation by applying
+- [Numeric Evaluation](https://mathlive.io/compute-engine/guides/numeric-evaluation.md): To obtain an exact numeric evaluation of an expression use expr.evaluate().
+- [Canonical Form](https://mathlive.io/compute-engine/guides/canonical-form.md): Many mathematical objects can be represented by several equivalent expressions.
+- [Symbols](https://mathlive.io/compute-engine/guides/symbols.md): A symbol is a named object in the Compute Engine. It has a type and may
+- [Custom Functions and Symbols](https://mathlive.io/compute-engine/guides/augmenting.md): The MathJSON Standard Library is a
+- [Parsing and Serializing LaTeX](https://mathlive.io/compute-engine/guides/latex-syntax.md): The Compute Engine manipulates MathJSON expressions. It can also convert LaTeX strings to
+- [Types](https://mathlive.io/compute-engine/guides/types.md): In the Compute Engine, the type of an expression is the set of the
+- [Units and Quantities](https://mathlive.io/compute-engine/guides/units.md): The Compute Engine supports physical units and quantities. You can parse LaTeX
+- [Simplify](https://mathlive.io/compute-engine/guides/simplify.md): A complicated mathematical expression can often be transformed into a form that
+- [Compiling Expressions](https://mathlive.io/compute-engine/guides/compiling.md): The Compute Engine can compile LaTeX expressions to JavaScript functions!
+- [Python/NumPy Compilation Target](https://mathlive.io/compute-engine/guides/python-target.md): The Python compilation target generates NumPy-compatible Python code from mathematical expressions, enabling seamless integration with scientific Python workflows.
+- [Assumptions](https://mathlive.io/compute-engine/guides/assumptions.md): Assumptions are statements about symbols that are assumed to be true. For
+- [Patterns and Rules](https://mathlive.io/compute-engine/guides/patterns-and-rules.md): Recognizing patterns and applying rules is a powerful symbolic computing tool to
+- [Extended Rules — The Identities Library](https://mathlive.io/compute-engine/guides/identities.md): The Identities Library is an optional add-on that teaches the Compute
+- [Logic and First-Order Logic](https://mathlive.io/compute-engine/guides/logic.md): This guide covers working with logical expressions and First-Order Logic (FOL)
+- [Linear Algebra](https://mathlive.io/compute-engine/guides/linear-algebra.md): This guide covers working with vectors, matrices, and tensors in the Compute
+- [MathJSON Format](https://mathlive.io/math-json.md): MathJSON is a lightweight data interchange format for mathematical notation
+- [Compute Engine API Reference](https://mathlive.io/compute-engine/api.md): Complete API reference for the Compute Engine: the ComputeEngine and BoxedExpression classes, their properties and methods, and the supporting types.
+- [MathJSON Standard Library](https://mathlive.io/compute-engine/standard-library.md): The MathJSON standard library defines the vocabulary used by a MathJSON
+- [Arithmetic](https://mathlive.io/compute-engine/reference/arithmetic.md): Arithmetic in the Compute Engine: numeric constants such as ExponentialE and GoldenRatio, and functions for sums, products, powers, roots and rounding.
+- [Calculus](https://mathlive.io/compute-engine/reference/calculus.md): Calculus is the mathematical study of continuous change.
+- [Collections](https://mathlive.io/compute-engine/reference/collections.md): In the Compute Engine, collections group together multiple elements
+- [Colors](https://mathlive.io/compute-engine/reference/colors.md): The colors library provides functions for color manipulation,
+- [Complex](https://mathlive.io/compute-engine/reference/complex.md): Complex numbers in the Compute Engine: the ImaginaryUnit constant and the Real, Imaginary, Conjugate, Abs, Arg and ComplexRoots functions.
+- [Control Structures](https://mathlive.io/compute-engine/reference/control-structures.md): Control Structures define how a sequence of expressions is evaluated.
+- [Core](https://mathlive.io/compute-engine/reference/core.md): The functions described in this section are part of the core of the Compute
+- [Functions](https://mathlive.io/compute-engine/reference/functions.md): Functions are first-class values in the Compute Engine. This means that
+- [Linear Algebra](https://mathlive.io/compute-engine/reference/linear-algebra.md): Linear algebra is the branch of
+- [Logic](https://mathlive.io/compute-engine/reference/logic.md): Boolean logic in the Compute Engine: the True and False constants and the And, Or, Not, implication and equivalence operators, with their LaTeX notation.
+- [Sets](https://mathlive.io/compute-engine/reference/sets.md): A set is a collection of distinct elements.
+- [Special Functions](https://mathlive.io/compute-engine/reference/special-functions.md): Special functions in the Compute Engine: error and Gamma functions, Zeta, Beta, Lambert W, Fresnel integrals, Bessel and Airy functions, and elliptic integrals.
+- [Statistics](https://mathlive.io/compute-engine/reference/statistics.md): For the following functions, when the input is a collection, it can take the
+- [Combinatorics](https://mathlive.io/compute-engine/reference/combinatorics.md): Combinatorics functions in the Compute Engine provide essential tools for counting and enumerating discrete structures. These functions enable computation of binomial and multinomial coefficients,…
+- [Number Theory](https://mathlive.io/compute-engine/reference/number-theory.md): The functions in this section provide tools for number-theoretic computations:
+- [Strings and Text](https://mathlive.io/compute-engine/reference/strings.md): Strings and text in the Compute Engine: Unicode-aware operations over grapheme clusters, scalars and code points, and why strings are not collections.
+- [Trigonometry](https://mathlive.io/compute-engine/reference/trigonometry.md): Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return.
+- [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md): The Compute Engine provides a unit system for representing and computing with
+- [Extended Rules — Symbolic Integration](https://mathlive.io/compute-engine/guides/integration-rules.md): The Integration Rules library is an optional add-on that extends the
+- [Sequences](https://mathlive.io/compute-engine/guides/sequences.md): Mathematical sequences like the Fibonacci numbers, arithmetic progressions, or
+- [Fungrim Identities — Bessel and hypergeometric functions](https://mathlive.io/compute-engine/reference/fungrim-bessel-hypergeometric.md): Part of the Fungrim Identities reference — 115 identities for bessel and hypergeometric functions.
+- [Fungrim Identities — Complex numbers](https://mathlive.io/compute-engine/reference/fungrim-complex.md): Part of the Fungrim Identities reference — 40 identities for complex numbers.
+- [Fungrim Identities — Elementary functions](https://mathlive.io/compute-engine/reference/fungrim-elementary.md): Part of the Fungrim Identities reference — 212 identities for elementary functions.
+- [Fungrim Identities — Elliptic integrals](https://mathlive.io/compute-engine/reference/fungrim-elliptic-integrals.md): Part of the Fungrim Identities reference — 304 identities for elliptic integrals.
+- [Fungrim Identities — Gamma and related functions](https://mathlive.io/compute-engine/reference/fungrim-gamma.md): Part of the Fungrim Identities reference — 162 identities for gamma and related functions.
+- [Fungrim Identities — Modular forms and theta functions](https://mathlive.io/compute-engine/reference/fungrim-modular-theta.md): Part of the Fungrim Identities reference — 318 identities for modular forms and theta functions.
+- [Fungrim Identities — Number theory](https://mathlive.io/compute-engine/reference/fungrim-number-theory.md): Part of the Fungrim Identities reference — 70 identities for number theory.
+- [Fungrim Identities — Orthogonal polynomials](https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials.md): Part of the Fungrim Identities reference — 74 identities for orthogonal polynomials.
+- [Fungrim Identities — Combinatorial and integer sequences](https://mathlive.io/compute-engine/reference/fungrim-sequences.md): Part of the Fungrim Identities reference — 65 identities for combinatorial and integer sequences.
+- [Fungrim Identities — Zeta and L-functions](https://mathlive.io/compute-engine/reference/fungrim-zeta.md): Part of the Fungrim Identities reference — 80 identities for zeta and l-functions.
+- [Fungrim Identities](https://mathlive.io/compute-engine/reference/fungrim.md): The Compute Engine ships a library of special-function identities derived from the Fungrim "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation…
+
+## Cortex
+
+- [All Cortex documentation, concatenated](https://mathlive.io/llms-cortex.txt)
+- [Cortex](https://mathlive.io/cortex.md): Cortex is a programming language for scientific computing built on the Compute Engine.
+- [Getting Started with Cortex](https://mathlive.io/cortex/getting-started.md): Install Cortex, try the interactive REPL, run a source file, and embed the language in JavaScript.
+- [Cortex Goals](https://mathlive.io/cortex/goals.md): The goals guiding Cortex's design: ergonomic code that is easy to read and write, and familiarity with existing scientific and programming notation.
+- [Cortex Principles](https://mathlive.io/cortex/principles.md): The principles behind Cortex: an expression-oriented language where conditionals, matches and blocks produce values, while declarations remain statements.
+- [Cortex Naming](https://mathlive.io/cortex/naming.md): Naming conventions in Cortex: capitalized identifiers denote library and engine operators, lowercase identifiers denote user-defined variables and functions.
+- [Cortex Syntax](https://mathlive.io/cortex/syntax.md): The complete Cortex grammar: the notation used for productions, and the syntactic categories covering expressions, statements, literals and operators.
+- [Cortex Literals](https://mathlive.io/cortex/literals.md): Literal forms in Cortex: symbols following the MathJSON Unicode UAX31 profile, numbers, strings and collections, and the MathJSON each produces.
+- [Cortex Operators](https://mathlive.io/cortex/operators.md): Operators in Cortex: infix, prefix and postfix forms, precedence and associativity, and the whitespace rules that govern how operands are parsed.
+- [Cortex Control Flow](https://mathlive.io/cortex/control-flow.md): Control flow in Cortex: function definitions in math and block style, conditionals, pattern matching and loops, and the MathJSON each form lowers to.
+- [Cortex Declarations](https://mathlive.io/cortex/declarations.md): Declare symbols in Cortex: let for mutable bindings, const for immutable ones, with optional type annotations and lexical scoping rules.
+- [Cortex Evaluation](https://mathlive.io/cortex/evaluation.md): How executeCortex evaluates a Cortex program: top-level statements run sequentially in the engine's current scope, and the last statement's value is the result.
+- [Cortex Types](https://mathlive.io/cortex/types.md): Cortex has no type system of its own — it reuses the Compute Engine's type language, the same syntax accepted by ce.declare("f", "(real) -> real").
+- [Cortex Comments](https://mathlive.io/cortex/comments.md): Line and nestable block comments in Cortex, documentation comments, and why comments are lossy — they do not survive the round trip through MathJSON.
+- [Cortex Pragmas](https://mathlive.io/cortex/pragmas.md): Pragmas in Cortex: source forms the parser evaluates, injecting environment variables and other host values into MathJSON before the program runs.
+- [Cortex Examples](https://mathlive.io/cortex/examples.md): Complete, executable Cortex programs — from simple iteration to symbolic computation — each one verified by the documentation test suite.
+- [Cortex CLI](https://mathlive.io/cortex/cli.md): The cortex command-line interface: run files, evaluate inline programs, or start an interactive REPL.
+- [Cortex MCP Server](https://mathlive.io/cortex/mcp.md): Connect AI assistants to Cortex with the built-in Model Context Protocol server: exact arithmetic, symbolic computation, and library documentation as tools.
+- [Cortex for AI Agents](https://mathlive.io/cortex/for-agents.md): A condensed, machine-verified reference for AI agents writing Cortex: core semantics, syntax, and a table of the ways Cortex differs from Python and JavaScript reflexes.
+- [Cortex Source Code](https://mathlive.io/cortex/source-code.md): Source code requirements for Cortex: UTF-8 decoding, Unicode NFC normalization of identifiers, and how line terminators and whitespace are treated.
+- [Inside Cortex](https://mathlive.io/cortex/implementation.md): Cortex uses MathJSON as its intermediate representation and the Compute Engine as its runtime. The public language entry point exposes the three stages …
+
+## Tutorials
+
+- [All Tutorials documentation, concatenated](https://mathlive.io/llms-tutorials.txt)
+- [Tutorial: Simple Quiz](https://mathlive.io/tutorials/simple-quiz.md): In this tutorial, we'll create a web-based quiz application that allows
+
+## Additional Resources
+
+- [All Additional Resources documentation, concatenated](https://mathlive.io/llms-additional-resources.txt)
+- [About Us](https://mathlive.io/about.md): Arno Gourdol on the path from WinMath in 1984 to Apple and Adobe, and why Farfield Studio is building open source tools for scientific computing.
+- [MathLive SDKs](https://mathlive.io/sdk.md): MathLive provides several SDKs to help you build scientific and technical applications.

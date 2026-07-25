@@ -618,6 +618,8 @@ export declare function parseTypePrefix(source: string, typeResolver?: TypeResol
  *    - `expression`
  *    - `error`: an invalid value, such as `["Error", "missing"]`
  *    - `nothing`: the type of the `Nothing` symbol, the unit type
+ *    - `missing`: the type of the `Missing` symbol, the unit type of an
+ *       absent-but-positioned value (Julia `missing`, R `NA`)
  *    - `never`: the bottom type
  *    - `unknown`: a value whose type is not known
  *
@@ -651,7 +653,7 @@ export declare function parseTypePrefix(source: string, typeResolver?: TypeResol
  *
  *
  */
-export type PrimitiveType = NumericPrimitiveType | 'collection' | 'indexed_collection' | 'list' | 'set' | 'dictionary' | 'record' | 'tuple' | 'value' | 'scalar' | 'function' | 'symbol' | 'boolean' | 'string' | 'color' | 'expression' | 'unknown' | 'error' | 'nothing' | 'never' | 'any';
+export type PrimitiveType = NumericPrimitiveType | 'collection' | 'indexed_collection' | 'list' | 'set' | 'dictionary' | 'record' | 'tuple' | 'value' | 'scalar' | 'function' | 'symbol' | 'boolean' | 'string' | 'color' | 'expression' | 'unknown' | 'error' | 'nothing' | 'missing' | 'never' | 'any';
 /**
  * The numeric tower (D10, 2026-07-02): `integer ⊂ rational ⊂ real ⊂ complex ⊂
  * number`, with a parallel `finite_*` tower and a shared `non_finite_number`
@@ -1233,6 +1235,39 @@ export declare function functionResult(type: Readonly<Type> | undefined): Type |
 export declare function collectionElementType(type: Readonly<Type>): Type | undefined;
 export declare function isValidTypeName(name: string): boolean;
 /**
+ * True if `t` carries a `missing` arm at any nesting level (a scalar `missing`,
+ * a `T | missing` union, or a `missing` cell nested inside a list/collection/
+ * tuple/record). Used to gate the missing-value strip (§3.B of
+ * `docs/plans/2026-07-22-missing-value-typing-design.md`) so that a
+ * Missing-free program is never touched by the lift.
+ */
+export declare function typeContainsMissing(t: Readonly<Type>): boolean;
+/**
+ * The result type of a `propagate` application in which some operand cell may
+ * be absent (I6 absorption, §3.0/§3.B). Every `propagate` result cell is
+ * numeric, and an absent numeric cell contributes `NaN` — which is `number`
+ * but not any `finite_*`/`real`/`integer` subtype (Q2). So this transform:
+ *
+ * - strips every `missing` arm (the arm is absorbed, never re-attached), and
+ * - widens every numeric leaf to `number` (to admit the injected `NaN`),
+ *
+ * recursing through list/collection/tuple cells. `Sin(Missing) : number`,
+ * `Add(Missing, 1) : number`, `Sin(list<number|missing>) : list<number>`,
+ * `Add(Missing, matrix) : matrix`. Applied ONLY when absence is possible (some
+ * operand carries a `missing` arm), so Missing-free programs are untouched.
+ */
+export declare function absorbNumericAbsence(t: Readonly<Type>): Type;
+/**
+ * `t` with every `missing` arm removed, recursively through each cell (§3.B
+ * step 1). A bare `missing` cell becomes `never` (`never <:` anything, so the
+ * absence signal is carried by the runtime, not the type). This is the
+ * strip-before-validate transform: an operand of type `T | missing` validates
+ * against a parameter `P` iff `strip(T | missing) = T <: P`, so a scalar
+ * `Missing` is admissible without widening `P` (I4 — inference still unifies an
+ * unconstrained symbol against the bare `P`).
+ */
+export declare function stripMissingFromType(t: Readonly<Type>): Type;
+/**
  * True if `t` denotes an **atomic** value type — a cell in the cell/axis model
  * (see `docs/plans/2026-07-20-tensor-unification-design.md`, §D5). Atomic
  * types are the ones that may occupy a single tensor cell: numbers, booleans,
@@ -1496,7 +1531,7 @@ import { TypeResolver } from './types.js';
           | "-infinity" | "-oo" | "-∞"
 
 <primitive_type> ::= <numeric_primitive>
-                   | "any" | "unknown" | "nothing" | "never" | "error"
+                   | "any" | "unknown" | "nothing" | "missing" | "never" | "error"
                    | "expression" | "symbol" | "function" | "value"
                    | "scalar" | "boolean" | "string"
                    | "collection" | "indexed_collection" | "list" | "tuple"
@@ -2747,6 +2782,8 @@ type OperatorDefinitionFlags = {
     lazy: boolean;
     scoped: boolean;
     broadcastable: boolean;
+    missingBehavior?: 'reject' | 'propagate' | 'handle';
+    missingStrip: 'all' | number[];
     associative: boolean;
     commutative: boolean;
     commutativeOrder: ((a: Expression, b: Expression) => number) | undefined;
@@ -2765,9 +2802,12 @@ interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDefinitio
     complexity: number;
     inferredSignature: boolean;
     signature: BoxedType;
+    readonly resolvedMissingBehavior: 'reject' | 'propagate' | 'handle' | 'pass-through';
+    stripsMissingAt(i: number): boolean;
     readonly lambda: LambdaDefinition | undefined;
     type?: (ops: ReadonlyArray<Expression>, options: {
         engine: ExpressionComputeEngine;
+        operandTypes?: ReadonlyArray<Type | undefined>;
     }) => Type | TypeString | BoxedType | undefined;
     sgn?: (ops: ReadonlyArray<Expression>, options: {
         engine: ExpressionComputeEngine;
@@ -5085,6 +5125,29 @@ export type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefin
      */
     signature?: Type | TypeString | BoxedType;
     /**
+     * If `true`, the `signature` is a starting point to be refined, not a
+     * contract: assigning a function literal to this operator narrows the
+     * signature from the literal's body, and calls type from the narrowed
+     * signature.
+     *
+     * Declaring a `signature` normally pins it (`inferredSignature: false`),
+     * which is what you want for a fixed API. Set this to `true` to vouch
+     * that a name is an operator — so `f(x)` parses as an application rather
+     * than a multiplication — while leaving its types to be inferred from the
+     * body assigned later:
+     *
+     * ```js
+     * ce.declare('q', { signature: '(unknown) -> unknown', inferredSignature: true });
+     * ce.assign('q', ce.parse('t \\mapsto 2t+1'));
+     * // signature is now `(unknown) -> finite_number`, so `q(x) < y` types
+     * // `boolean` and compiles, while `q(L) < y` over a list `L` still types
+     * // `list<boolean>` and fails closed.
+     * ```
+     *
+     * A declaration that omits `signature` entirely behaves the same way.
+     */
+    inferredSignature?: boolean;
+    /**
      * The type of the result (return type) based on the type of
      * the arguments.
      *
@@ -5103,6 +5166,11 @@ export type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefin
      */
     type?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
+        /** Strip-before-validate override (§3.B): for a stripped parameter
+         * position with an absent operand, the operand's `missing`-stripped
+         * type; `undefined` where no override applies. A handler consults
+         * `operandTypes[i]` before `ops[i].type`. */
+        operandTypes?: ReadonlyArray<Type | undefined>;
     }) => Type | TypeString | BoxedType | undefined;
     /** Return the sign of the function expression.
      *
@@ -5699,6 +5767,35 @@ export type OperatorDefinitionFlags = {
      * **Default**: `false`
      */
     broadcastable: boolean;
+    /**
+     * How this operator treats an absent (`Missing`) operand, per the
+     * missing-value typing design
+     * (`docs/plans/2026-07-22-missing-value-typing-design.md`, §3.A). The
+     * declarable states are:
+     *
+     * - `'propagate'` — the signature is implicitly lifted `(A) -> B` to
+     *   `(A | missing) -> B`; an absent operand cell yields `NaN` in the
+     *   corresponding numeric result cell (arithmetic, transcendentals,
+     *   `Power`/`Root`).
+     * - `'handle'` — the operator owns its `Missing` result and runtime (`At`,
+     *   the reducers, `Coalesce`, `IsMissing`, `Equal`).
+     * - `'reject'` — an absent operand is an error, enforced in both strict and
+     *   non-strict modes.
+     *
+     * If undeclared, the *resolved* behavior is `'propagate'` when the signature
+     * is declared (not inferred) and every parameter type is numeric, otherwise
+     * `'pass-through'` (no strip, ordinary validation). See
+     * {@link BoxedOperatorDefinition.resolvedMissingBehavior}.
+     */
+    missingBehavior?: 'reject' | 'propagate' | 'handle';
+    /**
+     * Which parameter positions strip a `missing` arm before validation (§3.A).
+     * `'all'` (the default where the resolved behavior is `propagate`/`handle`)
+     * strips every position; a `number[]` strips only the listed 0-based
+     * positions. Consumed identically by validation, typing, and the runtime
+     * gate.
+     */
+    missingStrip: 'all' | number[];
     /** If `true`, `["f", ["f", a], b]` simplifies to `["f", a, b]`
      *
      * **Default**: `false`
@@ -5789,6 +5886,18 @@ export interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDe
     inferredSignature: boolean;
     /** The type of the arguments and return value of this function */
     signature: BoxedType;
+    /**
+     * The *resolved* missing-value behavior (§3.A of the missing-value typing
+     * design): the declared {@link missingBehavior} when present, otherwise
+     * `'propagate'` for a declared all-numeric signature and `'pass-through'`
+     * for everything else. Recomputed from the current signature — never cached
+     * across a signature mutation.
+     */
+    readonly resolvedMissingBehavior: 'reject' | 'propagate' | 'handle' | 'pass-through';
+    /** True if a `missing` arm is stripped from parameter position `i` before
+     * validation (§3.A). Only `propagate`/`handle` operators strip; `missingStrip`
+     * selects the positions. */
+    stripsMissingAt(i: number): boolean;
     /** If this operator definition was created from a user-defined function
      * literal (`f(x) := …`, `x ↦ …`, `ce.assign('f', lambda)`), a structured
      * view of it for traversal and classification: the parameters and the body
@@ -5806,6 +5915,9 @@ export interface BoxedOperatorDefinition extends BoxedBaseDefinition, OperatorDe
      */
     type?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
+        /** Stripped operand types conveyed by the missing-value strip (§3.B).
+         * A handler consults `operandTypes[i]` before `ops[i].type`. */
+        operandTypes?: ReadonlyArray<Type | undefined>;
     }) => Type | TypeString | BoxedType | undefined;
     /** If present, this handler can be used to determine the sign of the
      *  return value of the function, based on the sign and type of its
@@ -5964,6 +6076,7 @@ export type CommonSymbolBindings = {
     Pi: Expression;
     E: Expression;
     Nothing: Expression;
+    Missing: Expression;
 };
 export declare class EngineStartupCoordinator {
     private readonly engine;
@@ -8309,6 +8422,29 @@ export declare const RELOP_LIBRARY: SymbolDefinitions;
 export declare const NUMBER_THEORY_LIBRARY: SymbolDefinitions[];
 /* 0.93.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const FRACTALS_LIBRARY: SymbolDefinitions[];
+/* 0.93.0 */import type { Expression, IComputeEngine as ComputeEngine } from '../global-types.js';
+/**
+ * The absent-datum / empty-input gate shared by the 15 data-consuming
+ * aggregates (`Mean`, `Variance`, …, `Max`, `Min`, `Mode`) — §3.C of the
+ * missing-value typing design
+ * (`docs/plans/2026-07-22-missing-value-typing-design.md`, revision 6).
+ *
+ * A data-consuming aggregate over data that contains an ABSENT datum — a
+ * `Missing` symbol or a `NaN` number, whether a direct scalar operand or an
+ * element flattened from a finite collection operand — is itself absent. So is
+ * an aggregate over EMPTY input (no data at all). In a numeric result cell,
+ * absence is normalized to `NaN` (I6 absorption): there is no `| missing` arm,
+ * so the gate returns `NaN`, never the `Missing` symbol.
+ *
+ * Returns `ce.NaN` when the gate fires (absent datum or empty input),
+ * otherwise `undefined` (the handler proceeds with its ordinary computation).
+ *
+ * A NON-finite collection operand (a symbolic-length range, an
+ * enumeration-declined source) is UNDECIDABLE here: the gate returns
+ * `undefined` so the operator's own handler decides (it typically stays
+ * symbolic). Only a genuinely finite, fully-flattened input is judged empty.
+ */
+export declare function aggregateAbsence(ce: ComputeEngine, ops: ReadonlyArray<Expression>): Expression | undefined;
 /* 0.93.0 */import type { SymbolDefinitions, Expression } from '../global-types.js';
 import { type UnitExpression } from './unit-data.js';
 /**
@@ -11583,6 +11719,16 @@ export declare class BoxedFunction extends _BoxedExpression implements FunctionI
     get(index: Expression | string): Expression | undefined;
     indexWhere(predicate: (element: Expression) => boolean): number | undefined;
     subsetOf(rhs: Expression, strict: boolean): boolean;
+    /** Splice `Spread` operands (`f(...p)`) into the operand list.
+     *
+     * Returns `null` when no operand is a `Spread` (the common case, one cheap
+     * scan); the spliced operand list when every spread argument evaluated to a
+     * tuple; `this` when a spread argument has not (yet) resolved to a value
+     * (the call stays symbolic — a `Spread` operand must never reach positional
+     * parameter binding); or an error expression when it resolved to a definite
+     * non-tuple value (only tuples spread — a `List` does not).
+     */
+    private _spliceSpreadOps;
     _computeValue(options?: Partial<EvaluateOptions>): () => Expression;
     _computeValueAsync(options?: Partial<EvaluateOptions>): () => Promise<Expression>;
 }
@@ -11923,6 +12069,27 @@ type InternalSimplifyOptions = SimplifyOptions & {
      * `simplify()`) so the trial cannot nest. */
     noExpansionTrial?: boolean;
 };
+/**
+ * Value-blind entry point for the PUBLIC `.simplify()` methods (on
+ * `BoxedSymbol`/`BoxedFunction`). It enforces ROADMAP Item E's invariant:
+ *
+ * > `simplify()` may use sign/parity derived from a symbol's DECLARED TYPE and
+ * > in-scope ASSUMPTIONS, but NOT from its ASSIGNED VALUE. An assigned value is
+ * > treated as if the symbol were merely declared with that value's type.
+ *
+ * The seam: before running `simplify`, shadow-declare every assigned,
+ * non-constant free symbol of `expr` as VALUELESS (keeping its declared type)
+ * in a fresh scope. With no value, `BoxedSymbol.sgn`/`isOdd`/`isEven` fall back
+ * to type + assumptions (the shadow scope preserves outer assumptions), so no
+ * value leaks into a sign/parity-driven rewrite. `.evaluate()`/`.N()`/type
+ * inference are untouched — only `simplify()`'s VIEW is blinded.
+ *
+ * Re-entrancy is automatically safe: a rule that recursively calls
+ * `.simplify()` on a sub-expression re-enters here, but the symbols are already
+ * shadowed valueless, so `assignedVariableNames` returns nothing and no scope
+ * is pushed.
+ */
+export declare function simplifyValueBlind(expr: Expression, options?: Partial<InternalSimplifyOptions>): RuleSteps;
 export declare function simplify(expr: Expression, options?: Partial<InternalSimplifyOptions>, steps?: RuleSteps): RuleSteps;
 export {};
 /* 0.93.0 */import type { IComputeEngine as ComputeEngine, Expression } from '../global-types.js';
@@ -12232,24 +12399,13 @@ export declare function checkTypes(ce: ComputeEngine, args: ReadonlyArray<Expres
  * Check that the argument is pure.
  */
 export declare function checkPure(ce: ComputeEngine, arg: Expression | Expression | undefined | null): Expression;
-/**
- *
- * If the arguments match the parameters, return null.
- *
- * Otherwise return a list of expressions indicating the mismatched
- * arguments.
- *
- * <!--
- * @todo?:
- * - Some permutations of operands should perhaps always be treated as invalid. Consider:
- *   - A sequence wildcard (non-optional, i.e. '__') followed by either a universal wildcard ('_'),
- *   or another non-optional sequence wildcard. (note that an optional sequence wildcard is
- *   unproblematic here.)
- *
- * -->
- *
- */
-export declare function validateArguments(ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean, freshlyInferred?: ReadonlySet<BoxedValueDefinition>): ReadonlyArray<Expression> | null;
+export declare function validateArguments(ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean, freshlyInferred?: ReadonlySet<BoxedValueDefinition>, 
+/** Strip-before-validate (§3.B of the missing-value typing design): for a
+ * position where this predicate returns `true`, an operand carrying a
+ * `missing` arm is admitted when its stripped type still matches the
+ * parameter (a scalar `Missing` → `never`, admissible everywhere). The
+ * missing arm is carried by the runtime gate, not the type. */
+stripMissing?: (index: number) => boolean): ReadonlyArray<Expression> | null;
 export declare function spellCheckMessage(expr: Expression): string;
 /* 0.93.0 */export {};
 /* 0.93.0 */import type { BoxedSubstitution, ExpressionInput, PatternMatchOptions, Expression } from '../global-types.js';
@@ -12859,6 +13015,33 @@ export declare function isValueDef(def: BoxedDefinition | undefined): def is Tag
  * so no boxed symbol is allocated per check.
  */
 export declare function hasAssignedVariable(expr: Expression): boolean;
+/**
+ * The names of the free symbols in `expr` that carry a USER-ASSIGNED value (the
+ * same predicate as `hasAssignedVariable`, but returning every matching name).
+ * Used by the value-blind `simplify()` seam to shadow-declare these symbols as
+ * valueless so their sign/parity fall back to type + assumptions.
+ */
+export declare function assignedVariableNames(expr: Expression): string[];
+/**
+ * Run `fn` with each name in `names` shielded from its assigned value: for the
+ * duration of the call, the symbol is shadow-declared VALUELESS (keeping its
+ * declared type; in-scope assumptions survive) in a temporary scope.
+ *
+ * This is the shared mechanism behind the binder convention (ARCHITECTURE.md,
+ * "Bound variables, free symbols, and assigned values"): a variable a binder
+ * owns (`Solve`/`Integrate`/`Limit`/`D`/`Sum`/…) is a pure symbol, so a
+ * same-named global assignment must not leak into the operation OR its result.
+ *
+ * Only names carrying a USER-ASSIGNED, non-constant value are shielded — a
+ * valueless or built-in-constant name needs no shield (and a constant must not
+ * be stripped). When none qualify, `fn` runs directly with no scope push, so
+ * the common case (no contradictory assignment) has zero overhead and cannot
+ * change behavior.
+ *
+ * Re-entrancy is naturally safe: a shielded symbol no longer reads as assigned,
+ * so a nested `withValueShield` over the same name finds nothing to shield.
+ */
+export declare function withValueShield<T>(ce: ComputeEngine, names: Iterable<string>, fn: () => T): T;
 export declare function isOperatorDef(def: BoxedDefinition | undefined): def is TaggedOperatorDefinition;
 export declare function updateDef(ce: ComputeEngine, name: string, def: BoxedDefinition, newDef: Partial<OperatorDefinition> | BoxedOperatorDefinition | Partial<ValueDefinition> | BoxedValueDefinition): void;
 export declare function placeholderDef(ce: ComputeEngine, name: string): BoxedDefinition;
@@ -13359,6 +13542,8 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
     url?: string;
     wikidata?: string;
     broadcastable: boolean;
+    missingBehavior?: 'reject' | 'propagate' | 'handle';
+    missingStrip: 'all' | number[];
     associative: boolean;
     commutative: boolean;
     commutativeOrder: ((a: Expression, b: Expression) => number) | undefined;
@@ -13391,6 +13576,7 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
     get lambda(): LambdaDefinition | undefined;
     type?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
+        operandTypes?: ReadonlyArray<Type | undefined>;
     }) => BoxedType | Type | TypeString | undefined;
     sgn?: (ops: ReadonlyArray<Expression>, options: {
         engine: ComputeEngine;
@@ -13418,6 +13604,14 @@ export declare class _BoxedOperatorDefinition implements BoxedOperatorDefinition
     constructor(ce: ComputeEngine, name: string, def: OperatorDefinition);
     /** For debugging */
     toJSON(): Record<string, unknown>;
+    /**
+     * The *resolved* missing-value behavior (§3.A of the missing-value typing
+     * design). Computed from the declared {@link missingBehavior} and the current
+     * signature on every access — never cached, so a signature mutation
+     * (`infer()`/`update()`) is reflected immediately.
+     */
+    get resolvedMissingBehavior(): 'reject' | 'propagate' | 'handle' | 'pass-through';
+    stripsMissingAt(i: number): boolean;
     infer(sig: Type): void;
     update(def: OperatorDefinition): void;
 }
@@ -15008,6 +15202,13 @@ import type { NumericValue } from '../numeric-value/types.js';
 export declare function isExpression(x: unknown): x is Expression;
 export declare function isNumber(expr: Expression | null | undefined): expr is Expression & NumberLiteralInterface;
 export declare function isSymbol(expr: Expression | null | undefined, name?: string): expr is Expression & SymbolInterface;
+/**
+ * True when a value is an absence MARKER — the `Missing` symbol or a `NaN`
+ * number — regardless of provenance (I6). This is the value-level test the
+ * missing-value runtime gate and chained-`At` absorption use
+ * (`docs/plans/2026-07-22-missing-value-typing-design.md`).
+ */
+export declare function isAbsentValue(expr: Expression | null | undefined): boolean;
 export declare function isFunction(expr: Expression | null | undefined, operator?: string): expr is Expression & FunctionInterface;
 export declare function isString(expr: Expression | null | undefined): expr is Expression & StringInterface;
 /**
@@ -16491,6 +16692,7 @@ export declare class ComputeEngine implements IComputeEngine {
     readonly Pi: Expression;
     readonly E: Expression;
     readonly Nothing: Expression;
+    readonly Missing: Expression;
     readonly Zero: Expression;
     readonly One: Expression;
     readonly Half: Expression;
@@ -17502,6 +17704,14 @@ export declare class ComputeEngine implements IComputeEngine {
     /** Shortcut for `this.expr(["Tuple", ...])`
      *
      * The result is canonical.
+     *
+     * A `Nothing` element is spliced out, exactly as it is from a `Tuple`
+     * literal built with `box()`/`expr()`/`function()` — `Nothing` is an
+     * ERASURE marker, and splicing changes the ARITY of the tuple. A caller
+     * that needs a fixed-arity POSITIONAL pair whose slot may legitimately hold
+     * `Nothing` (a dictionary `(key, value)` entry, say) must build it with
+     * `_fn('Tuple', …)` instead. Use `Missing` for an absent-but-positioned
+     * coordinate.
      */
     tuple(...elements: ReadonlyArray<number>): Expression;
     tuple(...elements: ReadonlyArray<Expression>): Expression;
@@ -18407,6 +18617,35 @@ export interface CompileTarget<Expr = unknown> {
      * `Match` case. See `BaseCompiler.withBoundNames` and finding A2.
      */
     boundVars?: ReadonlySet<string>;
+    /**
+     * Target-supplied absence capability (§3.F of the missing-value typing
+     * design, `docs/plans/2026-07-22-missing-value-typing-design.md`). Because
+     * the interpreter domain-normalizes at construction (I6), numeric absence
+     * reaches the compile boundary already as `NaN` — no conversion shim is
+     * needed. The capability lets the discharge primitives (`IsMissing`,
+     * `Coalesce`; the consumers land in P3) and Kleene `Equal` lower uniformly:
+     *
+     * - `numeric` — the absent-element operations for a numeric-domain position.
+     *   `make()` emits the target's `NaN`; `isAbsent(x)` tests it; `coalesce(x,
+     *   d)` returns `x` unless absent, else `d`. `isAbsent` is **omitted** on a
+     *   target that cannot guarantee `isnan` survives (GPU fast-math) — then
+     *   discharge on that target is a compile error (fail closed).
+     * - `object` — the analogous operations for an object-domain (non-numeric)
+     *   position, keyed on the target's null literal. A target without this axis
+     *   rejects (compile error) any `missing`-typed object-domain position.
+     */
+    absence?: {
+        numeric: {
+            make: () => TargetSource;
+            isAbsent?: (x: TargetSource) => TargetSource;
+            coalesce?: (x: TargetSource, d: TargetSource) => TargetSource;
+        };
+        object?: {
+            nullLiteral: TargetSource;
+            isAbsent: (x: TargetSource) => TargetSource;
+            coalesce: (x: TargetSource, d: TargetSource) => TargetSource;
+        };
+    };
     /** Target language identifier (for debugging/logging) */
     language?: string;
     /**
@@ -18853,6 +19092,7 @@ export declare function tryGetComplexParts(expr: Expression, compile: (e: Expres
     im: string | null;
 } | null;
 /* 0.93.0 */import type { Expression, FunctionInterface, IComputeEngine as ComputeEngine } from '../global-types.js';
+import type { Type } from '../../common/type/types.js';
 import type { CompileTarget, CompilationResult, TargetSource } from './types.js';
 /**
  * A `Tuple` or `List` literal with a broadcasting component — a shape whose
@@ -18929,6 +19169,18 @@ export declare class BaseCompiler {
      * `return _acc; + 1.0`). The offending head is named in the error, which the
      * engine-level `compile()` surfaces via `success: false` + `unsupported`.
      */
+    /**
+     * Pick the target's absence axis (§3.F) for a position of type `t` by its
+     * DOMAIN (I6): a numeric-domain position (`<: number` after stripping the
+     * `missing` arm — `never` counts, since a bare-`missing` numeric absence is
+     * `NaN`) uses `absence.numeric`; any other (object) domain uses
+     * `absence.object`. Throws (fail closed) when the target declares no absence
+     * capability at all, or lacks the required object axis.
+     */
+    static absenceAxisForType(t: Readonly<Type>, target: CompileTarget<Expression>, opName: string): {
+        isAbsent?: (x: TargetSource) => TargetSource;
+        coalesce?: (x: TargetSource, d: TargetSource) => TargetSource;
+    };
     static compileValueOperand(expr: Expression | undefined, target: CompileTarget<Expression>, prec?: number): TargetSource;
     /**
      * Compile an expression to target language source code
@@ -18936,6 +19188,16 @@ export declare class BaseCompiler {
     static compile(expr: Expression | undefined, target: CompileTarget<Expression>, prec?: number): TargetSource;
     /** The innermost compile target's `boundVars`, synced by `compile()`. */
     private static _boundVarsCtx;
+    /**
+     * Statically splice `Spread` operands (`f(...p)`) into the call's argument
+     * list. A literal tuple splices directly; a symbolic argument whose STATIC
+     * type is a tuple of known arity n rewrites to n positional `At` accesses
+     * (`f(At(p,1), …, At(p,n))`). An argument whose arity is not statically
+     * known fails closed (D6): the compiled code could not re-validate the
+     * arity the interpreter enforces at splice time (a JS/Python dynamic
+     * spread would silently mis-bind on a mismatch instead of erroring).
+     */
+    private static spliceSpreadOperands;
     private static _compileInner;
     /**
      * Compile a function expression
@@ -18986,6 +19248,23 @@ export declare class BaseCompiler {
      * the declaration has no value (`Declare(sym)` / `Declare(sym, type)`).
      */
     private static declareValueOperand;
+    /**
+     * Desugar a destructuring `Declare` statement (`let (x, y) = (…, …)`) into
+     * per-leaf declares, so locals collection, complex/vector inference and
+     * every target's statement emitter see only plain scalar declares. Returns
+     * `null` when the statement is not a destructuring declare.
+     *
+     * Only a LITERAL tuple value lowers: each element expression is bound
+     * exactly once, in pattern order, so the rewrite is observationally
+     * identical to the interpreter's evaluate-once semantics. A `_` leaf keeps
+     * its element as a bare statement (its evaluation still happens). A
+     * non-literal value (a symbol, a call) has no sound static lowering
+     * without a typed temporary, and a shape mismatch is an interpreter error
+     * — both fail closed (D6) so the engine falls back to the interpreter.
+     * (Without this, the pattern compiled as a single `let _ = …` and every
+     * pattern name silently read as NaN.)
+     */
+    private static desugarPatternDeclare;
     /**
      * Compile a block expression
      */
@@ -20254,6 +20533,8 @@ export interface IComputeEngine {
     readonly Pi: Expression;
     readonly E: Expression;
     readonly Nothing: Expression;
+    /** The `Missing` symbol: an absent value whose position is preserved. */
+    readonly Missing: Expression;
     readonly Zero: Expression;
     readonly One: Expression;
     readonly Half: Expression;
@@ -23187,23 +23468,6 @@ export declare function lookupDefinition(ce: IComputeEngine, id: MathJsonSymbol)
 export declare function searchDefinitions(ce: IComputeEngine, query: string | string[], options?: {
     limit?: number;
 }): DefinitionSearchResult[];
-/**
- * Given a name that is *not* a known operator, return the closest known
- * operator name (a "did you mean" suggestion), or `undefined` when nothing is
- * close enough. Matching is conservative and applied in priority order, the
- * first tier that yields a match wins:
- *
- *  1. case-insensitive exact match (`arg` → `Arg`),
- *  2. singular/plural (`Quartile` → `Quartiles`, or vice-versa),
- *  3. Damerau–Levenshtein distance ≤ 2 for names of length ≥ 6, ≤ 1 for
- *     length 5, never for length < 5 (short names produce junk suggestions:
- *     `vec` → `Sec`, `rand` → `And`, `print` → `Prime`),
- *  4. the name is a prefix (≥ 3 chars) of exactly one known operator.
- *
- * Within a tier, ties break to the candidate sharing the longest prefix with
- * the query (`integral` → `Integrate`, not `Interval`), then the shortest,
- * then alphabetically.
- */
 export declare function suggestOperatorName(ce: IComputeEngine, name: string): string | undefined;
 export declare function declareSymbolValue(ce: IComputeEngine, name: MathJsonSymbol, def: Partial<ValueDefinition>, scope?: Scope): BoxedDefinition;
 export declare function declareSymbolOperator(ce: IComputeEngine, name: string, def: OperatorDefinition, scope?: Scope): BoxedDefinition;
@@ -23642,7 +23906,7 @@ export declare class Formatter {
  * These types were ported from the old combinator library. They are the
  * **canonical** diagnostic types for the Phase 1 lexer/parser rewrite.
  */
-export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'evaluation-canceled' | 'unknown-function' | 'latex-parsing-unavailable' | 'match-case-arrow-expected' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
+export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'evaluation-canceled' | 'unknown-function' | 'print-not-available' | 'assign-in-argument' | 'zero-index' | 'floor-division-comment' | 'latex-parsing-unavailable' | 'match-case-arrow-expected' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
 export type DiagnosticMessage = DiagnosticCode | [DiagnosticCode, ...any];
 /**
  * The parser will attempt to continue parsing even when an error is
@@ -23848,11 +24112,20 @@ export declare class Parser {
      * `{` is a diagnostic (with a fix-it suggesting `{`). */
     private parseDoBlock;
     private parseDeclaration;
+    /** A tuple destructuring pattern in a declaration: `(a, b)`, `(a, _, c)`,
+     * `(a, (b, c))`. Elements are bare symbols (`_` skips a position) or nested
+     * tuple patterns; at least two elements are required (one element is a
+     * parenthesized name, not a tuple). `names` collects the bound names across
+     * nesting levels so a duplicate anywhere in the pattern is a diagnostic.
+     * Returns a `Tuple` node, or `null` after reporting a diagnostic. */
+    private parseDeclarationPattern;
     /** Parse the optional `: Type` and `= value` tail of a declaration and build
      * the engine `Declare` node (type positional; `value`/`constant` in a
      * trailing attributes `Dictionary`). On a malformed type, returns `null` (the
      * type subparse has already recovered). The current token is the one right
-     * after the declared name (`:`, `=`, or a separator). */
+     * after the declared name (`:`, `=`, or a separator). With `allowType:
+     * false` a `:` annotation is a diagnostic; with `requireValue: true` a
+     * missing `= value` is one (both used by destructuring declarations). */
     private finishDeclaration;
     /** Build a `["KeyValuePair", key, value]` attributes entry with a bare-symbol
      * key (matching the engine's attributes-Dictionary accessor). */

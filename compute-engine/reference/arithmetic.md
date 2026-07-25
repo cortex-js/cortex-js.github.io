@@ -1,0 +1,1131 @@
+<!-- https://mathlive.io/compute-engine/reference/arithmetic/ -->
+
+# Arithmetic
+
+## Constants
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
+
+| Symbol            | Value                        |                                                                                                                                                           |
+| :---------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ExponentialE`    | $$\approx 2.7182818284\ldots$$     | [Euler's number](https://www.wikidata.org/wiki/Q82435)                                                                                                    |
+| `MachineEpsilon`  | $$ 2^{−52}$$               | The difference between 1 and the next larger floating point number. <br/>See [Machine Epsilon on Wikipedia](https://en.wikipedia.org/wiki/Machine_epsilon) |
+| `CatalanConstant` | $$\approx 0.9159655941\ldots $$ | $$ \sum_{n=0}^{\infty} \frac{(-1)^{n}}{(2n+1)^2} $$ <br/> See [Catalan's Constant on Wikipedia](https://en.wikipedia.org/wiki/Catalan%27s_constant)      |
+| `GoldenRatio`     | $$\approx 1.6180339887\ldots$$  | $$ \frac{1+\sqrt{5}}{2} $$ <br/>See [Golden Ratio on Wikipedia](https://en.wikipedia.org/wiki/Golden_ratio)                                                  |
+| `EulerGamma`      | $$\approx 0.5772156649\ldots $$ | See [Euler-Mascheroni Constant on Wikipedia](https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant)                                             |
+
+</div>
+
+<ReadMore path="/compute-engine/reference/trigonometry/" >
+See also **Trigonometry** for `Pi` and related constants<Icon name="chevron-right-bold" />
+</ReadMore>
+
+<ReadMore path="/compute-engine/reference/complex/" > 
+See also **Complex** for `ImaginaryUnit`<Icon name="chevron-right-bold" />
+</ReadMore>
+
+## Functions
+
+### Arithmetic Functions
+
+<div className="symbols-table first-column-header">
+
+| Function   | Notation                      |                                                                                            |
+| :--------- | :---------------------------- | :----------------------------------------------------------------------------------------- |
+| `Add`      | $$ a + b$$                  | [Addition](https://www.wikidata.org/wiki/Q32043)          |
+| `Subtract` | $$ a - b$$                  | [Subtraction](https://www.wikidata.org/wiki/Q32043)       |
+| `Negate`   | $$-a$$                      | [Additive inverse](https://www.wikidata.org/wiki/Q715358) |
+| `Multiply` | $$ a\times b $$             | [Multiplication](https://www.wikidata.org/wiki/Q40276)    |
+| `Divide`   | $$ \frac{a}{b} $$           | [Divide](https://www.wikidata.org/wiki/Q1226939)          |
+| `Power`    | $$ a^b $$                   | [Exponentiation](https://www.wikidata.org/wiki/Q33456)    |
+| `Root`     | $$\sqrt[n]{x}=x^{\frac1n}$$ | [n<sup>th</sup> root](https://www.wikidata.org/wiki/Q601053)        |
+| `Sqrt`     | $$\sqrt{x}=x^{\frac12}$$    | [Square root](https://www.wikidata.org/wiki/Q134237)      |
+| `Square`   | $$x^2$$                     |                                                           |
+
+</div>
+
+### Sums and Products
+
+<FunctionDefinition name="Sum">
+
+<Signature name="Sum">_xs_: collection</Signature>
+
+Evaluate to a sum of all the elements in _collection_. If all the elements are
+numbers, the result is a number. Otherwise it is an `["Add"]` expression.
+
+<Latex flow="column" value="\sum x_{i}"/>
+
+```json example
+["Sum", ["List", 5, 7, 11]]
+// ➔ 23
+
+["Sum", ["List", 5, 7, "x" , "y"]]
+// ➔ ["Add", 12, "x", "y"]
+```
+
+Note this is equivalent to:
+
+```json example
+["Reduce", ["List", 5, 7, 11], "Add"]
+```
+
+
+<Signature name="Sum" returns="number">_body_: function, ..._bounds_: tuple</Signature>
+
+Evaluate to the sum of `body` for each value in `bounds`.
+
+<Latex flow="column" value="\sum{i=1}^{10} i+1"/>
+
+```json example
+["Sum", ["Add", "i", 1], ["Tuple", "i", 1, 10]]
+// ➔ 65
+```
+
+The bounds can also be written as a `\le` (or `\ge`) range in the subscript,
+instead of the `i=1`/superscript form. The chained form gives both bounds; a
+one-sided form supplies a single bound (the other defaults):
+
+```json example
+// \sum_{1 \le i \le 10} i^2
+ce.parse('\\sum_{1 \\le i \\le 10} i^2').evaluate()
+// ➔ 385
+
+// \sum_{i \le 10} i   (lower bound defaults to 1)
+ce.parse('\\sum_{i \\le 10} i').evaluate()
+// ➔ 55
+```
+
+<Signature name="Sum" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the sum of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\sum_{n \in \{1,2,3\}} n"/>
+
+```json example
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 6
+
+["Sum", ["Power", "n", 2], ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 14  (1² + 2² + 3² = 1 + 4 + 9)
+
+["Sum", "n", ["Element", "n", ["Range", 1, 5]]]
+// ➔ 15  (1 + 2 + 3 + 4 + 5)
+```
+
+The indexing set can be:
+- **Set**: `["Set", 1, 2, 3]` - explicit finite set of values
+- **List**: `["List", 1, 2, 3]` - ordered list of values
+- **List (2-element)**: `["List", 1, 5]` - when a List has exactly 2 integer elements,
+  it is treated as a Range. This allows bracket notation like `\sum_{n \in [1,5]} n`
+  to iterate over all integers from 1 to 5 (evaluates to 15, not 6).
+- **Range**: `["Range", 1, 10]` - integer range from 1 to 10
+- **Interval**: `["Interval", 1, 10]` - enumerates integers in the interval.
+  Supports `Open` and `Closed` boundary markers:
+  - `["Interval", 1, 5]` → iterates 1, 2, 3, 4, 5 (closed bounds)
+  - `["Interval", ["Open", 0], 5]` → iterates 1, 2, 3, 4, 5 (excludes 0)
+  - `["Interval", 1, ["Open", 6]]` → iterates 1, 2, 3, 4, 5 (excludes 6)
+
+**Note:** Evaluation requires a finite, enumerable domain with at most 1000 elements.
+Sums over infinite sets (like `\sum_{n \in \mathbb{N}}`) remain symbolic.
+
+#### Multiple Indexing Sets
+
+Multiple Element expressions can be specified for multi-index sums:
+
+<Latex flow="column" value="\sum_{n \in A}\sum_{m \in B} n \cdot m"/>
+
+```json example
+["Sum", ["Multiply", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Element", "m", ["Set", 3, 4]]]
+// ➔ 21  (1·3 + 1·4 + 2·3 + 2·4)
+```
+
+Mixed indexing sets (Element + Limits) can be used together:
+
+```json example
+["Sum", ["Add", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Limits", "m", 1, 2]]
+// ➔ 12  (n iterates {1,2}, m iterates 1 to 2)
+```
+
+#### Condition Filtering
+
+A condition can be attached to an Element expression to filter values from the set.
+The condition is the optional 4th operand of the Element expression.
+
+<Latex flow="column" value="\sum_{n \in S, n > 0} n"/>
+
+```json example
+// Sum only positive values from S
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, -1, -2], ["Greater", "n", 0]]]
+// ➔ 6  (only 1 + 2 + 3)
+
+// Sum values greater than or equal to 2
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, 4], ["GreaterEqual", "n", 2]]]
+// ➔ 9  (only 2 + 3 + 4)
+
+// Product of negative values
+["Product", "k", ["Element", "k", ["Set", 1, -2, 3, -4], ["Less", "k", 0]]]
+// ➔ 8  (only (-2) × (-4))
+```
+
+Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `NotEqual`.
+
+#### Simplification
+
+When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
+| $$\sum_{n=a}^{b} n$$ | $$\frac{b(b+1) - a(a-1)}{2}$$ | Triangular number (general bounds) |
+| $$\sum_{n=1}^{b} n^2$$ | $$\frac{b(b+1)(2b+1)}{6}$$ | Sum of squares |
+| $$\sum_{n=1}^{b} n^3$$ | $$\left[\frac{b(b+1)}{2}\right]^2$$ | Sum of cubes |
+| $$\sum_{n=0}^{b} r^n$$ | $$\frac{1-r^{b+1}}{1-r}$$ | Geometric series |
+| $$\sum_{n=0}^{b} (-1)^n$$ | $$\frac{1+(-1)^b}{2}$$ | Alternating unit series |
+| $$\sum_{n=0}^{b} (-1)^n \cdot n$$ | $$(-1)^b \lfloor\frac{b+1}{2}\rfloor$$ | Alternating linear series |
+| $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
+| $$\sum_{k=0}^{n} \binom{n}{k}$$ | $$2^n$$ | Sum of binomial coefficients |
+| $$\sum_{k=0}^{n} (-1)^k \binom{n}{k}$$ | $$0$$ | Alternating binomial sum |
+| $$\sum_{k=0}^{n} k \binom{n}{k}$$ | $$n \cdot 2^{n-1}$$ | Weighted binomial sum |
+| $$\sum_{k=1}^{n} \frac{1}{k(k+1)}$$ | $$\frac{n}{n+1}$$ | Partial fractions (telescoping) |
+| $$\sum_{k=2}^{n} \frac{1}{k(k-1)}$$ | $$\frac{n-1}{n}$$ | Partial fractions (telescoping) |
+| $$\sum_{k=0}^{n} k^2 \binom{n}{k}$$ | $$n(n+1) \cdot 2^{n-2}$$ | Weighted squared binomial sum |
+| $$\sum_{k=0}^{n} k^3 \binom{n}{k}$$ | $$n^2(n+3) \cdot 2^{n-3}$$ | Weighted cubed binomial sum |
+| $$\sum_{k=0}^{n} (-1)^k k \binom{n}{k}$$ | $$0$$ | Alternating weighted binomial sum (n ≥ 2) |
+| $$\sum_{k=0}^{n} \binom{n}{k}^2$$ | $$\binom{2n}{n}$$ | Sum of binomial squares |
+| $$\sum_{k=1}^{n} k(k+1)$$ | $$\frac{n(n+1)(n+2)}{3}$$ | Sum of consecutive products |
+| $$\sum_{n=m}^{b} (a + dn)$$ | $$(b-m+1)\left(a + \frac{d(m+b)}{2}\right)$$ | Arithmetic progression (general bounds) |
+| $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `0`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
+- Nested sums: inner sums are simplified first, enabling cascading simplification
+
+#### Infinite Series
+
+A `Sum` over an **infinite** upper bound is evaluated exactly when it matches
+a known convergent family; otherwise it stays symbolic (and `N()` computes an
+accelerated numerical approximation). The recognized families:
+
+| Series | Value | Name |
+| :----- | :---- | :--- |
+| $$\sum_{k=a}^{\infty} k^{-s}, \; s > 1$$ | $$\zeta(s) - \sum_{k<a} k^{-s}$$ | p-series ($\zeta(2) = \pi^2/6$, …) |
+| $$\sum_{k=n_0}^{\infty} c\,r^k, \; \|r\| < 1$$ | $$\frac{c\,r^{n_0}}{1-r}$$ | Geometric series |
+| $$\sum_{k=1}^{\infty} \frac{(-1)^{k+1}}{k^s}$$ | $$\eta(s)$$ | Alternating p-series ($\eta(1) = \ln 2$, $\eta(2) = \pi^2/12$) |
+| $$\sum_{k=1}^{\infty} \frac{1}{(2k-1)^s}, \; s > 1$$ | $$(1 - 2^{-s})\,\zeta(s)$$ | Odd p-series ($\pi^2/8$ for $s=2$) |
+| $$\sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)^s}$$ | $$\beta(s)$$ | Dirichlet beta ($\pi/4$, Catalan's constant, $\pi^3/32$, $5\pi^5/1536$ for $s = 1, 2, 3, 5$) |
+| $$\sum_{k=a}^{\infty} \frac{r^k}{k!}$$ | $$e^r - \sum_{k<a} \frac{r^k}{k!}$$ | Exponential series (symbolic $r$ allowed) |
+| $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
+| $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
+
+For a **symbolic** ratio $r$, the families with a convergence region return a
+`When`-guarded value recording it — for example
+$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$. Divergent numeric cases
+($\sum 1/k$, $\sum k \cdot 2^k$) stay symbolic.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Product">
+
+<Signature name="Product">_xs_: collection</Signature>
+
+Evaluate to a product of all the elements in `collection`.
+
+If all the elements are numbers, the result is a number. Otherwise it is a `["Multiply"]` expression.
+
+
+<Latex value="\prod x_{i}"/>
+
+```json example
+["Product", ["List", 5, 7, 11]]
+// ➔ 385
+
+["Product", ["List", 5, "x", 11]]
+// ➔ ["Multiply", 55, "x"]
+```
+
+Note this is equivalent to:
+
+```json example
+["Reduce", ["List", 5, 7, 11], "Multiply"]
+```
+
+
+<Signature name="Product">_f_: function, _bounds_:tuple</Signature>
+
+Return the product of `body` for each value in `bounds`.
+
+<Latex value="\prod_{i=1}^{n} f(i)"/>
+
+```json example
+["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
+// ➔ 39916800
+```
+
+<Signature name="Product" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the product of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\prod_{k \in \{1,2,3,4\}} k"/>
+
+```json example
+["Product", "k", ["Element", "k", ["Set", 1, 2, 3, 4]]]
+// ➔ 24  (4!)
+
+["Product", ["Power", "k", 2], ["Element", "k", ["Set", 1, 2, 3]]]
+// ➔ 36  (1² × 2² × 3² = 1 × 4 × 9)
+```
+
+See the `Sum` documentation above for details on supported collection types.
+
+#### Simplification
+
+When `simplify()` is called on a `Product` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
+| $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
+| $$\prod_{n=1}^{b} (n+c)$$ | $$\frac{(b+c)!}{c!}$$ | Shifted factorial |
+| $$\prod_{n=1}^{b} (2n-1)$$ | $$(2b-1)!!$$ | Odd double factorial |
+| $$\prod_{n=1}^{b} 2n$$ | $$2^b \cdot b!$$ | Even double factorial |
+| $$\prod_{k=0}^{n-1} (x+k)$$ | $$(x)_n$$ | Rising factorial (Pochhammer) |
+| $$\prod_{k=0}^{n-1} (x-k)$$ | $$\frac{x!}{(x-n)!}$$ | Falling factorial |
+| $$\prod_{k=1}^{n} \frac{k+1}{k}$$ | $$n+1$$ | Telescoping product |
+| $$\prod_{k=2}^{n} (1 - \frac{1}{k^2})$$ | $$\frac{n+1}{2n}$$ | Wallis-like product |
+| $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `1`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
+
+#### Infinite Products
+
+A `Product` over an **infinite** upper bound is evaluated exactly for these
+known convergent families (staying symbolic otherwise):
+
+| Product | Value | Name |
+| :------ | :---- | :--- |
+| $$\prod_{k=a}^{\infty} \left(1 - \frac{1}{k^2}\right), \; a \ge 2$$ | $$\frac{a-1}{a}$$ | Telescoping |
+| $$\prod_{k=1}^{\infty} \left(1 - \frac{1}{(2k)^2}\right)$$ | $$\frac{2}{\pi}$$ | Wallis product |
+| $$\prod_{k=1}^{\infty} \left(1 - \frac{1}{(2k+1)^2}\right)$$ | $$\frac{\pi}{4}$$ | Odd Wallis analog |
+| $$\prod_{k=1}^{\infty} \left(1 + \frac{1}{k^2}\right)$$ | $$\frac{\sinh \pi}{\pi}$$ | From the $\sin$ product formula |
+
+</FunctionDefinition>
+
+
+### Interpreting Elliptical Notation
+
+<FunctionDefinition name="Interpret">
+
+<Signature name="Interpret">_expr_</Signature>
+
+Give formal meaning to an **elliptical** sum or product — one written with an
+ellipsis, such as $1 + 2 + \dots + n$ — by turning it into a `Sum` or
+`Product`. A sum or product containing an ellipsis is otherwise an inert
+notational object (see [Elliptical Notation](/compute-engine/guides/latex-syntax/#elliptical-notation)),
+returned unchanged by `evaluate()`.
+
+Interpretation is an explicit **opt-in**: a plain `evaluate()` never guesses.
+The recognizer handles arithmetic progressions, polynomial general terms (via
+finite differences), geometric patterns, and linear recurrences (via
+Berlekamp–Massey and `RSolve`). The gate is strict by design — an ambiguous or
+unproven pattern is returned unchanged rather than interpreted incorrectly.
+
+```json example
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", "n"]]
+// ➔ ["Sum", "k", ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", 100]]
+// ➔ a Sum that evaluates to 5050
+
+["Interpret", ["Multiply", 2, 4, "ContinuationPlaceholder", ["Multiply", 2, "n"]]]
+// ➔ ["Product", ["Multiply", 2, "k"], ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 1, 2, 3, 5, 8, "ContinuationPlaceholder", 55]]
+// ➔ ["Sum", ["Fibonacci", "k"], ["Limits", "k", 1, 10]]  (evaluates to 143)
+```
+
+<ReadMore path="/compute-engine/guides/sequences/#interpreting-elliptical-notation" >
+Read more about **interpreting elliptical notation** and the recognizer families <Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+
+### Transcendental Functions
+
+<div className="symbols-table first-column-header">
+
+| Function     | Notation                |                                                                                                                            |
+| :----------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| `Exp`        | $$\exponentialE^{x}$$ | [Exponential function](https://www.wikidata.org/wiki/Q168698). Applied to a matrix, broadcasts element-wise — it is **not** the matrix exponential $e^M$ |
+| `Ln`         | $$\ln(x)$$            | [Logarithm function](https://www.wikidata.org/wiki/Q11197), the natural logarithm, the inverse of `Exp`          |
+| `Log`        | $$\log_b(x)$$         | `["Log", <v>, <b>]`<br/> Logarithm of base _b_, default 10                                     |
+| `Lb`         | $$\log_2(x)$$         | [Binary logarithm function](https://www.wikidata.org/wiki/Q581168), the base-2 logarithm  |
+| `Lg`         | $$\log_{10}(x)$$     | [Common logarithm](https://www.wikidata.org/wiki/Q966582), the base-10 logarithm                                        |
+| `LogOnePlus` | $$\ln(x+1)$$          |                                                                                           |
+
+</div>
+
+<ReadMore path="/compute-engine/reference/trigonometry/" > 
+See also **Trigonometry** for trigonometric functions <Icon name="chevron-right-bold" />
+</ReadMore>
+
+<ReadMore path="/compute-engine/reference/complex/" > 
+See also **Complex** for complex functions <Icon name="chevron-right-bold" />
+</ReadMore>
+
+<ReadMore path="/compute-engine/reference/statistics/" > 
+See also **Statistics** for statistics functions and functions on lists<Icon name="chevron-right-bold" />
+</ReadMore>
+
+### Rounding
+
+<div className="symbols-table first-column-header">
+
+| Function | Notation     |                                                                                                                   |
+| :------- | :----------- | :---------------------------------------------------------------------------------------------------------------- |
+| `Abs`    | $$\|x\| $$ | Absolute value, [magnitude](https://www.wikidata.org/wiki/Q3317982)              |
+| `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
+| `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
+| `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
+| `Round`  |              |                                                                                  |
+
+</div>
+
+### Other Relational Operators
+
+<FunctionDefinition name="Congruent">
+
+<Signature name="Congruent">_a_, _b_, _modulus_</Signature>
+
+Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
+
+
+
+```json example
+["Congruent", 26, 11, 5]
+// ➔ True
+```
+
+<Latex value=" 26 \equiv 11 \pmod{5}" flow="column"/>
+
+</FunctionDefinition>
+
+
+
+
+### Other Functions
+
+
+
+
+<FunctionDefinition name="Clamp">
+
+<Signature name="Clamp">_value_</Signature>
+
+<Signature name="Clamp">_value_, _lower_, _upper_</Signature>
+
+- If `value` is less than `lower`, evaluate to `lower`
+- If `value` is greater than `upper`, evaluate to `upper`
+- Otherwise, evaluate to `value`
+
+If `lower`and `upper`are not provided, they take the default values of -1 and
++1.
+
+```json example
+["Clamp", 0.42]
+// ➔ 1
+["Clamp", 4.2]
+// ➔ 1
+["Clamp", -5, 0, "+Infinity"]
+// ➔ 0
+["Clamp", 100, 0, 11]
+// ➔ 11
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Random">
+
+<Signature name="Random"></Signature>
+
+<Signature name="Random">_seed_</Signature>
+
+<Signature name="Random">_n_</Signature>
+
+<Signature name="Random">_m_, _n_</Signature>
+
+`Random` is **not** a pure function: by its nature it evaluates to a different
+value on each evaluation.
+
+- `["Random"]` evaluates to a non-deterministic floating-point number in the
+  interval $[0, 1)$.
+- `["Random", seed]` (with a real `seed`) evaluates to a deterministic
+  floating-point number in $[0, 1)$ derived from the seed.
+- `["Random", n]` (with an integer `n`) evaluates to a non-deterministic integer
+  in the interval $[0, n)$.
+- `["Random", m, n]` evaluates to a non-deterministic integer in the interval
+  $[m, n)$.
+
+```json example
+["Random"]
+// ➔ 0.6233… (for example)
+["Random", 10]
+// ➔ 7 (for example)
+["Random", 5, 10]
+// ➔ 8 (for example)
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomInteger">
+
+<Signature name="RandomInteger">_upper_: integer</Signature>
+
+<Signature name="RandomInteger">_lower_: integer, _upper_: integer</Signature>
+
+Return a random integer using inclusive bounds. With one argument the lower
+bound is `0`; with two arguments the result is in $[lower, upper]$.
+`RandomInteger` uses the Compute Engine's seeded random-number generator, so a
+seeded engine produces reproducible results.
+
+```json example
+["RandomInteger", 6]
+// ➔ an integer from 0 through 6
+
+["RandomInteger", 5, 10]
+// ➔ an integer from 5 through 10
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Max">
+
+<Signature name="Max">_x1_, _x2_, ...</Signature>
+
+<Signature name="Max">_list_</Signature>
+
+If all the arguments are real numbers, excluding `NaN`, evaluate to the largest
+of the arguments.
+
+Otherwise, simplify the expression by removing values that are smaller than or
+equal to the largest real number.
+
+```json example
+["Max", 5, 2, -1]
+// ➔ 5
+["Max", 0, 7.1, "NaN", "x", 3]
+// ➔ ["Max", 7.1, "NaN", "x"]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Min">
+
+<Signature name="Max">_x1_, _x2_, ...</Signature>
+
+<Signature name="Max">_list_</Signature>
+
+If all the arguments are real numbers, excluding `NaN`, evaluate to the smallest
+of the arguments.
+
+Otherwise, simplify the expression by removing values that are greater than or
+equal to the smallest real number.
+
+<Latex value=" \min(0, 7.1, 3) = 0"/>
+
+```json example
+["Min", 5, 2, -1]
+// ➔ -1
+["Min", 0, 7.1, "x", 3]
+// ➔ ["Min", 0, "x"]
+```
+
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Mod">
+
+<Signature name="Mod">_a_, _b_</Signature>
+
+Evaluate to the Euclidian division (modulus) of `a` by `b`.
+
+When `a` and `b` are positive integers, this is equivalent to the `%` operator in
+JavaScript, and returns the remainder of the division of `a` by `b`.
+
+However, when `a` and `b` are not positive integers, the result is different.
+
+The result is always the same sign as `b`, or 0.
+
+```json example
+["Mod", 7, 5]
+// ➔ 2
+
+["Mod", -7, 5]
+// ➔ 3
+
+["Mod", 7, -5]
+// ➔ -3
+
+["Mod", -7, -5]
+// ➔ -2
+```
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="Rational">
+
+<Signature name="Rational">_n_</Signature>
+
+Evaluate to a rational approximating the value of the number `n`.
+
+```json example
+["Rational", 0.42]
+// ➔ ["Rational", 21, 50]
+```
+
+
+<br/>
+
+<Signature name="Rational">_numerator_, _denominator_</Signature>
+
+Represent a rational number equal to `numerator`over `denominator`.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="Numerator">
+
+<Signature name="Numerator">_expr_</Signature>
+
+Return the numerator of `expr`.
+
+Note that `expr` may be a non-canonical form.
+
+
+```json example
+["Numerator", ["Rational", 4, 5]]
+// ➔ 4
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Denominator">
+
+<Signature name="Denominator">_expr_</Signature>
+
+Return the denominator of `expr`.
+
+Note that `expr` may be a non-canonical form.
+
+
+```json example
+["Denominator", ["Rational", 4, 5]]
+// ➔ 5
+```
+</FunctionDefinition>
+
+
+<FunctionDefinition name="NumeratorDenominator">
+
+<Signature name="NumeratorDenominator">_expr_</Signature>
+
+Return the numerator and denominator of `expr` as a sequence.
+
+Note that `expr` may be a non-canonical form.
+
+```json example
+["NumeratorDenominator", ["Rational", 4, 5]]
+// ➔ ["Sequence", 4, 5]
+```
+
+The sequence can be used with another function, for example GCD to 
+check if the fraction is in its canonical form:
+
+```json example
+["GCD", ["NumeratorDenominator", ["Rational", 4, 5]]]
+// ➔ 1
+
+["GCD", ["NumeratorDenominator", ["Rational", 8, 10]]]
+// ➔ 2
+```
+
+</FunctionDefinition>
+
+
+
+
+
+
+
+
+## Relational Operators
+
+<div className="symbols-table first-column-header">
+
+| Function       | Notation         |                                                                       |
+| :------------- | :--------------- | :------------------------------------------------------------------------------ |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
+| `NotEqual`     | $$ x \ne y $$  |                                                                                 |
+| `Greater`      | $$ x \gt y $$  | |
+| `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
+| `Less`         | $$ x \lt y $$  |                                                                                 |
+| `LessEqual`    | $$ x \leq y $$ |                                                                                 |
+
+See below for additonal relational operators: `Congruent`, etc...
+
+</div>
+
+## Polynomial Arithmetic
+
+These functions operate on polynomial expressions.
+
+<div className="symbols-table first-column-header">
+
+| Function               | Description                                                      |
+| :--------------------- | :--------------------------------------------------------------- |
+| `Expand`               | Expand products and positive integer powers                      |
+| `ExpandAll`            | Recursively expand products and positive integer powers          |
+| `Factor`               | Factor an expression into irreducible factors                    |
+| `Together`             | Combine rational expressions into a single fraction              |
+| `Distribute`           | Distribute multiplication over addition                          |
+| `PolynomialDegree`     | Return the degree of a polynomial                                |
+| `CoefficientList`      | Return the list of coefficients of a polynomial                  |
+| `Polynomial`           | Construct a polynomial from a coefficient list                   |
+| `PolynomialQuotient`   | Return the quotient of polynomial division                       |
+| `PolynomialRemainder`  | Return the remainder of polynomial division                      |
+| `GCD`                  | Greatest common divisor of integers or polynomials               |
+| `PolynomialGCD`        | Return the greatest common divisor of two polynomials            |
+| `Cancel`               | Cancel common polynomial factors in a rational expression        |
+| `PartialFraction`      | Decompose a rational expression into partial fractions           |
+| `Apart`                | Alias for `PartialFraction`                                      |
+| `PolynomialRoots`      | Return the roots of a polynomial                                 |
+| `Discriminant`         | Return the discriminant of a polynomial                          |
+
+</div>
+
+<FunctionDefinition name="Expand">
+
+<Signature name="Expand">_expr_</Signature>
+
+Expand out products and positive integer powers in `expr`.
+
+```json example
+["Expand", ["Power", ["Add", "x", 1], 2]]
+// ➔ ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ExpandAll">
+
+<Signature name="ExpandAll">_expr_</Signature>
+
+Recursively expand out products and positive integer powers in `expr` and all subexpressions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Factor">
+
+<Signature name="Factor">_expr_</Signature>
+
+<Signature name="Factor">_expr_, _var_</Signature>
+
+Factor a polynomial expression into a product of irreducible factors.
+
+Supports:
+- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
+- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
+- **Quadratic factoring**: $ ax^2 + bx + c $ (when roots are rational)
+- **Rational root factoring**: Degree 3+ polynomials with rational roots (via Rational Root Theorem)
+- **Content extraction**: $ 6x^2 + 12x + 6 \to 6(x+1)^2 $ (extracts GCD of integer coefficients first)
+- **Common factor extraction**: $ 2x + 4 \to 2(x+2) $
+
+The optional `var` parameter specifies which variable to factor over.
+
+**Perfect square trinomial:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Power", ["Add", "x", 1], 2]  // (x+1)²
+```
+
+**Quadratic with rational roots:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 5, "x"], 6]]
+// ➔ ["Multiply", ["Add", "x", 2], ["Add", "x", 3]]  // (x+2)(x+3)
+```
+
+**Difference of squares:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], -4]]
+// ➔ ["Multiply", ["Add", "x", -2], ["Add", "x", 2]]  // (x-2)(x+2)
+```
+
+A difference of squares is factored recursively, so a higher-degree input such
+as $$ x^6 - 1 $$ is reduced all the way to its irreducible (cyclotomic) factors
+rather than stopping at the first split:
+```json example
+["Factor", ["Subtract", ["Power", "x", 6], 1]]
+// ➔ (x-1)(x+1)(x²+x+1)(x²-x+1)
+```
+
+The factors are always polynomials: `Factor` never introduces `Sqrt` or `Abs`
+(e.g. $$ x^3 - 1 \to (x-1)(x^2+x+1) $$, not the branch-dependent
+$$ (x\sqrt{x}-1)(x\sqrt{x}+1) $$).
+
+**With coefficients:**
+```json example
+["Factor", ["Add", ["Multiply", 4, ["Power", "x", 2]], ["Multiply", 12, "x"], 9]]
+// ➔ ["Power", ["Add", ["Multiply", 2, "x"], 3], 2]  // (2x+3)²
+```
+
+**Cubic with rational roots:**
+```json example
+["Factor", ["Add", ["Power", "x", 3], ["Negate", ["Multiply", 6, ["Power", "x", 2]]], ["Multiply", 11, "x"], -6]]
+// ➔ ["Multiply", ["Add", "x", -1], ["Add", "x", -2], ["Add", "x", -3]]  // (x-1)(x-2)(x-3)
+```
+
+**Automatic use in sqrt simplification:**
+```json example
+["Sqrt", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Abs", ["Add", "x", 1]]  // |x+1| (auto-factors before applying sqrt rule)
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Together">
+
+<Signature name="Together">_expr_</Signature>
+
+Combine rational expressions into a single fraction with a common denominator.
+
+```json example
+["Together", ["Add", ["Divide", 1, "x"], ["Divide", 1, "y"]]]
+// ➔ ["Divide", ["Add", "x", "y"], ["Multiply", "x", "y"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Distribute">
+
+<Signature name="Distribute">_expr_</Signature>
+
+Distribute multiplication over addition in `expr`.
+
+```json example
+["Distribute", ["Multiply", "a", ["Add", "b", "c"]]]
+// ➔ ["Add", ["Multiply", "a", "b"], ["Multiply", "a", "c"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialDegree">
+
+<Signature name="PolynomialDegree">_poly_</Signature>
+
+<Signature name="PolynomialDegree">_poly_, _var_</Signature>
+
+Return the degree of the polynomial `poly` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
+
+```json example
+["PolynomialDegree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ 3
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="CoefficientList">
+
+<Signature name="CoefficientList">_poly_</Signature>
+
+<Signature name="CoefficientList">_poly_, _var_</Signature>
+
+Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from highest to lowest degree.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
+
+```json example
+["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ ["List", 1, 0, 2, 1]
+```
+
+The result represents the polynomial $$ 1 \cdot x^3 + 0 \cdot x^2 + 2 \cdot x + 1 $$. The first element is the leading coefficient, and the last element is the constant term.
+
+This function is also available as a method on expressions:
+
+```javascript
+const coeffs = ce.parse('x^3 + 2x + 1').polynomialCoefficients('x');
+// ➔ [1, 0, 2, 1]  (as BoxedExpression[])
+```
+
+When the variable is omitted, it is auto-detected if the expression has exactly one unknown:
+
+```javascript
+ce.parse('x^2 + 5').polynomialCoefficients();
+// ➔ [1, 0, 5]
+```
+
+Returns `undefined` if the expression is not a polynomial in the given variable. This subsumes an `isPolynomial` check and degree computation:
+
+```javascript
+const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
+const degree = expr.polynomialCoefficients('x')?.length - 1;
+```
+
+**Multivariate validation:** Pass an array of variables to validate that the expression is polynomial in all of them. The coefficients are decomposed by the first variable:
+
+```javascript
+ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y']);
+// ➔ [y, 3, y²]  (polynomial in both x and y, decomposed by x)
+
+ce.parse('sin(x)*y + 1').polynomialCoefficients(['x', 'y']);
+// ➔ undefined  (not polynomial in x)
+```
+
+### `polynomialRoots()`
+
+The `polynomialRoots()` method returns the roots of a polynomial expression:
+
+```javascript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x');
+// ➔ [2, 3]
+
+ce.parse('x^3 - 6x^2 + 11x - 6').polynomialRoots('x');
+// ➔ [1, 2, 3]
+
+ce.parse('x^2 + 1').polynomialRoots('x');
+// ➔ []  (no real roots)
+
+ce.parse('sin(x)').polynomialRoots('x');
+// ➔ undefined  (not a polynomial)
+```
+
+Returns `undefined` if the expression is not a polynomial. Returns an empty array if no roots can be found (e.g., irreducible over the rationals). Supports auto-detection of the variable when omitted.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Polynomial">
+
+<Signature name="Polynomial">_coefficients_, _var_</Signature>
+
+Construct a polynomial expression from a list of coefficients (highest degree first) and a variable. This is the inverse of `CoefficientList`.
+
+```json example
+["Polynomial", ["List", 1, 0, 2, 1], "x"]
+// ➔ ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1]
+```
+
+This constructs the polynomial $$ x^3 + 2x + 1 $$ from the coefficient list $$[1, 0, 2, 1]$$.
+
+**Round-trip with CoefficientList:**
+
+$$\operatorname{Polynomial}(\operatorname{CoefficientList}(p, x), x) = p$$
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialQuotient">
+
+<Signature name="PolynomialQuotient">_dividend_, _divisor_</Signature>
+
+<Signature name="PolynomialQuotient">_dividend_, _divisor_, _var_</Signature>
+
+Return the quotient of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
+
+```json example
+["PolynomialQuotient", ["Subtract", ["Power", "x", 3], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Add", ["Power", "x", 2], "x", 1]
+```
+
+This represents $$ \frac{x^3 - 1}{x - 1} = x^2 + x + 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialRemainder">
+
+<Signature name="PolynomialRemainder">_dividend_, _divisor_</Signature>
+
+<Signature name="PolynomialRemainder">_dividend_, _divisor_, _var_</Signature>
+
+Return the remainder of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
+
+```json example
+["PolynomialRemainder", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], ["Add", "x", 1], "x"]
+// ➔ -2
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="GCD">
+
+<Signature name="GCD">_x-1_, _x-2_, ...</Signature>
+
+Return the greatest common divisor of the arguments.
+
+With integer arguments, `GCD` returns their integer greatest common divisor:
+
+```json example
+["GCD", 60, 12, 18]
+// ➔ 6
+```
+
+`GCD` also computes the greatest common divisor of **polynomials**. When the
+arguments are univariate polynomials in the same variable that share a
+non-trivial common factor, the variable is inferred and a (monic) polynomial
+GCD is returned:
+
+```json example
+["GCD",
+  ["Add", ["Power", "x", 2], ["Multiply", 3, "x"], 2],
+  ["Add", ["Power", "x", 2], ["Multiply", 4, "x"], 3]]
+// ➔ ["Add", "x", 1]
+```
+
+This represents $$ \gcd(x^2 + 3x + 2, x^2 + 4x + 3) = x + 1 $$.
+
+When the polynomial GCD would be a constant, the expression is left
+unevaluated, so that a bare symbol keeps its integer-GCD reading — for example
+`["GCD", "x", 6]` (where `x` may stand for an unknown integer) stays symbolic.
+Use `PolynomialGCD` with an explicit variable when you want the coprime
+&rarr; `1` result, or to control which variable the GCD is taken over.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialGCD">
+
+<Signature name="PolynomialGCD">_a_, _b_</Signature>
+
+<Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
+
+Return the greatest common divisor of two polynomials `a` and `b` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
+
+```json example
+["PolynomialGCD", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Subtract", "x", 1]
+```
+
+This represents $$ \gcd(x^2 - 1, x - 1) = x - 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Cancel">
+
+<Signature name="Cancel">_expr_</Signature>
+
+<Signature name="Cancel">_expr_, _var_</Signature>
+
+Cancel common polynomial factors in the numerator and denominator of the rational expression `expr` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x`.
+
+```json example
+["Cancel", ["Divide", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1]], "x"]
+// ➔ ["Add", "x", 1]
+```
+
+This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common factor $$(x - 1)$$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PartialFraction">
+
+<Signature name="PartialFraction">_expr_</Signature>
+
+<Signature name="PartialFraction">_expr_, _var_</Signature>
+
+Decompose a rational expression into a sum of simpler fractions (partial fractions) with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x` — so a
+pipeline such as `expr |> Apart` works without naming the variable.
+
+Supports:
+- **Distinct linear factors**: $ \frac{1}{(x+1)(x+2)} \to \frac{1}{x+1} - \frac{1}{x+2} $
+- **Repeated linear factors**: $ \frac{3x+5}{(x+1)^2} \to \frac{3}{x+1} + \frac{2}{(x+1)^2} $
+- **Irreducible quadratic factors**: $ \frac{1}{(x+1)(x^2+1)} \to \frac{1}{2(x+1)} + \frac{-x+1}{2(x^2+1)} $
+- **Improper fractions**: Performs polynomial division first, then decomposes the proper remainder.
+
+Returns the expression unchanged if it is not a rational expression in `var`, or if the denominator cannot be factored.
+
+```json example
+["PartialFraction", ["Divide", 1, ["Multiply", ["Add", "x", 1], ["Add", "x", 2]]], "x"]
+// ➔ ["Add", ["Divide", 1, ["Add", "x", 1]], ["Divide", -1, ["Add", "x", 2]]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Apart">
+
+<Signature name="Apart">_expr_</Signature>
+
+<Signature name="Apart">_expr_, _var_</Signature>
+
+Alias for `PartialFraction`. Decompose a rational expression into partial fractions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialRoots">
+
+<Signature name="PolynomialRoots">_poly_</Signature>
+
+<Signature name="PolynomialRoots">_poly_, _var_</Signature>
+
+Return the roots of the polynomial `poly` with respect to the variable `var` as a set.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
+
+Returns `undefined` if the expression is not a polynomial or no roots can be found. Supports polynomials up to degree 4 with rational roots, and degree 2 with irrational roots.
+
+```json example
+["PolynomialRoots", ["Add", ["Power", "x", 2], ["Multiply", -5, "x"], 6], "x"]
+// ➔ ["Set", 2, 3]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Discriminant">
+
+<Signature name="Discriminant">_poly_</Signature>
+
+<Signature name="Discriminant">_poly_, _var_</Signature>
+
+Return the discriminant of the polynomial `poly` with respect to the variable `var`. Supports degree 2, 3, and 4 polynomials. Works with symbolic coefficients.
+
+- **Degree 2** ($$ax^2 + bx + c$$): returns $$b^2 - 4ac$$
+- **Degree 3** ($$ax^3 + bx^2 + cx + d$$): returns $$b^2c^2 - 4ac^3 - 4b^3d + 18abcd - 27a^2d^2$$
+- **Degree 4**: returns the full 16-term discriminant formula
+
+```json example
+["Discriminant", ["Add", ["Power", "x", 2], ["Multiply", -5, "x"], 6], "x"]
+// ➔ 1
+```
+
+A discriminant of 0 indicates repeated roots. For quadratics, a negative discriminant indicates no real roots.
+
+</FunctionDefinition>
