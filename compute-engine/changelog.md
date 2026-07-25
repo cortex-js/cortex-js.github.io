@@ -5,7 +5,7 @@
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.94.0 _2026-07-24_
 
 ### Breaking Changes
 
