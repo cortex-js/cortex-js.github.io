@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
-<title data-rh="true">Cortex Types · MathLive</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" property="og:url" content="https://mathlive.io/cortex/types/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Cortex Types · MathLive"><meta data-rh="true" name="description" content="Cortex has no type system of its own — it reuses the Compute Engine&#x27;s type language, the same syntax accepted by ce.declare(&quot;f&quot;, &quot;(real) -&gt; real&quot;)."><meta data-rh="true" property="og:description" content="Cortex has no type system of its own — it reuses the Compute Engine&#x27;s type language, the same syntax accepted by ce.declare(&quot;f&quot;, &quot;(real) -&gt; real&quot;)."><link data-rh="true" rel="icon" href="/img/logo.webp"><link data-rh="true" rel="canonical" href="https://mathlive.io/cortex/types/"><link data-rh="true" rel="alternate" href="https://mathlive.io/cortex/types/" hreflang="en"><link data-rh="true" rel="alternate" href="https://mathlive.io/cortex/types/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://Q23Y5RN3UQ-dsn.algolia.net" crossorigin="anonymous"><link data-rh="true" rel="alternate" type="text/markdown" href="/cortex/types.md"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Types","item":"https://mathlive.io/cortex/types/"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="MathLive" href="/opensearch.xml">
+<title data-rh="true">Cortex Types · MathLive</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://mathlive.io/img/social-card.jpg"><meta data-rh="true" property="og:url" content="https://mathlive.io/cortex/types/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Cortex Types · MathLive"><meta data-rh="true" name="description" content="Cortex has no type system of its own — it reuses the Compute Engine&#x27;s type language, the same syntax accepted by ce.declare(&quot;f&quot;, &quot;(real) -&gt; real&quot;), and adds a type statement to name new types."><meta data-rh="true" property="og:description" content="Cortex has no type system of its own — it reuses the Compute Engine&#x27;s type language, the same syntax accepted by ce.declare(&quot;f&quot;, &quot;(real) -&gt; real&quot;), and adds a type statement to name new types."><link data-rh="true" rel="icon" href="/img/logo.webp"><link data-rh="true" rel="canonical" href="https://mathlive.io/cortex/types/"><link data-rh="true" rel="alternate" href="https://mathlive.io/cortex/types/" hreflang="en"><link data-rh="true" rel="alternate" href="https://mathlive.io/cortex/types/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://Q23Y5RN3UQ-dsn.algolia.net" crossorigin="anonymous"><link data-rh="true" rel="alternate" type="text/markdown" href="/cortex/types.md"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Types","item":"https://mathlive.io/cortex/types/"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="MathLive" href="/opensearch.xml">
 
 <link rel="stylesheet" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css">
 <script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine","@cortex-js/compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),c="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");m&&(d.type="module"),d.id=c,d.src=o,d.async=!1,t&&n===e.length-1&&(d.onload=t),document.head.appendChild(d)})}()</script>
@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.8f2d8ef0.js" defer="defer"></script>
-<script src="/assets/js/main.893f474f.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.e6fb7fdb.js" defer="defer"></script>
+<script src="/assets/js/main.83198356.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -32,7 +32,8 @@ type language, the same syntax accepted by
 <code>ce.declare(&quot;f&quot;, &quot;(real) -&gt; real&quot;)</code>. See the
 <a class="" href="/compute-engine/guides/types/">Compute Engine type guide</a> for the type
 language itself. This page covers where a type
-annotation is written in Cortex source and what it means; the type grammar
+annotation is written in Cortex source and what it means, and how a program
+declares type names of its own; the type grammar
 includes unions, intersections, tuples, records, function signatures, and
 generic collection types.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="annotation-positions">Annotation positions<a href="#annotation-positions" class="hash-link" aria-label="Direct link to Annotation positions" title="Direct link to Annotation positions" translate="no">​</a></h2>
@@ -83,13 +84,189 @@ bare symbol as a boolean operand (<code>And</code>/<code>Or</code>/<code>Xor</co
 <code>boolean</code> for the lifetime of the engine; a later numeric use of the same
 symbol in the same scope will then error. This is engine behavior, not
 something specific to Cortex.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="declaring-a-type">Declaring a type<a href="#declaring-a-type" class="hash-link" aria-label="Direct link to Declaring a type" title="Direct link to Declaring a type" translate="no">​</a></h2>
+<p>A <code>type</code> statement gives a name to a type. The name is usable by every
+annotation later in the program — and by later cells sharing the same engine.
+There are two forms, and they mean different things.</p>
+<p><strong><code>type</code> declares a new, distinct type.</strong> Nothing that merely <em>looks</em> like the
+definition belongs to it: the definition describes how the type is built, not
+which values are already members of it.</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+let p = point(1, 2)
+p
+// ➔ point(1, 2)</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p><strong><code>type alias</code> declares another name for an existing type.</strong> Any value of
+that shape is a value of the alias — it is an abbreviation, not a new type.</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type alias pair = tuple&lt;number, number&gt;
+let a: pair = (1, 2)
+a
+// ➔ (1, 2)</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>Reach for <code>type alias</code> to shorten a type you write often
+(<code>type alias grid = list&lt;list&lt;number&gt;&gt;</code>), and for <code>type</code> when the new type is
+meant to be its own thing — a <code>meters</code> that a bare number cannot be mistaken
+for.</p>
+<p>Neither <code>type</code> nor <code>alias</code> is a reserved word. Only the statement-position
+shapes <code>type name =</code>, <code>type name&lt;</code>, <code>type alias name =</code> and
+<code>type alias name&lt;</code> are read as a type declaration, so <code>type</code> remains an
+ordinary identifier everywhere else — <code>type: integer = 4</code> still declares a
+variable named <code>type</code>:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="3" aria-label="Cortex source code">let type = 5
+type + 1
+// ➔ 6</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>(And <code>type alias = tuple&lt;number, number&gt;</code>, with nothing between <code>alias</code> and
+<code>=</code>, declares a type <em>named</em> <code>alias</code> — legal, but not a spelling to reach
+for.)</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="constructors">Constructors<a href="#constructors" class="hash-link" aria-label="Direct link to Constructors" title="Direct link to Constructors" translate="no">​</a></h3>
+<p>A type declaration also declares a <strong>constructor</strong>: a function of the same
+name that builds values of the type. A <code>tuple</code> definition gives a constructor
+with one argument per field; any other definition gives a one-argument
+constructor:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+type meters = number
+(point(1, 2), meters(5))
+// ➔ (point(1, 2), meters(5))</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>The arguments are checked against the definition, so <code>point(1)</code> and
+<code>point(&quot;a&quot;, 2)</code> produce an error value rather than a malformed point.</p>
+<p>A value built this way carries its type with it, wherever it goes:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+let ps = [point(1, 2), point(3, 4)]
+Type(ps)
+// ➔ &quot;list&lt;point^2&gt;&quot;</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>An <strong>alias</strong> constructor is a checked cast instead of a tag: it validates the
+arguments against the definition and hands back the plain value.</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="3" aria-label="Cortex source code">type alias pair = tuple&lt;number, number&gt;
+pair(1, 2)
+// ➔ (1, 2)</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>A <code>record</code> definition auto-declares <strong>no</strong> constructor: a record&#x27;s fields
+are named, so building one from positional arguments would silently depend
+on the order the fields happen to be written in. Write one instead — see
+<a href="#constructor-functions" class="">constructor functions</a> below. Until one is
+declared, calling the name reports a <code>type-not-callable</code> warning.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="constructor-functions">Constructor functions<a href="#constructor-functions" class="hash-link" aria-label="Direct link to Constructor functions" title="Direct link to Constructor functions" translate="no">​</a></h3>
+<p>A <code>function</code> with a declared type&#x27;s name — in the same scope, after the
+<code>type</code> statement — is that type&#x27;s <strong>constructor function</strong>. The body
+computes the <em>payload</em>: a value that must satisfy the type&#x27;s definition
+(for a record, exactly the definition&#x27;s keys, each field matching its
+type). The engine checks the payload and tags it; the result is a value of
+the type. This is how a <code>record</code>-bodied type gets its constructor:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type circle = record&lt;x: number, y: number, r: number&gt;
+function circle(x, y, r) { {x -&gt; x, y -&gt; y, r -&gt; r} }
+Type(circle(1, 2, 3))
+// ➔ &quot;circle&quot;</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>Constructor functions are not record-specific: one may be written for any
+definition, replacing the automatic constructor — the <em>smart constructor</em>
+idiom of validating or normalizing on the way in:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="6" aria-label="Cortex source code">type frac = record&lt;n: integer, d: integer&gt;
+function frac(n: integer, d: integer) {
+  {n -&gt; n / GCD(n, d), d -&gt; d / GCD(n, d)}
+}
+frac(2, 4) == frac(1, 2)
+// ➔ True</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>A value that already satisfies the definition can be handed to the
+constructor directly — one argument, checked and tagged, body skipped.
+That raw spelling is also how a constructed value prints and reads back
+(<code>circle(1, 2, 3)</code> prints as <code>circle({x -&gt; 1, y -&gt; 2, r -&gt; 3})</code>), so a
+round trip injects the payload unchanged and a normalizing constructor&#x27;s
+values stay equal after it.</p>
+<p>Because the payload spelling must construct unchanged, a constructor&#x27;s
+parameters have to be <em>distinguishable</em> from the payload itself: a
+<code>function</code> whose parameters could also be a valid payload — same number of
+arguments, types the definition overlaps — is rejected when it is
+declared. Use a different number of arguments, or annotate the parameters
+with types the definition body cannot mistake.</p>
+<p>A constructor function may call itself, and returning its own constructed
+value passes it through unchanged. A <code>function</code> with a type&#x27;s name declared
+<em>before</em> the type is an ordinary function — the later <code>type</code> statement then
+reports the usual conflict. And for an <strong>alias</strong>, a same-name function is
+just an ordinary function: there is no tag to apply.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="values-of-a-new-type-are-opaque">Values of a new type are opaque<a href="#values-of-a-new-type-are-opaque" class="hash-link" aria-label="Direct link to Values of a new type are opaque" title="Direct link to Values of a new type are opaque" translate="no">​</a></h3>
+<p>A <code>point</code> is not the tuple it is defined from — that is what makes it a new
+type. So a plain tuple is not accepted where a <code>point</code> is expected, and the
+operations that take a tuple apart do not reach inside one:</p>
+<div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">type point = tuple&lt;x: number, y: number&gt;</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">let q: point = (1, 2)   // error: a tuple is not a point</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">let p = point(1, 2)</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">First(p)                // error</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">let (a, b) = p          // error</span><br></div></code></pre></div></div>
+<p>Each of those lines parses: the rejection happens when the program runs, as
+an <a class="" href="/cortex/evaluation/#errors-are-values">error value</a>, not as a parse
+error.</p>
+<p>To read the parts back, <a class="" href="/cortex/control-flow/#match"><code>match</code></a> on the
+constructor — a constructor pattern is an ordinary operator pattern, and
+binds one variable per field:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="6" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+let p = point(3, 4)
+match p {
+  point(x, y) =&gt; x + y
+}
+// ➔ 7</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>To read a single <strong>named field</strong>, use the <code>.</code> accessor. It works on values
+of a declared type whose definition has named fields — a record body or a
+named-tuple body — and on records and dictionaries generally:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+let p = point(3, 4)
+p.x + p.y
+// ➔ 7</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>On a dictionary, <code>d.x</code> is exactly <code>d[&quot;x&quot;]</code>, absent-key behavior included.
+The accessor reads one named field through the type&#x27;s definition; it does
+not make the value a collection — <code>First(p)</code>, <code>p[&quot;x&quot;]</code> and destructuring
+keep rejecting, and <code>match</code> remains the way to take the whole value apart
+at once. (The dot must touch the value it reads: <code>p.x</code> is a field access,
+<code>p .x</code> is not; and a number never takes a field — <code>2.x</code> is a
+multiplication.)</p>
+<p>An <strong>alias</strong> has none of this reserve — it <em>is</em> its definition, so an
+alias-typed value works anywhere the underlying shape works:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type alias meters = number
+function height(m: meters) { m + 1 }
+height(2)
+// ➔ 3</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="equality">Equality<a href="#equality" class="hash-link" aria-label="Direct link to Equality" title="Direct link to Equality" translate="no">​</a></h3>
+<p>Two values built by the same constructor are equal when their arguments are.
+Values built by different constructors are never equal, and neither is a
+constructed value and a plain one of the same shape:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="4" aria-label="Cortex source code">type point = tuple&lt;x: number, y: number&gt;
+type polar = tuple&lt;r: number, t: number&gt;
+(point(1, 2) == point(1, 2), point(1, 2) == (1, 2), polar(1, 2) == point(1, 2))
+// ➔ (True, False, False)</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="scope-and-re-running-a-cell">Scope, and re-running a cell<a href="#scope-and-re-running-a-cell" class="hash-link" aria-label="Direct link to Scope, and re-running a cell" title="Direct link to Scope, and re-running a cell" translate="no">​</a></h3>
+<p>A type declaration — both the type name and its constructor — lives in the
+current scope, like a <code>let</code>. One inside a block or a loop body stays there:</p>
+<div class="playground_zsDR"><div class="editor_r0Kl"><textarea class="textarea_Jiif" spellcheck="false" autocapitalize="off" autocorrect="off" rows="6" aria-label="Cortex source code">let origin = 0
+do {
+  type inner = tuple&lt;number, number&gt;
+  inner(3, 4)
+}
+// ➔ inner(3, 4)</textarea><div class="toolbar_Piw7"><button class="run__SUn">Run ⏎</button><span class="hint_osqg">⌘/Ctrl + Enter</span></div></div></div>
+<p>Re-running a <code>type</code> statement for a name that an earlier <code>type</code> statement
+declared <strong>replaces</strong> the earlier definition, constructor included —
+<a href="#constructor-functions" class="">constructor functions</a> too, since an edited
+definition may invalidate the old body; re-running the whole cell restores
+both. Re-running a <code>function</code> statement that declares a constructor
+replaces the constructor. A name declared some other way — a <code>function</code> of
+that name <em>predating</em> the type, or a type declared by the host
+application — is not replaced: the statement reports an error value and
+declares nothing.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="type-variables">Type variables<a href="#type-variables" class="hash-link" aria-label="Direct link to Type variables" title="Direct link to Type variables" translate="no">​</a></h3>
+<p>The syntax <code>type point&lt;T&gt; = tuple&lt;T, T&gt;</code> is <strong>reserved</strong> for a future
+release. It parses, and reports a dedicated <code>type-variables-unsupported</code>
+diagnostic, in both forms:</p>
+<div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">type point&lt;T&gt; = tuple&lt;T, T&gt;</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="encoding">Encoding<a href="#encoding" class="hash-link" aria-label="Direct link to Encoding" title="Direct link to Encoding" translate="no">​</a></h3>
+<p>A <code>type</code> statement lowers to the engine&#x27;s <code>DeclareType</code> operator — the
+MathJSON mirror of <code>ce.declareType()</code>. The body is carried as the source text
+of the type. The bare form has no attributes; the <code>alias</code> form adds an
+attributes dictionary with <code>alias -&gt; True</code>:</p>
+<div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">type point = tuple&lt;x: number, y: number&gt;</span><br></div></code></pre></div></div>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;DeclareType&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;point&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token property" style="color:var(--base-0c)">&quot;str&quot;</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;tuple&lt;x: number, y: number&gt;&quot;</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token punctuation" style="color:var(--base-06)">]</span><br></div></code></pre></div></div>
+<div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">type alias pair = tuple&lt;number, number&gt;</span><br></div></code></pre></div></div>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;DeclareType&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;pair&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token property" style="color:var(--base-0c)">&quot;str&quot;</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;tuple&lt;number, number&gt;&quot;</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;Dictionary&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;KeyValuePair&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;alias&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;True&quot;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">]</span><br></div></code></pre></div></div>
+<p>A type is registered when its statement is canonicalized, which is why the
+statements after it — in the same program or in a later cell — can annotate
+with it. A type declared by the host with <code>ce.declareType()</code> is visible to a
+program the same way, constructor and all.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="diagnostics">Diagnostics<a href="#diagnostics" class="hash-link" aria-label="Direct link to Diagnostics" title="Direct link to Diagnostics" translate="no">​</a></h2>
 <p>An invalid type inside an annotation position surfaces as a
 <code>type-annotation-error</code> diagnostic, offset-corrected to point at the
 offending token within the type text (not at the <code>:</code> or the declaration
 target):</p>
 <div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">x: notatype</span><br></div></code></pre></div></div>
-<p>produces a <code>type-annotation-error</code> diagnostic pointing at <code>notatype</code>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/cortex/evaluation/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Evaluation</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/cortex/comments/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Comments</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#annotation-positions" class="table-of-contents__link toc-highlight">Annotation positions</a></li><li><a href="#mathjson-representation" class="table-of-contents__link toc-highlight">MathJSON representation</a></li><li><a href="#semantics" class="table-of-contents__link toc-highlight">Semantics</a></li><li><a href="#inference" class="table-of-contents__link toc-highlight">Inference</a></li><li><a href="#diagnostics" class="table-of-contents__link toc-highlight">Diagnostics</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+<p>produces a <code>type-annotation-error</code> diagnostic pointing at <code>notatype</code>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/cortex/evaluation/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Evaluation</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/cortex/comments/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Comments</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#annotation-positions" class="table-of-contents__link toc-highlight">Annotation positions</a></li><li><a href="#mathjson-representation" class="table-of-contents__link toc-highlight">MathJSON representation</a></li><li><a href="#semantics" class="table-of-contents__link toc-highlight">Semantics</a></li><li><a href="#inference" class="table-of-contents__link toc-highlight">Inference</a></li><li><a href="#declaring-a-type" class="table-of-contents__link toc-highlight">Declaring a type</a><ul><li><a href="#constructors" class="table-of-contents__link toc-highlight">Constructors</a></li><li><a href="#constructor-functions" class="table-of-contents__link toc-highlight">Constructor functions</a></li><li><a href="#values-of-a-new-type-are-opaque" class="table-of-contents__link toc-highlight">Values of a new type are opaque</a></li><li><a href="#equality" class="table-of-contents__link toc-highlight">Equality</a></li><li><a href="#scope-and-re-running-a-cell" class="table-of-contents__link toc-highlight">Scope, and re-running a cell</a></li><li><a href="#type-variables" class="table-of-contents__link toc-highlight">Type variables</a></li><li><a href="#encoding" class="table-of-contents__link toc-highlight">Encoding</a></li></ul></li><li><a href="#diagnostics" class="table-of-contents__link toc-highlight">Diagnostics</a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>

@@ -73,6 +73,16 @@ calculus, linear algebra, strings, and more.
 Use the **CLI and interactive REPL** from a terminal.
 </ReadMore>
 
+<ReadMore path="/cortex/from-python/">
+Coming from **Python**? Translate your idioms — and learn the three reflexes
+that silently do the wrong thing.
+</ReadMore>
+
+<ReadMore path="/cortex/from-mathematica/">
+Coming from **Mathematica**? Most of the mental model carries over; here is
+what changes.
+</ReadMore>
+
 <ReadMore path="/cortex/for-agents/">
 Writing Cortex with an LLM? Give it the **language card for AI agents** — a
 condensed, machine-verified reference.
@@ -283,6 +293,15 @@ Use the **language reference** for syntax, operators, declarations, types, and
 control flow.
 </ReadMore>
 
+<ReadMore path="/cortex/from-python/">
+Already know **Python**? Start from the idiom-by-idiom translation guide.
+</ReadMore>
+
+<ReadMore path="/cortex/from-mathematica/">
+Already know **Mathematica**? Start from the Wolfram Language translation
+guide.
+</ReadMore>
+
 ---
 
 # Cortex Goals
@@ -350,6 +369,36 @@ Map([1, 2, 3], x |-> x^2)
 
 `Sin`, `Simplify`, and `Map` are library operators; `x` is an ordinary user
 symbol.
+
+## Glyph Aliases
+
+A few mathematical glyphs are **input aliases** for library symbols,
+canonicalized at the lexer — every position (expression, parameter,
+binding, match pattern) treats the glyph exactly like its ASCII spelling,
+and serialization emits the canonical name:
+
+| Glyph | Symbol            |
+| :---- | :---------------- |
+| `π`   | `Pi`              |
+| `∞`   | `Infinity`        |
+| `ⅈ`   | `ImaginaryUnit`   |
+| `ⅇ`   | `ExponentialE`    |
+| `∅`   | `EmptySet`        |
+| `⧝`   | `ComplexInfinity` |
+| `ℝ`   | `RealNumbers`     |
+| `ℤ`   | `Integers`        |
+| `ℚ`   | `RationalNumbers` |
+| `ℕ`   | `NonNegativeIntegers` |
+| `ℂ`   | `ComplexNumbers`  |
+
+```cortex
+3.1 ∈ ℝ
+// ➔ True
+```
+
+Note the doublestruck `ⅈ`/`ⅇ` (U+2148/U+2147), not the ordinary letters:
+`i` and `e` remain plain user symbols. To name a raw symbol that happens to
+be a glyph, use the verbatim form (`` `π` ``).
 
 This is a **convention with no enforced semantics** — nothing in the parser
 or the engine requires a capitalized name to be an operator or a lowercase
@@ -435,7 +484,10 @@ U+FF41-U+FF46
 _binary-digit_ → U+0030 | U+0031 | U+FF10 | U+FF11
 
 _numerical-constant_ → **`NaN`** | **`Infinity`** | **`+Infinity`** |
-**`-Infinity`**
+**`-Infinity`** | **`oo`** | **`+oo`** | **`-oo`**
+
+(`oo` is an input alias for `Infinity`; the serializer always emits the
+canonical `Infinity` spelling.)
 
 _base-10-exponent_ → (**`e`** | **`E`**) \[_sign_\](_digit_)+
 
@@ -530,7 +582,12 @@ _argument_ → \[**`...`**\] _expression_
 
 _index-clause_ → **`[`** (_expression_)#**`,`** **`]`**
 
-_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ | **`!`**)\*
+_field-clause_ → **`.`** _symbol_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `.` must abut the base; not after a number
+literal
+
+_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ |
+_field-clause_ | **`!`**)\*
 
 _expression_ → _primary_ | _prefix-expression_ | _infix-expression_ |
 _postfix-expression_
@@ -555,12 +612,16 @@ _function-definition_ → _symbol_ _parameters_
 \[**`->`** _type_\] **`=`** _expression_ |
 **`function`** _symbol_ _parameters_ \[**`->`** _type_\] _block_
 
+_type-declaration_ → **`type`** \[**`alias`**\] _symbol_
+\[**`<`** (_symbol_)#**`,`** **`>`**\] **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` slot is reserved and rejected
+
 _while-statement_ → **`while`** _expression_ _block_
 
 _for-statement_ → **`for`** _symbol_ **`in`** _expression_ _block_
 
-_statement_ → _declaration_ | _function-definition_ | _while-statement_ |
-_for-statement_ | _expression_
+_statement_ → _declaration_ | _type-declaration_ | _function-definition_ |
+_while-statement_ | _for-statement_ | _expression_
 
 _statement-separator_ → **`;`** | _linebreak_
 
@@ -635,8 +696,9 @@ call/index applies to. The primary forms are:
   [LaTeX Islands](/cortex/literals/#latex-islands)
 - a function call: `f(x, y)`
 - an index expression: `xs[i]`
+- a field access: `p.x`
 
-## Calls and indexing
+## Calls, indexing and field access
 
 A call is a symbol (or another primary) immediately followed — with **no**
 whitespace — by a parenthesized, comma-separated argument list:
@@ -672,10 +734,25 @@ xs[i]       // ["At", "xs", "i"]
 f(x)[0]     // ["At", ["f", "x"], 0]
 ```
 
-In both cases the `(` or `[` must directly abut the callee/indexed
-expression: whitespace before it means the parenthesized/bracketed form is a
-separate primary (a parenthesized expression or a list literal), not a
-call/index — the same whitespace-sensitivity that governs operators.
+Field access is a primary immediately followed — with no whitespace — by a
+`.` and a symbol, and lowers to `Field`. Chains associate left, and a call
+on a field value lowers through `Apply` like any non-symbol callee:
+
+```cortex
+p.x         // ["Field", "p", "x"]
+a.b.c       // ["Field", ["Field", "a", "b"], "c"]
+p.x(2)      // ["Apply", ["Field", "p", "x"], 2]
+```
+
+A number literal never takes a field: the lexer folds a trailing dot into
+the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
+range. See [Types](/cortex/types/#values-of-a-new-type-are-opaque) for what
+`p.x` means on values of declared types, records and dictionaries.
+
+In all three cases the `(`, `[` or `.` must directly abut the
+callee/indexed expression: whitespace before it means the form is a
+separate primary (or, for `.`, a diagnosed stray token), not a
+call/index/field — the same whitespace-sensitivity that governs operators.
 
 ## Collections, tuples, and dictionaries
 
@@ -845,9 +922,9 @@ The Verbatim Form must be used if the symbol name is a reserved word.
 `await`, `begin`, `break`, `case`, `catch`, `class`, `const`, `continue`,
 `debugger`, `default`, `delete`, `dynamic`, `do`, `each`, `else`, `end`,
 `export`, `extern`, `false`, `finally`, `for`, `from`, `function`, `generator`,
-`get`, `global`, `goto`, `if`, `in`, `inline`, `interface`, `internal`,
+`get`, `global`, `goto`, `if`, `in`, `Infinity`, `inline`, `interface`, `internal`,
 `import`, `iterator`, `label`, `lazy`, `local`, `loop`, `match`, `module`,
-`namespace`, `native`, `new`, `not`, `of`, `on`, `optional`, `or`, `package`,
+`namespace`, `NaN`, `native`, `new`, `not`, `of`, `on`, `oo`, `optional`, `or`, `package`,
 `parallel`, `private`, `protected`, `protocol`, `public`, `repeat`, `return`,
 `self`, `set`, `static`, `super`, `switch`, `this`, `throw`, `to`, `true`,
 `try`, `union`, `until`, `using`, `var`, `variant`, `warn`, `when`, `where`,
@@ -1419,7 +1496,7 @@ Source: https://mathlive.io/cortex/control-flow/
 ## Functions
 
 A function can be defined in two forms, both lowering to the same shape:
-`["Assign", name, ["Function", body, …params]]`.
+`["DefineFunction", name, ["Function", body, …params]]`.
 
 The **math style** is a single expression:
 
@@ -1428,7 +1505,7 @@ f(x) = x + 1
 ```
 
 ```json
-["Assign", "f", ["Function", ["Add", "x", 1], "x"]]
+["DefineFunction", "f", ["Function", ["Add", "x", 1], "x"]]
 ```
 
 ```cortex
@@ -1436,7 +1513,7 @@ f(x, y) = x + y
 ```
 
 ```json
-["Assign", "f", ["Function", ["Add", "x", "y"], "x", "y"]]
+["DefineFunction", "f", ["Function", ["Add", "x", "y"], "x", "y"]]
 ```
 
 The **block style** wraps the body in a statement block, whose value is its
@@ -1447,7 +1524,7 @@ function f(x) { x + 1 }
 ```
 
 ```json
-["Assign", "f", ["Function", ["Block", ["Add", "x", 1]], "x"]]
+["DefineFunction", "f", ["Function", ["Block", ["Add", "x", 1]], "x"]]
 ```
 
 Parameters can carry a type annotation (`f(x: real) = …`), and the block
@@ -1462,9 +1539,67 @@ f(x: real) = x + 1
 ```
 
 ```json
-["Assign", "f",
+["DefineFunction", "f",
   ["Function", ["Add", "x", 1], ["Typed", "x", {"str": "real"}]]]
 ```
+
+### Multiple clauses (literal parameters)
+
+A parameter can be a **literal** — a number, string, boolean, `Infinity`,
+`-Infinity`, or `NaN` (the spellings that are literals in expression
+position; `oo` is an input alias for `Infinity`. A constant *name* like
+`Pi` is a symbol and stays a parameter name — writing `f(Pi) = …` binds a
+parameter named `Pi` and draws an advisory `parameter-shadows-constant`
+diagnostic). Definition statements **accumulate**: defining the same name again
+with a different parameter list adds a *clause* rather than replacing the
+function, and a call dispatches to the most specific clause that matches
+its arguments (declaration order only breaks ties between equally specific
+clauses). A non-finite literal clause matches only itself — `f(NaN) = 0`
+handles exactly `NaN`; a `f(x: real)` clause never captures it:
+
+```cortex
+f(NaN) = 0
+f(Infinity) = 1
+f(x: number) = x + 1
+f(Infinity) + f(NaN)
+// ➔ 1
+```
+
+```cortex
+fib(0) = 0
+fib(1) = 1
+fib(n: integer) = fib(n - 1) + fib(n - 2)
+fib(10)
+// ➔ 55
+```
+
+Redefining a clause with the *same* parameter list replaces just that
+clause — so re-running an edited definition behaves as expected. A plain
+assignment (`f = x |-> …`) still replaces the whole binding, clauses and
+all.
+
+A literal parameter lowers to an anonymous parameter constrained to that
+exact value (a *value type*):
+
+```json
+["DefineFunction", "fib",
+  ["Function", 0, ["Typed", "literalParam_1", {"str": "0"}]]]
+```
+
+If no clause matches the evaluated arguments, the call is a
+`no-matching-clause` error. To inspect the clause set of a function, use
+`About`:
+
+```cortex
+f(0) = 1
+f(n: integer) = n + 1
+About(f)
+```
+
+The listing shows one line per clause, in declaration order, and annotates
+clauses that overlap an earlier one of equal specificity as well as clauses
+made unreachable by more specific ones covering their whole (finite)
+domain.
 
 ### Anonymous functions
 
@@ -1683,6 +1818,117 @@ Alternatives must be **binding-free** — `_` is fine (`[0, _] | [_, 0]`), but a
 named binding inside an alternative (`a | 2 => …`) is a
 `match-alternative-binding` diagnostic, since there is no single value for
 the body to bind `a` to when the alternatives disagree on shape.
+
+### Range patterns
+
+`lo..hi` in pattern position is an **inclusive numeric membership test**: the
+case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
+The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
+form keys on the operator, not on how it was written:
+
+```cortex
+match x {
+  0..9 => "digit"
+  10..99 => "two digits"
+  _ => "big"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  ["MatchCase", ["Range", 0, 9], {"str": "digit"}],
+  ["MatchCase", ["Range", 10, 99], {"str": "two digits"}],
+  ["MatchCase", "_", {"str": "big"}]
+]
+```
+
+Both endpoints are included, and they are compared with the same tolerance
+`match` uses for every other number leaf, so a subject a hair outside an
+endpoint still selects the case. Only a **number** matches: a symbol, a
+collection, a string, a complex number and `NaN` all fall through to the next
+case.
+
+Bounds must be **numeric literals** — negated literals and `Infinity` /
+`-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
+
+```cortex
+match x {
+  0..Infinity => "nonnegative"
+  _ => "negative"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  ["MatchCase", ["Range", 0, "PositiveInfinity"], {"str": "nonnegative"}],
+  ["MatchCase", "_", {"str": "negative"}]
+]
+```
+
+A bound that is a bare identifier (which would otherwise *bind*, like any
+identifier in pattern position), a computed expression, or `NaN` is a
+`range-pattern-bounds` diagnostic; a stepped range is a `range-pattern-step`
+diagnostic; and a range whose lower bound exceeds its upper bound is a
+`range-pattern-empty` diagnostic (that case can never match). Use a guard when
+a bound is not a literal:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+match x {
+  0..limit => "in"
+  _ => "out"
+}
+```
+
+Write instead:
+
+```cortex
+match x {
+  n if n >= 0 && n <= limit => "in"
+  _ => "out"
+}
+```
+
+A range pattern binds nothing, so it is legal inside an or-alternative, and a
+guard on a range case can only reference names from the enclosing scope:
+
+```cortex
+match x {
+  0..9 | 100..109 => "in"
+  _ => "out"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  [
+    "MatchCase",
+    ["Alternatives", ["Range", 0, 9], ["Range", 100, 109]],
+    {"str": "in"}
+  ],
+  ["MatchCase", "_", {"str": "out"}]
+]
+```
+
+Two consequences worth knowing. First, this is a **carve-out**: a `Range`
+*value* can no longer be matched structurally in pattern position — write
+`== Range(1, 10)` (a pin) to compare against the range value itself. Second,
+a range nested inside a list, tuple or dictionary pattern keeps its ordinary
+structural meaning; membership applies at the top level of a case pattern (or
+of an or-alternative). A `Range` whose bounds are not literals is likewise
+still an ordinary structural pattern.
+
+Because a run of operator characters lexes as one token, a **negative upper
+bound needs a space**: write `0 .. -1`, not `0..-1` (the same maximal-munch
+rule that makes `3! ^ 2` require its space). The formatter always spaces `..`
+in pattern position for this reason.
 
 ### Guards
 
@@ -2042,6 +2288,23 @@ Destructuring lowers to the same `Declare` primitive with the pattern in the
 name position: `["Declare", ["Tuple", "q", "r"], ["Dictionary",
 ["KeyValuePair", "value", …]]]`.
 
+## Declaring a type
+
+A third declaration keyword, `type`, introduces a **type** name rather than a
+symbol — and, with it, a constructor of the same name:
+
+```cortex
+type point = tuple<x: number, y: number>
+type alias pair = tuple<number, number>
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+`type` declares a new, distinct type; `type alias` declares another name for
+an existing one. Unlike `let` and `const`, `type` is not a reserved word —
+only these statement shapes claim it. See
+[Declaring a type](/cortex/types/#declaring-a-type) for the whole story.
+
 ## Reassignment vs. declaration
 
 A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
@@ -2144,7 +2407,8 @@ lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
 `let` and `const` are the binding keywords. There is currently no compound
-assignment (`+=`) or destructuring declaration.
+assignment (`+=`); destructuring declarations (`let (x, y) = t`) are
+described above.
 
 ---
 
@@ -2297,7 +2561,8 @@ type language, the same syntax accepted by
 `ce.declare("f", "(real) -> real")`. See the
 [Compute Engine type guide](/compute-engine/guides/types/) for the type
 language itself. This page covers where a type
-annotation is written in Cortex source and what it means; the type grammar
+annotation is written in Cortex source and what it means, and how a program
+declares type names of its own; the type grammar
 includes unions, intersections, tuples, records, function signatures, and
 generic collection types.
 
@@ -2398,6 +2663,282 @@ bare symbol as a boolean operand (`And`/`Or`/`Xor`/`Not`) infers that symbol
 `boolean` for the lifetime of the engine; a later numeric use of the same
 symbol in the same scope will then error. This is engine behavior, not
 something specific to Cortex.
+
+## Declaring a type
+
+A `type` statement gives a name to a type. The name is usable by every
+annotation later in the program — and by later cells sharing the same engine.
+There are two forms, and they mean different things.
+
+**`type` declares a new, distinct type.** Nothing that merely *looks* like the
+definition belongs to it: the definition describes how the type is built, not
+which values are already members of it.
+
+```cortex-live
+type point = tuple<x: number, y: number>
+let p = point(1, 2)
+p
+// ➔ point(1, 2)
+```
+
+**`type alias` declares another name for an existing type.** Any value of
+that shape is a value of the alias — it is an abbreviation, not a new type.
+
+```cortex-live
+type alias pair = tuple<number, number>
+let a: pair = (1, 2)
+a
+// ➔ (1, 2)
+```
+
+Reach for `type alias` to shorten a type you write often
+(`type alias grid = list<list<number>>`), and for `type` when the new type is
+meant to be its own thing — a `meters` that a bare number cannot be mistaken
+for.
+
+Neither `type` nor `alias` is a reserved word. Only the statement-position
+shapes `type name =`, `type name<`, `type alias name =` and
+`type alias name<` are read as a type declaration, so `type` remains an
+ordinary identifier everywhere else — `type: integer = 4` still declares a
+variable named `type`:
+
+```cortex-live
+let type = 5
+type + 1
+// ➔ 6
+```
+
+(And `type alias = tuple<number, number>`, with nothing between `alias` and
+`=`, declares a type *named* `alias` — legal, but not a spelling to reach
+for.)
+
+### Constructors
+
+A type declaration also declares a **constructor**: a function of the same
+name that builds values of the type. A `tuple` definition gives a constructor
+with one argument per field; any other definition gives a one-argument
+constructor:
+
+```cortex-live
+type point = tuple<x: number, y: number>
+type meters = number
+(point(1, 2), meters(5))
+// ➔ (point(1, 2), meters(5))
+```
+
+The arguments are checked against the definition, so `point(1)` and
+`point("a", 2)` produce an error value rather than a malformed point.
+
+A value built this way carries its type with it, wherever it goes:
+
+```cortex-live
+type point = tuple<x: number, y: number>
+let ps = [point(1, 2), point(3, 4)]
+Type(ps)
+// ➔ "list<point^2>"
+```
+
+An **alias** constructor is a checked cast instead of a tag: it validates the
+arguments against the definition and hands back the plain value.
+
+```cortex-live
+type alias pair = tuple<number, number>
+pair(1, 2)
+// ➔ (1, 2)
+```
+
+A `record` definition auto-declares **no** constructor: a record's fields
+are named, so building one from positional arguments would silently depend
+on the order the fields happen to be written in. Write one instead — see
+[constructor functions](#constructor-functions) below. Until one is
+declared, calling the name reports a `type-not-callable` warning.
+
+### Constructor functions
+
+A `function` with a declared type's name — in the same scope, after the
+`type` statement — is that type's **constructor function**. The body
+computes the *payload*: a value that must satisfy the type's definition
+(for a record, exactly the definition's keys, each field matching its
+type). The engine checks the payload and tags it; the result is a value of
+the type. This is how a `record`-bodied type gets its constructor:
+
+```cortex-live
+type circle = record<x: number, y: number, r: number>
+function circle(x, y, r) { {x -> x, y -> y, r -> r} }
+Type(circle(1, 2, 3))
+// ➔ "circle"
+```
+
+Constructor functions are not record-specific: one may be written for any
+definition, replacing the automatic constructor — the *smart constructor*
+idiom of validating or normalizing on the way in:
+
+```cortex-live
+type frac = record<n: integer, d: integer>
+function frac(n: integer, d: integer) {
+  {n -> n / GCD(n, d), d -> d / GCD(n, d)}
+}
+frac(2, 4) == frac(1, 2)
+// ➔ True
+```
+
+A value that already satisfies the definition can be handed to the
+constructor directly — one argument, checked and tagged, body skipped.
+That raw spelling is also how a constructed value prints and reads back
+(`circle(1, 2, 3)` prints as `circle({x -> 1, y -> 2, r -> 3})`), so a
+round trip injects the payload unchanged and a normalizing constructor's
+values stay equal after it.
+
+Because the payload spelling must construct unchanged, a constructor's
+parameters have to be *distinguishable* from the payload itself: a
+`function` whose parameters could also be a valid payload — same number of
+arguments, types the definition overlaps — is rejected when it is
+declared. Use a different number of arguments, or annotate the parameters
+with types the definition body cannot mistake.
+
+A constructor function may call itself, and returning its own constructed
+value passes it through unchanged. A `function` with a type's name declared
+*before* the type is an ordinary function — the later `type` statement then
+reports the usual conflict. And for an **alias**, a same-name function is
+just an ordinary function: there is no tag to apply.
+
+### Values of a new type are opaque
+
+A `point` is not the tuple it is defined from — that is what makes it a new
+type. So a plain tuple is not accepted where a `point` is expected, and the
+operations that take a tuple apart do not reach inside one:
+
+```cortex
+type point = tuple<x: number, y: number>
+let q: point = (1, 2)   // error: a tuple is not a point
+let p = point(1, 2)
+First(p)                // error
+let (a, b) = p          // error
+```
+
+Each of those lines parses: the rejection happens when the program runs, as
+an [error value](/cortex/evaluation/#errors-are-values), not as a parse
+error.
+
+To read the parts back, [`match`](/cortex/control-flow/#match) on the
+constructor — a constructor pattern is an ordinary operator pattern, and
+binds one variable per field:
+
+```cortex-live
+type point = tuple<x: number, y: number>
+let p = point(3, 4)
+match p {
+  point(x, y) => x + y
+}
+// ➔ 7
+```
+
+To read a single **named field**, use the `.` accessor. It works on values
+of a declared type whose definition has named fields — a record body or a
+named-tuple body — and on records and dictionaries generally:
+
+```cortex-live
+type point = tuple<x: number, y: number>
+let p = point(3, 4)
+p.x + p.y
+// ➔ 7
+```
+
+On a dictionary, `d.x` is exactly `d["x"]`, absent-key behavior included.
+The accessor reads one named field through the type's definition; it does
+not make the value a collection — `First(p)`, `p["x"]` and destructuring
+keep rejecting, and `match` remains the way to take the whole value apart
+at once. (The dot must touch the value it reads: `p.x` is a field access,
+`p .x` is not; and a number never takes a field — `2.x` is a
+multiplication.)
+
+An **alias** has none of this reserve — it *is* its definition, so an
+alias-typed value works anywhere the underlying shape works:
+
+```cortex-live
+type alias meters = number
+function height(m: meters) { m + 1 }
+height(2)
+// ➔ 3
+```
+
+### Equality
+
+Two values built by the same constructor are equal when their arguments are.
+Values built by different constructors are never equal, and neither is a
+constructed value and a plain one of the same shape:
+
+```cortex-live
+type point = tuple<x: number, y: number>
+type polar = tuple<r: number, t: number>
+(point(1, 2) == point(1, 2), point(1, 2) == (1, 2), polar(1, 2) == point(1, 2))
+// ➔ (True, False, False)
+```
+
+### Scope, and re-running a cell
+
+A type declaration — both the type name and its constructor — lives in the
+current scope, like a `let`. One inside a block or a loop body stays there:
+
+```cortex-live
+let origin = 0
+do {
+  type inner = tuple<number, number>
+  inner(3, 4)
+}
+// ➔ inner(3, 4)
+```
+
+Re-running a `type` statement for a name that an earlier `type` statement
+declared **replaces** the earlier definition, constructor included —
+[constructor functions](#constructor-functions) too, since an edited
+definition may invalidate the old body; re-running the whole cell restores
+both. Re-running a `function` statement that declares a constructor
+replaces the constructor. A name declared some other way — a `function` of
+that name *predating* the type, or a type declared by the host
+application — is not replaced: the statement reports an error value and
+declares nothing.
+
+### Type variables
+
+The syntax `type point<T> = tuple<T, T>` is **reserved** for a future
+release. It parses, and reports a dedicated `type-variables-unsupported`
+diagnostic, in both forms:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+type point<T> = tuple<T, T>
+```
+
+### Encoding
+
+A `type` statement lowers to the engine's `DeclareType` operator — the
+MathJSON mirror of `ce.declareType()`. The body is carried as the source text
+of the type. The bare form has no attributes; the `alias` form adds an
+attributes dictionary with `alias -> True`:
+
+```cortex
+type point = tuple<x: number, y: number>
+```
+
+```json
+["DeclareType", "point", {"str": "tuple<x: number, y: number>"}]
+```
+
+```cortex
+type alias pair = tuple<number, number>
+```
+
+```json
+["DeclareType", "pair", {"str": "tuple<number, number>"},
+  ["Dictionary", ["KeyValuePair", "alias", "True"]]]
+```
+
+A type is registered when its statement is canonicalized, which is why the
+statements after it — in the same program or in a later cell — can annotate
+with it. A type declared by the host with `ce.declareType()` is visible to a
+program the same way, constructor and all.
 
 ## Diagnostics
 
@@ -2867,15 +3408,14 @@ N(4 * inside / total)
 // ➔ ≈ 3.14 (varies by run)
 ```
 
-**Reproducible simulations.** `RandomSeed(n)` seeds the random stream, so a
-simulation can be replayed exactly; seeding again with the same value rewinds
-the stream (`RandomSeed()` returns to a non-deterministic stream):
+**Reproducible simulations.** `WithRandomSeed(seed, body)` evaluates `body`
+with a seeded random frame. The block replays exactly, while repeated draws
+*inside* it still differ (the n-th draw of a frame is `hash(seed, n)`). Frames
+nest, and the innermost one wins. Outside any frame, draws are live:
 
 ```cortex
-RandomSeed(7)
-let a = [RandomInteger(1, 100), RandomInteger(1, 100), RandomInteger(1, 100)]
-RandomSeed(7)
-let b = [RandomInteger(1, 100), RandomInteger(1, 100), RandomInteger(1, 100)]
+let a = WithRandomSeed(7, [Random(Range(1, 100)), Random(Range(1, 100))])
+let b = WithRandomSeed(7, [Random(Range(1, 100)), Random(Range(1, 100))])
 a == b
 // ➔ True
 ```
@@ -3446,7 +3986,12 @@ use the Compute Engine's ordinary textual representation.
 `cortex check` parses a program and reports its diagnostics — syntax errors,
 malformed strings, invalid type annotations, `match` shape problems, and the
 trap lints (`=` inside a call argument, a literal index `0`, a `//` comment
-that reads as floor division) — without evaluating anything. It accepts the same source forms as evaluation: a file,
+that reads as floor division) — without evaluating anything. It also
+canonicalizes the program (still without running it) and reports the problems
+that surface there — type errors such as `"a" + 1`, but also a wrong argument
+count — as `static-type-error` diagnostics anchored to the offending statement.
+An `Error(…)` value the program itself builds is not reported: errors are
+values. It accepts the same source forms as evaluation: a file,
 `--eval`, or standard input.
 
 ```shell
@@ -4056,17 +4601,19 @@ Verified operator names, so you don't have to guess (search for more with
 
 - **Numbers**: `Abs`, `Floor`, `Ceil` (not `Ceiling`), `Round`, `Sqrt`,
   `Max`, `Min` (each takes a list or varargs), `Mod`, `GCD`, `LCM`,
-  `IsPrime`, `RandomInteger(a, b)`.
+  `IsPrime`, `Random(Range(a, b))`.
 - **Lists**: `Length`, `First`, `Last`, `Rest`, `Take`, `Drop`, `Reverse`,
   `Sort` (optional comparator — see below), `IndexOf`, `Join`, `Append`,
   `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,
+  `Count(xs)` / `Count(xs, v)` / `Count(xs, pred)`,
   `Reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
 - **Strings**: `Characters`, `StringJoin`, `StringSplit(s)` (splits on
   whitespace by default), `String(x)`.
 - **Dictionaries**: `Keys`, `Values`.
 - **Symbolic**: `Simplify`, `HoldValues(body)` (evaluate `body` with its
   assigned symbols kept symbolic), `Solve(eq == v, x)`, `D(expr, x)`,
-  `Derivative(f)`, `Integrate`, `N`, `Type`.
+  `Derivative(f)`, `Integrate`, `N`, `Type`, `IsError(x)` (true for an error
+  value, or an expression carrying one).
 
 Caution: `Head` and `Tail` exist but are **structural** operators
 (`Head([1,2,3])` is the *operator name* `"List"`, not the first element) —
@@ -4286,3 +4833,640 @@ serializeCortex(["Add", ["Multiply", 2, "x"], 1]);
 The serializer formats an expression; it does not execute it. Comments are
 currently lossy on the parse side, so parsing and then serializing source code
 does not preserve comments or the author's original whitespace.
+
+---
+
+# Cortex for Mathematica Users
+
+Source: https://mathlive.io/cortex/from-mathematica/
+
+# Cortex for Mathematica Users
+
+A working translation guide for anyone coming from the Wolfram Language. Every
+Cortex example on this page is executed by the documentation test suite and
+its `// ➔` output verified.
+
+**What carries over.** Almost all of the mental model. Values are symbolic
+expressions; evaluation is exact unless you ask for a number; capitalized
+names are the library and lowercase names are yours; `Simplify`, `Solve`, `D`,
+`Integrate`, `Limit`, `Series`, `Factor`, `Expand`, `N` and the linear-algebra
+operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
+`Product`, `Integrate`, `D` and `Table`; `Range(5)` starts at 1; indexing is
+1-based and `-1` is the last element; arithmetic threads over lists the way a
+`Listable` function does.
+
+**What to unlearn.** Four things:
+
+1. **Function application uses parentheses**: `f(x)`, not `f[x]`. Square
+   brackets are indexing (Wolfram's `[[…]]`).
+2. **`{…}` is a set, not a list.** A Cortex list is `[1, 2, 3]`. The braces
+   survive in iterator triples, where they read positionally, but a bare
+   `{1, 2, 2}` is the *set* `{1, 2}`.
+3. **`=` is assignment and `->` is a key/value pair.** Equations use `==`
+   (as in Wolfram), but replacement rules must be written `Rule(x, 3)`.
+4. **There is no `%`**, no `Out[]`, and no notebook history. `%` is the
+   remainder operator.
+
+## Expressions and Evaluation
+
+| Wolfram | Cortex |
+|:--|:--|
+| `f[x]`, `Sin[x]` | `f(x)`, `Sin(x)` |
+| `x = 5` | `let x = 5` |
+| `f[x_] := x^2` | `f(x) = x^2` |
+| `f = Function[x, x^2]` | `f = x \|-> x^2` |
+| `#^2 &` | `x \|-> x^2` — no slot/`&` syntax |
+| `expr /. x -> 3` | `ReplaceAll(expr, Rule(x, 3))` |
+| `a == b`, `SameQ[a, b]` | `a == b`, `a === b` — see below |
+| `expr // N` | `expr \|> N` (or `~>`) |
+| `N[expr]`, `N[expr, 25]` | `N(expr)`, `N(expr, 25)` |
+| `Hold[expr]` | `HoldValues(expr)` — evaluate with assigned symbols kept symbolic |
+| `Print[x]` | *(no printing)* — the program's value is its **last statement** |
+| `%`, `Out[3]` | *(no history)* — bind with `let` |
+| `(* comment *)` | `// comment` or `/* comment */` |
+| `expr;` to suppress output | `;` is a statement separator, nothing is suppressed |
+
+```cortex
+f(x) = x^2 + 1
+(f(3), D(f(x), x), Integrate(f(x), {x, 0, 1}))
+// ➔ (10, 2x, 4/3)
+```
+
+Only the value of the **last** statement is returned; an earlier statement
+that evaluates to an error value also raises a diagnostic, so nothing vanishes
+silently.
+
+### `==` vs `===` (Wolfram's `SameQ`)
+
+`==` is the semantic comparison: it evaluates, compares within tolerance, and
+may stay an unresolved *condition* (`x == y` is what you hand to `Solve`).
+`===` is `SameQ`: structural identity, no tolerance, and **total** — it always
+answers `True` or `False`.
+
+```cortex
+(Sqrt(2) == 1.4142135623730951, Sqrt(2) === 1.4142135623730951, x === y, 1 === 1.0)
+// ➔ (True, False, False, True)
+```
+
+One caveat for Wolfram users: `SameQ[1, 1.]` is `False` there, because `1` and
+`1.` are different *kinds* of number. In Cortex `1 === 1.0` is `True` — the
+lexer folds `1.0` to the integer literal `1`, and `===` compares number leaves
+by exact value, so `0.5 === 1/2` is `True` too.
+
+## Lists and Parts
+
+| Wolfram | Cortex |
+|:--|:--|
+| `{1, 2, 3}` (list) | `[1, 2, 3]` — braces make a **set** |
+| `xs[[i]]` | `xs[i]` — 1-based, as in Wolfram |
+| `xs[[-1]]`, `First`, `Last`, `Rest` | `xs[-1]`, `First(xs)`, `Last(xs)`, `Rest(xs)` |
+| `xs[[2 ;; 4]]` | `xs[2..4]` |
+| `m[[i, j]]` | `m[i, j]` (or `m[i][j]`) |
+| `Range[5]`, `Range[2, 10, 2]` | `Range(5)` or `1..5`; `Range(2, 10, 2)` |
+| `Length`, `Sort`, `Reverse`, `Flatten` | same names |
+| `Total[xs]` | `Sum(xs)` |
+| `Select[xs, f]` | `Filter(xs, f)` |
+| `Count[xs, v]`, `Count[xs, f]` | `Count(xs, v)`, `Count(xs, f)` — `Count(xs)` is the length |
+| `Map[f, xs]`, `f /@ xs` | `Map(xs, f)` — collection **first** |
+| `Fold[f, init, xs]` | `Fold(f, init, xs)` |
+| `Apply[f, {a, b}]`, `f @@ t` | `Apply(f, (a, b))`, or spread: `f(...t)` |
+| `Position[xs, v]` | `IndexOf(xs, v)` |
+| `Append[xs, v]`, `Join` | `Append(xs, v)`, `Join(xs, ys)` |
+| `Tally`, `Partition` | same names (`Tally` returns a `(values, counts)` pair) |
+| `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]`, enumerate with `Keys`/`Values` |
+| `Union`, `Intersection` | same names, returning a set |
+
+```cortex
+let xs = [3, 1, 4, 1, 5]
+(xs[1], xs[-1], xs[2..4], Length(xs), Sort(xs))
+// ➔ (3, 5, [1,4,1], 5, [1,1,3,4,5])
+```
+
+`Count` covers all three Wolfram spellings — the plain length, a value to
+match, and a predicate:
+
+```cortex
+let xs = [3, 1, 4, 1, 5, 1]
+(Count(xs), Count(xs, 1), Count(xs, k |-> k > 2))
+// ➔ (6, 3, 3)
+```
+
+Lists and sets are genuinely different types, so the brace/bracket distinction
+is not cosmetic:
+
+```cortex
+(Type({1, 2, 3}), Type([1, 2, 3]))
+// ➔ ("set<finite_integer>", "vector<finite_integer^3>")
+```
+
+### Threading over lists
+
+Arithmetic and the elementary functions thread over lists, so a `Listable`
+habit transfers directly. Matrices multiply as matrices:
+
+```cortex
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sin([0, Pi]))
+// ➔ ([2,3,4], [4,10,18], [0,0])
+```
+
+```cortex
+let A = [[2, 1], [1, 3]]
+(Determinant(A), Inverse(A), A * [1, 1])
+// ➔ (5, [[3/5,-1/5],[-1/5,2/5]], [3,4])
+```
+
+## Iterators and Table
+
+Iterator triples in braces work exactly as in Wolfram — `Sum`, `Product`,
+`Integrate`, `D` and `Table` all read `{var, lo, hi}` (and `{var, lo, hi,
+step}`) positionally:
+
+```cortex
+let squares = Table(k^2, {k, 1, 5})
+(Sum(squares), Sum(1/k^2, {k, 1, Infinity}), Product(k, {k, 1, 5}))
+// ➔ (55, 1/6 * pi^2, 120)
+```
+
+`Sum`, `Product`, `Integrate` and `Table` all accept the tuple spelling
+`(k, 1, 5)` as well. `D(expr, {x, 2})` takes a second derivative.
+
+```cortex
+Sum(Table(k^2, (k, 1, 5)))
+// ➔ 55
+```
+
+`Table` is a lazy generator, so the value above is materialized by `Sum`. When
+you want an ordinary list, index it, aggregate it, or build it with `Map`:
+
+```cortex
+let g = x |-> x^2 + 1
+(g(3), Sum(Map(1..4, g)))
+// ➔ (10, 34)
+```
+
+## Control Flow and Pattern Matching
+
+| Wolfram | Cortex |
+|:--|:--|
+| `If[c, a, b]` | `if c { a } else { b }` — an expression |
+| `Which[c1, a, c2, b, True, z]` | `if c1 { a } else if c2 { b } else { z }` |
+| `Switch[x, 0, "zero", _, "other"]` | `match x { 0 => "zero"; _ => "other" }` |
+| `Cases[xs, patt]` | `Filter` with a predicate, or `Map` over a `match` |
+| `Do[body, {k, 1, n}]` | `for k in 1..n { body }` |
+| `While[c, body]` | `while c { body }` |
+| `Module[{t}, body]` | `do { let t = …; body }`, or a `function` block |
+| `With[{t = v}, body]` | `do { const t = v; body }` |
+| `Block[{x}, body]` | *(no dynamic scoping)* — Cortex is lexically scoped |
+
+`match` replaces the whole `Switch`/`Which`/`Cases` family. It is structural
+and total: it always selects a case, and a bare identifier in pattern position
+**binds** rather than compares. Guards use `if`, and `== expr` pins a value.
+
+```cortex
+classify(z) = match z {
+  0 => "zero"
+  n if n > 0 => "positive"
+  _ => "negative"
+}
+Map([-2, 0, 5], classify)
+// ➔ ["negative", "zero", "positive"]
+```
+
+Because a pattern is parsed as an ordinary expression, matching on operator
+structure comes for free — a case pattern `a + b` destructures an `Add` and
+captures its operands, the Wolfram `Plus[a_, b_]` idiom. Blank patterns are
+spelled differently: `_` is the wildcard, `name` is a named capture (Wolfram's
+`name_`), `name: type` adds a type guard (`name_Integer`), and `...rest`
+captures the remainder of a list (`___`). See
+[Control Flow](/cortex/control-flow/#match) for the full pattern grammar.
+
+Scoping constructs are blocks:
+
+```cortex
+function area(r) {
+  let c = Pi
+  c * r^2
+}
+(area(2), area(3))
+// ➔ (4pi, 9pi)
+```
+
+## Symbolic Mathematics
+
+This is the part that needs the least translation:
+
+| Wolfram | Cortex |
+|:--|:--|
+| `Simplify`, `Expand`, `Factor` | same names |
+| `Solve[x^2 == 4, x]` | `Solve(x^2 == 4, x)` |
+| `Solve[{e1, e2}, {x, y}]` | `Solve([e1, e2], [x, y])` — lists in brackets |
+| `D[f, x]`, `D[f, {x, 2}]` | `D(f, x)`, `D(f, {x, 2})` |
+| `Integrate[f, x]`, `Integrate[f, {x, a, b}]` | same, with parentheses |
+| `Limit[f, x -> 0]` | `Limit(f, x, 0)` |
+| `Series[f, {x, 0, n}]` | `Series(f, x, 0)` — the tail is a `BigO` term |
+| `Det`, `Inverse`, `Transpose`, `Eigenvalues` | `Determinant`, `Inverse`, `Transpose`, `Eigenvalues` |
+| `Dot`, `Cross`, `LinearSolve` | same names |
+| `Pi`, `Infinity`, `I`, `E` | `Pi`, `Infinity`, **`i`**, **`e`** — lowercase |
+| `PrimeQ`, `NextPrime`, `FactorInteger`, `Divisors` | `IsPrime`, `NextPrime`, `FactorInteger`, `Divisors` |
+| `Binomial`, `GCD`, `LCM`, `n!` | same |
+
+```cortex
+(Solve(x^2 - 5x + 6 == 0, x), Simplify((x^2 - 1)/(x - 1)), Factor(x^2 - 4))
+// ➔ ([3,2], x + 1, (x - 2) * (x + 2))
+```
+
+```cortex
+(Limit((1 + 1/n)^n, n, Infinity), Series(Cos(x), x, 0))
+// ➔ (e, 1 - 1/2 * x^2 + 1/24 * x^4 + BigO(x^6))
+```
+
+`N` takes an optional precision, and the engine works to arbitrary precision:
+
+```cortex
+N(Pi, 25)
+// ➔ 3.141592653589793238462643
+```
+
+## Traps
+
+Surface forms that look like Wolfram but behave differently.
+
+| You write | What actually happens | Write instead |
+|:--|:--|:--|
+| `f[x]` | `f` *indexed* at `x` — an `incompatible-type` error value, not a call | `f(x)` |
+| `{1, 2, 3}` for a list | A **set**: unordered, deduplicated, not indexable by position | `[1, 2, 3]` |
+| `E`, `I` | Ordinary undeclared symbols — they stay symbolic, silently | `e`, `i` |
+| `expr /. x -> 3` | `->` builds a `KeyValuePair`, not a `Rule` | `ReplaceAll(expr, Rule(x, 3))` |
+| `%` for the last result | `%` is the `Mod` operator | bind results with `let` |
+| `x = 4` inside `Solve` | `=` is assignment: `Solve(x^2 = 4, x)` is silently `[]` | `Solve(x^2 == 4, x)` |
+| `expr;` to suppress | `;` only separates statements | *(nothing to suppress)* |
+| `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Cortex operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
+| `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
+| `StringLength`, `ToUpperCase` | Inert — the string library is small | `Length(Characters(s))`; decompose and rebuild |
+| `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(Range(1, n))` |
+| `SameQ[1, 1.]` | `1 === 1.0` is `True` — the lexer folds `1.0` to `1` | *(nothing — but don't read `===` as type-aware)* |
+| `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
+| `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
+
+The rows about inert names deserve emphasis: **an unknown capitalized name is
+not an error.** Cortex leaves the call symbolic (with a did-you-mean warning
+when a close library name exists), exactly the way Wolfram leaves `Foo[1]`
+unevaluated. A program that calls `Total(xs)` therefore returns the unevaluated
+`Total([…])` rather than a number — when a result looks unfinished, check for
+an inert head.
+
+The most-reached-for Wolfram names are curated into that warning, so
+`Total(xs)` reports `did you mean Sum` and `Select(xs, f)` reports
+`did you mean Filter`. The suggestion is only a pointer to the right
+neighborhood — it is **not** an alias, and the call shape may differ
+(`Accumulate[xs]` becomes `Scan(xs, Add)`, with an explicit combining
+function). `MemberQ[xs, v]` maps directly to `Contains(xs, v)`, same
+argument order.
+
+Also worth knowing: lazy collection operators (`Range`, `Map`, `Filter`,
+`Take`, `Table`) enumerate only when materialized, and a tuple does **not**
+materialize its operands — `(Table(k, {k, 1, 3}), 5)` keeps the unevaluated
+`Tabulate(…)`. Aggregate or index where you stand.
+
+## Next
+
+<ReadMore path="/cortex/examples/">
+**~70 complete programs**, all verified — number theory, calculus, linear
+algebra, units, strings, and reproducible randomness.
+</ReadMore>
+
+<ReadMore path="/cortex/control-flow/">
+**Control flow** in full — the complete `match` pattern grammar, blocks,
+loops, and function forms.
+</ReadMore>
+
+<ReadMore path="/cortex/for-agents/">
+The **condensed language card** — the same material at reference density.
+</ReadMore>
+
+---
+
+# Cortex for Python Users
+
+Source: https://mathlive.io/cortex/from-python/
+
+# Cortex for Python Users
+
+A working translation guide. Every Cortex example on this page is executed by
+the documentation test suite and its `// ➔` output verified, so nothing here
+can drift from the implementation.
+
+**What carries over.** The shape of a program: sequential statements,
+lexically scoped functions, closures, first-class lambdas, `Map`/`Filter`, a
+`for x in collection` loop, arbitrary-precision integers, `%` with Python's
+sign convention, negative indices, chained comparisons, and `**` for
+exponentiation.
+
+**What to unlearn.** Three things, in order of how much trouble they cause:
+
+1. **Indexing is 1-based.** `xs[1]` is the first element.
+2. **Arithmetic is exact and symbolic by default.** `1/3` is the rational one
+   third, `Ln(2)` stays `ln(2)`. Floats happen only when you ask, with `N(…)`.
+3. **`//` is a comment, not floor division**, and `=` is assignment, never
+   equality. Both fail *quietly* — see [Traps](#traps).
+
+There is no `print`. A program's value is the value of its **last statement**.
+
+## Variables and Functions
+
+| Python | Cortex |
+|:--|:--|
+| `x = 5` | `let x = 5` |
+| `TAU = 6.28` (by convention) | `const tau = 6.28` (enforced) |
+| `x: int = 4` | `let n: integer = 4` |
+| `def f(x): return x**2` | `f(x) = x^2` |
+| `def f(x):` with a body | `function f(x) { … }` — value is the last expression |
+| `lambda x: x*2` | `x \|-> 2x` |
+| `lambda: 42` | `() \|-> 42` |
+| `def f(x: float) -> float:` | `f(x: real) -> real = x^2` |
+| `return` | *(no `return`)* — the last expression is the value |
+| `math.floor(x)`, `np.mean(xs)` | `Floor(x)`, `Mean(xs)` — no modules, no imports |
+
+Naming convention: `Capitalized` names are library operators, `lowercase`
+names are yours. Calling an unknown function is not an error — the call stays
+symbolic, with a did-you-mean warning when a close library name exists
+(`len` suggests `Length`).
+
+```cortex
+fact(n) = if n <= 1 { 1 } else { n * fact(n - 1) }
+let double = x |-> 2x
+(fact(5), double(21))
+// ➔ (120, 42)
+```
+
+## Collections
+
+| Python | Cortex |
+|:--|:--|
+| `[1, 2, 3]` | `[1, 2, 3]` |
+| `{1, 2, 3}` (set) | `{1, 2, 3}` |
+| `(1, 2)` (tuple) | `(1, 2)` |
+| `{"a": 1}` (dict) | `{"a" -> 1}`; empty dictionary is `{->}` |
+| `d["a"]` | `d["a"]` — never `d.a` |
+| `xs[0]` | `xs[1]` — **1-based** |
+| `xs[-1]` | `xs[-1]` |
+| `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
+| `range(1, 6)` | `1..5` or `Range(1, 5)` — **inclusive** of the end |
+| `len(xs)` | `Length(xs)` |
+| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) \|-> a > b)` |
+| `sum`, `min`, `max`, `any`, `all` | `Sum`, `Min`, `Max`, `Any`, `All` |
+| `reversed(xs)` | `Reverse(xs)` |
+| `zip(a, b)` | `Zip(a, b)` |
+| `enumerate(xs)` | `Zip(1..Length(xs), xs)` |
+| `xs.index(v)` | `IndexOf(xs, v)` |
+| `xs + ys`, `xs.append(v)` | `Join(xs, ys)`, `Append(xs, v)` — both return a **new** collection |
+| `xs[2] = 9` | *(no element assignment)* — rebuild with `Map`/`Join` |
+| `d.keys()`, `d.values()` | `Keys(d)`, `Values(d)` |
+| `dict(zip(ks, vs))` | `DictionaryFrom(Zip(ks, vs))` |
+| `collections.Counter(xs)` | `Tally(xs)` → a `(values, counts)` pair |
+
+Collections are **immutable values**. There is no in-place mutation: build a
+new collection and rebind the name.
+
+```cortex
+let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
+(counts["apples"], Keys(counts), counts["pears"])
+// ➔ (3, ["apples","figs"], NaN)
+```
+
+A missing dictionary key yields `NaN` rather than raising `KeyError` — see
+[Traps](#traps).
+
+### Comprehensions
+
+Cortex has no comprehension syntax. Use the pipeline operator `|>` with
+`Filter`/`Map`; `_` is the placeholder for the piped value.
+
+```python
+sum(n**2 for n in range(1, 11) if n % 2 == 1)
+```
+
+```cortex
+1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(_, n |-> n^2) |> Sum
+// ➔ 165
+```
+
+`Range`, `Map`, `Filter`, `Take`, `Drop` and `Join` are **generators**, like
+Python's — they enumerate only when materialized (indexed, aggregated, or
+iterated). A deferred mapping function reads variables at *materialization*
+time, so the same "late binding in a closure" surprise applies:
+
+```cortex
+let n = 1
+let m = Map(1..3, k |-> k * n)
+n = 10
+Sum(m)
+// ➔ 60
+```
+
+## Control Flow
+
+| Python | Cortex |
+|:--|:--|
+| `if c: … elif d: … else: …` | `if c { … } else if d { … } else { … }` |
+| `a if c else b` | `if c { a } else { b }` — `if` is an **expression** |
+| `and`, `or`, `not` | `&&`, `\|\|`, `!` (the words are reserved but unimplemented) |
+| `for x in xs:` | `for x in xs { … }` |
+| `for i in range(n):` | `for i in 1..n { … }` |
+| `while c:` | `while c { … }` |
+| `break`, `continue` | *(reserved, not implemented)* — loop on a condition instead |
+| `match … case` (3.10+) | `match … { pattern => body }` |
+| `try/except` | *(none)* — errors are ordinary values |
+| `# comment` | `// comment` or `/* … */` |
+
+Loops run **for effect**: their value is `Nothing`. Accumulate into a variable
+declared outside the loop, or use `Map`/`Filter`/`Reduce`/`Fold` when you want
+a value.
+
+```cortex
+let total = 0
+for k in 1..100 { if k % 3 == 0 || k % 5 == 0 { total = total + k } }
+total
+// ➔ 2418
+```
+
+### Pattern matching
+
+Cortex `match` is close to Python 3.10's `match`/`case`, with three
+differences: cases are written `pattern => body` (no `case` keyword and no
+colon), a **bare name always binds** (it never compares), and you pin a value
+to compare against with `== expr`.
+
+```python
+match n:
+    case 0: "zero"
+    case k if k > 0: "positive"
+    case _: "negative"
+```
+
+```cortex
+classify(n) = match n {
+  0 => "zero"
+  k if k > 0 => "positive"
+  _ => "negative"
+}
+Map([-2, 0, 5], classify)
+// ➔ ["negative", "zero", "positive"]
+```
+
+Because a bare name binds, `match x { Pi => … }` does *not* test for π — it
+binds a fresh variable named `Pi`. Write `match x { == Pi => … }`. This is the
+same rule as Python's (where a bare `case FOO:` is a capture pattern), but it
+bites more often because Cortex's constants are ordinary names.
+
+## Math and Numerics
+
+| Python | Cortex |
+|:--|:--|
+| `7 / 2` → `3.5` | `7 / 2` → the exact rational `7/2`; `N(7 / 2)` → `3.5` |
+| `7 // 2` → `3` | `Floor(7 / 2)` — **`//` starts a comment in Cortex** |
+| `7 % 2`, `-7 % 3` → `2` | `7 % 2`, `-7 % 3` → `2` — same sign convention |
+| `x ** 2`, `pow(x, 2)` | `x^2` or `x**2` |
+| `math.sqrt(x)` | `Sqrt(x)` — exact: `Sqrt(9)` is `3`, `Sqrt(2)` stays `√2` |
+| `math.pi`, `math.e` | `Pi`, `e` |
+| `math.log(x)`, `math.log10(x)` | `Ln(x)`, `Log(x)`; `Log(x, b)` for base *b* |
+| `abs`, `round`, `math.floor`, `math.ceil` | `Abs`, `Round`, `Floor`, `Ceil` (not `Ceiling`) |
+| `float(expr)` | `N(expr)`, or `N(expr, digits)` for a precision |
+| `10 ** 100` (bigint) | `10^100` — same unbounded integers |
+| `complex(2, 3)` | `2 + 3i` |
+| `statistics.mean/median` | `Mean`, `Median`, `Variance`, `StandardDeviation` |
+| `math.gcd`, `math.factorial` | `GCD`, `LCM`, `n!` |
+| *(SymPy territory)* | `Simplify`, `Solve`, `D`, `Integrate`, `Limit`, `Series` are built in |
+
+Exactness is the default, and comparison is tolerant, so the classic
+floating-point gotcha does not appear:
+
+```cortex
+let exact = 1/3 + 1/6
+let approx = N(1/3 + 1/6)
+(exact, approx, 0.1 + 0.2 == 0.3)
+// ➔ (1/2, 0.5, True)
+```
+
+`Round` rounds halves **away from zero**; Python rounds halves to even. This
+is the one numeric answer that differs on values you are likely to type:
+
+```cortex
+(Round(0.5), Round(2.5), Round(-0.5))
+// ➔ (1, 3, -1)
+```
+
+(Python gives `0`, `2`, `0`.)
+
+Because values are Compute Engine expressions, arithmetic over a list is
+elementwise without NumPy:
+
+```cortex
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(1..4, k |-> k^2)))
+// ➔ ([2,3,4], [4,10,18], 30)
+```
+
+## Strings
+
+| Python | Cortex |
+|:--|:--|
+| `f"x is {x}"` | `"x is \(x)"` — works in any string literal |
+| `"a" + "b"` | `StringJoin("a", "b")` — `+` on strings is a **type error** |
+| `len(s)` | `Length(Characters(s))` — strings are not collections |
+| `s[0]` | `Characters(s)[1]` |
+| `s.split()` / `s.split(",")` | `StringSplit(s)` / `StringSplit(s, ",")` |
+| `"".join(parts)` | `StringJoin(…)`, or `Fold` over the parts |
+| `str(x)` | `String(x)` |
+| `"""…"""` | `"""…"""` — multi-line strings, same delimiter |
+| `r"raw\string"` | `#"raw\string"#` — extended string literal |
+
+```cortex
+let name = "world"
+let parts = StringSplit("a b c")
+("hello \(name)", StringJoin("a", "b"), Length(Characters(name)), parts[2])
+// ➔ ("hello world", "ab", 5, "b")
+```
+
+There is no `.upper()`, `.replace()`, `.find()` or `.strip()`: the string
+library today is `Characters`, `GraphemeClusters`, `UnicodeScalars`,
+`StringSplit`, `StringJoin`, `StringFrom` and `String`. Decompose to a list of
+characters or code points, work there, and rebuild.
+
+## Errors
+
+There are no exceptions. A runtime problem becomes an ordinary
+`Error(…)` **value** that flows through the computation, so a bad element does
+not abort the rest of the work:
+
+```cortex
+Map([16, -4, "banana", 81], x |-> Sqrt(x))
+// ➔ [4, 2i, NaN, 9]
+```
+
+Note also `Sqrt(-4)` → `2i` rather than a `ValueError`: the engine works over
+the complex numbers. Malformed *source* is different — it produces
+**diagnostics** with source positions, reported separately from the value.
+
+## Familiar
+
+These transfer straight across — no translation needed:
+
+```cortex
+let xs = [10, 20, 30]
+(xs[-1], 20 in xs, 1 < 2 < 3, 2**10, -7 % 3)
+// ➔ (30, True, True, 1024, 2)
+```
+
+- Negative indices count from the end; `in` tests membership.
+- Chained comparisons (`1 < x <= 4`) mean the conjunction, as in Python.
+- `**` is an accepted alias of `^`, right-associative (`2^3^2` is `512`).
+- `%` is the remainder with Python's sign convention.
+- Integers are arbitrary precision, with no `int`/`long` distinction.
+- `true`/`false` are accepted spellings of `True`/`False`.
+- Closures capture lexically, and functions are first-class values.
+- `;` separates statements on one line, exactly as in Python.
+
+## Traps
+
+Reflexes that produce a *wrong answer* rather than an error. The parser emits
+a **warning diagnostic** for the first three — visible on stderr from the CLI,
+and in the `diagnostics` array when embedding — but the program still runs and
+still returns a plausible-looking value.
+
+| You write | What actually happens | Write instead |
+|:--|:--|:--|
+| `7 // 2` | `//` starts a comment, so the statement is just `7` | `Floor(7 / 2)` |
+| `xs[0]` | Silently `NaN` — indexing is 1-based | `xs[1]` |
+| `Solve(x^2 = 4, x)` | Silently `[]` — `=` is assignment | `Solve(x^2 == 4, x)` |
+| `d["missing"]` | `NaN`, not a `KeyError` | Guard first: `IndexOf(Keys(d), k)` is `0` when the key is absent |
+| `xs[1:3]` | Python's half-open slice; `xs[2..3]` is 1-based and inclusive | check both ends |
+| `x^1/2` | `(x^1)/2` — `^` binds tighter than `/` | `Sqrt(x)` or `x^(1/2)` |
+| `while c: … break` | `break` is unimplemented; the loop runs to the iteration limit | make the condition do the work |
+| `print(x)` | Inert, nothing is printed | the program's value is its last statement |
+| `Round(2.5)` | `3` (half away from zero), not Python's `2` | *(intentional)* |
+| `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
+| `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
+| `"\(xs)"` with a list `xs` | Broadcasts into a *list of strings* | interpolate scalars only |
+| `x && y` on fresh symbols | Types those symbols `boolean` for the engine's lifetime | use distinct names for boolean work |
+
+One more, specific to a symbolic language: a `Take(xs, 3)` (or any lazy
+operator) stored inside a **tuple** stays unevaluated, because a tuple does
+not materialize its operands. Aggregate or index where you stand if you need
+the work done now.
+
+## Next
+
+<ReadMore path="/cortex/examples/">
+**~70 complete programs**, all verified — iteration, number theory, calculus,
+linear algebra, strings, and randomness.
+</ReadMore>
+
+<ReadMore path="/cortex/for-agents/">
+The **condensed language card** — the same material at reference density, for
+AI agents and for skimming.
+</ReadMore>
+
+<ReadMore path="/cortex/control-flow/">
+**Control flow** in full — `match` patterns, guards, pins, destructuring,
+blocks and loops.
+</ReadMore>

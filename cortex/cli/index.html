@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.8f2d8ef0.js" defer="defer"></script>
-<script src="/assets/js/main.893f474f.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.e6fb7fdb.js" defer="defer"></script>
+<script src="/assets/js/main.83198356.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -59,7 +59,12 @@ use the Compute Engine&#x27;s ordinary textual representation.</p>
 <p><code>cortex check</code> parses a program and reports its diagnostics — syntax errors,
 malformed strings, invalid type annotations, <code>match</code> shape problems, and the
 trap lints (<code>=</code> inside a call argument, a literal index <code>0</code>, a <code>//</code> comment
-that reads as floor division) — without evaluating anything. It accepts the same source forms as evaluation: a file,
+that reads as floor division) — without evaluating anything. It also
+canonicalizes the program (still without running it) and reports the problems
+that surface there — type errors such as <code>&quot;a&quot; + 1</code>, but also a wrong argument
+count — as <code>static-type-error</code> diagnostics anchored to the offending statement.
+An <code>Error(…)</code> value the program itself builds is not reported: errors are
+values. It accepts the same source forms as evaluation: a file,
 <code>--eval</code>, or standard input.</p>
 <div class="language-shell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-shell codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">npx cortex check program.cx</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">npx cortex check </span><span class="token parameter variable" style="color:var(--base-09)">--eval</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;let x = 5; x +&#x27;</span><br></div></code></pre></div></div>
 <p>The exit status is <code>0</code> when there are no error diagnostics (warnings are

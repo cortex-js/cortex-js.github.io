@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.8f2d8ef0.js" defer="defer"></script>
-<script src="/assets/js/main.893f474f.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.e6fb7fdb.js" defer="defer"></script>
+<script src="/assets/js/main.83198356.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -127,17 +127,19 @@ any number of recursive calls — <code>fib(n-1) + fib(n-2)</code> is fine), and
 <ul>
 <li class=""><strong>Numbers</strong>: <code>Abs</code>, <code>Floor</code>, <code>Ceil</code> (not <code>Ceiling</code>), <code>Round</code>, <code>Sqrt</code>,
 <code>Max</code>, <code>Min</code> (each takes a list or varargs), <code>Mod</code>, <code>GCD</code>, <code>LCM</code>,
-<code>IsPrime</code>, <code>RandomInteger(a, b)</code>.</li>
+<code>IsPrime</code>, <code>Random(Range(a, b))</code>.</li>
 <li class=""><strong>Lists</strong>: <code>Length</code>, <code>First</code>, <code>Last</code>, <code>Rest</code>, <code>Take</code>, <code>Drop</code>, <code>Reverse</code>,
 <code>Sort</code> (optional comparator — see below), <code>IndexOf</code>, <code>Join</code>, <code>Append</code>,
 <code>Sum</code>, <code>Mean</code>, <code>StandardDeviation</code> (sample, n−1), <code>Map</code>, <code>Filter</code>,
+<code>Count(xs)</code> / <code>Count(xs, v)</code> / <code>Count(xs, pred)</code>,
 <code>Reduce(list, f, init)</code>, <code>Range(a, b)</code> inclusive, <code>Range(a, b, step)</code>.</li>
 <li class=""><strong>Strings</strong>: <code>Characters</code>, <code>StringJoin</code>, <code>StringSplit(s)</code> (splits on
 whitespace by default), <code>String(x)</code>.</li>
 <li class=""><strong>Dictionaries</strong>: <code>Keys</code>, <code>Values</code>.</li>
 <li class=""><strong>Symbolic</strong>: <code>Simplify</code>, <code>HoldValues(body)</code> (evaluate <code>body</code> with its
 assigned symbols kept symbolic), <code>Solve(eq == v, x)</code>, <code>D(expr, x)</code>,
-<code>Derivative(f)</code>, <code>Integrate</code>, <code>N</code>, <code>Type</code>.</li>
+<code>Derivative(f)</code>, <code>Integrate</code>, <code>N</code>, <code>Type</code>, <code>IsError(x)</code> (true for an error
+value, or an expression carrying one).</li>
 </ul>
 <p>Caution: <code>Head</code> and <code>Tail</code> exist but are <strong>structural</strong> operators
 (<code>Head([1,2,3])</code> is the <em>operator name</em> <code>&quot;List&quot;</code>, not the first element) —

@@ -894,10 +894,79 @@ same arguments are applied to it.
 On the other hand, the `Random` function is not pure: by
 its nature it evaluates to a different value on every evaluation.
 
-Numbers, symbols and strings are pure. A function expression is pure if the
-function itself is pure, and all its arguments are pure as well.
+Numbers, symbols and strings are pure.
+
+### Effects
+
+Being impure is not a single thing: an expression is impure because it carries
+one or more **effects**. There are nine of them — `console`, `entropy`,
+`environment`, `fs_read`, `fs_write`, `network`, `random`, `scope` and `time`.
+`Random` carries `random` (it draws from the ambient random stream); `Assign`,
+`Declare` and `Assume` carry `scope` (they mutate a binding that outlives the
+call). An expression with no effects is pure. Effects can also be declared as
+part of a function's type — see
+[Effect Specifiers](/compute-engine/guides/types/#effect-specifiers).
 
 **To check if an expression is pure** use `expr.isPure`.
+
+**To find out *which* effects it carries** use `expr.effects`: `undefined` when
+there are none, `'any'` when the effects are not known, otherwise the labels in
+alphabetical order. It reports what evaluating the expression **does**, not
+what the value it produces **can do** if you later invoke it — a symbol bound
+to a drawing function has no effects, because evaluating it just yields the
+function. The latent effects of a callable live on its type, as
+`expr.type.effects`.
+
+```js
+ce.parse("1 + x^2").effects;                     // ➔ undefined
+ce.box(["Random"]).effects;                      // ➔ ["random"]
+ce.box(["Assign", "q", 1]).effects;              // ➔ ["scope"]
+
+ce.assign("rf", ce.box(["Function", ["Random"], "x"]));
+ce.box("rf").effects;                            // ➔ undefined (producing)
+ce.box("rf").type.effects;                       // ➔ ["random"] (invoking)
+ce.box(["Map", ["List", 1, 2], "rf"]).effects;   // ➔ ["random"]
+```
+
+### Purity Is Computed, Not Looked Up
+
+The effects of a function expression are not simply "the operator's effects
+plus every operand's effects". They are computed by looking at what the
+expression will actually *do*, following symbols through their current
+bindings. Four consequences are worth knowing:
+
+- **Held content contributes nothing.** `Hold` never evaluates its operand, so
+  `Hold(Random())` is pure. The draw resurfaces where the content is forced:
+  `ReleaseHold(Hold(Random()))` is impure.
+
+- **A frame discharges what it delimits.** `WithRandomSeed(42, Random())` is
+  pure. The frame absorbs the draws inside it, and the whole block genuinely
+  replays identically on re-evaluation — which is exactly what purity claims.
+  (Two `Random()` calls *within* one frame still return different values; that
+  is the frame's stream advancing, not an effect escaping.) A `scope` write is
+  not discharged: `WithRandomSeed(42, Block(Assign(x, 1), Random()))` is
+  impure.
+
+- **A function literal is pure; its arrow carries the effect.** `x |-> Random()`
+  is pure — building the function draws nothing. The effect lives on its type,
+  `(unknown) random -> number`, and fires when the function is applied.
+
+- **Callbacks are resolved through their bindings.** `Map(xs, f)` is pure
+  exactly when `f` is. If `f` is currently bound to a drawing function, the
+  whole expression is impure; reassign `f` to a pure function and it becomes
+  pure.
+
+```js
+ce.box(["Hold", ["Random"]]).isPure;                  // ➔ true
+ce.box(["WithRandomSeed", 42, ["Random"]]).isPure;    // ➔ true
+ce.box(["Function", ["Random"], "x"]).isPure;         // ➔ true
+
+ce.assign("f", ce.box(["Function", ["Random"], "x"]));
+ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ false
+
+ce.assign("f", ce.box(["Function", ["Multiply", "x", 2], "x"]));
+ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ true
+```
 
 ## Checking the Kind of Expression
 
@@ -1331,6 +1400,36 @@ integration (`NIntegrate`) returns the estimate computed from the samples
 taken so far, with a correspondingly larger error bound.
 
 
+## Errors
+
+An [`["Error"]`](/compute-engine/reference/core/#Error) is a **value**, and it
+propagates along the ordinary value path. If an operand that a function
+evaluates strictly turns out to be an error, the whole expression evaluates to
+that error — not to a frozen expression wrapped around it. The propagated
+error carries an `["ErrorTrace"]` breadcrumb recording the operators it passed
+through, so the failure site is still recoverable.
+
+```ts
+console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
+// ➔ ["Error",
+//      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
+```
+
+A **collection** is the exception: an error among its elements stays in place,
+because a collection containing an error is still a well-formed collection.
+
+Errors do not spread past the tools that inspect them. `Type` reports
+`"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
+`True`/`False`, and
+[`Match`](/compute-engine/reference/control-structures/#Match) decides on an
+error subject — an `["Error", ...]` case destructures it, which is how a
+failure is rescued.
+
+`NaN` is **not** an error. It is an ordinary IEEE numeric value that inhabits
+the number domain, so it does not propagate this way: a function applied to
+`NaN` runs and receives it, and is free to inspect it.
+
 
 ## Lexical Scopes and Evaluation Contexts
 
@@ -1712,7 +1811,8 @@ that require evaluation, such as `\sin(\pi)`.
 | `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
+| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`                |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Structural identity of the **evaluated** operands (Cortex `===`). Unlike `isSame()`, each operand is evaluated first, so `["Same", ["Add", 1, 1], 2]` is `True`. Always decides. |
 
 </div>
 
@@ -2785,6 +2885,82 @@ console.info(ce.parse('\\operatorname{double}(3)').json);
 // ➔ ["double", 3]
 ```
 
+## When Is the Value Captured?
+
+An assignment evaluates its right-hand side **eagerly**, when the assignment
+itself is evaluated. Any symbol that has a value at that moment is replaced by
+its value, permanently:
+
+```js
+ce.parse("p := 1").evaluate();
+ce.parse("a := p + 5").evaluate(); // a is 6: the value of p was captured
+ce.parse("p := 2").evaluate();     // changing p has no effect on a
+console.log(ce.parse("a").evaluate());
+// ➔ 6
+```
+
+A symbol that has **no value** at that moment is an unknown: it remains in the
+stored value as a symbol. The value of `a` below is the expression $p + 5$,
+and evaluating `a` evaluates that expression — so `p` resolves to whatever its
+value is **at evaluation time**:
+
+```js
+ce.parse("a := p + 5").evaluate(); // p is unknown: a is the expression p + 5
+ce.parse("p := 2").evaluate();
+console.log(ce.parse("a").evaluate());
+// ➔ 7
+```
+
+The stored value itself never changes; what changes is the result of
+evaluating it. This is the usual convention in computer algebra systems (it
+matches `Set`, i.e. `=`, in Mathematica): defining a symbol in terms of an
+unknown means the symbol's value _is_ that symbolic expression. There is no
+way to "snapshot" an unknown other than as the symbol itself.
+
+**Assigning a symbol to another symbol captures its current value — it does
+not create an alias.**
+
+```js
+ce.parse("a := p + 5").evaluate();
+ce.parse("b := a").evaluate();   // b is the expression p + 5, not a reference to a
+ce.parse("p := 1").evaluate();
+ce.parse("a := 100").evaluate(); // no effect on b
+console.log(ce.parse("b").evaluate());
+// ➔ 6
+```
+
+**Self-referential and mutually referential values are allowed.** Because
+assignment is eager, a cycle can end up baked into a stored value: evaluating
+the right-hand side of `q := p + 1` when `p` is already `q + 1` stores the
+self-referential expression $q + 2$ as the value of `q`. Evaluating a symbol
+whose value refers back to itself — directly or through other symbols —
+returns the stored expression rather than recursing:
+
+```js
+ce.parse("s := s + 1").evaluate();
+console.log(ce.parse("s").evaluate());
+// ➔ s + 1
+```
+
+**To store an expression as inert data**, without capturing or resolving
+anything, wrap it in `Hold`: the value of the symbol is then the held
+expression itself, which stays unchanged under evaluation.
+
+```js
+ce.assign("a", ce.box(["Hold", ["Add", "p", 5]]));
+ce.parse("p := 2").evaluate();
+console.log(ce.parse("a").evaluate());
+// ➔ Hold(p + 5)
+```
+
+**To resolve a held expression**, apply `ReleaseHold`, which removes one
+layer of `Hold` and evaluates the result:
+
+```js
+console.log(ce.box(["ReleaseHold", "a"]).evaluate());
+// ➔ 7
+```
+
 ## Explicit Declarations
 
 **To have more control over the definition of a symbol** use
@@ -2799,7 +2975,7 @@ ce.declare("m",  "integer");
 
 // Declaring a function "f"
 ce.declare("f", {
-  signature: "number -> number",
+  signature: "(number) -> number",
   evaluate: ce.parse("x \\mapsto 2x"),
 });
 ```
@@ -2906,7 +3082,7 @@ function.
 
 ```js
 ce.declare("double", {
-  signature: "number -> number",
+  signature: "(number) -> number",
   description: "Multiply a number by two",
   keywords: ["twice", "doubling"],
   evaluate: ([x]) => x.mul(2),
@@ -2931,6 +3107,227 @@ definition.
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
+
+### Declaring the Effects of a Function
+
+If your function does something besides returning a value — draws a random
+number, writes a symbol, calls the network, prints — say so. The Compute Engine
+uses that information to decide what it may cache, share or re-evaluate, and a
+function that quietly lies about it will produce stale results.
+
+**To declare effects**, use the `effects` property, an array of labels (or the
+string `'any'` for "unknown effects"):
+
+```js
+ce.assign("lastId", 0);
+
+ce.declare("nextId", {
+  signature: "() -> integer",
+  effects: ["scope"],
+  evaluate: (_ops, { engine }) => {
+    const n = engine.box("lastId").evaluate().re + 1;
+    engine.assign("lastId", n);
+    return engine.number(n);
+  },
+});
+
+ce.lookupDefinition("nextId").operator.signature.toString();
+// ➔ "() scope -> integer"
+
+ce.box(["nextId"]).evaluate();  // ➔ 1
+ce.box(["nextId"]).evaluate();  // ➔ 2
+```
+
+Equivalently, write the effects directly in the signature string, in the slot
+between the argument list and the arrow:
+
+```js
+ce.declare("now", {
+  signature: "() time -> number",
+  evaluate: (_ops, { engine }) => engine.number(Date.now()),
+});
+
+ce.box(["now"]).isPure;
+// ➔ false
+```
+
+The nine labels and the `any` and `pure` keywords are described in
+[Effect Specifiers](/compute-engine/guides/types/#effect-specifiers).
+
+The older `pure` and `drawsRandom` flags are still accepted as shorthand —
+`drawsRandom: true` is `effects: ["random"]`, and a bare `pure: false` means
+`effects: 'any'` — and both are now *derived* from the effect set rather than
+stored separately. Declarations that contradict themselves are rejected at
+registration rather than resolved silently:
+
+```js
+ce.declare("bad", { signature: "(number) -> number", pure: true, drawsRandom: true });
+// ➔ throws: the 'pure' and 'drawsRandom' flags are contradictory
+
+ce.declare("bad", { signature: "(number) random -> number", pure: true });
+// ➔ throws: the declared effects and the 'pure'/'drawsRandom' flags disagree
+```
+
+For a function defined by a body rather than a JavaScript handler, effects are
+**inferred** from the body unless you state them. Stating them makes them a
+contract: every body later assigned to that symbol must stay within the
+declared set, or the assignment fails with an `incompatible-type` error. See
+[Inferred and Declared Effects](/compute-engine/guides/types/#inferred-and-declared-effects).
+
+**To require an effect-free argument**, give the parameter a function signature
+with a bare arrow — `signature: "((any) -> number, real, real) -> real"` says
+"the first argument must be a pure callback", and it is checked when the
+operator is applied.
+
+Alternatively, an `evaluate` handler can inspect its operands at run time and
+decline. Which property to read depends on what the handler will do with the
+operand — the difference between *invoking* a value and *evaluating* an
+expression:
+
+- **A callback the handler will invoke**: read `op.type.effects`, the latent
+  set on the operand's arrow. It resolves through symbol bindings, so a symbol
+  bound to a drawing function reports `["random"]`. The value is `undefined`
+  (no effects), `[]` (declared pure), `'any'` (unknown), or the labels.
+
+```js
+ce.declare("sampleWith", {
+  signature: "(function, integer) -> number",
+  evaluate: ([f, n], { engine }) => {
+    const latent = f.type.effects;
+    if (latent === "any" || (latent !== undefined && latent.length > 0))
+      return engine.error([
+        "incompatible-type",
+        "a pure callback",
+        `a callback with ${latent === "any" ? "unknown" : latent} effects`,
+      ]);
+    let sum = 0;
+    for (let i = 1; i <= n.re; i++)
+      sum += engine.function("Apply", [f, i]).N().re;
+    return engine.number(sum);
+  },
+});
+
+ce.box(["sampleWith", ["Function", ["Multiply", "x", 2], "x"], 3]).evaluate();
+// ➔ 12
+
+ce.box(["sampleWith", ["Function", ["Random"], "x"], 3]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'a pure callback'",
+//                 "'a callback with random effects'"]]
+```
+
+- **A held expression the handler will evaluate**: read `expr.effects`, the
+  effects of evaluating it. (`expr.isPure` is the boolean summary of the same
+  answer; `effects` says *which*, so the error message can name them.)
+
+```js
+ce.declare("assertPure", {
+  signature: "(any) -> any",
+  lazy: true,
+  evaluate: ([body], { engine }) => {
+    const effects = body.canonical.effects;
+    if (effects === undefined) return body.canonical.evaluate();
+    return engine.error([
+      "incompatible-type",
+      "a pure operand",
+      `an operand with ${effects === "any" ? "unknown" : effects} effects`,
+    ]);
+  },
+});
+
+ce.box(["assertPure", ["Add", 1, 2]]).evaluate();
+// ➔ 3
+
+ce.box(["assertPure", ["Assign", "q", 1]]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'a pure operand'",
+//                 "'an operand with scope effects'"]]
+```
+
+### Declaring an Operator that Binds a Variable
+
+Some operators own a **bound variable**: the `k` of a summation, the `x` of a
+derivative or an integral. A bound variable is not an ordinary argument — it
+must be a *new* variable belonging to the operator, shadowing any same-named
+symbol outside it, and it must stay symbolic even if a symbol of the same name
+has a value.
+
+**To declare a binder**, give the `scoped` property a **binding-site
+selector** instead of `true`. The selector tells the engine which operands are
+binding sites; the engine then declares those variables in the operator's own
+scope before your operands are canonicalized, and makes every occurrence in
+the other operands refer to that binding — consistently across the LaTeX,
+MathJSON, and `ce.function()` routes.
+
+The prebuilt selectors cover the common shapes:
+
+- `operandSites(...indices)` — the operands at these positions are bare
+  bound-variable symbols (like `Series`' expansion variable).
+- `operandsFrom(first)` — every operand from position `first` on is a bound
+  variable (like `D`'s variadic differentiation variables).
+- `indexingSetSites(first)` — the first element of each `Element`- or
+  `Limits`-shaped operand from position `first` on is a bound variable (like
+  `Sum`, `Product`, or a comprehension: `["Element", "k", collection]`).
+- `limitsIndexSites(op)` — the index inside the single `Limits` operand at
+  position `op`.
+
+For example, an operator that computes the maximum of an expression over an
+indexing set:
+
+```js
+import { ComputeEngine, indexingSetSites } from "@cortex-js/compute-engine";
+
+const ce = new ComputeEngine();
+
+ce.declare("MaxOver", {
+  lazy: true,
+  scoped: indexingSetSites(1),
+  signature: "(expression, expression) -> number",
+  evaluate: (ops, { engine }) => {
+    // A lazy operator receives its operands unevaluated: canonicalize
+    // the ones you consume.
+    const body = ops[0].canonical;
+    const elem = ops[1].canonical; // Element(k, collection)
+    const k = elem.op1.symbol;
+    const coll = elem.op2.evaluate();
+    let best;
+    for (const v of coll.each()) {
+      const val = body.subs({ [k]: v }).evaluate().re;
+      if (best === undefined || val > best) best = val;
+    }
+    return best === undefined ? undefined : engine.number(best);
+  },
+});
+```
+
+The engine guarantees the binding behavior without further work in the
+handler. Even with a same-named global that has a value, the bound variable is
+the operator's own:
+
+```js
+ce.parse("k := 100").evaluate();
+
+const e = ce.box([
+  "MaxOver",
+  ["Subtract", ["Multiply", "k", 6], ["Power", "k", 2]],
+  ["Element", "k", ["List", 1, 2, 3, 4, 5]],
+]);
+console.log(e.evaluate());
+// ➔ 9        (max of 6k - k² over {1…5}, at k = 3 — not affected by k := 100)
+console.log(ce.parse("k").evaluate());
+// ➔ 100      (the global k is untouched)
+```
+
+A few notes:
+
+- `scoped: true` (without a selector) still means "this operator has a scope,
+  but no syntactic bound variables" — appropriate for `Block`-like operators
+  whose scope holds declarations.
+- With multiple indexing clauses, **later clauses see earlier bindings**: a
+  collection expression in clause 2 may reference the index of clause 1, and a
+  collection in clause 1 that mentions the *name* of clause 2's index refers
+  to the enclosing scope, not the later clause.
+- A parameter or index named after a library constant (`Pi`, `e`, `i`) is
+  bound like any other variable inside the operator; the constant is
+  unaffected outside it.
 
 **To define a function without specifying a body for it**, specify
 the signature of the function as the second argument of `ce.declare()` or
@@ -3369,6 +3766,56 @@ In general, re-declaring a function in the same scope is not allowed and
 will throw an error. However, the standard functions are in a `system` scope
 so a new declaration in the `global` scope or a child scope will
 override the original declaration.
+
+
+## Multi-Clause Function Definitions
+
+**To define a function by cases** — separate definitions for particular
+argument values, plus a general fallback — use the `DefineFunction`
+operator. Unlike `Assign`, which replaces a binding wholesale,
+`DefineFunction` **accumulates**: each statement adds a *clause*, and a
+call dispatches to the most specific clause admitting its arguments
+(declaration order only breaks ties between equally specific clauses).
+
+```js
+ce.box(['DefineFunction', 'fib',
+  ['Function', 0, ['Typed', 'z', { str: '0' }]]]).evaluate();
+ce.box(['DefineFunction', 'fib',
+  ['Function', 1, ['Typed', 'o', { str: '1' }]]]).evaluate();
+ce.box(['DefineFunction', 'fib',
+  ['Function',
+    ['Add', ['fib', ['Subtract', 'n', 1]], ['fib', ['Subtract', 'n', 2]]],
+    ['Typed', 'n', { str: 'integer' }]]]).evaluate();
+
+console.log(ce.box(['fib', 10]).evaluate().toString());
+// ➔ 55
+```
+
+A parameter constrained to a single value (`{ str: '0' }` above) uses a
+**value type**: the clause admits exactly that value. In Cortex, literal
+parameters provide the same thing directly: `fib(0) = 0`.
+
+The clause rules:
+
+- A new clause with the **same parameter types** replaces the earlier
+  clause in place (so re-running an edited definition behaves as
+  expected); any other parameter list appends a clause.
+- A plain assignment (`Assign`, `ce.assign()`) still **replaces the whole
+  binding**, clauses and all.
+- If a symbolic argument leaves dispatch undecided — a more specific
+  clause *might* apply once the value is known — the call stays inert
+  (symbolic) rather than committing to a fallback.
+- If the evaluated arguments match **no** clause, the call is a
+  `no-matching-clause` error value.
+- Effects must be uniform across clauses: there is one effect row per
+  function. An explicit specifier on one clause establishes the row;
+  another clause's explicit specifier must agree, or the definition is
+  rejected with `incompatible-clause-effects`.
+
+**To inspect the clause set**, use `About`: it lists one line per clause
+in declaration order, and annotates overlapping equal-specificity clauses
+and clauses made unreachable by more specific ones covering their whole
+(finite) domain.
 
 
 ## Defining Multiple Functions and Symbols
@@ -5150,7 +5597,7 @@ The Compute Engine supports the following primitive types:
 | `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. No other type matches `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
-| `never`       | The type that has no values; the empty type or **bottom type**                                             |
+| `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
@@ -5322,6 +5769,18 @@ The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
 honest type is a subtype of every broader form — `vector<finite_integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
+
+The **empty list** has no elements, so its element type is the bottom type 
+`never`. Covariance then makes it a member of every list type, which is what 
+you want — an empty list is a valid list of anything.
+
+```js
+ce.parse("\\[\\]").type.toString();
+// ➔ "list<never>"
+
+ce.parse("\\[\\]").type.matches("list<integer>");
+// ➔ true
+```
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
 
@@ -5586,7 +6045,217 @@ and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
+The type `function` matches any function value — any parameter shape, any
+effects. It is a distinct primitive, **not** a shorthand for a signature such
+as `(any*) -> unknown`: a written signature constrains callbacks
+contravariantly (its parameter types are a promise about what callers may
+pass), so no signature spelling can accept every function. Use `function` for
+operator parameters that take a callback whose shape depends on other
+operands (e.g. `Map`), and a full signature only when the callback's shape is
+fixed.
+
+### Effect Specifiers
+
+A function signature can also state the **effects** of calling the function:
+what it does besides returning a value. The effects go in a slot between the
+argument list and the arrow.
+
+```js
+ce.type("(real) random -> real");     // may draw from the random stream
+ce.type("(string) network -> string"); // performs host network I/O
+ce.type("() scope -> nothing");       // mutates a binding that outlives the call
+```
+
+There are nine effect labels, a closed set:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"14ch"}}>
+
+| Label | Meaning |
+| :------------ | :---------------------------------------------------------- |
+| `console` | Emits host console or diagnostic output |
+| `entropy` | Unseeded, non-replayable nondeterminism |
+| `environment` | Reads host environment data: navigator, locale, environment variables |
+| `fs_read` | Reads the host filesystem |
+| `fs_write` | Writes the host filesystem |
+| `network` | Performs host network I/O |
+| `random` | May draw from the ambient seeded random stream |
+| `scope` | May mutate a binding that outlives the call |
+| `time` | Reads the host clock |
+
+</div>
+
+Several labels may appear in the slot, separated by spaces. They may be written
+in any order; the canonical form orders them alphabetically.
+
+```js
+ce.type("(string) scope network -> string").toString();
+// ➔ "(string) network scope -> string"
+```
+
+Two keywords may appear in the slot instead of labels:
+
+- `any` means **unknown effects**. It is the top of the effect ordering: every
+  consumer treats it as though every label, present and future, were there. Use
+  it for an opaque function that cannot state what it does.
+- `pure` means **no effects**, stated explicitly.
+
+An **empty slot also means pure**. `(real) pure -> real` and `(real) -> real`
+describe the same set of effects (none) and are interchangeable everywhere a
+type is compared, but they are not spelled the same: `pure` is a *statement*,
+and it survives serialization so that re-declaring from a serialized signature
+keeps the purity contract. An empty slot states nothing, and leaves the effects
+to be inferred from the function's body.
+
+```js
+ce.type("(real) pure -> real").toString();
+// ➔ "(real) pure -> real"
+
+ce.type("(real) -> real").toString();
+// ➔ "(real) -> real"
+```
+
+The grammar fails closed. An unknown label, a repeated label, or `any` or `pure`
+combined with anything else is a type error rather than a silently weakened
+contract:
+
+```js
+ce.type("(real) rndm -> real");
+// ➔ throws: Unknown effect label `rndm`
+
+ce.type("(real) any random -> real");
+// ➔ throws: `any` cannot be combined with other effect labels
+```
+
+Because argument lists are always parenthesized, the slot is positionally
+isolated: an identifier there can only be an effect label, so adding a label in
+a future version can never change how an existing type string parses.
+
+#### Effects and Subtyping
+
+Signatures are **covariant** in their effect set: a function that does less is
+usable wherever a function that may do more is accepted. So `(real) -> real` is
+a subtype of `(real) random -> real`, which is a subtype of `(real) any ->
+real`.
+
+In argument position this flips, which is what makes an annotated parameter a
+*requirement*. A parameter typed with a bare arrow demands a **pure** callback,
+and the check happens at the call boundary like any other argument check:
+
+```js
+ce.declare("integ", { signature: "((any) -> number, real, real) -> real" });
+
+ce.box(["integ", ["Function", ["Add", "x", 1], "x"], 0, 1]).isValid;
+// ➔ true
+
+ce.box(["integ", ["Function", ["Random"], "x"], 0, 1]).isValid;
+// ➔ false  (incompatible-type: "(any) -> number" vs "(unknown) random -> number")
+```
+
+To tolerate an effect rather than forbid it, list it: a parameter typed `(any)
+random -> number` accepts both a drawing callback and a pure one. An operand
+typed `any` fails every bound — a function that will not state its effects
+cannot prove their absence.
+
+The `function` primitive is the escape hatch: it is effect-top, so it accepts
+any callable whatever its effects. That is why `Map(xs, x |-> Random())` is
+accepted; the effect is not rejected, it is simply carried onto the
+application.
+
+#### Inferred and Declared Effects
+
+For a function you define, effects are normally **inferred** from the body, and
+re-inferred every time you assign a new body. A bare arrow leaves them on that
+inferred track — it declares the parameter and result types without pinning the
+effects:
+
+```js
+ce.declare("counter", { type: "number", value: 0 });
+ce.declare("fib", { type: "(number) -> number" });
+
+// Accepted: the body writes an enclosing binding, and the inferred effects
+// are revised to `scope`.
+ce.assign("fib", ce.box(["Function",
+  ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
+
+// Accepted too: a pure body revises them back.
+ce.assign("fib", ce.box(["Function", ["Add", "n", 1], "n"]));
+```
+
+Stating the effects explicitly — a non-empty specifier, or the `pure` keyword —
+turns them into a **contract** instead. Every body assigned to the symbol must
+stay within it. Over-declaring is allowed (a pure body satisfies a `scope`
+contract), but exceeding it is an `incompatible-type` error and the definition
+is not installed:
+
+```js
+ce.declare("g", { type: "(number) pure -> number" });
+
+ce.box(["Assign", "g", ce.box(["Function",
+  ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"])]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "pure effects", "scope effects"))
+```
+
+This mirrors how the rest of the type system treats inference: an inferred type
+is flexible and revisable, a declared one is enforced.
+
+### Overload Sets
+
+A function that can be called in several different ways is described by an
+**intersection** of function signatures. The value inhabits every arm, that is,
+it is callable at each of them.
+
+```js
+ce.declare("Draw", {
+  signature: "((set<real>) -> real) & ((collection) -> any)",
+  evaluate: (ops) => {
+    /* dispatch on ops at run time */
+  },
+});
+
+ce.box(["Draw", ["Interval", 0, 1]]).type; // ➔ "real"
+ce.box(["Draw", ["List", 1, 2, 3]]).type; // ➔ "any"
+ce.box(["Draw", 5]).isValid; // ➔ false
+```
+
+Use an intersection (`&`), not a union (`|`). A union would say the value is
+callable in *one* of those ways without saying which, so a call site could rely
+on none of them individually.
+
+**Parenthesize each arm.** The `->` of a signature binds the loosest of all type
+operators: its return type extends as far right as possible and absorbs any
+following `&` or `|`. So `(number) -> real & string` is a *single* signature
+returning `real & string`, not an intersection of two signatures.
+
+When a call is made, the arm whose parameters accept the arguments is selected.
+If several arms accept them, the **most specific** one wins — above,
+`Interval(0,1)` is a `set<real>`, and since `set<real>` is a subtype of
+`collection` both arms accept it, so the first arm is chosen and the result type
+is `real` rather than `any`. Arms that are not comparable are tried in
+declaration order, so it is good practice to write the most specific arm first.
+If no arm accepts the arguments, the call is an error.
+
+An overload set is a subtype of each of its arms:
+
+```js
+ce.type("((number) -> real) & ((string) -> boolean)").matches("(number) -> real");
+// ➔ true
+```
+
+A symbol declared with an overload set behaves the same way:
+
+```js
+ce.declare("f", "((integer) -> integer) & ((string) -> string)");
+
+ce.box(["f", 3]).type; // ➔ "integer"
+ce.box(["f", "'a'"]).type; // ➔ "string"
+ce.box(["f", true]).isValid; // ➔ false
+```
+
+Note that a single `["Function"]` literal usually cannot implement an overload
+set: assigning `(x) -> x + 1` to the `f` above is rejected, because that one
+body must satisfy both `(integer) -> integer` and `(string) -> string`. Overload
+sets are intended for operators whose implementation dispatches on its arguments
+at run time.
 
 ### Typed Function Literals
 
@@ -5611,6 +6280,27 @@ mode, the arguments of a typed literal are checked against the declared
 parameter types when the function is applied — a mismatch produces an
 `incompatible-type` error. Assigning a typed literal to a symbol gives that
 symbol the annotated signature, including the return type.
+
+The return ascription may also be a **full signature carrying effects** — this
+is how a definition states its effect contract
+(`function roll(n) random -> integer { … }` lowers to a body ascribed
+`"(n: unknown) random -> integer"`). Because of that reading, ascribing an
+*effect-bearing function type* as a plain **return type** requires grouping
+parentheses around it:
+
+```js
+// The literal's own contract: `mk` draws from the random stream.
+ce.box(["Function", ["Typed", body, "'(real) random -> real'"], "x"]);
+
+// A pure literal whose RETURN VALUE is a drawing function: group the type.
+ce.box(["Function", ["Typed", body, "'((real) random -> real)'"], "x"]);
+```
+
+The same rule applies in Cortex: write
+`function mk(x) -> ((real) random -> real) { … }` for the effectful *return
+type*, and `function roll(n) random -> integer { … }` for the definition's own
+contract. An effect-free signature never needs the parentheses — it is always
+read as a return type.
 
 Two refinements apply to this check. A **collection argument against a scalar
 parameter broadcasts**: with `h` declared `(number) -> number`, `h([1, 2, 3])`
@@ -5666,6 +6356,10 @@ Intersections are most useful for extending or combining record types.
 
 For example, `record<length: integer> & record<size: integer>` is the type of values 
 that are records with both a `length` and a `size` key, that is `record<length: integer, size: integer>`.
+
+An intersection of **function signatures** describes a function that can be
+called in several different ways — see [Overload Sets](#overload-sets). Each arm
+must be parenthesized, since `->` binds looser than `&`.
 
 
 ### Negation
@@ -5825,6 +6519,117 @@ ce.type("(x: integer) -> integer")
 // ➔ true
 ```
 
+### Could a Value Be of a Type?
+
+`matches()` asks whether **every** value of a type is a value of the target. 
+That is the right question for type checking, but not for classifying a value 
+by its shape — and the two answers differ on **union types**.
+
+A union matches a target only if *every* one of its members does, so a union 
+answers `false` even when one of its members is exactly the shape you asked 
+about:
+
+```js
+ce.type("integer | string").matches("integer");
+// ➔ false  (a `string` is not an `integer`)
+```
+
+**To check whether a value of a type could be of another type**, use 
+`type.couldMatch()`:
+
+```js
+ce.type("integer | string").couldMatch("integer");
+// ➔ true
+
+// Unions are distributed at every depth, including inside a parameter
+ce.type("list<integer | string>").couldMatch("list<integer>");
+// ➔ true  (witness: `[1, 2]`)
+```
+
+`couldMatch()` is symmetric, and decisive for the composite shapes it models — 
+list elements and dimensions, tuple arity and element names, and the element 
+type of sets and collections:
+
+```js
+ce.type("tuple<number, number>").couldMatch("list<tuple<number, number>>");
+// ➔ false  (a point is not a list of points)
+
+ce.type("list<integer>").couldMatch("list<string>");
+// ➔ false
+```
+
+The `never` type has no values, so nothing could be one — the one place 
+`couldMatch()` deliberately differs from `matches()`, for which `never` is a 
+subtype of everything. An `unknown` type could be anything: check `isUnknown` 
+if you want to treat an inconclusive type as a non-match.
+
+```js
+ce.type("never").couldMatch("integer");
+// ➔ false   (`ce.type("never").matches("integer")` is `true`)
+
+ce.type("unknown").couldMatch("integer");
+// ➔ true
+```
+
+**To examine the members of a union**, use `type.unionMembers`. Any other type 
+yields a single-element array, so the same code path works for both:
+
+```js
+ce.type("integer | string").unionMembers.map((t) => t.toString());
+// ➔ ["integer", "string"]
+
+ce.type("integer").unionMembers.map((t) => t.toString());
+// ➔ ["integer"]
+```
+
+Note that `unionMembers` does not reach a union nested inside a parameter — 
+`list<integer | string>` is a single member. Use `couldMatch()`, which handles 
+that case directly.
+
+**To check whether two types have no values in common**, use 
+`type.isDisjointFrom()`:
+
+```js
+ce.type("integer | string").isDisjointFrom("boolean");
+// ➔ true
+
+ce.type("integer | string").isDisjointFrom("integer | boolean");
+// ➔ false  (they share `integer`)
+```
+
+Types are separated by category, so a composite type is disjoint from a 
+primitive one and from a composite of another kind — a `list` is not a 
+`string`, a `tuple` is not a `list`. (A `record`, however, is NOT disjoint
+from a `dictionary`: a record is the named-shape subtype of dictionary in
+the type hierarchy, so a record value is a dictionary value.)
+
+```js
+ce.type("list<integer>").isDisjointFrom("string");
+// ➔ true
+
+ce.type("tuple<number, number>").isDisjointFrom("list<tuple<number, number>>");
+// ➔ true
+```
+
+:::warning
+`isDisjointFrom()` is conservative: when disjointness cannot be established the 
+answer is `false`, meaning "these may overlap", never a false claim of 
+disjointness.
+
+Because of that, `!isDisjointFrom()` is **not** the same as `couldMatch()` and 
+should not be used to classify a value by shape. Two collections whose element 
+types cannot coincide are the case to watch:
+
+```js
+ce.type("list<integer>").isDisjointFrom("list<string>");
+// ➔ false — "may overlap"
+
+ce.type("list<integer>").couldMatch("list<string>");
+// ➔ false — the answer you want
+```
+
+:::
+
 ### Checking the Type of a Numeric Value
 
 The properties `expr.isNumber`, `expr.isInteger`, `expr.isRational` and 
@@ -5940,6 +6745,32 @@ ce.declareType(
 
 The type is defined in the current lexical scope.
 
+A program can declare its own types with the `["DeclareType"]` operator —
+the MathJSON mirror of `ce.declareType()` — or, in Cortex, with the `type`
+statement, which comes in two forms:
+
+```js
+type point = tuple<x: number, y: number>  // nominal
+type alias pair = tuple<number, number>   // structural alias
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+A bare `type` declares a **nominal** type (see below): a new, distinct type
+that no structural value inhabits — `let q: point = (1, 2)` is rejected,
+since the type of `(1, 2)` is a tuple, not a `point`. Values of a nominal
+type come from its **constructor** instead (`point(1, 2)`, see below). It
+lowers to `["DeclareType", "point", "'tuple<x: number, y: number>'"]`.
+
+`type alias` declares a **structural alias**: any value matching the
+definition is compatible with the type. It lowers to the same operator with
+the attributes dictionary `["Dictionary", ["KeyValuePair", "alias",
+"True"]]` — the surface mirror of `ce.declareType()`'s `{ alias: true }`
+option.
+
+The type-variable syntax `type point<T> = tuple<T, T>` is reserved for a
+future release and is reported as not yet supported (both forms).
+
 
 ### Nominal vs Structural Types
 
@@ -5968,6 +6799,160 @@ ce.type("tuple<x: integer, y: integer>")
   .matches("pointData");
 // ➔ true
 ```
+
+### Type Constructors
+
+Declaring a type also declares a **constructor**: an operator of the same
+name, in the same scope, that builds values of that type. This is what makes
+a nominal type inhabitable — without it, the type would be a set with no
+members.
+
+```js
+ce.declareType("point", "tuple<x: integer, y: integer>");
+ce.expr(["point", 1, 2]).type;
+// ➔ "point"
+```
+
+The constructor's signature comes from the definition:
+
+- a `tuple` definition gives one argument per element, with the element names
+  as parameter names: `point: (x: integer, y: integer) -> point`;
+- any other definition gives a single argument:
+  `ce.declareType("meters", "number")` gives `meters: (number) -> meters`;
+- a `record` definition auto-declares **no** constructor. A record's field
+  order is documentation, not semantics, so building one positionally would
+  silently depend on it. Record types are inhabited through a **constructor
+  function** instead (below).
+
+Arguments are validated against that signature, so `["point", 1]` (too few)
+and `["point", "'a'", 2]` (wrong type) produce the usual error values.
+
+#### Constructor Functions
+
+Assigning a **function literal** to a nominal type's name — in the scope the
+type is declared in, after the declaration — installs it as the type's
+**constructor function**. The body computes the *payload*, a value that must
+satisfy the definition; the engine checks it (for a record: exactly the
+definition's keys, each field's value against its type) and tags it. This is
+the record inhabitation story, and, for any definition, the smart-constructor
+idiom (validation, normalization, alternate parameterizations):
+
+```js
+ce.declareType("circle", "record<x: number, y: number, r: number>");
+ce.assign("circle", ce.box(["Function",
+  ["Dictionary",
+    ["KeyValuePair", {str: "x"}, "x"],
+    ["KeyValuePair", {str: "y"}, "y"],
+    ["KeyValuePair", {str: "r"}, "r"]],
+  "x", "y", "r"]));
+
+ce.box(["circle", 1, 2, 3]).evaluate().type;
+// ➔ "circle"
+```
+
+In Cortex the same declaration is
+`function circle(x, y, r) { {x -> x, y -> y, r -> r} }`.
+
+The installed operator is an **overload set**: the user's arm plus an
+automatic **raw-injection** arm — a single argument that already satisfies
+the definition is checked and tagged directly, body skipped. Serialization
+emits that raw spelling (`["circle", {payload}]`), so a round trip injects
+the payload unchanged and a normalizing constructor's values compare equal
+after it. Because the raw arm must win on its own domain, a user arm whose
+parameters are not distinguishable from the payload (same arity, overlapping
+types — including unannotated parameters against a same-arity definition) is
+**rejected at install**; use a different arity or annotate the parameters
+with types disjoint from the definition body.
+
+A constructor function may call itself (a recursive normalizer); returning
+its own constructed value passes through un-nested. Assigning a function
+literal to an **alias** type's name replaces the identity constructor with an
+ordinary function — no tagging. Everything else about the constructor guard
+is unchanged: assigning a non-function value over any minted constructor
+still throws.
+
+A nominal constructor is **inert**: `["point", 1, 2]` evaluates to itself,
+and the tag is the value's identity — it survives canonicalization,
+serialization (`["point", 1, 2]` is ordinary MathJSON) and storage in a
+collection (`[p, q]` has type `list<point^2>`). It is pure, and it introduces
+no per-value metadata.
+
+An **alias** declaration mints a checked identity constructor instead: it
+validates its arguments against the definition and returns the plain
+structural value, so `["pointData", 1, 2]` evaluates to the ordinary tuple
+`(1, 2)`. It is a checked-cast spelling, not a tag.
+
+Pass `{ mint: false }` to declare a type without a constructor:
+
+```js
+ce.declareType("bare", "number", { mint: false });
+ce.operatorInfo("bare");
+// ➔ undefined
+```
+
+A type declaration claims **both** namespaces — the type name and the value
+name — atomically. If the current scope already has a value or operator of
+that name, the declaration fails and registers nothing; a name in an outer
+scope is shadowed, not conflicted. Re-declaring a type from a `["DeclareType"]`
+statement replaces its constructor along with its definition.
+
+### Nominal Types Are Opaque
+
+A value of a nominal type is **not** its representation: `point` is not a
+subtype of `tuple<x: integer, y: integer>`, so the operations that consume
+the underlying structure reject it, exactly as they would any other operand
+of the wrong type.
+
+```js
+ce.expr(["First", ["point", 1, 2]]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "indexed_collection", "point"))
+
+ce.declareType("meters", "number");
+ce.expr(["Add", ["meters", 5], 1]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "number", "meters"))
+```
+
+That is the point of a nominal type: a `meters` cannot be added to a bare
+number by accident. There are three sanctioned windows back in:
+
+- **field access** — the `Field` operator (`p.x` in Cortex) reads one named
+  field through the type's definition when the body has named fields (a
+  record body, or a named-tuple body): `ce.box(["Field", p, "'x'"])`. This
+  dispatches off the definition's field map and does **not** make the value
+  a collection — `First(p)` and `p["x"]` keep rejecting;
+- **pattern matching** — in Cortex, `match p { point(x, y) => x + y }`;
+- reading the operands of the MathJSON application directly from a host.
+
+A **structural alias** has no such reserve: an alias-typed operand unfolds to
+its definition, so `m + 1` with `m: meters` an alias of `number`, or
+`First(p)` with `p` an alias of a tuple, work as expected.
+
+### Equality of Nominal Values
+
+Two values built by the same constructor are equal when their arguments are;
+values built by different constructors — or a constructed value and a plain
+value of the same shape — are not:
+
+```js
+ce.declareType("polar", "tuple<r: integer, t: integer>");
+
+ce.expr(["Equal", ["point", 1, 2], ["point", 1, 2]]).evaluate();
+// ➔ "True"
+ce.expr(["Equal", ["point", 1, 2], ["Tuple", 1, 2]]).evaluate();
+// ➔ "False"
+ce.expr(["Equal", ["polar", 1, 2], ["point", 1, 2]]).evaluate();
+// ➔ "False"
+```
+
+### Compiling Nominal Values
+
+Nominal-ness is static information, fully checked before any code is
+emitted, so **compilation erases the tag**: a constructor application
+compiles exactly where the equivalent plain value compiles, to the same code.
+`meters(x)` compiles to the compiled `x`; `point(x, y)` compiles to whatever
+a `Tuple` compiles to on that target (a JavaScript pair, a GLSL `vec2`) — and
+declines identically where a `Tuple` would. A new type therefore costs
+nothing at run time.
 
 ### Recursive Types
 
@@ -7183,6 +8168,21 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+### Why a compilation declined
+
+When `success` is `false`, `CompilationResult.error` carries the reason (the
+same text the `fallback: false` path throws). The message identifies which of
+three things happened:
+
+| Message shape                                                | Meaning                                                                                   |
+| :----------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| `X: cannot compile — …` naming an operand or a component      | The head lowers, but not for these operand shapes (e.g. a collection-valued point component) |
+| `X: cannot compile — the operator is known … no lowering`     | A target gap: the engine knows `X`, this target has no codegen for it                      |
+| ``Unknown operator `X` ``                                     | No operator definition for `X` at all — a typo, or a symbol never declared as a function   |
+
+`CompilationResult.unsupported` lists the same heads declaratively, so a caller
+can branch on the condition without parsing the message.
+
 ### Values That May Be Lists
 
 An operand typed
@@ -7206,6 +8206,33 @@ scalar or a list, such as the result of a call whose return type is
   NumPy broadcasts natively.
 - **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
   targets have no dynamic lists.
+
+## Implicit Compilation and the `jit` Setting
+
+Beyond explicit `compile()` calls, the engine **compiles automatically** in a
+number of implicit spots — for example when draining a large numeric `Map`,
+or when an exact integer computation over a large collection is provably safe
+to run in floating point. This is transparent: results are identical to the
+interpreter's, and any compilation failure silently falls back to
+interpretation.
+
+The `jit` property of a `ComputeEngine` instance controls this behavior:
+
+- **`"auto"`** (the default): implicit compilation is attempted where
+  beneficial. If the environment forbids code generation altogether (a
+  strict Content-Security-Policy page without `'unsafe-eval'`, an MV3
+  browser extension), the engine detects this on the first attempt and
+  latches to `"off"` engine-wide, so at most one CSP violation is reported.
+- **`"off"`**: no implicit code generation is ever attempted; every implicit
+  path uses the interpreter. Set it up front on hardened runtimes, or use it
+  as a diagnostic kill switch to compare interpreter and compiled behavior.
+
+Explicit `compile()` calls are not affected by this setting — a direct
+request keeps failing loudly with the environment's own error.
+
+Toggling `jit` is an engine-configuration change: caches whose entries were
+produced on the other route are invalidated, so `jit = "off"` genuinely
+re-runs the interpreter rather than serving previously compiled results.
 
 ## What Can Be Compiled
 
@@ -7341,6 +8368,24 @@ console.log(f.run());
 
 `Comprehension` is not compilable to GLSL or WGSL (shaders have no dynamic
 arrays). Imperative `Loop` is still compilable to GLSL/WGSL.
+
+#### Multi-statement constructs on the shader targets
+
+A shader has no expression-level loop or IIFE, so on GLSL and WGSL a `Sum` or
+`Product` with a symbolic bound is emitted as **statements** (with constant
+bounds it unrolls into an ordinary expression instead). Such a loop is hoisted
+ahead of the value that consumes it, so it can appear anywhere in an
+expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
+its enclosing loop body rather than out of it.
+
+A loop inside a **conditionally-evaluated branch** — an `If`, `When`, `Which` or
+`Match` arm — fails closed (`success: false`) instead. A shader conditional is
+an expression, not a statement, so there is no place to put the loop inside the
+branch; hoisting it out would run it whichever branch is selected, which changes
+the result whenever the branch draws from the random stream.
+
+`Loop` and `Block` are not hoisted either — they remain valid only as a whole
+function body, and fail closed when used as a sub-expression.
 
 #### `Block` and `where`
 
@@ -8642,6 +9687,12 @@ The `ce.assume()` method returns a status indicating the result of the assumptio
 - `'tautology'` - The assumption is redundant (already implied by existing assumptions)
 - `'contradiction'` - The assumption conflicts with existing assumptions
 - `'not-a-predicate'` - The expression is not a valid assumption proposition
+- `'internal-error'` - The assumption could not be processed
+
+Every outcome is reported as a return value; an expression that cannot be
+assumed does not throw. The `["Assume"]` operator reports the same outcomes as
+a string — see the
+[`Assume` reference](/compute-engine/reference/core/#Assume).
 
 ```js
 ce.assume(ce.parse("x > 4"));
@@ -12595,20 +13646,6 @@ tolerance: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.randomSeed
-
-```ts
-randomSeed: string | number | null;
-```
-
-Seed controlling deterministic, reproducible randomness. `null` (default)
- is non-deterministic. See the accessor on `ComputeEngine` for the full
- semantics (stream reset on assignment, compile-time baking).
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ExpressionComputeEngine.angularUnit
 
 ```ts
@@ -13308,11 +14345,35 @@ declareType(name, type, options?): void
 
 ####### type
 
-[`Type`](#type-3)
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
 
 ####### options?
 
 ####### alias?
+
+`boolean`
+
+####### fromStatement?
+
+`boolean`
+
+####### mint?
 
 `boolean`
 
@@ -13378,6 +14439,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -13460,6 +14522,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -13575,6 +14638,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -13657,6 +14721,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -15011,6 +16076,7 @@ type ValueDefinition = BaseDefinition & {
      | TypeString
      | BoxedType;
   inferred: boolean;
+  effectsDeclared: boolean;
   value:   | LatexString
      | ExpressionInput
      | ((ce) => Expression | null);
@@ -15034,6 +16100,26 @@ inferred: boolean;
 If true, the type is inferred, and could be adjusted later
 as more information becomes available or if the symbol is explicitly
 declared.
+
+#### ValueDefinition.effectsDeclared
+
+```ts
+effectsDeclared: boolean;
+```
+
+Annotation provenance on the EFFECTS axis of a function-typed
+declaration (`docs/EFFECTS-MODEL.md`, "Annotation provenance") — the
+effects-axis analog of `inferred`.
+
+True when the author STATED the arrow's effects: a non-empty specifier
+(`(number) scope -> number`), or the `pure` keyword — which denotes the
+same empty set a bare arrow does, so the type alone cannot tell them
+apart. A bare arrow leaves effects on the inferred track: assigning a
+body re-stamps them freely. A stated set is a CONTRACT: every assigned
+body must satisfy `inferred ⊆ declared`.
+
+Set by `ce.declare()` from the parsed declaration; not normally written
+by hand.
 
 #### ValueDefinition.value
 
@@ -15983,6 +17069,28 @@ Default: `true`
 
 <MemberCard>
 
+##### BaseCollectionHandlers.elementMemo?
+
+```ts
+optional elementMemo?: boolean;
+```
+
+Opt this operator's instances into per-instance element memoization: a
+complete walk of an unmodified instance is served from a cached prefix
+on subsequent walks (`boxed-expression/collection-element-memo.ts`).
+
+Set it on lazy operators that evaluate a function per element (`Map`,
+`Filter`, `Tabulate`, …), where re-deriving an element is expensive.
+Leave it off structural reindexers (`Take`, `Reverse`, `Zip`, …), which
+re-serve their source's elements cheaply — when the source is itself a
+flagged instance, the source's own memo already absorbs the cost.
+
+Default: `false`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BaseCollectionHandlers.contains?
 
 ```ts
@@ -16279,6 +17387,24 @@ A type that is not inferred, but has been set explicitly, cannot be updated.
 
 <MemberCard>
 
+##### BoxedValueDefinition.effectsDeclared
+
+```ts
+effectsDeclared: boolean;
+```
+
+Annotation provenance on the EFFECTS axis — the effects-axis analog of
+[inferredType](#inferredtype) (`docs/EFFECTS-MODEL.md`, "Annotation provenance").
+
+True when the declaration STATED the arrow's effects (a non-empty
+specifier, or the `pure` keyword). False for a bare arrow, which leaves
+effects on the inferred track: an assigned body's inferred effects are
+accepted and re-stamped, never checked against the declaration.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedValueDefinition.type
 
 ```ts
@@ -16314,13 +17440,55 @@ Release resources owned by this definition when its scope is disposed.
 
 <MemberCard>
 
+### BindingSite
+
+```ts
+type BindingSite = {
+  path: readonly number[];
+  type: TypeString;
+  clauseLocal: boolean;
+};
+```
+
+A located binding site: where, inside an operator expression, one of that
+operator's **bound variables** sits, and how to declare it.
+
+</MemberCard>
+
+<MemberCard>
+
+### BindingSiteSelector
+
+```ts
+type BindingSiteSelector = (ops, phase) => readonly BindingSite[];
+```
+
+Locate an operator's binding sites among its operands.
+
+Used as the value of the [OperatorDefinitionFlags.scoped](#scoped) flag to
+declare that an operator is a *binder*: the framework mints the operator's
+scope, declares each site's symbol in it before the `canonical` handler
+runs, and rebinds the sites (and same-named occurrences elsewhere in the
+expression) to that scope afterwards. This is what makes the parse,
+`ce.box()` and `ce.function()` routes agree about which binding a bound
+variable denotes.
+
+`phase: 'pre'` runs on the RAW operands, before the `canonical` handler; it
+may return fewer sites than `'post'` — return nothing rather than guess.
+`phase: 'post'` runs on the handler's RESULT operands and is authoritative.
+
+</MemberCard>
+
+<MemberCard>
+
 ### OperatorDefinitionFlags
 
 ```ts
 type OperatorDefinitionFlags = {
   lazy: boolean;
-  scoped: boolean;
+  scoped: boolean | BindingSiteSelector;
   broadcastable: boolean;
+  inspectsErrors: boolean;
   missingBehavior: "reject" | "propagate" | "handle";
   missingStrip: "all" | number[];
   associative: boolean;
@@ -16329,6 +17497,14 @@ type OperatorDefinitionFlags = {
   idempotent: boolean;
   involution: boolean;
   pure: boolean;
+  effects: EffectSet | undefined;
+  effectsDeclared: boolean;
+  frameProtocol: "seed" | undefined;
+  invokes: boolean | {};
+  discharges: {} | undefined;
+  holdClass: "evaluate" | "quote" | "release";
+  drawsRandom: boolean;
+  readsRandomFrame: boolean;
 };
 ```
 
@@ -16367,6 +17543,34 @@ operator.
 #### Extends
 
 - [`BoxedBaseDefinition`](#boxedbasedefinition).[`OperatorDefinitionFlags`](#operatordefinitionflags)
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.scoped
+
+```ts
+scoped: boolean;
+```
+
+Normalized from the declaration's `scoped` flag: `true` when the operator
+creates a lexical scope, whether it was declared `true` or as a
+binding-site selector.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.bindingSites?
+
+```ts
+optional bindingSites?: BindingSiteSelector;
+```
+
+The binding-site selector of the declaration's `scoped` flag, when one
+was given. `undefined` for `scoped: true` (a scope with no syntactic
+bound variables) and for an unscoped operator.
+
+</MemberCard>
 
 <MemberCard>
 
@@ -16416,6 +17620,19 @@ design): the declared [missingBehavior](#missingbehavior) when present, otherwis
 `'propagate'` for a declared all-numeric signature and `'pass-through'`
 for everything else. Recomputed from the current signature — never cached
 across a signature mutation.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.invokesNone
+
+```ts
+readonly invokesNone: boolean;
+```
+
+True when NO operand position invokes — the cheap operator-level
+pre-gate for the latent half of the projection rule.
 
 </MemberCard>
 
@@ -16572,6 +17789,25 @@ stripsMissingAt(i): boolean
 True if a `missing` arm is stripped from parameter position `i` before
 validation (§3.A). Only `propagate`/`handle` operators strip; `missingStrip`
 selects the positions.
+
+####### i
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.invokesAt()
+
+```ts
+invokesAt(i): boolean
+```
+
+True if operand position `i` may INVOKE a function-valued operand — the
+per-position reader for [OperatorDefinitionFlags.invokes](#invokes). Missing
+map indices default to `true`. Every consumer of the metadata goes
+through this accessor (or [invokesNone](#invokesnone)), never the raw field.
 
 ####### i
 
@@ -19954,20 +21190,6 @@ tolerance: number;
 
 <MemberCard>
 
-##### IComputeEngine.randomSeed
-
-```ts
-randomSeed: string | number | null;
-```
-
-Seed controlling deterministic, reproducible randomness. `null` (default)
- is non-deterministic. See the accessor on `ComputeEngine` for the full
- semantics (stream reset on assignment, compile-time baking).
-
-</MemberCard>
-
-<MemberCard>
-
 ##### IComputeEngine.angularUnit
 
 ```ts
@@ -20667,11 +21889,35 @@ declareType(name, type, options?): void
 
 ####### type
 
-[`Type`](#type-3)
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
 
 ####### options?
 
 ####### alias?
+
+`boolean`
+
+####### fromStatement?
+
+`boolean`
+
+####### mint?
 
 `boolean`
 
@@ -20737,6 +21983,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -20819,6 +22066,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -20934,6 +22182,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -21016,6 +22265,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
+  `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
   `eq`: (`a`) => `boolean` \| `undefined`;
@@ -22196,6 +23446,49 @@ constant, because `x` is not constant.
 :::info[Note]
 Applicable to canonical expressions only
 :::
+
+Since Stage 2 of the effects model this is a **view** of the runtime
+effect channel: "no impurity label in `effectsOf(expr)`" (see
+`boxed-expression/effects-of.ts`).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.effects
+
+```ts
+readonly effects: 
+  | "any"
+  | readonly EffectLabel[]
+  | undefined;
+```
+
+The effects of **evaluating** this expression: `undefined` when there are
+none (the expression is pure), `'any'` when the effects are not known, or
+the effect labels in alphabetical order.
+
+This is the set `isPure` summarizes — `isPure` is "no impurity label in
+here" — but it says *which* effects, so a consumer can act on them: a
+`scope` write invalidates a memo, `random` means the value will differ on
+re-evaluation, `network` means evaluating may be slow or may fail.
+
+It reports what evaluating this expression **does**, not what the value it
+produces **can do** if you later invoke it. A symbol bound to a drawing
+function has no effects — evaluating it just yields the function — while
+its *type* carries the draw:
+
+```ts
+ce.assign('rf', ce.box(['Function', ['Random'], 'x']));
+ce.box('rf').effects;           // ➔ undefined  (producing the value)
+ce.box('rf').isPure;            // ➔ true
+ce.box('rf').type.effects;      // ➔ ['random'] (invoking it)
+ce.box(['Map', xs, 'rf']).effects; // ➔ ['random'] (Map invokes it)
+```
+
+Numbers, strings, symbols and dictionaries have no effects. See
+`docs/EFFECTS-MODEL.md` ("Projection and discharge") for how an
+application's effects are computed from its operator and operands.
 
 </MemberCard>
 
@@ -25643,6 +26936,46 @@ type: Type;
 
 <MemberCard>
 
+##### BoxedType.unionMembers
+
+The members of a union type, each boxed, or `[this]` for any other type.
+
+Lets a consumer reason arm-by-arm without reading the raw `Type` AST.
+Note that a union may be nested inside a parameter (`list<A | B>`), which
+this does not reach — `couldMatch()` handles that case directly and is
+usually what an arm walk was reaching for.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.effects
+
+The **latent** effects on this type's arrow: what fires if a value of this
+type is invoked. `undefined` when the type is not callable, or when its
+arrow states nothing (the inferred track); `[]` when it states `pure`;
+`'any'` for "unknown effects"; otherwise the labels, alphabetically
+sorted.
+
+This is how an operator asks "what happens if I call this operand?" —
+`op.type.effects`, which resolves through symbol bindings because `.type`
+does. It is the *invoking* half of the effects model; the *producing*
+half — what evaluating an expression does — is `expr.effects`.
+
+For an overload set (an intersection of signatures) the answer is the
+union of the arms': an overload with one effect-bearing arm is not pure.
+
+```ts
+ce.type('(real) random -> real').effects;  // ➔ ['random']
+ce.type('(real) pure -> real').effects;    // ➔ []
+ce.type('(real) -> real').effects;         // ➔ undefined
+ce.type('number').effects;                 // ➔ undefined
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedType.isUnknown
 
 </MemberCard>
@@ -25715,7 +27048,127 @@ is(other): boolean
 
 ####### other
 
-[`Type`](#type-3)
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.isDisjointFrom()
+
+```ts
+isDisjointFrom(other): boolean
+```
+
+True when no value can inhabit both this type and `other`.
+
+Use this — not `!matches()` — to decide whether two types are unrelated.
+`matches()` answers "is this a subtype of `other`", so two types that
+share values without either containing the other (`integer | string` vs
+`integer | boolean`) fail `matches()` in both directions.
+
+Conservative in the safe direction: when disjointness cannot be
+established the answer is `false` ("they may overlap"), never a false
+claim of disjointness. So `!a.isDisjointFrom(b)` reads as *possible*
+overlap, and `unknown` overlaps everything.
+
+Throws if `other` is a string that is not a valid type.
+
+####### other
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.couldMatch()
+
+```ts
+couldMatch(other): boolean
+```
+
+True when *some* value inhabits both this type and `other` — "could a
+value of this type be an `other`?".
+
+This is the predicate for classifying a value by shape ("might this be a
+point, a point list, a matrix"). Prefer it to `matches()`, which answers
+"is EVERY value of this type an `other`" and so reports `false` for a
+union whose members include exactly the shape asked about:
+
+```ts
+const t = ce.type('tuple<number, number> | list<tuple<number, number>>');
+t.matches('list<tuple<number, number>>');    // false
+t.couldMatch('list<tuple<number, number>>'); // true
+```
+
+Unions are distributed at every depth, so a union nested inside a
+parameter is handled too — `list<integer | tuple<number, number>>` could
+be a `list<tuple<number, number>>`, witness `[(1,2)]`.
+
+Symmetric, and decisive for the composite shapes it models: a
+`tuple<number, number>` could not be a `list<tuple<number, number>>`, and
+`list<integer>` could not be a `list<string>`. Shapes it does not model
+fall back to assignability in either direction, so the answer is never
+narrower than `matches()` — with one deliberate exception: `never` is
+uninhabited, so nothing could be a `never`.
+
+`unknown` could be anything. Consumers that treat an inconclusive type as
+"no" must check `isUnknown` themselves.
+
+Throws if `other` is a string that is not a valid type.
+
+####### other
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
 
 </MemberCard>
 
@@ -26062,6 +27515,64 @@ type NamedElement = {
 
 <MemberCard>
 
+### EffectLabel
+
+```ts
+type EffectLabel = 
+  | "console"
+  | "entropy"
+  | "environment"
+  | "fs_read"
+  | "fs_write"
+  | "network"
+  | "random"
+  | "scope"
+  | "time";
+```
+
+An effect label: a member of a closed, engine-versioned enumeration.
+
+Each label carries fixed metadata (impurity, observation vs action, frame
+kind, handler-backed); consumers key on that metadata, never on the label
+name. See `docs/EFFECTS-MODEL.md`.
+
+The labels bear no implication relations to each other: the order on effect
+sets is plain powerset inclusion, so the singletons are pairwise
+incomparable (in particular `fs_write` does not imply `fs_read`).
+
+</MemberCard>
+
+<MemberCard>
+
+### EffectSet
+
+```ts
+type EffectSet = "any" | EffectLabel[];
+```
+
+The effect set carried by a signature's arrow.
+
+- `'any'` is the distinguished **top**: "unknown effects". Under union it
+  absorbs, and no finite bound admits it.
+- Otherwise a duplicate-free, alphabetically sorted list of labels, possibly
+  **empty**.
+
+An absent (`undefined`) `effects` field and `[]` denote the **same set**, ∅:
+every semantic operation — subtyping, `pure`, the label predicates, union,
+`matches()` — treats them identically. They differ only in **serialization**
+(ruled 2026-08-01): absent is an empty specifier slot (effects were never
+stated, and stay on the inferred track), while `[]` is the author's `pure`
+and serializes back as ` pure`, so an explicit purity contract survives a
+parse → serialize → re-declare round trip.
+
+Build one with `normalizeEffectSet()` (inference: an empty result collapses
+to `undefined`) or `normalizeStatedEffectSet()` (a stated set: an empty
+result stays `[]`).
+
+</MemberCard>
+
+<MemberCard>
+
 ### FunctionSignature
 
 ```ts
@@ -26071,6 +27582,7 @@ type FunctionSignature = {
   optArgs: NamedElement[];
   variadicArg: NamedElement;
   variadicMin: 0 | 1;
+  effects: EffectSet;
   result: Type;
 };
 ```
@@ -26385,10 +27897,17 @@ Types are described using the following BNF grammar:
 
 <named_tuple_elements> ::= <name> <type> ("," <name> <type>)*
 
-<signature> ::=  <arguments> " -> " <type>
+<signature> ::=  <arguments> (" " <effects>)? " -> " <type>
+
+<effects> ::= "pure" | "any" | <effect-label> (" " <effect-label>)*
+
+(`pure` is the STATED empty set: the same set as an empty slot, and the
+spelling that round-trips through serialization. See {@link EffectSet}.)
+
+<effect-label> ::= "console" | "entropy" | "environment" | "fs_read"
+           | "fs_write" | "network" | "random" | "scope" | "time"
 
 <arguments> ::= "()"
-           | <argument>
            | "(" <argument-list> ")"
 
 <argument> ::= <type>
@@ -26452,6 +27971,9 @@ Examples of types strings:
 - `"(number, y:number?) -> number"` -- a signature with an optional named argument (can have several optional arguments, at the end)
 - `"(number, number+) -> number"` -- a signature with a rest argument (can have only one, and no optional arguments if there is a rest argument).
 - `"() -> number"` -- a signature with an empty argument list
+- `"(number) random -> number"` -- a signature that may draw from the seeded random stream
+- `"(number) random scope -> number"` -- a signature with two effect labels
+- `"(number) any -> number"` -- a signature with unknown effects
 - `"number | boolean"` -- a union type
 - `"(x: number) & (y: number)"` -- an intersection type
 - `"number | ((x: number) & (y: number))"` -- a union type with an intersection type
@@ -27020,60 +28542,6 @@ If `lower`and `upper`are not provided, they take the default values of -1 and
 
 </FunctionDefinition>
 
-<FunctionDefinition name="Random">
-
-<Signature name="Random"></Signature>
-
-<Signature name="Random">_seed_</Signature>
-
-<Signature name="Random">_n_</Signature>
-
-<Signature name="Random">_m_, _n_</Signature>
-
-`Random` is **not** a pure function: by its nature it evaluates to a different
-value on each evaluation.
-
-- `["Random"]` evaluates to a non-deterministic floating-point number in the
-  interval $[0, 1)$.
-- `["Random", seed]` (with a real `seed`) evaluates to a deterministic
-  floating-point number in $[0, 1)$ derived from the seed.
-- `["Random", n]` (with an integer `n`) evaluates to a non-deterministic integer
-  in the interval $[0, n)$.
-- `["Random", m, n]` evaluates to a non-deterministic integer in the interval
-  $[m, n)$.
-
-```json example
-["Random"]
-// ➔ 0.6233… (for example)
-["Random", 10]
-// ➔ 7 (for example)
-["Random", 5, 10]
-// ➔ 8 (for example)
-```
-
-</FunctionDefinition>
-
-<FunctionDefinition name="RandomInteger">
-
-<Signature name="RandomInteger">_upper_: integer</Signature>
-
-<Signature name="RandomInteger">_lower_: integer, _upper_: integer</Signature>
-
-Return a random integer using inclusive bounds. With one argument the lower
-bound is `0`; with two arguments the result is in $[lower, upper]$.
-`RandomInteger` uses the Compute Engine's seeded random-number generator, so a
-seeded engine produces reproducible results.
-
-```json example
-["RandomInteger", 6]
-// ➔ an integer from 0 through 6
-
-["RandomInteger", 5, 10]
-// ➔ an integer from 5 through 10
-```
-
-</FunctionDefinition>
-
 <FunctionDefinition name="Max">
 
 <Signature name="Max">_x1_, _x2_, ...</Signature>
@@ -27234,6 +28702,257 @@ check if the fraction is in its canonical form:
 
 
 
+
+### Random Numbers
+
+The random operators take a **domain** to draw from, never a seed. Seeding is
+done by wrapping the work in a `WithRandomSeed` block, which makes every draw
+inside it reproducible.
+
+<div className="symbols-table first-column-header">
+
+| Function           | Result                                     |
+| :----------------- | :----------------------------------------- |
+| `WithRandomSeed`   | evaluate an expression with a seeded block |
+| `Random`           | one draw                                   |
+| `RandomChoice`     | `k` draws, with replacement                |
+| `RandomSample`     | `k` elements, without replacement          |
+| `RandomShuffle`    | a permutation                              |
+
+</div>
+
+**One draw, or `k` draws:**
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
+
+|                      | one draw       | `k` draws                 |
+| :------------------- | :------------- | :------------------------ |
+| with replacement     | `Random(xs)`   | `RandomChoice(xs, k)`     |
+| without replacement  | `Random(xs)`   | `RandomSample(xs, k)`     |
+| all of them          | —              | `RandomShuffle(xs)`       |
+
+</div>
+
+`Random(xs)` and `RandomChoice(xs, 1)` have the same distribution: with a single
+draw, "with" and "without" replacement coincide. The wrapper is the only
+difference — `RandomChoice` returns a list.
+
+<FunctionDefinition name="WithRandomSeed">
+
+<Signature name="WithRandomSeed">_seed_: finite\_real | string, _body_: any</Signature>
+
+Evaluate _body_ with a random seed frame installed. Every draw inside the frame
+is deterministic, and the whole block replays identically on re-evaluation,
+while repeated draws **within** the frame still differ.
+
+```json example
+["WithRandomSeed", 42, ["Random"]]
+// ➔ 0.7367300395263549 — the same value on every evaluation
+
+["WithRandomSeed", 42, ["Delimiter", ["Sequence", ["Random"], ["Random"]]]]
+// ➔ (0.7367300395263549, 0.4498528692283148) — two different draws,
+//   and the same pair every time
+```
+
+Outside a frame, draws are **live**: `["Random"]` on its own is
+non-deterministic, which is what an animation or a ticker needs.
+
+Frames nest and the innermost wins. Counters are per frame, so a nested frame
+never disturbs its parent's later draws:
+
+```json example
+["WithRandomSeed", 1,
+  ["Delimiter", ["Sequence",
+    ["Random"],
+    ["WithRandomSeed", 2, ["Random"]],
+    ["Random"]]]]
+// ➔ the first and third draws are the frame-1 stream's 1st and 2nd values;
+//   the inner frame does not shift them
+```
+
+Scoping is **dynamic**: the frame is active through calls to user-defined
+functions, not just lexically inside _body_. The seed is evaluated once on entry
+to the frame, not once per draw, and it may be a string
+(`["WithRandomSeed", "'cell-a7'", …]`).
+
+Seed a **row or cell**, not a whole document: with one document-wide frame,
+inserting a draw near the top shifts every later value below it.
+
+**A frame around a lazy collection does not make it replayable.** Only
+evaluation consumes draw indices, and a lazy view is not evaluated until its
+elements are read — by which time the frame has exited, so the draws escape it.
+The expression *looks* framed and the failure is silent:
+
+```json example
+["WithRandomSeed", 12345,
+  ["Comprehension", ["Random"], ["Element", "k", ["Range", 1, 6]]]]
+// the elements draw LIVE (outside the frame), not the seeded stream:
+//   this instance: [0.9120…, 0.1273…, 0.4710…, …]   ✗ NOT the framed values
+//   re-created (a fresh parse or evaluation): different values again
+```
+
+Reading the elements of the **same instance** twice does give the same values
+— a lazy collection's elements are cached per instance, so one instance is
+one draw set (two readers of the same list agree). But that is read
+coherence, not replay: the values are live draws, and a re-created instance
+draws fresh ones.
+
+Materialize inside the frame, and it replays. `ListFrom` is the general form —
+it works over any finite collection body — and indexing or a reducer will do it
+too:
+
+```json example
+["WithRandomSeed", 12345,
+  ["ListFrom",
+    ["Comprehension", ["Random"], ["Element", "k", ["Range", 1, 6]]]]]
+// ➔ the same six values on every evaluation ✓
+//   (identical to ["RandomChoice", ["Interval", 0, 1], 6] in the same frame)
+```
+
+Note that `["Repeat", ["Random"], n]` is eager and replayable but draws
+**once**, yielding n copies of a single value — it is not a uniform batch.
+
+<ReadMore path="https://github.com/cortex-js/compute-engine/blob/main/docs/RANDOMNESS-MODEL.md" >
+The generator, the seed folding, the interpreted/compiled/GPU parity contract,
+and how many draws each operator consumes are specified in the
+**Randomness Model** note<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Random">
+
+<Signature name="Random"></Signature>
+
+<Signature name="Random">_domain_: collection</Signature>
+
+`Random` is **not** a pure function: it carries the `random` effect and
+evaluates to a different value on each evaluation. Wrapping it in
+`WithRandomSeed` discharges that effect — the block as a whole is pure and
+replays identically.
+
+- `["Random"]` evaluates to a real number in the interval $[0, 1)$.
+- `["Random", ["Interval", a, b]]` evaluates to a real number in $[a, b)$.
+  Open/closed endpoint markers are ignored: a floating-point draw cannot respect
+  an open endpoint.
+- `["Random", ["Range", …]]` evaluates to an element of the range, which is
+  **inclusive** at both ends and normalizes reversed bounds
+  (`["Range", 7, 2]` descends).
+- `["Random", xs]` evaluates to an element of the finite collection `xs`.
+
+```json example
+["Random"]
+// ➔ 0.6233… (for example)
+["Random", ["Range", 1, 6]]
+// ➔ 4 (for example) — a die roll
+["Random", ["Interval", -1, 1]]
+// ➔ -0.318… (for example)
+["Random", ["List", 5, 2, 10, 18]]
+// ➔ 10 (for example)
+```
+
+The domain is never materialized: `["Random", ["Range", 1, 1000000]]` indexes
+the range, it does not build it.
+
+`Random` draws along the **first axis** of a non-flat domain, so
+`["Random", ["List", ["List", 1, 2], ["List", 3, 4]]]` returns a *row*.
+A `Tuple` is treated as an ordinary finite indexed collection and yields one of
+its elements — deliberately unlike `Join`, where a tuple operand is a single
+atomic element.
+
+An unbounded or empty `Interval`, an infinite `Range` or collection, and an
+empty collection are all errors.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomChoice">
+
+<Signature name="RandomChoice">_domain_: collection, _k_: number</Signature>
+
+Evaluate to a list of `k` independent draws from _domain_, **with
+replacement**. Because each draw is independent, `k` may exceed the size of the
+domain — that is what replacement means.
+
+```json example
+["RandomChoice", ["Range", 1, 6], 3]
+// ➔ [4, 1, 4] (for example) — repeats are expected
+
+["WithRandomSeed", 7, ["RandomChoice", ["Interval", 0, 1], 4]]
+// ➔ a reproducible list of 4 reals in [0, 1)
+```
+
+`k` is typed `number`, not `integer`, so a computed count does not have to be
+rounded by the caller; it is rounded on evaluation (half toward $+\infty$:
+`2.5` → `3`, `-2.5` → `-2`). A negative or out-of-range count is an error, and
+`k = 0` evaluates to the empty list.
+
+Only the `k` drawn elements are materialized — the source domain is not, so
+`["RandomChoice", ["Range", 1, 1000000000], 5]` is cheap.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomSample">
+
+<Signature name="RandomSample">_xs_: indexed\_collection, _k_: number</Signature>
+
+Evaluate to a list of `k` elements drawn from _xs_ **without replacement**.
+
+"Without replacement" is over **positions**, not values. On a multiset, repeated
+values are expected: `["RandomSample", ["List", 1, 1, 2], 2]` returns `[1, 1]`
+in about a quarter of trials. It does not return distinct *values*.
+
+Unlike `RandomChoice`, `k` may not exceed the size of `xs` — there are only that
+many positions to draw. `k` equal to the size returns a permutation.
+
+<ReadMore path="/compute-engine/reference/statistics/#randomsample" >
+See **Statistics** for the full description of `RandomSample`<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomShuffle">
+
+<Signature name="RandomShuffle">_xs_: indexed\_collection</Signature>
+
+Evaluate to a random permutation of the elements of _xs_.
+
+<ReadMore path="/compute-engine/reference/collections/#randomshuffle" >
+See **Collections** for the full description of `RandomShuffle`<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+#### Migrating from the previous random operators
+
+`RandomInteger`, `RandomList`, `RandomSeed`, `Sample` and `Shuffle` have been
+removed, along with the `ce.randomSeed` property and every per-operator `seed`
+argument. Each removed head throws an `operator-removed` error naming its
+replacement for one release, so a stored document fails loudly rather than
+silently stopping to randomize.
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"26ch"}}>
+
+| Was                        | Now                                                 |
+| :------------------------- | :-------------------------------------------------- |
+| `Random(seed)`             | `WithRandomSeed(seed, Random())`                     |
+| `Random(n)`, $n > 0$       | `Random(Range(0, n-1))`                              |
+| `Random(m, n)`, $m < n$    | `Random(Range(m, n-1))`                              |
+| `RandomInteger(a, b)`      | `Random(Range(a, b))`                                |
+| `RandomList(n)`            | `RandomChoice(Interval(0, 1), n)`                    |
+| `RandomList(n, seed)`      | `WithRandomSeed(seed, RandomChoice(Interval(0,1), n))` |
+| `RandomSeed(s)`            | `WithRandomSeed(s, …)` around the work               |
+| `Sample(xs, k)`            | `RandomSample(xs, k)`                                |
+| `Shuffle(xs)`              | `RandomShuffle(xs)`                                  |
+| `Shuffle(xs, seed)`        | `WithRandomSeed(seed, RandomShuffle(xs))`            |
+| `ce.randomSeed = s`        | `WithRandomSeed(s, …)`                               |
+
+</div>
+
+Note the `-1` on the `Random(n)` and `Random(m, n)` rows: the old bounds were
+upper-**exclusive** and `Range` is inclusive. The formulas hold only in the
+ranges stated — degenerate old calls ($n \leq 0$, $m \geq n$) need rewriting by
+hand, because `Range` normalizes reversed bounds into a descending range instead
+of producing an empty one.
 
 ## Relational Operators
 
@@ -29059,6 +30778,23 @@ and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
 
+**Reading a lazy collection repeatedly is cheap.** The elements of a lazy
+collection are computed on first read and cached per instance: walking the
+same collection again — or reading it by index — serves the cached elements
+instead of re-evaluating them. The cache is invalidated precisely: it is
+refreshed when a symbol the collection (transitively) depends on is
+reassigned, when an assumption or definition changes, or when an engine
+setting such as `precision` or `tolerance` changes — but **not** by
+assignments to unrelated symbols, so an animation loop updating one variable
+does not force unrelated collections to recompute.
+
+One consequence for random-valued elements: a collection whose elements draw
+random values (`["Map", xs, ["Function", ["Random"], "x"]]`) draws **once
+per instance** — every reader of that instance sees the same values, like a
+list. A re-created instance draws fresh values. See the
+[`WithRandomSeed`](/compute-engine/reference/arithmetic/#withrandomseed)
+notes for making draws reproducible.
+
 Materializing a lazy collection involves evaluating all its elements and storing 
 them in memory, resulting in an **eager collection**. This is also known as 
 **realizing** the collection.
@@ -29083,9 +30819,9 @@ Common examples include:
 For example, let's say you want to express the first 10 prime numbers:
 
 ```json example
-["ListFrom", 
+["ListFrom",
   ["Take", 
-    ["Filter", "Integers", ["IsPrime", "_"]], 
+    ["Filter", ["Range", 1, "Infinity"], ["IsPrime", "_"]], 
     10
   ]
 ]
@@ -29093,7 +30829,20 @@ For example, let's say you want to express the first 10 prime numbers:
 ```
 
 In this expression, only the first 10 prime numbers are computed, 
-and only when the `ListFrom` function is called.
+and only as the elements are accessed. Without the `ListFrom`, the `Take` 
+stays a lazy collection: `["Take", ["Filter", ...], 10]` is finite (at most 
+10 elements), but its elements are only produced on demand.
+
+:::info[Use `Range`, not `Integers`, for an infinite indexed source]
+`Integers` and the other number domains are **sets**: unordered, so they have
+no indexes, and operators that require an indexed collection — `Take`, `Drop`,
+`At`, `First`, `Second`, `Third`, `Last`, `Rest`, `Most` — reject them with an
+`incompatible-type` error. `Filter` preserves the kind of its source, so
+filtering a set yields a set, and `Take` rejects that too.
+
+For an infinite source that _can_ be indexed and `Take`n, use
+`["Range", 1, "Infinity"]` (the positive integers in their natural order).
+:::
 
 Lazy collections are partially materialized when converting an expression to
 a string representation, such as when using the `expr.latex`, `expr.toString()` 
@@ -29101,9 +30850,9 @@ or `expr.print()` methods. A placeholder is inserted to indicate missing
 elements.
 
 ```js example
-const expr = ce.expr(["Map", "Integers", ["Square", "_"]]);
+const expr = ce.expr(["Map", ["Range", 1, "Infinity"], ["Square", "_"]]);
 expr.print();
-// ➔ [1, 4, 9, 16, 25...]
+// ➔ [1,4,9,16,25,...]
 ```
 
 #### Materialization Cap
@@ -29209,9 +30958,40 @@ Operations on indexed collections:
 - [**Take**](#take), [**Drop**](#drop), [**Most**](#most), [**Rest**](#rest): access a subset of a collection.
 - [**IndexOf**](#indexof): find the index of an element in a collection.
 - [**Extract**](#extract), [**Exclude**](#exclude): access a collection of elements at specific indexes.
-- [**Sort**](#sort), [**Shuffle**](#shuffle), [**Reverse**](#reverse): reorder a collection.
+- [**Sort**](#sort), [**RandomShuffle**](#randomshuffle), [**Reverse**](#reverse): reorder a collection.
 - [**Unique**](#unique): remove duplicates from a collection.
 - [**RotateLeft**](#rotateleft), [**RotateRight**](#rotateright): rotate a collection to the left or right.
+
+:::info[Predicate and key arguments accept a shorthand]
+Wherever an operation below takes a _predicate_ or a _key_ function, the
+argument can be written either as a full function literal —
+`["Function", ["Greater", "x", 5], "x"]` — or as a **shorthand function
+literal**: an expression whose wildcards (`_`, `_1`, `_2`, …) or free
+unknowns become its parameters. The two are equivalent:
+
+```json example
+["CountIf", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
+// ➔ 2
+```
+
+A bare `"_"` is the **identity function** — the shorthand of the shorthand:
+
+```json example
+["Map", ["List", 1, 2, 3], "_"]
+// ➔ ["List", 1, 2, 3]
+
+["ChunkBy", ["List", 1, 1, 2, 2, 3], "_"]
+// ➔ ["List", ["List", 1, 1], ["List", 2, 2], ["List", 3]]
+```
+
+Only the bare `"_"` means the identity: `"_1"`, `"_2"`, … are the positional
+parameters of an enclosing shorthand, and any other symbol may _name_ a
+function, so those are left alone.
+
+<ReadMore path="/compute-engine/reference/functions/#Function" >
+Read more about **shorthand function literals**<Icon name="chevron-right-bold" />
+</ReadMore>
+:::
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
 See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
@@ -29612,6 +31392,57 @@ Unlike [`Fill`](#fill), `Tabulate` takes each dimension as a separate argument.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Table
+</nav>
+
+<FunctionDefinition name="Table">
+
+<Signature name="Table" returns="collection">_f_:function, _dimension_:integer, ...</Signature>
+
+<Signature name="Table" returns="collection">_body_, _spec-1_, ..._spec-n_</Signature>
+
+An alias for [`Tabulate`](#tabulate) that additionally accepts
+Mathematica-style **iterator specs**. Each spec names an index variable and its
+bounds, and `body` is evaluated once per index value.
+
+A spec may be written with braces or with parentheses — `{k, lo, hi}` (a
+`Set`) and `(k, lo, hi)` (a `Tuple`) are equivalent:
+
+```json example
+["Table", ["Square", "k"], ["Tuple", "k", 1, 5]]
+// ➔ ["List", 1, 4, 9, 16, 25]
+
+["Table", ["Square", "k"], ["Set", "k", 1, 5]]
+// ➔ ["List", 1, 4, 9, 16, 25]
+```
+
+A fourth element is a **step**, in either spelling:
+
+```json example
+["Table", "k", ["Tuple", "k", 1, 10, 4]]
+// ➔ ["List", 1, 5, 9]
+```
+
+Multiple specs iterate as nested loops, the first spec being the outermost, and
+produce a nested list:
+
+```json example
+["Table", ["Multiply", "i", "j"], ["Tuple", "i", 1, 2], ["Tuple", "j", 1, 3]]
+// ➔ ["List", ["List", 1, 2, 3], ["List", 2, 4, 6]]
+```
+
+With no iterator spec — for example `["Table", f, 5]` — `Table` behaves exactly
+like `Tabulate`.
+
+The tuple and brace spellings are interchangeable, step included:
+`["Sum", "k", ["Tuple", "k", 1, 10, 2]]` and
+`["Sum", "k", ["Set", "k", 1, 10, 2]]` both evaluate to `25`. `Integrate`
+has no step slot, so a 4-element spec is not recognized there in either
+spelling (the expression stays unevaluated).
+
+</FunctionDefinition>
+
 
 <nav className="hidden">
 ### Repeat
@@ -29678,21 +31509,31 @@ Use `Take` to get a finite number of elements.
 
 <Signature name="Iterate"  returns="indexed_collection">_f_:function, _initial_:any</Signature>
 
-An infinite collection of the results of applying `f` to the initial
-value.
+An infinite collection built by applying `f` repeatedly, starting from the
+_initial_ value: element _k_ is `f(k, element(k-1))`, and `element(0)` is
+_initial_. The initial value is **not** itself an element of the collection.
 
-If the `initial` value is not specified, it is assumed to be `0`
+If _initial_ is not specified, it is `Nothing`.
 
-```json example
-["Iterate", ["Multiply", "_", 2], 1]
-// ➔ ["List", 1, 2, 4, 8, 16, ...]
-```
+A `f` declared with **two** parameters receives the 1-based index and the
+previous element. A **unary** `f` — including the wildcard shorthand below —
+receives the previous element only.
 
 Use `Take` to get a finite number of elements.
 
 ```json example
-["Take", ["Iterate", ["Add", "_", 2]], 7], 5]
-// ➔ ["List", 7, 9, 11, 13, 15]
+["Take", ["Iterate", ["Multiply", "_", 2], 1], 5]
+// ➔ ["List", 2, 4, 8, 16, 32]
+
+["Take", ["Iterate", ["Add", "_", 2], 7], 5]
+// ➔ ["List", 9, 11, 13, 15, 17]
+```
+
+With the two-parameter form, the index is available — here the factorials:
+
+```json example
+["Take", ["Iterate", ["Function", ["Multiply", "n", "acc"], "n", "acc"], 1], 5]
+// ➔ ["List", 1, 2, 6, 24, 120]
 ```
 
 </FunctionDefinition>
@@ -29839,6 +31680,37 @@ Return the dictionary values in dictionary iteration order.
 ["Values", ["Dictionary", ["KeyValuePair", "a", 1], ["KeyValuePair", "b", 2]]]
 // ➔ ["List", 1, 2]
 ```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Field
+</nav>
+
+<FunctionDefinition name="Field">
+
+<Signature name="Field">_value_: any, _field_: string</Signature>
+
+Access a **named field** of a value — `p.x` in Cortex.
+
+On a **record** or **dictionary** value, `["Field", d, "'x'"]` behaves
+exactly as `["At", d, "'x'"]`, including the position-preserving absence
+marker for a key a dictionary may not have.
+
+```json example
+["Field", ["Dictionary", ["KeyValuePair", "a", 10]], "'a'"]
+// ➔ 10
+```
+
+On a value of a **nominal type** whose definition body has named fields — a
+`record` body, or a named-tuple body — the field resolves through the type's
+definition. This is the sanctioned accessor window of the nominal-types
+design: it reads one named field off the definition's field map and does
+**not** make the value a collection (`First(p)` and `p["x"]` keep
+rejecting). A field name that is not in a record or named-tuple definition
+is an `unknown-field` error value.
+
+On an operand whose type is unknown, `Field` stays symbolic.
 
 </FunctionDefinition>
 
@@ -30252,19 +32124,34 @@ specified count.
 
 
 <nav className="hidden">
-### Shuffle
+### RandomShuffle
 </nav>
 
-<FunctionDefinition name="Shuffle">
+<FunctionDefinition name="RandomShuffle">
 
-<Signature name="Shuffle" returns="indexed_collection">_xs_: indexed_collection</Signature>
+<Signature name="RandomShuffle" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
 Return the collection in random order.
 
 ```json example
-["Shuffle", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 10, 18, 5, 5]
+["RandomShuffle", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 10, 18, 5, 2]
 ```
+
+There is no seed argument: wrap the call in `WithRandomSeed(seed, …)` to make
+the permutation reproducible.
+
+```json example
+["WithRandomSeed", 42, ["RandomShuffle", ["List", 5, 2, 10, 18]]]
+// ➔ the same permutation on every evaluation
+```
+
+A permutation needs every element, so the collection is materialized; a
+collection larger than 1,000,000 elements is refused with an `out-of-range`
+error rather than attempted.
+
+`Shuffle` was renamed to `RandomShuffle`; the old name throws an
+`operator-removed` error for one release.
 
 </FunctionDefinition>
 
@@ -30301,7 +32188,7 @@ The optional function is interpreted by its **arity**:
   their original relative order.
 
   ```json example
-  ["Sort", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+  ["Sort", ["List", -3, 1, -2], ["Abs", "_"]]
   // ➔ ["List", 1, -2, -3]
   ```
 
@@ -30482,6 +32369,44 @@ rows.
 // ➔ 4
 ```
 
+<Signature name="Count" returns="integer">_xs_: collection, _value_: any</Signature>
+
+With a second argument that is not a function, returns how many elements of
+_xs_ are equal to _value_. The value is compared using structural identity,
+like the [`Same`](/compute-engine/reference/core/#Same) operator — the same
+comparison [`Contains`](#contains) uses. Number leaves compare by exact value,
+so `0.5` counts as an occurrence of `1/2`.
+
+```json example
+["Count", ["List", 1, 2, 2, 3, 2], 2]
+// ➔ 3
+
+["Count", ["List", 1, 2, 2, 3], 5]
+// ➔ 0
+```
+
+<Signature name="Count" returns="integer">_xs_: collection, _pred_: function</Signature>
+
+With a second argument that is a function, returns how many elements satisfy
+the predicate. The predicate follows the [`Filter`](#filter) contract: it must
+return `True` or `False` for each element.
+
+```json example
+["Count", ["List", 1, 2, 3, 4, 5], ["Greater", "_", 2]]
+// ➔ 3
+```
+
+A shorthand predicate is told from a value by its wildcard: `["Greater", "_", 2]`
+carries one, so it is applied as a predicate, while `True` carries none and is
+counted as an occurrence.
+
+```json example
+["Count", ["List", "True", "False", "True"], "True"]
+// ➔ 2
+```
+
+Both two-argument forms require a finite collection; over an unbounded
+collection the expression remains unevaluated.
 
 </FunctionDefinition>
 
@@ -30514,7 +32439,9 @@ Returns the symbol `True` if the collection has no elements.
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function.
+Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function (structural identity, like the `Same` operator).
+
+`Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
 
 
 ```json example
@@ -30564,9 +32491,9 @@ Returns the 1-based index of the first element in the collection that satisfies 
 Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
 
 ```json example
-["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 10
-["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 100]]]
+["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 100]]
 // ➔ "Nothing"
 ```
 </FunctionDefinition>
@@ -30588,35 +32515,77 @@ Returns the number of elements in the collection that satisfy the predicate.
 Returns a list of indexes of elements in the collection that satisfy the predicate.
 
 ```json example
-["Position", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+["Position", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
 // ➔ ["List", 3, 4]
 ```
 </FunctionDefinition>
 
-<FunctionDefinition name="Exists">
-<Signature name="Exists">_collection_, _predicate_:function</Signature>
-
-Returns `True` if any element of the collection satisfies the predicate, `False` otherwise.
+:::info[To test a predicate over a collection, use `Any`/`All`]
+`Exists` and `ForAll` are **logical quantifiers**, not collection operators.
+They take a _condition_ and a _proposition_ — not a collection and a
+predicate function — and they bind a variable. For "does any/every element of
+this collection satisfy this predicate?", reach for
+[`Any`](#any) and [`All`](#all) instead.
 
 ```json example
-["Exists", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 15]]]
+["Any", ["List", 5, 2, 10, 18], ["Greater", "_", 15]]
 // ➔ "True"
-["Exists", ["List", 5, 2, 10], ["Function", ["Greater", "_", 15]]]
+
+["All", ["List", 5, 2, 10, 18], ["Greater", "_", 0]]
+// ➔ "True"
+```
+:::
+
+<FunctionDefinition name="Exists">
+<Signature name="Exists">_condition_, _proposition_:boolean</Signature>
+
+The **existential quantifier**: `True` when the proposition holds for at
+least one value of the quantified variable.
+
+The variable is introduced by the first operand, either as a bare symbol or —
+so the engine can decide the proposition by enumeration — as an
+`["Element", _variable_, _domain_]` condition over a finite domain.
+
+```json example
+["Exists", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 15]]
+// ➔ "True"
+
+["Exists", ["Element", "x", ["Set", 5, 2, 10]], ["Greater", "x", 15]]
 // ➔ "False"
 ```
+
+`Exists` is a **binder**: the quantified variable is scoped to the
+proposition and shadows any outer symbol of the same name, so an assigned
+value never leaks into the quantified formula.
+
+See also `NotExists` and `ExistsUnique` in the
+[Logic reference](/compute-engine/reference/logic/).
+
 </FunctionDefinition>
 
 <FunctionDefinition name="ForAll">
-<Signature name="ForAll">_collection_, _predicate_:function</Signature>
+<Signature name="ForAll">_condition_, _proposition_:boolean</Signature>
 
-Returns `True` if all elements of the collection satisfy the predicate, `False` otherwise.
+The **universal quantifier**: `True` when the proposition holds for every
+value of the quantified variable. Like `Exists`, it binds the variable
+introduced by its first operand, and it is decided by enumeration when that
+operand is an `["Element", _variable_, _domain_]` condition over a finite
+domain.
 
 ```json example
-["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 0]]]
+["ForAll", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 0]]
 // ➔ "True"
-["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+
+["ForAll", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 5]]
 // ➔ "False"
 ```
+
+Written in LaTeX, `\forall x \in \{1, 2, 3\}, x > 0` parses to
+`["ForAll", ["Element", "x", ["Set", 1, 2, 3]], ["Greater", "x", 0]]`.
+
+See also `NotForAll` in the
+[Logic reference](/compute-engine/reference/logic/).
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -30652,6 +32621,10 @@ predicate, so it can return a definite answer even for an infinite collection.
 
 `Any` of an empty collection is `False`. When the answer depends on symbolic or
 undetermined elements, the expression stays unevaluated.
+
+To test whether a collection contains a specific value, use **`Contains`** —
+`Contains(xs, v)` is equivalent to `Any(xs, (e) |-> e === v)` (structural
+identity, not the tolerant `==`).
 
 ```json example
 ["Any", ["List"]]
@@ -30716,7 +32689,7 @@ Returns a collection where _pred_ is applied to each element of the
 collection. Only the elements for which the predicate returns `"True"` are kept.
 
 ```json example
-["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
+["Filter", ["List", 5, 2, 10, 18], ["Less", "_", 10]]
 // ➔ ["List", 5, 2]
 ```
 
@@ -31030,7 +33003,7 @@ To split a collection into a given _number_ of groups, use `Chunk` instead.
 // ➔ ["List", ["List", 1, 2], ["List", 3, 4], ["List", 5]]
 ["Partition", ["List", 1, 2, 3, 4, 5], 2, 1]
 // ➔ ["List", ["List", 1, 2], ["List", 2, 3], ["List", 3, 4], ["List", 4, 5]]
-["Partition", ["List", 1, 2, 3, 4, 5, 6], ["Function", ["Even", "_"]]]
+["Partition", ["List", 1, 2, 3, 4, 5, 6], ["IsEven", "_"]]
 // ➔ ["List", ["List", 2, 4, 6], ["List", 1, 3, 5]]
 ```
 </FunctionDefinition>
@@ -31054,7 +33027,7 @@ To split a collection into chunks of a given _size_, use `Partition` instead.
 Partitions the collection into groups according to the value of the grouping function applied to each element. Returns a dictionary mapping group keys to lists of elements. Dictionary keys are strings: the key value returned by the function is stringified.
 
 ```json example
-["GroupBy", ["List", 1, 2, 3, 4], ["Function", ["IsEven", "x"], "x"]]
+["GroupBy", ["List", 1, 2, 3, 4], ["IsEven", "_"]]
 // ➔ {"dict": {"False": [1, 3], "True": [2, 4]}}
 ```
 </FunctionDefinition>
@@ -31946,6 +33919,90 @@ Two auxiliary heads may appear inside a pattern:
 // ➔ "small"
 ```
 
+**Range patterns**. A two-operand `["Range", lo, hi]` at the **top level** of a
+case's pattern — or of one of its `["Alternatives"]` — is an **inclusive
+numeric membership test** rather than a structure to match: the case is
+selected if the subject is a real number between _lo_ and _hi_.
+
+```json example
+["Match", 5,
+  ["MatchCase", ["Range", 1, 10], "'in range'"],
+  ["MatchCase", "_", "'out of range'"]
+]
+// ➔ "in range"
+```
+
+Both endpoints are included, and the endpoint comparisons use the engine's
+tolerance. The bounds must be numeric literals; `Infinity` and `-Infinity`
+are allowed, so `["Range", 0, {"num": "+Infinity"}]` means "any non-negative
+number". A `Range` that is not a well-formed range pattern — a symbolic bound,
+or a third _step_ operand — is not a membership test and keeps its ordinary
+structural meaning. (In Cortex, those spellings are reported as parse
+diagnostics instead.)
+
+A subject that is not a number falls through: a symbol (including a constant
+such as `"Pi"`, which is not a *literal*), an operator expression, a string, a
+collection, a complex number, and `NaN` all fail a range case.
+
+```json example
+["Match", "Pi",
+  ["MatchCase", ["Range", 1, 10], "'in range'"],
+  ["MatchCase", "_", "'not a number literal'"]
+]
+// ➔ "not a number literal"
+```
+
+The consequence is that a literal `Range` **value** can no longer be matched
+*structurally* at the top level of a pattern. To compare a subject against a
+`Range` value, use a pin — `["Pin", ["Range", 1, 10]]`, which compares values
+and is not re-read as a membership test. A `Range` nested inside a `List`,
+`Tuple` or `Dictionary` pattern also keeps its ordinary structural meaning.
+
+In Cortex, a range pattern is written `lo..hi`:
+`match n { 0..9 => "digit"; _ => "more" }`.
+
+**Error subjects**. `["Match"]` also decides when the subject is an
+[error](/compute-engine/reference/core/#Error) — it is the construct for
+rescuing a failed computation. Matching stays total, but an error is never
+handed to a pattern that would pretend the failure has a shape: literal,
+range, pin, and structural cases all fail against an error subject, and it
+falls through to `"_"` or to a capture.
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", 0, "'zero'"],
+  ["MatchCase", ["List", "_a"], "'a list'"],
+  ["MatchCase", "_", "'rescued'"]
+]
+// ➔ "rescued"
+```
+
+An explicit `["Error", ...]` pattern is the exception: it destructures the
+error, binding its payload. This is the idiomatic rescue:
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", ["Error", "_code"], "code"],
+  ["MatchCase", "_", "'no error'"]
+]
+// ➔ ["ErrorCode", "'incompatible-type'", "'number'", "'string'"]
+```
+
+A guard can inspect the subject with
+[`IsError`](/compute-engine/reference/core/#IsError) or
+[`Type`](/compute-engine/reference/core/#Type):
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", "_v", ["IsError", "v"], "'failed'"],
+  ["MatchCase", "_", "'ok'"]
+]
+// ➔ "failed"
+```
+
+The `["ErrorTrace"]` breadcrumb a bubbled error carries is stripped before
+matching, so a pattern only ever sees the error's code and context.
+
 If no case matches, the value of the expression is
 `["Error", "'match-no-case'", subject]` — an ordinary error value.
 
@@ -32321,6 +34378,86 @@ since it changes the state of the Compute Engine.
 </FunctionDefinition>
 
 <nav className="hidden">
+### DeclareType
+</nav>
+<FunctionDefinition name="DeclareType">
+
+<Signature name="DeclareType">_name_, _type_</Signature>
+
+<Signature name="DeclareType">_name_, _type_, _attributes_</Signature>
+
+Declare a new type in the current scope — the MathJSON mirror of the
+`ce.declareType()` API. The _name_ is a symbol (or string) naming the type;
+the _type_ operand is a string holding a type expression.
+
+By default the declared type is **nominal**: only a value whose type is the
+named type itself is compatible. An optional trailing _attributes_ dictionary
+with the key `alias` set to `True` declares a **structural alias** instead:
+any value whose type matches the definition is compatible.
+
+```json example
+// A structural alias: any pair of numbers is a "point"
+["DeclareType", "point", "'tuple<number, number>'", ["Dictionary",
+  ["KeyValuePair", "alias", "True"]]]
+```
+
+The declaration also declares a **value constructor** — an operator of the
+same name, in the same scope, which is what makes a nominal type inhabitable:
+
+```json example
+["DeclareType", "point", "'tuple<x: number, y: number>'"]
+
+["point", 1, 2]
+// ➔ ["point", 1, 2], of type "point"
+```
+
+The constructor's signature comes from the definition: a `tuple` definition
+gives one argument per element (named, if the elements are named), and any
+other definition gives a single argument. A **`record`** definition is the
+exception: it declares no constructor, since building a record from
+positional arguments would depend on the order its fields happen to be
+written in. Arguments are validated against that signature, so a wrong arity
+or an argument of the wrong type produces the usual error value.
+
+A **nominal** constructor is inert: the application is the value, and its
+type is the declared type. An **alias** constructor is a checked identity
+instead — `["pair", 1, 2]` validates `(1, 2)` against the definition and
+evaluates to that plain tuple.
+
+Because the declaration claims both the type name and the value name, it is
+**atomic**: if the current scope already has a value or operator of that
+name, nothing is registered and an error value is returned. (A name in an
+outer scope is shadowed, not conflicted.) The host API's `mint` option has no
+`attributes` equivalent: a declaration through this operator always declares
+a constructor.
+
+Evaluates to `Nothing`. The declaration takes effect at canonicalization time,
+so later statements of the same `["Block"]` can use the type in their own
+annotations. A `DeclareType` for a name that an earlier `DeclareType`
+statement declared **replaces** that definition — constructor included — so
+re-running a program on the same engine works; a name declared any other way
+(e.g. via `ce.declareType()`) reports an error value instead.
+
+In Cortex, the `type` statement lowers to this operator. The bare form
+declares a **nominal** type (no attributes); the `type alias` form declares a
+**structural alias** (the `alias -> True` attributes dictionary):
+
+```js
+type point = tuple<x: number, y: number>  // nominal
+type alias pair = tuple<number, number>   // structural alias
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+`DeclareType` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+since it changes the state of the Compute Engine.
+
+<ReadMore path="/compute-engine/guides/types/#defining-new-types" >Read more
+about defining new types. </ReadMore>
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Assign
 </nav>
 <FunctionDefinition name="Assign">
@@ -32328,6 +34465,14 @@ since it changes the state of the Compute Engine.
 <Signature name="Assign">_symbol_, _value_</Signature>
 
 Set the value of `symbol` to `value`.
+
+The _value_ operand is evaluated **eagerly**, when the assignment is
+evaluated: any symbol that has a value at that moment is substituted
+permanently. A symbol with no value (an unknown) remains symbolic in the
+stored value, and resolves to its current value whenever `symbol` is
+evaluated. See
+[When Is the Value Captured?](/compute-engine/guides/augmenting/#when-is-the-value-captured)
+for details.
 
 If `symbol` has not been declared in the current scope, consider parent
 scopes until a definition for the symbol is found.
@@ -32367,9 +34512,44 @@ The predicate can take the form of:
 - an inequality: `["Assume", ["Greater", "x", 0]]`
 - a membership expression: `["Assume", ["Element", "x", "Integers"]]`
 
+`Assume` evaluates to a **string** reporting the outcome:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
+
+| Outcome              | Meaning                                                     |
+| :------------------- | :---------------------------------------------------------- |
+| `"ok"`               | the assumption was recorded                                  |
+| `"tautology"`        | the assumption is already implied by the existing ones       |
+| `"contradiction"`    | the assumption conflicts with the existing ones              |
+| `"not-a-predicate"`  | the argument is not a proposition that can be assumed        |
+| `"internal-error"`   | the assumption could not be processed                        |
+
+</div>
+
+```json example
+["Assume", ["Greater", "x", 0]]
+// ➔ "ok"
+
+["Assume", ["Greater", 1, 0]]
+// ➔ "tautology"
+
+["Assume", ["Less", 1, 0]]
+// ➔ "contradiction"
+```
+
+Every outcome is reported as a value: an argument that is not a predicate does
+not raise an error.
+
+```json example
+["Assume", 42]
+// ➔ "not-a-predicate"
+```
+
 `Assume` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
 
+The `ce.assume()` method returns the same outcomes as a JavaScript string. See
+[Assumptions](/compute-engine/guides/assumptions/) for details.
 
 </FunctionDefinition>
 
@@ -32562,6 +34742,71 @@ of commutative functions, use [`CanonicalForm`](#CanonicalForm).
 
 See [Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions) for other options to compare two expressions, such 
 as the `Equal` function.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Same
+</nav>
+<FunctionDefinition name="Same">
+
+<Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
+
+Evaluate to `True` if every adjacent pair of operands is **structurally
+identical**, otherwise `False`. This is the `===` operator in Cortex.
+
+`Same` is **total**: it always decides. It evaluates its operands first, then
+compares the resulting values structurally — with no tolerance, and without
+numerically approximating an exact value.
+
+```json example
+["Same", ["Sqrt", 2], 1.4142135623730951]
+// ➔ "False"
+
+["Equal", ["Sqrt", 2], 1.4142135623730951]
+// ➔ "True"
+```
+
+`Equal` is the semantic, tolerant comparison: it may stay unevaluated when the
+answer is not known, since `x = y` is a *condition*. `Same` answers regardless:
+
+```json example
+["Same", "x", "y"]
+// ➔ "False"
+
+["Equal", "x", "y"]
+// ➔ ["Equal", "x", "y"]  (unevaluated)
+```
+
+Number leaves compare by **exact value**, not by notation:
+
+```json example
+["Same", 0.5, ["Divide", 1, 2]]
+// ➔ "True"
+```
+
+Totality also means `Same` has no IEEE exemption for `NaN`, where `Equal`
+does:
+
+```json example
+["Same", "NaN", "NaN"]
+// ➔ "True"
+
+["Equal", "NaN", "NaN"]
+// ➔ "False"
+```
+
+`Same` is not broadcast over collections: a list operand is compared as a
+whole, so `["Same", ["List", 1, 2], ["List", 1, 2]]` is the scalar `True`, not
+a list of booleans.
+
+With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
+`True` — matching the Cortex spelling `a === b === c`.
+
+**`Same` vs `IsSame`.** [`IsSame`](#IsSame) holds its operands and compares
+them as written, while `Same` compares the values they evaluate to. So
+`["IsSame", ["Add", 1, 1], 2]` is `False` but `["Same", ["Add", 1, 1], 2]` is
+`True`.
 
 </FunctionDefinition>
 
@@ -32975,6 +35220,96 @@ expression.
 
 The _context_ is an optional expression that provides additional information
 about the error.
+
+An error is an ordinary **value**. When a strict operand of an expression
+evaluates to an error, the whole expression evaluates to that error rather than
+to a frozen tree. See [Errors](/compute-engine/guides/evaluate/#errors) for the
+propagation rules.
+
+#### The `ErrorTrace` Breadcrumb
+
+An error that propagated out of the expression where it was raised carries a
+breadcrumb recording the operators it passed through. The breadcrumb is an
+`["ErrorTrace"]` expression, and it is always the **last** operand of the
+`["Error"]`:
+
+```json example
+["Add", ["Ln", "'a'"], 2]
+// ➔ ["Error",
+//      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
+```
+
+Each frame is an `["ErrorFrame", operator, index]` expression, where _index_ is
+the 1-based position of the operand the error came from. Frames read
+**innermost first** — the failure site comes first, the outermost operator
+last.
+
+An error that never propagated keeps its historical shape unchanged, with no
+`["ErrorTrace"]` operand:
+
+```json example
+["Error", "'oops'"]
+// ➔ ["Error", "'oops'"]
+```
+
+So the breadcrumb is identified **by its head, never by its position**: to read
+it, take the last operand of the `["Error"]` and check that its operator is
+`ErrorTrace`. Code that reads operand 2 as the error _context_ must skip an
+`["ErrorTrace"]` found there — a traced error whose context slot is empty is
+`["Error", code, ["ErrorTrace", ...]]`.
+
+The breadcrumb is data, not display: `toString()` and the LaTeX serializer
+render a traced error exactly like an untraced one.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IsError
+</nav>
+<FunctionDefinition name="IsError">
+
+<Signature name="IsError" returns="boolean">_expression_</Signature>
+
+Evaluate to `True` if _expression_ evaluates to an error, `False` otherwise.
+
+`IsError` **holds** its operand — a strict position would propagate the error
+away before it could be inspected — and it is total: it always answers.
+
+```json example
+["IsError", ["Ln", "'a'"]]
+// ➔ "True"
+
+["IsError", ["Add", 1, 1]]
+// ➔ "False"
+
+["IsError", "x"]
+// ➔ "False"
+```
+
+An expression that is not itself an error but *embeds* one also reports
+`True`.
+
+There is one exception: an error held inside a **collection value** is not
+reported, because a collection containing an error is still a well-formed
+collection.
+
+```json example
+["IsError", ["List", 1, ["Ln", "'a'"]]]
+// ➔ "False"
+```
+
+`NaN` is not an error — it is an ordinary IEEE numeric value:
+
+```json example
+["IsError", "NaN"]
+// ➔ "False"
+```
+
+To inspect an error rather than merely detect it, use
+[`Type`](#Type) (which returns `"error"`), or destructure it with an
+`["Error", ...]` case in a
+[`Match`](/compute-engine/reference/control-structures/#Match) expression.
 
 </FunctionDefinition>
 
@@ -36338,15 +38673,52 @@ ce.parse('[0, 1]').json;
 
 ### Interval Serialization
 
-Intervals are serialized using American notation with explicit LaTeX bracket commands:
+An interval is always serialized so that it reads back as an `Interval`. Which
+spelling is used depends on the position it appears in.
+
+**In a set position** — the right side of `\in`/`\notin`, either side of `\cup`,
+`\cap`, `\setminus`, `\subset`, `\subseteq`, `\supset`, `\supseteq` — the
+conventional bracket notation is used, because the operator forces the set
+reading when the LaTeX is parsed back (see **Contextual Interval Parsing**
+above):
+
+```js
+ce.expr(['Element', 'x', ['Interval', 0, 1]]).latex;
+// ➔ "x\\in\\lbrack0, 1\\rbrack"
+
+ce.expr(['Union', ['Interval', 0, 1], ['Interval', 2, 3]]).latex;
+// ➔ "\\lbrack0, 1\\rbrack\\cup\\lbrack2, 3\\rbrack"
+```
+
+**Anywhere else** nothing disambiguates the interval, so the serialization has
+to stand on its own. Half-open intervals use American notation and an open
+interval uses the ISO reversed brackets; both are unambiguous:
 
 ```js
 ce.expr(['Interval', 0, ['Open', 1]]).latex;
 // ➔ "\\lbrack0, 1\\rparen"
 
 ce.expr(['Interval', ['Open', 0], ['Open', 1]]).latex;
-// ➔ "\\lparen0, 1\\rparen"
+// ➔ "\\rbrack0, 1\\lbrack"
 ```
+
+A **closed** interval has no unambiguous bracket spelling — `[a, b]` is also how
+a two-element list is written, and that is how the parser reads it — so it uses
+the function form:
+
+```js
+ce.expr(['Interval', 0, 1]).latex;
+// ➔ "\\mathrm{Interval}(0, 1)"
+
+ce.parse('\\mathrm{Interval}(0, 1)').json;
+// ➔ ["Interval", 0, 1]
+```
+
+This matters wherever the list reading would also be valid. For example
+`["RandomChoice", ["Interval", 0, 1], n]` draws `n` uniform reals, while
+`["RandomChoice", ["List", 0, 1], n]` picks `n` times between the two *values*
+`0` and `1` — both produce a list of numbers in range, so a lossy round-trip
+would be undetectable downstream.
 
 ---
 
@@ -37591,15 +39963,42 @@ A sliding window is a moving subset of the data of a specified window size.
 
 
 <nav className="hidden">
-### Sample
+### RandomSample
 </nav>
-<FunctionDefinition name="Sample">
+<FunctionDefinition name="RandomSample">
 
-<Signature name="Sample">_collection_, _size:number_</Signature>
+<Signature name="RandomSample">_xs_: indexed_collection, _k_: number</Signature>
 
-Evaluate to a **random sample** of a specified size from a _collection_ of numbers.
+Evaluate to a **random sample** of `k` elements drawn from the indexed
+collection _xs_, **without replacement**.
 
-Sampling is done without replacement unless otherwise specified.
+"Without replacement" is over **positions**, not values: each position of _xs_
+is drawn at most once, but a multiset still yields repeated values.
+`["RandomSample", ["List", 1, 1, 2], 2]` returns `[1, 1]` in about a quarter of
+trials — it does not return distinct *values*.
+
+```json example
+["RandomSample", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 5]  (for example)
+
+["WithRandomSeed", 42, ["RandomSample", ["Range", 1, 100], 3]]
+// ➔ the same three elements on every evaluation
+```
+
+`k` may not exceed the number of elements of _xs_ (an `out-of-range` error);
+`k` equal to that number returns a permutation. `k` is rounded on evaluation, so
+a computed count needs no rounding by the caller.
+
+_xs_ must be an **indexed** collection: an `Interval` or a `Set` is an invalid
+domain. Use [`RandomChoice`](/compute-engine/reference/arithmetic/#randomchoice)
+for drawing **with** replacement, or from a non-indexed domain.
+
+The collection is never materialized — a sparse Fisher-Yates over the index
+space draws exactly `k` elements, so `["RandomSample", ["Range", 1, 1000000], 3]`
+is cheap.
+
+`Sample` was renamed to `RandomSample` and no longer takes a seed argument; the
+old name throws an `operator-removed` error for one release.
 
 </FunctionDefinition>
 
