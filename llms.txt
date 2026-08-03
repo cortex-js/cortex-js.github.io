@@ -99,6 +99,8 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Cortex Goals](https://mathlive.io/cortex/goals.md): The goals guiding Cortex's design: ergonomic code that is easy to read and write, and familiarity with existing scientific and programming notation.
 - [Cortex Principles](https://mathlive.io/cortex/principles.md): The principles behind Cortex: an expression-oriented language where conditionals, matches and blocks produce values, while declarations remain statements.
 - [Cortex Naming](https://mathlive.io/cortex/naming.md): Naming conventions in Cortex: capitalized identifiers denote library and engine operators, lowercase identifiers denote user-defined variables and functions.
+- [Cortex for Python Users](https://mathlive.io/cortex/from-python.md): A translation guide from Python to Cortex: idiom-by-idiom mappings for variables, collections, control flow, math and strings, plus the reflexes that silently do the wrong thing.
+- [Cortex for Mathematica Users](https://mathlive.io/cortex/from-mathematica.md): A translation guide from the Wolfram Language to Cortex: idiom-by-idiom mappings for expressions, lists, iterators, pattern matching and calculus, plus the surface forms that look alike but differ.
 - [Cortex Syntax](https://mathlive.io/cortex/syntax.md): The complete Cortex grammar: the notation used for productions, and the syntactic categories covering expressions, statements, literals and operators.
 - [Cortex Literals](https://mathlive.io/cortex/literals.md): Literal forms in Cortex: symbols following the MathJSON Unicode UAX31 profile, numbers, strings and collections, and the MathJSON each produces.
 - [Cortex Operators](https://mathlive.io/cortex/operators.md): Operators in Cortex: infix, prefix and postfix forms, precedence and associativity, and the whitespace rules that govern how operands are parsed.
@@ -114,8 +116,6 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Cortex for AI Agents](https://mathlive.io/cortex/for-agents.md): A condensed, machine-verified reference for AI agents writing Cortex: core semantics, syntax, and a table of the ways Cortex differs from Python and JavaScript reflexes.
 - [Cortex Source Code](https://mathlive.io/cortex/source-code.md): Source code requirements for Cortex: UTF-8 decoding, Unicode NFC normalization of identifiers, and how line terminators and whitespace are treated.
 - [Inside Cortex](https://mathlive.io/cortex/implementation.md): Cortex uses MathJSON as its intermediate representation and the Compute Engine as its runtime. The public language entry point exposes the three stages …
-- [Cortex for Mathematica Users](https://mathlive.io/cortex/from-mathematica.md): A translation guide from the Wolfram Language to Cortex: idiom-by-idiom mappings for expressions, lists, iterators, pattern matching and calculus, plus the surface forms that look alike but differ.
-- [Cortex for Python Users](https://mathlive.io/cortex/from-python.md): A translation guide from Python to Cortex: idiom-by-idiom mappings for variables, collections, control flow, math and strings, plus the reflexes that silently do the wrong thing.
 
 ## Tutorials
 
