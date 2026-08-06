@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -39,7 +39,7 @@
 <li class=""><a href="#stirling-numbers" class="">Stirling numbers</a> (4)</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bell-numbers">Bell numbers<a href="#bell-numbers" class="hash-link" aria-label="Direct link to Bell numbers" title="Direct link to Bell numbers" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{BellNumber}(n)=\frac{2\Im(\int_{0}^{\pi}\!\sin(nx)\exp(\exp(\exp(\imaginaryI x)))\, \mathrm{d}x)n!}{\exponentialE\pi}</code></p>
+<p><code class="language-math math-inline">\mathrm{BellNumber}(n)=\frac{2n!\Im(\int_{0}^{\pi}\!\exp(\exp(\exp(\imaginaryI x)))\sin(nx)\, \mathrm{d}x)}{\pi\exponentialE}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://arxiv.org/abs/0708.3301" target="_blank" rel="noopener noreferrer" class="">arxiv.org</a>
@@ -52,7 +52,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/03ee0b" target="_blank" rel="noopener noreferrer" class=""><code>03ee0b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BernoulliB}(2n)=\frac{2\Zeta(2n)(2n)!\times(-1)^{n+1}}{(2\pi)^{2n}}</code></p>
+<p><code class="language-math math-inline">\mathrm{BernoulliB}(2n)=\frac{(-1)^{n+1}\times2(2n)!\Zeta(2n)}{(2\pi)^{2n}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/14ecc4" target="_blank" rel="noopener noreferrer" class=""><code>14ecc4</code> · Fungrim entry ↗</a></p>
@@ -262,7 +262,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bceed4" target="_blank" rel="noopener noreferrer" class=""><code>bceed4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n})/\sqrt{5}\sinh(n(\ln(\varphi)+\frac{\pi}{2}\imaginaryI))</code></p>
+<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c4d78a" target="_blank" rel="noopener noreferrer" class=""><code>c4d78a</code> · Fungrim entry ↗</a></p>

@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -74,7 +74,18 @@ represent the same symbol.</p>
 <li class=""><strong>U+007E TILDE</strong> : <strong><code>~</code></strong></li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="verbatim-form">Verbatim Form<a href="#verbatim-form" class="hash-link" aria-label="Direct link to Verbatim Form" title="Direct link to Verbatim Form" translate="no">​</a></h3>
-<p>The Verbatim Form must be used if the symbol name is a reserved word.</p>
+<p>The Verbatim Form must be used if the symbol name is a word the grammar
+claims.</p>
+<p><strong>Words the grammar claims</strong> — the only ones a plain symbol may not spell —
+are the literals <code>true</code>, <code>false</code>, <code>Infinity</code>, <code>oo</code>, <code>NaN</code>, and the active
+keywords and word operators <code>break</code>, <code>const</code>, <code>continue</code>, <code>do</code>, <code>else</code>, <code>for</code>,
+<code>function</code>, <code>if</code>, <code>in</code>, <code>match</code>, <code>while</code>.</p>
+<p>Every other reserved word listed below is an ordinary identifier today: it can
+name a binding, be assigned to, be a <code>|-&gt;</code> parameter, and be called. The words
+are listed because the language reserves the right to claim them later, and
+because a future construct that can be recognized contextually — as <code>type</code> and
+<code>alias</code> already are — will not need to claim them at all. Prefer not to use
+them as names.</p>
 <p><strong>Reserved words</strong> are: <code>abstract</code>, <code>at</code>, <code>and</code>, <code>as</code>, <code>async</code>, <code>assert</code>,
 <code>await</code>, <code>begin</code>, <code>break</code>, <code>case</code>, <code>catch</code>, <code>class</code>, <code>const</code>, <code>continue</code>,
 <code>debugger</code>, <code>default</code>, <code>delete</code>, <code>dynamic</code>, <code>do</code>, <code>each</code>, <code>else</code>, <code>end</code>,

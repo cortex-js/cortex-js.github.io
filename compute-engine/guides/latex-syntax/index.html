@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -131,7 +131,10 @@ sequence written with braces, <code>\{a_n\}_{n=1}^{\infty}</code>, parses to the
 <p>The parser applies maximum effort to recover common notation that would
 otherwise error:</p>
 <table><thead><tr><th style="text-align:left">LaTeX</th><th style="text-align:left">MathJSON</th><th style="text-align:left">Note</th></tr></thead><tbody><tr><td style="text-align:left"><code>13^{\text{th}}</code></td><td style="text-align:left"><code>13</code></td><td style="text-align:left">Ordinal superscripts (<code>st</code>/<code>nd</code>/<code>rd</code>/<code>th</code>) devolve to the base number</td></tr><tr><td style="text-align:left"><code>x^{}</code>, <code>x_{}</code>, <code>\alpha_{}</code></td><td style="text-align:left"><code>x</code>, <code>x</code>, <code>alpha</code></td><td style="text-align:left">Empty scripts are dropped</td></tr><tr><td style="text-align:left"><code>1{,}000</code></td><td style="text-align:left"><code>1000</code></td><td style="text-align:left">The <code>{,}</code> thin-separator thousands idiom (between digits)</td></tr><tr><td style="text-align:left"><code>\cancel{x}</code>, <code>\bcancel{x}</code>, <code>\xcancel{x}</code></td><td style="text-align:left"><code>x</code></td><td style="text-align:left">Unwrap to their body</td></tr><tr><td style="text-align:left"><code>\cancelto{4}{72}</code></td><td style="text-align:left"><code>4</code></td><td style="text-align:left">Parses to the replacement value</td></tr><tr><td style="text-align:left"><code>d \not= 0</code></td><td style="text-align:left"><code>[&quot;NotEqual&quot;, &quot;d&quot;, 0]</code></td><td style="text-align:left"><code>\not</code>-prefixed relations compose into the negated relation</td></tr><tr><td style="text-align:left"><code>a \not\in B</code></td><td style="text-align:left"><code>[&quot;NotElement&quot;, &quot;a&quot;, &quot;B&quot;]</code></td><td style="text-align:left"></td></tr><tr><td style="text-align:left"><code>a \not\le b</code></td><td style="text-align:left"><code>[&quot;Not&quot;, [&quot;LessEqual&quot;, &quot;a&quot;, &quot;b&quot;]]</code></td><td style="text-align:left">Relations without a dedicated negated head wrap in <code>Not(…)</code></td></tr><tr><td style="text-align:left"><code>\pmod{7}</code></td><td style="text-align:left"><code>[&quot;Mod&quot;, …, 7]</code></td><td style="text-align:left">Standalone <code>\pmod</code> places the modulus as the second argument of <code>Mod</code></td></tr><tr><td style="text-align:left"><code>\sin a&#x27;</code></td><td style="text-align:left"><code>[&quot;Sin&quot;, [&quot;Prime&quot;, &quot;a&quot;]]</code></td><td style="text-align:left">Primed variables type-check as arguments</td></tr></tbody></table>
-<p><code>\not\equiv</code> (optionally with a trailing <code>\pmod n</code>) negates a congruence, and a
+<p>A bare <code>\equiv</code> (or the <code>≡</code> character) parses as
+<a class="" href="/compute-engine/reference/core/#IdenticallyEqual"><code>IdenticallyEqual</code></a>; it is a
+congruence, <code>Congruent</code>, only when followed by <code>\pmod n</code>. <code>\not\equiv</code>
+(optionally with a trailing <code>\pmod n</code>) negates a congruence, and a
 chain of congruence steps such as
 <code>3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}</code> folds into a conjunction of the
 adjacent steps.</p>

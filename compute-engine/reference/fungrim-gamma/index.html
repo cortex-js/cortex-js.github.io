@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -38,7 +38,7 @@
 <li class=""><a href="#gamma-function" class="">Gamma function</a> (24)</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="barnes-g-function">Barnes G-function<a href="#barnes-g-function" class="hash-link" aria-label="Direct link to Barnes G-function" title="Direct link to Barnes G-function" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\gamma)z^2)+\sum_{n=3}^{\infty}\frac{1}{n}(\Zeta(n-1)\times(-1)^{n+1}z^{n})</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\operatorname{EulerGamma})z^2)+\sum_{n=3}^{\infty}\frac{1}{n}((-1)^{n+1}\Zeta(n-1)z^{n})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\vert z\vert\lt1</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -68,14 +68,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5261e3" target="_blank" rel="noopener noreferrer" class=""><code>5261e3</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin-\infty..-1</code>.
+<p><code class="language-math math-inline">\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin-\infty..(-1)</code>.
 <strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://doi.org/10.1145/384101.384104" target="_blank" rel="noopener noreferrer" class="">doi.org</a>
 <a href="https://fungrim.org/entry/541e2e" target="_blank" rel="noopener noreferrer" class=""><code>541e2e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&amp;x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{\lfloor x\rfloor}{2}(\lfloor x\rfloor-1)\pi\imaginaryI&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&amp;x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{1}{2}(\lfloor x\rfloor(\lfloor x\rfloor-1))\pi\imaginaryI&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin\Z_{\le0}</code>.
 <strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function; <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -87,7 +87,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5babc2" target="_blank" rel="noopener noreferrer" class=""><code>5babc2</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(((-x)/12-1/x+1/(1-\exp(-x))-1/2)\exp(-(xz)))/x^2\, \mathrm{d}x</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(\exp(-zx)(1/(1-\exp(-x))-1/x-1/2-x/12))/x^2\, \mathrm{d}x</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Re(z)\gt0</code>.
 <strong>Symbols:</strong> <strong>BernoulliPolynomial</strong> — Bernoulli polynomial; <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -107,7 +107,7 @@ Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://dx.doi.org/10.1098/rspa.2014.0534" target="_blank" rel="noopener noreferrer" class="">dx.doi.org</a>
 <a href="https://fungrim.org/entry/6f8e14" target="_blank" rel="noopener noreferrer" class=""><code>6f8e14</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\Z</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -169,12 +169,12 @@ Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://arxiv.org/abs/math/0308086" target="_blank" rel="noopener noreferrer" class="">arxiv.org</a>
 <a href="https://fungrim.org/entry/b64782" target="_blank" rel="noopener noreferrer" class=""><code>b64782</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-G/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}</code></p>
+<p><code class="language-math math-inline">\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-\operatorname{G}/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}</code></p>
 <p><strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ce66a9" target="_blank" rel="noopener noreferrer" class=""><code>ce66a9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land x\notin\Z</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -186,7 +186,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/daef08" target="_blank" rel="noopener noreferrer" class=""><code>daef08</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{G}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}</code></p>
+<p><code class="language-math math-inline">\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{\operatorname{G}}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}</code></p>
 <p><strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/dc507f" target="_blank" rel="noopener noreferrer" class=""><code>dc507f</code> · Fungrim entry ↗</a></p>
@@ -197,7 +197,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e05807" target="_blank" rel="noopener noreferrer" class=""><code>e05807</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&amp;n\lt0\\1&amp;n=0\\\frac{1}{2}(\ln(2\pi)-1)&amp;n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\gamma-1)+\frac{1}{2})&amp;n\ge2\end{cases}</code></p>
+<p><code class="language-math math-inline">z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&amp;n\lt0\\1&amp;n=0\\\frac{1}{2}(\ln(2\pi)-1)&amp;n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\operatorname{EulerGamma}-1)+\frac{1}{2})&amp;n\ge2\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
 <strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -221,7 +221,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/315b3d" target="_blank" rel="noopener noreferrer" class=""><code>315b3d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Beta(n, b)=\begin{cases}\tilde\infty&amp;-b\in0..n-1\\(n\binom{(n+b)-1}{n})^{-1}&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\Beta(n, b)=\begin{cases}\tilde\infty&amp;-b\in0..(n-1)\\(n\binom{(n+b)-1}{n})^{-1}&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land b\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/72db94" target="_blank" rel="noopener noreferrer" class=""><code>72db94</code> · Fungrim entry ↗</a></p>
@@ -274,7 +274,7 @@ Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/fd0e48" target="_blank" rel="noopener noreferrer" class=""><code>fd0e48</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="digamma-function">Digamma function<a href="#digamma-function" class="hash-link" aria-label="Direct link to Digamma function" title="Direct link to Digamma function" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/00c02a" target="_blank" rel="noopener noreferrer" class=""><code>00c02a</code> · Fungrim entry ↗</a></p>
@@ -298,7 +298,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/11dfd2" target="_blank" rel="noopener noreferrer" class=""><code>11dfd2</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\gamma-2\ln(2)-\frac{3\ln(3)}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}</code></p>
 <p><a href="https://fungrim.org/entry/177de7" target="_blank" rel="noopener noreferrer" class=""><code>177de7</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\mathrm{PolyGamma}(m, z)^{\prime}(z)=\mathrm{PolyGamma}(m+n, z)</code></p>
@@ -315,13 +315,13 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/22a9cd" target="_blank" rel="noopener noreferrer" class=""><code>22a9cd</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\lparen0, \infty\rparen&amp;n=0\\\lparen-n, 1-n\rparen&amp;n\lt0\end{cases})</code></p>
+<p><code class="language-math math-inline">\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\rbrack0, \infty\lbrack&amp;n=0\\\rbrack-n, 1-n\lbrack&amp;n\lt0\end{cases})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
 <strong>Symbols:</strong> <strong>DigammaFunctionZero</strong> — Zero of the digamma function; <strong>UniqueZero</strong> — Unique zero (root) of function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/233814" target="_blank" rel="noopener noreferrer" class=""><code>233814</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}+(2z^{m+1})^{-1}+\frac{1}{mz^{m}})\times(-1)^{m+1})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)</code></p>
+<p><code class="language-math math-inline">\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((-1)^{m+1}(\frac{1}{mz^{m}}+(2z^{m+1})^{-1}+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}))+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">m\in\N^*\land z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N</code>.
 <strong>Symbols:</strong> <strong>RisingFactorial</strong> — Rising factorial; <strong>StirlingSeriesRemainder</strong> — Remainder term in the Stirling series for the logarithmic gamma function.
 Used by the Compute Engine for simplification.
@@ -343,8 +343,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3f15eb" target="_blank" rel="noopener noreferrer" class=""><code>3f15eb</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{p}{q})=-\gamma-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">q\in2..\infty\land p\in1..q-1</code>.
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{p}{q})=-\operatorname{EulerGamma}-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">q\in2..\infty\land p\in1..(q-1)</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3fe553" target="_blank" rel="noopener noreferrer" class=""><code>3fe553</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -353,7 +353,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/42c1f5" target="_blank" rel="noopener noreferrer" class=""><code>42c1f5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\gamma-\frac{3\ln(3)}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}</code></p>
 <p><a href="https://fungrim.org/entry/45a969" target="_blank" rel="noopener noreferrer" class=""><code>45a969</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{PolyGamma}(2, 1)=-(2\Zeta(3))</code></p>
@@ -389,7 +389,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/5db5f2" target="_blank" rel="noopener noreferrer" class=""><code>5db5f2</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}1/(n+1)-1/(n+z))-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}(1/(n+1)-1/(n+z)))-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\Z_{\le0}</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/686524" target="_blank" rel="noopener noreferrer" class=""><code>686524</code> · Fungrim entry ↗</a></p>
@@ -404,7 +404,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6f3fec" target="_blank" rel="noopener noreferrer" class=""><code>6f3fec</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(3)=\frac{3}{2}-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(3)=\frac{3}{2}-\operatorname{EulerGamma}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/75f9bf" target="_blank" rel="noopener noreferrer" class=""><code>75f9bf</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -413,10 +413,10 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/78c19c" target="_blank" rel="noopener noreferrer" class=""><code>78c19c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\gamma-3\ln(2)</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\operatorname{EulerGamma}-3\ln(2)</code></p>
 <p><a href="https://fungrim.org/entry/7ec4f0" target="_blank" rel="noopener noreferrer" class=""><code>7ec4f0</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8G</code></p>
+<p><code class="language-math math-inline">\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8\operatorname{G}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/807c7d" target="_blank" rel="noopener noreferrer" class=""><code>807c7d</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -425,10 +425,10 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8415c7" target="_blank" rel="noopener noreferrer" class=""><code>8415c7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\operatorname{EulerGamma}</code></p>
 <p><a href="https://fungrim.org/entry/89bed3" target="_blank" rel="noopener noreferrer" class=""><code>89bed3</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\gamma-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\operatorname{EulerGamma}-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}</code></p>
 <p><a href="https://fungrim.org/entry/8c368f" target="_blank" rel="noopener noreferrer" class=""><code>8c368f</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{PolyGamma}(m, n)=(-1)^{m+1}m!\mathrm{HurwitzZeta}(m+1, n)</code></p>
@@ -441,10 +441,10 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/921d61" target="_blank" rel="noopener noreferrer" class=""><code>921d61</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\gamma-2\ln(2)-\frac{3\ln(3)}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}</code></p>
 <p><a href="https://fungrim.org/entry/967bbb" target="_blank" rel="noopener noreferrer" class=""><code>967bbb</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\gamma-\frac{3\ln(3)}{2}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}</code></p>
 <p><a href="https://fungrim.org/entry/98f642" target="_blank" rel="noopener noreferrer" class=""><code>98f642</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Digamma}(z+n)=\mathrm{Digamma}(z)+\sum_{k=0}^{n-1}\frac{1}{z+k}</code></p>
@@ -452,12 +452,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9f32fe" target="_blank" rel="noopener noreferrer" class=""><code>9f32fe</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z)=-(\frac{1}{z})-\gamma+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(z)=-(\frac{1}{z})-\operatorname{EulerGamma}+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\vert z\vert\lt1</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a2675b" target="_blank" rel="noopener noreferrer" class=""><code>a2675b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Re(z)\gt0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a4cc3b" target="_blank" rel="noopener noreferrer" class=""><code>a4cc3b</code> · Fungrim entry ↗</a></p>
@@ -478,7 +478,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/aa47cd" target="_blank" rel="noopener noreferrer" class=""><code>aa47cd</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(2)=1-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(2)=1-\operatorname{EulerGamma}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ada157" target="_blank" rel="noopener noreferrer" class=""><code>ada157</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -509,7 +509,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c687d6" target="_blank" rel="noopener noreferrer" class=""><code>c687d6</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\vert z\vert\lt1</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c76eaf" target="_blank" rel="noopener noreferrer" class=""><code>c76eaf</code> · Fungrim entry ↗</a></p>
@@ -525,7 +525,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cfb999" target="_blank" rel="noopener noreferrer" class=""><code>cfb999</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8G</code></p>
+<p><code class="language-math math-inline">\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8\operatorname{G}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d2f9fb" target="_blank" rel="noopener noreferrer" class=""><code>d2f9fb</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -549,17 +549,17 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e83059" target="_blank" rel="noopener noreferrer" class=""><code>e83059</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(1)=-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(1)=-\operatorname{EulerGamma}</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ea2482" target="_blank" rel="noopener noreferrer" class=""><code>ea2482</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Re(z)\gt0</code>.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="http://functions.wolfram.com/GammaBetaErf/PolyGamma/26/01/01/0001/" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
 <a href="https://fungrim.org/entry/ee3dc5" target="_blank" rel="noopener noreferrer" class=""><code>ee3dc5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(k/n+z))</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(z+k/n))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land z\in\C\land nz\notin\Z_{\le0}</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/eec21a" target="_blank" rel="noopener noreferrer" class=""><code>eec21a</code> · Fungrim entry ↗</a></p>
@@ -569,10 +569,10 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f1e02b" target="_blank" rel="noopener noreferrer" class=""><code>f1e02b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\gamma-3\ln(2)</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\operatorname{EulerGamma}-3\ln(2)</code></p>
 <p><a href="https://fungrim.org/entry/f93bae" target="_blank" rel="noopener noreferrer" class=""><code>f93bae</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\gamma</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\operatorname{EulerGamma}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\Re(z)\gt0</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f946a5" target="_blank" rel="noopener noreferrer" class=""><code>f946a5</code> · Fungrim entry ↗</a></p>
@@ -648,7 +648,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/355c22" target="_blank" rel="noopener noreferrer" class=""><code>355c22</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((k+z)\mathrm{RisingFactorial}(z, k))</code></p>
+<p><code class="language-math math-inline">\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((z+k)\mathrm{RisingFactorial}(z, k))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace0\rbrace\land k\in\N</code>.
 <strong>Symbols:</strong> <strong>RisingFactorial</strong> — Rising factorial.
 Used by the Compute Engine for simplification.
@@ -747,7 +747,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e78989" target="_blank" rel="noopener noreferrer" class=""><code>e78989</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\binom{z}{k}=\frac{\Gamma(z+1)}{\Gamma(k+1)\Gamma(z-k+1)}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land k\in\N\land z-k\notin-\infty..-1</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land k\in\N\land z-k\notin-\infty..(-1)</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e87c43" target="_blank" rel="noopener noreferrer" class=""><code>e87c43</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -759,7 +759,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="gamma-function">Gamma function<a href="#gamma-function" class="hash-link" aria-label="Direct link to Gamma function" title="Direct link to Gamma function" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\Gamma(z-1)=\frac{\Gamma(z)}{z-1}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus-\infty..1</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus(-\infty..1)</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/14af98" target="_blank" rel="noopener noreferrer" class=""><code>14af98</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -789,7 +789,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/56d710" target="_blank" rel="noopener noreferrer" class=""><code>56d710</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\Gamma(z)=(z-1)\Gamma(z-1)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus-\infty..1</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus(-\infty..1)</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/639d91" target="_blank" rel="noopener noreferrer" class=""><code>639d91</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -798,12 +798,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6430cc" target="_blank" rel="noopener noreferrer" class=""><code>6430cc</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\gamma z</code></p>
+<p><code class="language-math math-inline">\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\operatorname{EulerGamma}z</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\vert z\vert\lt1</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/661054" target="_blank" rel="noopener noreferrer" class=""><code>661054</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}((z+n)-1/2)\ln((z+n)/((z+n)-1))-1)</code></p>
+<p><code class="language-math math-inline">\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}(((z+n)-1/2)\ln((z+n)/((z+n)-1))-1))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\lparen-\infty, 0\rbrack</code>.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> B. C. Carlson (1977), Special functions of applied mathematics, Academic Press. Proposition 3.8-1.
@@ -846,7 +846,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\vert\Gamma(\frac{1}{2}+y\imaginaryI)\vert=\sqrt{\frac{\pi}{\cosh(\pi y)}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">y\in\R</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/c7b921" target="_blank" rel="noopener noreferrer" class=""><code>c7b921</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{sinc}(\pi z)=(\Gamma(1+z)\Gamma(1-z))^{-1}</code></p>

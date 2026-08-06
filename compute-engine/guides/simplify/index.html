@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -73,6 +73,15 @@ of operations in the expression, and giving an increasing cost to:</p>
 <p><strong>To influence how the complexity of an expression is measured</strong>, set the
 <code>costFunction</code> property of the compute engine to a function assigning a cost to
 an expression.</p>
+<p>The cost is applied strictly: a rewrite is kept only if the result does not
+cost more than what it replaces. <code>simplify()</code> therefore never returns
+something more complicated than what you gave it.</p>
+<p>Some rewrites are mathematically preferred yet score worse — combining powers
+takes $2 \cdot 2^x$ from cost 4 to cost 5. Those do not rely on any
+numeric allowance; they are tagged <code>purpose: &#x27;transform&#x27;</code>, which exempts them
+from the cost gate entirely. If you write a rule that should apply regardless
+of cost, tag it the same way — see
+<a class="" href="/compute-engine/guides/patterns-and-rules/">Patterns and Rules</a>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="numeric-simplifications">Numeric Simplifications<a href="#numeric-simplifications" class="hash-link" aria-label="Direct link to Numeric Simplifications" title="Direct link to Numeric Simplifications" translate="no">​</a></h2>
 <p>The <code>expr.simplify()</code> function will apply some numeric simplifications, such as
 combining small integer and rational values, simplifying division by 1, addition

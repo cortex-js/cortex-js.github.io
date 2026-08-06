@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -60,8 +60,9 @@ name position: <code>[&quot;Declare&quot;, [&quot;Tuple&quot;, &quot;q&quot;, &q
 symbol — and, with it, a constructor of the same name:</p>
 <div class="language-cortex codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cortex codeBlock_bY9V thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:var(--console-color)"><span class="token plain">type point = tuple&lt;x: number, y: number&gt;</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">type alias pair = tuple&lt;number, number&gt;</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">let p = point(1, 2)</span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">let a: pair = (1, 2)</span><br></div></code></pre></div></div>
 <p><code>type</code> declares a new, distinct type; <code>type alias</code> declares another name for
-an existing one. Unlike <code>let</code> and <code>const</code>, <code>type</code> is not a reserved word —
-only these statement shapes claim it. See
+an existing one, and takes a type-parameter clause if it needs one
+(<code>type alias Pair&lt;T&gt; = tuple&lt;T, T&gt;</code>). Unlike <code>let</code> and <code>const</code>, <code>type</code> is not
+a reserved word — only these statement shapes claim it. See
 <a class="" href="/cortex/types/#declaring-a-type">Declaring a type</a> for the whole story.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="reassignment-vs-declaration">Reassignment vs. declaration<a href="#reassignment-vs-declaration" class="hash-link" aria-label="Direct link to Reassignment vs. declaration" title="Direct link to Reassignment vs. declaration" translate="no">​</a></h2>
 <p>A bare <code>x = 5</code> — no <code>let</code>/<code>const</code> keyword, no type annotation — is not

@@ -79,9 +79,10 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md): The Compute Engine provides a unit system for representing and computing with
 - [Extended Rules — Symbolic Integration](https://mathlive.io/compute-engine/guides/integration-rules.md): The Integration Rules library is an optional add-on that extends the
 - [Sequences](https://mathlive.io/compute-engine/guides/sequences.md): Mathematical sequences like the Fibonacci numbers, arithmetic progressions, or
+- [The Structural Tier](https://mathlive.io/compute-engine/guides/structural-tier.md): The structural tier is the middle ground between a raw parse and a
 - [Fungrim Identities — Bessel and hypergeometric functions](https://mathlive.io/compute-engine/reference/fungrim-bessel-hypergeometric.md): Part of the Fungrim Identities reference — 115 identities for bessel and hypergeometric functions.
-- [Fungrim Identities — Complex numbers](https://mathlive.io/compute-engine/reference/fungrim-complex.md): Part of the Fungrim Identities reference — 40 identities for complex numbers.
-- [Fungrim Identities — Elementary functions](https://mathlive.io/compute-engine/reference/fungrim-elementary.md): Part of the Fungrim Identities reference — 212 identities for elementary functions.
+- [Fungrim Identities — Complex numbers](https://mathlive.io/compute-engine/reference/fungrim-complex.md): Part of the Fungrim Identities reference — 36 identities for complex numbers.
+- [Fungrim Identities — Elementary functions](https://mathlive.io/compute-engine/reference/fungrim-elementary.md): Part of the Fungrim Identities reference — 211 identities for elementary functions.
 - [Fungrim Identities — Elliptic integrals](https://mathlive.io/compute-engine/reference/fungrim-elliptic-integrals.md): Part of the Fungrim Identities reference — 304 identities for elliptic integrals.
 - [Fungrim Identities — Gamma and related functions](https://mathlive.io/compute-engine/reference/fungrim-gamma.md): Part of the Fungrim Identities reference — 162 identities for gamma and related functions.
 - [Fungrim Identities — Modular forms and theta functions](https://mathlive.io/compute-engine/reference/fungrim-modular-theta.md): Part of the Fungrim Identities reference — 318 identities for modular forms and theta functions.

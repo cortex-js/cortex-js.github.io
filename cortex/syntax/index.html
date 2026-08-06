@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -142,20 +142,44 @@ literal</p>
 <em>postfix-expression</em></p>
 <p><em>prefix-expression</em> → (<strong><code>-</code></strong> | <strong><code>!</code></strong>) <em>expression</em></p>
 <p><em>infix-expression</em> → <em>expression</em> <em>operator</em> <em>expression</em></p>
-<p><em>parameter</em> → <em>symbol</em> [<strong><code>:</code></strong> <em>type</em>]</p>
+<p><em>literal-parameter</em> → <em>signed-number</em> | <em>string</em> | <strong><code>true</code></strong> | <strong><code>false</code></strong>
+    — a string literal parameter cannot contain interpolation</p>
+<p><em>parameter</em> → <em>symbol</em> [<strong><code>:</code></strong> <em>type</em>] | <em>literal-parameter</em></p>
 <p><em>parameters</em> → <strong><code>(</code></strong> [(<em>parameter</em>)#<strong><code>,</code></strong>] <strong><code>)</code></strong></p>
+<p><em>effect-label</em> → <strong><code>console</code></strong> | <strong><code>entropy</code></strong> | <strong><code>environment</code></strong> |
+<strong><code>fs_read</code></strong> | <strong><code>fs_write</code></strong> | <strong><code>network</code></strong> | <strong><code>random</code></strong> |
+<strong><code>scope</code></strong> | <strong><code>time</code></strong></p>
+<p><em>effect-specifier</em> → <strong><code>pure</code></strong> | <strong><code>any</code></strong> | (<em>effect-label</em>)+
+    — labels are space-separated; duplicates are rejected;
+<strong><code>pure</code></strong> and <strong><code>any</code></strong> cannot be combined with another word</p>
 <p><em>declaration</em> → (<strong><code>let</code></strong> | <strong><code>const</code></strong>) <em>symbol</em>
 [<strong><code>:</code></strong> <em>type</em>] [<strong><code>=</code></strong> <em>expression</em>] |
 (<strong><code>let</code></strong> | <strong><code>const</code></strong>) <em>tuple-pattern</em> <strong><code>=</code></strong> <em>expression</em> |
 <em>symbol</em> <strong><code>:</code></strong> <em>type</em> [<strong><code>=</code></strong> <em>expression</em>]</p>
 <p><em>tuple-pattern</em> → <strong><code>(</code></strong> (<em>symbol</em> | <em>tuple-pattern</em>)#<strong><code>,</code></strong> <strong><code>)</code></strong>
     — at least two elements; <code>_</code> skips a position</p>
+<p><em>math-function-signature</em> → <strong><code>-&gt;</code></strong> <em>type</em> |
+<em>effect-specifier</em> <strong><code>-&gt;</code></strong> <em>type</em></p>
+<p><em>type-parameter</em> → <em>symbol</em> [<strong><code>:</code></strong> <em>type</em>]
+    — the bound must be a ground type (it may not mention
+another type parameter)</p>
+<p><em>type-parameter-clause</em> → <strong><code>&lt;</code></strong> (<em>type-parameter</em>)#<strong><code>,</code></strong> <strong><code>&gt;</code></strong>
+    — at least one parameter (<code>&lt;&gt;</code> is rejected); duplicate
+names are rejected; the names scope over the definition&#x27;s HEAD only (its
+parameters, effect specifier, and return type), not over its body</p>
 <p><em>function-definition</em> → <em>symbol</em> <em>parameters</em>
-[<strong><code>-&gt;</code></strong> <em>type</em>] <strong><code>=</code></strong> <em>expression</em> |
-<strong><code>function</code></strong> <em>symbol</em> <em>parameters</em> [<strong><code>-&gt;</code></strong> <em>type</em>] <em>block</em></p>
-<p><em>type-declaration</em> → <strong><code>type</code></strong> [<strong><code>alias</code></strong>] <em>symbol</em>
-[<strong><code>&lt;</code></strong> (<em>symbol</em>)#<strong><code>,</code></strong> <strong><code>&gt;</code></strong>] <strong><code>=</code></strong> <em>type</em>
-    — the <code>&lt;…&gt;</code> slot is reserved and rejected</p>
+[<em>math-function-signature</em>] <strong><code>=</code></strong> <em>expression</em> |
+<strong><code>function</code></strong> <em>symbol</em> [<em>type-parameter-clause</em>] <em>parameters</em>
+[<em>effect-specifier</em>] [<strong><code>-&gt;</code></strong> <em>type</em>] <em>block</em>
+    — the <code>&lt;…&gt;</code> clause is claimed only by the
+<strong><code>function</code></strong> form: <code>f&lt;T&gt;(x) = x</code> is genuinely ambiguous with a relational
+expression, so the math form does not take it</p>
+<p><em>type-declaration</em> → <strong><code>type</code></strong> <strong><code>alias</code></strong> <em>symbol</em>
+[<em>type-parameter-clause</em>] <strong><code>=</code></strong> <em>type</em> |
+<strong><code>type</code></strong> <em>symbol</em> <strong><code>=</code></strong> <em>type</em>
+    — only the <strong><code>alias</code></strong> form takes a clause; the
+<code>&lt;…&gt;</code> slot of the bare (nominal) form is reserved and rejected. The clause
+names scope over the definition only, and each must be used in it</p>
 <p><em>while-statement</em> → <strong><code>while</code></strong> <em>expression</em> <em>block</em></p>
 <p><em>for-statement</em> → <strong><code>for</code></strong> <em>symbol</em> <strong><code>in</code></strong> <em>expression</em> <em>block</em></p>
 <p><em>statement</em> → <em>declaration</em> | <em>type-declaration</em> | <em>function-definition</em> |

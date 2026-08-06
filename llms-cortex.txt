@@ -116,6 +116,10 @@ calls and indexing.
 **Declarations** — binding names with `let` and `const`.
 </ReadMore>
 
+<ReadMore path="/cortex/types/">
+**Types** — annotations, named types, effects, and absence values.
+</ReadMore>
+
 <ReadMore path="/cortex/comments/">
 **Comments** — line and block comments.
 </ReadMore>
@@ -437,7 +441,7 @@ exponentiation.
 1. **Indexing is 1-based.** `xs[1]` is the first element.
 2. **Arithmetic is exact and symbolic by default.** `1/3` is the rational one
    third, `Ln(2)` stays `ln(2)`. Floats happen only when you ask, with `N(…)`.
-3. **`//` is a comment, not floor division**, and `=` is assignment, never
+3. **`//` is a comment, not floor division**, and `=` assigns only as a whole statement — inside an expression it is `Equal`, never
    equality. Both fail *quietly* — see [Traps](#traps).
 
 There is no `print`. A program's value is the value of its **last statement**.
@@ -477,7 +481,7 @@ let double = x |-> 2x
 | `{1, 2, 3}` (set) | `{1, 2, 3}` |
 | `(1, 2)` (tuple) | `(1, 2)` |
 | `{"a": 1}` (dict) | `{"a" -> 1}`; empty dictionary is `{->}` |
-| `d["a"]` | `d["a"]` — never `d.a` |
+| `d["a"]` | `d["a"]`, or `d.a` when the key is an identifier |
 | `xs[0]` | `xs[1]` — **1-based** |
 | `xs[-1]` | `xs[-1]` |
 | `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
@@ -504,8 +508,10 @@ let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
 // ➔ (3, ["apples","figs"], NaN)
 ```
 
-A missing dictionary key yields `NaN` rather than raising `KeyError` — see
-[Traps](#traps).
+A missing numeric dictionary field yields `NaN` rather than raising
+`KeyError`; a missing nonnumeric field remains `Missing`. `IsMissing`
+recognizes either representation, and `Coalesce(value, fallback)` supplies a
+default. See [Traps](#traps).
 
 ### Comprehensions
 
@@ -544,7 +550,7 @@ Sum(m)
 | `for x in xs:` | `for x in xs { … }` |
 | `for i in range(n):` | `for i in 1..n { … }` |
 | `while c:` | `while c { … }` |
-| `break`, `continue` | *(reserved, not implemented)* — loop on a condition instead |
+| `break`, `continue` | `break`, `continue` |
 | `match … case` (3.10+) | `match … { pattern => body }` |
 | `try/except` | *(none)* — errors are ordinary values |
 | `# comment` | `// comment` or `/* … */` |
@@ -707,11 +713,11 @@ still returns a plausible-looking value.
 |:--|:--|:--|
 | `7 // 2` | `//` starts a comment, so the statement is just `7` | `Floor(7 / 2)` |
 | `xs[0]` | Silently `NaN` — indexing is 1-based | `xs[1]` |
-| `Solve(x^2 = 4, x)` | Silently `[]` — `=` is assignment | `Solve(x^2 == 4, x)` |
-| `d["missing"]` | `NaN`, not a `KeyError` | Guard first: `IndexOf(Keys(d), k)` is `0` when the key is absent |
+| `f(a = 1)` as a keyword argument | There are no keyword arguments; inside an expression `=` is `Equal`, so this passes the boolean `a == 1` | pass positionally |
+| `d["missing"]` | An absence value, not a `KeyError` (`NaN` for a numeric field, otherwise `Missing`) | `Coalesce(d["missing"], fallback)` or test with `IsMissing` |
 | `xs[1:3]` | Python's half-open slice; `xs[2..3]` is 1-based and inclusive | check both ends |
 | `x^1/2` | `(x^1)/2` — `^` binds tighter than `/` | `Sqrt(x)` or `x^(1/2)` |
-| `while c: … break` | `break` is unimplemented; the loop runs to the iteration limit | make the condition do the work |
+| `x = 5` inside an expression | Compares, rather than assigning — only a whole statement assigns | `:=` to assign in place, `==` to be explicit |
 | `print(x)` | Inert, nothing is printed | the program's value is its last statement |
 | `Round(2.5)` | `3` (half away from zero), not Python's `2` | *(intentional)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
@@ -769,7 +775,7 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 2. **`{…}` is a set, not a list.** A Cortex list is `[1, 2, 3]`. The braces
    survive in iterator triples, where they read positionally, but a bare
    `{1, 2, 2}` is the *set* `{1, 2}`.
-3. **`=` is assignment and `->` is a key/value pair.** Equations use `==`
+3. **`=` assigns only as a whole statement; inside an expression it is `Equal`.** `->` is a key/value pair. `:=` always assigns and `==` always compares
    (as in Wolfram), but replacement rules must be written `Rule(x, 3)`.
 4. **There is no `%`**, no `Out[]`, and no notebook history. `%` is the
    remainder operator.
@@ -840,7 +846,7 @@ by exact value, so `0.5 === 1/2` is `True` too.
 | `Position[xs, v]` | `IndexOf(xs, v)` |
 | `Append[xs, v]`, `Join` | `Append(xs, v)`, `Join(xs, ys)` |
 | `Tally`, `Partition` | same names (`Tally` returns a `(values, counts)` pair) |
-| `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]`, enumerate with `Keys`/`Values` |
+| `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]` or `d.a`, enumerate with `Keys`/`Values` |
 | `Union`, `Intersection` | same names, returning a set |
 
 ```cortex
@@ -1005,7 +1011,7 @@ Surface forms that look like Wolfram but behave differently.
 | `E`, `I` | Ordinary undeclared symbols — they stay symbolic, silently | `e`, `i` |
 | `expr /. x -> 3` | `->` builds a `KeyValuePair`, not a `Rule` | `ReplaceAll(expr, Rule(x, 3))` |
 | `%` for the last result | `%` is the `Mod` operator | bind results with `let` |
-| `x = 4` inside `Solve` | `=` is assignment: `Solve(x^2 = 4, x)` is silently `[]` | `Solve(x^2 == 4, x)` |
+| `x = 4` inside `Solve` | Works as expected — inside an expression `=` is `Equal`, so `Solve(x^2 = 4, x)` is the equation | *(nothing to change)* |
 | `expr;` to suppress | `;` only separates statements | *(nothing to suppress)* |
 | `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Cortex operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
 | `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
@@ -1233,9 +1239,20 @@ _prefix-expression_ → (**`-`** | **`!`**) _expression_
 
 _infix-expression_ → _expression_ _operator_ _expression_
 
-_parameter_ → _symbol_ \[**`:`** _type_\]
+_literal-parameter_ → _signed-number_ | _string_ | **`true`** | **`false`**
+&nbsp;&nbsp;&nbsp;&nbsp;— a string literal parameter cannot contain interpolation
+
+_parameter_ → _symbol_ \[**`:`** _type_\] | _literal-parameter_
 
 _parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
+
+_effect-label_ → **`console`** | **`entropy`** | **`environment`** |
+**`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
+**`scope`** | **`time`**
+
+_effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
+&nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
+**`pure`** and **`any`** cannot be combined with another word
 
 _declaration_ → (**`let`** | **`const`**) _symbol_
 \[**`:`** _type_\] \[**`=`** _expression_\] |
@@ -1245,13 +1262,32 @@ _symbol_ **`:`** _type_ \[**`=`** _expression_\]
 _tuple-pattern_ → **`(`** (_symbol_ | _tuple-pattern_)#**`,`** **`)`**
 &nbsp;&nbsp;&nbsp;&nbsp;— at least two elements; `_` skips a position
 
-_function-definition_ → _symbol_ _parameters_
-\[**`->`** _type_\] **`=`** _expression_ |
-**`function`** _symbol_ _parameters_ \[**`->`** _type_\] _block_
+_math-function-signature_ → **`->`** _type_ |
+_effect-specifier_ **`->`** _type_
 
-_type-declaration_ → **`type`** \[**`alias`**\] _symbol_
-\[**`<`** (_symbol_)#**`,`** **`>`**\] **`=`** _type_
-&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` slot is reserved and rejected
+_type-parameter_ → _symbol_ \[**`:`** _type_\]
+&nbsp;&nbsp;&nbsp;&nbsp;— the bound must be a ground type (it may not mention
+another type parameter)
+
+_type-parameter-clause_ → **`<`** (_type-parameter_)#**`,`** **`>`**
+&nbsp;&nbsp;&nbsp;&nbsp;— at least one parameter (`<>` is rejected); duplicate
+names are rejected; the names scope over the definition's HEAD only (its
+parameters, effect specifier, and return type), not over its body
+
+_function-definition_ → _symbol_ _parameters_
+\[_math-function-signature_\] **`=`** _expression_ |
+**`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
+\[_effect-specifier_\] \[**`->`** _type_\] _block_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` clause is claimed only by the
+**`function`** form: `f<T>(x) = x` is genuinely ambiguous with a relational
+expression, so the math form does not take it
+
+_type-declaration_ → **`type`** **`alias`** _symbol_
+\[_type-parameter-clause_\] **`=`** _type_ |
+**`type`** _symbol_ **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— only the **`alias`** form takes a clause; the
+`<…>` slot of the bare (nominal) form is reserved and rejected. The clause
+names scope over the definition only, and each must be used in it
 
 _while-statement_ → **`while`** _expression_ _block_
 
@@ -1553,7 +1589,20 @@ In addition, the first character of a symbol cannot be:
 
 ### Verbatim Form
 
-The Verbatim Form must be used if the symbol name is a reserved word.
+The Verbatim Form must be used if the symbol name is a word the grammar
+claims.
+
+**Words the grammar claims** — the only ones a plain symbol may not spell —
+are the literals `true`, `false`, `Infinity`, `oo`, `NaN`, and the active
+keywords and word operators `break`, `const`, `continue`, `do`, `else`, `for`,
+`function`, `if`, `in`, `match`, `while`.
+
+Every other reserved word listed below is an ordinary identifier today: it can
+name a binding, be assigned to, be a `|->` parameter, and be called. The words
+are listed because the language reserves the right to claim them later, and
+because a future construct that can be recognized contextually — as `type` and
+`alias` already are — will not need to claim them at all. Prefer not to use
+them as names.
 
 **Reserved words** are: `abstract`, `at`, `and`, `as`, `async`, `assert`,
 `await`, `begin`, `break`, `case`, `catch`, `class`, `const`, `continue`,
@@ -1838,8 +1887,10 @@ precedence (for example `+` and `-`, or `*` and `/`).
 
 | Tier | Operator            | ASCII  | Fancy | Kind   | Associativity |
 | ---- | -------------------- | ------ | ----- | ------ | ------------- |
-| 10   | Assign                | `=`    |       | infix  | right         |
+| 10   | Assign                | `:=`   |       | infix  | right         |
+| —    | Assign _or_ Equal     | `=`    |       | infix  | positional    |
 | 15   | MapsTo                | `\|->` | `↦`   | infix  | right         |
+| 18   | Coalesce              | `??`   |       | infix  | right         |
 | 20   | Pipe                  | `\|>`  |       | infix  | left          |
 | 20   | Pipe                  | `~>`   |       | infix  | left          |
 | 30   | KeyValuePair          | `->`   | `→`   | infix  | left          |
@@ -1853,6 +1904,7 @@ precedence (for example `+` and `-`, or `*` and `/`).
 | 60   | LessEqual             | `<=`   | `⩽`   | infix  | n-ary chain   |
 | 60   | GreaterEqual          | `>=`   | `⩾`   | infix  | n-ary chain   |
 | 60   | Element               | `in`   | `∈`   | infix  | n-ary chain   |
+| 60   | Element (type test)   | `is`   |       | infix  |               |
 | 60   | NotElement            | `!in`  | `∉`   | infix  | n-ary chain   |
 | 65   | Range                 | `..`   | `‥`   | infix  | left          |
 | 70   | Add                   | `+`    |       | infix  | left          |
@@ -1915,6 +1967,68 @@ a + b |> f       // (a + b) |> f
 a || b |> f      // (a || b) |> f
 x = a |> f       // x = (a |> f)
 ```
+
+## Absence coalescing: `??`
+
+`a ?? b` is `Coalesce(a, b)`: the value of `a` unless `a` is **absent**
+(`Missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
+evaluated when `a` is present.
+
+```cortex
+let timeout = config.timeout ?? 30
+let first = xs[1] ?? 0
+```
+
+`??` discharges **absence**. It does _not_ rescue an `Error`: an error operand
+is an error, not a missing value, and propagates.
+
+It is right-associative, so a chain falls through left to right:
+
+```cortex
+a ?? b ?? c      // Coalesce(a, Coalesce(b, c))
+```
+
+Its precedence (18) sits between `|->` and `|>`, which fixes the two groupings
+that matter:
+
+```cortex
+xs |> f ?? 0     // (xs |> f) ?? 0 — the default is for the pipeline's RESULT
+x |-> x.a ?? 0   // x |-> (x.a ?? 0) — the default is inside the body
+```
+
+Like `|>`, it is looser than `->`, so a dictionary value needs parentheses:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+{a -> 1, b -> x ?? 2}
+```
+
+Write `{a -> 1, b -> (x ?? 2)}` instead. It is also looser than `||` and `&&`
+(the C# position), so `a ?? b || c` is `a ?? (b || c)`.
+
+## Type test: `is`
+
+`x is integer` tests at runtime whether a value inhabits a type. It is the
+same test a `match` type pattern performs, and lowers to the same
+`Element(value, type)` expression:
+
+```cortex
+x is integer
+x is string && y is boolean
+```
+
+The right operand is a **type name**, not an expression, so a typo is a
+parse-time diagnostic rather than a comparison against an undeclared symbol.
+This first version resolves **simple named types** only: a compound type
+(`!error`, `integer | string`, `list<integer>`) parses but reports
+`type-pattern-unsupported`, exactly as the equivalent typed pattern does.
+
+`is` is a **contextual** word, not a reserved one — it is recognized only
+between an operand and a type name, so `let is = 5` and `f(is)` remain legal.
+
+Since `is` and `in` spell the same `Element` expression, a program serialized
+back from MathJSON uses `in` for both.
 
 ## Anonymous functions: `|->`
 
@@ -2119,8 +2233,76 @@ used contextually to separate a `match` pattern from its result.
 
 ## Assignment vs. equality
 
-`=` is `Assign` — **assignment**, not equality. Use `==` (`Equal`) to compare
-values and `===` (`Same`) for structural identity.
+Three spellings, two meanings:
+
+- **`:=` always assigns.**
+- **`==` always compares** (and `===` is `Same`, structural identity).
+- **`=` is positional.** It assigns when it is the top-level operator of a
+  **statement** whose left side is a binding target — a name, or a field/index
+  path rooted at one. Everywhere else it compares.
+
+So a statement assigns:
+
+```cortex
+x = 5
+count = count + 1
+```
+
+…while the same `=` inside any larger expression is an equation, which is what
+a reader of mathematics expects:
+
+```cortex
+Solve(x^2 = 4, x)        // Equal — the equation, not an assignment
+if a = true { 1 } else { 2 }
+[a = 1, b = 2]
+```
+
+This is why `=` needs no parentheses to be safe in a condition: `if a = true`
+cannot silently assign, and the C footgun does not exist in Cortex.
+
+As a comparison, `=` binds at the relational tier (60) like `==`, so
+`if x = 5 && y` groups as `(x = 5) && y`. As an assignment it binds loosest
+(10), taking the whole right-hand side.
+
+Two consequences worth knowing:
+
+**A non-binding left side compares, even as a statement.** `x^2 = 4` on its own
+line is the equation, because `x^2` is not a name. A bare name always assigns,
+so write `==` when you mean the equation:
+
+```cortex
+y == 2 * x + 1           // the equation
+y = 2 * x + 1            // assigns to y
+```
+
+**A chain is diagnosed.** `a = b = 5` would assign `a` the *boolean* `b == 5`,
+which is never what a chained assignment means:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+a = b = 5
+```
+
+Write `a := b := 5` to chain the assignment, or `a = (b = 5)` if the comparison
+really was intended.
+
+**An assignment in a condition is a warning.** `:=` is unconditional, so it
+reaches a condition where a bare `=` no longer can — and Cortex has no
+`if init; cond` form, so the assigned value *is* the test:
+
+```cortex
+if flag := true { 1 }   // warning: assign-in-condition
+```
+
+It is a warning rather than an error, since `:=` is the deliberate spelling.
+It fires only where a value is consumed as a boolean — an `if`/`while`
+condition — not for `f(a := 1)` or `[a := 1]`, which are unambiguous.
+
+**Serialization uses the explicit spellings.** An expression written back out
+by the formatter or serializer always uses `:=` for assignment and `==` for
+comparison, never a bare `=` — so a round-trip is exact regardless of position.
+`=` is an input convenience.
 
 ---
 
@@ -2179,6 +2361,45 @@ f(x: real) = x + 1
 ["DefineFunction", "f",
   ["Function", ["Add", "x", 1], ["Typed", "x", {"str": "real"}]]]
 ```
+
+### Effect specifiers
+
+A definition can state the effects that calling it may perform. The specifier
+sits after the parameter list and before the return arrow:
+
+```cortex
+function roll(n) random -> integer { Random(n) }
+```
+
+```json
+["DefineFunction", "roll",
+  ["Function",
+    ["Typed", ["Block", ["Random", "n"]],
+      {"str": "(n: unknown) random -> integer"}],
+    "n"]]
+```
+
+The nine effect labels are `console`, `entropy`, `environment`, `fs_read`,
+`fs_write`, `network`, `random`, `scope`, and `time`. Several labels may be
+listed with spaces. `pure` explicitly promises no effects; `any` means the
+effects are unknown. `pure` and `any` must appear alone.
+
+Without a specifier, effects are inferred from the body and may change when
+the definition is replaced. A written specifier is a contract: the body's
+inferred effects must be a subset of it. A pure body may satisfy a broader
+contract, but a body that performs an undeclared effect is rejected.
+
+The block form may omit the return annotation (`function f() random { … }`),
+in which case its declared result is `unknown`. In the math form, a written
+effect specifier must be followed by a return arrow:
+
+```cortex
+roll(n) random -> integer = Random(n)
+```
+
+See [Effect Specifiers](/compute-engine/guides/types/#effect-specifiers) for
+subtyping, callback checks, and the distinction between inferred and declared
+effects.
 
 ### Multiple clauses (literal parameters)
 
@@ -2320,6 +2541,69 @@ if x > 0 { 1 } else if x < 0 { 2 } else { 3 }
 
 A `{ }` block's value is its last expression — the same `Block` semantics
 as a multi-statement program (see [Blocks](#blocks) below).
+
+### The conditional expression `a if c else b`
+
+When both branches are single expressions, the braces are noise. The
+conditional form spells the same `If` without them:
+
+```cortex
+let x = 5
+10 if x > 3 else 20
+// ➔ 10
+```
+
+```json
+["If", ["Greater", "x", 3], 10, 20]
+```
+
+It is the *same* `If` — only the branches differ: plain expressions instead of
+`Block`s, so the conditional introduces no scope and no statement can appear in
+a branch.
+
+Three rules follow from where it sits in the grammar:
+
+**The `else` is required.** It is what ends the condition, and a missing branch
+would leave the false case with no value to name. `1 if c` is an error; use the
+block form (`if c { 1 }`) when there is nothing to return.
+
+**It binds looser than every operator that computes, but tighter than the four
+that bind or pair — `=`, `|->`, `|>` and `->`.** So the whole conditional is the
+right-hand side of an assignment, the body of a function, or the value of a
+dictionary entry, and no parentheses are needed around a comparison:
+
+```cortex
+let scale = 2
+let tag = n |-> "big" if n * scale > 10 else "small"
+tag(6)
+// ➔ "big"
+```
+
+```cortex
+let n = 7
+{ "value" -> n, "parity" -> "odd" if n % 2 == 1 else "even" }
+// ➔ {"value" -> 7, "parity" -> "odd"}
+```
+
+Going the other way — a conditional used as an operand — does need
+parentheses, since `1 if c else 2 + 3` reads as `1 if c else (2 + 3)`:
+
+```cortex
+(10 if 3 > 0 else 20) + 5
+// ➔ 15
+```
+
+**Chains nest to the right,** so there is no `else if` spelling to learn:
+
+```cortex
+let n = 0
+"zero" if n == 0 else "negative" if n < 0 else "positive"
+// ➔ "zero"
+```
+
+One layout rule: the `if` must be on the **same line** as the value before it.
+A line break separates statements, so an `if` that starts a line always begins
+a new `if`-statement, never a continuation of the line above.
 
 ## `match`
 
@@ -2855,13 +3139,70 @@ counter |-> do { counter = counter + 1; counter }
 
 A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.
 
-## `return` / `break` / `continue`
+## `break` and `continue`
 
-These three words are reserved but **not implemented**: Cortex's
-expression-oriented style (an `if` is a value, a block's value is its last
-expression) doesn't need an explicit `return` yet, and loops are for-effect
-only. Using them produces a `reserved-word` diagnostic rather than the
-control-transfer behavior their names suggest.
+`break` leaves the innermost enclosing loop; `continue` skips to its next
+iteration. Both lower to the engine's `Break()` / `Continue()` primitives.
+
+```cortex
+for x in [1, 2, 3, 4] {
+  if x > 3 { break }
+  if x == 2 { continue }
+  f(x)
+}
+```
+
+They are valid anywhere inside a loop body — directly, or nested in an `if`, a
+`match` case, or a `do` block:
+
+```cortex
+for x in xs {
+  match x {
+    0 => continue
+    _ => f(x)
+  }
+}
+```
+
+Outside a loop they are a `control-outside-loop` diagnostic:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+if x > 1 { break }
+```
+
+The loop context **resets at every function and lambda boundary**. A `break`
+written inside a function or lambda defined in a loop body does not target
+that loop — it is outside a loop, and diagnosed:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+for x in xs {
+  function h() { break }
+}
+```
+
+This boundary is not a style rule. The engine's `Block` short-circuits on
+`Break`/`Continue` structurally, so a `Break` returned out of a lambda body
+would otherwise transfer control to whatever loop happened to be running.
+
+Only the value-less forms are surface syntax. The engine's `Break(v)` — which
+makes the loop evaluate to `v` — has no Cortex spelling yet; it is bundled with
+the ruling on a general `return`.
+
+Serialized back from MathJSON, they appear in their call form (`Break()`,
+`Continue()`), like the `Loop` they belong to.
+
+## `return`
+
+`return` is **not implemented**: Cortex's expression-oriented style (an `if` is
+a value, a block's value is its last expression) doesn't need an explicit
+`return` yet. It is listed among the words the language reserves the right to
+claim later, but nothing claims it today — so `return` is an ordinary
+identifier and carries no control-flow meaning at all, rather than producing a
+diagnostic. Prefer not to use it as a name.
 
 ---
 
@@ -2938,8 +3279,9 @@ let a: pair = (1, 2)
 ```
 
 `type` declares a new, distinct type; `type alias` declares another name for
-an existing one. Unlike `let` and `const`, `type` is not a reserved word —
-only these statement shapes claim it. See
+an existing one, and takes a type-parameter clause if it needs one
+(`type alias Pair<T> = tuple<T, T>`). Unlike `let` and `const`, `type` is not
+a reserved word — only these statement shapes claim it. See
 [Declaring a type](/cortex/types/#declaring-a-type) for the whole story.
 
 ## Reassignment vs. declaration
@@ -3233,6 +3575,18 @@ annotation is recorded in the function's signature, but the current runtime
 does not reject a returned value merely because its inferred type differs from
 the annotation.
 
+Named functions can also declare their effects between the parameter list and
+the return type:
+
+```cortex
+function roll(n: integer) random -> integer { Random(n) }
+```
+
+Effect labels are part of the function type. See
+[Effect specifiers](/cortex/control-flow/#effect-specifiers) for declaration
+syntax and the [function type guide](/compute-engine/guides/types/#function-types)
+for subtyping rules.
+
 ## MathJSON representation
 
 The parser holds a type annotation as a MathJSON string. A declaration places
@@ -3300,6 +3654,32 @@ bare symbol as a boolean operand (`And`/`Or`/`Xor`/`Not`) infers that symbol
 `boolean` for the lifetime of the engine; a later numeric use of the same
 symbol in the same scope will then error. This is engine behavior, not
 something specific to Cortex.
+
+## Absence values
+
+Cortex distinguishes three related kinds of absence:
+
+- `Nothing` means “no value here” and is removed from function arguments and
+  collection literals.
+- `Missing` is a position-preserving missing value. Its type is `missing`.
+- `NaN` is the numeric form of an absent or undefined result. Numeric
+  operations and missing numeric fields generally normalize absence to `NaN`.
+
+`IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
+value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
+first value that is not missing; if every argument is missing, it returns the
+last one unchanged.
+
+```cortex-live
+(Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
+  Coalesce(Missing, 0), Missing + 1)
+// ➔ (3, True, True, 0, NaN)
+```
+
+A missing dictionary field follows the expected value domain: a numeric field
+produces `NaN`, while a string or other nonnumeric field produces `Missing`.
+Use `IsMissing` when the distinction between those representations is not
+important, and `Coalesce` to supply a fallback.
 
 ## Declaring a type
 
@@ -3538,15 +3918,61 @@ declares nothing.
 
 ### Type variables
 
-The syntax `type point<T> = tuple<T, T>` is **reserved** for a future
-release. It parses, and reports a dedicated `type-variables-unsupported`
-diagnostic, in both forms:
+A generic **type alias** takes a type-parameter clause between its name
+and the `=`. The applied spelling is usable anywhere a type is written,
+and expands **transparently** — `Pair<integer>` means exactly
+`tuple<integer, integer>`, and that expansion is what type displays and
+error messages show:
+
+```cortex
+type alias Pair<T> = tuple<T, T>
+let p: Pair<integer> = (1, 2)
+```
+
+A parameter may carry a ground bound, enforced wherever the alias is
+applied — including application to another clause's type variable, which
+is admitted when the variable's own bound satisfies the parameter's. One
+alias may therefore be built out of another:
+
+```cortex
+type alias Keyed<T: number> = tuple<string, T>
+type alias Table<T: integer> = list<Keyed<T>>
+let rows: Table<integer> = [("a", 1), ("b", 2)]
+```
+
+A generic alias may not refer to itself, every parameter must be used in
+the body, and applying one without its arguments (a bare `Pair`) is an
+error. Unlike a plain alias, a generic one declares **no**
+[constructor](#constructor-functions) and claims nothing in the value
+namespace: a `function` of the same name is an ordinary function,
+declared before or after. A dependent alias **snapshots** the
+definitions it was built from: re-running the `type` statement for
+`Keyed` leaves `Table` as it was until `Table`'s own statement is re-run
+too — which re-running the cell does.
+
+A parameterized **nominal** type — the bare form,
+`type point<T> = tuple<T, T>` — remains **reserved** and reports a
+dedicated `type-variables-unsupported` diagnostic:
 
 <!-- cortex-test: expect-diagnostics -->
 
 ```cortex
 type point<T> = tuple<T, T>
 ```
+
+Generic **functions** are supported: a `function` definition takes a
+type-parameter clause between its name and its parameter list, and the
+quantified names scope over the definition's head (its parameters, effect
+specifier, and return type):
+
+```cortex
+function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
+swap(1, "a")
+```
+
+A type parameter may carry a ground bound (`function g<T: number>(x: T) -> T`),
+which is enforced at every call. The equivalent full-type spelling is a
+`forall` annotation — `let f: forall T. (T) -> T = x |-> x`.
 
 ### Encoding
 
@@ -3570,6 +3996,19 @@ type alias pair = tuple<number, number>
 ```json
 ["DeclareType", "pair", {"str": "tuple<number, number>"},
   ["Dictionary", ["KeyValuePair", "alias", "True"]]]
+```
+
+A type-parameter clause rides the same dictionary, as the text of the
+clause:
+
+```cortex
+type alias Pair<T> = tuple<T, T>
+```
+
+```json
+["DeclareType", "Pair", {"str": "tuple<T, T>"},
+  ["Dictionary", ["KeyValuePair", "alias", "True"],
+    ["KeyValuePair", "typeParams", {"str": "T"}]]]
 ```
 
 A type is registered when its statement is canonicalized, which is why the
@@ -5052,7 +5491,7 @@ name exists, e.g. `len` → `Length`).
 ```cortex
 let x = 5                 // mutable declaration
 const tau = 6.28          // immutable; reassigning yields an Error value
-x = x + 3                 // assignment (= is Assign, NOT equality)
+x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
 f(x) = x^2                // function definition, math style
 square = x |-> x^2        // anonymous function ("|->" is the lambda arrow)
 function g(n) {           // function definition, block style
@@ -5076,8 +5515,9 @@ g(x) + f(2)
   enforced at call time.
 - **Collections**: list `[1, 2, 3]`, set `{1, 2, 3}`, tuple `(1, 2)`,
   dictionary `{one -> 1, two -> 2}`, empty dictionary `{->}` (`{}` is the
-  empty set). Access dictionaries with `d["key"]`, not `d.key`. Tuples index
-  like lists (`p[1]` is the first component); a matrix (list of lists)
+  empty set). Access dictionaries with `d["key"]`; identifier-shaped keys also
+  have the shorthand `d.key`. Tuples index like lists (`p[1]` is the first
+  component); a matrix (list of lists)
   indexes as `m[2, 1]` or `m[2][1]`.
 - **Spread**: in a call argument list, `...t` splices a **tuple**'s elements
   in as positional arguments (`f(...p)`, `Max(...t)`, `g(1, ...p, ...q)`).
@@ -5092,11 +5532,12 @@ g(x) + f(2)
 - **LaTeX islands**: `$\frac{1}{2}$` splices parsed LaTeX into the expression
   (available in the CLI and any host that injects a LaTeX parser).
 
-**Operator precedence**, loosest → tightest: `=` · `|->` · `|>` (pipe) · `->`
-(key-value) · `||` · `&&` · comparisons `== != < <= > >= === in !in`
-(chainable: `1 < 2 < 3`) · `..` (range) · `+ -` · `* / %` · unary `- !` ·
-`^`/`**` (right-associative) · postfix `!`. Calls `f(x)` and indexing `xs[i]`
-bind tightest of all.
+**Operator precedence**, loosest → tightest: `:=` · `|->` · `??` (coalesce) ·
+`|>` (pipe) · `->` (key-value) · `||` · `&&` · comparisons
+`== != < <= > >= === in !in is` (chainable: `1 < 2 < 3`) · `..` (range) ·
+`+ -` · `* / %` · unary `- !` · `^`/`**` (right-associative) · postfix `!`.
+Calls `f(x)` and indexing `xs[i]` bind tightest of all. A bare `=` has no
+fixed tier: it binds like `:=` when it assigns and like `==` when it compares.
 
 ## If You Know Python or JavaScript
 
@@ -5109,12 +5550,13 @@ actually happens → write instead:**
 | `7 // 2` floor division | **Silent wrong value**: `//` starts a comment, so this is just `7` | `Floor(7 / 2)` |
 | `7 / 2` integer division | Exact rational `7/2`, not `3` or `3.5` | `Floor(7 / 2)` for `3`; `N(7 / 2)` for `3.5` |
 | `range(1, 5)` excludes end | Inert call + did-you-mean; `Range(1, 5)` **includes** 5: `[1,2,3,4,5]` | `Range(1, n)` or `1..n` for 1…n inclusive |
-| `Solve(x^2 = 4, x)` | **Silently** `[]` — `=` is assignment | `Solve(x^2 == 4, x)` → `[2, -2]` |
+| `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
 | `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
 | `cond ? a : b` | Parse diagnostic | `if cond { a } else { b }` — `if` is an expression |
 | `elif` | Parse diagnostic | `else if` |
-| `return` / `break` / `continue` | Reserved words, **not implemented** — `while true { … break }` runs to the iteration limit | Last expression is the value; loop on a condition instead of breaking |
+| `return` | Reserved word, **not implemented** | A block's value is its last expression |
+| `break` / `continue` | Work as expected inside a `while`/`for` body; the loop context resets at every function and lambda boundary | *(nothing to change)* |
 | `print(x)` | Inert unknown call; nothing prints | The program's value is its **last statement** |
 | `len(xs)` | Inert + did-you-mean | `Length(xs)` |
 | `s[i]` / `len(s)` on a string | Error value / inert — strings are **not** collections | `Characters(s)[i]`, `Length(Characters(s))` |
@@ -5223,13 +5665,17 @@ let xs = [10, 20, 30, 40]
 // ➔ ([10,20], 10, 40, [1,2,3], 3)
 ```
 
-Dictionaries (string keys; a **missing key silently yields `NaN`**):
+Dictionaries (string keys; dot access is shorthand for identifier-shaped
+keys):
 
 ```cortex
 let d = {one -> 1, two -> 2}
-(d["two"], Keys(d))
-// ➔ (2, ["one","two"])
+(d.two, d["two"], IsMissing(d.missing), Coalesce(d.missing, 0))
+// ➔ (2, 2, True, 0)
 ```
+
+An absent numeric field evaluates to `NaN`; an absent nonnumeric field remains
+`Missing`. `IsMissing` recognizes both forms.
 
 ## Library Quick Roster
 
@@ -5247,6 +5693,8 @@ Verified operator names, so you don't have to guess (search for more with
 - **Strings**: `Characters`, `StringJoin`, `StringSplit(s)` (splits on
   whitespace by default), `String(x)`.
 - **Dictionaries**: `Keys`, `Values`.
+- **Absence**: `Missing` preserves a missing position; `Nothing` is omitted
+  from arguments and collections; `IsMissing`, `Coalesce`.
 - **Symbolic**: `Simplify`, `HoldValues(body)` (evaluate `body` with its
   assigned symbols kept symbolic), `Solve(eq == v, x)`, `D(expr, x)`,
   `Derivative(f)`, `Integrate`, `N`, `Type`, `IsError(x)` (true for an error

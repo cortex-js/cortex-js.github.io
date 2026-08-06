@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -275,7 +275,7 @@ canonical either.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="rule-purpose">Rule Purpose<a href="#rule-purpose" class="hash-link" aria-label="Direct link to Rule Purpose" title="Direct link to Rule Purpose" translate="no">​</a></h3>
 <p>The optional <code>purpose</code> property controls how <code>simplify()</code> treats a rule. It
 does not affect <code>replace()</code>, which always applies every rule.</p>
-<div class="symbols-table"><table><thead><tr><th style="text-align:left"><code>purpose</code></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:left"><code>&#x27;simplify&#x27;</code></td><td style="text-align:left"><strong>(default)</strong> Subject to the cost gate: the rewrite is kept only if the result is &quot;simpler&quot; (lower cost).</td></tr><tr><td style="text-align:left"><code>&#x27;transform&#x27;</code></td><td style="text-align:left">A mathematically-preferred rewrite that is <strong>exempt</strong> from the cost gate — applied even if it does not lower cost.</td></tr><tr><td style="text-align:left"><code>&#x27;expand&#x27;</code></td><td style="text-align:left">Grows the expression by design (e.g. expanding a definition). <strong>Excluded</strong> from <code>simplify()</code>&#x27;s scan, but still reachable through <code>expr.replace()</code>.</td></tr></tbody></table></div>
+<div class="symbols-table"><table><thead><tr><th style="text-align:left"><code>purpose</code></th><th style="text-align:left"></th></tr></thead><tbody><tr><td style="text-align:left"><code>&#x27;simplify&#x27;</code></td><td style="text-align:left"><strong>(default)</strong> Subject to the cost gate: the rewrite is kept only if the result is &quot;simpler&quot;, that is, if it does not cost more than what it replaces.</td></tr><tr><td style="text-align:left"><code>&#x27;transform&#x27;</code></td><td style="text-align:left">A mathematically-preferred rewrite that is <strong>exempt</strong> from the cost gate — applied even if it does not lower cost.</td></tr><tr><td style="text-align:left"><code>&#x27;expand&#x27;</code></td><td style="text-align:left">Grows the expression by design (e.g. expanding a definition). <strong>Excluded</strong> from <code>simplify()</code>&#x27;s scan, but still reachable through <code>expr.replace()</code>.</td></tr></tbody></table></div>
 <p>So a rule tagged <code>&#x27;expand&#x27;</code> will fire with <code>expr.replace(rules)</code> but will be
 ignored by <code>expr.simplify()</code> — which is how a rewrite like
 <code>Γ(z+1) → z·Γ(z)</code> (useful on demand, but not a simplification) is kept out of

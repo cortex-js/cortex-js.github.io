@@ -18,7 +18,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Barnes G-function
 
-$$\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\gamma)z^2)+\sum_{n=3}^{\infty}\frac{1}{n}(\Zeta(n-1)\times(-1)^{n+1}z^{n})$$
+$$\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\operatorname{EulerGamma})z^2)+\sum_{n=3}^{\infty}\frac{1}{n}((-1)^{n+1}\Zeta(n-1)z^{n})$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -63,9 +63,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})$$
+$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi})$$
 
-**Holds when** $x\in\R\land x\notin-\infty..-1$.
+**Holds when** $x\in\R\land x\notin-\infty..(-1)$.
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1145/384101.384104)
@@ -73,7 +73,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{\lfloor x\rfloor}{2}(\lfloor x\rfloor-1)\pi\imaginaryI&\top\end{cases}$$
+$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{1}{2}(\lfloor x\rfloor(\lfloor x\rfloor-1))\pi\imaginaryI&\top\end{cases}$$
 
 **Holds when** $x\in\R\land x\notin\Z_{\le0}$.
 **Symbols:** **BarnesG** — Barnes G-function; **LogBarnesG** — Logarithmic Barnes G-function.
@@ -91,7 +91,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(((-x)/12-1/x+1/(1-\exp(-x))-1/2)\exp(-(xz)))/x^2\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(\exp(-zx)(1/(1-\exp(-x))-1/x-1/2-x/12))/x^2\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **LogBarnesG** — Logarithmic Barnes G-function.
@@ -120,7 +120,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -212,7 +212,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-G/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
+$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-\operatorname{G}/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -220,7 +220,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
+$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
 
 **Holds when** $x\in\R\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -238,7 +238,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{G}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
+$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{\operatorname{G}}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -255,7 +255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\gamma-1)+\frac{1}{2})&n\ge2\end{cases}$$
+$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\operatorname{EulerGamma}-1)+\frac{1}{2})&n\ge2\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -292,7 +292,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Beta(n, b)=\begin{cases}\tilde\infty&-b\in0..n-1\\(n\binom{(n+b)-1}{n})^{-1}&\top\end{cases}$$
+$$\Beta(n, b)=\begin{cases}\tilde\infty&-b\in0..(n-1)\\(n\binom{(n+b)-1}{n})^{-1}&\top\end{cases}$$
 
 **Holds when** $n\in\N^*\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -376,7 +376,7 @@ Used by the Compute Engine for expansion.
 
 ## Digamma function
 
-$$\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\gamma$$
+$$\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\operatorname{EulerGamma}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -415,7 +415,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}$$
 
 [`177de7` · Fungrim entry ↗](https://fungrim.org/entry/177de7)
 
@@ -444,7 +444,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\lparen0, \infty\rparen&n=0\\\lparen-n, 1-n\rparen&n\lt0\end{cases})$$
+$$\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\rbrack0, \infty\lbrack&n=0\\\rbrack-n, 1-n\lbrack&n\lt0\end{cases})$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **DigammaFunctionZero** — Zero of the digamma function; **UniqueZero** — Unique zero (root) of function.
@@ -453,7 +453,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}+(2z^{m+1})^{-1}+\frac{1}{mz^{m}})\times(-1)^{m+1})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
+$$\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((-1)^{m+1}(\frac{1}{mz^{m}}+(2z^{m+1})^{-1}+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}))+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
 
 **Holds when** $m\in\N^*\land z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
@@ -487,9 +487,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{p}{q})=-\gamma-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))$$
+$$\mathrm{Digamma}(\frac{p}{q})=-\operatorname{EulerGamma}-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))$$
 
-**Holds when** $q\in2..\infty\land p\in1..q-1$.
+**Holds when** $q\in2..\infty\land p\in1..(q-1)$.
 Used by the Compute Engine for simplification.
 [`3fe553` · Fungrim entry ↗](https://fungrim.org/entry/3fe553)
 
@@ -503,7 +503,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\gamma-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}$$
 
 [`45a969` · Fungrim entry ↗](https://fungrim.org/entry/45a969)
 
@@ -563,7 +563,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}1/(n+1)-1/(n+z))-\gamma$$
+$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}(1/(n+1)-1/(n+z)))-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -587,7 +587,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(3)=\frac{3}{2}-\gamma$$
+$$\mathrm{Digamma}(3)=\frac{3}{2}-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`75f9bf` · Fungrim entry ↗](https://fungrim.org/entry/75f9bf)
@@ -602,13 +602,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\gamma-3\ln(2)$$
+$$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\operatorname{EulerGamma}-3\ln(2)$$
 
 [`7ec4f0` · Fungrim entry ↗](https://fungrim.org/entry/7ec4f0)
 
 ---
 
-$$\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8G$$
+$$\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8\operatorname{G}$$
 
 Used by the Compute Engine for simplification.
 [`807c7d` · Fungrim entry ↗](https://fungrim.org/entry/807c7d)
@@ -623,13 +623,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\gamma$$
+$$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\operatorname{EulerGamma}$$
 
 [`89bed3` · Fungrim entry ↗](https://fungrim.org/entry/89bed3)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\gamma-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
+$$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\operatorname{EulerGamma}-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
 
 [`8c368f` · Fungrim entry ↗](https://fungrim.org/entry/8c368f)
 
@@ -651,13 +651,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}$$
 
 [`967bbb` · Fungrim entry ↗](https://fungrim.org/entry/967bbb)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\gamma-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}$$
 
 [`98f642` · Fungrim entry ↗](https://fungrim.org/entry/98f642)
 
@@ -671,7 +671,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z)=-(\frac{1}{z})-\gamma+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}$$
+$$\mathrm{Digamma}(z)=-(\frac{1}{z})-\operatorname{EulerGamma}+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -679,7 +679,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\gamma$$
+$$\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -712,7 +712,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Digamma}(2)=1-\gamma$$
+$$\mathrm{Digamma}(2)=1-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`ada157` · Fungrim entry ↗](https://fungrim.org/entry/ada157)
@@ -764,7 +764,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\gamma$$
+$$\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -789,7 +789,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8G$$
+$$\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8\operatorname{G}$$
 
 Used by the Compute Engine for simplification.
 [`d2f9fb` · Fungrim entry ↗](https://fungrim.org/entry/d2f9fb)
@@ -828,14 +828,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(1)=-\gamma$$
+$$\mathrm{Digamma}(1)=-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`ea2482` · Fungrim entry ↗](https://fungrim.org/entry/ea2482)
 
 ---
 
-$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\gamma$$
+$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -844,7 +844,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(k/n+z))$$
+$$\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(z+k/n))$$
 
 **Holds when** $n\in\N^*\land z\in\C\land nz\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -860,13 +860,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\gamma-3\ln(2)$$
+$$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\operatorname{EulerGamma}-3\ln(2)$$
 
 [`f93bae` · Fungrim entry ↗](https://fungrim.org/entry/f93bae)
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\gamma$$
+$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -985,7 +985,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((k+z)\mathrm{RisingFactorial}(z, k))$$
+$$\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((z+k)\mathrm{RisingFactorial}(z, k))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -1139,7 +1139,7 @@ Used by the Compute Engine for simplification.
 
 $$\binom{z}{k}=\frac{\Gamma(z+1)}{\Gamma(k+1)\Gamma(z-k+1)}$$
 
-**Holds when** $z\in\C\land k\in\N\land z-k\notin-\infty..-1$.
+**Holds when** $z\in\C\land k\in\N\land z-k\notin-\infty..(-1)$.
 Used by the Compute Engine for simplification.
 [`e87c43` · Fungrim entry ↗](https://fungrim.org/entry/e87c43)
 
@@ -1158,7 +1158,7 @@ Used by the Compute Engine for simplification.
 
 $$\Gamma(z-1)=\frac{\Gamma(z)}{z-1}$$
 
-**Holds when** $z\in\C\setminus-\infty..1$.
+**Holds when** $z\in\C\setminus(-\infty..1)$.
 Used by the Compute Engine for simplification.
 [`14af98` · Fungrim entry ↗](https://fungrim.org/entry/14af98)
 
@@ -1206,7 +1206,7 @@ Used by the Compute Engine for simplification.
 
 $$\Gamma(z)=(z-1)\Gamma(z-1)$$
 
-**Holds when** $z\in\C\setminus-\infty..1$.
+**Holds when** $z\in\C\setminus(-\infty..1)$.
 Used by the Compute Engine for simplification.
 [`639d91` · Fungrim entry ↗](https://fungrim.org/entry/639d91)
 
@@ -1220,7 +1220,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\gamma z$$
+$$\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\operatorname{EulerGamma}z$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -1228,7 +1228,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}((z+n)-1/2)\ln((z+n)/((z+n)-1))-1)$$
+$$\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}(((z+n)-1/2)\ln((z+n)/((z+n)-1))-1))$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -1296,7 +1296,7 @@ Used by the Compute Engine for simplification.
 $$\vert\Gamma(\frac{1}{2}+y\imaginaryI)\vert=\sqrt{\frac{\pi}{\cosh(\pi y)}}$$
 
 **Holds when** $y\in\R$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`c7b921` · Fungrim entry ↗](https://fungrim.org/entry/c7b921)
 
 ---

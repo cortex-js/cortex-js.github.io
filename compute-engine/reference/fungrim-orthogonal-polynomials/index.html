@@ -19,8 +19,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f6e0d07b.css">
-<script src="/assets/js/runtime~main.72f49b7d.js" defer="defer"></script>
-<script src="/assets/js/main.19305e69.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.789f42cf.js" defer="defer"></script>
+<script src="/assets/js/main.3b56949f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -48,7 +48,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0649c9" target="_blank" rel="noopener noreferrer" class=""><code>0649c9</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-(x^2-1)^{1/2})}^{n})</code></p>
+<p><code class="language-math math-inline">\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-{(x^2-1)}^{1/2})}^{n})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
 <strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
 Used by the Compute Engine for expansion.
@@ -138,13 +138,13 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5f09f4" target="_blank" rel="noopener noreferrer" class=""><code>5f09f4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+(x^2-1)^{1/2})}^{n}-{(x-(x^2-1)^{1/2})}^{n})</code></p>
+<p><code class="language-math math-inline">\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+{(x^2-1)}^{1/2})}^{n}-{(x-{(x^2-1)}^{1/2})}^{n})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C</code>.
 <strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/61375f" target="_blank" rel="noopener noreferrer" class=""><code>61375f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{(x-1)^{r}}</code></p>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})}{(x-1)^{r}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
 <strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind.
 Used by the Compute Engine for expansion.
@@ -301,7 +301,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e03fa4" target="_blank" rel="noopener noreferrer" class=""><code>e03fa4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{2(x-1)^{r}}</code></p>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})}{2(x-1)^{r}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
 <strong>Symbols:</strong> <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
@@ -392,22 +392,22 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/415911" target="_blank" rel="noopener noreferrer" class=""><code>415911</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{n!\times2^{n}}</code></p>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{2^{n}n!}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>  <em>or</em>  <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4cfeac" target="_blank" rel="noopener noreferrer" class=""><code>4cfeac</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, 0)=\frac{\binom{2n}{n}\times(-1)^{n}}{4^{n}}</code></p>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, 0)=\frac{(-1)^{n}\binom{2n}{n}}{4^{n}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/674afa" target="_blank" rel="noopener noreferrer" class=""><code>674afa</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}</code></p>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n, z)=\frac{(-1)^{n}\binom{2n}{n}\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)}{4^{n}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6cd4a1" target="_blank" rel="noopener noreferrer" class=""><code>6cd4a1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}</code></p>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(2n+1, z)=\frac{(-1)^{n}(2n+1)\binom{2n}{n}}{4^{n}}z\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/859445" target="_blank" rel="noopener noreferrer" class=""><code>859445</code> · Fungrim entry ↗</a></p>

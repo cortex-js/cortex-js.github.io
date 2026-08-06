@@ -2,7 +2,7 @@
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **212 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **211 identities** for elementary functions.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -19,7 +19,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Powers](#powers) (8)
 - [Sinc function](#sinc-function) (24)
 - [Sine](#sine) (59)
-- [Square roots](#square-roots) (26)
+- [Square roots](#square-roots) (25)
 
 ## Exponential function
 
@@ -190,7 +190,7 @@ Used by the Compute Engine for simplification.
 
 ## Inverse tangent
 
-$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, 1+xy)$$
+$$\arctan(x)-\arctan(y)=\arctan(x-y, 1+xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -245,7 +245,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
+$$\arctan(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -292,7 +292,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, 1+x(x+y))$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -353,7 +353,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, 0)=\frac{\pi\mathrm{sgn}(y)}{2}$$
+$$\arctan(y, 0)=\frac{\pi\mathrm{sgn}(y)}{2}$$
 
 **Holds when** $y\in\R$.
 Used by the Compute Engine for simplification.
@@ -384,7 +384,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/(z^2+1)^{1/2}))}{{(z^2+1)}^{\frac{n+1}{2}}}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/{(1+z^2)}^{1/2}))}{\sqrt{1+z^2}^{n+1}}$$
 
 **Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -401,7 +401,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
+$$\arctan(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
 
 **Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
@@ -432,7 +432,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
+$$\arctan(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -486,7 +486,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x)+\arctan(y)=\mathrm{Arctan_2}(x+y, 1-xy)$$
+$$\arctan(x)+\arctan(y)=\arctan(x+y, 1-xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -518,7 +518,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+y\imaginaryI))$$
+$$\arctan(y, x)=\Im(\ln(x+y\imaginaryI))$$
 
 **Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
@@ -551,7 +551,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\lparen-\infty, -\exponentialE^{-1}\rparen, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\lparen0, \pi\rparen, y\mapsto y\imaginaryI-y\cot(y))$$
+$$\mathrm{Map}(\rbrack-\infty, -\exponentialE^{-1}\lbrack, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\rbrack0, \pi\lbrack, y\mapsto y\imaginaryI-y\cot(y))$$
 
 Used by the Compute Engine for simplification.
 [`44ad09` · Fungrim entry ↗](https://fungrim.org/entry/44ad09)
@@ -610,7 +610,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
+$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(\mathrm{LambertWPuiseuxCoefficient}(k-2)/2+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-2-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k-2+1)-j)&\top\end{cases}/4)}{k+1}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
 **Symbols:** **LambertWPuiseuxCoefficient** — Coefficient in scaled Puiseux expansion of Lambert W-function.
@@ -634,7 +634,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Map}(\lparen-\exponentialE^{-1}, \infty\rparen, x\mapsto\operatorname{W}(x))=\lparen-1, \infty\rparen$$
+$$\mathrm{Map}(\rbrack-\exponentialE^{-1}, \infty\lbrack, x\mapsto\operatorname{W}(x))=\rbrack-1, \infty\lbrack$$
 
 Used by the Compute Engine for simplification.
 [`ee86fb` · Fungrim entry ↗](https://fungrim.org/entry/ee86fb)
@@ -1182,7 +1182,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\binom{2n}{k}\times(-1)^{k+n})}{4^{n}}$$
+$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}(-1)^{n+k}\binom{2n}{k}\cos(2(n-k)z))}{4^{n}}$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -1515,7 +1515,7 @@ Used by the Compute Engine for simplification.
 $$\sqrt{r\exp(\imaginaryI\theta)}=\sqrt{r}\exp(\frac{\imaginaryI\theta}{2})$$
 
 **Holds when** $r\in\lbrack0, \infty\rparen\land\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`1232f7` · Fungrim entry ↗](https://fungrim.org/entry/1232f7)
 
 ---
@@ -1541,13 +1541,6 @@ $$z\mapsto\sqrt{z}^{\prime}(z)=\frac{1}{2\sqrt{z}}$$
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
 [`2a11ab` · Fungrim entry ↗](https://fungrim.org/entry/2a11ab)
-
----
-
-$$\sqrt{-1}=\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`2eb54a` · Fungrim entry ↗](https://fungrim.org/entry/2eb54a)
 
 ---
 
@@ -1689,7 +1682,7 @@ Used by the Compute Engine for simplification.
 $$\sqrt{\exp(\imaginaryI\theta)\infty}=\exp(\frac{\imaginaryI\theta}{2})\infty$$
 
 **Holds when** $\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`f9f31d` · Fungrim entry ↗](https://fungrim.org/entry/f9f31d)
 
 ---

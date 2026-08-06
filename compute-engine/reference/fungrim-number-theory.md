@@ -536,7 +536,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\gamma)$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\operatorname{EulerGamma})$$
 
 **Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
 Used by the Compute Engine for simplification.

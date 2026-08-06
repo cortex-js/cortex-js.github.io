@@ -1661,14 +1661,29 @@ console.log(expr, '=', expr.simplify());
 
 ## Comparing Expressions
 
-There are two useful ways to compare symbolic expressions:
+There are three tiers of comparison, from the strictest and cheapest to the
+most powerful and most expensive:
 
-- structural equality
-- mathematical equality
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
 
-### Structural Equality: `isSame()`
+| Tier | Method | Operator | Notation | Answers |
+| :--- | :--- | :--- | :--- | :--- |
+| Syntactic | `isSame()` | `Same` | `===`, `≣` (Cortex) | Always `True` or `False` |
+| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Cortex) | `True`, `False`, or undetermined |
+| Identity | `isIdenticallyEqual()` | `IdenticallyEqual` | `\equiv`, `≡` | `True`, `False`, or undetermined |
 
-Structural equality (or syntactic equality) considers the **symbolic structure** used
+</div>
+
+Each tier answers a different question: "are these the same expression?",
+"do these have the same value?", and "are these the same function of their
+free variables?".
+
+The operator, its LaTeX/Cortex notation and its JavaScript method share the
+same semantics at each tier.
+
+### Syntactic Equality: `isSame()`
+
+Syntactic equality (or structural equality) considers the **symbolic structure** used
 to represent an expression. 
 
 The symbolic structure of an expression is the tree of symbols and functions
@@ -1687,17 +1702,23 @@ exactly identical, that is each sub-expression is recursively identical in `lhs`
 and `rhs`. The argument can be an `Expression` or a JavaScript primitive
 (`number`, `bigint`, `boolean`, `string`).
 
-This is a fast, exact check — no evaluation is performed.
+This is a fast, exact check — no evaluation is performed, and the answer is
+always `true` or `false`, never undetermined.
 
-- \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
-  integers, the other is an integer
+`isSame()` is **strictly syntactic**: it compares the expressions as written
+(in canonical form) and never substitutes the value of a symbol. If `x` has
+been assigned the value `5`, `ce.symbol('x').isSame(5)` is `false` — one
+expression is a symbol, the other a number. Use `isEqual()` to compare values.
+
+- \\( x + x \\) and \\( 2x \\) are not structurally equal, one is a sum of two
+  terms, the other a product
 - \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structurally equal, one is a
   power of a sum, the other a sum of terms.
 
 
 ```live show-line-numbers
-const a = ce.parse('2 + 1');
-const b = ce.parse('3');
+const a = ce.parse('x + x');
+const b = ce.parse('2x');
 console.log('isSame?', a.isSame(b));
 ```
 
@@ -1741,39 +1762,81 @@ ce.expr(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
 
 
 
-### Mathematical Equality: `isEqual()`
+### Arithmetic Equality: `isEqual()`
 
-It turns out that comparing two arbitrary mathematical expressions is a complex
-problem. 
+The `lhs.isEqual(rhs)` function answers "do these two expressions have the same
+value?". It is the JavaScript counterpart of the `=` operator (`==` in Cortex).
 
-In fact, [Richardson's Theorem](https://en.wikipedia.org/wiki/Richardson%27s_theorem)
-proves that it is impossible to determine if two symbolic expressions are
-identical in general.
+The comparison is deliberately **cheap and predictable**:
 
-However, there are many cases where it is possible to make a comparison between
-two expressions to check if they represent the same mathematical object.
+1. Both operands are evaluated (so assigned symbol values are substituted).
+2. If the results are structurally identical, they are equal.
+3. Otherwise, if the difference between them has no unknowns, it is evaluated
+   numerically: they are equal if the absolute value of the difference is less
+   than `ce.tolerance`.
+4. Otherwise the answer is `undefined`.
 
-The `lhs.isEqual(rhs)` function returns true if `lhs` and `rhs` represent the
-same mathematical object. 
-
-If `lhs` and `rhs` are numeric expressions, they are evaluated before being 
-compared. They are considered equal if the absolute value of the difference 
-between them is less than `ce.tolerance`.
-
-The expressions \\( x^2 - 3x + 4 \\) and \\( 4 - 3x + x^2 \\) will be considered
-equal (`isEqual` returns true) because the difference between them is zero, 
-i.e. \\( (x^2 - 3x + 4) - (4 - 3x + x^2) \\) is zero once the expression has 
-been simplified.
+No expansion, no simplification and no sampling is attempted. In particular,
+`isEqual()` does **not** attempt to prove a symbolic identity: the expressions
+\\( (x+1)^2 \\) and \\( x^2 + 2x + 1 \\) have the same value for every \\( x
+\\), but `isEqual()` returns `undefined` for them. Use
+[`isIdenticallyEqual()`](#identity-isidenticallyequal) for that question.
 
 Note that unlike `expr.isSame()`, `expr.isEqual()` can return `true`, `false` or
 `undefined`. The latter value indicates that there is not enough information to
-determine if the two expressions are mathematically equal.
+determine if the two expressions have the same value.
+
+The corresponding `Equal` expression is **inert** when the answer is
+`undefined`: it stays unevaluated, since \\( x = y \\) is a *condition*, not a
+claim that is false until proven. This is what makes an equation usable as an
+argument to `Solve`.
 
 ```live show-line-numbers
 const a = ce.parse('1 + 2');
 const b = ce.parse('3');
 console.log('isEqual?', a.isEqual(b));
+
+// Undetermined: the `Equal` expression stays unevaluated
+console.log(ce.parse('x = y').evaluate());
 ```
+
+Following IEEE 754, `NaN` is not equal to anything, including itself: `NaN =
+NaN` is `False`, and so is the comparison of two collections that contain it,
+`["Equal", ["List", "NaN"], ["List", "NaN"]]`. Only the syntactic tier reports
+those as identical (`["Same", "NaN", "NaN"]` is `True`).
+
+### Identity: `isIdenticallyEqual()`
+
+Comparing two arbitrary symbolic expressions is a hard problem. In fact,
+[Richardson's Theorem](https://en.wikipedia.org/wiki/Richardson%27s_theorem)
+proves that it is impossible in general to determine if two symbolic
+expressions are identical.
+
+However, there are many cases where it is possible to decide it in practice.
+The `lhs.isIdenticallyEqual(rhs)` function asks whether `lhs` and `rhs` are the
+same function of their free variables, that is whether they have the same value
+for **every** value of those variables. It is the JavaScript counterpart of the
+`IdenticallyEqual` operator, written \\( \\equiv \\) in LaTeX.
+
+```live show-line-numbers
+console.log(ce.parse('(x+1)^2').isIdenticallyEqual(ce.parse('x^2+2x+1')));
+console.log(ce.parse('\\sin^2 x + \\cos^2 x \\equiv 1').evaluate());
+```
+
+Like `isEqual()`, it is three-valued: `true`, `false` or `undefined` when the
+question could not be settled, in which case an `IdenticallyEqual` expression
+stays unevaluated. A `false` requires a definite disagreement of values:
+expressions that merely differ at the sampled points, such as \\( x \\) and
+\\( x + 1 \\), are `undefined`, since an assumption could still constrain them
+to be equal.
+
+:::warning[Stochastic verdicts]
+To settle an identity, this tier uses symbolic transformations (expansion and
+simplification) **and** numerical sampling: the two expressions are evaluated
+at a number of pseudo-random points. A `true` answer obtained by sampling is
+therefore a very strong indication, not a formal proof. This is the only tier
+that can answer from sampling; `isSame()` and `isEqual()` never do.
+:::
 
 
 ### Smart Comparison: `is()`
@@ -1806,23 +1869,27 @@ that require evaluation, such as `\sin(\pi)`.
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.isSame(rhs)`                        | Structural equality (fast, exact, no evaluation). Accepts primitives. |
+| `lhs.isSame(rhs)`                        | Syntactic equality (fast, exact, no evaluation). Accepts primitives. |
 | `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
-| `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
+| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation and tolerance compare). May return `undefined`. |
+| `lhs.isIdenticallyEqual(rhs)`            | Identity in all free variables (expansion, simplification, sampling). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
-| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`                |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Structural identity of the **evaluated** operands (Cortex `===`). Unlike `isSame()`, each operand is evaluated first, so `["Same", ["Add", 1, 1], 2]` is `True`. Always decides. |
+| `ce.expr(["IdenticallyEqual", lhs, rhs]).evaluate()` | Synonym for `lhs.isIdenticallyEqual(rhs)` |
+| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`, comparing the operands as written (they are not canonicalized) |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Cortex `===`). Always decides. |
 
 </div>
 
 :::info[Choosing the Right Comparison]
-- Use **`isSame()`** when you know the exact value you're comparing against
+- Use **`isSame()`** when you know the exact expression you're comparing against
   (e.g., checking if an operand is `0` or `1` in a simplification rule).
 - Use **`is()`** when the expression might need evaluation to reveal its value
   (e.g., checking user input like `\cos(\pi/2)` against `0`).
-- Use **`isEqual()`** for full mathematical equality, including symbolic
-  expressions with unknowns.
+- Use **`isEqual()`** to compare values, including expressions that must be
+  evaluated first.
+- Use **`isIdenticallyEqual()`** to check a symbolic identity, i.e. an equality
+  that must hold for every value of the free variables.
 :::
 
 ## Replacing a Symbol in an Expression
@@ -2607,7 +2674,8 @@ This partial canonicalization:
 Unlike the full canonical form, it does **not** evaluate numeric expressions:
 \\(3 \times 2\\) stays as `["Multiply", 2, 3]` rather than being folded to `6`.
 
-You can combine this with `isEqual()` to give differentiated feedback:
+You can combine this with `isIdenticallyEqual()` to give differentiated
+feedback:
 
 ```js
 const goodAnswer = ce.parse(answerLatex, { form: ['Flatten', 'Order'] });
@@ -2615,12 +2683,18 @@ const input = ce.parse(inputLatex, { form: ['Flatten', 'Order'] });
 
 if (goodAnswer.isSame(input)) {
   // Correct method — structurally equivalent
-} else if (goodAnswer.isEqual(input)) {
-  // Right numeric value but wrong method
+} else if (goodAnswer.isIdenticallyEqual(input)) {
+  // Right answer but wrong method
 } else {
   // Incorrect
 }
 ```
+
+Use `isIdenticallyEqual()` rather than `isEqual()` when the answer may contain
+unknowns: `isEqual()` compares values and returns `undefined` for a symbolic
+identity such as \\( (x+1)^2 \\) versus \\( x^2 + 2x + 1 \\), while
+`isIdenticallyEqual()` establishes it. See
+[Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions).
 
 If you only need binding (so that operator definitions are available and
 arithmetic methods like `.add()` and `.mul()` work) without any normalization,
@@ -3065,7 +3139,7 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
   argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
-  Compute Engine instance that is evaluating the expression and a `numericApproximation` property that is true if the result should be a numeric approximation.
+  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, and an `expression` property that is the expression being evaluated.
 
 Since `args` is an array, you can use destructuring to get the arguments:
 
@@ -3074,6 +3148,63 @@ ce.declare("double", { evaluate: (args) => args[0].mul(2) });
 
 // or
 ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+```
+
+### The `expression` option
+
+The `expression` option is the canonical expression node being evaluated. Its
+operands (`expression.ops`, `expression.op1`, ...) are the **raw** arguments:
+canonical and bound, but not yet evaluated. The `args` array, by contrast,
+holds the **evaluated** arguments — and when `numericApproximation` is true,
+those have already been turned into floating point numbers. When your handler
+needs to know something about an argument that evaluation destroys — above all
+whether it was *exact* — `expression` is where to look. Treat it as read-only.
+
+The `Power` operator uses it to pick the right branch for a negative base. The
+convention is that a rational exponent `p/q` in lowest terms with an **odd**
+`q` has a real value — `(-8)^(2/3) = 4` — while everything else takes the
+principal complex value. Under `.N()` the exponent reaches the handler as a
+double, from which `p/q` can only be guessed back; reading it from
+`expression.op2` instead keeps the exact terms, so `.N()`, the type and the
+compiled code all decide the same branch.
+
+`expression` is optional: a handler called outside the evaluation driver may
+not receive one, so guard for `undefined` and fall back to what `args` tells
+you. The operand accessors `op1`/`op2`/`ops` and the number properties such as
+`isExact` live on narrowed interfaces, so reach them through the `isFunction()`
+and `isNumber()` guards — the same narrowing the `Power` handler uses.
+
+**`expression.ops[i]` is not always the provenance of `args[i]`.** The
+evaluated arguments are produced by a pass that reindexes them: it flattens an
+**associative** operator (`f(a, f(b, c))` arrives as three arguments, one more
+than the node has), it unwraps `ReleaseHold` (so `expression.ops[i]` is the
+wrapper rather than what was evaluated), and it drops an argument whose
+evaluation yields nothing. The positional correspondence holds only for a
+non-associative operator with no `ReleaseHold` and no dropped argument. If your
+handler indexes into `expression.ops`, treat
+`expression.ops.length !== args.length` as "no provenance available" and fall
+back.
+
+**On a `lazy: true` operator the contrast does not exist**: held operands are
+passed through untouched, so `args` is raw and held as well. Such a handler
+must canonicalize each held operand it consumes — on the `ce.box()` and
+`ce.parse()` routes the held operands are not even canonical.
+
+```js
+import { isFunction, isNumber } from "@cortex-js/compute-engine";
+
+ce.declare("IsExactArgument", {
+  signature: "(number) -> boolean",
+  evaluate: ([x], { expression, engine }) => {
+    // `x` may have been numericized; the raw operand never is.
+    const raw =
+      expression !== undefined && isFunction(expression) ? expression.op1 : x;
+    return isNumber(raw) && raw.isExact ? engine.True : engine.False;
+  },
+});
+
+ce.box(["IsExactArgument", ["Rational", 1, 3]]).N();  // → True
+ce.box(["IsExactArgument", 0.3333]).N();              // → False
 ```
 
 In addition to the `evaluate` handler the function definition can include
@@ -4093,7 +4224,10 @@ otherwise error:
 | `\pmod{7}` | `["Mod", …, 7]` | Standalone `\pmod` places the modulus as the second argument of `Mod` |
 | `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
 
-`\not\equiv` (optionally with a trailing `\pmod n`) negates a congruence, and a
+A bare `\equiv` (or the `≡` character) parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual); it is a
+congruence, `Congruent`, only when followed by `\pmod n`. `\not\equiv`
+(optionally with a trailing `\pmod n`) negates a congruence, and a
 chain of congruence steps such as
 `3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}` folds into a conjunction of the
 adjacent steps.
@@ -5513,6 +5647,7 @@ It is also said that type A **matches** type B.
 any
 ├── error
 ├── nothing
+├── missing
 ├── never
 ├── unknown
 └── expression
@@ -5594,9 +5729,10 @@ The Compute Engine supports the following primitive types:
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. No other type matches `any` |
+| `any`      | The universal or top type. Every type is a subtype of, and therefore matches, `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
+| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
@@ -5604,7 +5740,7 @@ The Compute Engine supports the following primitive types:
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
-| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `list`, a `vector`, a `matrix` or a `tensor` |
+| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `list`, a `vector`, a `matrix` or a `tensor` |
 | `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
 | `boolean`       | The type of the symbol `True` or `False`|
 | `string`        | The type of a string of Unicode characters    |
@@ -5842,10 +5978,11 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 The **dictionary** and **record** types represent a collection of key-value pairs, 
 where each key is a string and each value can be any type.
 
-A **record** is a special case of a dictionary where the keys are fixed, 
-while a **dictionary** can have keys that are not defined in advance.
+A concrete **record value** has a known set of keys, while a **dictionary** can
+have keys that are not defined in advance. A record *type* lists the fields a
+value must have; it does not forbid additional fields.
 
-A **record** is used to represent objects and structured data with a fixed set of properties.
+A **record** is used to represent objects and structured data with known properties.
 A **dictionary** is well suited to represent hash tables or caches.
 
 **Keys** must be unique when compared in NFC form within a dictionary or record. Keys are not ordered.
@@ -5863,11 +6000,10 @@ For example: `record<red: integer, green: integer, blue: integer>` is a record t
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
 **Compatibility:**
-- A record of type `record<K1: T1, K2: T2, ...>` is compatible with a record of type
-  `record<K1: T1, K2: T2, ..., K3: T3, ...>` if:
-  - The keys of the first record are a subset of the keys of the second.
-  - The values of the first record are compatible with the values of the second.
-  - The order of the keys does not matter.
+- A record type `A` matches a record type `B` when every field required by `B`
+  is present in `A` with a compatible type. Thus a record with more fields is a
+  subtype of one with fewer fields (width subtyping). The order of the keys
+  does not matter.
 - A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
 
 
@@ -6011,8 +6147,8 @@ one or two integers as input and returning an integer.
 If there are any optional arguments, they must be at the end of the argument list.
 
 ```js
-ce.type("(integer, integer?) -> number")
-  .matches("(integer) -> number");
+ce.type("(integer) -> number")
+  .matches("(integer, integer?) -> number");
 // ➔ true
 ```
 
@@ -6024,8 +6160,8 @@ A function signature can include a variable number of arguments, also known as
 **variadic arguments**. 
 
 Variadic arguments are indicated by a `+` or `*` 
-immediately after the type of the last argument. The `+` prefix indicates that
-the function accepts one or more arguments of that type, while the `*` prefix
+immediately after the type of the last argument. The `+` suffix indicates that
+the function accepts one or more arguments of that type, while the `*` suffix
 indicates that the function accepts zero or more arguments of that type.
 
 For example `(string, integer+) -> integer` is a function that accepts a 
@@ -6312,6 +6448,355 @@ parameter) is accepted provisionally and checked against its actual value
 when the operator evaluates; only a provable mismatch (a flat `list<number>`
 can never be a matrix) errors immediately at canonicalization.
 
+## Generic Signatures
+
+A signature such as `(list<number>) -> number` pins the types of a function
+once and for all. Many functions are not like that: reversing a collection
+returns the same kind of collection it was given, and swapping the components
+of a tuple returns those components in the other order, whatever they are. A
+**generic signature** states such a relation between the argument types and
+the result type directly, instead of giving up and returning `unknown`.
+
+A generic signature is a function signature prefixed by a **quantifier
+clause**: the keyword `forall`, a comma-separated list of **type variables**,
+and a dot.
+
+```js
+ce.type("forall T. (T) -> T");                              // identity
+ce.type("forall T, U. (tuple<T, U>) -> tuple<U, T>");       // swap
+ce.type("forall T: indexed_collection. (T) -> T");          // reverse
+ce.type("forall T, U. (list<T>, (T) any -> U) -> list<U>"); // map
+```
+
+Any identifier can be a type variable — there is no naming convention — and a
+variable is only a variable because the clause declares it. The names are the
+author's and they round-trip: `forall Elem. (list<Elem>) -> Elem` serializes
+back with `Elem`, not with a canonical letter.
+
+```js
+ce.type("forall Elem. (list<Elem>) -> Elem").toString();
+// ➔ "forall Elem. (list<Elem>) -> Elem"
+```
+
+The dot terminates the clause. It is load-bearing: a bound is a type, and
+types extend as far right as they can, so without the dot
+`forall T: (real) -> real (T) -> boolean` could not be read.
+
+Within a signature, every occurrence of a quantified name is the *same*
+variable, including inside a nested signature: in
+`forall T, U. (list<T>, (T) any -> U) -> list<U>` the callback's parameter
+type is the list's element type. Note the `any` in the callback's effect slot
+— a bare arrow demands a **pure** callback (see
+[Effects and Subtyping](#effects-and-subtyping)), so an operator that accepts
+arbitrary callbacks must write the effect-top form.
+
+A variable may appear in an argument or result position, in the element
+position of a constructed type (`list<T>`, `tuple<T, U>`, `set<T>`,
+`collection<T>`, `dictionary<T>`, `broadcastable<T>`, a vector or matrix
+element, a record field), and inside a nested signature. It may **not** appear
+in a union, an intersection or a negation:
+
+```js
+ce.type("forall T. (T | string) -> T");
+// ➔ throws: unsupported-variable-position: The type variable `T` cannot
+//   appear in a union, an intersection, a negation or a bound
+```
+
+`forall` is a reserved word in type strings: `ce.declareType("forall", …)` is
+a `reserved-type-name` error.
+
+A **type alias** can be parameterized the same way — see
+[Generic Type Aliases](#generic-type-aliases).
+
+### Instantiating at the Call Site
+
+Nothing stays generic once it is called. At each call the engine solves the
+variables against the types of the actual arguments and substitutes the
+solution into the result type, so the type of an application is always
+**ground** — no variable ever escapes into an expression's type.
+
+```js
+ce.declare("first", {
+  signature: "forall T. (indexed_collection<T>) -> T",
+  evaluate: ([xs]) => xs.at(1),
+});
+
+ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "finite_integer"
+ce.box(["first", ["List", "'a'", "'b'"]]).type; // ➔ "string"
+```
+
+A variable that occurs at several argument positions is solved to the **join**
+of what those positions contribute — the narrowest type that covers them all,
+the same rule the engine uses elsewhere to type a result from several
+operands:
+
+```js
+ce.declare("n", "integer");
+ce.declare("r", "real");
+ce.declare("pick", { signature: "forall T. (T, T) -> T" });
+
+ce.box(["pick", "n", "n"]).type; // ➔ "integer"
+ce.box(["pick", "n", "r"]).type; // ➔ "real"
+```
+
+Variables in element positions are solved by matching the argument's structure:
+
+```js
+ce.declare("swap", { signature: "forall T, U. (tuple<T, U>) -> tuple<U, T>" });
+
+ce.box(["swap", ["Tuple", 1, "'a'"]]).type;
+// ➔ "tuple<string, finite_integer>"
+```
+
+A callback's parameter type is instantiated too, which is what makes an
+annotated callback checkable and an unannotated one inferable at the right
+type:
+
+```js
+ce.declare("keep", {
+  signature: "forall T, U. (list<T>, (T) any -> U) -> list<U>",
+});
+
+ce.box(["keep", ["List", 1, 2, 3],
+  ["Function", ["Greater", "x", 0], "x"]]).type;
+// ➔ "list<boolean>"
+```
+
+If no solution satisfies every position, the call is an ordinary
+`incompatible-type` error; the expected type reported is the *instantiated*
+one, never variable syntax.
+
+### Bounds
+
+A variable can declare an **upper bound** with `T: <type>`. Only argument
+types that are a subtype of the bound are accepted, and the variable still
+binds the argument's type *verbatim* — so a bounded identity preserves the
+argument's kind and its dimensions:
+
+```js
+ce.declare("rev", { signature: "forall T: indexed_collection. (T) -> T" });
+
+ce.box(["rev", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]).type;
+// ➔ "matrix<finite_integer^(2x3)>"
+```
+
+Violating the bound is an error naming the bound:
+
+```js
+ce.box(["rev", ["Set", 1, 2]]).isValid; // ➔ false
+
+ce.box(["rev", ["Set", 1, 2]]).toString();
+// ➔ rev(Error(ErrorCode("incompatible-type", "indexed_collection",
+//      "set<finite_integer>")))
+```
+
+An unbounded variable has an implicit bound of `any`. A bound must be a
+**ground** type: it cannot mention a variable, its own or another's.
+
+```js
+ce.type("forall T, U: list<T>. (U) -> T");
+// ➔ throws: unsupported-variable-position: The bound of the type variable
+//   `U` must be a ground type: `list<T>` refers to a type variable
+```
+
+Several standard library operators are declared this way — `Identity` is
+`forall T. (T) -> T`, `Reverse` is
+`forall T: indexed_collection. (T) -> T`, `Inverse` is
+`forall T: matrix. (T) -> T` — so their results are typed from their
+arguments:
+
+```js
+ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<finite_integer^3>"
+```
+
+A **scalar** bound interacts with broadcasting. On an operator that
+broadcasts, a collection argument is admitted against a scalar parameter —
+the bound is checked against the scalar base, as it always was — and the
+variable binds the argument's **element** type; the call's ordinary broadcast
+wrap then puts the argument's shape back on the result. `Conjugate` and
+`Chop` are `forall T: number. (T) -> T`, `Remainder` is
+`forall T: number. (T, T) -> T`:
+
+```js
+ce.box(["Conjugate", ["List", 1, 2, 3]]).type;
+// ➔ "vector<finite_integer^3>"
+
+ce.box(["Remainder", ["List", ["List", 1, 2], ["List", 3, 4]], 7]).type;
+// ➔ "matrix<finite_integer^(2x2)>"
+```
+
+Broadcasting maps all the way down to the scalar leaves, so the variable is
+bound to a leaf type whatever the argument's rank. Only the kinds a broadcast
+actually maps are peeled: a `set` argument is admitted but never mapped
+(`Conjugate(Set(1, 2))` stays a `set<finite_integer>`), and a tuple is atomic
+(`Conjugate((1, 2))` is a `tuple<finite_integer, finite_integer>`).
+
+### Generic Overload Sets
+
+Each arm of an [overload set](#overload-sets) carries its own clause, and each
+arm must be parenthesized:
+
+```js
+ce.type("(forall T. (list<T>) -> T) & (forall T. (set<T>) -> boolean)");
+```
+
+The two `T`s are unrelated: a clause quantifies exactly one arm. A single
+clause spread over the whole intersection is not accepted, and neither is a
+clause nested inside another signature — quantification is top-level (or
+arm-level) only.
+
+```js
+ce.type("forall T. ((list<T>) -> T) & ((set<T>) -> boolean)");
+// ➔ throws: unsupported-variable-position: A `forall` clause can only be
+//   applied to a function signature
+
+ce.type("forall T. ((forall U. (U) -> U)) -> T");
+// ➔ throws: unsupported-variable-position: A `forall` clause can only
+//   quantify a top-level signature (or one arm of an overload set), not a
+//   nested one
+```
+
+### Generic Declarations and Function Literals
+
+A generic signature can be implemented by an ordinary function body — a
+`["Function"]` literal, a `x |-> …` lambda, a Cortex `function` definition —
+as long as the clause is stated on the *whole signature*. There are three
+spellings.
+
+**The `function f<T>(…)` definition form** (Cortex) puts a **type-parameter
+clause** between the name and the parameter list. A parameter may carry a
+ground bound, the effect specifier and the return type are unchanged, and the
+clause names are usable anywhere in the head:
+
+```plaintext
+function f<T>(x: T) -> T { x + x }
+function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
+function g<T: number, U>(x: T, k: (T) any -> U) -> list<U> { [k(x)] }
+function tick<T>(x: T) random -> T { x }
+function h<T: (real) -> real>(k: T, x: real) -> real { k(x) }
+```
+
+**A full-signature annotation** states the polytype where a type is expected
+and leaves the body a plain literal:
+
+```plaintext
+const f: forall T. (x: T) -> T = x |-> x
+```
+
+```js
+ce.box(["Function", ["Add", "x", "x"], "'forall T. (x: T) -> T'"]).type;
+// ➔ "forall T. (x: T) -> T"
+```
+
+**Declare, then assign** — the form to use for a generic **recursive**
+function, since the body can only call the symbol once it is declared:
+
+```js
+ce.declare("nest", "forall T. (x: T, n: integer) -> T");
+ce.assign("nest", ce.box(["Function",
+  ["If", ["LessEqual", "n", 0], "x", ["nest", "x", ["Subtract", "n", 1]]],
+  "x", "n"]));
+
+ce.box(["nest", 5, 3]).evaluate().toString(); // ➔ "5"
+ce.box(["nest", 5, 3]).type; // ➔ "finite_integer"
+ce.box(["nest", "'a'", 2]).type; // ➔ "string"
+```
+
+However it is written, the declaration is what every call sees: the arguments
+are checked against the clause, the bounds are enforced, and the result type
+is the *instantiated* one, exactly as for a generic `evaluate` handler.
+
+**What the body sees.** The clause quantifies the *signature*, not the body.
+Inside the body a quantified parameter is an ordinary unannotated parameter:
+`x: T` carries no type information there, a bound `T: number` does not make
+the body see a `number`, and two parameters sharing `T` are not known to have
+the same type. The clause is the **call-site contract**; the body is
+canonicalized once, exactly as an untyped literal's is.
+
+For the same reason the clause names scope over the definition's **head**
+only — its parameters, its effect specifier and its return type. A body-local
+type annotation naming a type variable is an unknown-type error:
+
+```plaintext
+function f<T>(x: T) -> T { let y: T = x; y }
+// ➔ Unknown type "T"
+```
+
+**The result is a trusted ascription.** Nothing verifies that the body
+actually returns a value of the argument's type — as with a
+[typed function literal](#typed-function-literals), the annotation *is* the
+type, it is not a run-time check:
+
+```js
+ce.declare("f", "forall T. (x: T) -> T");
+ce.assign("f", ce.box(["Function", 0, "x"]));
+
+ce.box(["f", "'a'"]).type; // ➔ "string"
+ce.box(["f", "'a'"]).evaluate().toString(); // ➔ "0"
+```
+
+**Reading a `forall` return annotation.** A polytype ascribed to the body of a
+literal is always the literal's **own** signature — the same reading as an
+effect-bearing annotation (see [Typed Function Literals](#typed-function-literals)).
+To ascribe a *return type* that is itself a generic function, group it:
+
+```js
+ce.box(["Function", ["Typed", body, "'forall T. (T) -> T'"], "x"]).type;
+// ➔ "forall T. (T) -> T"          (the literal is generic)
+
+ce.box(["Function", ["Typed", body, "'(forall T. (T) -> T)'"], "x"]).type;
+// ➔ "(unknown) -> forall T. (T) -> T"   (the literal RETURNS a generic function)
+```
+
+The same holds in Cortex: `function mk(x) -> forall T. (T) -> T { … }` defines
+a generic `mk`, while `function mk(x) -> (forall T. (T) -> T) { … }` defines a
+plain `mk` that returns one.
+
+**Broadcasting.** A generic literal broadcasts like any other function whose
+parameters are scalar: a collection argument is mapped, down to the scalar
+leaves, and the result carries the argument's shape. Since the variable binds
+an *element* (see [Bounds](#bounds)), a result that mentions it is the
+per-element answer:
+
+```js
+ce.declare("dup", "forall T. (x: T) -> tuple<T, T>");
+ce.assign("dup", ce.box(["Function", ["Tuple", "x", "x"], "x"]));
+
+ce.box(["dup", 5]).type;
+// ➔ "tuple<finite_integer, finite_integer>"
+
+ce.box(["dup", ["List", 1, 2]]).type;
+// ➔ "list<tuple<finite_integer, finite_integer>>"
+
+ce.box(["dup", ["List", 1, 2]]).evaluate().toString();
+// ➔ "[(1, 1),(2, 2)]"
+
+ce.box(["dup", ["List", ["List", 1, 2], ["List", 3, 4]]]).evaluate().toString();
+// ➔ "[[(1, 1),(2, 2)],[(3, 3),(4, 4)]]"
+```
+
+**Limits.** The first four are rejected, each with its own message:
+
+- **No partial application.** A generic function must be given all of its
+  arguments; currying one reports
+  `Partial application of a generic function is not supported`. (Solving the
+  supplied prefix and pruning the clause is future work.)
+- **No generic clause in a multi-clause set**, in either direction: neither a
+  second clause added to a generic definition nor a generic clause added to an
+  existing one (`generic-clause-unsupported`).
+- **No literal body for a generic overload set.** An intersection with a
+  generic arm still needs an `evaluate` handler — the same reason a single
+  literal cannot implement an ordinary [overload set](#overload-sets).
+- **The math definition form does not take a clause.** In Cortex,
+  `f<T>(x) = x` is an ordinary expression (`f < T > (x)`, then `= x`), not a
+  definition — only the `function` keyword form claims the `<…>` slot.
+- **Compilation declines.** A generic function is not compiled — `compile()`
+  falls back to the (correct) interpreted evaluation for any expression that
+  calls one. A compiled body could not reproduce behavior that depends on the
+  parameter types — a collection argument that would broadcast, in
+  particular — so the engine declines whole-fn rather than produce a wrong
+  value; per-instantiation compilation is future work.
+
 ## Literal Type
 
 A **literal type** is a type that represents a single value. 
@@ -6505,8 +6990,8 @@ input types are contravariant.
 
 
 ```js
-ce.type("(integer) -> integer")
-  .matches("(number) -> number");
+ce.type("(number) -> integer")
+  .matches("(integer) -> number");
 // ➔ true
 ```
 
@@ -6629,6 +7114,82 @@ ce.type("list<integer>").couldMatch("list<string>");
 ```
 
 :::
+
+### Generic Patterns
+
+A [generic signature](#generic-signatures) can be used as a pattern, and the 
+two predicates ask different questions about it — deliberately.
+
+`matches()` is an **existential** check: does *some* instantiation of the 
+pattern's variables make the subject a subtype? That is what "is this an 
+identity function?" usually means:
+
+```js
+ce.type("(number) -> number").matches("forall T. (T) -> T");
+// ➔ true  (instantiate `T` as `number`)
+
+ce.type("(integer) -> string").matches("forall T. (T) -> T");
+// ➔ false  (no single `T` is both `integer` and `string`)
+```
+
+The instantiation is consistent across every occurrence of a variable, and it 
+must satisfy the variable's bound:
+
+```js
+ce.type("(list<integer>) -> list<integer>")
+  .matches("forall T: indexed_collection. (T) -> T");
+// ➔ true
+
+ce.type("(set<integer>) -> set<integer>")
+  .matches("forall T: indexed_collection. (T) -> T");
+// ➔ false  (a `set` is not an `indexed_collection`)
+```
+
+`couldMatch()` solves nothing. It reads each occurrence of a variable as its 
+declared bound — `any` when the variable is unbounded — with no consistency 
+between occurrences. For a signature pattern that reading is decided by the 
+parameter position, which is contravariant, so the same identity probe answers 
+`false`:
+
+```js
+ce.type("(number) -> number").couldMatch("forall T. (T) -> T");
+// ➔ false  (the pattern reads as `(any) -> any`)
+
+ce.type("(number) -> number").couldMatch("(any) -> any");
+// ➔ false  (the ground row it reduces to)
+```
+
+So ask `matches()` when the *pattern* is generic. `couldMatch()` earns its keep 
+on the other side, when a generic type is the **subject** being classified — 
+and there the bound is what makes the answer informative. An unbounded variable 
+reads as `any` and cannot rule anything out:
+
+```js
+ce.type("forall T. (T) -> T").couldMatch("(any) -> string");
+// ➔ true  (`T` reads as `any`: vacuous)
+
+ce.type("forall T: number. (T) -> T").couldMatch("(any) -> string");
+// ➔ false  (`T` reads as `number`, which is not a `string`)
+
+ce.type("forall T: number. (T) -> T").couldMatch("(any) -> number");
+// ➔ true
+```
+
+A generic signature is a function value like any other, so it could be a 
+`function`, and a bound is read on the subject side too:
+
+```js
+ce.type("forall T. (T) -> T").couldMatch("function");
+// ➔ true
+
+ce.type("forall T: indexed_collection. (T) -> T")
+  .couldMatch("(indexed_collection) -> indexed_collection");
+// ➔ true
+
+ce.type("forall T. (T) -> T")
+  .couldMatch("(indexed_collection) -> indexed_collection");
+// ➔ false  (`T` reads as `any`, which is not an `indexed_collection`)
+```
 
 ### Checking the Type of a Numeric Value
 
@@ -6768,8 +7329,10 @@ the attributes dictionary `["Dictionary", ["KeyValuePair", "alias",
 "True"]]` — the surface mirror of `ce.declareType()`'s `{ alias: true }`
 option.
 
-The type-variable syntax `type point<T> = tuple<T, T>` is reserved for a
-future release and is reported as not yet supported (both forms).
+An **alias** can take type parameters — `type alias Pair<T> = tuple<T, T>`,
+see [Generic Type Aliases](#generic-type-aliases). A parameterized **nominal**
+type (`type point<T> = tuple<T, T>`) is reserved for a future release and is
+reported as not yet supported.
 
 
 ### Nominal vs Structural Types
@@ -6799,6 +7362,108 @@ ce.type("tuple<x: integer, y: integer>")
   .matches("pointData");
 // ➔ true
 ```
+
+### Generic Type Aliases
+
+An alias can take **type parameters**, declared in a clause between its name
+and its definition. The applied spelling is then usable anywhere a type is
+written, and it expands **transparently**: `Pair<integer>` *is*
+`tuple<integer, integer>`.
+
+```js
+ce.declareType("Pair", "tuple<T, T>", { alias: true, typeParams: ["T"] });
+
+ce.type("Pair<integer>").toString();
+// ➔ "tuple<integer, integer>"
+
+ce.box(["Tuple", 1, 2]).type.matches("Pair<integer>"); // ➔ true
+```
+
+The parameters may be given as names (each with an optional bound), as
+records (`[{ name: "T", bound: "number" }]`), or as a single clause string
+(`"T, U: number"`). In Cortex, the same declaration is a `type alias`
+statement with a type-parameter clause — the clause a
+[generic function definition](#generic-declarations-and-function-literals)
+takes:
+
+```plaintext
+type alias Pair<T> = tuple<T, T>
+let p: Pair<integer> = (1, 2)
+```
+
+An argument may be any type, including another application, and an alias may
+be applied inside another alias's definition:
+
+```js
+ce.type("list<Pair<integer>>").toString();
+// ➔ "list<tuple<integer, integer>>"
+
+ce.type("Pair<Pair<integer>>").toString();
+// ➔ "tuple<tuple<integer, integer>, tuple<integer, integer>>"
+
+ce.declareType("Wrap", "list<Pair<T>>", { alias: true, typeParams: ["T"] });
+ce.type("Wrap<integer>").toString();
+// ➔ "list<tuple<integer, integer>>"
+```
+
+**Bounds.** A parameter may declare a ground upper bound, exactly as a
+[`forall` variable](#bounds) does, and the bound is enforced wherever the
+alias is applied:
+
+```js
+ce.declareType("Keyed", "tuple<string, T>",
+  { alias: true, typeParams: ["T: number"] });
+
+ce.type("Keyed<integer>").toString(); // ➔ "tuple<string, integer>"
+
+ce.type("Keyed<string>");
+// ➔ throws: generic-alias-bound: The type argument `string` does not
+//   satisfy the bound `number` of the parameter `T` of "Keyed"
+```
+
+An argument may also be a type **variable** in scope — a `forall` clause's
+variable, or the enclosing alias's own parameter. Such an argument is
+admitted by comparing the two bounds: the variable's own declared bound must
+satisfy the parameter's (an unbounded variable is bounded by `any`, which
+satisfies only `any`).
+
+```js
+ce.type("forall T: integer. (Keyed<T>) -> T").toString();
+// ➔ "forall T: integer. (tuple<string, T>) -> T"
+
+ce.type("forall T. (Keyed<T>) -> T");
+// ➔ throws: generic-alias-bound: The type argument `T` does not satisfy the
+//   bound `number` of the parameter `T` of "Keyed" (an open argument is
+//   admitted by its own declared bound, `any`)
+```
+
+**Transparency.** The expansion happens when the type is resolved, so nothing
+downstream ever meets an applied reference: `.type`, `toString()`,
+`matches()` and error messages all show the expansion. The *source* keeps
+what was written — a Cortex program round-trips
+`let p: Pair<integer> = (1, 2)` verbatim — but the type it denotes displays
+as `tuple<integer, integer>`.
+
+**Limits.**
+
+- A generic alias must be **applied**: a bare `Pair`, an empty `Pair<>` and a
+  wrong number of arguments are all `generic-alias-arity` errors.
+- It may not refer to **itself** (`generic-alias-self-reference`): the
+  definition is expanded eagerly, so there is nothing to expand into yet.
+  A [recursive type](#recursive-types) is declared without a clause.
+- Every parameter must be **used** in the definition
+  (`generic-alias-unused-parameter`) — under transparency an unused
+  parameter could not affect anything.
+- Only the `alias` form takes a clause; a parameterized **nominal** type is
+  still reported as not yet supported.
+- No [constructor](#type-constructors) is declared for a generic alias, and
+  the name is not claimed in the value namespace at all: a function of the
+  same name is legal, before or after the alias.
+
+Re-running a `type` statement replaces the alias, clause included, but a
+dependent alias keeps the definition it **snapshotted** when it was declared
+— re-run it too (as re-running a whole notebook cell does) for it to pick up
+the new one.
 
 ### Type Constructors
 
@@ -6975,20 +7640,51 @@ For example, a definition of a JSON value could be:
 
 ```js
 ce.declareType("json", `
-    nothing
+    missing
   | boolean
-  | number
+  | finite_real
   | string
   | type json_array
   | type json_object
-`);
-ce.declareType("json_object", "dictionary<json>");
-ce.declareType("json_array", "list<json>");
+`, { alias: true });
+ce.declareType("json_object", "dictionary<json>", { alias: true });
+ce.declareType("json_array", "list<json>", { alias: true });
 ```
 
 When using `type json_array` or `type json_object`, the type is not yet defined, 
 but it will be defined later in the code. Using the `type` keyword allows you to use the type
 before declaring it. If the referenced type is already defined, the `type` keyword is optional.
+
+The declaration that fulfills a forward reference completes the record the
+reference already installed, so every type that mentioned the name resolves
+through to the definition. Only an unfulfilled reference can be completed this
+way: a name that already has a definition is a redeclaration, and still an
+error.
+
+Three details of the definition above are worth spelling out, because a
+plausible-looking variant of each does not describe JSON:
+
+- `{ alias: true }` on **every** type in the set. These are structural
+  aliases, so a plain list or dictionary *is* a `json`. Declared nominally
+  (the default), the types would be opaque — their only inhabitants are
+  constructor applications, and `ce.type("list<number>").matches("json")`
+  would be `false`.
+- `missing`, not `nothing`, for JSON `null`. `Nothing` means "no value here"
+  and is *erased* from collection literals — `[1, Nothing, 3]` has two
+  elements. `Missing` is position-preserving, so it survives inside an array
+  or as a dictionary value.
+- `finite_real`, not `number`. The engine's `number` admits complex and
+  non-finite values, so `2 + 3i` and `NaN` would both be accepted as JSON.
+
+The same set can be written as a single self-recursive alias, which needs no
+forward references at all:
+
+```js
+ce.declareType("json", `
+    missing | boolean | finite_real | string
+  | list<json> | dictionary<json>
+`, { alias: true });
+```
 
 ---
 
@@ -7595,6 +8291,17 @@ of operations in the expression, and giving an increasing cost to:
 **To influence how the complexity of an expression is measured**, set the
 `costFunction` property of the compute engine to a function assigning a cost to
 an expression.
+
+The cost is applied strictly: a rewrite is kept only if the result does not
+cost more than what it replaces. `simplify()` therefore never returns
+something more complicated than what you gave it.
+
+Some rewrites are mathematically preferred yet score worse — combining powers
+takes \\(2 \cdot 2^x\\) from cost 4 to cost 5. Those do not rely on any
+numeric allowance; they are tagged `purpose: 'transform'`, which exempts them
+from the cost gate entirely. If you write a rule that should apply regardless
+of cost, tag it the same way — see
+[Patterns and Rules](/compute-engine/guides/patterns-and-rules/).
 
 ## Numeric Simplifications
 
@@ -10343,7 +11050,7 @@ does not affect `replace()`, which always applies every rule.
 
 | `purpose`     |                                                                                                                   |
 | :------------ | :---------------------------------------------------------------------------------------------------------------- |
-| `'simplify'`  | **(default)** Subject to the cost gate: the rewrite is kept only if the result is "simpler" (lower cost).         |
+| `'simplify'`  | **(default)** Subject to the cost gate: the rewrite is kept only if the result is "simpler", that is, if it does not cost more than what it replaces. |
 | `'transform'` | A mathematically-preferred rewrite that is **exempt** from the cost gate — applied even if it does not lower cost. |
 | `'expand'`    | Grows the expression by design (e.g. expanding a definition). **Excluded** from `simplify()`'s scan, but still reachable through `expr.replace()`. |
 
@@ -10657,6 +11364,12 @@ ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 
 **Note:** `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
 and parses as `To`, not `Implies`.
+
+**Note:** `\equiv` is *not* a spelling of `Equivalent`: it parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+mathematical identity operator. Use `\iff` or `\Leftrightarrow` for a
+biconditional. (Over boolean operands the two agree, since two propositions are
+identically equal exactly when they are equivalent.)
 
 ### Additional Operators
 
@@ -13372,12 +14085,18 @@ Assignable value for `ce.assign()`.
 
 </MemberCard>
 
-### ExpressionComputeEngine
+### ~~ExpressionComputeEngine~~
 
 Compute engine surface used by expression types.
 
 This interface is augmented by `types-engine.ts` with the concrete
 `IComputeEngine` members to avoid type-layer circular dependencies.
+
+#### Deprecated
+
+Use `ComputeEngine` (the type exported from the package entry
+points) or `IComputeEngine` instead — the three are interchangeable, and
+this alias will be removed in a future release.
 
 #### Extends
 
@@ -13385,7 +14104,7 @@ This interface is augmented by `types-engine.ts` with the concrete
 
 <MemberCard>
 
-##### ExpressionComputeEngine.latexSyntax
+##### ExpressionComputeEngine.~~latexSyntax~~
 
 ```ts
 readonly latexSyntax: ILatexSyntax | undefined;
@@ -13398,7 +14117,7 @@ The LatexSyntax instance used for LaTeX parsing/serialization.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.latexOptions
+##### ExpressionComputeEngine.~~latexOptions~~
 
 ```ts
 latexOptions: Partial<ParseLatexOptions & SerializeLatexOptions>;
@@ -13412,7 +14131,7 @@ Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.True
+##### ExpressionComputeEngine.~~True~~
 
 ```ts
 readonly True: Expression;
@@ -13422,7 +14141,7 @@ readonly True: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.False
+##### ExpressionComputeEngine.~~False~~
 
 ```ts
 readonly False: Expression;
@@ -13432,7 +14151,7 @@ readonly False: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.Pi
+##### ExpressionComputeEngine.~~Pi~~
 
 ```ts
 readonly Pi: Expression;
@@ -13442,7 +14161,7 @@ readonly Pi: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.E
+##### ExpressionComputeEngine.~~E~~
 
 ```ts
 readonly E: Expression;
@@ -13452,7 +14171,7 @@ readonly E: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.Nothing
+##### ExpressionComputeEngine.~~Nothing~~
 
 ```ts
 readonly Nothing: Expression;
@@ -13462,7 +14181,7 @@ readonly Nothing: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.Missing
+##### ExpressionComputeEngine.~~Missing~~
 
 ```ts
 readonly Missing: Expression;
@@ -13474,7 +14193,7 @@ The `Missing` symbol: an absent value whose position is preserved.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.Zero
+##### ExpressionComputeEngine.~~Zero~~
 
 ```ts
 readonly Zero: Expression;
@@ -13484,7 +14203,7 @@ readonly Zero: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.One
+##### ExpressionComputeEngine.~~One~~
 
 ```ts
 readonly One: Expression;
@@ -13494,7 +14213,7 @@ readonly One: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.Half
+##### ExpressionComputeEngine.~~Half~~
 
 ```ts
 readonly Half: Expression;
@@ -13504,7 +14223,7 @@ readonly Half: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.NegativeOne
+##### ExpressionComputeEngine.~~NegativeOne~~
 
 ```ts
 readonly NegativeOne: Expression;
@@ -13514,7 +14233,17 @@ readonly NegativeOne: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.I
+##### ExpressionComputeEngine.~~Two~~
+
+```ts
+readonly Two: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~I~~
 
 ```ts
 readonly I: Expression;
@@ -13526,7 +14255,7 @@ ImaginaryUnit
 
 <MemberCard>
 
-##### ExpressionComputeEngine.NaN
+##### ExpressionComputeEngine.~~NaN~~
 
 ```ts
 readonly NaN: Expression;
@@ -13536,7 +14265,7 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.PositiveInfinity
+##### ExpressionComputeEngine.~~PositiveInfinity~~
 
 ```ts
 readonly PositiveInfinity: Expression;
@@ -13546,7 +14275,7 @@ readonly PositiveInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.NegativeInfinity
+##### ExpressionComputeEngine.~~NegativeInfinity~~
 
 ```ts
 readonly NegativeInfinity: Expression;
@@ -13556,7 +14285,7 @@ readonly NegativeInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.ComplexInfinity
+##### ExpressionComputeEngine.~~ComplexInfinity~~
 
 ```ts
 readonly ComplexInfinity: Expression;
@@ -13566,7 +14295,7 @@ readonly ComplexInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.context
+##### ExpressionComputeEngine.~~context~~
 
 ```ts
 readonly context: EvalContext;
@@ -13576,7 +14305,7 @@ readonly context: EvalContext;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.contextStack
+##### ExpressionComputeEngine.~~contextStack~~
 
 ```ts
 contextStack: readonly EvalContext[];
@@ -13586,7 +14315,7 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
-##### ExpressionComputeEngine.iterationLimit
+##### ExpressionComputeEngine.~~iterationLimit~~
 
 ```ts
 iterationLimit: number;
@@ -13596,7 +14325,7 @@ iterationLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.recursionLimit
+##### ExpressionComputeEngine.~~recursionLimit~~
 
 ```ts
 recursionLimit: number;
@@ -13606,7 +14335,7 @@ recursionLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.maxCollectionSize
+##### ExpressionComputeEngine.~~maxCollectionSize~~
 
 ```ts
 maxCollectionSize: number;
@@ -13616,7 +14345,7 @@ maxCollectionSize: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.bignum
+##### ExpressionComputeEngine.~~bignum~~
 
 ```ts
 bignum: (a) => BigDecimal;
@@ -13626,7 +14355,7 @@ bignum: (a) => BigDecimal;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.complex
+##### ExpressionComputeEngine.~~complex~~
 
 ```ts
 complex: (a, b?) => Complex;
@@ -13636,7 +14365,7 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.tolerance
+##### ExpressionComputeEngine.~~tolerance~~
 
 ```ts
 tolerance: number;
@@ -13646,7 +14375,7 @@ tolerance: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.angularUnit
+##### ExpressionComputeEngine.~~angularUnit~~
 
 ```ts
 angularUnit: AngularUnit;
@@ -13656,7 +14385,7 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.costFunction
+##### ExpressionComputeEngine.~~costFunction~~
 
 ```ts
 costFunction: (expr) => number;
@@ -13666,7 +14395,7 @@ costFunction: (expr) => number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.simplificationRules
+##### ExpressionComputeEngine.~~simplificationRules~~
 
 ```ts
 simplificationRules: Rule[];
@@ -13680,7 +14409,7 @@ The rules used by `.simplify()` when no explicit `rules` option is passed.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.solveRules
+##### ExpressionComputeEngine.~~solveRules~~
 
 ```ts
 solveRules: Rule[];
@@ -13699,7 +14428,7 @@ The rules used by `solve()` to find roots of univariate expressions.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.harmonizationRules
+##### ExpressionComputeEngine.~~harmonizationRules~~
 
 ```ts
 harmonizationRules: Rule[];
@@ -13713,7 +14442,7 @@ The rules used by `solve()` to transform an equation into equivalent,
 
 <MemberCard>
 
-##### ExpressionComputeEngine.strict
+##### ExpressionComputeEngine.~~strict~~
 
 ```ts
 strict: boolean;
@@ -13723,7 +14452,7 @@ strict: boolean;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.jit
+##### ExpressionComputeEngine.~~jit~~
 
 ```ts
 jit: "auto" | "off";
@@ -13739,7 +14468,7 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
-##### ExpressionComputeEngine.trace
+##### ExpressionComputeEngine.~~trace~~
 
 ```ts
 trace: readonly string[];
@@ -13751,7 +14480,7 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
-##### ExpressionComputeEngine.precision
+##### ExpressionComputeEngine.~~precision~~
 
 ```ts
 get precision(): number
@@ -13762,7 +14491,7 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.withTimeLimit()
+##### ExpressionComputeEngine.~~withTimeLimit()~~
 
 ```ts
 withTimeLimit<T>(limit, fn): T
@@ -13798,7 +14527,7 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
-##### ExpressionComputeEngine.chop()
+##### ExpressionComputeEngine.~~chop()~~
 
 ###### chop(n)
 
@@ -13834,7 +14563,7 @@ chop(n): number | BigDecimal
 
 <MemberCard>
 
-##### ExpressionComputeEngine.expr()
+##### ExpressionComputeEngine.~~expr()~~
 
 ```ts
 expr(expr, options?): Expression
@@ -13888,7 +14617,7 @@ Use `expr()` instead.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.parse()
+##### ExpressionComputeEngine.~~parse()~~
 
 ###### parse(latex, options)
 
@@ -13931,7 +14660,7 @@ parse(latex, options?): Expression | null
 
 <MemberCard>
 
-##### ExpressionComputeEngine.appliedNonFunctions()
+##### ExpressionComputeEngine.~~appliedNonFunctions()~~
 
 ```ts
 appliedNonFunctions(latex): string[]
@@ -13957,7 +14686,7 @@ juxtaposition analysis.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.function()
+##### ExpressionComputeEngine.~~function()~~
 
 ```ts
 function(name, ops, options?): Expression
@@ -13993,7 +14722,7 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getCompilationTarget()
+##### ExpressionComputeEngine.~~getCompilationTarget()~~
 
 ###### getCompilationTarget(name)
 
@@ -14023,7 +14752,7 @@ getCompilationTarget(name):
 
 <MemberCard>
 
-##### ExpressionComputeEngine.number()
+##### ExpressionComputeEngine.~~number()~~
 
 ```ts
 number(value, options?): Expression
@@ -14054,7 +14783,7 @@ number(value, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.symbol()
+##### ExpressionComputeEngine.~~symbol()~~
 
 ```ts
 symbol(sym, options?): Expression
@@ -14074,11 +14803,15 @@ symbol(sym, options?): Expression
 
 [`Metadata`](#metadata-1)
 
+####### autoDeclare?
+
+`boolean`
+
 </MemberCard>
 
 <MemberCard>
 
-##### ExpressionComputeEngine.string()
+##### ExpressionComputeEngine.~~string()~~
 
 ```ts
 string(s, metadata?): Expression
@@ -14096,7 +14829,7 @@ string(s, metadata?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.error()
+##### ExpressionComputeEngine.~~error()~~
 
 ```ts
 error(message, where?): Expression
@@ -14114,7 +14847,7 @@ error(message, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.typeError()
+##### ExpressionComputeEngine.~~typeError()~~
 
 ```ts
 typeError(expectedType, actualType, where?): Expression
@@ -14138,7 +14871,7 @@ typeError(expectedType, actualType, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.hold()
+##### ExpressionComputeEngine.~~hold()~~
 
 ```ts
 hold(expr): Expression
@@ -14152,7 +14885,7 @@ hold(expr): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.tuple()
+##### ExpressionComputeEngine.~~tuple()~~
 
 ###### tuple(elements)
 
@@ -14178,7 +14911,7 @@ tuple(...elements): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.type()
+##### ExpressionComputeEngine.~~type()~~
 
 ```ts
 type(type): BoxedType
@@ -14201,6 +14934,7 @@ type(type): BoxedType
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -14208,7 +14942,7 @@ type(type): BoxedType
 
 <MemberCard>
 
-##### ExpressionComputeEngine.rules()
+##### ExpressionComputeEngine.~~rules()~~
 
 ```ts
 rules(rules, options?): BoxedRuleSet
@@ -14235,7 +14969,7 @@ Default purpose applied to any rule in the set that doesn't carry
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getRuleSet()
+##### ExpressionComputeEngine.~~getRuleSet()~~
 
 ```ts
 getRuleSet(id?): BoxedRuleSet | undefined
@@ -14249,7 +14983,7 @@ getRuleSet(id?): BoxedRuleSet | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.pushScope()
+##### ExpressionComputeEngine.~~pushScope()~~
 
 ```ts
 pushScope(scope?, name?): void
@@ -14267,7 +15001,7 @@ pushScope(scope?, name?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.popScope()
+##### ExpressionComputeEngine.~~popScope()~~
 
 ```ts
 popScope(): void
@@ -14277,7 +15011,44 @@ popScope(): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.lookupDefinition()
+##### ExpressionComputeEngine.~~createScope()~~
+
+```ts
+createScope(bindings?, parent?): InspectableScope
+```
+
+####### bindings?
+
+`Record`\<`string`, 
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`TaggedValueDefinition`](#taggedvaluedefinition)
+  \| [`TaggedOperatorDefinition`](#taggedoperatordefinition)\>
+
+####### parent?
+
+`Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~lookupDefinition()~~
 
 ```ts
 lookupDefinition(id): BoxedDefinition | undefined
@@ -14291,7 +15062,7 @@ lookupDefinition(id): BoxedDefinition | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.assign()
+##### ExpressionComputeEngine.~~assign()~~
 
 ###### assign(ids)
 
@@ -14333,7 +15104,7 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.declareType()
+##### ExpressionComputeEngine.~~declareType()~~
 
 ```ts
 declareType(name, type, options?): void
@@ -14360,6 +15131,7 @@ declareType(name, type, options?): void
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -14377,11 +15149,15 @@ declareType(name, type, options?): void
 
 `boolean`
 
+####### typeParams?
+
+[`TypeParamsOption`](#typeparamsoption)
+
 </MemberCard>
 
 <MemberCard>
 
-##### ExpressionComputeEngine.declare()
+##### ExpressionComputeEngine.~~declare()~~
 
 ###### declare(symbols)
 
@@ -14418,6 +15194,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -14436,6 +15213,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -14463,6 +15241,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -14482,6 +15261,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -14498,7 +15278,7 @@ declare(id, def, scope?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -14519,6 +15299,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -14546,6 +15327,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -14565,6 +15347,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -14581,7 +15364,7 @@ declare(id, def, scope?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -14617,6 +15400,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -14635,6 +15419,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -14662,6 +15447,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -14681,6 +15467,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -14697,7 +15484,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -14718,6 +15505,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -14745,6 +15533,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -14764,6 +15553,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -14780,7 +15570,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -14793,7 +15583,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.assume()
+##### ExpressionComputeEngine.~~assume()~~
 
 ```ts
 assume(predicate): AssumeResult
@@ -14807,7 +15597,7 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
-##### ExpressionComputeEngine.declareSequence()
+##### ExpressionComputeEngine.~~declareSequence()~~
 
 ```ts
 declareSequence(name, def): IComputeEngine
@@ -14838,7 +15628,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getSequenceStatus()
+##### ExpressionComputeEngine.~~getSequenceStatus()~~
 
 ```ts
 getSequenceStatus(name): SequenceStatus
@@ -14862,7 +15652,7 @@ ce.getSequenceStatus('F');
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getSequence()
+##### ExpressionComputeEngine.~~getSequence()~~
 
 ```ts
 getSequence(name): SequenceInfo | undefined
@@ -14879,7 +15669,7 @@ Returns `undefined` if the symbol is not a sequence.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.listSequences()
+##### ExpressionComputeEngine.~~listSequences()~~
 
 ```ts
 listSequences(): string[]
@@ -14892,7 +15682,7 @@ Returns an array of sequence names.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.isSequence()
+##### ExpressionComputeEngine.~~isSequence()~~
 
 ```ts
 isSequence(name): boolean
@@ -14908,7 +15698,7 @@ Check if a symbol is a defined sequence.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.clearSequenceCache()
+##### ExpressionComputeEngine.~~clearSequenceCache()~~
 
 ```ts
 clearSequenceCache(name?): void
@@ -14925,7 +15715,7 @@ If no name is provided, clears caches for all sequences.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getSequenceCache()
+##### ExpressionComputeEngine.~~getSequenceCache()~~
 
 ```ts
 getSequenceCache(name): 
@@ -14947,7 +15737,7 @@ For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
 
 <MemberCard>
 
-##### ExpressionComputeEngine.getSequenceTerms()
+##### ExpressionComputeEngine.~~getSequenceTerms()~~
 
 ```ts
 getSequenceTerms(
@@ -14995,7 +15785,7 @@ ce.getSequenceTerms('F', 0, 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.lookupOEIS()
+##### ExpressionComputeEngine.~~lookupOEIS()~~
 
 ```ts
 lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
@@ -15026,7 +15816,7 @@ const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.checkSequenceOEIS()
+##### ExpressionComputeEngine.~~checkSequenceOEIS()~~
 
 ```ts
 checkSequenceOEIS(name, count?, options?): Promise<{
@@ -15067,7 +15857,7 @@ const result = await ce.checkSequenceOEIS('F', 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.interpret()
+##### ExpressionComputeEngine.~~interpret()~~
 
 ```ts
 interpret(expr, options?): Promise<InterpretResult>
@@ -15107,7 +15897,7 @@ const { expression, candidates } = await ce.interpret(
 
 <MemberCard>
 
-##### ExpressionComputeEngine.forget()
+##### ExpressionComputeEngine.~~forget()~~
 
 ```ts
 forget(symbol?): void
@@ -15121,7 +15911,7 @@ forget(symbol?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.ask()
+##### ExpressionComputeEngine.~~ask()~~
 
 ```ts
 ask(pattern): BoxedSubstitution[]
@@ -15135,7 +15925,7 @@ ask(pattern): BoxedSubstitution[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.verify()
+##### ExpressionComputeEngine.~~verify()~~
 
 ```ts
 verify(query): boolean | undefined
@@ -15149,7 +15939,7 @@ verify(query): boolean | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.operatorInfo()
+##### ExpressionComputeEngine.~~operatorInfo()~~
 
 ```ts
 operatorInfo(head): OperatorInfo | undefined
@@ -15174,7 +15964,7 @@ maintaining a parallel list of "known" operators.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.normalizeIdentifier()
+##### ExpressionComputeEngine.~~normalizeIdentifier()~~
 
 ```ts
 normalizeIdentifier(latex): string
@@ -15200,7 +15990,7 @@ name without the side-effect of auto-declaring the symbol.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.symbolInfo()
+##### ExpressionComputeEngine.~~symbolInfo()~~
 
 ```ts
 symbolInfo(name): SymbolInfo | undefined
@@ -15226,7 +16016,7 @@ two methods are non-overlapping).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.searchDefinitions()
+##### ExpressionComputeEngine.~~searchDefinitions()~~
 
 ```ts
 searchDefinitions(query, options?): DefinitionSearchResult[]
@@ -15253,6 +16043,73 @@ call for full detail.
 ####### limit?
 
 `number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~suggestOperatorName()~~
+
+```ts
+suggestOperatorName(name): string | undefined
+```
+
+Given a `name` that is **not** a known operator, return the closest known
+operator name — a "did you mean" suggestion — or `undefined` when nothing
+is close enough. Powers the Cortex `unknown-function` diagnostic.
+
+Matching is conservative and applied in priority order (first match wins):
+case-insensitive exact match, singular/plural, Damerau–Levenshtein
+distance (≤ 2 for names of length ≥ 6, ≤ 1 for length 5, never for
+shorter names), then a prefix match against exactly one operator. Ties
+prefer the candidate sharing the longest prefix with the query.
+
+```ts
+ce.suggestOperatorName('Quartile'); // → 'Quartiles'
+ce.suggestOperatorName('foo');      // → undefined
+```
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~functionProperties()~~
+
+```ts
+functionProperties(name): FunctionProperties | undefined
+```
+
+Return the known analytic properties of an operator — poles, zeros, branch
+points/cuts, residues, holomorphic/meromorphic domains — drawn from the
+Fungrim-derived metadata store, or `undefined` if none are recorded.
+
+```ts
+ce.functionProperties('Gamma')?.poles?.toString(); // 'NonPositiveIntegers'
+```
+
+The set-valued accessors (`poles`, `zeros`, ...) return a boxed set for the
+unconditional record of that kind; parametric / conditional records (e.g.
+residues that depend on parameters) are available via `entries`.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~toJSON()~~
+
+```ts
+toJSON(): string
+```
+
+Debug representation, e.g. for `JSON.stringify()`.
 
 </MemberCard>
 
@@ -16067,6 +16924,60 @@ ce.declare('MyGcd', {
 
 <MemberCard>
 
+### EvaluateHandlerOptions
+
+```ts
+type EvaluateHandlerOptions = Partial<EvaluateOptions> & {
+  engine: ComputeEngine;
+  expression: Expression;
+};
+```
+
+The `options` argument passed to an `evaluate` / `evaluateAsync` handler.
+
+#### EvaluateHandlerOptions.expression?
+
+```ts
+optional expression?: Expression;
+```
+
+The canonical expression node being evaluated.
+
+Its `ops` are the **raw** operands: canonical and bound, but
+**pre-numericization** — the same objects the `type` handler sees. The
+handler's first parameter, by contrast, holds the *evaluated* operands,
+which under `numericApproximation` have already been turned into floats.
+
+That makes this the handler's only access to the operands' exactness. For
+example `Power` reads the exact rational `p/q` of its exponent from
+`expression.op2` to decide the branch of a negative base — under `.N()`
+the exponent it receives as an operand is a double, from which `p/q`
+can only be guessed.
+
+**`expression.ops[i]` is NOT in general the provenance of `ops[i]`.** The
+evaluated operands come from `holdMap`, which reindexes them: it FLATTENS
+an associative operator (`f(a, f(b, c))` arrives as three operands, one
+more than the node has), it UNWRAPS `ReleaseHold` (so `expression.ops[i]`
+is the wrapper, not what was evaluated), and it DROPS an operand whose
+evaluation yields nothing. The correspondence holds only for a
+non-associative operator with no `ReleaseHold` and no dropped operand — so
+a handler that indexes into `expression.ops` must treat
+`expression.ops.length !== ops.length` as "no provenance" and fall back to
+what it can compute from the evaluated operands alone.
+
+**On a `lazy: true` operator there is no contrast to draw**: `holdMap`
+returns the operands unchanged, so the handler's first parameter is raw
+and held too — and, on the box/parse routes, not even canonicalized (see
+the lazy-operator trap in `CLAUDE.md`: such a handler must canonicalize
+each held operand it consumes).
+
+Read-only: do not mutate it, and do not assume it is present (a handler
+invoked outside the evaluation driver may not receive one).
+
+</MemberCard>
+
+<MemberCard>
+
 ### ValueDefinition
 
 ```ts
@@ -16528,7 +17439,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   evaluateAsync: (ops, options) => Promise<Expression | undefined>;
   evalDimension: (args, options) => Expression;
   compile: OperatorCompileHandler;
-  eq: (a, b) => boolean | undefined;
+  eq: (a, b, prover?) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
   collection: CollectionHandlers;
 };
@@ -16793,6 +17704,22 @@ declared on one of those heads is ignored.
 Return `undefined` (or an empty string) to fall back to the
 default compilation (a `null` returned from untyped JavaScript is
 tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
+
+#### OperatorDefinition.eq?
+
+```ts
+optional eq?: (a, b, prover?) => boolean | undefined;
+```
+
+Custom equality handler.
+
+`prover` indicates the tier of the caller: `false` for the cheap
+arithmetic tier (`eq()` / `.isEqual()`), `true` for the prover tier
+(`eqIdentical()` / `.isIdenticallyEqual()`), and `undefined` when the
+caller does not distinguish (e.g. `cmp()`). A handler that does
+prover-tier work (sampling, expand/simplify, identity questions in the
+free variables) must decline — return `undefined` — when
+`prover === false`.
 
 </MemberCard>
 
@@ -17677,6 +18604,7 @@ optional type?: (ops, options) =>
   | NumericType
   | FunctionSignature
   | ValueType
+  | TypeVariable
   | TypeReference
   | BoxedType
   | undefined;
@@ -17713,8 +18641,10 @@ simplifications are valid.
 ##### BoxedOperatorDefinition.eq?
 
 ```ts
-optional eq?: (a, b) => boolean | undefined;
+optional eq?: (a, b, prover?) => boolean | undefined;
 ```
+
+See `OperatorDefinition.eq` for the meaning of `prover`.
 
 </MemberCard>
 
@@ -18218,6 +19148,7 @@ LaTeX expressions that are equivalent, for example `\operatorname{gcd}` or
 type BaseEntry = {
   name: MathJsonSymbol;
   serialize: LatexString | SerializeHandler;
+  standaloneSymbol: boolean;
 };
 ```
 
@@ -18642,7 +19573,8 @@ flagging charitable parse decisions — undeclared symbols, application-like
 juxtaposition read as multiply, discarded `%` comments, and trailing noise
 dropped by recovery.
 
-This flag only takes effect through ComputeEngine.parse, which
+This flag only takes effect through
+[ComputeEngine.parse](#parse-1), which
 wires up the collector and attaches the resulting array to the top-level
 parsed expression's `parseDiagnostics` property. On the standalone
 `LatexSyntax.parse()` entry point the flag is a silent no-op (that entry
@@ -19392,6 +20324,102 @@ boundaryError(msg): MathJsonExpression
 
 <MemberCard>
 
+### RootStyle
+
+```ts
+type RootStyle = "radical" | "quotient" | "solidus";
+```
+
+How to serialize a root, i.e. `\sqrt{x}`, `x^{1/2}` or `x^\frac12`.
+
+</MemberCard>
+
+<MemberCard>
+
+### FractionStyle
+
+```ts
+type FractionStyle = 
+  | "quotient"
+  | "block-quotient"
+  | "inline-quotient"
+  | "inline-solidus"
+  | "nice-solidus"
+  | "reciprocal"
+  | "factor";
+```
+
+How to serialize a fraction.
+
+</MemberCard>
+
+<MemberCard>
+
+### LogicStyle
+
+```ts
+type LogicStyle = "word" | "boolean" | "uppercase-word" | "punctuation";
+```
+
+How to serialize the logic operators.
+
+</MemberCard>
+
+<MemberCard>
+
+### PowerStyle
+
+```ts
+type PowerStyle = "root" | "solidus" | "quotient";
+```
+
+How to serialize a fractional power.
+
+</MemberCard>
+
+<MemberCard>
+
+### NumericSetStyle
+
+```ts
+type NumericSetStyle = "compact" | "regular" | "interval" | "set-builder";
+```
+
+How to serialize a numeric set, i.e. `\R^*`, `\R \setminus \lbrace 0\rbrace`.
+
+</MemberCard>
+
+<MemberCard>
+
+### IndexStyle
+
+```ts
+type IndexStyle = "subscript" | "bracket";
+```
+
+How to serialize collection indexing (the `At` operator).
+
+</MemberCard>
+
+<MemberCard>
+
+### StyleOption
+
+```ts
+type StyleOption<T> = T | ((expr, level) => T);
+```
+
+A serialization style option: either a constant, or a function of the
+expression and of its nesting level.
+
+#### Type Parameters
+
+• T extends `string`
+
+</MemberCard>
+
+<MemberCard>
+
 ### SerializeLatexOptions
 
 ```ts
@@ -19403,21 +20431,14 @@ type SerializeLatexOptions = NumberSerializationFormat & {
   multiply: LatexString;
   missingSymbol: LatexString;
   keywordStyle: "text" | "keyword" | "operatorname";
-  applyFunctionStyle: (expr, level) => DelimiterScale;
-  groupStyle: (expr, level) => DelimiterScale;
-  rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
-  fractionStyle: (expr, level) => 
-     | "quotient"
-     | "block-quotient"
-     | "inline-quotient"
-     | "inline-solidus"
-     | "nice-solidus"
-     | "reciprocal"
-     | "factor";
-  logicStyle: (expr, level) => "word" | "boolean" | "uppercase-word" | "punctuation";
-  powerStyle: (expr, level) => "root" | "solidus" | "quotient";
-  numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
-  indexStyle: (expr, level) => "subscript" | "bracket";
+  applyFunctionStyle: StyleOption<DelimiterScale>;
+  groupStyle: StyleOption<DelimiterScale>;
+  rootStyle: StyleOption<RootStyle>;
+  fractionStyle: StyleOption<FractionStyle>;
+  logicStyle: StyleOption<LogicStyle>;
+  powerStyle: StyleOption<PowerStyle>;
+  numericSetStyle: StyleOption<NumericSetStyle>;
+  indexStyle: StyleOption<IndexStyle>;
   dotNotation: boolean;
   dmsFormat: boolean;
   angleNormalization: "none" | "0...360" | "-180...180";
@@ -19530,7 +20551,7 @@ All three spellings parse back to the same expression.
 #### SerializeLatexOptions.indexStyle
 
 ```ts
-indexStyle: (expr, level) => "subscript" | "bracket";
+indexStyle: StyleOption<IndexStyle>;
 ```
 
 Notation used to serialize collection indexing (the `At` operator), e.g.
@@ -19653,6 +20674,37 @@ ce.expr(['Degrees', 370])
 
 </MemberCard>
 
+<MemberCard>
+
+### ResolvedSerializeLatexOptions
+
+```ts
+type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions, 
+  | "applyFunctionStyle"
+  | "groupStyle"
+  | "rootStyle"
+  | "fractionStyle"
+  | "logicStyle"
+  | "powerStyle"
+  | "numericSetStyle"
+  | "indexStyle"> & {
+  applyFunctionStyle: (expr, level) => DelimiterScale;
+  groupStyle: (expr, level) => DelimiterScale;
+  rootStyle: (expr, level) => RootStyle;
+  fractionStyle: (expr, level) => FractionStyle;
+  logicStyle: (expr, level) => LogicStyle;
+  powerStyle: (expr, level) => PowerStyle;
+  numericSetStyle: (expr, level) => NumericSetStyle;
+  indexStyle: (expr, level) => IndexStyle;
+};
+```
+
+The serialization options as seen by the serializer: the style options
+have been normalized from their constant form (e.g. `rootStyle: 'solidus'`)
+to their function form.
+
+</MemberCard>
+
 ### Serializer
 
 An instance of `Serializer` is provided to the `serialize` handlers of custom
@@ -19663,7 +20715,7 @@ LaTeX dictionary entries.
 ##### Serializer.options
 
 ```ts
-readonly options: Required<SerializeLatexOptions>;
+readonly options: Required<ResolvedSerializeLatexOptions>;
 ```
 
 </MemberCard>
@@ -20789,6 +21841,226 @@ Verified, OEIS-attributed closed-form proposals (possibly empty).
 
 ## Other
 
+### FunctionPropertyRecord
+
+A single analytic-property record for an operator. The MathJSON fields are
+raw (as translated from Fungrim); box them with `ce.expr` to query.
+
+<MemberCard>
+
+##### FunctionPropertyRecord.id
+
+```ts
+readonly id: string;
+```
+
+The Fungrim entry id (provenance).
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.property
+
+```ts
+readonly property: string;
+```
+
+One of `Poles`, `Zeros`, `BranchPoints`, `BranchCuts`, `Residue`,
+`EssentialSingularities`, `IsHolomorphic`, `IsMeromorphic`,
+`AnalyticContinuation`, `Solutions`, `ComplexZeroMultiplicity`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.var
+
+```ts
+readonly var: string | null;
+```
+
+The distinguished variable the property is stated in (e.g. `z`).
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.argIndex
+
+```ts
+readonly argIndex: number | null;
+```
+
+Index of `var` among the operator's arguments, or null when there is no
+single argument position (parametric / composite).
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.expr
+
+```ts
+readonly expr: ExpressionInput | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.domain
+
+```ts
+readonly domain: ExpressionInput | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.point
+
+```ts
+readonly point: ExpressionInput | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.condition
+
+```ts
+readonly condition: ExpressionInput | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.value
+
+```ts
+readonly value: ExpressionInput | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionPropertyRecord.assumptions
+
+```ts
+readonly assumptions: ExpressionInput | null;
+```
+
+</MemberCard>
+
+### FunctionProperties
+
+Queryable analytic properties of an operator, returned by
+`ce.functionProperties(name)`. The set-valued accessors return a boxed set
+(e.g. `NonPositiveIntegers`) for the unconditional record of that kind, or
+`undefined` when no such record exists. Parametric / conditional records
+(e.g. residues that depend on parameters) are available via `entries`.
+
+<MemberCard>
+
+##### FunctionProperties.operator
+
+```ts
+readonly operator: string;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.entries
+
+```ts
+readonly entries: readonly FunctionPropertyRecord[];
+```
+
+All analytic-property records for this operator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.poles
+
+```ts
+readonly poles: Expression | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.zeros
+
+```ts
+readonly zeros: Expression | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.branchPoints
+
+```ts
+readonly branchPoints: Expression | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.branchCuts
+
+```ts
+readonly branchCuts: Expression | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.essentialSingularities
+
+```ts
+readonly essentialSingularities: Expression | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.holomorphicDomain
+
+```ts
+readonly holomorphicDomain: Expression | undefined;
+```
+
+The domain on which the function is holomorphic.
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionProperties.isMeromorphic
+
+```ts
+readonly isMeromorphic: boolean | undefined;
+```
+
+Whether the function is meromorphic, when the corpus records it.
+
+</MemberCard>
+
 <MemberCard>
 
 ### SymbolTable
@@ -21052,6 +22324,16 @@ readonly Half: Expression;
 
 ```ts
 readonly NegativeOne: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.Two
+
+```ts
+readonly Two: Expression;
 ```
 
 </MemberCard>
@@ -21618,6 +22900,10 @@ symbol(sym, options?): Expression
 
 [`Metadata`](#metadata-1)
 
+####### autoDeclare?
+
+`boolean`
+
 </MemberCard>
 
 <MemberCard>
@@ -21745,6 +23031,7 @@ type(type): BoxedType
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -21816,6 +23103,43 @@ pushScope(scope?, name?): void
 ```ts
 popScope(): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.createScope()
+
+```ts
+createScope(bindings?, parent?): InspectableScope
+```
+
+####### bindings?
+
+`Record`\<`string`, 
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`TaggedValueDefinition`](#taggedvaluedefinition)
+  \| [`TaggedOperatorDefinition`](#taggedoperatordefinition)\>
+
+####### parent?
+
+`Scope`
 
 </MemberCard>
 
@@ -21904,6 +23228,7 @@ declareType(name, type, options?): void
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -21920,6 +23245,10 @@ declareType(name, type, options?): void
 ####### mint?
 
 `boolean`
+
+####### typeParams?
+
+[`TypeParamsOption`](#typeparamsoption)
 
 </MemberCard>
 
@@ -21962,6 +23291,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -21980,6 +23310,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -22007,6 +23338,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -22026,6 +23358,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -22042,7 +23375,7 @@ declare(id, def, scope?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -22063,6 +23396,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -22090,6 +23424,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -22109,6 +23444,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -22125,7 +23461,7 @@ declare(id, def, scope?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -22161,6 +23497,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -22179,6 +23516,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -22206,6 +23544,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -22225,6 +23564,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -22241,7 +23581,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -22262,6 +23602,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferred`: `boolean`;
@@ -22289,6 +23630,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
@@ -22308,6 +23650,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
      \| [`ValueType`](#valuetype)
+     \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype)
      \| `undefined`;
@@ -22324,7 +23667,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`) => `boolean` \| `undefined`;
+  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
  \}\>\>
@@ -22802,6 +24145,73 @@ call for full detail.
 
 <MemberCard>
 
+##### IComputeEngine.suggestOperatorName()
+
+```ts
+suggestOperatorName(name): string | undefined
+```
+
+Given a `name` that is **not** a known operator, return the closest known
+operator name — a "did you mean" suggestion — or `undefined` when nothing
+is close enough. Powers the Cortex `unknown-function` diagnostic.
+
+Matching is conservative and applied in priority order (first match wins):
+case-insensitive exact match, singular/plural, Damerau–Levenshtein
+distance (≤ 2 for names of length ≥ 6, ≤ 1 for length 5, never for
+shorter names), then a prefix match against exactly one operator. Ties
+prefer the candidate sharing the longest prefix with the query.
+
+```ts
+ce.suggestOperatorName('Quartile'); // → 'Quartiles'
+ce.suggestOperatorName('foo');      // → undefined
+```
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.functionProperties()
+
+```ts
+functionProperties(name): FunctionProperties | undefined
+```
+
+Return the known analytic properties of an operator — poles, zeros, branch
+points/cuts, residues, holomorphic/meromorphic domains — drawn from the
+Fungrim-derived metadata store, or `undefined` if none are recorded.
+
+```ts
+ce.functionProperties('Gamma')?.poles?.toString(); // 'NonPositiveIntegers'
+```
+
+The set-valued accessors (`poles`, `zeros`, ...) return a boxed set for the
+unconditional record of that kind; parametric / conditional records (e.g.
+residues that depend on parameters) are available via `entries`.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.toJSON()
+
+```ts
+toJSON(): string
+```
+
+Debug representation, e.g. for `JSON.stringify()`.
+
+</MemberCard>
+
+<MemberCard>
+
 ### RuleStep
 
 ```ts
@@ -22881,6 +24291,43 @@ type Scope = KernelScope<BoxedDefinition>;
 ```
 
 Lexical scope specialized to boxed definitions.
+
+</MemberCard>
+
+<MemberCard>
+
+### InspectableScope
+
+```ts
+type InspectableScope = KernelInspectableScope<BoxedDefinition>;
+```
+
+A caller-owned, readable lexical scope — the product of
+`ce.createScope()`. Specialized to boxed definitions.
+
+</MemberCard>
+
+<MemberCard>
+
+### ScopeDeclaration
+
+```ts
+type ScopeDeclaration = KernelScopeDeclaration<BoxedDefinition>;
+```
+
+One entry of an [InspectableScope](#inspectablescope) harvest.
+
+</MemberCard>
+
+<MemberCard>
+
+### ScopeNarrowing
+
+```ts
+type ScopeNarrowing = KernelScopeNarrowing<BoxedDefinition>;
+```
+
+One outer-definition narrowing observed by an [InspectableScope](#inspectablescope).
 
 </MemberCard>
 
@@ -23160,6 +24607,42 @@ This expression is a number, but not `±Infinity`, `ComplexInfinity` or
 </MemberCard>
 
 #### Other
+
+<MemberCard>
+
+##### Expression.hash
+
+```ts
+readonly hash: number;
+```
+
+A structural hash of this expression, suitable as an **in-memory**
+bucketing or cache key with a deep compare on hit.
+
+The contract:
+
+- **Invariant**: if `a.isSame(b)` is `true`, then `a.hash === b.hash`.
+  The hash is the structural tier's companion — a pure function of the
+  canonical tree. A symbol's assigned value never affects it.
+
+- **Stability**: deterministic within a release — the same canonical
+  tree yields the same hash across engine instances and processes, as
+  it is computed from structure and strings only, with no engine state.
+  **Not stable across releases**: the hash function may change in any
+  release, so a cache keyed on it must not outlive the engine build.
+  Never persist it.
+
+- **Collisions**: a 32-bit-class, bucketing-grade hash. Distinct
+  expressions may share a hash; always verify a hash hit with
+  `isSame()` (or another structural compare) before treating two
+  expressions as identical.
+
+- **Bound variables**: folds bound-variable _names_ (binding-identity,
+  not alpha-equivalence), matching `isSame()`: `Sum(i, i in 1..n)` and
+  `Sum(j, j in 1..n)` hash differently, just as they are not `isSame()`.
+  This clause co-evolves with `isSame()` semantics.
+
+</MemberCard>
 
 <MemberCard>
 
@@ -24562,7 +26045,8 @@ It is possible that the result of `expr.evaluate()` may be the same as
 The result is in canonical form.
 
 **Time and recursion limits**: if the evaluation runs inside an enclosing
-ComputeEngine.withTimeLimit span and exceeds its deadline, or
+[`ComputeEngine.withTimeLimit`](#withtimelimit)
+span and exceeds its deadline, or
 exceeds the recursion limit, a `CancellationError` is thrown (its `cause`
 is `'timeout'` or `'recursion-depth-exceeded'`). Catch it to distinguish
 an interrupted evaluation from a symbolic (inert) result.
@@ -25269,6 +26753,46 @@ as `x = 4` could make true — is `undefined`, never a definitive
 
 </MemberCard>
 
+<MemberCard>
+
+##### Expression.isIdenticallyEqual()
+
+```ts
+isIdenticallyEqual(other): boolean | undefined
+```
+
+Identity of this expression and `other` in **all** their free variables,
+that is `sin(x)^2 + cos(x)^2 ≡ 1`. This is the deepest — and most
+expensive — of the three equality tiers:
+
+| Method | Semantics |
+| --- | --- |
+| `expr.isSame(other)` | **Structural**: syntactic equality of the canonical forms. Always decidable, no evaluation. |
+| `expr.isEqual(other)` | **Arithmetic**: the values are equal (within `engine.tolerance`). |
+| `expr.isIdenticallyEqual(other)` | **Identity**: the two expressions are equal for every value of their free variables. |
+
+Three-valued: `true` when identity could be established, `false` when the
+expressions are provably different, and `undefined` when neither could be
+determined. In particular, expressions that merely *disagree* at sampled
+points (`x+1` vs `x+2`) are `undefined`, not `false`: an assumption could
+still constrain them equal.
+
+Identity is established by stochastic sampling (evaluating both
+expressions at random points), falling back to a symbolic
+expand-and-simplify proof. A `true` obtained from sampling alone is
+therefore a very strong indication, but not a formal proof
+([Richardson's theorem](https://en.wikipedia.org/wiki/Richardson%27s_theorem)
+makes a complete decision procedure impossible).
+
+This is the API counterpart of the `IdenticallyEqual` operator (`\equiv`
+in LaTeX).
+
+####### other
+
+`number` \| [`Expression`](#expression-5)
+
+</MemberCard>
+
 #### Tensor Expression
 
 <MemberCard>
@@ -25339,6 +26863,7 @@ set type(type:
   | NumericType
   | FunctionSignature
   | ValueType
+  | TypeVariable
   | TypeReference
   | BoxedType): void
 ```
@@ -26766,6 +28291,7 @@ new BoxedType(type, typeResolver?): BoxedType
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
 
 ####### typeResolver?
@@ -26936,6 +28462,24 @@ type: Type;
 
 <MemberCard>
 
+##### BoxedType.isPolymorphic
+
+```ts
+readonly isPolymorphic: boolean;
+```
+
+True when this type is a **polytype**: a signature carrying a `forall`
+clause, or an overload set with at least one such arm.
+
+Computed ONCE, here, at construction: every per-call dispatch check
+(argument validation, result typing) reads this boolean and is O(1) — it
+must never become a tree walk. Polytypes are legal only as signatures, so
+the computation itself is a shallow field test.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedType.unionMembers
 
 The members of a union type, each boxed, or `[this]` for any other type.
@@ -27016,6 +28560,20 @@ static narrow(...types): BoxedType
 matches(other): boolean
 ```
 
+True when every value of this type is an `other`.
+
+**A polymorphic PATTERN is a consistent existential** (D12): the pattern's
+variables are solved against the subject and the match holds iff a
+consistent instantiation exists — so
+`ce.type('(number) -> number').matches('forall T. (T) -> T')` is `true`,
+the probe users actually mean. `couldMatch` deliberately answers `false`
+on the same row (D6's bound-reading, contravariant `any`); the two
+predicates diverge by design.
+
+A polymorphic SUBJECT is the `isSubtype` story: rule 1 against a ground
+pattern (instantiate-and-check), rule 3 (α-equivalence) against a
+polymorphic one.
+
 ####### other
 
   \| `string`
@@ -27033,6 +28591,7 @@ matches(other): boolean
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -27063,6 +28622,7 @@ is(other): boolean
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -27107,6 +28667,7 @@ Throws if `other` is a string that is not a valid type.
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -27167,6 +28728,7 @@ Throws if `other` is a string that is not a valid type.
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
   \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
 
@@ -27573,6 +29135,71 @@ result stays `[]`).
 
 <MemberCard>
 
+### TypeVariable
+
+```ts
+type TypeVariable = {
+  kind: "variable";
+  name: string;
+};
+```
+
+A universally quantified type variable (rank-1).
+
+Only legal inside a function signature; declared and scoped by its arm's
+`forall` clause ([FunctionSignature.typeParams](#typeparams)). A variable is
+**atomic and opaque**: it is never reduced, distributed or collapsed, and it
+is substituted away by instantiation at a call site.
+
+</MemberCard>
+
+<MemberCard>
+
+### TypeParameter
+
+```ts
+type TypeParameter = {
+  name: string;
+  bound: Type;
+};
+```
+
+One entry of a signature's `forall` clause: the variable's name and its
+optional declared upper bound.
+
+The bound must be **ground** (no type variables) — validated when the
+declared type is boxed. An unbounded variable's implicit bound is `any`.
+
+</MemberCard>
+
+<MemberCard>
+
+### TypeParamsOption
+
+```ts
+type TypeParamsOption = 
+  | string
+  | ReadonlyArray<
+  | string
+  | {
+  name: string;
+  bound: Type | TypeString;
+}>;
+```
+
+The `typeParams` option of a generic type-ALIAS declaration
+(`ce.declareType('Pair', 'tuple<T, T>', { alias: true, typeParams: ['T'] })`).
+
+Either clause TEXT (`'T, U: number'`, also accepted one entry at a time) or
+pre-built parameters whose bound may be a type string. Every TEXT spelling
+goes through the shared clause parser (`parseTypeParameterClause`); the
+object-array form is validated directly by `normalizeDeclaredTypeParams`
+(same rules: reserved names, duplicates, ground bounds).
+
+</MemberCard>
+
+<MemberCard>
+
 ### FunctionSignature
 
 ```ts
@@ -27583,6 +29210,7 @@ type FunctionSignature = {
   variadicArg: NamedElement;
   variadicMin: 0 | 1;
   effects: EffectSet;
+  typeParams: TypeParameter[];
   result: Type;
 };
 ```
@@ -27643,8 +29271,9 @@ A record is a collection of key-value pairs.
 
 The keys are strings. The set of keys is fixed.
 
-For a record type to be a subtype of another record type, it must have a
-subset of the keys, and all their types must match (width subtyping).
+For a record type to be a subtype of another record type, it must contain
+every key required by the other type, and all their types must match (width
+subtyping). It may contain additional keys.
 
 </MemberCard>
 
@@ -27815,6 +29444,7 @@ type TypeReference = {
   name: string;
   alias: boolean;
   def: Type | undefined;
+  typeParams: TypeParameter[];
 };
 ```
 
@@ -27844,6 +29474,7 @@ type Type =
   | NumericPrimitiveType
   | FunctionSignature
   | ValueType
+  | TypeVariable
   | TypeReference;
 ```
 
@@ -27878,6 +29509,15 @@ Types are described using the following BNF grammar:
                | <set>
                | <broadcastable>
                | <collection>
+               | <type_reference>
+
+(A reference to a user-declared type. The optional argument list applies a
+GENERIC type alias (`Pair<integer>`); it is expanded eagerly into the
+substituted alias body when the type is built, so an applied reference never
+appears in a `Type`. The authoritative grammar lives with the parser in
+`./parser.ts`.)
+
+<type_reference> ::= ( "type" )? <identifier> ( "<" <type> ("," <type>)* ">" )?
 
 <primitive> ::= "any" | "unknown" | <value-type> | <symbolic-type> | <numeric-type>
 
@@ -28960,16 +30600,22 @@ of producing an empty one.
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known |
 | `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 | `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
 | `Less`         | $$ x \lt y $$  |                                                                                 |
 | `LessEqual`    | $$ x \leq y $$ |                                                                                 |
+| `IdenticallyEqual` | $$ x \equiv y $$ | Assert an identity: the two expressions have the same value for **every** value of their free variables |
 
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
+`IdenticallyEqual` (same value for every value of the free variables) — are
+compared in
+[Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions).
 
 ## Polynomial Arithmetic
 
@@ -34752,12 +36398,14 @@ as the `Equal` function.
 
 <Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
 
-Evaluate to `True` if every adjacent pair of operands is **structurally
-identical**, otherwise `False`. This is the `===` operator in Cortex.
+Evaluate to `True` if every adjacent pair of operands is **syntactically
+identical**, otherwise `False`. This is the `===` operator in Cortex, also
+written `≣` (U+2263). It is the operator counterpart of the `expr.isSame()`
+method.
 
-`Same` is **total**: it always decides. It evaluates its operands first, then
-compares the resulting values structurally — with no tolerance, and without
-numerically approximating an exact value.
+`Same` is **total**: it always decides. It compares the canonical form of its
+operands as written — with no tolerance, and without numerically approximating
+an exact value.
 
 ```json example
 ["Same", ["Sqrt", 2], 1.4142135623730951]
@@ -34766,6 +36414,11 @@ numerically approximating an exact value.
 ["Equal", ["Sqrt", 2], 1.4142135623730951]
 // ➔ "True"
 ```
+
+`Same` **never dereferences the value of a symbol**: two expressions that are
+written differently are not the same, even if they have the same value. With
+`x` assigned the value `5`, `["Same", "x", 5]` is `False` while
+`["Equal", "x", 5]` is `True`.
 
 `Equal` is the semantic, tolerant comparison: it may stay unevaluated when the
 answer is not known, since `x = y` is a *condition*. `Same` answers regardless:
@@ -34786,13 +36439,19 @@ Number leaves compare by **exact value**, not by notation:
 ```
 
 Totality also means `Same` has no IEEE exemption for `NaN`, where `Equal`
-does:
+does. This holds inside a collection as well:
 
 ```json example
 ["Same", "NaN", "NaN"]
 // ➔ "True"
 
 ["Equal", "NaN", "NaN"]
+// ➔ "False"
+
+["Same", ["List", "NaN"], ["List", "NaN"]]
+// ➔ "True"
+
+["Equal", ["List", "NaN"], ["List", "NaN"]]
 // ➔ "False"
 ```
 
@@ -34803,10 +36462,54 @@ a list of booleans.
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
 `True` — matching the Cortex spelling `a === b === c`.
 
-**`Same` vs `IsSame`.** [`IsSame`](#IsSame) holds its operands and compares
-them as written, while `Same` compares the values they evaluate to. So
-`["IsSame", ["Add", 1, 1], 2]` is `False` but `["Same", ["Add", 1, 1], 2]` is
-`True`.
+**`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
+written, while `Same` compares their canonical forms. So
+`["IsSame", ["Add", 1, 1], 2]` is `False`, but `["Same", ["Add", 1, 1], 2]` is
+`True`, since canonicalization folds `1 + 1` to `2`.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IdenticallyEqual
+</nav>
+<FunctionDefinition name="IdenticallyEqual">
+
+<Signature name="IdenticallyEqual" returns="boolean">_expression1_, _expression2_</Signature>
+
+Evaluate to `True` if the two expressions are **identically equal**, that is if
+they have the same value for every value of their free variables. This is the
+operator counterpart of the `expr.isIdenticallyEqual()` method.
+
+<Latex value="(x+1)^2 \equiv x^2 + 2x + 1" flow="column"/>
+
+```json example
+["IdenticallyEqual", ["Square", ["Add", "x", 1]],
+  ["Add", ["Square", "x"], ["Multiply", 2, "x"], 1]]
+// ➔ "True"
+```
+
+Unlike `Equal`, which compares the value of its operands, `IdenticallyEqual`
+proves an identity: it applies symbolic transformations (expansion and
+simplification) and evaluates both expressions at a number of pseudo-random
+sample points. A `True` answer that rests on sampling is a very strong
+indication rather than a formal proof — this is the only comparison operator
+that can answer from sampling.
+
+Like `Equal`, it is three-valued: `True`, `False`, or — when the identity can
+neither be established nor refuted — unevaluated. Note that expressions that
+merely *disagree* at the sampled points are undetermined, not `False`:
+
+```json example
+["IdenticallyEqual", 1, 2]
+// ➔ "False"
+
+["IdenticallyEqual", ["Sin", "x"], ["Cos", "x"]]
+// ➔ ["IdenticallyEqual", ["Sin", "x"], ["Cos", "x"]]  (unevaluated)
+```
+
+The LaTeX notation is `\equiv` (or the `≡` character). A `\equiv` followed by
+`\pmod{n}` is a congruence and parses as
+[`Congruent`](/compute-engine/reference/arithmetic/#Congruent) instead.
 
 </FunctionDefinition>
 
@@ -35933,6 +37636,31 @@ wrapping its last statement, so the canonical form of the example above is:
   ["Block", ["Typed", ["Add", "x", 1], "'integer'"]],
   ["Typed", "x", "'integer'"]]
 ```
+
+**Generic literals**. A whole-signature annotation carrying a `forall` clause
+makes the literal **generic** (see [Generic Signatures](/compute-engine/guides/types/#generic-signatures)).
+It may be written as a signature string in place of the parameter list:
+
+```json example
+["Function", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]
+```
+
+or as a full-signature `Typed` marker on the body — which is also the
+canonical form the sugar above lowers to:
+
+```json example
+["Function",
+  ["Block", ["Typed", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]],
+  "x"]
+```
+
+The signature is the single source of truth for the parameter types: a
+parameter whose type mentions a type variable is **erased** to a bare symbol,
+while a ground one (`["Typed", "n", "'integer'"]`) keeps its annotation and is
+checked as usual. Each application solves the variables against the arguments,
+so `["Apply", _literal_, 21]` above evaluates to `42` and the bound `number`
+is enforced. A `forall` clause on an individual *parameter* annotation is not
+accepted — type variables are introduced by a whole-signature clause only.
 
 Type annotations round-trip through MathJSON but are dropped when serializing
 to LaTeX (there is no LaTeX notation for them).
@@ -37868,6 +39596,11 @@ Source: https://mathlive.io/compute-engine/reference/logic/
 
 </div>
 
+`Equivalent` serializes as `\iff`. Note that `\equiv` is not one of its
+notations: it parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+mathematical identity operator.
+
 ### Operator Precedence
 
 Logical operators have lower precedence than comparison and arithmetic operators,
@@ -38586,6 +40319,79 @@ New sets can be defined using one of the following operators.
 | `SymmetricDifference` | $$ \operatorname{A} \triangle \operatorname{B} $$ | Disjunctive union = $$ (\operatorname{A} \setminus \operatorname{B}) \cup (\operatorname{B} \setminus \operatorname{A})$$ [Q1147242](https://www.wikidata.org/wiki/Q1147242)                                      |
 
 </div>
+
+## Ring Constructions
+
+The two standard notations for building a new ring from an existing one are
+recognized on the blackboard-bold ring and field constants — $$\Z$$, $$\Q$$,
+$$\R$$ and $$\C$$.
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"19ch"}}>
+
+| Function       | Notation                                    | &nbsp;                                                                        |
+| :------------- | :------------------------------------------ | :---------------------------------------------------------------------------- |
+| `Adjoin`       | $$ \Z[\sqrt{2}] $$                          | The ring $$\Z$$ with $$\sqrt{2}$$ adjoined                                     |
+| `QuotientRing` | $$ \Z_n $$ or $$ \Z/n\Z $$                  | The quotient of $$\Z$$ by the ideal generated by $$n$$, i.e. the integers modulo $$n$$ |
+
+</div>
+
+**Adjunction** accepts one or more adjuncts, and reads an undeclared symbol as
+an indeterminate, i.e. a polynomial ring:
+
+```js
+ce.parse("\\Z[\\sqrt{2}]");
+// ➔ ["Adjoin", "Integers", ["Sqrt", 2]]
+
+ce.parse("\\Z[\\sqrt{2},\\sqrt{3}]");
+// ➔ ["Adjoin", "Integers", ["Sqrt", 2], ["Sqrt", 3]]
+
+ce.parse("\\Z[i]");   // the Gaussian integers
+// ➔ ["Adjoin", "Integers", ["Complex", 0, 1]]
+
+ce.parse("\\Z[x]");   // polynomials in x with integer coefficients
+// ➔ ["Adjoin", "Integers", "x"]
+```
+
+Field adjunction written with **parentheses** — $$\Q(\sqrt{2})$$ — is not
+parsed: parentheses following a symbol are read as multiplication or function
+application everywhere else in the grammar. Use the bracket form.
+
+**Quotients** can be written with a subscript or in the longer ideal notation.
+Both parse to the same expression, which serializes back to the subscript form:
+
+```js
+ce.parse("\\Z_n");
+// ➔ ["QuotientRing", "Integers", "n"]
+
+ce.parse("\\Z/n\\Z");
+// ➔ ["QuotientRing", "Integers", "n"]
+
+ce.box(["QuotientRing", "Integers", 12]).latex;
+// ➔ "\Z_{12}"
+```
+
+:::warning
+$$\Z_p$$ is read as the integers **modulo** $$p$$, that is $$\Z/p\Z$$. Some
+texts use the same notation for the ring of $$p$$-adic integers; that reading
+is not available. The mod-$$n$$ reading is by far the more common one in the
+material this engine parses.
+:::
+
+A subscript that marks a **sign restriction** is not a quotient: $$\Z_+$$,
+$$\R_-$$ and $$\Z_{\geq 0}$$ still name `PositiveIntegers`, `NegativeNumbers`
+and `NonNegativeIntegers`, as before.
+
+Both operators are **inert**: they stay symbolic, and there is no membership
+test (`Element`), no enumeration of residues, and no arithmetic in the
+constructed ring. They do carry a type, formed by joining the base ring's
+element type with the types of the adjoined elements:
+
+```js
+ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<finite_real>
+ce.parse("\\Z[i]").type;           // ➔ set<finite_complex>
+ce.parse("\\Z[x]").type;           // ➔ set<unknown>
+ce.parse("\\Z_n").type;            // ➔ set<finite_integer>
+```
 
 ## Relations
 
@@ -43205,6 +45011,638 @@ Read more about **Collections** and the `At` function <Icon name="chevron-right-
 
 ---
 
+# The Structural Tier
+
+Source: https://mathlive.io/compute-engine/guides/structural-tier/
+
+<Intro>
+The **structural tier** is the middle ground between a raw parse and a
+canonical expression: the tree keeps the shape it was parsed with, but its
+operator definitions are resolved, so it has a type and can be transformed.
+This page collects the contracts a pipeline built on that tier can rely on.
+</Intro>
+
+Most applications never need this page: parse, canonicalize, evaluate. It is
+written for consumers that carry an expression through several
+transformation passes — an expansion fixpoint, a classifier tuned on parse
+shape, an incremental editor — and need to know exactly what survives each
+pass and what the engine may change underneath them.
+
+## The Three Tiers
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
+
+|  | raw <br/>`{ form: 'raw' }` | **structural** <br/>`{ form: 'structural' }` | canonical <br/>(default) |
+| :--- | :---: | :---: | :---: |
+| Parse vocabulary preserved | yes | **yes** | no (rewritten) |
+| Operator definitions resolved (bound) | no | **yes** | yes |
+| `expr.type` answers | `unknown` | **yes** | yes |
+| Usable in `.add()`, `.mul()`, … | no | **yes** | yes |
+| `.subs()` / `.map()` shape-preserving | yes | **yes** | no (result re-canonicalizes) |
+| Arity and type errors checked | no | **no** | yes |
+| Scope processing, binder shadowing | no | **no** | yes |
+
+</div>
+
+**To create a structural expression** use `ce.parse(s, { form: 'structural' })`,
+`ce.expr(json, { form: 'structural' })` or
+`ce.function(op, ops, { form: 'structural' })`. Note that `ce._fn()` does
+**not** accept the option. The legacy spellings `{ canonical: false }` (raw)
+and `{ structural: true }` still work at runtime, but are no longer part of
+the typed API surface — new code should use `form`.
+
+```ts
+const expr = ce.parse('2x - (a+b)', { form: 'structural' });
+console.log(expr.json);
+// ➔ ["Subtract", ["InvisibleOperator", 2, "x"], ["Delimiter", ["Add", "a", "b"]]]
+
+console.log(expr.isStructural, expr.isCanonical);
+// ➔ true false
+
+console.log(expr.type.toString());
+// ➔ "broadcastable<number>"
+
+console.log(expr.subs({ a: ce.expr(3) }).json);
+// ➔ ["Subtract", ["InvisibleOperator", 2, "x"], ["Delimiter", ["Add", 3, "b"]]]
+// still structural: the sugar survived the substitution
+```
+
+Structural boxing **preserves** the shape it is given; it does not recover
+one. A structural box of an already-canonical tree leaves it canonical
+(`Add(a, Negate(b))` stays `Add(a, Negate(b))`) — there is no projection back
+from canonical to parse shape. A tree that must stay in parse vocabulary has
+to be non-canonical from the parse onward.
+
+:::warning[`.evaluate()` leaves the tier]
+`.evaluate()` and `.N()` always answer with a **canonical** value. On a
+structural or raw tree they evaluate the expression's canonical form, so
+every tier agrees on the value — including binders (`Sum`, `Integrate`, `D`,
+a function literal), whose bound variables are declared by canonicalization
+and would otherwise be evaluated unbound:
+
+```ts
+console.log(ce.parse('\\sum_{n=1}^{3} n', { form: 'structural' }).evaluate());
+// ➔ 6        (same as the canonical tree)
+
+console.log(ce.parse('\\sum_{n=1}^{3} n', { form: 'raw' }).evaluate());
+// ➔ 6
+
+console.log(ce.parse('\\sum_{n=1}^{3} n').evaluate());
+// ➔ 6
+```
+
+A bare symbol behaves the same way. A structural or raw symbol is not bound
+to a definition, so it is resolved in the current scope before being
+evaluated: it answers with its assigned value, not with itself. A symbol with
+no value evaluates to itself (as a canonical symbol).
+
+```ts
+ce.assign('x', 5);
+
+console.log(ce.box('x', { form: 'raw' }).evaluate());
+// ➔ 5       (same as the canonical symbol)
+
+console.log(ce.box('zzz', { form: 'raw' }).evaluate());
+// ➔ zzz     (no value: the symbol itself)
+```
+
+The receiver itself is not changed — it stays on its tier — but the
+**result** is canonical: it is in canonical vocabulary, and it is not a
+structural expression. A pipeline that must stay on the structural tier
+should not route through `.evaluate()`.
+:::
+
+Also note that `.subs()` is not capture-avoiding on **any** tier. If a
+substitution reaches into a binder body, avoiding name collisions is the
+caller's responsibility.
+
+## Parse Vocabulary vs Canonical Vocabulary
+
+The vocabulary a fresh parse produces and the vocabulary canonicalization
+produces differ in a bounded set of ways, listed below.
+
+:::info[Notice guarantee]
+The raw parse vocabulary is a **documented interchange vocabulary**, not an
+implementation detail: consumers pattern-match these spellings and we will
+not respell them silently. Any change to a spelling on this page lands as a
+called-out **BREAKING** entry in the CHANGELOG — never slipped into a release
+unannounced. Build on the current spellings; watch the changelog line, not
+the trees.
+
+The vocabulary is *versioned*, not *frozen*: this is a notice guarantee, not
+a promise that it never changes.
+:::
+
+### What Differs
+
+1. **Sugar heads are rewritten.** `InvisibleOperator` becomes `Multiply`, a
+   function application or `At`, depending on context; `Delimiter` is erased;
+   `Subtract` becomes `Add(…, Negate(…))`; `Sequence` is spliced.
+
+   ```ts
+   ce.parse('2x', { form: 'raw' }).json;   // ➔ ["InvisibleOperator", 2, "x"]
+   ce.parse('2x').json;                         // ➔ ["Multiply", 2, "x"]
+
+   ce.parse('a - b', { form: 'raw' }).json; // ➔ ["Subtract", "a", "b"]
+   ce.parse('a - b').json;                       // ➔ ["Add", "a", ["Negate", "b"]]
+
+   ce.parse('(a+b)', { form: 'raw' }).json; // ➔ ["Delimiter", ["Add", "a", "b"]]
+   ce.parse('(a+b)').json;                       // ➔ ["Add", "a", "b"]
+
+   ce.parse('f(1,2)', { form: 'raw' }).json;
+   // ➔ ["InvisibleOperator", "f", ["Delimiter", ["Sequence", 1, 2], "'(,)'"]]
+   ce.parse('f(1,2)').json;                      // ➔ ["f", 1, 2]
+   ```
+
+2. **Operand order.** `Add` and `Multiply` sort their operands canonically.
+
+   ```ts
+   ce.parse('-2+x', { form: 'raw' }).json;  // ➔ ["Add", ["Negate", 2], "x"]
+   ce.parse('-2+x').json;                        // ➔ ["Add", "x", -2]
+
+   ce.parse('\\pi x 2', { form: 'raw' }).json;
+   // ➔ ["InvisibleOperator", "Pi", "x", 2]
+   ce.parse('\\pi x 2').json;                    // ➔ ["Multiply", 2, "Pi", "x"]
+   ```
+
+3. **Flattening.** Associative operators flatten, and the fence goes with
+   them.
+
+   ```ts
+   ce.parse('(a+b)+c', { form: 'raw' }).json;
+   // ➔ ["Add", ["Delimiter", ["Add", "a", "b"]], "c"]
+   ce.parse('(a+b)+c').json;                     // ➔ ["Add", "a", "b", "c"]
+   ```
+
+4. **Exact literal folding.** Integers, rationals and radicals fold in `Add`
+   and `Multiply`. Machine floats, infinities and `NaN` deliberately do not.
+
+   ```ts
+   ce.parse('2+x+5', { form: 'raw' }).json; // ➔ ["Add", 2, "x", 5]
+   ce.parse('2+x+5').json;                       // ➔ ["Add", "x", 7]
+   ```
+
+5. **Generic-symbol folds.** `x/x` becomes `1` and `1^x` becomes `1` at
+   canonicalization. This is a documented engine convention, not a bug: the
+   operands are gone entirely.
+
+   ```ts
+   ce.parse('\\frac{x}{x}', { form: 'raw' }).json; // ➔ ["Divide", "x", "x"]
+   ce.parse('\\frac{x}{x}').json;                       // ➔ 1
+   ce.parse('1^x').json;                                // ➔ 1
+   ```
+
+6. **Literal normalization.** `Negate(2)` becomes `-2`; a literal
+   a literal `a + bi` becomes `Complex(a, b)`. The `Complex` fold
+   requires **both** parts to be literal — a symbolic imaginary term stays a
+   product.
+
+   ```ts
+   ce.parse('-2', { form: 'raw' }).json;    // ➔ ["Negate", 2]
+   ce.parse('-2').json;                          // ➔ -2
+
+   ce.parse('2+3\\imaginaryI').json;             // ➔ ["Complex", 2, 3]
+   ce.parse('\\imaginaryI b').json;              // ➔ ["Multiply", "ImaginaryUnit", "b"]
+   ```
+
+7. **Symbol resolution.** Constant symbols resolve at canonicalization, not
+   at parse time: on a raw or structural tree `e` is still the symbol `e`.
+
+   ```ts
+   ce.parse('e', { form: 'raw' }).json;     // ➔ "e"
+   ce.parse('e').json;                           // ➔ "ExponentialE"
+   ```
+
+   To ask whether a name *would* resolve to a constant — and to get the
+   answer for the current scope chain, so a user redeclaration is respected —
+   use `ce.lookupDefinition(name)`. It returns `undefined` for an undeclared
+   name and has no auto-declare side effect, so it is safe to call
+   speculatively:
+
+   ```ts
+   const v = ce.lookupDefinition('i')?.value;
+   const isImaginaryUnit = v?.isConstant === true && v.value?.im === 1;
+   ```
+
+   Two traps. A symbol-level query cannot see **binder** shadowing (a `\sum`
+   over `i` rebinds `i` inside its body), so mask binder-bound names first.
+   And the query key is the *post-parse* symbol name: the LaTeX→symbol
+   mapping is a parse step, so `\pi` is already the symbol `Pi` on a raw
+   tree — `lookupDefinition('pi')` finds nothing.
+
+8. **Binder rewrites.** Scoped operators normalize their bound variables and
+   canonicalize their bodies. See [below](#binder-spellings).
+
+### What Does Not Differ
+
+These constructs read the same on both routes, so a walk tuned on parse trees
+needs no defensive re-parse for them:
+
+```ts
+ce.parse('\\frac{x}{y}', { form: 'raw' }).json; // ➔ ["Divide", "x", "y"]
+ce.parse('\\frac{x}{y}').json;                       // ➔ ["Divide", "x", "y"]
+
+ce.parse('a<b<c', { form: 'raw' }).json;        // ➔ ["Less", "a", "b", "c"]
+ce.parse('a<b<c').json;                              // ➔ ["Less", "a", "b", "c"]
+
+ce.parse('\\sqrt{x}', { form: 'raw' }).json;    // ➔ ["Sqrt", "x"]
+ce.parse('\\sqrt{x}').json;                          // ➔ ["Sqrt", "x"]
+
+ce.parse('x_1', { form: 'raw' }).json;          // ➔ "x_1"
+ce.parse('x_1').json;                                // ➔ "x_1"
+```
+
+One case to keep in mind rather than delete: the `v_1` → `At(v, 1)`
+projection over a declared list happens at **parse** time, so both routes
+agree — but that means parse shape is **declaration-sensitive**. The same
+source parses differently depending on what is in scope:
+
+```ts
+ce.parse('v_1', { form: 'raw' }).json;  // ➔ "v_1"
+ce.declare('v', 'list<number>');
+ce.parse('v_1', { form: 'raw' }).json;  // ➔ ["At", "v", 1]
+```
+
+A walk tuned on parse trees inherits that sensitivity whether or not it ever
+touches a canonical tree.
+
+### Binder Spellings
+
+Binder limits are carried as a `Tuple` on the raw and structural routes and
+as `Limits` on the canonical route:
+
+```ts
+ce.parse('\\sum_{n=1}^{10} n^2', { form: 'structural' }).json;
+// ➔ ["Sum", ["Power", "n", 2], ["Tuple", "n", 1, 10]]
+ce.parse('\\sum_{n=1}^{10} n^2').json;
+// ➔ ["Sum", ["Power", "n", 2], ["Limits", "n", 1, 10]]
+
+ce.parse('\\prod_{k=1}^{5} k', { form: 'structural' }).json;
+// ➔ ["Product", "k", ["Tuple", "k", 1, 5]]
+ce.parse('\\prod_{k=1}^{5} k').json;
+// ➔ ["Product", "k", ["Limits", "k", 1, 5]]
+```
+
+A structural `Function` body carries **no `Block` wrapper**; the canonical
+form adds one:
+
+```ts
+ce.parse('x \\mapsto x^2 + 1', { form: 'structural' }).json;
+// ➔ ["Function", ["Add", ["Power", "x", 2], 1], "x"]
+ce.parse('x \\mapsto x^2 + 1').json;
+// ➔ ["Function", ["Block", ["Add", ["Power", "x", 2], 1]], "x"]
+```
+
+`D` **retains** its `Delimiter`; canonicalization erases it:
+
+```ts
+ce.parse('\\frac{d}{dx}(x^2+1)', { form: 'structural' }).json;
+// ➔ ["D", ["Delimiter", ["Add", ["Power", "x", 2], 1]], "x"]
+ce.parse('\\frac{d}{dx}(x^2+1)').json;
+// ➔ ["D", ["Add", ["Power", "x", 2], 1], "x"]
+```
+
+`Integrate` combines both rewrites — the `Tuple` becomes `Limits` *and* the
+integrand is lifted into a `Function`/`Block`:
+
+```ts
+ce.parse('\\int_0^1 x^2 dx', { form: 'structural' }).json;
+// ➔ ["Integrate", ["Power", "x", 2], ["Tuple", "x", 0, 1]]
+ce.parse('\\int_0^1 x^2 dx').json;
+// ➔ ["Integrate", ["Function", ["Block", ["Power", "x", 2]], "x"],
+//                 ["Limits", "x", 0, 1]]
+```
+
+## Undeclared Call Heads Bind Vacuously
+
+A structural box of a function expression whose head is **undeclared**
+succeeds. There is no error, no auto-declare, and no operator definition:
+
+```ts
+const expr = ce.expr(['myHead', 1, 2], { form: 'structural' });
+
+console.log(expr.isValid);              // ➔ true
+console.log(expr.errors);               // ➔ []
+console.log(expr.operatorDefinition);   // ➔ undefined
+console.log(ce.lookupDefinition('myHead')); // ➔ undefined
+```
+
+The head is simply not bound — the node is inert. This is the intended
+behavior, and it is covered by the notice guarantee above.
+
+The **canonical** route does the opposite: it auto-declares the head as a
+`function` with an inferred type, a write to the current lexical scope.
+
+```ts
+const ce2 = new ComputeEngine();
+ce2.expr(['myHead', 1, 2]);   // canonical
+
+const def = ce2.lookupDefinition('myHead');
+console.log(def.value.type.toString());   // ➔ "function"
+console.log(def.value.inferredType);      // ➔ true
+```
+
+Inert versus declaring is precisely the structural/canonical split. If the
+head *is* declared as an operator, the structural box binds it normally:
+
+```ts
+ce.expr(['Sin', 1], { form: 'structural' }).operatorDefinition?.name;
+// ➔ "Sin"
+```
+
+## Bound-Symbol Equality
+
+This section describes the **Structural** tier of comparison — `Same` and
+`expr.isSame()`. See
+[Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions)
+for the three tiers and how they differ. This contract is a property of
+binder identity, not of value following, so it is **unchanged** by the
+equality-tier semantics: the arithmetic and prover tiers do not enter into
+it.
+
+**Bound-symbol equality is per-binder-instance.** Each canonicalization of a
+binder mints fresh bindings, so the `n` of one `Sum` and the `n` of a
+separately built `Sum` are *different variables*, deliberately.
+
+**Compare at, or below, a common root.** Whole-tree comparison handles the
+bound occurrences correctly:
+
+```ts
+const a = ce.parse('\\sum_{n=1}^{10} n^2');
+const b = ce.parse('\\sum_{n=1}^{10} n^2');
+
+console.log(a.isSame(b));          // ➔ true
+```
+
+**Detached cross-tree leaf comparison is out of contract.** A bound leaf
+lifted out of its tree carries no binder context to be equivalent *under*, so
+comparing it against the same-position leaf of another tree is not a
+meaningful question — and answers `false`:
+
+```ts
+console.log(a.op1.op1.isSame(b.op1.op1));   // ➔ false — out of contract
+```
+
+Comparing roots first is not a workaround; it is the sanctioned pattern.
+
+**Reflexivity is guaranteed.** The identical object always compares equal to
+itself, bound or not:
+
+```ts
+const leaf = a.op1.op1;
+console.log(leaf.isSame(leaf));    // ➔ true
+```
+
+:::info[Not full alpha-equivalence]
+`isSame()` compares occurrences under a common binder by *name*, so it is
+alpha-*aware* — fresh binding identity does not defeat it. It is not
+alpha-*equivalent*: renaming a bound variable changes the answer.
+
+```ts
+ce.parse('\\sum_{n=1}^{10} n^2').isSame(ce.parse('\\sum_{m=1}^{10} m^2'));
+// ➔ false
+```
+:::
+
+## Error Attachment and Incremental Validity
+
+A pipeline that edits a tree in place wants to re-check only what it changed.
+Two properties bound what that is allowed to mean.
+
+### An Error Attaches at the Nearest Constraining Ancestor
+
+An `incompatible-type` error attaches at the nearest ancestor whose signature
+or canonical handler actually **constrains** the propagated type. That is not
+"the immediate parent": broadcasting and type-transparent operators pass the
+change through without erroring, so the attachment point can be arbitrarily
+far above the edit.
+
+```ts
+const mk = (leaf) =>
+  ce.expr(['Sum', ['Power', 'n', 2], ['Limits', 'n', 1, ['Sin', ['Sqrt', leaf]]]]);
+
+console.log(mk(4).isValid);              // ➔ true
+
+console.log(mk(['List', 1, 2]).isValid); // ➔ false
+console.log(mk(['List', 1, 2]).json);
+// ➔ ["Sum", ["Power", "n", 2],
+//     ["Limits", "n", 1,
+//       ["Error", ["ErrorCode", "'incompatible-type'", "'number'", "'vector<2>'"]]]]
+```
+
+The edit is at the operand of `Sqrt`, three levels down. Both the edited
+subtree and its parent probe as valid on their own —
+
+```ts
+console.log(ce.expr(['Sqrt', ['List', 1, 2]]).isValid);          // ➔ true
+console.log(ce.expr(['Sin', ['Sqrt', ['List', 1, 2]]]).isValid); // ➔ true
+```
+
+— and the error materializes only at the `Sum` bound, the first ancestor that
+requires a `number`.
+
+### `isValid` Is Not a Complete Oracle
+
+A scalar→collection change frequently produces **no box-time error at all**.
+Broadcastable lift at applications defers collection mismatches to runtime by
+design:
+
+```ts
+ce.declare('g', '(string) -> number');
+
+console.log(ce.expr(['g', 42]).isValid);
+// ➔ false  — ["g", ["Error", ["ErrorCode", "'incompatible-type'", "'string'", "'finite_integer'"]]]
+
+console.log(ce.expr(['g', ['List', 1, 2]]).isValid);
+// ➔ true   — the lift makes it a broadcast application
+console.log(ce.expr(['g', ['List', 1, 2]]).type.toString());
+// ➔ "vector<2>"
+```
+
+Only operators that constrain collections inside their canonical handlers —
+`Sum` bounds, above — fire at box time. Part of this class surfaces only at
+evaluate or compile time. Do not treat `.isValid` as a complete validity
+oracle for a type-changing edit.
+
+### The Sound Incremental Rule
+
+Compare the changed subtree's **type** before and after the edit.
+
+- **Type unchanged** ⇒ no ancestor's validity can change. Probing the subtree
+  alone suffices.
+- **Type changed** ⇒ re-probe from the root, or walk upward re-boxing one
+  ancestor at a time and stop as soon as a node's recomputed type equals its
+  pre-edit type.
+
+```ts
+ce.declare('k', '(number) -> number');
+
+ce.expr(['k', 'x']).type.toString();            // ➔ "number"
+ce.expr(['k', ['List', 1, 2]]).type.toString(); // ➔ "vector<2>"
+// type changed ⇒ ancestors must be re-probed
+```
+
+Validity itself is compositional, and `Error` nodes attach at the offending
+operator, so a subtree probe (`ce.expr(changedSubtreeJson).isValid`, then
+discard the tree) costs work proportional to the change rather than to the
+whole expression. Note that a canonical probe **writes to scope** — it
+auto-declares undeclared heads and free symbols. Contain those writes with a
+per-call scope (below), or with `ce.pushScope()`/`ce.popScope()`.
+
+## Per-Call Scope Control
+
+:::warning[Unreleased]
+The API described in this section is **not yet released**. It is documented
+here as a contract; the spellings are subject to the notice guarantee only
+once it ships. Check the CHANGELOG for the release that carries it.
+:::
+
+Canonical parsing and boxing write to the engine's current lexical scope:
+free symbols are declared by usage inference, undeclared call heads are
+auto-declared, the subscript fold resolves names, and an `Assign` left-hand
+side is pre-declared. A consumer parsing untrusted or out-of-order input
+needs to contain those writes.
+
+### The `scope` Option
+
+```ts
+ce.parse(latex, { scope });
+ce.expr(json,   { scope });
+```
+
+When a `scope` is supplied, the parse or box runs with it as the current
+lexical scope. Lookups walk `scope → parents`, and **all auto-declares and
+inference land rooted at the supplied scope**. Discarding the scope discards
+the writes.
+
+:::warning[Behavior change]
+`ce.expr`'s existing `scope` option steers *lookup only* today —
+auto-declares still land in the engine's current scope. Receiving the writes
+is a semantic change to a shipped option, and lands as a called-out BREAKING
+CHANGELOG entry.
+:::
+
+### `ce.createScope()`
+
+There is deliberately no separate `bindings` option: the declarations table
+is the *scope's initializer*, so `scope` stays the single per-call option and
+no option-interaction rules exist.
+
+```ts
+ce.createScope(
+  bindings?: Record<string, Type | TypeString | BoxedDefinition>,
+  parent?: Scope
+): InspectableScope;
+
+const scope = ce.createScope({ h: 'function', p: 'tuple<3>' });
+const expr = ce.parse(row, { scope });
+```
+
+`parent` defaults to the engine's current lexical scope **at call time**;
+callers with ordering discipline should pass their document scope explicitly.
+Each entry is declared into the fresh scope, shadowing outer declarations
+innermost-wins. Reusing one scope across several calls is supported and
+useful — parsing every row of a document into the same scope accumulates the
+harvest across rows.
+
+With the caller supplying every free name, a parse becomes a function of
+(latex, dictionary, declarations) plus the engine's standard library.
+
+**`BoxedDefinition` initializer values.** A harvested definition re-installs
+the **same definition object**, not a fresh holder: binding identity and
+write-version continuity are preserved, so seeding pass *N+1* from pass *N*'s
+harvest keeps write-version-keyed caches warm by construction. Two
+constraints: definitions are engine-bound, so this works within one engine
+only; and installing one definition in two live scopes makes it **shared
+mutable state** — a type narrowing through either scope is visible in both.
+That aliasing is the intended semantics for sequential pass-seeding, and is
+documented rather than prevented.
+
+### Reading Back What a Parse Declared
+
+`createScope()` returns an `InspectableScope` — structurally a `Scope`,
+assignable anywhere a `Scope` is accepted, plus a read surface. A scope's
+content is opaque by design (`Scope.bindings` is publicly
+`Map<string, unknown>`, holding internal records whose shape is not API), so
+these methods are the supported decode.
+
+```ts
+interface InspectableScope extends Scope {
+  declarations(): ReadonlyArray<{
+    name: string;
+    type: BoxedType;
+    inferred: boolean;
+    def: BoxedDefinition;
+  }>;
+
+  narrowings(): ReadonlyArray<{
+    name: string;
+    from: BoxedType;
+    to: BoxedType;
+    def: BoxedDefinition;
+  }>;
+
+  dispose(): void;
+}
+```
+
+`declarations()` reports the scope's own bindings — the initializer's entries
+with their post-inference types, alongside anything auto-declared during the
+call. `inferred` is true when the type was auto-declared or inferred from
+usage rather than stated by the caller; an initializer entry declared with an
+explicit type reports `false` even if inference later narrowed it. For an
+operator definition, `type` is its signature. Types are answered as
+`BoxedType` — the same boxed form as `expr.type` — so `entry.type.toString()`
+is the canonical type spelling and `entry.type.matches(…)` works directly.
+Both listings are sorted **lexicographically by name**, deterministically and
+independently of the order in which declares interleaved; a fingerprint over
+`[name, type.toString()]` pairs is stable.
+
+```ts
+const scope = ce.createScope(heads);
+const expr = ce.parse(row, { scope });
+const harvested = scope.declarations();
+// … read inferred parameter types; drop `scope` when done
+```
+
+One known boundary: the engine's interned common symbols (`Pi`, `e`, `i`,
+`True`, …) resolve ahead of the lexical scope chain, so a binding for one of
+those names is recorded in `declarations()` but does not shadow the constant
+during boxing — the same behavior as `ce.declare` of the same name.
+
+Callers that want no harvest simply drop the scope reference; there is no
+separate discard path. A caller-owned scope is never pushed through the
+engine's scope-discard path, so its definitions are **not** auto-disposed:
+holding a harvested definition after the parse, or after dropping the scope,
+is supported.
+
+`dispose()` is a deterministic release of the event subscriptions held by
+constant- and dynamic-valued definitions. It is idempotent, and definitions
+stay data-readable afterwards; re-installing a **disposed** definition is out
+of contract.
+
+:::warning[Dispose between passes, not mid-pass]
+`dispose()` bumps each definition's write version once. Consumers whose
+caches are keyed on write version must call it *between* passes.
+:::
+
+A hand-rolled `{ parent, bindings }` object literal still satisfies `Scope`
+and works as the `scope` option, but only `createScope()` products are
+inspectable.
+
+### Known Residual: Outer-Scope Narrowing
+
+An ephemeral scope contains new *declarations*; it does not contain
+*narrowing* of declarations that already exist. Type inference during a
+contained parse can still narrow a symbol declared in an **outer** scope.
+
+That residual is observable rather than silent: `narrowings()` reports every
+outer definition the contained parse narrowed, with its before and after
+type. A caller that needs containment rather than observation can compare or
+restore from that listing.
+
+---
+
 # Fungrim Identities — Bessel and hypergeometric functions
 
 Source: https://mathlive.io/compute-engine/reference/fungrim-bessel-hypergeometric/
@@ -43237,7 +45675,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
+$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -43246,7 +45684,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
+$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -43313,7 +45751,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sin(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43363,7 +45801,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\sqrt{2}(\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(-(\imaginaryI z))^{-1/2-\nu}+\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))\exp(\imaginaryI z)(\imaginaryI z)^{-1/2-\nu})z^{\nu}}{2\sqrt{\pi}}$$
+$$\operatorname{J}_{\nu}(z)=\frac{z^{\nu}((\imaginaryI z)^{-(1/2)-\nu}\exp(\imaginaryI z)\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))+(-(\imaginaryI z))^{-(1/2)-\nu}\exp(-(\imaginaryI z))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z))}{\sqrt{2\pi}}$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -43380,7 +45818,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43388,7 +45826,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}((2^{1/2}\cos(z)z^{1/2})/\pi^{1/2}))$$
+$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cos(z)))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43412,7 +45850,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sin(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43436,7 +45874,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cosh(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cosh(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43444,7 +45882,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cos(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cos(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43468,7 +45906,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43485,7 +45923,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -43493,7 +45931,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
+$$\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{\pi z}{2}}\exp(-z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43501,7 +45939,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t)\exp(z\cos(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\cosh(t))\, \mathrm{d}t)$$
+$$\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\exp(z\cos(t))\cos(\nu t)\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(z\cosh(t))-\nu t)\, \mathrm{d}t)$$
 
 **Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -43509,7 +45947,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=\frac{\exp(-z)}{\sqrt{\frac{2z}{\pi}}}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)$$
+$$\operatorname{K}_{\nu}(z)=\frac{\exp(-z)\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)}{\sqrt{\frac{2z}{\pi}}}$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -43559,7 +45997,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=\frac{\pi(\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, z^2/4)}{(z/2)^{\nu}}-\mathrm{Hypergeometric0F1Regularized}(\nu+1, z^2/4)(z/2)^{\nu})}{2\sin(\pi\nu)}$$
+$$\operatorname{K}_{\nu}(z)=\frac{\pi(\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, z^2/4)}{z/2^{\nu}}-z/2^{\nu}\mathrm{Hypergeometric0F1Regularized}(1+\nu, z^2/4))}{2\sin(\pi\nu)}$$
 
 **Holds when** $\nu\in\C\setminus\Z\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -43568,15 +46006,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(\frac{z}{2})^{\nu}}{\Gamma(\nu+1)}$$
+$$\operatorname{J}_{\nu}(z)=\frac{\frac{z}{2}^{\nu}\exp(-(\imaginaryI z))\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\Gamma(\nu+1)}$$
 
-**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..-1\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..(-1)\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`9ad254` · Fungrim entry ↗](https://fungrim.org/entry/9ad254)
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -43608,7 +46046,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sinh(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sinh(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43632,7 +46070,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\nu}(z)=\frac{\cos(\pi\nu)\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(z^2/4))(z/2)^{\nu}-\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, -(z^2/4))}{(z/2)^{\nu}}}{\sin(\pi\nu)}$$
+$$\operatorname{Y}_{\nu}(z)=\frac{\cos(\pi\nu)z/2^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(z^2/4))-\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, -(z^2/4))}{z/2^{\nu}}}{\sin(\pi\nu)}$$
 
 **Holds when** $\nu\in\C\setminus\Z\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -43657,7 +46095,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{((3z)/2)^{2/3}})$$
+$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}((3z)/2^{1/3}^2)}{(3z)/2^{1/3}^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43665,7 +46103,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\sinh(t))\, \mathrm{d}t)$$
+$$\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(z\sinh(t))-\nu t)\, \mathrm{d}t)$$
 
 **Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -43673,7 +46111,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
+$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{\pi z}{2}}\exp(-z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43681,7 +46119,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43697,7 +46135,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{n}(z)=\frac{1}{\pi}(-2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z)))$$
+$$\operatorname{Y}_{n}(z)=-\frac{2}{\pi}(\imaginaryI^{n}\operatorname{K}_{n}(\imaginaryI z)+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z))$$
 
 **Holds when** $n\in\Z\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43705,7 +46143,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -43713,7 +46151,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2(\frac{3z}{2})^{\frac{2}{3}}}$$
+$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-(3z)/2^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-(3z)/2^{1/3}^2)}{2(3z)/2^{1/3}^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43721,7 +46159,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -43762,7 +46200,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -43808,7 +46246,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})$$
+$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)z^{1-b}\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z$.
 **Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function.
@@ -43861,7 +46299,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(\mathrm{HypergeometricUStar}(b-a, b, -z)\exponentialE^{z}z^{a-b})$$
+$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(z^{a-b}\exponentialE^{z}\mathrm{HypergeometricUStar}(b-a, b, -z))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric1F1Regularized** — Regularized Kummer confluent hypergeometric function; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -43890,7 +46328,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\sqrt{1+\ell+\imaginaryI\eta}\sqrt{(1+\ell)-\imaginaryI\eta}\mathrm{CoulombG}(\ell+1, \eta, z)}{\ell+1}$$
 
 **Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function.
@@ -43899,7 +46337,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))}{\Gamma(2\ell+2)}$$
+$$\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}((\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)+\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta))-\pi\eta))}{\Gamma(2\ell+2)}$$
 
 **Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})$.
 **Symbols:** **CoulombC** — Coulomb wave function Gamow factor.
@@ -43926,7 +46364,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\sqrt{1+\ell+\imaginaryI\eta}\sqrt{(1+\ell)-\imaginaryI\eta}\mathrm{CoulombF}(\ell+1, \eta, z)}{\ell+1}$$
 
 **Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function.
@@ -43944,7 +46382,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))$$
+$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))}{(2z)^{\imaginaryI\eta}}+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))$$
 
 **Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace\land\Re(z)\gt0$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function; **CoulombSigma** — Coulomb wave function phase shift; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -43996,7 +46434,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))/\sqrt{\pi}$$
+$$\mathrm{Erf}(z)=(2z\exp(-z^2)\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -44012,7 +46450,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erfc}(z)=\frac{\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
+$$\mathrm{Erfc}(z)=\frac{\exp(-z^2)\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)}{z\sqrt{\pi}}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -44037,7 +46475,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
+$$\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\exp(-z^2)\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)}{z\sqrt{\pi}}$$
 
 **Holds when** $z\in\C\land z\ne0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -44054,7 +46492,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))/\sqrt{\pi}$$
+$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\times(-1)^{n+1}\mathrm{HermitePolynomial}(n-1, z))/\sqrt{\pi}\exp(-z^2)$$
 
 **Holds when** $z\in\C\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -44088,7 +46526,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, -a+b+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
+$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, b-a+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -44123,7 +46561,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}}{(n+1)!}$$
+$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)}{(n+1)!}$$
 
 **Holds when** $a\in\C\land b\in\C\land n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function; **RisingFactorial** — Rising factorial.
@@ -44140,7 +46578,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, -a+b+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
+$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, b-a+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -44166,7 +46604,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a+b-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, -a-b+c+1, 1-1/z)z^{a-c}(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
+$$\frac{1}{\pi}(\sin(\pi(c-a-b))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, (a+b)-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{z^{a-c}(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, c-a-b+1, 1-1/z)}{\Gamma(a)\Gamma(b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -44175,7 +46613,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, a+b-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, -a-b+c+1, 1-z)(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
+$$\frac{1}{\pi}(\sin(\pi(c-a-b))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, (a+b)-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c-a-b+1, 1-z)}{\Gamma(a)\Gamma(b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -44209,7 +46647,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-complex/
 
 # Complex numbers
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **40 identities** for complex numbers.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **36 identities** for complex numbers.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -44219,7 +46657,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Complex parts](#complex-parts) (21)
 - [Complex plane](#complex-plane) (3)
-- [Imaginary unit](#imaginary-unit) (16)
+- [Imaginary unit](#imaginary-unit) (12)
 
 ## Complex parts
 
@@ -44341,7 +46779,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arg(x+y\imaginaryI)=\mathrm{Arctan_2}(y, x)$$
+$$\arg(x+y\imaginaryI)=\arctan(y, x)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44432,7 +46870,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Li}_{2}(\imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
+$$\operatorname{Li}_{2}(\imaginaryI)=\operatorname{G}\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)
@@ -44443,13 +46881,6 @@ $$\Re(\imaginaryI)=0$$
 
 Used by the Compute Engine for simplification.
 [`249fd6` · Fungrim entry ↗](https://fungrim.org/entry/249fd6)
-
----
-
-$$\imaginaryI^2=-1$$
-
-Used by the Compute Engine for simplification.
-[`31b0df` · Fungrim entry ↗](https://fungrim.org/entry/31b0df)
 
 ---
 
@@ -44481,20 +46912,6 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\imaginaryI}=-\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`67c262` · Fungrim entry ↗](https://fungrim.org/entry/67c262)
-
----
-
-$$\imaginaryI^3=-\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`8be138` · Fungrim entry ↗](https://fungrim.org/entry/8be138)
-
----
-
 $$\vert\Gamma(\imaginaryI)\vert=\sqrt{\frac{\pi}{\sinh(\pi)}}$$
 
 Used by the Compute Engine for simplification.
@@ -44517,13 +46934,6 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^4=1$$
-
-Used by the Compute Engine for simplification.
-[`e0425a` · Fungrim entry ↗](https://fungrim.org/entry/e0425a)
-
----
-
 $$\imaginaryI^{z}=\exp(\frac{\pi\imaginaryI z}{2})$$
 
 **Holds when** $z\in\C$.
@@ -44540,7 +46950,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **212 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **211 identities** for elementary functions.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -44557,7 +46967,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Powers](#powers) (8)
 - [Sinc function](#sinc-function) (24)
 - [Sine](#sine) (59)
-- [Square roots](#square-roots) (26)
+- [Square roots](#square-roots) (25)
 
 ## Exponential function
 
@@ -44728,7 +47138,7 @@ Used by the Compute Engine for simplification.
 
 ## Inverse tangent
 
-$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, 1+xy)$$
+$$\arctan(x)-\arctan(y)=\arctan(x-y, 1+xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -44783,7 +47193,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
+$$\arctan(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44830,7 +47240,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, 1+x(x+y))$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44891,7 +47301,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, 0)=\frac{\pi\mathrm{sgn}(y)}{2}$$
+$$\arctan(y, 0)=\frac{\pi\mathrm{sgn}(y)}{2}$$
 
 **Holds when** $y\in\R$.
 Used by the Compute Engine for simplification.
@@ -44922,7 +47332,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/(z^2+1)^{1/2}))}{{(z^2+1)}^{\frac{n+1}{2}}}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/{(1+z^2)}^{1/2}))}{\sqrt{1+z^2}^{n+1}}$$
 
 **Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -44939,7 +47349,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
+$$\arctan(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
 
 **Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
@@ -44970,7 +47380,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
+$$\arctan(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -45024,7 +47434,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x)+\arctan(y)=\mathrm{Arctan_2}(x+y, 1-xy)$$
+$$\arctan(x)+\arctan(y)=\arctan(x+y, 1-xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -45056,7 +47466,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+y\imaginaryI))$$
+$$\arctan(y, x)=\Im(\ln(x+y\imaginaryI))$$
 
 **Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
@@ -45089,7 +47499,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\lparen-\infty, -\exponentialE^{-1}\rparen, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\lparen0, \pi\rparen, y\mapsto y\imaginaryI-y\cot(y))$$
+$$\mathrm{Map}(\rbrack-\infty, -\exponentialE^{-1}\lbrack, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\rbrack0, \pi\lbrack, y\mapsto y\imaginaryI-y\cot(y))$$
 
 Used by the Compute Engine for simplification.
 [`44ad09` · Fungrim entry ↗](https://fungrim.org/entry/44ad09)
@@ -45148,7 +47558,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
+$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(\mathrm{LambertWPuiseuxCoefficient}(k-2)/2+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-2-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k-2+1)-j)&\top\end{cases}/4)}{k+1}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
 **Symbols:** **LambertWPuiseuxCoefficient** — Coefficient in scaled Puiseux expansion of Lambert W-function.
@@ -45172,7 +47582,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Map}(\lparen-\exponentialE^{-1}, \infty\rparen, x\mapsto\operatorname{W}(x))=\lparen-1, \infty\rparen$$
+$$\mathrm{Map}(\rbrack-\exponentialE^{-1}, \infty\lbrack, x\mapsto\operatorname{W}(x))=\rbrack-1, \infty\lbrack$$
 
 Used by the Compute Engine for simplification.
 [`ee86fb` · Fungrim entry ↗](https://fungrim.org/entry/ee86fb)
@@ -45720,7 +48130,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\binom{2n}{k}\times(-1)^{k+n})}{4^{n}}$$
+$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}(-1)^{n+k}\binom{2n}{k}\cos(2(n-k)z))}{4^{n}}$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -46053,7 +48463,7 @@ Used by the Compute Engine for simplification.
 $$\sqrt{r\exp(\imaginaryI\theta)}=\sqrt{r}\exp(\frac{\imaginaryI\theta}{2})$$
 
 **Holds when** $r\in\lbrack0, \infty\rparen\land\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`1232f7` · Fungrim entry ↗](https://fungrim.org/entry/1232f7)
 
 ---
@@ -46079,13 +48489,6 @@ $$z\mapsto\sqrt{z}^{\prime}(z)=\frac{1}{2\sqrt{z}}$$
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
 [`2a11ab` · Fungrim entry ↗](https://fungrim.org/entry/2a11ab)
-
----
-
-$$\sqrt{-1}=\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`2eb54a` · Fungrim entry ↗](https://fungrim.org/entry/2eb54a)
 
 ---
 
@@ -46227,7 +48630,7 @@ Used by the Compute Engine for simplification.
 $$\sqrt{\exp(\imaginaryI\theta)\infty}=\exp(\frac{\imaginaryI\theta}{2})\infty$$
 
 **Holds when** $\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`f9f31d` · Fungrim entry ↗](https://fungrim.org/entry/f9f31d)
 
 ---
@@ -46270,7 +48673,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}$$
+$$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{\mathrm{AGM}(a, b)(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))}{\pi a(a-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -46310,7 +48713,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{AGM}(1, x)^{\prime}(1)=\frac{n!\mathrm{SloaneA}(60\,691, n)\times(-1)^{n}}{8^{n}}$$
+$$x\mapsto\mathrm{AGM}(1, x)^{\prime}(1)=\frac{(-1)^{n}n!\mathrm{SloaneA}(60\,691, n)}{8^{n}}$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
@@ -46486,7 +48889,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})+(\frac{-1}{2}\imaginaryI)\pi}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(x/(x+y)^{1/2})-\frac{\pi\imaginaryI}{2}}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -46507,7 +48910,7 @@ $$\mathrm{CarlsonRG}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRG}(x, y, z)$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`092716` · Fungrim entry ↗](https://fungrim.org/entry/092716)
 
 ---
@@ -46521,7 +48924,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-x^{1/2}/w)}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -46538,7 +48941,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, 2x)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}\sqrt{x}}$$
+$$\mathrm{CarlsonRF}(0, x, 2x)=\frac{\Gamma(1/4)^2}{\sqrt{x}\times4\sqrt{2\pi}}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -46650,7 +49053,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-1/x^{1/2})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -46693,7 +49096,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases}/\sqrt{x}$$
+$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(1+c)&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticK}(1+c)+2\imaginaryI\mathrm{EllipticK}(-c)&\top\end{cases}/\sqrt{x}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -46719,7 +49122,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, -1, 1)=\frac{3\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}(1+\imaginaryI)\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRD}(0, -1, 1)=\frac{3\Gamma(1/4)^2(1-\imaginaryI)}{8\sqrt{2\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -47105,7 +49508,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -2)=-(((2^{1/2}/8\imaginaryI)\Gamma(1/4)^2)/\sqrt{\pi})$$
+$$\mathrm{CarlsonRF}(0, -1, -2)=-(\frac{\Gamma(1/4)^2\imaginaryI}{4\sqrt{2\pi}})$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -47157,7 +49560,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, -1, 1, 1)=\frac{3\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}(1+\imaginaryI)\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRJ}(0, -1, 1, 1)=\frac{3\Gamma(1/4)^2(1-\imaginaryI)}{8\sqrt{2\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -47267,7 +49670,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -(cx))=\frac{\begin{cases}\mathrm{artanh}((c+1)^{1/2})&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\\mathrm{artanh}((c+1)^{1/2})+\imaginaryI\pi&\top\end{cases}}{\sqrt{x}\sqrt{c+1}}$$
+$$\mathrm{CarlsonRC}(x, -(cx))=\frac{\begin{cases}\mathrm{artanh}((c+1)^{1/2})&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{artanh}((c+1)^{1/2})+\pi\imaginaryI&\top\end{cases}}{\sqrt{(c+1)x}}$$
 
 **Holds when** $x\in\C\land c\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -47284,7 +49687,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-1/y^{1/2})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -47319,7 +49722,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, -x)=\frac{\sqrt{2}\begin{cases}1+\imaginaryI&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\1-\imaginaryI&\top\end{cases}\sqrt{\pi}^{3}\sqrt{x}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRG}(0, x, -x)=\frac{\sqrt{x}\sqrt{2}\sqrt{\pi}^{3}\begin{cases}1+\imaginaryI&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\1-\imaginaryI&\top\end{cases}}{2\Gamma(1/4)^2}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -47499,7 +49902,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, 1, -1)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRG}(0, 1, -1)=\frac{\sqrt{2}\sqrt{\pi}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -47669,7 +50072,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-x, y)=\frac{\frac{\pi}{2}-\imaginaryI\mathrm{artanh}(x/(x+y)^{1/2})}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(-x, y)=\frac{\frac{\pi}{2}-\mathrm{artanh}(x/(x+y)^{1/2})\imaginaryI}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -47710,7 +50113,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-x^{1/2}/y)}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -47778,7 +50181,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-x^{1/2}/y)}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -47887,7 +50290,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -x)=\frac{\sqrt{2}\begin{cases}1-\imaginaryI&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\1+\imaginaryI&\top\end{cases}\Gamma(1/4)^2}{8\sqrt{\pi}\sqrt{x}}$$
+$$\mathrm{CarlsonRF}(0, x, -x)=\frac{\Gamma(1/4)^2\begin{cases}1-\imaginaryI&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\1+\imaginaryI&\top\end{cases}}{\sqrt{x}\times4\sqrt{2\pi}}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -47964,7 +50367,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 1, -1)=\frac{\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{CarlsonRF}(0, 1, -1)=\frac{\Gamma(1/4)^2(1-\imaginaryI)}{4\sqrt{2\pi}}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -48001,7 +50404,7 @@ $$\mathrm{CarlsonRD}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRD}(x, y, z)$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f68409` · Fungrim entry ↗](https://fungrim.org/entry/f68409)
 
 ---
@@ -48273,7 +50676,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(2)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
+$$\mathrm{EllipticE}(2)=\frac{\sqrt{2}\sqrt{\pi}^{3}(1+\imaginaryI)}{\Gamma(1/4)^2}$$
 
 Used by the Compute Engine for simplification.
 [`5d2c01` · Fungrim entry ↗](https://fungrim.org/entry/5d2c01)
@@ -48304,7 +50707,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(2)=\frac{\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(2)=\frac{\Gamma(1/4)^2(1-\imaginaryI)}{4\sqrt{2\pi}}$$
 
 Used by the Compute Engine for simplification.
 [`630eca` · Fungrim entry ↗](https://fungrim.org/entry/630eca)
@@ -48370,7 +50773,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{n}{3}\sin(\phi)^3\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{1}{3}(n\sin(\phi)^3)\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
 
 **Holds when** $n\in\C\land\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
@@ -48672,7 +51075,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{m}{3}\sin(\phi)^3\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
+$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{1}{3}(m\sin(\phi)^3)\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -48691,7 +51094,7 @@ Used by the Compute Engine for simplification.
 
 ## Weierstrass elliptic functions
 
-$$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
+$$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{\frac{1}{3}(z\mathrm{JacobiTheta}(1, 0, \tau, 3))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
@@ -48772,7 +51175,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
+$$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\exp(\frac{-z^2/6\mathrm{JacobiTheta}(1, 0, \tau, 3)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)})\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function.
@@ -48832,7 +51235,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Barnes G-function
 
-$$\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\gamma)z^2)+\sum_{n=3}^{\infty}\frac{1}{n}(\Zeta(n-1)\times(-1)^{n+1}z^{n})$$
+$$\mathrm{LogBarnesG}(1+z)=\frac{1}{2}((\ln(2\pi)-1)z)-\frac{1}{2}((1+\operatorname{EulerGamma})z^2)+\sum_{n=3}^{\infty}\frac{1}{n}((-1)^{n+1}\Zeta(n-1)z^{n})$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -48877,9 +51280,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})$$
+$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi})$$
 
-**Holds when** $x\in\R\land x\notin-\infty..-1$.
+**Holds when** $x\in\R\land x\notin-\infty..(-1)$.
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1145/384101.384104)
@@ -48887,7 +51290,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{\lfloor x\rfloor}{2}(\lfloor x\rfloor-1)\pi\imaginaryI&\top\end{cases}$$
+$$\mathrm{LogBarnesG}(x)=\begin{cases}\ln(\mathrm{BarnesG}(x))&x\gt0\\\ln(\vert\mathrm{BarnesG}(x)\vert)+\frac{1}{2}(\lfloor x\rfloor(\lfloor x\rfloor-1))\pi\imaginaryI&\top\end{cases}$$
 
 **Holds when** $x\in\R\land x\notin\Z_{\le0}$.
 **Symbols:** **BarnesG** — Barnes G-function; **LogBarnesG** — Logarithmic Barnes G-function.
@@ -48905,7 +51308,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(((-x)/12-1/x+1/(1-\exp(-x))-1/2)\exp(-(xz)))/x^2\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=(z\mathrm{GammaLn}(z)+z^2/4)-(\ln(z)\mathrm{BernoulliPolynomial}(2, z))/2-\ln(\mathrm{ConstGlaisher})-\int_{0}^{\infty}\!(\exp(-zx)(1/(1-\exp(-x))-1/x-1/2-x/12))/x^2\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **LogBarnesG** — Logarithmic Barnes G-function.
@@ -48934,7 +51337,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -49026,7 +51429,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-G/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
+$$\mathrm{BarnesG}(\frac{1}{4})=\frac{\exp(3/32-\operatorname{G}/(4\pi))}{\mathrm{ConstGlaisher}^{\frac{9}{8}}\Gamma(1/4)^{\frac{3}{4}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -49034,7 +51437,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
+$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\pi\imaginaryI x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
 
 **Holds when** $x\in\R\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -49052,7 +51455,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{G}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
+$$\mathrm{BarnesG}(\frac{3}{4})=\frac{\exp(\frac{3}{32}+\frac{\operatorname{G}}{4\pi})\sqrt[4]{\Gamma(\frac{1}{4})}}{\sqrt[8]{2}\sqrt[4]{\pi}\mathrm{ConstGlaisher}^{\frac{9}{8}}}$$
 
 **Symbols:** **BarnesG** — Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -49069,7 +51472,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\gamma-1)+\frac{1}{2})&n\ge2\end{cases}$$
+$$z\mapsto\mathrm{BarnesG}(z)^{\prime}(n)=\begin{cases}0&n\lt0\\1&n=0\\\frac{1}{2}(\ln(2\pi)-1)&n=1\\\mathrm{BarnesG}(n)(\frac{\ln(2\pi)}{2}+(n-1)(\mathrm{HarmonicNumber}(n-2)-\operatorname{EulerGamma}-1)+\frac{1}{2})&n\ge2\end{cases}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -49106,7 +51509,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Beta(n, b)=\begin{cases}\tilde\infty&-b\in0..n-1\\(n\binom{(n+b)-1}{n})^{-1}&\top\end{cases}$$
+$$\Beta(n, b)=\begin{cases}\tilde\infty&-b\in0..(n-1)\\(n\binom{(n+b)-1}{n})^{-1}&\top\end{cases}$$
 
 **Holds when** $n\in\N^*\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -49190,7 +51593,7 @@ Used by the Compute Engine for expansion.
 
 ## Digamma function
 
-$$\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\gamma$$
+$$\mathrm{Digamma}(n)=\mathrm{HarmonicNumber}(n-1)-\operatorname{EulerGamma}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -49229,7 +51632,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}$$
 
 [`177de7` · Fungrim entry ↗](https://fungrim.org/entry/177de7)
 
@@ -49258,7 +51661,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\lparen0, \infty\rparen&n=0\\\lparen-n, 1-n\rparen&n\lt0\end{cases})$$
+$$\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x), \begin{cases}\rbrack0, \infty\lbrack&n=0\\\rbrack-n, 1-n\lbrack&n\lt0\end{cases})$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **DigammaFunctionZero** — Zero of the digamma function; **UniqueZero** — Unique zero (root) of function.
@@ -49267,7 +51670,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}+(2z^{m+1})^{-1}+\frac{1}{mz^{m}})\times(-1)^{m+1})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
+$$\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((-1)^{m+1}(\frac{1}{mz^{m}}+(2z^{m+1})^{-1}+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}))+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
 
 **Holds when** $m\in\N^*\land z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
@@ -49301,9 +51704,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{p}{q})=-\gamma-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))$$
+$$\mathrm{Digamma}(\frac{p}{q})=-\operatorname{EulerGamma}-\ln(2q)-\frac{1}{2}(\pi\cot((\pi p)/q))+2(\sum_{k=1}^{\lfloor\frac{q-1}{2}\rfloor}\cos(\frac{1}{q}(2\pi kp))\ln(\sin((\pi k)/q)))$$
 
-**Holds when** $q\in2..\infty\land p\in1..q-1$.
+**Holds when** $q\in2..\infty\land p\in1..(q-1)$.
 Used by the Compute Engine for simplification.
 [`3fe553` · Fungrim entry ↗](https://fungrim.org/entry/3fe553)
 
@@ -49317,7 +51720,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\gamma-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}$$
 
 [`45a969` · Fungrim entry ↗](https://fungrim.org/entry/45a969)
 
@@ -49377,7 +51780,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}1/(n+1)-1/(n+z))-\gamma$$
+$$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}(1/(n+1)-1/(n+z)))-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -49401,7 +51804,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(3)=\frac{3}{2}-\gamma$$
+$$\mathrm{Digamma}(3)=\frac{3}{2}-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`75f9bf` · Fungrim entry ↗](https://fungrim.org/entry/75f9bf)
@@ -49416,13 +51819,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\gamma-3\ln(2)$$
+$$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\operatorname{EulerGamma}-3\ln(2)$$
 
 [`7ec4f0` · Fungrim entry ↗](https://fungrim.org/entry/7ec4f0)
 
 ---
 
-$$\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8G$$
+$$\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8\operatorname{G}$$
 
 Used by the Compute Engine for simplification.
 [`807c7d` · Fungrim entry ↗](https://fungrim.org/entry/807c7d)
@@ -49437,13 +51840,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\gamma$$
+$$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\operatorname{EulerGamma}$$
 
 [`89bed3` · Fungrim entry ↗](https://fungrim.org/entry/89bed3)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\gamma-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
+$$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\operatorname{EulerGamma}-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
 
 [`8c368f` · Fungrim entry ↗](https://fungrim.org/entry/8c368f)
 
@@ -49465,13 +51868,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\gamma-2\ln(2)-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{5}{6})=(3^{1/2}\pi)/2-\operatorname{EulerGamma}-2\ln(2)-\frac{3\ln(3)}{2}$$
 
 [`967bbb` · Fungrim entry ↗](https://fungrim.org/entry/967bbb)
 
 ---
 
-$$\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\gamma-\frac{3\ln(3)}{2}$$
+$$\mathrm{Digamma}(\frac{1}{3})=-((3^{1/2}\pi)/6)-\operatorname{EulerGamma}-\frac{3\ln(3)}{2}$$
 
 [`98f642` · Fungrim entry ↗](https://fungrim.org/entry/98f642)
 
@@ -49485,7 +51888,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z)=-(\frac{1}{z})-\gamma+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}$$
+$$\mathrm{Digamma}(z)=-(\frac{1}{z})-\operatorname{EulerGamma}+\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n}$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -49493,7 +51896,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\gamma$$
+$$\mathrm{Digamma}(z)=\int_{0}^{1}\!\frac{1-t^{z-1}}{1-t}\, \mathrm{d}t-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -49526,7 +51929,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Digamma}(2)=1-\gamma$$
+$$\mathrm{Digamma}(2)=1-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`ada157` · Fungrim entry ↗](https://fungrim.org/entry/ada157)
@@ -49578,7 +51981,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\gamma$$
+$$\mathrm{Digamma}(1+z)=(\sum_{n=1}^{\infty}(-1)^{n+1}\Zeta(n+1)z^{n})-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -49603,7 +52006,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8G$$
+$$\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8\operatorname{G}$$
 
 Used by the Compute Engine for simplification.
 [`d2f9fb` · Fungrim entry ↗](https://fungrim.org/entry/d2f9fb)
@@ -49642,14 +52045,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(1)=-\gamma$$
+$$\mathrm{Digamma}(1)=-\operatorname{EulerGamma}$$
 
 Used by the Compute Engine for simplification.
 [`ea2482` · Fungrim entry ↗](https://fungrim.org/entry/ea2482)
 
 ---
 
-$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\gamma$$
+$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -49658,7 +52061,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(k/n+z))$$
+$$\mathrm{Digamma}(nz)=\ln(n)+\frac{1}{n}(\sum_{k=0}^{n-1}\mathrm{Digamma}(z+k/n))$$
 
 **Holds when** $n\in\N^*\land z\in\C\land nz\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -49674,13 +52077,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\gamma-3\ln(2)$$
+$$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\operatorname{EulerGamma}-3\ln(2)$$
 
 [`f93bae` · Fungrim entry ↗](https://fungrim.org/entry/f93bae)
 
 ---
 
-$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\gamma$$
+$$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}\, \mathrm{d}t-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -49799,7 +52202,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((k+z)\mathrm{RisingFactorial}(z, k))$$
+$$\mathrm{RisingFactorial}(z+1, k)=\frac{1}{z}((z+k)\mathrm{RisingFactorial}(z, k))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace\land k\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
@@ -49953,7 +52356,7 @@ Used by the Compute Engine for simplification.
 
 $$\binom{z}{k}=\frac{\Gamma(z+1)}{\Gamma(k+1)\Gamma(z-k+1)}$$
 
-**Holds when** $z\in\C\land k\in\N\land z-k\notin-\infty..-1$.
+**Holds when** $z\in\C\land k\in\N\land z-k\notin-\infty..(-1)$.
 Used by the Compute Engine for simplification.
 [`e87c43` · Fungrim entry ↗](https://fungrim.org/entry/e87c43)
 
@@ -49972,7 +52375,7 @@ Used by the Compute Engine for simplification.
 
 $$\Gamma(z-1)=\frac{\Gamma(z)}{z-1}$$
 
-**Holds when** $z\in\C\setminus-\infty..1$.
+**Holds when** $z\in\C\setminus(-\infty..1)$.
 Used by the Compute Engine for simplification.
 [`14af98` · Fungrim entry ↗](https://fungrim.org/entry/14af98)
 
@@ -50020,7 +52423,7 @@ Used by the Compute Engine for simplification.
 
 $$\Gamma(z)=(z-1)\Gamma(z-1)$$
 
-**Holds when** $z\in\C\setminus-\infty..1$.
+**Holds when** $z\in\C\setminus(-\infty..1)$.
 Used by the Compute Engine for simplification.
 [`639d91` · Fungrim entry ↗](https://fungrim.org/entry/639d91)
 
@@ -50034,7 +52437,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\gamma z$$
+$$\mathrm{GammaLn}(1+z)=(\sum_{k=2}^{\infty}\frac{1}{k}(\Zeta(k)(-z)^{k}))-\operatorname{EulerGamma}z$$
 
 **Holds when** $z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
@@ -50042,7 +52445,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}((z+n)-1/2)\ln((z+n)/((z+n)-1))-1)$$
+$$\Gamma(z)=\sqrt{2\pi}z^{z-\frac{1}{2}}\exp(-z)\exp(\sum_{n=1}^{\infty}(((z+n)-1/2)\ln((z+n)/((z+n)-1))-1))$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -50110,7 +52513,7 @@ Used by the Compute Engine for simplification.
 $$\vert\Gamma(\frac{1}{2}+y\imaginaryI)\vert=\sqrt{\frac{\pi}{\cosh(\pi y)}}$$
 
 **Holds when** $y\in\R$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`c7b921` · Fungrim entry ↗](https://fungrim.org/entry/c7b921)
 
 ---
@@ -50185,7 +52588,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Dedekind eta function
 
-$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
+$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50194,7 +52597,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[4]{2^{1/4}-1}\sqrt{(1+2^{1/2})^{1/2}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\sqrt[4]{2^{1/4}-1}\sqrt{\sqrt{1+2^{1/2}}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}\mathrm{DedekindEta}(\imaginaryI)$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -50210,7 +52613,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((\frac{1}{2}\imaginaryI)\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{\imaginaryI\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)}{2\pi}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
@@ -50219,7 +52622,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\sqrt[8]{3}\exp(-((1/24\imaginaryI)\pi))\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
+$$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\exp(-((\pi\imaginaryI)/24))\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
 
 Used by the Compute Engine for simplification.
 [`204acd` · Fungrim entry ↗](https://fungrim.org/entry/204acd)
@@ -50241,7 +52644,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{1}{2}(2^{1/2}\times3^{3/4})}}{6^{\frac{3}{8}}}$$
+$$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{3^{3/4}}{2^{1/2}}}\mathrm{DedekindEta}(\imaginaryI)}{6^{\frac{3}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -50257,7 +52660,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(7\imaginaryI)=\sqrt[4]{7^{1/2}-7/2+\frac{1}{2}((4\times7^{1/2}-7)^{1/2})}/\sqrt{7}\mathrm{DedekindEta}(\imaginaryI)$$
+$$\mathrm{DedekindEta}(7\imaginaryI)=(\sqrt[4]{\sqrt{7}-\frac{7}{2}+\frac{1}{2}(\sqrt{4\times7^{1/2}-7})}\mathrm{DedekindEta}(\imaginaryI))/\sqrt{7}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -50265,7 +52668,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau))\mathrm{EisensteinE}(2, \tau)$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau)\mathrm{EisensteinE}(2, \tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50303,7 +52706,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp((1/24\imaginaryI)\pi)\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
+$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp(\frac{\pi\imaginaryI}{24})\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50319,7 +52722,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt{2^{1/4}-1}}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\sqrt{2^{1/4}-1}\mathrm{DedekindEta}(\imaginaryI)}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -50344,7 +52747,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\sqrt{3}\imaginaryI)=\frac{\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{\pi\times2^{\frac{4}{3}}}$$
+$$\mathrm{DedekindEta}(\sqrt{3}\imaginaryI)=\frac{\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{2^{\frac{4}{3}}\pi}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -50371,7 +52774,7 @@ Used by the Compute Engine for simplification.
 
 ## Illustrations of Eisenstein series
 
-$$\mathrm{EisensteinE}(2, \tau)=-(\frac{(12\imaginaryI)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
+$$\mathrm{EisensteinE}(2, \tau)=-(\frac{12\imaginaryI\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50421,7 +52824,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\sum_{m=1}^{\infty}\exp(2\imaginaryI\pi mn\tau)n^{2k-1})}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\sum_{m=1}^{\infty}n^{2k-1}\exp(2\pi\imaginaryI\tau)^{mn}))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50542,7 +52945,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\imaginaryI\pi n\tau))}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\pi\imaginaryI\tau)^{n})}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50559,7 +52962,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\exp(2\imaginaryI\pi n\tau)n^{2k-1})/(1-\exp(2\imaginaryI\pi n\tau)))}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(n^{2k-1}\exp(2\pi\imaginaryI\tau)^{n})/(1-\exp(2\pi\imaginaryI\tau)^{n}))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50631,7 +53034,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}\sum_{n\in \Z}((m\tau+n)^{2k})^{-1})$$
+$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}(\sum_{n\in \Z}((m\tau+n)^{2k})^{-1}))$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series.
@@ -50673,7 +53076,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}((4\imaginaryI)\pi\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
+$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}(4\pi\imaginaryI\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series.
@@ -50716,7 +53119,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50891,7 +53294,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50931,7 +53334,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -50963,7 +53366,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}\sqrt[4]{\sqrt{2}+1}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -50979,7 +53382,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{2})=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI){(2^{1/2}-1)}^{\frac{2}{3}}\sqrt[12]{4+3\sqrt{2}}}{2^{\frac{7}{24}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{2})=\frac{{(2^{1/2}-1)}^{\frac{2}{3}}\sqrt[12]{4+3\sqrt{2}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{24}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51003,7 +53406,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51011,7 +53414,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\imaginaryI\pi)^{r}}$$
+$$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\pi\imaginaryI)^{r}}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N\land s\in\N$.
 Used by the Compute Engine for simplification.
@@ -51027,7 +53430,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+10\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{7}{8}}}{5(\sqrt[4]{5}-1)\sqrt{1+\sqrt{5}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+10\imaginaryI)=\frac{2^{\frac{7}{8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{(5^{1/4}-1)\sqrt{5\sqrt{5}+5}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51051,7 +53454,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{7/16}}&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -51139,7 +53542,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)/\sqrt{y}$$
+$$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{y})/\sqrt{y}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -51155,7 +53558,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{5\sqrt{5^{1/2}-2}}$$
+$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt{5\times5^{1/2}-10}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51219,7 +53622,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{1+\sqrt{3}+\sqrt{2}\sqrt[4]{27}}}{2^{\frac{11}{24}}\times3^{\frac{3}{8}}\sqrt[6]{3^{1/2}-1}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+6\imaginaryI)=\frac{\sqrt[3]{1+\sqrt{3}+\sqrt{2}\sqrt[4]{27}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{11}{24}}\times3^{\frac{3}{8}}\sqrt[6]{\sqrt{3}-1}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51323,7 +53726,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51347,7 +53750,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{-4+2\sqrt{2}\times3^{3/4}+2\sqrt{3}+3\sqrt{2}-3^{3/4}+3^{5/4}}}{2\times3^{\frac{3}{8}}\sqrt[6]{(2^{1/2}-1)(3^{1/2}-1)}}$$
+$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\sqrt[3]{(3\times2^{1/2}-4+3^{5/4}+2\sqrt{3})-3^{3/4}+2\sqrt{2}\times3^{\frac{3}{4}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2\times3^{\frac{3}{8}}\sqrt[6]{(\sqrt{2}-1)(\sqrt{3}-1)}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51371,7 +53774,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{2-3\times2^{1/2}+3^{5/4}+3^{3/4}}}{2^{19/48}\times3^{3/8}}}{\sqrt[3]{-1+\sqrt{2}\times3^{3/4}-\sqrt{3}}\sqrt[12]{2^{1/2}-1}\sqrt[6]{1+\sqrt{3}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\frac{{(2-3\times2^{1/2}+3^{5/4}+3^{3/4})}^{1/3}}{2^{19/48}\times3^{3/8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[12]{\sqrt{2}-1}\sqrt[6]{\sqrt{3}+1}\sqrt[3]{(-1)-\sqrt{3}+\sqrt{2}\times3^{\frac{3}{4}}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51403,7 +53806,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 45\imaginaryI)=\frac{\sqrt{10}(3+\sqrt{5}+(\sqrt{3}+\sqrt{5}+\sqrt[4]{60})\sqrt[3]{2+\sqrt{3}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{30\sqrt{1+\sqrt{5}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 45\imaginaryI)=\frac{(3+\sqrt{5}+(\sqrt{3}+\sqrt{5}+\sqrt[4]{60})\sqrt[3]{2+\sqrt{3}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{3\sqrt{10+10\sqrt{5}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51419,7 +53822,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}}{2^{\frac{7}{16}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
+$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{16}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51459,7 +53862,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51515,7 +53918,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51554,7 +53957,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+\frac{1}{\sqrt[4]{2}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{2}}}{\sqrt{1+\sqrt{2}}}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+2^{-(1/4)})\sqrt{\frac{2^{1/2}+1}{2}}\sqrt{2}}{\sqrt{1+\sqrt{2}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -51586,7 +53989,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51626,7 +54029,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{7/16}}&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -51738,7 +54141,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51778,7 +54181,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51930,7 +54333,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt[4]{\frac{\sqrt{6}\Gamma(1/24)\Gamma(5/24)\Gamma(7/24)\Gamma(11/24)}{96(18-10\sqrt{3}-7\sqrt{6}+12\sqrt{2})\pi^3}}$$
+$$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt[4]{\frac{\sqrt{6}\Gamma(1/24)\Gamma(5/24)\Gamma(7/24)\Gamma(11/24)}{96\pi^3((18+12\times2^{1/2})-10\times3^{1/2}-7\times6^{1/2})}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [mathworld.wolfram.com](http://mathworld.wolfram.com/PolyasRandomWalkConstants.html)
@@ -51946,7 +54349,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\times(-1)^{n}\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})-\tan(\pi z)$$
+$$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{(-1)^{n}\exp(\pi\imaginaryI\tau)^{2n}\sin(2\pi nz)}{1-\exp(\pi\imaginaryI\tau)^{2n}})-\tan(\pi z)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\cos(\pi z)\ne0$.
 Used by the Compute Engine for simplification.
@@ -51970,7 +54373,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -51978,7 +54381,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{5+2\sqrt{5}}}{5^{\frac{3}{4}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\sqrt{5+2\sqrt{5}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{5^{\frac{3}{4}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -52065,7 +54468,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -52105,7 +54508,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}\sqrt[4]{\sqrt{2}+1}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -52121,7 +54524,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})$$
+$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\exp(\pi\imaginaryI\tau)^{2n}\sin(2\pi nz)}{1-\exp(\pi\imaginaryI\tau)^{2n}})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\sin(\pi z)\ne0$.
 Used by the Compute Engine for simplification.
@@ -52153,7 +54556,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{\sqrt{2}(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)}{2\sqrt{y}}$$
+$$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{y})}{\sqrt{2y}}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -52161,7 +54564,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}}{2^{\frac{7}{8}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
+$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -52257,7 +54660,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 3\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{3}}}{\sqrt[4]{2}\times3^{\frac{3}{8}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 3\imaginaryI)=\frac{\sqrt{\sqrt{3}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}\times3^{\frac{3}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -52395,7 +54798,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{(-2\imaginaryI)\pi\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{-2\pi\imaginaryI\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
 
 **Holds when** $\Im(\tau)\gt0\land\mathrm{EisensteinE}(4, \tau)\ne0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -52438,7 +54841,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{16})}^3$$
+$$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+2^8\frac{\mathrm{DedekindEta}(2\tau)}{\mathrm{DedekindEta}(\tau)}^{16})}^3$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -52522,7 +54925,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=((-2\imaginaryI)\pi\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=(-2\pi\imaginaryI\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -52577,7 +54980,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau)))\mathrm{ModularLambda}(\tau)$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau))\mathrm{ModularLambda}(\tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
@@ -52612,7 +55015,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\tau)=\frac{256{(-\mathrm{ModularLambda}(\tau)+\mathrm{ModularLambda}(\tau)^2+1)}^3}{(1-\mathrm{ModularLambda}(\tau))^2\mathrm{ModularLambda}(\tau)^2}$$
+$$\mathrm{ModularJ}(\tau)=\frac{256{(1-\mathrm{ModularLambda}(\tau)+\mathrm{ModularLambda}(\tau)^2)}^3}{\mathrm{ModularLambda}(\tau)^2(1-\mathrm{ModularLambda}(\tau))^2}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant; **ModularLambda** — Modular lambda function.
@@ -52629,7 +55032,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen-\infty, 0\rparen$$
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack-\infty, 0\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
@@ -52647,7 +55050,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(2\tau)^{16}\mathrm{DedekindEta}(\tau/2)^8)/\mathrm{DedekindEta}(\tau)^{24}$$
+$$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(\tau/2)^8\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
@@ -52725,7 +55128,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((2\imaginaryI)(-6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+8\mathrm{WeierstrassZeta}(\frac{1}{2}, 2\tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \frac{\tau}{2}))\mathrm{ModularLambda}(\tau))$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}(2\imaginaryI((\mathrm{WeierstrassZeta}(1/2, \tau/2)+8\mathrm{WeierstrassZeta}(1/2, 2\tau))-6\mathrm{WeierstrassZeta}(1/2, \tau))\mathrm{ModularLambda}(\tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function; **WeierstrassZeta** — Weierstrass zeta function.
@@ -52734,7 +55137,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen1, \infty\rparen$$
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack1, \infty\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
@@ -53311,7 +55714,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\gamma)$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\operatorname{EulerGamma})$$
 
 **Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
 Used by the Compute Engine for simplification.
@@ -53399,7 +55802,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-(x^2-1)^{1/2})}^{n})$$
+$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-{(x^2-1)}^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -53534,7 +55937,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+(x^2-1)^{1/2})}^{n}-{(x-(x^2-1)^{1/2})}^{n})$$
+$$\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+{(x^2-1)}^{1/2})}^{n}-{(x-{(x^2-1)}^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -53543,7 +55946,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{(x-1)^{r}}$$
+$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})}{(x-1)^{r}}$$
 
 **Holds when** $n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -53778,7 +56181,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{2(x-1)^{r}}$$
+$$x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})}{2(x-1)^{r}}$$
 
 **Holds when** $n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -53919,7 +56322,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{n!\times2^{n}}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{2^{n}n!}$$
 
 **Holds when** $n\in\N$ &nbsp;_or_&nbsp; $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -53927,7 +56330,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{(-1)^{n}\binom{2n}{n}}{4^{n}}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -53935,7 +56338,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, z)=\frac{(-1)^{n}\binom{2n}{n}\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -53943,7 +56346,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{(-1)^{n}(2n+1)\binom{2n}{n}}{4^{n}}z\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -54056,7 +56459,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Bell numbers
 
-$$\mathrm{BellNumber}(n)=\frac{2\Im(\int_{0}^{\pi}\!\sin(nx)\exp(\exp(\exp(\imaginaryI x)))\, \mathrm{d}x)n!}{\exponentialE\pi}$$
+$$\mathrm{BellNumber}(n)=\frac{2n!\Im(\int_{0}^{\pi}\!\exp(\exp(\exp(\imaginaryI x)))\sin(nx)\, \mathrm{d}x)}{\pi\exponentialE}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -54076,7 +56479,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliB}(2n)=\frac{2\Zeta(2n)(2n)!\times(-1)^{n+1}}{(2\pi)^{2n}}$$
+$$\mathrm{BernoulliB}(2n)=\frac{(-1)^{n+1}\times2(2n)!\Zeta(2n)}{(2\pi)^{2n}}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -54407,7 +56810,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n})/\sqrt{5}\sinh(n(\ln(\varphi)+\frac{\pi}{2}\imaginaryI))$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -54634,7 +57037,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..\max(q, 2)-1, \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
+$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletGroup** — Dirichlet characters with given modulus.
@@ -54645,7 +57048,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..p^{e_{var}}-1\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -54724,14 +57127,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(q, \ell)\lhd n=\mathrm{DirichletCharacter}(q, \ell, n)$$
 
-**Holds when** $q\in\N^*\land\ell\in1..\max(q, 2)-1\land\gcd(\ell, q)=1\land n\in\Z$.
+**Holds when** $q\in\N^*\land\ell\in1..(\max(q, 2)-1)\land\gcd(\ell, q)=1\land n\in\Z$.
 **Symbols:** **DirichletCharacter** — Dirichlet character.
 Used by the Compute Engine for simplification.
 [`d9a187` · Fungrim entry ↗](https://fungrim.org/entry/d9a187)
 
 ---
 
-$$\mathrm{PrimitiveDirichletCharacters}(q)=\mathrm{Filter}(\mathrm{DirichletGroup}(q), \chi\mapsto\forall d\in1..q-1, (d\mid q)\implies(\exists a\in0..q-1, \mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))$$
+$$\mathrm{PrimitiveDirichletCharacters}(q)=\mathrm{Filter}(\mathrm{DirichletGroup}(q), \chi\mapsto\forall d\in1..(q-1), ((d\mid q)\implies(\exists a\in0..(q-1), (\mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletGroup** — Dirichlet characters with given modulus; **PrimitiveDirichletCharacters** — Primitive Dirichlet characters with given modulus.
@@ -54810,7 +57213,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8G$$
+$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8\operatorname{G}$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -54861,7 +57264,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Li}_{s}(z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\operatorname{Li}_{s}(z)=\frac{\Gamma(1-s)(\imaginaryI^{1-s}\mathrm{HurwitzZeta}(1-s, \frac{1}{2}+\frac{\ln(-z)}{2\pi\imaginaryI})+\imaginaryI^{s-1}\mathrm{HurwitzZeta}(1-s, 1/2-\ln(-z)/(2\pi\imaginaryI)))}{(2\pi)^{1-s}}$$
 
 **Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -54950,7 +57353,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(n, a)=\frac{\mathrm{PolyGamma}(n-1, a)\times(-1)^{n}}{(n-1)!}$$
+$$\mathrm{HurwitzZeta}(n, a)=\frac{(-1)^{n}\mathrm{PolyGamma}(n-1, a)}{(n-1)!}$$
 
 **Holds when** $n\in2..\infty\land a\in\C$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -54984,7 +57387,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{3}{4})=\pi^2-8G$$
+$$\mathrm{HurwitzZeta}(2, \frac{3}{4})=\pi^2-8\operatorname{G}$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -55209,7 +57612,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})$$
+$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}((-1)^{n}\mathrm{StieltjesGamma}(n, a)(s-1)^{n})$$
 
 **Holds when** $s\in\C\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **StieltjesGamma** — Stieltjes constant.
@@ -55235,7 +57638,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\gamma\ln(2)-\ln(2)^2$$
+$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\operatorname{EulerGamma}\ln(2)-\ln(2)^2$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -55251,7 +57654,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\sum_{k=1}^{M}(\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k))/((2k)!N_{var}^{2k-1})+\frac{1}{2}}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t$$
+$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\frac{1}{2}+\sum_{k=1}^{M}(\mathrm{BernoulliB}(2k)\mathrm{RisingFactorial}(s, 2k-1))/((2k)!N_{var}^{2k-1})}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)\mathrm{RisingFactorial}(s, 2M)}{(2M)!t^{s+2M}}\, \mathrm{d}t$$
 
 **Holds when** $s\in\C\land s\ne1\land N_{var}\in\Z\land M\in\Z\land\Re((s+2M)-1)\gt0\land N_{var}\ge1\land M\ge1$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
@@ -55263,7 +57666,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{StieltjesGamma}(0, 1)=\mathrm{StieltjesGamma}(0)=\gamma$$
+$$\mathrm{StieltjesGamma}(0, 1)=\mathrm{StieltjesGamma}(0)=\operatorname{EulerGamma}$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -55278,7 +57681,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})$$
+$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}((-1)^{n}\mathrm{StieltjesGamma}(n)(s-1)^{n})$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
@@ -55296,7 +57699,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{KeiperLiLambda}(1)=(\frac{\gamma}{2}+1)-\frac{\ln(4\pi)}{2}$$
+$$\mathrm{KeiperLiLambda}(1)=(\frac{\operatorname{EulerGamma}}{2}+1)-\frac{\ln(4\pi)}{2}$$
 
 **Symbols:** **KeiperLiLambda** — Keiper-Li coefficient.
 Used by the Compute Engine for simplification.
@@ -55331,7 +57734,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1440 identities** behind the engine's **1450 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1435 identities** behind the engine's **1445 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -55339,13 +57742,13 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Areas
 
-### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (212)
+### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (211)
 
-Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (26)
+Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (25)
 
-### [Complex numbers](/compute-engine/reference/fungrim-complex/) (40)
+### [Complex numbers](/compute-engine/reference/fungrim-complex/) (36)
 
-Complex parts (21) · Complex plane (3) · Imaginary unit (16)
+Complex parts (21) · Complex plane (3) · Imaginary unit (12)
 
 ### [Gamma and related functions](/compute-engine/reference/fungrim-gamma/) (162)
 

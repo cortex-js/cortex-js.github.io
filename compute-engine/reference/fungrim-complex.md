@@ -2,7 +2,7 @@
 
 # Complex numbers
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **40 identities** for complex numbers.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **36 identities** for complex numbers.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -12,7 +12,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Complex parts](#complex-parts) (21)
 - [Complex plane](#complex-plane) (3)
-- [Imaginary unit](#imaginary-unit) (16)
+- [Imaginary unit](#imaginary-unit) (12)
 
 ## Complex parts
 
@@ -134,7 +134,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arg(x+y\imaginaryI)=\mathrm{Arctan_2}(y, x)$$
+$$\arg(x+y\imaginaryI)=\arctan(y, x)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -225,7 +225,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Li}_{2}(\imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
+$$\operatorname{Li}_{2}(\imaginaryI)=\operatorname{G}\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)
@@ -236,13 +236,6 @@ $$\Re(\imaginaryI)=0$$
 
 Used by the Compute Engine for simplification.
 [`249fd6` · Fungrim entry ↗](https://fungrim.org/entry/249fd6)
-
----
-
-$$\imaginaryI^2=-1$$
-
-Used by the Compute Engine for simplification.
-[`31b0df` · Fungrim entry ↗](https://fungrim.org/entry/31b0df)
 
 ---
 
@@ -274,20 +267,6 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\imaginaryI}=-\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`67c262` · Fungrim entry ↗](https://fungrim.org/entry/67c262)
-
----
-
-$$\imaginaryI^3=-\imaginaryI$$
-
-Used by the Compute Engine for simplification.
-[`8be138` · Fungrim entry ↗](https://fungrim.org/entry/8be138)
-
----
-
 $$\vert\Gamma(\imaginaryI)\vert=\sqrt{\frac{\pi}{\sinh(\pi)}}$$
 
 Used by the Compute Engine for simplification.
@@ -307,13 +286,6 @@ $$\imaginaryI^{n}=\begin{cases}1&\mathrm{CongruentMod}(n, 0, 4)\\\imaginaryI&\ma
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
 [`c12a41` · Fungrim entry ↗](https://fungrim.org/entry/c12a41)
-
----
-
-$$\imaginaryI^4=1$$
-
-Used by the Compute Engine for simplification.
-[`e0425a` · Fungrim entry ↗](https://fungrim.org/entry/e0425a)
 
 ---
 
