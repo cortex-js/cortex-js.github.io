@@ -57,6 +57,45 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features
 
+- **Parameterized nominal types: `type tree<T> = tuple<value: T, children: list<tree<T>>>`.** A nominal `type` declaration now takes the same
+  type-parameter clause a generic alias takes, in Cortex as above and from the
+  host with
+  `ce.declareType('tree', '…', { typeParams: [{ name: 'T', variance: 'out' }] })`.
+  Unlike an alias, an application is **opaque** — `tree<integer>` is never
+  expanded — which is precisely what lets the definition refer to itself, so a
+  recursive parametric container (a rose tree, a JSON with a payload, a zipper)
+  is expressible for the first time. The arity, bound and unused-parameter rules
+  are the alias's, shared and generalized; self-reference, which an alias
+  forbids, is the point here.
+
+  A parameter carries a **variance** marker — `out` (covariant), `in`
+  (contravariant) or `inout` (invariant) — saying how two applications relate:
+  under `out`, a `tree<integer>` is usable where a `tree<number>` is expected.
+  **No marker means `out`**, declared rather than inferred and verified against
+  the definition like a written one: values are immutable, so covariance is
+  sound and is what a payload container wants, and only the consuming minority
+  pays an annotation. Because the default is declared, a definition that uses
+  its parameter in an input position does not quietly change the type's
+  subtyping contract — it is a `variance-violation` at the declaration, naming
+  the violated variance and where it came from, the offending occurrences by
+  path (`notify.(arg 1)`), and exactly the markers that would verify. `inout`
+  verifies against any definition. Variance and bounds do not interact.
+
+  A `tuple` definition mints a **quantified** constructor
+  (`tree: forall T. (T, list<tree<T>>) -> tree<T>`), so `tree(1, [])` solves
+  `T = finite_integer` from its arguments; a `record` definition is still
+  inhabited by a constructor function, whose own clause is independent of the
+  type's. Field access and `match` read the definition **instantiated at the
+  application's arguments** — with `t: tree<number>`, `t.value` is a `number`
+  and `match t { tree(v, cs) => … }` binds `cs: list<tree<number>>`. Compilation
+  erases the tag at the instantiated definition, as it already did for an
+  unparameterized nominal type: `tree<integer>` compiles like the equivalent
+  tuple, and declines identically where that would. One documented limitation: a
+  construction solves its parameters from its arguments alone and an annotation
+  does not widen them, so an explicitly `inout`/`in` parameterized type can only
+  be constructed at exactly its argument type. See the new "Parameterized
+  Nominal Types" section of the types guide.
+
 - **Cortex: `break` and `continue`.** They leave, or skip to the next iteration
   of, the innermost enclosing `while`/`for` loop, and lower to the engine's
   existing `Break()`/`Continue()` primitives. Valid anywhere in a loop body,
@@ -99,6 +138,15 @@ import ChangeLog from '@site/src/components/ChangeLog';
   position.
 
 ### Resolved Issues
+
+- **An even root of an even power reduces, and no longer does so for complex
+  values.** `\sqrt[4]{x^2}` now returns `\sqrt{|x|}`. It did not before, because
+  the result is structurally larger and the cost check rejected it — which was
+  quietly masking a soundness bug: the rewrite had no real-domain guard, so for
+  a value declared complex it would have produced `\sqrt{|z|}`, where the
+  principal value of `\sqrt[4]{z^2}` at `z=i` is `e^{i\pi/4}`, not 1. The guard
+  is now in place and the reduction is kept for being the reduced real-domain
+  form rather than the smaller one. A complex-declared base is left alone.
 
 - **A closure returned from a function now resolves captured variables from
   inside a nested block.** `k ↦ (x ↦ if x > 1 { k } else { 0 })` applied at

@@ -223,7 +223,7 @@ Save this program as `squares.cx`:
 
 ```cortex
 square(x) = x^2
-Map(Range(1, 5), square)
+Map(1..5, square)
 ```
 
 Run it:
@@ -269,7 +269,7 @@ import {
 const ce = new ComputeEngine();
 const { value, diagnostics } = executeCortex(
   ce,
-  "factorial(n) = if n <= 1 { 1 } else { n * factorial(n - 1) }\nfactorial(10)"
+  "factorial(n) = 1 if n <= 1 else n * factorial(n - 1)\nfactorial(10)"
 );
 
 if (diagnostics.length > 0) console.error(diagnostics);
@@ -432,9 +432,9 @@ can drift from the implementation.
 
 **What carries over.** The shape of a program: sequential statements,
 lexically scoped functions, closures, first-class lambdas, `Map`/`Filter`, a
-`for x in collection` loop, arbitrary-precision integers, `%` with Python's
-sign convention, negative indices, chained comparisons, and `**` for
-exponentiation.
+`for x in collection` loop, the conditional expression `a if c else b`,
+arbitrary-precision integers, `%` with Python's sign convention, negative
+indices, chained comparisons, and `**` for exponentiation.
 
 **What to unlearn.** Three things, in order of how much trouble they cause:
 
@@ -467,7 +467,7 @@ symbolic, with a did-you-mean warning when a close library name exists
 (`len` suggests `Length`).
 
 ```cortex
-fact(n) = if n <= 1 { 1 } else { n * fact(n - 1) }
+fact(n) = 1 if n <= 1 else n * fact(n - 1)
 let double = x |-> 2x
 (fact(5), double(21))
 // ➔ (120, 42)
@@ -545,7 +545,7 @@ Sum(m)
 | Python | Cortex |
 |:--|:--|
 | `if c: … elif d: … else: …` | `if c { … } else if d { … } else { … }` |
-| `a if c else b` | `if c { a } else { b }` — `if` is an **expression** |
+| `a if c else b` | `a if c else b` — same syntax; chains nest right, so there is no `elif` spelling to learn |
 | `and`, `or`, `not` | `&&`, `\|\|`, `!` (the words are reserved but unimplemented) |
 | `for x in xs:` | `for x in xs { … }` |
 | `for i in range(n):` | `for i in 1..n { … }` |
@@ -921,7 +921,7 @@ let g = x |-> x^2 + 1
 
 | Wolfram | Cortex |
 |:--|:--|
-| `If[c, a, b]` | `if c { a } else { b }` — an expression |
+| `If[c, a, b]` | `a if c else b`, or `if c { a } else { b }` — an expression |
 | `Which[c1, a, c2, b, True, z]` | `if c1 { a } else if c2 { b } else { z }` |
 | `Switch[x, 0, "zero", _, "other"]` | `match x { 0 => "zero"; _ => "other" }` |
 | `Cases[xs, patt]` | `Filter` with a predicate, or `Map` over a `match` |
@@ -1016,7 +1016,7 @@ Surface forms that look like Wolfram but behave differently.
 | `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Cortex operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
 | `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
 | `StringLength`, `ToUpperCase` | Inert — the string library is small | `Length(Characters(s))`; decompose and rebuild |
-| `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(Range(1, n))` |
+| `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(1..n)` |
 | `SameQ[1, 1.]` | `1 === 1.0` is `True` — the lexer folds `1.0` to `1` | *(nothing — but don't read `===` as type-aware)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
 | `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
@@ -1921,6 +1921,12 @@ precedence (for example `+` and `-`, or `*` and `/`).
 Postfix calls and indexing (`f(x)`, `xs[i]`) bind tighter than every entry in
 this table — they are handled directly by the parser rather than through the
 operator table, since they are not spelled with an operator symbol.
+
+The conditional expression `a if c else b` is not an operator row either, but
+it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
+binds looser than every operator that computes and tighter than the forms that
+bind or pair (`=`, `|->`, `|>`, `->`). See
+[Control Flow](/cortex/control-flow/#the-conditional-expression-a-if-c-else-b).
 
 ## The whitespace rule
 
@@ -3442,7 +3448,7 @@ one to a variable stores a snapshot of the element *values*:
 
 ```cortex
 let xs = []
-for k in Range(1, 3) { xs = Join(xs, [k]) }
+for k in 1..3 { xs = Join(xs, [k]) }
 xs
 // ➔ [1, 2, 3]
 ```
@@ -3950,15 +3956,73 @@ definitions it was built from: re-running the `type` statement for
 `Keyed` leaves `Table` as it was until `Table`'s own statement is re-run
 too — which re-running the cell does.
 
-A parameterized **nominal** type — the bare form,
-`type point<T> = tuple<T, T>` — remains **reserved** and reports a
-dedicated `type-variables-unsupported` diagnostic:
+A parameterized **nominal** type — the bare form — takes a clause too, and
+takes it the same way. The difference is what an application means: a
+nominal type is **opaque**, so `tree<integer>` is never expanded, which is
+what lets its body be recursive.
 
-<!-- cortex-test: expect-diagnostics -->
+```cortex-live
+type tree<T> = tuple<value: T, children: list<tree<T>>>
+let t = tree(1, [tree(2, [])])
+Type(t)
+// ➔ "tree<finite_integer>"
+```
+
+The constructor is **quantified** — `tree: forall T. (T, list<tree<T>>) ->
+tree<T>` — so `T` is solved at each construction, from the arguments.
+Applying the type at the wrong arity — including a bare `tree` — is the same
+error as for an alias, and a parameter bound is enforced the same way.
+
+Reading a value reads the definition **instantiated at the application's
+arguments**, so a field or a `match` binding comes back at the type the
+application supplied, not at `T`:
+
+```cortex-live
+type tree<T> = tuple<value: T, children: list<tree<T>>>
+let t: tree<number> = tree(1, [])
+Type(t.value)
+// ➔ "number"
+```
+
+**Variance.** A parameter may carry an `in`/`out`/`inout` marker saying how
+two applications relate: `out` (covariant) makes a `tree<integer>` usable
+where a `tree<number>` is expected, `in` (contravariant) reverses that, and
+`inout` (invariant) relates only identical arguments. The words are
+contextual, claimed only inside a clause. An alias takes no marker — it
+expands rather than relates.
 
 ```cortex
-type point<T> = tuple<T, T>
+type tree<out T> = tuple<value: T, children: list<tree<T>>>
+type sink<in T> = tuple<accept: (T) -> nothing>
 ```
+
+**A parameter with no marker means `out`** — declared, not inferred, and
+verified against the body like any written marker. Values are immutable, so
+covariance is sound, and it is what the common case (a payload container)
+wants; only the minority that consumes its parameter needs to say so. Because
+the default is *declared*, a body that uses its parameter in an input
+position does not quietly change the type's subtyping contract — it is a
+`variance-violation` naming the offending occurrence and the markers that
+would verify:
+
+```cortex
+type events<T> = tuple<log: list<T>, notify: (T) -> nothing>
+```
+
+This statement parses, but declares nothing: it evaluates to an error value
+carrying a `variance-violation`. `T` appears in both an output position
+(`log`) and an input one (`notify.(arg 1)`), so `events` can only be
+`inout` — writing `type events<inout T> = …` accepts the definition, at the
+cost of `events<integer>` no longer being usable as an `events<number>`.
+`inout` verifies against any body: invariance promises nothing, so it is
+always sound, just less permissive.
+
+One limitation follows from that. A construction solves its parameters from
+its arguments alone, and an annotation does not widen them: `let t:
+tree<number> = tree(1, [])` works only because the `tree<finite_integer>` it
+builds *is* a `tree<number>` under `out`. For an explicitly `inout` or `in`
+parameter that step is not available, so such a type can only be constructed
+at exactly its argument type.
 
 Generic **functions** are supported: a `function` definition takes a
 type-parameter clause between its name and its parameter list, and the
@@ -4009,6 +4073,18 @@ type alias Pair<T> = tuple<T, T>
 ["DeclareType", "Pair", {"str": "tuple<T, T>"},
   ["Dictionary", ["KeyValuePair", "alias", "True"],
     ["KeyValuePair", "typeParams", {"str": "T"}]]]
+```
+
+The clause is carried **without** its enclosing `<`/`>`, and a variance
+marker is simply part of that text — the bare form needs no other change:
+
+```cortex
+type tree<out T> = tuple<value: T, children: list<tree<T>>>
+```
+
+```json
+["DeclareType", "tree", {"str": "tuple<value: T, children: list<tree<T>>>"},
+  ["Dictionary", ["KeyValuePair", "typeParams", {"str": "out T"}]]]
 ```
 
 A type is registered when its statement is canonicalized, which is why the
@@ -4188,6 +4264,11 @@ A few idioms these programs rely on:
 - Loops (`for`, `while`) are evaluated **for effect** — accumulate into a
   variable (a number, or a list built up with `Join`/`Append`), or use
   `Map`/`Filter`/`Reduce` for value-producing iteration.
+- `1..n` is the **inclusive** range from 1 to n, and `x |> f` pipes a value
+  into a function — when the function takes several arguments, `_` marks the
+  piped value's slot (`xs |> Map(_, f)`).
+- `a if c else b` is the conditional expression — the same `If` as
+  `if c { a } else { b }`, without the braces.
 - Collection **literals** evaluate their elements; lazy **operators**
   (`Range`, `Map`, `Filter`) are generators that enumerate on demand (see
   [Evaluation](/cortex/evaluation/)).
@@ -4196,12 +4277,12 @@ A few idioms these programs rely on:
 
 ## Iteration and Accumulation
 
-**Sum of the multiples of 3 or 5 below 100.** A `for` loop over a `Range`,
+**Sum of the multiples of 3 or 5 below 100.** A `for` loop over a range,
 accumulating into a variable:
 
 ```cortex
 let total = 0
-for k in Range(1, 99) {
+for k in 1..99 {
   if k % 3 == 0 || k % 5 == 0 { total = total + k }
 }
 total
@@ -4212,7 +4293,7 @@ total
 is a single `Map` — no printing, no mutation:
 
 ```cortex
-Map(Range(1, 15), k |->
+Map(1..15, k |->
   if k % 15 == 0 { "FizzBuzz" }
   else if k % 3 == 0 { "Fizz" }
   else if k % 5 == 0 { "Buzz" }
@@ -4221,13 +4302,13 @@ Map(Range(1, 15), k |->
 ```
 
 **Collatz stopping time.** A `while` loop whose body chooses the next value
-with an `if` expression:
+with a conditional expression:
 
 ```cortex
 let n = 27
 let steps = 0
 while n != 1 {
-  n = if n % 2 == 0 { n / 2 } else { 3n + 1 }
+  n = n / 2 if n % 2 == 0 else 3n + 1
   steps = steps + 1
 }
 steps
@@ -4254,7 +4335,7 @@ appended literal snapshots the loop variable's current value:
 
 ```cortex
 let xs = []
-for k in Range(1, 3) { xs = Join(xs, [k]) }
+for k in 1..3 { xs = Join(xs, [k]) }
 xs
 // ➔ [1, 2, 3]
 ```
@@ -4264,7 +4345,7 @@ xs
 ```cortex
 let a = 0
 let b = 1
-for k in Range(1, 20) {
+for k in 1..20 {
   let t = a + b
   a = b
   b = t
@@ -4273,11 +4354,11 @@ a
 // ➔ 6765
 ```
 
-**A trial-division primality test.** A function with a block body, used to
-count the primes below 100:
+**A trial-division primality test.** A function with a typed parameter and a
+block body, used to count the primes below 100:
 
 ```cortex
-isPrime(n) = if n < 2 { False } else {
+isPrime(n: integer) = if n < 2 { False } else {
   let d = 2
   let prime = True
   while d * d <= n {
@@ -4286,7 +4367,7 @@ isPrime(n) = if n < 2 { False } else {
   prime
 }
 let count = 0
-for k in Range(2, 99) { if isPrime(k) { count = count + 1 } }
+for k in 2..99 { if isPrime(k) { count = count + 1 } }
 count
 // ➔ 25
 ```
@@ -4349,26 +4430,41 @@ pair carried in a two-element list literal, stays exact all the way to F(200)
 — far past the 2⁵³ limit of floating point:
 
 ```cortex
-Fold((p, _) |-> [p[2], p[1] + p[2]], [0, 1], Range(1, 200))[1]
+Fold((p, _) |-> [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
 // ➔ 280571172992510140037611932413038677189525
 ```
 
 ## Recursion
 
 A recursive function refers to itself by name — a one-step definition just
-works, because the name is declared before the body is processed:
+works, because the name is declared before the body is processed. Definition
+statements **accumulate**: repeating a name with a different parameter list
+adds a *clause*, and a call dispatches to the most specific clause that
+matches — so a base case is a literal-parameter clause rather than an `if`
+(see [Multiple clauses](/cortex/control-flow/#multiple-clauses-literal-parameters)):
 
 ```cortex
-fact(n) = if n <= 1 { 1 } else { n * fact(n - 1) }
+fact(0) = 1
+fact(n: integer) = n * fact(n - 1)
 fact(10)
 // ➔ 3628800
 ```
 
-The two-step form — declare with `let`, then assign a `|->` lambda — is
-equivalent (`let fact` followed by
-`fact = n |-> if n <= 1 { 1 } else { n * fact(n - 1) }`). Note that
-*mutually* recursive functions still require declaring all the names with
-`let` before defining any of them.
+**Multi-clause Fibonacci**, with two base clauses:
+
+```cortex
+fib(0) = 0
+fib(1) = 1
+fib(n: integer) = fib(n - 1) + fib(n - 2)
+Map(1..10, fib)
+// ➔ [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+```
+
+A single-clause spelling with a conditional is equivalent
+(`fact(n) = 1 if n <= 1 else n * fact(n - 1)`), as is the two-step form —
+declare with `let`, then assign a `|->` lambda. Note that *mutually*
+recursive functions still require declaring all the names with `let` before
+defining any of them.
 
 ## Higher-Order Functions
 
@@ -4387,14 +4483,14 @@ dg(2)
 // ➔ 12000001/1000000
 ```
 
-Wrap the call in `N(…)` for a floating-point value — numericization reaches
+Pipe the call into `N` for a floating-point value — numericization reaches
 through the user-function/closure call:
 
 ```cortex
 deriv(f, h) = x |-> (f(x + h) - f(x - h)) / (2h)
 g(x) = x^3
 let dg = deriv(g, 1/1000)
-N(dg(2))
+dg(2) |> N
 // ➔ 12.000001
 ```
 
@@ -4453,7 +4549,7 @@ rational number); `N(…)` converts the final result to a float:
 
 ```cortex
 let x = 1
-for k in Range(1, 6) { x = (x + 2/x) / 2 }
+for k in 1..6 { x = (x + 2/x) / 2 }
 N(x)
 // ➔ 1.4142135623730950488
 ```
@@ -4465,7 +4561,7 @@ g(x) = x^2
 let n = 100
 let h = 1/n
 let area = (g(0) + g(1)) / 2
-for k in Range(1, n - 1) { area = area + g(k * h) }
+for k in 1..n - 1 { area = area + g(k * h) }
 N(area * h)
 // ➔ 0.33335
 ```
@@ -4475,7 +4571,7 @@ N(area * h)
 ```cortex
 let inside = 0
 let total = 500
-for k in Range(1, total) {
+for k in 1..total {
   let px = Random()
   let py = Random()
   if px^2 + py^2 < 1 { inside = inside + 1 }
@@ -4490,8 +4586,8 @@ with a seeded random frame. The block replays exactly, while repeated draws
 nest, and the innermost one wins. Outside any frame, draws are live:
 
 ```cortex
-let a = WithRandomSeed(7, [Random(Range(1, 100)), Random(Range(1, 100))])
-let b = WithRandomSeed(7, [Random(Range(1, 100)), Random(Range(1, 100))])
+let a = WithRandomSeed(7, [Random(1..100), Random(1..100)])
+let b = WithRandomSeed(7, [Random(1..100), Random(1..100)])
 a == b
 // ➔ True
 ```
@@ -4592,7 +4688,7 @@ an exact rational — no floating-point drift:
 
 ```cortex
 let h = 0
-for k in Range(1, 20) { h = h + 1/k }
+for k in 1..20 { h = h + 1/k }
 h
 // ➔ 55835135/15519504
 ```
@@ -4636,7 +4732,7 @@ closed form of the golden ratio:
 
 ```cortex
 let x = 2
-for k in Range(1, 40) { x = 1 + 1/x }
+for k in 1..40 { x = 1 + 1/x }
 let phi = $\frac{1 + \sqrt{5}}{2}$
 N(Abs(x - phi))
 // ➔ ≈ 6.24e-18
@@ -4668,17 +4764,17 @@ count
 pentagon on the unit circle; their vector sum is exactly zero:
 
 ```cortex
-Sum(Exp(2*Pi*ImaginaryUnit*k/5), (k, 0, 4))
+Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
 // ➔ 0
 ```
 
 (`N(…)` of the same sum returns zero to floating-point roundoff, ≈ 1e-16.)
 
-**An exact rational Fold.** Folding `1/k` over a `Range` keeps the accumulator
+**An exact rational Fold.** Folding `1/k` over a range keeps the accumulator
 an exact rational — the 10th harmonic number:
 
 ```cortex
-Fold((a, k) |-> a + 1/k, 0, Range(1, 10))
+Fold((a, k) |-> a + 1/k, 0, 1..10)
 // ➔ 7381/2520
 ```
 
@@ -4717,13 +4813,12 @@ let x = 2^11 - 1
 ```
 
 **A formatted table.** `\t` and `\n` escapes in a string literal are real
-control characters. Build a table of `n`, `n²`, `n³` — a plain header string
-plus one interpolated row per value, joined with `Fold`/`StringJoin`:
+control characters. Build a table of `n`, `n²`, `n³` — one interpolated row
+per value, folded onto the header with `StringJoin` in a pipeline:
 
 ```cortex
 let header = "n\tn^2\tn^3\n"
-let lines = Map(Range(1, 5), n |-> "\(n)\t\(n^2)\t\(n^3)\n")
-StringJoin(header, Fold((acc, line) |-> StringJoin(acc, line), "", lines))
+1..5 |> Map(_, n |-> "\(n)\t\(n^2)\t\(n^3)\n") |> Fold(StringJoin, header, _)
 ```
 
 produces (tabs aligned, newline-separated rows):
@@ -4741,7 +4836,7 @@ n	n^2	n^3
 characters (grapheme clusters); `Tally` counts them:
 
 ```cortex
-let freq = Tally(Characters("mississippi"))
+let freq = "mississippi" |> Characters |> Tally
 let d = DictionaryFrom(Zip(freq[1], freq[2]))
 (d["m"], d["i"], d["s"], d["p"])
 // ➔ (1, 4, 4, 2)
@@ -4756,16 +4851,12 @@ let words = StringSplit("the quick brown fox the lazy dog the")
 // ➔ (8, [3, 1, 1, 1, 1, 1])
 ```
 
-**A Caesar cipher.** `UnicodeScalars` turns a string into its code points;
-shifting each and rebuilding with `StringFrom(…, "unicode-scalars")` is the
-inverse operation, so encoding then decoding round-trips:
+**A Caesar cipher.** A three-stage pipeline: `UnicodeScalars` turns a string
+into its code points, `Map` shifts each, and `StringFrom(…, "unicode-scalars")`
+rebuilds the string. Shifting back decodes, so the cipher round-trips:
 
 ```cortex
-function shift(s, k) {
-  let out = []
-  for c in UnicodeScalars(s) { out = Join(out, [c + k]) }
-  StringFrom(out, "unicode-scalars")
-}
+shift(s, k) = s |> UnicodeScalars |> Map(_, c |-> c + k) |> StringFrom(_, "unicode-scalars")
 (shift("hello", 3), shift(shift("hello", 3), -3))
 // ➔ ("khoor", "hello")
 ```
@@ -4803,11 +4894,11 @@ let xs = [4, 8, 15, 16, 23, 42]
 // ➔ (18, 31/2, 42, 182)
 ```
 
-**Filter and reduce** with anonymous functions:
+**Filter and reduce** with anonymous functions, chained into a pipeline —
+`_` is the piped value:
 
 ```cortex
-let evens = Filter(Range(1, 10), n |-> n % 2 == 0)
-Reduce(evens, (acc, n) |-> acc + n)
+1..10 |> Filter(_, n |-> n % 2 == 0) |> Reduce(_, (acc, n) |-> acc + n)
 // ➔ 30
 ```
 
@@ -4826,6 +4917,14 @@ let m = [[1, 2], [3, 4]]
 // ➔ 18
 ```
 
+When a stage takes several arguments, `_` marks the slot the piped value
+fills. The primes below 100, counted:
+
+```cortex
+1..100 |> Filter(_, IsPrime) |> Length
+// ➔ 25
+```
+
 **Spread arguments.** In a call argument list, `...t` splices the elements of
 the tuple `t` in as positional arguments; several spreads splice in order:
 
@@ -4841,7 +4940,7 @@ dot(...p, ...q)
 explicit initial value:
 
 ```cortex
-Fold((acc, n) |-> acc + n^2, 0, Range(1, 5))
+Fold((acc, n) |-> acc + n^2, 0, 1..5)
 // ➔ 55
 ```
 
@@ -4906,9 +5005,9 @@ let value = {"I" -> 1, "V" -> 5, "X" -> 10, "L" -> 50, "C" -> 100, "D" -> 500, "
 let s = ["M","C","M","X","C","I","V"]
 let n = Length(s)
 let total = 0
-for i in Range(1, n) {
+for i in 1..n {
   let cur = value[s[i]]
-  if i < n && cur < value[s[i + 1]] { total = total - cur } else { total = total + cur }
+  total = total - cur if i < n && cur < value[s[i + 1]] else total + cur
 }
 total
 // ➔ 1994
@@ -5196,7 +5295,7 @@ Unclosed blocks, collections, strings, and expressions ending with an operator
 continue at a secondary prompt:
 
 ```text
-cortex> if (x > 0) {
+cortex> if x > 0 {
 ...   x + 1
 ... }
 6
@@ -5498,7 +5597,7 @@ function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
   t * 2                   // a block's value is its last expression
 }
-let parity = if x % 2 == 0 { "even" } else { "odd" }  // if is an EXPRESSION
+let parity = "even" if x % 2 == 0 else "odd"  // conditional expression; if is also an expression: if c { a } else { b }
 g(x) + f(2)
 // ➔ 22
 ```
@@ -5533,7 +5632,8 @@ g(x) + f(2)
   (available in the CLI and any host that injects a LaTeX parser).
 
 **Operator precedence**, loosest → tightest: `:=` · `|->` · `??` (coalesce) ·
-`|>` (pipe) · `->` (key-value) · `||` · `&&` · comparisons
+`|>` (pipe) · `->` (key-value) · `a if c else b` (conditional) · `||` · `&&` ·
+comparisons
 `== != < <= > >= === in !in is` (chainable: `1 < 2 < 3`) · `..` (range) ·
 `+ -` · `* / %` · unary `- !` · `^`/`**` (right-associative) · postfix `!`.
 Calls `f(x)` and indexing `xs[i]` bind tightest of all. A bare `=` has no
@@ -5553,7 +5653,7 @@ actually happens → write instead:**
 | `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
 | `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
-| `cond ? a : b` | Parse diagnostic | `if cond { a } else { b }` — `if` is an expression |
+| `cond ? a : b` | Parse diagnostic | `a if cond else b`, or `if cond { a } else { b }` — both are expressions |
 | `elif` | Parse diagnostic | `else if` |
 | `return` | Reserved word, **not implemented** | A block's value is its last expression |
 | `break` / `continue` | Work as expected inside a `while`/`for` body; the loop context resets at every function and lambda boundary | *(nothing to change)* |
@@ -5590,7 +5690,7 @@ Functions, recursion (self-reference works in a one-step definition, with
 any number of recursive calls — `fib(n-1) + fib(n-2)` is fine), and closures:
 
 ```cortex
-fact(n) = if n <= 1 { 1 } else { n * fact(n - 1) }
+fact(n) = 1 if n <= 1 else n * fact(n - 1)
 makeAdder(k) = x |-> x + k     // closures capture lexically
 let add10 = makeAdder(10)
 add10(fact(5))
@@ -5684,7 +5784,7 @@ Verified operator names, so you don't have to guess (search for more with
 
 - **Numbers**: `Abs`, `Floor`, `Ceil` (not `Ceiling`), `Round`, `Sqrt`,
   `Max`, `Min` (each takes a list or varargs), `Mod`, `GCD`, `LCM`,
-  `IsPrime`, `Random(Range(a, b))`.
+  `IsPrime`, `Random(a..b)`.
 - **Lists**: `Length`, `First`, `Last`, `Rest`, `Take`, `Drop`, `Reverse`,
   `Sort` (optional comparator — see below), `IndexOf`, `Join`, `Append`,
   `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,

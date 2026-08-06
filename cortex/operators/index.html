@@ -19,7 +19,7 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.25b8f946.css">
-<script src="/assets/js/runtime~main.a0ee8f44.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d7921518.js" defer="defer"></script>
 <script src="/assets/js/main.29262280.js" defer="defer"></script>
 </head>
 <body>
@@ -53,6 +53,11 @@ precedence (for example <code>+</code> and <code>-</code>, or <code>*</code> and
 <p>Postfix calls and indexing (<code>f(x)</code>, <code>xs[i]</code>) bind tighter than every entry in
 this table — they are handled directly by the parser rather than through the
 operator table, since they are not spelled with an operator symbol.</p>
+<p>The conditional expression <code>a if c else b</code> is not an operator row either, but
+it has a place in this order: between <code>KeyValuePair</code> (30) and <code>Or</code> (40), so it
+binds looser than every operator that computes and tighter than the forms that
+bind or pair (<code>=</code>, <code>|-&gt;</code>, <code>|&gt;</code>, <code>-&gt;</code>). See
+<a class="" href="/cortex/control-flow/#the-conditional-expression-a-if-c-else-b">Control Flow</a>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-whitespace-rule">The whitespace rule<a href="#the-whitespace-rule" class="hash-link" aria-label="Direct link to The whitespace rule" title="Direct link to The whitespace rule" translate="no">​</a></h2>
 <p>An infix operator must have whitespace on <strong>both</strong> sides or on <strong>neither</strong>
 side. A prefix operator must have <strong>no</strong> whitespace before its operand. These

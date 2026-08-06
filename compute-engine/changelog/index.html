@@ -19,7 +19,7 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.25b8f946.css">
-<script src="/assets/js/runtime~main.a0ee8f44.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d7921518.js" defer="defer"></script>
 <script src="/assets/js/main.29262280.js" defer="defer"></script>
 </head>
 <body>
@@ -94,6 +94,44 @@ exact regardless of position — which means the formatter rewrites an authored
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Parameterized nominal types: <code>type tree&lt;T&gt; = tuple&lt;value: T, children: list&lt;tree&lt;T&gt;&gt;&gt;</code>.</strong> A nominal <code>type</code> declaration now takes the same
+type-parameter clause a generic alias takes, in Cortex as above and from the
+host with
+<code>ce.declareType(&#x27;tree&#x27;, &#x27;…&#x27;, { typeParams: [{ name: &#x27;T&#x27;, variance: &#x27;out&#x27; }] })</code>.
+Unlike an alias, an application is <strong>opaque</strong> — <code>tree&lt;integer&gt;</code> is never
+expanded — which is precisely what lets the definition refer to itself, so a
+recursive parametric container (a rose tree, a JSON with a payload, a zipper)
+is expressible for the first time. The arity, bound and unused-parameter rules
+are the alias&#x27;s, shared and generalized; self-reference, which an alias
+forbids, is the point here.</p>
+<p>A parameter carries a <strong>variance</strong> marker — <code>out</code> (covariant), <code>in</code>
+(contravariant) or <code>inout</code> (invariant) — saying how two applications relate:
+under <code>out</code>, a <code>tree&lt;integer&gt;</code> is usable where a <code>tree&lt;number&gt;</code> is expected.
+<strong>No marker means <code>out</code></strong>, declared rather than inferred and verified against
+the definition like a written one: values are immutable, so covariance is
+sound and is what a payload container wants, and only the consuming minority
+pays an annotation. Because the default is declared, a definition that uses
+its parameter in an input position does not quietly change the type&#x27;s
+subtyping contract — it is a <code>variance-violation</code> at the declaration, naming
+the violated variance and where it came from, the offending occurrences by
+path (<code>notify.(arg 1)</code>), and exactly the markers that would verify. <code>inout</code>
+verifies against any definition. Variance and bounds do not interact.</p>
+<p>A <code>tuple</code> definition mints a <strong>quantified</strong> constructor
+(<code>tree: forall T. (T, list&lt;tree&lt;T&gt;&gt;) -&gt; tree&lt;T&gt;</code>), so <code>tree(1, [])</code> solves
+<code>T = finite_integer</code> from its arguments; a <code>record</code> definition is still
+inhabited by a constructor function, whose own clause is independent of the
+type&#x27;s. Field access and <code>match</code> read the definition <strong>instantiated at the
+application&#x27;s arguments</strong> — with <code>t: tree&lt;number&gt;</code>, <code>t.value</code> is a <code>number</code>
+and <code>match t { tree(v, cs) =&gt; … }</code> binds <code>cs: list&lt;tree&lt;number&gt;&gt;</code>. Compilation
+erases the tag at the instantiated definition, as it already did for an
+unparameterized nominal type: <code>tree&lt;integer&gt;</code> compiles like the equivalent
+tuple, and declines identically where that would. One documented limitation: a
+construction solves its parameters from its arguments alone and an annotation
+does not widen them, so an explicitly <code>inout</code>/<code>in</code> parameterized type can only
+be constructed at exactly its argument type. See the new &quot;Parameterized
+Nominal Types&quot; section of the types guide.</p>
+</li>
+<li class="">
 <p><strong>Cortex: <code>break</code> and <code>continue</code>.</strong> They leave, or skip to the next iteration
 of, the innermost enclosing <code>while</code>/<code>for</code> loop, and lower to the engine&#x27;s
 existing <code>Break()</code>/<code>Continue()</code> primitives. Valid anywhere in a loop body,
@@ -137,6 +175,16 @@ bare assignment target, a mapsto parameter, and a call&#x27;s callee did not, so
 position.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>An even root of an even power reduces, and no longer does so for complex
+values.</strong> <code>\sqrt[4]{x^2}</code> now returns <code>\sqrt{|x|}</code>. It did not before, because
+the result is structurally larger and the cost check rejected it — which was
+quietly masking a soundness bug: the rewrite had no real-domain guard, so for
+a value declared complex it would have produced <code>\sqrt{|z|}</code>, where the
+principal value of <code>\sqrt[4]{z^2}</code> at <code>z=i</code> is <code>e^{i\pi/4}</code>, not 1. The guard
+is now in place and the reduction is kept for being the reduced real-domain
+form rather than the smaller one. A complex-declared base is left alone.</p>
+</li>
 <li class="">
 <p><strong>A closure returned from a function now resolves captured variables from
 inside a nested block.</strong> <code>k ↦ (x ↦ if x &gt; 1 { k } else { 0 })</code> applied at
