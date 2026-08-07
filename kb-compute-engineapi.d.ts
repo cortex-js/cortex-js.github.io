@@ -603,7 +603,7 @@ export declare function parseType(s: TypeString | Type | undefined, typeResolver
  * Unlike {@link parseType}, this does **not** require the whole string to be a
  * type: `source` may be followed by arbitrary trailing content (e.g.
  * `"real = 5"`, `"list<integer>, y"`). This is the entry point used by the
- * Cortex parser for type annotations (`x: real = 5`), where the type occupies
+ * Epsil parser for type annotations (`x: real = 5`), where the type occupies
  * a prefix of the remaining source.
  *
  * The parser's `input`-scanning "did you mean `list<…>`" heuristics are scoped
@@ -625,29 +625,13 @@ export declare function parseTypePrefix(source: string, typeResolver?: TypeResol
  * human message, and the offset WITHIN the clause text where it was found.
  *
  * Structured rather than thrown because each consumer surfaces it differently:
- * the Cortex parser turns it into a ranged diagnostic, the `DeclareType`
+ * the Epsil parser turns it into a ranged diagnostic, the `DeclareType`
  * operator into an error VALUE, the host `ce.declareType()` into a throw. */
 export interface TypeParameterClauseError {
     code: 'name-expected' | 'duplicate-name' | 'reserved-name' | 'bound-error' | 'separator-expected' | 'empty-clause';
     message: string;
     position: number;
 }
-/**
- * Parse the TEXT of a type-parameter clause — `"T"`, `"T, U: number"` — into
- * {@link TypeParameter}s.
- *
- * The one clause reader shared by every route that carries a clause as text:
- * the `typeParams` attrs entry of a `DeclareType` statement (A1), the host
- * `ce.declareType(…, { typeParams })` option (A2), and — indirectly — the
- * Cortex `type alias Pair<T> = …` statement, whose own character scanner adds
- * source ranges and hands the text on. The input is the clause CONTENTS: the
- * enclosing `<`/`>` are not part of it.
- *
- * The whole text must be consumed (a trailing `,` or a stray `>` is an error).
- * Names are checked for duplicates and against {@link isReservedTypeName}.
- * Bounds are parsed as ordinary — GROUND — types with the clause's own names
- * NOT in scope, so an F-bounded `T: list<U>` is an unknown-type error.
- */
 export declare function parseTypeParameterClause(text: string, typeResolver?: TypeResolver): {
     params: TypeParameter[];
 } | {
@@ -765,9 +749,18 @@ export type TypeVariable = {
     kind: 'variable';
     name: string;
 };
+/** How a parameterized NOMINAL type relates two of its applications
+ * (`docs/plans/2026-08-06-parameterized-nominal-types-design.md` §4).
+ *
+ * Declared inside a type-parameter clause (`type tree<out T> = …`); the words
+ * are contextual there and are never reserved. Only a nominal declaration
+ * carries one — a transparent alias has no declaration-level variance, and a
+ * `forall` clause never does. */
+export type TypeVariance = 'in' | 'out' | 'inout';
 /**
- * One entry of a signature's `forall` clause: the variable's name and its
- * optional declared upper bound.
+ * One entry of a signature's `forall` clause, or of a declared type's
+ * type-parameter clause: the variable's name and its optional declared upper
+ * bound.
  *
  * The bound must be **ground** (no type variables) — validated when the
  * declared type is boxed. An unbounded variable's implicit bound is `any`.
@@ -775,10 +768,15 @@ export type TypeVariable = {
 export type TypeParameter = {
     name: string;
     bound?: Type;
+    /** Declaration-level variance, on a parameterized NOMINAL type only.
+     * Absent means the default (`out`, verified — §4.4). */
+    variance?: TypeVariance;
 };
 /**
- * The `typeParams` option of a generic type-ALIAS declaration
- * (`ce.declareType('Pair', 'tuple<T, T>', { alias: true, typeParams: ['T'] })`).
+ * The `typeParams` option of a generic type declaration — an ALIAS
+ * (`ce.declareType('Pair', 'tuple<T, T>', { alias: true, typeParams: ['T'] })`)
+ * or a parameterized NOMINAL type
+ * (`ce.declareType('tree', '…', { typeParams: [{ name: 'T', variance: 'out' }] })`).
  *
  * Either clause TEXT (`'T, U: number'`, also accepted one entry at a time) or
  * pre-built parameters whose bound may be a type string. Every TEXT spelling
@@ -789,6 +787,7 @@ export type TypeParameter = {
 export type TypeParamsOption = string | ReadonlyArray<string | {
     name: string;
     bound?: Type | TypeString;
+    variance?: TypeVariance;
 }>;
 export type FunctionSignature = {
     kind: 'signature';
@@ -926,17 +925,47 @@ export type TypeReference = {
     name: string;
     alias: boolean;
     def: Type | undefined;
-    /** The `forall`-like clause of a GENERIC type ALIAS
-     * (`type alias Pair<T> = tuple<T, T>`), in declaration order.
+    /** The `forall`-like clause of a GENERIC type declaration — an ALIAS
+     * (`type alias Pair<T> = tuple<T, T>`) or a parameterized NOMINAL type
+     * (`type tree<out T> = …`) — in declaration order.
      *
-     * A record-level field, never part of a `Type`: an applied reference
-     * (`Pair<integer>`) is EAGERLY EXPANDED into the substituted body when the
-     * type is built, so no downstream consumer ever meets an unexpanded
-     * application. Present only on a structural alias — parameterized NOMINAL
-     * types are out of scope.
+     * A record-level field, never part of a `Type`: it lives on the declaration
+     * record held in a scope, not on an applied reference.
      *
-     * See `docs/plans/2026-08-04-generic-type-aliases-design.md`. */
+     * For an ALIAS an applied reference (`Pair<integer>`) is EAGERLY EXPANDED
+     * into the substituted body when the type is built, so no downstream
+     * consumer ever meets an unexpanded alias application. A parameterized
+     * NOMINAL application is the opposite: it is opaque, so it KEEPS its
+     * arguments (see `args`).
+     *
+     * See `docs/plans/2026-08-04-generic-type-aliases-design.md` and
+     * `docs/plans/2026-08-06-parameterized-nominal-types-design.md`. */
     typeParams?: TypeParameter[];
+    /** The type ARGUMENTS of an applied reference to a parameterized nominal
+     * type (`tree<integer>`), in declaration order.
+     *
+     * Present only on an APPLICATION, never on a declaration record, and never
+     * on a generic ALIAS (which is expanded away instead). An applied nominal
+     * reference is never expanded for subtyping — `tree<A>` and `tree<B>` are
+     * related by name plus an argument-wise comparison — which is what makes a
+     * recursive parametric type expressible at all (§1 of the design).
+     *
+     * An application delegates `def` to its declaration record, so a recursive
+     * body (`tree<T>` inside `tree`) sees the definition once it is set. */
+    args?: Type[];
+    /** Whether this declaration's variance has been VERIFIED against its body
+     * (parameterized-nominal design §4.2, ruling C). On the DECLARATION record
+     * only — absent on aliases, on non-parameterized nominals, and on an applied
+     * reference (which reads its record's state through `declarationOf`).
+     *
+     * `'deferred'` means the body reaches an unfulfilled forward reference, so
+     * the declaration was accepted provisionally: until fulfilment completes the
+     * group check, every subtype judgment reads its parameters as `inout`, which
+     * is sound whatever variance fulfilment reveals. */
+    _varianceState?: 'deferred' | 'verified';
+    /** The unfulfilled forward-reference names a `'deferred'` verification waits
+     * on. Cleared when the record reaches `'verified'`. */
+    _varianceBlockedOn?: string[];
 };
 export type Type = PrimitiveType | AlgebraicType | NegationType | CollectionType | ListType | SetType | BroadcastableType | RecordType | DictionaryType | TupleType | SymbolType | ExpressionType | NumericType | NumericPrimitiveType | FunctionSignature | ValueType | TypeVariable | TypeReference;
 /**
@@ -1146,7 +1175,10 @@ export type TypeVariableErrorCode = 'unresolved-type-variable' | 'unsolvable-typ
  | 'generic-alias-forward-reference'
 /** A clause parameter the alias body never mentions: under transparency a
  * phantom parameter is meaningless. */
- | 'generic-alias-unused-parameter';
+ | 'generic-alias-unused-parameter'
+/** A parameterized nominal type whose body contradicts the variance its
+ * clause declares — or the `out` a missing marker declares (§4.4). */
+ | 'variance-violation';
 /** An `Error` carrying one of the {@link TypeVariableErrorCode}s.
  *
  * The code is ALSO the head of the message: `parseType()` wraps a thrown error
@@ -1375,6 +1407,35 @@ export declare function parameterPositions(arm: FunctionSignature, count: number
  * admits every unary predicate at its skeleton, as it must.
  */
 export declare function groundSkeleton(t: Type, covariant?: boolean): Type;
+/**
+ * `t` read as a MEMBERSHIP/ADMISSION domain: which values could inhabit SOME
+ * instantiation of it.
+ *
+ * Same walk as {@link groundSkeleton}, and identical everywhere except at an
+ * applied reference whose parameter is read INVARIANTLY (`inout`, or a
+ * declaration whose variance is not verified yet — ruling C reads those as
+ * `inout` too). The two skeletons answer different questions and §4.3 makes
+ * them disagree there:
+ *
+ * - **Disjointness** (`groundSkeleton`, feeding `provablyDisjoint` and the D14a
+ *   arm-overlap check) must never claim disjointness it cannot prove, so an
+ *   invariant argument keeps the polarity and yields `cell<any>` — a concrete
+ *   application no over-claim can be derived from.
+ * - **Membership** cannot use that answer: `cell<integer> <: cell<any>` is
+ *   FALSE under invariance, so `cell<any>` would admit no application but the
+ *   literal `cell<any>` — an `inout` (or still-deferred) nominal could never be
+ *   a constructor argument of another parameterized nominal. The domain wanted
+ *   is "any application of this declaration", which no `Type` spells, so the
+ *   position reads as the top of its polarity (`any` covariantly, `never`
+ *   contravariantly) and the rest is decided POST-solve, against the
+ *   INSTANTIATED parameter — which `validate.ts` re-gates and, at a
+ *   constructor, the value-membership check re-gates again.
+ *
+ * `out` and `in` need no such widening: `X<A> <: X<any>` always holds under
+ * `out`, and `X<A> <: X<never>` always holds under `in` (the flipped position
+ * already yields `never`), so both admit every application as they stand.
+ */
+export declare function admissionSkeleton(t: Type, covariant?: boolean): Type;
 /* 0.102.0 */export type TokenType = 'IDENTIFIER' | 'STRING_LITERAL' | 'NUMBER_LITERAL' | 'VERBATIM_STRING' | 'TRUE' | 'FALSE' | 'NAN' | 'INFINITY' | 'PLUS_INFINITY' | 'MINUS_INFINITY' | '|' | '&' | '!' | '->' | '^' | '(' | ')' | '<' | '>' | '[' | ']' | ',' | ':' | '?' | '*' | '+' | '.' | '..' | 'x' | 'EOF' | 'WHITESPACE';
 export interface Token {
     type: TokenType;
@@ -1835,6 +1896,45 @@ export declare const SCALAR_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare const PRIMITIVE_TYPES_SET: ReadonlySet<PrimitiveType>;
 export declare function isValidPrimitiveType(s: any): s is PrimitiveType;
 export declare function isValidType(t: any): t is Readonly<Type>;
+/* 0.102.0 */import type { Type, TypeReference } from './types.js';
+/**
+ * Applied references to a parameterized NOMINAL type — the one node shape
+ * `docs/plans/2026-08-06-parameterized-nominal-types-design.md` §3 adds.
+ *
+ * An application (`tree<integer>`) is a DISTINCT object from the declaration
+ * record held in the scope (one record, many applications), but its `def` must
+ * still track that record: the placeholder is installed BEFORE the body parses,
+ * so a recursive `tree<T>` inside `tree`'s own definition is built while `def`
+ * is still `undefined`. A snapshot would freeze that. `def` is therefore an
+ * accessor delegating to the record, and every rebuild goes through
+ * {@link withTypeArguments} so the delegation survives.
+ *
+ * The record itself is reachable through a NON-ENUMERABLE `decl` back-pointer
+ * (read with {@link declarationOf}): the consumers that need the declared
+ * parameters — the variance-aware subtype rule, field access at an
+ * instantiated body — run below the resolver and cannot look the name up.
+ * Non-enumerable is load-bearing: `subtype.ts`'s de-dup key drops `def` BY
+ * NAME before `JSON.stringify`, so an enumerable back edge under any other
+ * name would re-introduce the circular-structure throw. For the same reason
+ * the record's `typeParams` are NOT copied onto the application — an
+ * enumerable `typeParams` would make an application read as a DECLARATION
+ * everywhere the two are told apart.
+ */
+export declare function applyTypeReference(record: TypeReference, args: Type[]): TypeReference;
+/** The DECLARATION record behind a reference: the back-pointer for an applied
+ * one, the reference itself for a declaration record or an unparameterized
+ * use. Total — a caller never has to case-split on which it holds. */
+export declare function declarationOf(ref: TypeReference): TypeReference;
+/**
+ * `ref` with a new argument list — the rebuild every structural walker
+ * (substitution, ground skeleton) needs.
+ *
+ * Copies property DESCRIPTORS, not values, so the `def` accessor installed by
+ * {@link applyTypeReference} keeps pointing at the declaration record.
+ */
+export declare function withTypeArguments(ref: TypeReference, args: Type[]): TypeReference;
+export declare function recordForwardArity(record: TypeReference, count: number): void;
+export declare function forwardArities(record: TypeReference): ReadonlySet<number> | undefined;
 /* 0.102.0 */import type { NumericPrimitiveType, PrimitiveType, Type, TypeCompatibility, TypeString } from './types.js';
 /** Return true if lhs is a subtype of rhs */
 export declare function isPrimitiveSubtype(lhs: PrimitiveType, rhs: PrimitiveType): boolean;
@@ -2100,6 +2200,18 @@ export declare function isValidTypeName(name: string): boolean;
  * is shared with `subtype.ts` (which must not import this module). The set is
  * allocated only once a reference is actually unfolded, so the identity path
  * (a non-reference type) allocates nothing.
+ *
+ * An APPLIED reference to a parameterized nominal type
+ * (`docs/plans/2026-08-06-parameterized-nominal-types-design.md` §7) unfolds to
+ * its definition INSTANTIATED at the application's arguments: `tree<integer>`
+ * erases to whatever `tuple<value: integer, children: list<tree<integer>>>`
+ * compiles to, and declines identically where that would. Without the
+ * substitution the compiler would meet the declaration's bare type variables
+ * and answer every layout question about `T` instead of about `integer`.
+ * The cycle guard keys on the DECLARATION record (`declarationOf`), not on the
+ * application: substitution rebuilds an application, so the fresh object would
+ * defeat an identity guard on the node itself. For an unparameterized reference
+ * the record IS the node, so the existing behavior is unchanged.
  */
 export declare function resolveTypeForCompilation(t: Readonly<Type>): Type;
 /**
@@ -2293,6 +2405,112 @@ export declare function isNonRealNumber(t: Readonly<Type>): boolean;
  * - `complex`, `finite_complex`, `imaginary` → `true` (is non-real)
  */
 export declare function couldBeNonRealNumber(t: Readonly<Type>): boolean;
+/* 0.102.0 */import type { Type, TypeParameter, TypeReference, TypeVariance } from './types.js';
+/**
+ * Variance of a parameterized NOMINAL type — the position analysis of
+ * `docs/plans/2026-08-06-parameterized-nominal-types-design.md` §4.2, the
+ * prescriptive diagnostic of §4.4, and the variance a subtype judgment may
+ * actually use (§4.3, ruling C).
+ *
+ * Variance is **verified, never inferred**: every parameter has a declared
+ * variance — the marker the author wrote, or `out` when none is spelled — and
+ * this module checks that declaration against the body. A body edit that would
+ * change the type's subtyping contract is therefore a loud error at the
+ * declaration, never a silent re-inference at the use sites.
+ *
+ * Layering: this module sits BELOW `subtype.ts` and must never import it. §4.3
+ * decides `tree<A> <: tree<B>` from the declared variance plus an argument-wise
+ * comparison, so no body is ever consulted and no subtype question arises here.
+ */
+/** Where a parameter occurs, relative to the root of the body. */
+export type Polarity = TypeVariance;
+/** One occurrence of a type parameter in a body. */
+export type VarianceOccurrence = {
+    param: string;
+    polarity: Polarity;
+    /** §4.4 path syntax: named fields and tuple elements by name, unnamed
+     * positions as `[0]`, signature parameters as `(arg 1)`, nested steps joined
+     * with `.`. The empty string is the root of the body. */
+    path: string;
+    /** The unfulfilled forward reference this occurrence sits under. Such an
+     * occurrence is RECORDED, not judged (ruling C): it counts as a USE of the
+     * parameter but is excluded from the polarity join until the reference is
+     * fulfilled. */
+    deferredVia?: string;
+};
+export type VarianceAnalysis = {
+    /** The joined polarity of each parameter's non-deferred occurrences.
+     * `undefined` when it has none (either unused, or used only under an
+     * unfulfilled forward reference). */
+    observed: Map<string, Polarity | undefined>;
+    occurrences: VarianceOccurrence[];
+    /** The unfulfilled forward-reference names this verification waits on. */
+    blockedOn: Set<string>;
+};
+export type VarianceResult = {
+    status: 'ok';
+    analysis: VarianceAnalysis;
+} | {
+    status: 'deferred';
+    blockedOn: string[];
+    analysis: VarianceAnalysis;
+} | {
+    status: 'violation';
+    code: 'variance-violation' | 'generic-alias-unused-parameter';
+    message: string;
+    analysis: VarianceAnalysis;
+};
+/**
+ * May a variance judgment READ `decl`'s declared markers?
+ *
+ * True for everything that has no variance state to wait on — a plain
+ * (non-parameterized) nominal, and a generic alias, which is expanded before
+ * any of this sees it — and for a parameterized nominal whose verification has
+ * completed. A record still `'deferred'` promises nothing yet: its declared
+ * variance is an ASSUMPTION that fulfilment may still reject.
+ */
+export declare function isVarianceSettled(decl: Readonly<TypeReference>): boolean;
+/**
+ * Every occurrence of `params` in `body`, with its polarity and its path.
+ *
+ * `selfName` is the type being declared: a reference to it is the RECURSIVE
+ * occurrence, and it composes with its own declared (or default) variance —
+ * the standard coinductive check, which terminates because the assumption is
+ * fixed before descending.
+ *
+ * Termination is STRUCTURAL, so no seen-set is needed: an applied reference
+ * descends into its `args` and NEVER into `decl.def`. A nominal type is opaque,
+ * so its body is not part of this walk — the recursion a `type tree<T> =
+ * tuple<value: T, children: list<tree<T>>>` closes lives entirely in the
+ * argument list, and argument lists are finite.
+ */
+export declare function analyzeVariance(body: Type, params: readonly TypeParameter[], selfName: string): VarianceAnalysis;
+/**
+ * Verify each parameter's DECLARED variance (the written marker, or `out`)
+ * against `body`.
+ *
+ * Returns `deferred` when the body reaches an unfulfilled forward reference:
+ * ruling C accepts the declaration provisionally, with no early error, and the
+ * strongly-connected group is verified together at fulfilment. Until then every
+ * subtype judgment reads the parameters as `inout` (see
+ * {@link subtypingVarianceOf}), which is sound whatever fulfilment reveals.
+ *
+ * MUST run AFTER the body parse returns: `parseType()` prefixes "Failed to
+ * parse type" onto anything thrown while a body is being built.
+ */
+export declare function verifyVariance(typeName: string, params: readonly TypeParameter[], body: Type, ctx?: {
+    triggeredBy?: string;
+}): VarianceResult;
+/**
+ * The variance parameter `i` of `ref`'s declaration may be READ AS by a subtype
+ * judgment.
+ *
+ * `inout` until the declaration's variance has been verified: in the window
+ * between a provisional acceptance and fulfilment (ruling C) an answer given
+ * under invariance stays sound under whatever variance fulfilment reveals, so
+ * nothing recorded in the window ever needs invalidating.
+ */
+export declare function subtypingVarianceOf(ref: Readonly<TypeReference>, i: number): Polarity;
 /* 0.102.0 */import { TypeNode, FunctionSignatureNode, ForallTypeNode, TypeVariableNode, UnionTypeNode, IntersectionTypeNode, NegationTypeNode, GroupTypeNode, ListTypeNode, VectorTypeNode, MatrixTypeNode, TensorTypeNode, TupleTypeNode, RecordTypeNode, DictionaryTypeNode, SetTypeNode, BroadcastableTypeNode, CollectionTypeNode, ExpressionTypeNode, SymbolTypeNode, NumericTypeNode, PrimitiveTypeNode, TypeReferenceNode, ValueNode, ASTVisitor } from './ast-nodes.js';
 import { Type, TypeResolver, TypeParameter } from './types.js';
 export declare class TypeBuilder implements ASTVisitor<Type> {
@@ -2331,20 +2549,27 @@ export declare class TypeBuilder implements ASTVisitor<Type> {
     visitPrimitiveType(node: PrimitiveTypeNode): Type;
     visitTypeReference(node: TypeReferenceNode): Type;
     /**
-     * Expand an applied generic-alias reference into its substituted body —
-     * the whole of the generic-alias feature at the TYPE layer
+     * Apply a generic type reference — the two halves of the feature at the TYPE
+     * layer.
+     *
+     * A generic ALIAS is TRANSPARENT, so the application is EXPANDED here, once,
+     * at type-resolution time: no applied-alias node exists in the `Type`
+     * representation, and nothing downstream ever meets one
      * (`docs/plans/2026-08-04-generic-type-aliases-design.md` §3.3).
      *
-     * Transparency means the expansion happens HERE, once, at type-resolution
-     * time: no applied-reference node exists in the `Type` representation, so
-     * nothing downstream (subtype, widen, compile, serialization) ever meets one.
+     * A parameterized NOMINAL type is OPAQUE, so the application is KEPT: the
+     * node carries its `args` and delegates `def` to the declaration record, and
+     * subtyping relates two applications by name plus arguments without ever
+     * consulting the body (`docs/plans/2026-08-06-parameterized-nominal-types-
+     * design.md` §3). That is what makes a RECURSIVE parametric type work: the
+     * `tree<T>` inside `tree`'s own body needs no definition to be built.
      *
      * Returns `undefined` — "not a generic application, carry on" — only when the
-     * resolver does not hand back a type RECORD (the Cortex parser's shim
+     * resolver does not hand back a type RECORD (the Epsil parser's shim
      * resolves a name to the bare name: it is a syntax check, and the engine
      * re-parses the same text with the real resolver).
      */
-    private expandGenericAlias;
+    private applyTypeReference;
     /**
      * A7 — per-argument admission.
      *
@@ -2508,7 +2733,7 @@ import { TypeParameter, TypeResolver } from './types.js';
    non-generic name are arity errors raised there — the grammar admits them.
    Writing the slot is also what closes the silent-truncation hazard: without
    it `p: Pair<integer>` parsed as the bare `Pair` and leaked `<integer>` to the
-   surrounding (Cortex) grammar. *)
+   surrounding (Epsil) grammar. *)
 <type_reference> ::= ( "type" )? <identifier> ( "<" <type> ( "," <type> )* ">" | "<" ">" )?
 
 <value> ::= <string_literal>
@@ -2550,7 +2775,7 @@ export declare class Parser {
     /**
      * Prefix mode: parse a type from the *start* of the input and stop at the
      * first token that cannot continue the type, without requiring EOF. Used by
-     * `parseTypePrefix()` (the Cortex type-annotation boundary). In this mode the
+     * `parseTypePrefix()` (the Epsil type-annotation boundary). In this mode the
      * lexer is tolerant (unexpected trailing characters become EOF) and the
      * `this.lexer.input`-scanning error heuristics are scoped to the consumed
      * range so trailing (non-type) source never leaks into a type suggestion.
@@ -10726,7 +10951,7 @@ export declare function adjoinType(ops: ReadonlyArray<Expression>): Type;
 export declare function quotientRingType(ops: ReadonlyArray<Expression>): Type;
 /* 0.102.0 */import type { SymbolDefinitions } from '../global-types.js';
 export declare const STATISTICS_LIBRARY: SymbolDefinitions[];
-/* 0.102.0 */import type { Expression } from '../global-types.js';
+/* 0.102.0 */import type { Expression, Scope } from '../global-types.js';
 /**
  * The *broadcast shape* of a single lazy-`Map` level — the structural gate
  * shared by the two drain-time optimizations that key on it:
@@ -10767,6 +10992,20 @@ export interface LoweredLevel {
     arity: number;
     /** The level's source operands (everything but the mapping function). */
     sources: ReadonlyArray<Expression>;
+    /** The mapping function's body scope, when a slot operand carries a FREE
+     * SYMBOL — a variable the lambda closed over rather than a literal.
+     *
+     * The lowered path evaluates in the AMBIENT scope, so such an operand only
+     * resolves while its defining frame is still current. A lazy `Map` returned
+     * from a function outlives that frame: `f(k) = Map([1,2], x ↦ x + k)` drained
+     * by the caller resolved `k` to nothing and produced `[k+1, k+2]`. The
+     * closure chain itself is intact (`captureClosures` rebinds the literal), so
+     * the fix is for the drain to evaluate INSIDE it.
+     *
+     * `undefined` when every slot operand is a literal — the shape the fusion
+     * work was built for (`1 + Mod(Range(0,899) + 29, 900)`), which keeps the
+     * original zero-scope-work path. */
+    closureScope?: Scope;
 }
 /**
  * The structural gate (§4, R2). A level is lowerable iff it is a `Map` whose
@@ -15193,7 +15432,7 @@ export declare function solveCongruence(ce: ComputeEngine, expr: Expression, x: 
  */
 export declare function conditionalValue(ce: ComputeEngine, value: Expression, guard: Expression): Expression | null;
 /* 0.102.0 */import type { Expression, FunctionInterface } from '../global-types.js';
-import type { EffectSet, FunctionSignature, Type } from '../../common/type/types.js';
+import type { EffectSet, FunctionSignature, Type, TypeReference } from '../../common/type/types.js';
 /**
  * Force the resolution of a canonical `Function` literal's type operands while
  * the scope that declares those type names is still current.
@@ -15215,7 +15454,7 @@ export declare function functionLiteralParameterType(param: Expression): Type | 
  * collection-like type. Conservative: unknown/any → scalar.
  * @internal
  */
-export declare function isScalarType(t: Type): boolean;
+export declare function isScalarType(t: Type, seen?: Set<TypeReference>): boolean;
 /** The parameters of a `Function` literal, as `{ name, type }` records. Bare
  * parameters have `type: undefined`. */
 export declare function functionLiteralParameters(expr: Expression): {
@@ -15229,7 +15468,7 @@ export declare function functionLiteralParameters(expr: Expression): {
 export declare function functionLiteralReturnMarker(expr: Expression): (Expression & FunctionInterface) | undefined;
 /**
  * The FULL SIGNATURE a return marker declares (`docs/EFFECTS-MODEL.md`,
- * "Cortex surface"), or `undefined` when the marker is an ordinary
+ * "Epsil surface"), or `undefined` when the marker is an ordinary
  * return-type ascription.
  *
  * **Decomposition predicate**: the marker's type operand decomposes as a full
@@ -15243,7 +15482,7 @@ export declare function functionLiteralReturnMarker(expr: Expression): (Expressi
  * the marker author's contract read as a returned function.
  *
  * The literal's parameter operands remain the parameters of record. The marker
- * signature's argument list is a MIRROR built by the Cortex lowering (and by
+ * signature's argument list is a MIRROR built by the Epsil lowering (and by
  * `desugarSignatureString`) and is never read for parameter types.
  */
 export declare function functionLiteralDeclaredSignature(expr: Expression): FunctionSignature | undefined;
@@ -15591,6 +15830,9 @@ type InternalSimplifyOptions = SimplifyOptions & {
     /** Set on the inner call of the trial expansion (see the end of
      * `simplify()`) so the trial cannot nest. */
     noExpansionTrial?: boolean;
+    /** Set on the inner call of the binder-body pass (see the end of
+     * `simplify()`) so that pass cannot nest. */
+    noBinderBodyPass?: boolean;
 };
 /**
  * Value-blind entry point for the PUBLIC `.simplify()` methods (on
@@ -15799,7 +16041,7 @@ export declare function constructorAssignmentError(symbol: string, declaredType:
 /**
  * The `incompatible-type` error VALUE a rejected declared type yields on the
  * `Assign` / `Declare` operator routes — the same shape and channel as the
- * call-boundary type check (`createTypeErrorExpression`), so Cortex's
+ * call-boundary type check (`createTypeErrorExpression`), so Epsil's
  * diagnostic machinery classifies it as `incompatible-type` rather than an
  * opaque message string.
  */
@@ -18114,8 +18356,8 @@ export declare function applyN(ops: ReadonlyArray<Expression>, fn: (...xs: numbe
 export declare function apply2(expr1: Expression, expr2: Expression, fn: (x1: number, x2: number) => number | Complex, bigFn?: (x1: BigDecimal, x2: BigDecimal) => BigDecimal | Complex | number, complexFn?: (x1: Complex, x2: number | Complex) => Complex | number): Expression | undefined;
 /* 0.102.0 */import type { Expression, EvaluateOptions, IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
- * `Match` dispatch — Cortex structural pattern matching
- * (see `docs/plans/2026-07-12-cortex-match-design.md`).
+ * `Match` dispatch — Epsil structural pattern matching
+ * (see `docs/plans/2026-07-12-epsil-match-design.md`).
  *
  * `["Match", subject, case₁, …, caseₙ]` where each `caseᵢ` is
  * `["MatchCase", pattern, body]` or `["MatchCase", pattern, guard, body]`.
@@ -21712,15 +21954,6 @@ export declare class ExactNumericValue extends NumericValue {
     static sum(values: NumericValue[], factory: NumericValueFactory): NumericValue[];
 }
 /* 0.102.0 */import type { Expression } from './global-types.js';
-/**
- * The default cost function, used to determine if a new expression is simpler
- * than the old one.
- *
- * To change the cost function used by the engine, set the
- * `ce.costFunction` property of the engine or pass a custom cost function
- * to the `simplify` function.
- *
- */
 export declare function costFunction(expr: Expression): number;
 export declare function leafCount(expr: Expression): number;
 export declare const DEFAULT_COST_FUNCTION: typeof costFunction;
@@ -22590,7 +22823,7 @@ export declare class ComputeEngine implements IComputeEngine {
     /**
      * Given a `name` that is **not** a known operator, return the closest known
      * operator name — a "did you mean" suggestion — or `undefined` when nothing
-     * is close enough. Powers the Cortex `unknown-function` diagnostic.
+     * is close enough. Powers the Epsil `unknown-function` diagnostic.
      *
      * Matching is conservative and applied in priority order (first match wins):
      * case-insensitive exact match, singular/plural, Damerau–Levenshtein
@@ -25737,6 +25970,51 @@ export declare class BaseCompiler {
      */
     private static desugarPatternDeclare;
     /**
+     * Desugar a destructuring `Assign` statement (`(a, b) := (…, …)`) into
+     * per-leaf temporaries followed by per-leaf writes, so the locals
+     * collection, the inference below and every target's statement emitter see
+     * only plain scalar declares and assigns. Returns `null` when the statement
+     * is not a destructuring assign.
+     *
+     * Unlike the declaration form, the targets ALREADY EXIST, so the writes
+     * cannot be interleaved with the reads: `(a, b) := (b, a)` lowered per-leaf
+     * would emit `a = b; b = a` and read the `a` it just clobbered. Every
+     * element is therefore bound to a temporary FIRST, and only then written to
+     * its target — which is exactly the interpreter's "evaluate the whole
+     * right-hand side, then write" order:
+     *
+     *     (a, b) := (b, a + b)
+     *       ⟶  let _tv1 = b; let _tv2 = a + b; a = _tv1; b = _tv2
+     *
+     * A `_` position still gets a temporary (its element is evaluated for
+     * effect) but no write. As with the declare form, only a LITERAL tuple value
+     * lowers — a non-literal value or a shape mismatch fails closed (D6) and
+     * the interpreter takes over.
+     *
+     * The rewrite is for EFFECT only: it ends on a write, whose value is one
+     * leaf's, not the tuple's. Callers must therefore only apply it in statement
+     * position — never where the statement's value is the enclosing block's
+     * (see the caller in `compileBlock`, which leaves a trailing destructuring
+     * assign to fail closed).
+     */
+    static desugarPatternAssign(arg: Expression, target: CompileTarget<Expression>): ReadonlyArray<Expression> | null;
+    /**
+     * Compile an expression as a statement list evaluated **for effect** — a
+     * loop body — rather than for its value.
+     *
+     * The difference from `compile()` is what happens to the LAST statement:
+     * compiled for a value it is wrapped/returned (`return <stmt>`, or the
+     * target's `block` hook), which inside a loop returns from the enclosing
+     * function on the first iteration. Compiled for effect it is just another
+     * statement. It is also the position where a destructuring assign lowers,
+     * since no statement's value is anyone's.
+     *
+     * Used by targets whose loop bodies route through `compileExpr` (the shader
+     * targets). The JavaScript and Python targets have their own statement
+     * dispatchers (`compileLoopBody`, `compilePythonStatements`).
+     */
+    static compileStatementList(expr: Expression, target: CompileTarget<Expression>): TargetSource;
+    /**
      * Compile a block expression
      */
     private static compileBlock;
@@ -25816,6 +26094,15 @@ export declare class BaseCompiler {
      * branches contain control flow.
      */
     private static compileLoopBody;
+    /**
+     * A loop-body target in which the desugar's temporaries resolve to BARE
+     * identifiers. `compileBlock` does this for its locals; the loop-body path
+     * has no locals collection of its own, so without it a temp is emitted as
+     * `let _tv1 = …` but read back as the free symbol `_._tv1`.
+     *
+     * Returns `target` unchanged when the statement list declares no temporary.
+     */
+    static loopBodyTempTarget(stmts: ReadonlyArray<Expression>, target: CompileTarget<Expression>): CompileTarget<Expression>;
     /**
      * Create a target that compiles conditions as plain JS booleans.
      * Used inside `compileLoopBody` so that `if (cond)` gets a real boolean,
@@ -27963,12 +28250,21 @@ export interface IComputeEngine {
      *
      * This is a convenience method equivalent to `ce.expr(parse(latex))`,
      * but uses the engine's symbol definitions for better parsing accuracy.
+     *
+     * `options.scope` RECEIVES the parse's writes: the whole parse runs with
+     * that scope as the current lexical scope, so name resolution (including
+     * the parser's symbol oracle) walks `scope → parents`, and every
+     * auto-declare and inference lands rooted there. Discarding the scope
+     * discards the writes. Use `ce.createScope()` to make one that can be read
+     * back.
      */
     parse(latex: string, options?: Partial<ParseLatexOptions> & {
         form?: FormOption;
+        scope?: Scope;
     }): Expression;
     parse(latex: string | null, options?: Partial<ParseLatexOptions> & {
         form?: FormOption;
+        scope?: Scope;
     }): Expression | null;
     /**
      * The symbols that appear in function-application syntax `f(…)` in `latex`
@@ -27987,7 +28283,6 @@ export interface IComputeEngine {
     function(name: string, ops: ReadonlyArray<ExpressionInput>, options?: {
         metadata?: Metadata;
         form?: FormOption;
-        structural?: boolean;
         scope?: Scope;
     }): Expression;
     /**
@@ -28396,7 +28691,7 @@ export interface IComputeEngine {
     /**
      * Given a `name` that is **not** a known operator, return the closest known
      * operator name — a "did you mean" suggestion — or `undefined` when nothing
-     * is close enough. Powers the Cortex `unknown-function` diagnostic.
+     * is close enough. Powers the Epsil `unknown-function` diagnostic.
      *
      * Matching is conservative and applied in priority order (first match wins):
      * case-insensitive exact match, singular/plural, Damerau–Levenshtein
@@ -31172,21 +31467,50 @@ export type { BoxedNumber } from './compute-engine/boxed-expression/boxed-number
 export type { BoxedSymbol } from './compute-engine/boxed-expression/boxed-symbol.js';
 export type { BoxedFunction } from './compute-engine/boxed-expression/boxed-function.js';
 export type { BoxedString } from './compute-engine/boxed-expression/boxed-string.js';
+/* 0.102.0 *//**
+ * The reserved words that are LITERALS: they cannot name a binding (the
+ * verbatim `` `word` `` form still can). `true`/`false` are the boolean
+ * literals; `Infinity`, its input alias `oo`, and `NaN` are the non-finite
+ * numeric literals.
+ */
+export declare const LITERAL_WORDS: ReadonlySet<string>;
+/**
+ * The words the grammar consumes today: statement/expression heads (`if`,
+ * `match`, `do`, `for`, `while`, `function`, `const`), the `else` clause
+ * separator, the loop separator and membership operator `in`, and the loop
+ * control transfers `break`/`continue`.
+ *
+ * `let`, `type`, and `alias` are deliberately absent: they are already
+ * contextual (`let type = 5` and `type = 5` both parse), so they are not
+ * reserved words at all.
+ */
+export declare const ACTIVE_WORDS: ReadonlySet<string>;
+/**
+ * The words a plain symbol may not spell — the union of `LITERAL_WORDS` and
+ * `ACTIVE_WORDS`. This is the set the parser rejects and the serializer emits
+ * in the verbatim form.
+ */
+export declare const HARD_RESERVED_WORDS: ReadonlySet<string>;
+/**
+ * Every word the language reserves the right to claim. Only the members of
+ * `HARD_RESERVED_WORDS` are rejected today; the rest are ordinary identifiers
+ * (see the module comment). Mirrored by `docs/literals.md`.
+ */
+export declare const RESERVED_WORDS: Set<string>;
 /* 0.102.0 */import { NumberSerializationFormat } from '../compute-engine/latex-syntax/types.js';
 import { MathJsonExpression } from '../math-json/types.js';
 import { FormattingOptions } from './formatter.js';
 export declare const NUMBER_FORMATTING_OPTIONS: NumberSerializationFormat;
 /**
- * Serialize a MathJSON expression to Cortex.
+ * Serialize a MathJSON expression to Epsil.
  *
  * @param options.fancySymbols - If true, some operators are replaced
  * with an equivalent Unicode character, for example: `*` -> `×`.
  *
  */
-export declare function serializeCortex(expr: MathJsonExpression, options?: FormattingOptions & {
+export declare function serializeEpsil(expr: MathJsonExpression, options?: FormattingOptions & {
     fancySymbols?: boolean;
 }): string;
-/* 0.102.0 */export declare const RESERVED_WORDS: Set<string>;
 /* 0.102.0 */import { MathJsonSymbol } from '../math-json/types.js';
 /**
  * Precedence of the conditional expression `a if c else b` (→ `["If", c, a,
@@ -31221,6 +31545,26 @@ export declare function serializeCortex(expr: MathJsonExpression, options?: Form
  * `KeyValuePair`, so the dictionary reader skips it).
  */
 export declare const CONDITIONAL_PRECEDENCE = 35;
+/**
+ * Precedence of the dynamic type test `x is integer` (→ `["Element", x,
+ * integer]`, the same shape a `match` type pattern lowers to).
+ *
+ * Like `CONDITIONAL_PRECEDENCE` this is deliberately NOT a row in `OPERATORS`:
+ * the right operand of `is` is a **type**, not an expression, so the parser
+ * recognizes the form directly (`parseTypeTestTail`) and hands the right side
+ * to the type subparser. A row here would let `peekInfix` claim `is` as an
+ * ordinary binary infix and parse `integer` as a symbol reference — losing the
+ * parse-time typo diagnostic an annotation gets.
+ *
+ * It shares the relational precedence (60) with `in`, which it reads as: the
+ * two spell the same `Element` test, and `x is integer && y is string` must
+ * group as `(x is integer) && (y is string)`.
+ *
+ * The serializer has no `is` spelling to emit — `Element` serializes as `in`,
+ * so `x is integer` reads back as `x in integer`. That is the same expression;
+ * `is` is an input spelling that says "type test" at the point of writing.
+ */
+export declare const TYPE_TEST_PRECEDENCE = 60;
 export interface OperatorDef {
     /** The MathJSON operator this spelling maps to, e.g. `'Add'`. */
     name: MathJsonSymbol;
@@ -31377,33 +31721,6 @@ export declare class Lexer {
 }
 /** Convenience: tokenize `source` into a `Token[]` (never throws). */
 export declare function tokenize(source: string): Token[];
-/* 0.102.0 */import { MathJsonExpression } from '../math-json/types.js';
-import { ParsingDiagnostic } from './diagnostics.js';
-/** Analyze the reported errors and combine them when possible */
-export declare function analyzeErrors(errors: ParsingDiagnostic[]): ParsingDiagnostic[];
-/**
- * Parse a Cortex source string into a MathJSON expression and a list of
- * diagnostics.
- *
- * The parser never throws (it accumulates diagnostics and recovers) with a
- * single exception: a `#error` pragma throws a `FatalParsingError`. It is
- * propagated to the caller (`executeCortex` catches it and turns it into a
- * diagnostic, so a notebook cell never throws to the host — plan §5).
- *
- * `options.allowHostPragmas` (default `false`) gates the host-state pragmas
- * `#env`/`#navigator`: when off they emit a `host-pragma-disabled` diagnostic
- * instead of reading the host environment.
- *
- * `options.typeNames` seeds the type names an annotation may refer to (the
- * host's already-declared types — `executeCortex` passes the engine's). A
- * `type` statement in the program extends the set. A name in neither is still a
- * parse-time `type-annotation-error`, so typos are caught early.
- */
-export declare function parseCortex(source: string, url?: string, options?: {
-    parseLatex?: (latex: string) => MathJsonExpression;
-    allowHostPragmas?: boolean;
-    typeNames?: readonly string[];
-}): [MathJsonExpression, ParsingDiagnostic[]];
 /* 0.102.0 */export type FormattingOptions = {
     indentChar: string;
     indentCharWidth: number;
@@ -31569,13 +31886,58 @@ export declare class Formatter {
     fencedList(open: string, sep: string | FormattingBlock, close: string, blocks: FormattingBlock[]): FormattingBlock;
     list(sep: string | FormattingBlock, blocks: FormattingBlock[]): FormattingBlock;
 }
+/* 0.102.0 */import type { MathJsonExpression } from '../math-json/types.js';
+import type { BoxedExpression, ComputeEngine } from '../compute-engine.js';
+import { ParsingDiagnostic } from './diagnostics.js';
+export interface ExecuteEpsilOptions {
+    /** Source URL (for `#url`/`#filename` pragmas and diagnostic origins). */
+    url?: string;
+    /** Injected LaTeX parser for `$…$` islands (a structural mirror of the
+     * engine's `ILatexSyntax` injection). */
+    parseLatex?: (latex: string) => MathJsonExpression;
+    /** Opt into the host-state pragmas `#env`/`#navigator` (default `false`). */
+    allowHostPragmas?: boolean;
+}
+export interface ExecuteEpsilResult {
+    /** The value of the last executed statement (or `Nothing`). Runtime problems
+     * surface here as `["Error", …]` values, never as thrown exceptions. */
+    value: BoxedExpression;
+    /** Parse-time (and a few execution-time) problems: unparseable syntax, gated
+     * host pragmas, a `#error` directive — plus a `static-type-error` diagnostic
+     * for each type error the engine detects when the program is canonicalized
+     * (reported *before* evaluation), and a `runtime-error` diagnostic for
+     * each *non-final* statement that evaluated to an error value (its value is
+     * discarded, so the problem would otherwise be invisible). */
+    diagnostics: ParsingDiagnostic[];
+}
+/**
+ * Parse and execute an Epsil program against a compute engine.
+ *
+ * Flow (plan §1): parse → report canonicalization-time type errors (nothing
+ * runs; see `staticDiagnostics()`) → evaluate each top-level statement
+ * **sequentially in `ce`'s current scope** (so a notebook cell-chain's
+ * declarations persist — no scope is pushed around the whole program; engine
+ * `Block`/`Function` still scope themselves). The returned `value` is the last
+ * statement's evaluated value.
+ *
+ * Two invariants (`docs/principles.md`, plan §5):
+ *  - **Symbolic-by-default.** Evaluation uses the engine's exactness contract:
+ *    `ln(2)` stays symbolic; numeric approximation is explicit (`N(expr)`).
+ *  - **Errors are values.** A runtime problem becomes an `["Error", …]` value
+ *    captured into `value`; nothing throws to the host. *Parse* problems (and a
+ *    `#error` directive) go to `diagnostics`.
+ *
+ * `while`/`for` lower to the engine's imperative `Loop` (see `parser.ts`), so
+ * they evaluate as ordinary engine primitives — no special handling here.
+ */
+export declare function executeEpsil(ce: ComputeEngine, source: string, options?: ExecuteEpsilOptions): ExecuteEpsilResult;
 /* 0.102.0 *//**
- * Cortex parsing diagnostics.
+ * Epsil parsing diagnostics.
  *
  * These types were ported from the old combinator library. They are the
  * **canonical** diagnostic types for the Phase 1 lexer/parser rewrite.
  */
-export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'type-variables-unsupported' | 'empty-type-parameter-clause' | 'duplicate-type-parameter' | 'generic-clause-unsupported' | 'type-shadow' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'static-type-error' | 'evaluation-canceled' | 'unknown-function' | 'print-not-available' | 'type-not-callable' | 'assign-in-argument' | 'parameter-shadows-constant' | 'zero-index' | 'floor-division-comment' | 'latex-parsing-unavailable' | 'conditional-else-expected' | 'match-case-arrow-expected' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'type-pattern-unsupported' | 'range-pattern-bounds' | 'range-pattern-step' | 'range-pattern-empty' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
+export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'type-variables-unsupported' | 'empty-type-parameter-clause' | 'duplicate-type-parameter' | 'generic-clause-unsupported' | 'type-shadow' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'static-type-error' | 'evaluation-canceled' | 'unknown-function' | 'print-not-available' | 'type-not-callable' | 'assign-in-condition' | 'chained-assignment' | 'destructuring-bare-equal' | 'control-outside-loop' | 'parameter-shadows-constant' | 'zero-index' | 'floor-division-comment' | 'latex-parsing-unavailable' | 'conditional-else-expected' | 'match-case-arrow-expected' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'type-pattern-unsupported' | 'range-pattern-bounds' | 'range-pattern-step' | 'range-pattern-empty' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
 export type DiagnosticMessage = DiagnosticCode | [DiagnosticCode, ...any];
 /**
  * The parser will attempt to continue parsing even when an error is
@@ -31615,8 +31977,8 @@ import type { ParsingDiagnostic } from './diagnostics.js';
  * statement's `sourceOffsets` range — or at the whole program when the
  * statement carries no offsets, rather than dropping the diagnostic.
  *
- * The caller supplies the engine: `cortex check` uses a fresh one, and
- * `executeCortex()` uses the session engine (so the pass sees the same
+ * The caller supplies the engine: `epsil check` uses a fresh one, and
+ * `executeEpsil()` uses the session engine (so the pass sees the same
  * library and the declarations of previous cells).
  *
  * **What the pushed scope shields (and what it does not).** The walk runs in a
@@ -31638,9 +32000,36 @@ import type { ParsingDiagnostic } from './diagnostics.js';
  * followed by `x + 1` checks clean), and the program reports it when it runs.
  */
 export declare function staticDiagnostics(ce: ComputeEngine, ast: MathJsonExpression, source: string): ParsingDiagnostic[];
+/* 0.102.0 */import { MathJsonExpression } from '../math-json/types.js';
+import { ParsingDiagnostic } from './diagnostics.js';
+/** Analyze the reported errors and combine them when possible */
+export declare function analyzeErrors(errors: ParsingDiagnostic[]): ParsingDiagnostic[];
+/**
+ * Parse an Epsil source string into a MathJSON expression and a list of
+ * diagnostics.
+ *
+ * The parser never throws (it accumulates diagnostics and recovers) with a
+ * single exception: a `#error` pragma throws a `FatalParsingError`. It is
+ * propagated to the caller (`executeEpsil` catches it and turns it into a
+ * diagnostic, so a notebook cell never throws to the host — plan §5).
+ *
+ * `options.allowHostPragmas` (default `false`) gates the host-state pragmas
+ * `#env`/`#navigator`: when off they emit a `host-pragma-disabled` diagnostic
+ * instead of reading the host environment.
+ *
+ * `options.typeNames` seeds the type names an annotation may refer to (the
+ * host's already-declared types — `executeEpsil` passes the engine's). A
+ * `type` statement in the program extends the set. A name in neither is still a
+ * parse-time `type-annotation-error`, so typos are caught early.
+ */
+export declare function parseEpsil(source: string, url?: string, options?: {
+    parseLatex?: (latex: string) => MathJsonExpression;
+    allowHostPragmas?: boolean;
+    typeNames?: readonly string[];
+}): [MathJsonExpression, ParsingDiagnostic[]];
 /* 0.102.0 */import { DiagnosticMessage } from './diagnostics.js';
 /**
- * The set of token types produced by the Cortex {@link Lexer}.
+ * The set of token types produced by the Epsil {@link Lexer}.
  *
  * This is the initial (Phase 1) set. The lexer emits a single `OPERATOR`
  * type: it maximal-munches a run of operator characters but does **not**
@@ -31753,7 +32142,7 @@ export declare class Parser {
     readonly diagnostics: ParsingDiagnostic[];
     /** Injected LaTeX parser for `$…$` islands (Part 3). Absent → an island is a
      * `latex-parsing-unavailable` diagnostic. Structurally mirrors the engine's
-     * `ILatexSyntax` injection so `src/cortex` never statically imports
+     * `ILatexSyntax` injection so `src/epsil` never statically imports
      * `latex-syntax`. */
     private readonly parseLatex?;
     /** When false (the default), the host-state pragmas `#env`/`#navigator` do
@@ -31790,6 +32179,40 @@ export declare class Parser {
      * top-level redeclaration is the legitimate statement-replace flow
      * (re-running a notebook cell). */
     private blockDepth;
+    /**
+     * Lexically enclosing loop bodies (`while`/`for`) — the `break`/`continue`
+     * context. Zero means "not in a loop", and those words are then a
+     * `control-outside-loop` diagnostic.
+     *
+     * It is SAVED AND RESET TO ZERO across every function/lambda boundary, not
+     * merely incremented: a `break` inside a lambda defined in a loop body must
+     * not escape to that loop. This is not a style rule — the engine's `Block`
+     * short-circuits on `Break`/`Continue` structurally, so a parser-only depth
+     * check without the function boundary would let a `Break` returned from a
+     * lambda body reach whatever loop happened to be running.
+     */
+    private loopDepth;
+    /**
+     * True only while the OUTERMOST expression of a statement is being parsed —
+     * the one position where a bare `=` means `Assign` rather than `Equal`.
+     *
+     * `parseExpression` consumes the flag on entry (reads it, then clears it),
+     * so exactly one Pratt loop ever sees it true: every nested call — a call
+     * argument, a collection element, a parenthesized group, an operator's right
+     * operand — sees `false` and reads `=` as a comparison. `parseStatement`
+     * sets it only on its fall-through expression-statement path, never around
+     * the keyword heads, so an `if`/`while` condition and a `match` subject are
+     * expression position too.
+     */
+    private assignPosition;
+    /**
+     * The `Equal` node most recently built from a BARE `=` (never from `==`).
+     * Used to catch `a = b = 5`: the outer `=` assigns and the inner compares,
+     * so the statement silently means "assign a boolean" to anyone arriving from
+     * C or Python. Identity comparison against the assignment's right operand is
+     * exact — `wrap()` returns a fresh object per node.
+     */
+    private lastBareEqualNode;
     /** Set by {@link recoverAtStatementBoundary}: the statement that just
      * returned `null` has ALREADY emitted its diagnostic and resynchronized to
      * the next statement boundary. The statement loops (`parseProgram`,
@@ -31894,6 +32317,24 @@ export declare class Parser {
      * `["If", cond, thenBlock, elseBlock?]`. Branches are `["Block", …]`; an
      * `else if` chains into a nested `If`. */
     private parseIf;
+    /**
+     * `break` / `continue` — statement-position loop control, lowering to the
+     * engine's `["Break"]` / `["Continue"]`.
+     *
+     * The FUNCTION form is what the engine dispatches on: a bare `Break` SYMBOL
+     * canonicalizes to an error (`canonicalStatement` in
+     * `library/control-structures.ts`), precisely so this shape cannot be
+     * confused with a variable reference.
+     *
+     * Only the value-less forms are surface syntax. `Break(v)` exists in the
+     * engine and types the loop accordingly, but `break value` is a ruling
+     * bundled with general `return` — see the language-extensions note.
+     */
+    private parseLoopControl;
+    /** Run `parse` with the `break`/`continue` context set to `depth`: one
+     * deeper for a loop body, zero for a function/lambda body (the boundary
+     * `break` may not cross). */
+    private inLoopContext;
     /** `while cond { … }` lowers to the engine's imperative `Loop`:
      * `Loop(Block(If(Not(cond), Break), body))` — an infinite loop that breaks
      * when the condition fails, then runs the body. No custom head, so it
@@ -32025,7 +32466,7 @@ export declare class Parser {
      * and the clause's source span.
      *
      * **Parsed from the RAW SOURCE, not from tokens.** `<` and `>` are operator
-     * characters, and the Cortex lexer maximal-munches a run of them into ONE
+     * characters, and the Epsil lexer maximal-munches a run of them into ONE
      * token: `<T: list<integer>>(` lexes the two closing angles as a single
      * `>>`, and a signature bound puts a `>` inside `->`. So the clause is
      * scanned character by character, its bounds are handed to the type
@@ -32078,7 +32519,7 @@ export declare class Parser {
      * ascription at all).
      *
      * With a specifier the ascription carries the **full signature** (the
-     * normative encoding of `docs/EFFECTS-MODEL.md`, "Cortex surface"):
+     * normative encoding of `docs/EFFECTS-MODEL.md`, "Epsil surface"):
      * parameter types from the parameter list, effects from the specifier slot,
      * and the return type — `unknown` when no `->` was given, the wide-result
      * convention that leaves the return inferred while still declaring the
@@ -32181,7 +32622,7 @@ export declare class Parser {
     /**
      * Parse a `: Type` annotation starting at the current `:` OPERATOR token. The
      * type is parsed by the engine's `common/type` prefix subparser, then parsing
-     * resumes in Cortex just past the type. Returns the held `{str}` type node and
+     * resumes in Epsil just past the type. Returns the held `{str}` type node and
      * its end offset, or `null` on a malformed type (after emitting a
      * `type-annotation-error` diagnostic). On `null` the cursor is left AT the
      * offending token: the caller resynchronizes, since the right resync unit
@@ -32192,14 +32633,14 @@ export declare class Parser {
     /** Parse a type starting at the (local) source offset `typeSourceStart` —
      * the raw text after a `:` annotation marker or a `type name =` head. The
      * type is parsed by the engine's `common/type` prefix subparser (with this
-     * parser's known-type-name resolver), then parsing resumes in Cortex just
+     * parser's known-type-name resolver), then parsing resumes in Epsil just
      * past the type. Returns the held `{str}` type node and its end offset, or
      * `null` on a malformed type (after emitting a `type-annotation-error`
      * diagnostic). Recovery is the CALLER's: on `null` the cursor is left at the
      * offending token, un-advanced (see {@link parseTypeAnnotation}). */
     private parseTypeBody;
     /** Advance the token cursor until the current token starts at or past the
-     * (local) `offset`. Used to resume Cortex parsing after a type subparse
+     * (local) `offset`. Used to resume Epsil parsing after a type subparse
      * consumed a prefix of the raw source. */
     private advanceToOffset;
     /** Emit exactly one diagnostic for an unexpected token. */
@@ -32243,6 +32684,21 @@ export declare class Parser {
      * `a if c else b if d else e` right-nests on its own.
      */
     private parseConditionalTail;
+    /**
+     * The tail of a dynamic type test — `is Type`, with the already-parsed
+     * `subject` to its left and the `is` current — yielding `["Element",
+     * subject, Type]`.
+     *
+     * `Element(value, <type name>)` is the engine's dynamic type test and is
+     * exactly what a `match` type pattern (`n: integer => …`) lowers to, so the
+     * two surfaces agree by construction. It resolves SIMPLE NAMED types only: a
+     * compound type parses (the subparser accepts the whole union, negation, or
+     * application) but never resolves, so it gets the same
+     * `type-pattern-unsupported` diagnostic the pattern form gets. Full type
+     * expressions in this position land with the typed-pattern work, in one
+     * place for both surfaces.
+     */
+    private parseTypeTestTail;
     /** A prefix-operator run followed by its operand, or a primary. */
     private parseUnary;
     /**
@@ -32279,6 +32735,59 @@ export declare class Parser {
     /** Combine an infix operator with its operands, flattening a run of the same
      * relational operator into an n-ary node (`a < b < c` → `Less(a,b,c)`). */
     private combineInfix;
+    /**
+     * A literal word is not an assignment target: `true = 5` would bind the
+     * boolean literal, and `NaN = 1` a numeric one. This is the bare-target
+     * position of the five-word rejection set — the other positions reject the
+     * word at its token, but here the literal has already become its value node
+     * (`true` → `{sym:"True"}`, `oo` → `{num:"+Infinity"}`), so the check reads
+     * the target's source slice instead. A verbatim `` `True` `` (or a plain
+     * `True`, which is not a reserved word) is unaffected.
+     */
+    private checkAssignTarget;
+    /**
+     * `if flag := true { … }` assigns and then uses the assigned value as the
+     * test. Positional `=` closed the IMPLICIT form of this trap — a bare `=` in
+     * a condition is now `Equal` — but `:=` is unconditional, so the explicit
+     * spelling still reaches here.
+     *
+     * A WARNING, not an error: `:=` is the deliberate assignment spelling, and
+     * refusing it in a position where the author typed it on purpose would
+     * repeat the mistake positional `=` was adopted to fix. Epsil has no
+     * `if init; cond` form, so the assigned value really is the test — which is
+     * what makes it worth remarking on.
+     *
+     * Scoped to the two positions that consume a value AS a boolean (an
+     * `if`/`while` condition, including the `a if c else b` ternary). A call
+     * argument or a collection element — `f(a := 1)`, `[a := 1]` — is odd but
+     * unambiguous, and the type system already handles it.
+     */
+    private checkConditionAssign;
+    /**
+     * Whether a node's source begins with a bare-symbol token — the check that
+     * keeps `isBindingTarget` honest about the *authored* syntax rather than the
+     * reduced node.
+     *
+     * A `+` prefix is the identity, so `+x` reduces to the bare symbol `x` and
+     * would otherwise look like a name; positional `=` must compare there.
+     *
+     * A parenthesized group is deliberately NOT caught: it returns its content
+     * node, whose span excludes the parentheses, so `(x) = 5` still assigns.
+     * That is the intended reading — redundant parentheses around a name do not
+     * change what it is. (The case the design note names, `Solve((x = 4), x)`,
+     * is already handled: the inner `=` is in expression position and compares.)
+     */
+    private startsWithSymbolToken;
+    /**
+     * Whether a node was spelled as a literal word. `true`/`false` become SYMBOL
+     * nodes (`{sym:"True"}`), so `isBindingTarget` would otherwise accept them
+     * and a bare `true = 5` would resolve to an assignment — while `NaN = 1`,
+     * whose literal becomes a NUMBER node, resolved to a comparison. Excluding
+     * them makes all five literal words behave alike: a bare `=` against one is
+     * the equation, and only the explicit `:=` asks to bind (and is rejected by
+     * {@link checkAssignTarget}).
+     */
+    private isLiteralWordNode;
     /** Extract the parameters from a mapsto LHS: a bare symbol (one parameter),
      * or a `Tuple` of parameters (`(x, y) |-> …`). Each parameter is either a
      * bare symbol or a typed `["Typed", sym, type]` node (`(x: integer) |-> …`).
@@ -32331,6 +32840,7 @@ export declare class Parser {
      * `["Tuple", a, b]`; `()` → diagnostic (no empty tuple in v0).
      */
     private parseParenthesized;
+    private parseParenthesizedBody;
     /** `[a, b]` → `["List", a, b]`; `[]` → `["List"]`. */
     private parseList;
     /**
@@ -32363,57 +32873,12 @@ export declare class Parser {
      * Absent a `(`, returns an empty list. */
     private parseArgumentClause;
 }
-/* 0.102.0 */import type { MathJsonExpression } from '../math-json/types.js';
-import type { BoxedExpression, ComputeEngine } from '../compute-engine.js';
-import { ParsingDiagnostic } from './diagnostics.js';
-export interface ExecuteCortexOptions {
-    /** Source URL (for `#url`/`#filename` pragmas and diagnostic origins). */
-    url?: string;
-    /** Injected LaTeX parser for `$…$` islands (a structural mirror of the
-     * engine's `ILatexSyntax` injection). */
-    parseLatex?: (latex: string) => MathJsonExpression;
-    /** Opt into the host-state pragmas `#env`/`#navigator` (default `false`). */
-    allowHostPragmas?: boolean;
-}
-export interface ExecuteCortexResult {
-    /** The value of the last executed statement (or `Nothing`). Runtime problems
-     * surface here as `["Error", …]` values, never as thrown exceptions. */
-    value: BoxedExpression;
-    /** Parse-time (and a few execution-time) problems: unparseable syntax, gated
-     * host pragmas, a `#error` directive — plus a `static-type-error` diagnostic
-     * for each type error the engine detects when the program is canonicalized
-     * (reported *before* evaluation), and a `runtime-error` diagnostic for
-     * each *non-final* statement that evaluated to an error value (its value is
-     * discarded, so the problem would otherwise be invisible). */
-    diagnostics: ParsingDiagnostic[];
-}
-/**
- * Parse and execute a Cortex program against a compute engine.
- *
- * Flow (plan §1): parse → report canonicalization-time type errors (nothing
- * runs; see `staticDiagnostics()`) → evaluate each top-level statement
- * **sequentially in `ce`'s current scope** (so a notebook cell-chain's
- * declarations persist — no scope is pushed around the whole program; engine
- * `Block`/`Function` still scope themselves). The returned `value` is the last
- * statement's evaluated value.
- *
- * Two invariants (`docs/principles.md`, plan §5):
- *  - **Symbolic-by-default.** Evaluation uses the engine's exactness contract:
- *    `ln(2)` stays symbolic; numeric approximation is explicit (`N(expr)`).
- *  - **Errors are values.** A runtime problem becomes an `["Error", …]` value
- *    captured into `value`; nothing throws to the host. *Parse* problems (and a
- *    `#error` directive) go to `diagnostics`.
- *
- * `while`/`for` lower to the engine's imperative `Loop` (see `parser.ts`), so
- * they evaluate as ordinary engine primitives — no special handling here.
- */
-export declare function executeCortex(ce: ComputeEngine, source: string, options?: ExecuteCortexOptions): ExecuteCortexResult;
 /* 0.102.0 */export * from './math-json/types.js';
 export { ComputeEngine } from './compute-engine.js';
-export { parseCortex } from './cortex/parse-cortex.js';
-export { serializeCortex } from './cortex/serialize-cortex.js';
-export { executeCortex } from './cortex/execute-cortex.js';
-export type { ExecuteCortexOptions, ExecuteCortexResult, } from './cortex/execute-cortex.js';
+export { parseEpsil } from './epsil/parse-epsil.js';
+export { serializeEpsil } from './epsil/serialize-epsil.js';
+export { executeEpsil } from './epsil/execute-epsil.js';
+export type { ExecuteEpsilOptions, ExecuteEpsilResult, } from './epsil/execute-epsil.js';
 export type { CancellationCause } from './common/interruptible.js';
 export declare const version = "0.102.0";
 /* 0.102.0 */export declare const version = "0.102.0";
@@ -32666,7 +33131,7 @@ export declare function matchesString(s: string): boolean;
 /* 0.102.0 *//**
  * Reserved prefix for parser-generated parameter names.
  *
- * A **literal parameter** in a Cortex function definition (`function f(0) =
+ * A **literal parameter** in an Epsil function definition (`function f(0) =
  * 1`, `f("yes") = …`) lowers to an anonymous value-typed parameter
  * `["Typed", "literalParam_1", {str: "0"}]` — the name is generated (1-based
  * parameter position), never written by the author, and the body cannot

@@ -627,7 +627,7 @@ methods and properties available.
 Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
-When using the Cortex language frontend, `%` is the infix `Mod` operator and a
+When using the Epsil language frontend, `%` is the infix `Mod` operator and a
 postfix `!` is `Factorial`:
 
 ```text
@@ -636,7 +636,7 @@ n!          // Factorial(n)
 ```
 
 The postfix `!` must immediately follow its operand. Prefix `!x` remains
-logical `Not`, and `x != y` remains `NotEqual`. Cortex also supports chained
+logical `Not`, and `x != y` remains `NotEqual`. Epsil also supports chained
 collection indexing: `m[2][1]` is equivalent to `m[2, 1]`.
 
 ## Creating Expressions
@@ -1668,8 +1668,8 @@ most powerful and most expensive:
 
 | Tier | Method | Operator | Notation | Answers |
 | :--- | :--- | :--- | :--- | :--- |
-| Syntactic | `isSame()` | `Same` | `===`, `≣` (Cortex) | Always `True` or `False` |
-| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Cortex) | `True`, `False`, or undetermined |
+| Syntactic | `isSame()` | `Same` | `===`, `≣` (Epsil) | Always `True` or `False` |
+| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Epsil) | `True`, `False`, or undetermined |
 | Identity | `isIdenticallyEqual()` | `IdenticallyEqual` | `\equiv`, `≡` | `True`, `False`, or undetermined |
 
 </div>
@@ -1678,7 +1678,7 @@ Each tier answers a different question: "are these the same expression?",
 "do these have the same value?", and "are these the same function of their
 free variables?".
 
-The operator, its LaTeX/Cortex notation and its JavaScript method share the
+The operator, its LaTeX/Epsil notation and its JavaScript method share the
 same semantics at each tier.
 
 ### Syntactic Equality: `isSame()`
@@ -1765,7 +1765,7 @@ ce.expr(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
 ### Arithmetic Equality: `isEqual()`
 
 The `lhs.isEqual(rhs)` function answers "do these two expressions have the same
-value?". It is the JavaScript counterpart of the `=` operator (`==` in Cortex).
+value?". It is the JavaScript counterpart of the `=` operator (`==` in Epsil).
 
 The comparison is deliberately **cheap and predictable**:
 
@@ -1877,7 +1877,7 @@ that require evaluation, such as `\sin(\pi)`.
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
 | `ce.expr(["IdenticallyEqual", lhs, rhs]).evaluate()` | Synonym for `lhs.isIdenticallyEqual(rhs)` |
 | `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`, comparing the operands as written (they are not canonicalized) |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Cortex `===`). Always decides. |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Epsil `===`). Always decides. |
 
 </div>
 
@@ -3923,7 +3923,7 @@ console.log(ce.box(['fib', 10]).evaluate().toString());
 ```
 
 A parameter constrained to a single value (`{ str: '0' }` above) uses a
-**value type**: the clause admits exactly that value. In Cortex, literal
+**value type**: the clause admits exactly that value. In Epsil, literal
 parameters provide the same thing directly: `fib(0) = 0`.
 
 The clause rules:
@@ -6432,7 +6432,7 @@ ce.box(["Function", ["Typed", body, "'(real) random -> real'"], "x"]);
 ce.box(["Function", ["Typed", body, "'((real) random -> real)'"], "x"]);
 ```
 
-The same rule applies in Cortex: write
+The same rule applies in Epsil: write
 `function mk(x) -> ((real) random -> real) { … }` for the effectful *return
 type*, and `function roll(n) random -> integer { … }` for the definition's own
 contract. An effect-free signature never needs the parentheses — it is always
@@ -6659,11 +6659,11 @@ ce.type("forall T. ((forall U. (U) -> U)) -> T");
 ### Generic Declarations and Function Literals
 
 A generic signature can be implemented by an ordinary function body — a
-`["Function"]` literal, a `x |-> …` lambda, a Cortex `function` definition —
+`["Function"]` literal, a `x |-> …` lambda, a Epsil `function` definition —
 as long as the clause is stated on the *whole signature*. There are three
 spellings.
 
-**The `function f<T>(…)` definition form** (Cortex) puts a **type-parameter
+**The `function f<T>(…)` definition form** (Epsil) puts a **type-parameter
 clause** between the name and the parameter list. A parameter may carry a
 ground bound, the effect specifier and the return type are unchanged, and the
 clause names are usable anywhere in the head:
@@ -6748,7 +6748,7 @@ ce.box(["Function", ["Typed", body, "'(forall T. (T) -> T)'"], "x"]).type;
 // ➔ "(unknown) -> forall T. (T) -> T"   (the literal RETURNS a generic function)
 ```
 
-The same holds in Cortex: `function mk(x) -> forall T. (T) -> T { … }` defines
+The same holds in Epsil: `function mk(x) -> forall T. (T) -> T { … }` defines
 a generic `mk`, while `function mk(x) -> (forall T. (T) -> T) { … }` defines a
 plain `mk` that returns one.
 
@@ -6787,7 +6787,7 @@ ce.box(["dup", ["List", ["List", 1, 2], ["List", 3, 4]]]).evaluate().toString();
 - **No literal body for a generic overload set.** An intersection with a
   generic arm still needs an `evaluate` handler — the same reason a single
   literal cannot implement an ordinary [overload set](#overload-sets).
-- **The math definition form does not take a clause.** In Cortex,
+- **The math definition form does not take a clause.** In Epsil,
   `f<T>(x) = x` is an ordinary expression (`f < T > (x)`, then `= x`), not a
   definition — only the `function` keyword form claims the `<…>` slot.
 - **Compilation declines.** A generic function is not compiled — `compile()`
@@ -7307,7 +7307,7 @@ ce.declareType(
 The type is defined in the current lexical scope.
 
 A program can declare its own types with the `["DeclareType"]` operator —
-the MathJSON mirror of `ce.declareType()` — or, in Cortex, with the `type`
+the MathJSON mirror of `ce.declareType()` — or, in Epsil, with the `type`
 statement, which comes in two forms:
 
 ```js
@@ -7381,7 +7381,7 @@ ce.box(["Tuple", 1, 2]).type.matches("Pair<integer>"); // ➔ true
 
 The parameters may be given as names (each with an optional bound), as
 records (`[{ name: "T", bound: "number" }]`), or as a single clause string
-(`"T, U: number"`). In Cortex, the same declaration is a `type alias`
+(`"T, U: number"`). In Epsil, the same declaration is a `type alias`
 statement with a type-parameter clause — the clause a
 [generic function definition](#generic-declarations-and-function-literals)
 takes:
@@ -7440,7 +7440,7 @@ ce.type("forall T. (Keyed<T>) -> T");
 **Transparency.** The expansion happens when the type is resolved, so nothing
 downstream ever meets an applied reference: `.type`, `toString()`,
 `matches()` and error messages all show the expansion. The *source* keeps
-what was written — a Cortex program round-trips
+what was written — a Epsil program round-trips
 `let p: Pair<integer> = (1, 2)` verbatim — but the type it denotes displays
 as `tuple<integer, integer>`.
 
@@ -7515,7 +7515,7 @@ ce.box(["circle", 1, 2, 3]).evaluate().type;
 // ➔ "circle"
 ```
 
-In Cortex the same declaration is
+In Epsil the same declaration is
 `function circle(x, y, r) { {x -> x, y -> y, r -> r} }`.
 
 The installed operator is an **overload set**: the user's arm plus an
@@ -7580,12 +7580,12 @@ ce.expr(["Add", ["meters", 5], 1]).evaluate();
 That is the point of a nominal type: a `meters` cannot be added to a bare
 number by accident. There are three sanctioned windows back in:
 
-- **field access** — the `Field` operator (`p.x` in Cortex) reads one named
+- **field access** — the `Field` operator (`p.x` in Epsil) reads one named
   field through the type's definition when the body has named fields (a
   record body, or a named-tuple body): `ce.box(["Field", p, "'x'"])`. This
   dispatches off the definition's field map and does **not** make the value
   a collection — `First(p)` and `p["x"]` keep rejecting;
-- **pattern matching** — in Cortex, `match p { point(x, y) => x + y }`;
+- **pattern matching** — in Epsil, `match p { point(x, y) => x + y }`;
 - reading the operands of the MathJSON application directly from a host.
 
 A **structural alias** has no such reserve: an alias-typed operand unfolds to
@@ -14630,6 +14630,13 @@ Parse a LaTeX string and return a boxed expression.
 This is a convenience method equivalent to `ce.expr(parse(latex))`,
 but uses the engine's symbol definitions for better parsing accuracy.
 
+`options.scope` RECEIVES the parse's writes: the whole parse runs with
+that scope as the current lexical scope, so name resolution (including
+the parser's symbol oracle) walks `scope → parents`, and every
+auto-declare and inference lands rooted there. Discarding the scope
+discards the writes. Use `ce.createScope()` to make one that can be read
+back.
+
 ####### latex
 
 `string`
@@ -14638,6 +14645,7 @@ but uses the engine's symbol definitions for better parsing accuracy.
 
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
+  `scope`: `Scope`;
  \}
 
 ###### parse(latex, options)
@@ -14654,6 +14662,7 @@ parse(latex, options?): Expression | null
 
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
+  `scope`: `Scope`;
  \}
 
 </MemberCard>
@@ -14709,10 +14718,6 @@ readonly [`ExpressionInput`](#expressioninput)[]
 ####### form?
 
 [`FormOption`](#formoption)
-
-####### structural?
-
-`boolean`
 
 ####### scope?
 
@@ -16056,7 +16061,7 @@ suggestOperatorName(name): string | undefined
 
 Given a `name` that is **not** a known operator, return the closest known
 operator name — a "did you mean" suggestion — or `undefined` when nothing
-is close enough. Powers the Cortex `unknown-function` diagnostic.
+is close enough. Powers the Epsil `unknown-function` diagnostic.
 
 Matching is conservative and applied in priority order (first match wins):
 case-insensitive exact match, singular/plural, Damerau–Levenshtein
@@ -22727,6 +22732,13 @@ Parse a LaTeX string and return a boxed expression.
 This is a convenience method equivalent to `ce.expr(parse(latex))`,
 but uses the engine's symbol definitions for better parsing accuracy.
 
+`options.scope` RECEIVES the parse's writes: the whole parse runs with
+that scope as the current lexical scope, so name resolution (including
+the parser's symbol oracle) walks `scope → parents`, and every
+auto-declare and inference lands rooted there. Discarding the scope
+discards the writes. Use `ce.createScope()` to make one that can be read
+back.
+
 ####### latex
 
 `string`
@@ -22735,6 +22747,7 @@ but uses the engine's symbol definitions for better parsing accuracy.
 
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
+  `scope`: `Scope`;
  \}
 
 ###### parse(latex, options)
@@ -22751,6 +22764,7 @@ parse(latex, options?): Expression | null
 
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
+  `scope`: `Scope`;
  \}
 
 </MemberCard>
@@ -22806,10 +22820,6 @@ readonly [`ExpressionInput`](#expressioninput)[]
 ####### form?
 
 [`FormOption`](#formoption)
-
-####### structural?
-
-`boolean`
 
 ####### scope?
 
@@ -24153,7 +24163,7 @@ suggestOperatorName(name): string | undefined
 
 Given a `name` that is **not** a known operator, return the closest known
 operator name — a "did you mean" suggestion — or `undefined` when nothing
-is close enough. Powers the Cortex `unknown-function` diagnostic.
+is close enough. Powers the Epsil `unknown-function` diagnostic.
 
 Matching is conservative and applied in priority order (first match wins):
 case-insensitive exact match, singular/plural, Damerau–Levenshtein
@@ -29155,17 +29165,37 @@ is substituted away by instantiation at a call site.
 
 <MemberCard>
 
+### TypeVariance
+
+```ts
+type TypeVariance = "in" | "out" | "inout";
+```
+
+How a parameterized NOMINAL type relates two of its applications
+(`docs/plans/2026-08-06-parameterized-nominal-types-design.md` §4).
+
+Declared inside a type-parameter clause (`type tree<out T> = …`); the words
+are contextual there and are never reserved. Only a nominal declaration
+carries one — a transparent alias has no declaration-level variance, and a
+`forall` clause never does.
+
+</MemberCard>
+
+<MemberCard>
+
 ### TypeParameter
 
 ```ts
 type TypeParameter = {
   name: string;
   bound: Type;
+  variance: TypeVariance;
 };
 ```
 
-One entry of a signature's `forall` clause: the variable's name and its
-optional declared upper bound.
+One entry of a signature's `forall` clause, or of a declared type's
+type-parameter clause: the variable's name and its optional declared upper
+bound.
 
 The bound must be **ground** (no type variables) — validated when the
 declared type is boxed. An unbounded variable's implicit bound is `any`.
@@ -29184,11 +29214,14 @@ type TypeParamsOption =
   | {
   name: string;
   bound: Type | TypeString;
+  variance: TypeVariance;
 }>;
 ```
 
-The `typeParams` option of a generic type-ALIAS declaration
-(`ce.declareType('Pair', 'tuple<T, T>', { alias: true, typeParams: ['T'] })`).
+The `typeParams` option of a generic type declaration — an ALIAS
+(`ce.declareType('Pair', 'tuple<T, T>', { alias: true, typeParams: ['T'] })`)
+or a parameterized NOMINAL type
+(`ce.declareType('tree', '…', { typeParams: [{ name: 'T', variance: 'out' }] })`).
 
 Either clause TEXT (`'T, U: number'`, also accepted one entry at a time) or
 pre-built parameters whose bound may be a type string. Every TEXT spelling
@@ -29445,6 +29478,9 @@ type TypeReference = {
   alias: boolean;
   def: Type | undefined;
   typeParams: TypeParameter[];
+  args: Type[];
+  _varianceState: "deferred" | "verified";
+  _varianceBlockedOn: string[];
 };
 ```
 
@@ -33221,7 +33257,7 @@ If the collection is nested, the indexes are applied in order.
 ```
 
 Applying `At` repeatedly is equivalent to supplying several indexes at once.
-In Cortex syntax, both `m[2][1]` and `m[2, 1]` select the same matrix element.
+In Epsil syntax, both `m[2][1]` and `m[2, 1]` select the same matrix element.
 Indexing a matrix once returns a row with its collection type preserved, so the
 result can be indexed again.
 
@@ -33337,7 +33373,7 @@ Return the dictionary values in dictionary iteration order.
 
 <Signature name="Field">_value_: any, _field_: string</Signature>
 
-Access a **named field** of a value — `p.x` in Cortex.
+Access a **named field** of a value — `p.x` in Epsil.
 
 On a **record** or **dictionary** value, `["Field", d, "'x'"]` behaves
 exactly as `["At", d, "'x'"]`, including the position-preserving absence
@@ -35583,7 +35619,7 @@ tolerance. The bounds must be numeric literals; `Infinity` and `-Infinity`
 are allowed, so `["Range", 0, {"num": "+Infinity"}]` means "any non-negative
 number". A `Range` that is not a well-formed range pattern — a symbolic bound,
 or a third _step_ operand — is not a membership test and keeps its ordinary
-structural meaning. (In Cortex, those spellings are reported as parse
+structural meaning. (In Epsil, those spellings are reported as parse
 diagnostics instead.)
 
 A subject that is not a number falls through: a symbol (including a constant
@@ -35604,7 +35640,7 @@ The consequence is that a literal `Range` **value** can no longer be matched
 and is not re-read as a membership test. A `Range` nested inside a `List`,
 `Tuple` or `Dictionary` pattern also keeps its ordinary structural meaning.
 
-In Cortex, a range pattern is written `lo..hi`:
+In Epsil, a range pattern is written `lo..hi`:
 `match n { 0..9 => "digit"; _ => "more" }`.
 
 **Error subjects**. `["Match"]` also decides when the subject is an
@@ -35659,7 +35695,7 @@ comparison chain or a `switch` statement, and fixed-shape destructuring is
 supported; symbolic patterns (such as `["Add", "_a", 1]`) cannot be
 compiled and fail with an error rather than producing incorrect code.
 
-In Cortex, `["Match"]` is written with the `match` keyword:
+In Epsil, `["Match"]` is written with the `match` keyword:
 `match x { 0 => "zero"; 1 | 2 | == Pi => "small or pi"; _ => "other" }`.
 
 </FunctionDefinition>
@@ -36084,7 +36120,7 @@ statement declared **replaces** that definition — constructor included — so
 re-running a program on the same engine works; a name declared any other way
 (e.g. via `ce.declareType()`) reports an error value instead.
 
-In Cortex, the `type` statement lowers to this operator. The bare form
+In Epsil, the `type` statement lowers to this operator. The bare form
 declares a **nominal** type (no attributes); the `type alias` form declares a
 **structural alias** (the `alias -> True` attributes dictionary):
 
@@ -36399,7 +36435,7 @@ as the `Equal` function.
 <Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
 
 Evaluate to `True` if every adjacent pair of operands is **syntactically
-identical**, otherwise `False`. This is the `===` operator in Cortex, also
+identical**, otherwise `False`. This is the `===` operator in Epsil, also
 written `≣` (U+2263). It is the operator counterpart of the `expr.isSame()`
 method.
 
@@ -36460,7 +36496,7 @@ whole, so `["Same", ["List", 1, 2], ["List", 1, 2]]` is the scalar `True`, not
 a list of booleans.
 
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
-`True` — matching the Cortex spelling `a === b === c`.
+`True` — matching the Epsil spelling `a === b === c`.
 
 **`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
 written, while `Same` compares their canonical forms. So
@@ -37724,7 +37760,7 @@ The right-pointing form is a **pipeline operator**: `\rhd` (also
 feeds the expression on its left to the function on its right, and stages
 chain left to right.
 
-The corresponding expression is `Pipe(value, function)`. For example, Cortex
+The corresponding expression is `Pipe(value, function)`. For example, Epsil
 `x |> f` constructs `Pipe(x, f)` and evaluates by applying `f` to `x`:
 
 ```json example
@@ -43339,7 +43375,7 @@ console.info(textExpr.latex);
 
 <Signature name="StringJoin" returns="string">..._strings_: string</Signature>
 
-Concatenate strings. In Cortex, the `<>` operator constructs `StringJoin`.
+Concatenate strings. In Epsil, the `<>` operator constructs `StringJoin`.
 
 ```json example
 ["StringJoin", "hello", " ", "world"]

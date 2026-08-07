@@ -1,50 +1,50 @@
-# MathLive — Cortex
+# MathLive — Epsil
 
-# Cortex
+# Epsil
 
-Source: https://mathlive.io/cortex/
+Source: https://mathlive.io/epsil/
 
-# Cortex
+# Epsil
 
 <Intro>
-Cortex is a programming language for scientific computing, built on the
+Epsil is a programming language for scientific computing, built on the
 Compute Engine.
 </Intro>
 
 :::warning[Experimental]
-Cortex is available as an **experimental** entry point. Its syntax and
+Epsil is available as an **experimental** entry point. Its syntax and
 semantics may change between releases while the language is being exercised in
 notebooks and other applications.
 :::
 
-Cortex is embedded from JavaScript through the
-`@cortex-js/compute-engine/cortex` entry point:
+Epsil is embedded from JavaScript through the
+`@cortex-js/compute-engine/epsil` entry point:
 
 ```js
-import { ComputeEngine, executeCortex } from "@cortex-js/compute-engine/cortex";
+import { ComputeEngine, executeEpsil } from "@cortex-js/compute-engine/epsil";
 
 const ce = new ComputeEngine();
-const { value, diagnostics } = executeCortex(ce, "1 + 2");
+const { value, diagnostics } = executeEpsil(ce, "1 + 2");
 ```
 
-Here is "Hello World" in Cortex. Edit the code and press **Run** (or
+Here is "Hello World" in Epsil. Edit the code and press **Run** (or
 <kbd>⌘/Ctrl</kbd>+<kbd>Enter</kbd>) — the result is the value of the last
-statement, shown as a Cortex value and as its underlying MathJSON.
+statement, shown as an Epsil value and as its underlying MathJSON.
 
-```cortex-live
+```epsil-live
 "Hello World"
 ```
 
-Cortex is **symbolic by default**: expressions stay exact unless you ask for a
+Epsil is **symbolic by default**: expressions stay exact unless you ask for a
 numeric approximation with `N()`.
 
-```cortex-live
+```epsil-live
 Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 ```
 
 Values have a type, and strings support `\(…)` interpolation:
 
-```cortex-live
+```epsil-live
 let x = 2^11 - 1
 "\(x) has type \(Type(x))"
 ```
@@ -52,117 +52,117 @@ let x = 2^11 - 1
 Errors are ordinary values, so a program never throws to its host — a problem
 surfaces as an `["Error", …]` value or a diagnostic:
 
-```cortex-live
+```epsil-live
 const answer = 42
 answer = 0
 ```
 
 ## Start Here
 
-<ReadMore path="/cortex/getting-started/">
+<ReadMore path="/epsil/getting-started/">
 Follow the **five-minute getting-started guide** — try the REPL, run a source
-file, and embed Cortex in JavaScript.
+file, and embed Epsil in JavaScript.
 </ReadMore>
 
-<ReadMore path="/cortex/examples/">
-Explore **complete Cortex programs** for symbolic computation, collections,
+<ReadMore path="/epsil/examples/">
+Explore **complete Epsil programs** for symbolic computation, collections,
 calculus, linear algebra, strings, and more.
 </ReadMore>
 
-<ReadMore path="/cortex/cli/">
+<ReadMore path="/epsil/cli/">
 Use the **CLI and interactive REPL** from a terminal.
 </ReadMore>
 
-<ReadMore path="/cortex/from-python/">
+<ReadMore path="/epsil/from-python/">
 Coming from **Python**? Translate your idioms — and learn the three reflexes
 that silently do the wrong thing.
 </ReadMore>
 
-<ReadMore path="/cortex/from-mathematica/">
+<ReadMore path="/epsil/from-mathematica/">
 Coming from **Mathematica**? Most of the mental model carries over; here is
 what changes.
 </ReadMore>
 
-<ReadMore path="/cortex/for-agents/">
-Writing Cortex with an LLM? Give it the **language card for AI agents** — a
+<ReadMore path="/epsil/for-agents/">
+Writing Epsil with an LLM? Give it the **language card for AI agents** — a
 condensed, machine-verified reference.
 </ReadMore>
 
-<ReadMore path="/cortex/mcp/">
-Connect ChatGPT, Claude, or another AI assistant to Cortex with the built-in
+<ReadMore path="/epsil/mcp/">
+Connect ChatGPT, Claude, or another AI assistant to Epsil with the built-in
 **MCP server** — exact math as a tool call.
 </ReadMore>
 
 ## Language Reference
 
-<ReadMore path="/cortex/syntax/">
-Read more about the **formal syntax of Cortex** — statements, primaries,
+<ReadMore path="/epsil/syntax/">
+Read more about the **formal syntax of Epsil** — statements, primaries,
 calls and indexing.
 </ReadMore>
 
-<ReadMore path="/cortex/literals/">
+<ReadMore path="/epsil/literals/">
 **Literals** — numbers, strings, symbols, and `$…$` LaTeX islands.
 </ReadMore>
 
-<ReadMore path="/cortex/operators/">
+<ReadMore path="/epsil/operators/">
 **Operators** — arithmetic, logic, relational, and the pipeline operator.
 </ReadMore>
 
-<ReadMore path="/cortex/control-flow/">
+<ReadMore path="/epsil/control-flow/">
 **Control flow** — `if`/`else`, `match`, loops, blocks, and functions.
 </ReadMore>
 
-<ReadMore path="/cortex/declarations/">
+<ReadMore path="/epsil/declarations/">
 **Declarations** — binding names with `let` and `const`.
 </ReadMore>
 
-<ReadMore path="/cortex/types/">
+<ReadMore path="/epsil/types/">
 **Types** — annotations, named types, effects, and absence values.
 </ReadMore>
 
-<ReadMore path="/cortex/comments/">
+<ReadMore path="/epsil/comments/">
 **Comments** — line and block comments.
 </ReadMore>
 
-<ReadMore path="/cortex/pragmas/">
+<ReadMore path="/epsil/pragmas/">
 **Pragmas** — parser directives embedded in the code.
 </ReadMore>
 
 ## Collections
 
-Cortex has literal syntax for the Compute Engine's collections.
+Epsil has literal syntax for the Compute Engine's collections.
 
 **Lists** are ordered and 1-indexed with `xs[i]`:
 
-```cortex-live
+```epsil-live
 [3, 5, 7, 11]
 ```
 
 **Sets** are unordered collections of unique elements:
 
-```cortex-live
+```epsil-live
 {3, 5, 7, 11}
 ```
 
 **Dictionaries** are sets of key/value pairs. The empty dictionary is `{->}`:
 
-```cortex-live
+```epsil-live
 {one -> 1, two -> 2}
 ```
 
-<ReadMore path="/cortex/syntax/#collections-tuples-and-dictionaries">
+<ReadMore path="/epsil/syntax/#collections-tuples-and-dictionaries">
 Read more about **lists, sets, tuples and dictionaries**.
 </ReadMore>
 
 ## Future Directions
 
 Several keywords are **reserved but not designed** — they are held so that a
-future version of Cortex can introduce them without breaking existing programs,
+future version of Epsil can introduce them without breaking existing programs,
 and using one as an ordinary name today is an error. None of the following are
 part of the language yet:
 
 - **Modules and imports** — `import`, `export`, `module`.
-- **Error-handling keywords** — `try`, `catch`, `throw`. In Cortex, errors are
+- **Error-handling keywords** — `try`, `catch`, `throw`. In Epsil, errors are
   ordinary values, so these are not needed for the current design.
 - **Concurrency** — `async`, `await`, `parallel`.
 - **Macros** and compile-time metaprogramming.
@@ -172,29 +172,29 @@ the verbatim form (`` `match` ``).
 
 ---
 
-# Getting Started with Cortex
+# Getting Started with Epsil
 
-Source: https://mathlive.io/cortex/getting-started/
+Source: https://mathlive.io/epsil/getting-started/
 
 # Getting Started
 
 <Intro>
-Install Cortex and run your first symbolic program in five minutes.
+Install Epsil and run your first symbolic program in five minutes.
 </Intro>
 
 :::warning[Experimental]
-Cortex is experimental. Its syntax and behavior may change between releases.
+Epsil is experimental. Its syntax and behavior may change between releases.
 :::
 
 ## Install
 
-Cortex is included with the Compute Engine package:
+Epsil is included with the Compute Engine package:
 
 ```shell
 npm install @cortex-js/compute-engine
 ```
 
-The package installs a `cortex` command. During development, run the
+The package installs an `epsil` command. During development, run the
 project-local command through `npx`.
 
 ## Try the REPL
@@ -202,15 +202,15 @@ project-local command through `npx`.
 Start an interactive session:
 
 ```shell
-npx cortex
+npx epsil
 ```
 
 Enter a declaration, then use it in another expression:
 
 ```text
-cortex> let x = 5
+epsil> let x = 5
 5
-cortex> x^2
+epsil> x^2
 25
 ```
 
@@ -219,9 +219,9 @@ the available commands and `.exit` when you are done.
 
 ## Run a Source File
 
-Save this program as `squares.cx`:
+Save this program as `squares.epsil`:
 
-```cortex
+```epsil
 square(x) = x^2
 Map(1..5, square)
 ```
@@ -229,7 +229,7 @@ Map(1..5, square)
 Run it:
 
 ```shell
-npx cortex squares.cx
+npx epsil squares.epsil
 ```
 
 The result is:
@@ -238,36 +238,36 @@ The result is:
 [1,4,9,16,25]
 ```
 
-The conventional file extensions are `.cx` and `.cortex`.
+The conventional file extension is `.epsil`.
 
 ## Work Symbolically
 
-Cortex uses the Compute Engine, so expressions remain exact and symbolic by
+Epsil uses the Compute Engine, so expressions remain exact and symbolic by
 default:
 
-```cortex-live
+```epsil-live
 Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 ```
 
 Use `N()` when you want a numeric approximation:
 
-```cortex-live
+```epsil-live
 N(Sqrt(2))
 ```
 
-## Embed Cortex in JavaScript
+## Embed Epsil in JavaScript
 
-Import the experimental Cortex entry point, create a `ComputeEngine`, then
+Import the experimental Epsil entry point, create a `ComputeEngine`, then
 execute source text:
 
 ```js
 import {
   ComputeEngine,
-  executeCortex,
-} from "@cortex-js/compute-engine/cortex";
+  executeEpsil,
+} from "@cortex-js/compute-engine/epsil";
 
 const ce = new ComputeEngine();
-const { value, diagnostics } = executeCortex(
+const { value, diagnostics } = executeEpsil(
   ce,
   "factorial(n) = 1 if n <= 1 else n * factorial(n - 1)\nfactorial(10)"
 );
@@ -282,35 +282,35 @@ engine when you want an isolated program.
 
 ## Where to Go Next
 
-<ReadMore path="/cortex/examples/">
+<ReadMore path="/epsil/examples/">
 Study **complete programs** covering control flow, collections, symbolic
 calculus, linear algebra, strings, and reproducible randomness.
 </ReadMore>
 
-<ReadMore path="/cortex/cli/">
+<ReadMore path="/epsil/cli/">
 Learn the **CLI and REPL** commands, output modes, diagnostics, and evaluation
 limits.
 </ReadMore>
 
-<ReadMore path="/cortex/syntax/">
+<ReadMore path="/epsil/syntax/">
 Use the **language reference** for syntax, operators, declarations, types, and
 control flow.
 </ReadMore>
 
-<ReadMore path="/cortex/from-python/">
+<ReadMore path="/epsil/from-python/">
 Already know **Python**? Start from the idiom-by-idiom translation guide.
 </ReadMore>
 
-<ReadMore path="/cortex/from-mathematica/">
+<ReadMore path="/epsil/from-mathematica/">
 Already know **Mathematica**? Start from the Wolfram Language translation
 guide.
 </ReadMore>
 
 ---
 
-# Cortex Goals
+# Epsil Goals
 
-Source: https://mathlive.io/cortex/goals/
+Source: https://mathlive.io/epsil/goals/
 
 # Goals and Priorities
 
@@ -332,13 +332,13 @@ Source: https://mathlive.io/cortex/goals/
 
 ---
 
-# Cortex Principles
+# Epsil Principles
 
-Source: https://mathlive.io/cortex/principles/
+Source: https://mathlive.io/epsil/principles/
 
 # Principles
 
-- Cortex is
+- Epsil is
   [expression-oriented](https://en.wikipedia.org/wiki/Expression-oriented_programming_language):
   conditionals, matches and blocks produce values. Declarations and
   effect-oriented loops remain statements.
@@ -354,18 +354,18 @@ Source: https://mathlive.io/cortex/principles/
 
 ---
 
-# Cortex Naming
+# Epsil Naming
 
-Source: https://mathlive.io/cortex/naming/
+Source: https://mathlive.io/epsil/naming/
 
 # Naming Conventions
 
-Cortex follows the naming convention already used throughout MathJSON and
+Epsil follows the naming convention already used throughout MathJSON and
 the Compute Engine's library: **capitalized** identifiers denote library or
 engine operators, **lowercase** identifiers denote user-defined variables
 and functions.
 
-```cortex
+```epsil
 Sin(x)
 Simplify(2 + 3x^3)
 Map([1, 2, 3], x |-> x^2)
@@ -395,7 +395,7 @@ and serialization emits the canonical name:
 | `ℕ`   | `NonNegativeIntegers` |
 | `ℂ`   | `ComplexNumbers`  |
 
-```cortex
+```epsil
 3.1 ∈ ℝ
 // ➔ True
 ```
@@ -420,13 +420,13 @@ other symbol.
 
 ---
 
-# Cortex for Python Users
+# Epsil for Python Users
 
-Source: https://mathlive.io/cortex/from-python/
+Source: https://mathlive.io/epsil/from-python/
 
-# Cortex for Python Users
+# Epsil for Python Users
 
-A working translation guide. Every Cortex example on this page is executed by
+A working translation guide. Every Epsil example on this page is executed by
 the documentation test suite and its `// ➔` output verified, so nothing here
 can drift from the implementation.
 
@@ -448,7 +448,7 @@ There is no `print`. A program's value is the value of its **last statement**.
 
 ## Variables and Functions
 
-| Python | Cortex |
+| Python | Epsil |
 |:--|:--|
 | `x = 5` | `let x = 5` |
 | `TAU = 6.28` (by convention) | `const tau = 6.28` (enforced) |
@@ -466,7 +466,7 @@ names are yours. Calling an unknown function is not an error — the call stays
 symbolic, with a did-you-mean warning when a close library name exists
 (`len` suggests `Length`).
 
-```cortex
+```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
 let double = x |-> 2x
 (fact(5), double(21))
@@ -475,7 +475,7 @@ let double = x |-> 2x
 
 ## Collections
 
-| Python | Cortex |
+| Python | Epsil |
 |:--|:--|
 | `[1, 2, 3]` | `[1, 2, 3]` |
 | `{1, 2, 3}` (set) | `{1, 2, 3}` |
@@ -502,7 +502,7 @@ let double = x |-> 2x
 Collections are **immutable values**. There is no in-place mutation: build a
 new collection and rebind the name.
 
-```cortex
+```epsil
 let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
 (counts["apples"], Keys(counts), counts["pears"])
 // ➔ (3, ["apples","figs"], NaN)
@@ -515,14 +515,14 @@ default. See [Traps](#traps).
 
 ### Comprehensions
 
-Cortex has no comprehension syntax. Use the pipeline operator `|>` with
+Epsil has no comprehension syntax. Use the pipeline operator `|>` with
 `Filter`/`Map`; `_` is the placeholder for the piped value.
 
 ```python
 sum(n**2 for n in range(1, 11) if n % 2 == 1)
 ```
 
-```cortex
+```epsil
 1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(_, n |-> n^2) |> Sum
 // ➔ 165
 ```
@@ -532,7 +532,7 @@ Python's — they enumerate only when materialized (indexed, aggregated, or
 iterated). A deferred mapping function reads variables at *materialization*
 time, so the same "late binding in a closure" surprise applies:
 
-```cortex
+```epsil
 let n = 1
 let m = Map(1..3, k |-> k * n)
 n = 10
@@ -542,7 +542,7 @@ Sum(m)
 
 ## Control Flow
 
-| Python | Cortex |
+| Python | Epsil |
 |:--|:--|
 | `if c: … elif d: … else: …` | `if c { … } else if d { … } else { … }` |
 | `a if c else b` | `a if c else b` — same syntax; chains nest right, so there is no `elif` spelling to learn |
@@ -559,7 +559,7 @@ Loops run **for effect**: their value is `Nothing`. Accumulate into a variable
 declared outside the loop, or use `Map`/`Filter`/`Reduce`/`Fold` when you want
 a value.
 
-```cortex
+```epsil
 let total = 0
 for k in 1..100 { if k % 3 == 0 || k % 5 == 0 { total = total + k } }
 total
@@ -568,7 +568,7 @@ total
 
 ### Pattern matching
 
-Cortex `match` is close to Python 3.10's `match`/`case`, with three
+Epsil `match` is close to Python 3.10's `match`/`case`, with three
 differences: cases are written `pattern => body` (no `case` keyword and no
 colon), a **bare name always binds** (it never compares), and you pin a value
 to compare against with `== expr`.
@@ -580,7 +580,7 @@ match n:
     case _: "negative"
 ```
 
-```cortex
+```epsil
 classify(n) = match n {
   0 => "zero"
   k if k > 0 => "positive"
@@ -593,14 +593,14 @@ Map([-2, 0, 5], classify)
 Because a bare name binds, `match x { Pi => … }` does *not* test for π — it
 binds a fresh variable named `Pi`. Write `match x { == Pi => … }`. This is the
 same rule as Python's (where a bare `case FOO:` is a capture pattern), but it
-bites more often because Cortex's constants are ordinary names.
+bites more often because Epsil's constants are ordinary names.
 
 ## Math and Numerics
 
-| Python | Cortex |
+| Python | Epsil |
 |:--|:--|
 | `7 / 2` → `3.5` | `7 / 2` → the exact rational `7/2`; `N(7 / 2)` → `3.5` |
-| `7 // 2` → `3` | `Floor(7 / 2)` — **`//` starts a comment in Cortex** |
+| `7 // 2` → `3` | `Floor(7 / 2)` — **`//` starts a comment in Epsil** |
 | `7 % 2`, `-7 % 3` → `2` | `7 % 2`, `-7 % 3` → `2` — same sign convention |
 | `x ** 2`, `pow(x, 2)` | `x^2` or `x**2` |
 | `math.sqrt(x)` | `Sqrt(x)` — exact: `Sqrt(9)` is `3`, `Sqrt(2)` stays `√2` |
@@ -617,7 +617,7 @@ bites more often because Cortex's constants are ordinary names.
 Exactness is the default, and comparison is tolerant, so the classic
 floating-point gotcha does not appear:
 
-```cortex
+```epsil
 let exact = 1/3 + 1/6
 let approx = N(1/3 + 1/6)
 (exact, approx, 0.1 + 0.2 == 0.3)
@@ -627,7 +627,7 @@ let approx = N(1/3 + 1/6)
 `Round` rounds halves **away from zero**; Python rounds halves to even. This
 is the one numeric answer that differs on values you are likely to type:
 
-```cortex
+```epsil
 (Round(0.5), Round(2.5), Round(-0.5))
 // ➔ (1, 3, -1)
 ```
@@ -637,14 +637,14 @@ is the one numeric answer that differs on values you are likely to type:
 Because values are Compute Engine expressions, arithmetic over a list is
 elementwise without NumPy:
 
-```cortex
+```epsil
 ([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(1..4, k |-> k^2)))
 // ➔ ([2,3,4], [4,10,18], 30)
 ```
 
 ## Strings
 
-| Python | Cortex |
+| Python | Epsil |
 |:--|:--|
 | `f"x is {x}"` | `"x is \(x)"` — works in any string literal |
 | `"a" + "b"` | `StringJoin("a", "b")` — `+` on strings is a **type error** |
@@ -656,7 +656,7 @@ elementwise without NumPy:
 | `"""…"""` | `"""…"""` — multi-line strings, same delimiter |
 | `r"raw\string"` | `#"raw\string"#` — extended string literal |
 
-```cortex
+```epsil
 let name = "world"
 let parts = StringSplit("a b c")
 ("hello \(name)", StringJoin("a", "b"), Length(Characters(name)), parts[2])
@@ -674,7 +674,7 @@ There are no exceptions. A runtime problem becomes an ordinary
 `Error(…)` **value** that flows through the computation, so a bad element does
 not abort the rest of the work:
 
-```cortex
+```epsil
 Map([16, -4, "banana", 81], x |-> Sqrt(x))
 // ➔ [4, 2i, NaN, 9]
 ```
@@ -687,7 +687,7 @@ the complex numbers. Malformed *source* is different — it produces
 
 These transfer straight across — no translation needed:
 
-```cortex
+```epsil
 let xs = [10, 20, 30]
 (xs[-1], 20 in xs, 1 < 2 < 3, 2**10, -7 % 3)
 // ➔ (30, True, True, 1024, 2)
@@ -732,31 +732,31 @@ the work done now.
 
 ## Next
 
-<ReadMore path="/cortex/examples/">
+<ReadMore path="/epsil/examples/">
 **~70 complete programs**, all verified — iteration, number theory, calculus,
 linear algebra, strings, and randomness.
 </ReadMore>
 
-<ReadMore path="/cortex/for-agents/">
+<ReadMore path="/epsil/for-agents/">
 The **condensed language card** — the same material at reference density, for
 AI agents and for skimming.
 </ReadMore>
 
-<ReadMore path="/cortex/control-flow/">
+<ReadMore path="/epsil/control-flow/">
 **Control flow** in full — `match` patterns, guards, pins, destructuring,
 blocks and loops.
 </ReadMore>
 
 ---
 
-# Cortex for Mathematica Users
+# Epsil for Mathematica Users
 
-Source: https://mathlive.io/cortex/from-mathematica/
+Source: https://mathlive.io/epsil/from-mathematica/
 
-# Cortex for Mathematica Users
+# Epsil for Mathematica Users
 
 A working translation guide for anyone coming from the Wolfram Language. Every
-Cortex example on this page is executed by the documentation test suite and
+Epsil example on this page is executed by the documentation test suite and
 its `// ➔` output verified.
 
 **What carries over.** Almost all of the mental model. Values are symbolic
@@ -772,7 +772,7 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 
 1. **Function application uses parentheses**: `f(x)`, not `f[x]`. Square
    brackets are indexing (Wolfram's `[[…]]`).
-2. **`{…}` is a set, not a list.** A Cortex list is `[1, 2, 3]`. The braces
+2. **`{…}` is a set, not a list.** An Epsil list is `[1, 2, 3]`. The braces
    survive in iterator triples, where they read positionally, but a bare
    `{1, 2, 2}` is the *set* `{1, 2}`.
 3. **`=` assigns only as a whole statement; inside an expression it is `Equal`.** `->` is a key/value pair. `:=` always assigns and `==` always compares
@@ -782,7 +782,7 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 
 ## Expressions and Evaluation
 
-| Wolfram | Cortex |
+| Wolfram | Epsil |
 |:--|:--|
 | `f[x]`, `Sin[x]` | `f(x)`, `Sin(x)` |
 | `x = 5` | `let x = 5` |
@@ -799,7 +799,7 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 | `(* comment *)` | `// comment` or `/* comment */` |
 | `expr;` to suppress output | `;` is a statement separator, nothing is suppressed |
 
-```cortex
+```epsil
 f(x) = x^2 + 1
 (f(3), D(f(x), x), Integrate(f(x), {x, 0, 1}))
 // ➔ (10, 2x, 4/3)
@@ -816,19 +816,19 @@ may stay an unresolved *condition* (`x == y` is what you hand to `Solve`).
 `===` is `SameQ`: structural identity, no tolerance, and **total** — it always
 answers `True` or `False`.
 
-```cortex
+```epsil
 (Sqrt(2) == 1.4142135623730951, Sqrt(2) === 1.4142135623730951, x === y, 1 === 1.0)
 // ➔ (True, False, False, True)
 ```
 
 One caveat for Wolfram users: `SameQ[1, 1.]` is `False` there, because `1` and
-`1.` are different *kinds* of number. In Cortex `1 === 1.0` is `True` — the
+`1.` are different *kinds* of number. In Epsil `1 === 1.0` is `True` — the
 lexer folds `1.0` to the integer literal `1`, and `===` compares number leaves
 by exact value, so `0.5 === 1/2` is `True` too.
 
 ## Lists and Parts
 
-| Wolfram | Cortex |
+| Wolfram | Epsil |
 |:--|:--|
 | `{1, 2, 3}` (list) | `[1, 2, 3]` — braces make a **set** |
 | `xs[[i]]` | `xs[i]` — 1-based, as in Wolfram |
@@ -849,7 +849,7 @@ by exact value, so `0.5 === 1/2` is `True` too.
 | `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]` or `d.a`, enumerate with `Keys`/`Values` |
 | `Union`, `Intersection` | same names, returning a set |
 
-```cortex
+```epsil
 let xs = [3, 1, 4, 1, 5]
 (xs[1], xs[-1], xs[2..4], Length(xs), Sort(xs))
 // ➔ (3, 5, [1,4,1], 5, [1,1,3,4,5])
@@ -858,7 +858,7 @@ let xs = [3, 1, 4, 1, 5]
 `Count` covers all three Wolfram spellings — the plain length, a value to
 match, and a predicate:
 
-```cortex
+```epsil
 let xs = [3, 1, 4, 1, 5, 1]
 (Count(xs), Count(xs, 1), Count(xs, k |-> k > 2))
 // ➔ (6, 3, 3)
@@ -867,7 +867,7 @@ let xs = [3, 1, 4, 1, 5, 1]
 Lists and sets are genuinely different types, so the brace/bracket distinction
 is not cosmetic:
 
-```cortex
+```epsil
 (Type({1, 2, 3}), Type([1, 2, 3]))
 // ➔ ("set<finite_integer>", "vector<finite_integer^3>")
 ```
@@ -877,12 +877,12 @@ is not cosmetic:
 Arithmetic and the elementary functions thread over lists, so a `Listable`
 habit transfers directly. Matrices multiply as matrices:
 
-```cortex
+```epsil
 ([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sin([0, Pi]))
 // ➔ ([2,3,4], [4,10,18], [0,0])
 ```
 
-```cortex
+```epsil
 let A = [[2, 1], [1, 3]]
 (Determinant(A), Inverse(A), A * [1, 1])
 // ➔ (5, [[3/5,-1/5],[-1/5,2/5]], [3,4])
@@ -894,7 +894,7 @@ Iterator triples in braces work exactly as in Wolfram — `Sum`, `Product`,
 `Integrate`, `D` and `Table` all read `{var, lo, hi}` (and `{var, lo, hi,
 step}`) positionally:
 
-```cortex
+```epsil
 let squares = Table(k^2, {k, 1, 5})
 (Sum(squares), Sum(1/k^2, {k, 1, Infinity}), Product(k, {k, 1, 5}))
 // ➔ (55, 1/6 * pi^2, 120)
@@ -903,7 +903,7 @@ let squares = Table(k^2, {k, 1, 5})
 `Sum`, `Product`, `Integrate` and `Table` all accept the tuple spelling
 `(k, 1, 5)` as well. `D(expr, {x, 2})` takes a second derivative.
 
-```cortex
+```epsil
 Sum(Table(k^2, (k, 1, 5)))
 // ➔ 55
 ```
@@ -911,7 +911,7 @@ Sum(Table(k^2, (k, 1, 5)))
 `Table` is a lazy generator, so the value above is materialized by `Sum`. When
 you want an ordinary list, index it, aggregate it, or build it with `Map`:
 
-```cortex
+```epsil
 let g = x |-> x^2 + 1
 (g(3), Sum(Map(1..4, g)))
 // ➔ (10, 34)
@@ -919,7 +919,7 @@ let g = x |-> x^2 + 1
 
 ## Control Flow and Pattern Matching
 
-| Wolfram | Cortex |
+| Wolfram | Epsil |
 |:--|:--|
 | `If[c, a, b]` | `a if c else b`, or `if c { a } else { b }` — an expression |
 | `Which[c1, a, c2, b, True, z]` | `if c1 { a } else if c2 { b } else { z }` |
@@ -929,13 +929,13 @@ let g = x |-> x^2 + 1
 | `While[c, body]` | `while c { body }` |
 | `Module[{t}, body]` | `do { let t = …; body }`, or a `function` block |
 | `With[{t = v}, body]` | `do { const t = v; body }` |
-| `Block[{x}, body]` | *(no dynamic scoping)* — Cortex is lexically scoped |
+| `Block[{x}, body]` | *(no dynamic scoping)* — Epsil is lexically scoped |
 
 `match` replaces the whole `Switch`/`Which`/`Cases` family. It is structural
 and total: it always selects a case, and a bare identifier in pattern position
 **binds** rather than compares. Guards use `if`, and `== expr` pins a value.
 
-```cortex
+```epsil
 classify(z) = match z {
   0 => "zero"
   n if n > 0 => "positive"
@@ -951,11 +951,11 @@ captures its operands, the Wolfram `Plus[a_, b_]` idiom. Blank patterns are
 spelled differently: `_` is the wildcard, `name` is a named capture (Wolfram's
 `name_`), `name: type` adds a type guard (`name_Integer`), and `...rest`
 captures the remainder of a list (`___`). See
-[Control Flow](/cortex/control-flow/#match) for the full pattern grammar.
+[Control Flow](/epsil/control-flow/#match) for the full pattern grammar.
 
 Scoping constructs are blocks:
 
-```cortex
+```epsil
 function area(r) {
   let c = Pi
   c * r^2
@@ -968,7 +968,7 @@ function area(r) {
 
 This is the part that needs the least translation:
 
-| Wolfram | Cortex |
+| Wolfram | Epsil |
 |:--|:--|
 | `Simplify`, `Expand`, `Factor` | same names |
 | `Solve[x^2 == 4, x]` | `Solve(x^2 == 4, x)` |
@@ -983,19 +983,19 @@ This is the part that needs the least translation:
 | `PrimeQ`, `NextPrime`, `FactorInteger`, `Divisors` | `IsPrime`, `NextPrime`, `FactorInteger`, `Divisors` |
 | `Binomial`, `GCD`, `LCM`, `n!` | same |
 
-```cortex
+```epsil
 (Solve(x^2 - 5x + 6 == 0, x), Simplify((x^2 - 1)/(x - 1)), Factor(x^2 - 4))
 // ➔ ([3,2], x + 1, (x - 2) * (x + 2))
 ```
 
-```cortex
+```epsil
 (Limit((1 + 1/n)^n, n, Infinity), Series(Cos(x), x, 0))
 // ➔ (e, 1 - 1/2 * x^2 + 1/24 * x^4 + BigO(x^6))
 ```
 
 `N` takes an optional precision, and the engine works to arbitrary precision:
 
-```cortex
+```epsil
 N(Pi, 25)
 // ➔ 3.141592653589793238462643
 ```
@@ -1013,7 +1013,7 @@ Surface forms that look like Wolfram but behave differently.
 | `%` for the last result | `%` is the `Mod` operator | bind results with `let` |
 | `x = 4` inside `Solve` | Works as expected — inside an expression `=` is `Equal`, so `Solve(x^2 = 4, x)` is the equation | *(nothing to change)* |
 | `expr;` to suppress | `;` only separates statements | *(nothing to suppress)* |
-| `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Cortex operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
+| `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Epsil operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
 | `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
 | `StringLength`, `ToUpperCase` | Inert — the string library is small | `Length(Characters(s))`; decompose and rebuild |
 | `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(1..n)` |
@@ -1022,7 +1022,7 @@ Surface forms that look like Wolfram but behave differently.
 | `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
 
 The rows about inert names deserve emphasis: **an unknown capitalized name is
-not an error.** Cortex leaves the call symbolic (with a did-you-mean warning
+not an error.** Epsil leaves the call symbolic (with a did-you-mean warning
 when a close library name exists), exactly the way Wolfram leaves `Foo[1]`
 unevaluated. A program that calls `Total(xs)` therefore returns the unevaluated
 `Total([…])` rather than a number — when a result looks unfinished, check for
@@ -1043,27 +1043,27 @@ materialize its operands — `(Table(k, {k, 1, 3}), 5)` keeps the unevaluated
 
 ## Next
 
-<ReadMore path="/cortex/examples/">
+<ReadMore path="/epsil/examples/">
 **~70 complete programs**, all verified — number theory, calculus, linear
 algebra, units, strings, and reproducible randomness.
 </ReadMore>
 
-<ReadMore path="/cortex/control-flow/">
+<ReadMore path="/epsil/control-flow/">
 **Control flow** in full — the complete `match` pattern grammar, blocks,
 loops, and function forms.
 </ReadMore>
 
-<ReadMore path="/cortex/for-agents/">
+<ReadMore path="/epsil/for-agents/">
 The **condensed language card** — the same material at reference density.
 </ReadMore>
 
 ---
 
-# Cortex Syntax
+# Epsil Syntax
 
-Source: https://mathlive.io/cortex/syntax/
+Source: https://mathlive.io/epsil/syntax/
 
-# Cortex Syntax
+# Epsil Syntax
 
 ## Notation
 
@@ -1091,7 +1091,7 @@ parser. The Unicode identifier rules are delegated to the
 or return arrow is parsed using the
 [Compute Engine type language](/compute-engine/guides/types/). Detailed
 `match` patterns are documented under
-[Control Flow](/cortex/control-flow/#match).
+[Control Flow](/epsil/control-flow/#match).
 
 _quoted-text-item_ → U+0000-U+0009 U+000B-U+000C U+000E-U+0021 U+0023-U+2027
 U+202A-U+D7FF | U+E000-U+10FFFF
@@ -1186,7 +1186,7 @@ inside an extended string, so it can hold `"` and `\` literally.
 _string_ → _single-line-string_ | _multiline-string_ | _extended-string_
 
 String escapes, interpolation, multiline indentation and continuation are
-specified in [Literals](/cortex/literals/#strings).
+specified in [Literals](/epsil/literals/#strings).
 
 _parenthesized_ → **`(`** _expression_ **`)`**
 
@@ -1300,12 +1300,12 @@ _statement-separator_ → **`;`** | _linebreak_
 
 _shebang_ → **`#!`** (unicode-char)\* (_linebreak | \_eof_)
 
-_cortex_ → (\[_shebang_\] (_statement_)#_statement-separator_ \[_eof_\])
+_epsil_ → (\[_shebang_\] (_statement_)#_statement-separator_ \[_eof_\])
 
 The Pratt (precedence-climbing) grammar for `_infix-expression_`,
 `_prefix-expression_`, and `_postfix-expression_` — the operator set, its
 precedence, and its associativity — is documented as a table in
-[Operators](/cortex/operators/) rather than spelled out production by
+[Operators](/epsil/operators/) rather than spelled out production by
 production; the whitespace rule described there (an infix operator has
 whitespace on both sides or neither; a prefix operator has no whitespace after
 it, and a postfix operator none before it) is part of this grammar, not a
@@ -1317,9 +1317,9 @@ A program is a sequence of statements separated by a linebreak or a `;`. Two
 expressions on the same line with no separator between them is **not** a
 silent sequence — it is a diagnostic:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 1 2
 ```
 
@@ -1331,7 +1331,7 @@ A well-formed multi-statement program wraps its statements in `["Block", …]`; 
 program consisting of a single statement is returned unwrapped (no `Block`
 wrapper):
 
-```cortex
+```epsil
 a
 2
 ```
@@ -1342,7 +1342,7 @@ a
 
 `;` is interchangeable with a linebreak as a separator:
 
-```cortex
+```epsil
 a; 2
 ```
 
@@ -1366,7 +1366,7 @@ call/index applies to. The primary forms are:
 - a dictionary: `{one -> 1, two -> 2}`
 - a `do { … }` block expression: `do { let t = 3; t + 1 }`
 - a `$…$` LaTeX island: `$\frac{1}{2}$` — see
-  [LaTeX Islands](/cortex/literals/#latex-islands)
+  [LaTeX Islands](/epsil/literals/#latex-islands)
 - a function call: `f(x, y)`
 - an index expression: `xs[i]`
 - a field access: `p.x`
@@ -1376,16 +1376,16 @@ call/index applies to. The primary forms are:
 A call is a symbol (or another primary) immediately followed — with **no**
 whitespace — by a parenthesized, comma-separated argument list:
 
-```cortex
+```epsil
 f(x, y)     // ["f", "x", "y"]
 f()         // ["f"]
 ```
 
 An argument may be prefixed with `...` to spread a tuple's elements into the
 call's arguments (valid only in call argument lists — see
-[Spread](/cortex/operators/#spread)):
+[Spread](/epsil/operators/#spread)):
 
-```cortex
+```epsil
 f(...p)      // ["f", ["Spread", "p"]]
 f(1, ...p)   // ["f", 1, ["Spread", "p"]]
 ```
@@ -1393,7 +1393,7 @@ f(1, ...p)   // ["f", 1, ["Spread", "p"]]
 If the callee is not a bare symbol (for example, a parenthesized expression
 or the result of another call), the call lowers to `Apply`:
 
-```cortex
+```epsil
 (getF())(x)   // ["Apply", ["getF"], "x"]
 (a + b)(2+1)  // ["Apply", ["Add", "a", "b"], ["Add", 2, 1]]
 ```
@@ -1402,7 +1402,7 @@ Indexing is a primary immediately followed — with no whitespace — by a
 bracketed index expression, and lowers to `At`. Indexing is **1-based**,
 matching the engine convention (`xs[1]` is the first element):
 
-```cortex
+```epsil
 xs[i]       // ["At", "xs", "i"]
 f(x)[0]     // ["At", ["f", "x"], 0]
 ```
@@ -1411,7 +1411,7 @@ Field access is a primary immediately followed — with no whitespace — by a
 `.` and a symbol, and lowers to `Field`. Chains associate left, and a call
 on a field value lowers through `Apply` like any non-symbol callee:
 
-```cortex
+```epsil
 p.x         // ["Field", "p", "x"]
 a.b.c       // ["Field", ["Field", "a", "b"], "c"]
 p.x(2)      // ["Apply", ["Field", "p", "x"], 2]
@@ -1419,7 +1419,7 @@ p.x(2)      // ["Apply", ["Field", "p", "x"], 2]
 
 A number literal never takes a field: the lexer folds a trailing dot into
 the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
-range. See [Types](/cortex/types/#values-of-a-new-type-are-opaque) for what
+range. See [Types](/epsil/types/#values-of-a-new-type-are-opaque) for what
 `p.x` means on values of declared types, records and dictionaries.
 
 In all three cases the `(`, `[` or `.` must directly abut the
@@ -1450,9 +1450,9 @@ A `{` in expression position is therefore **always** a collection literal (set
 or dictionary); to open a statement block in expression position, prefix it
 with `do`. `do { … }` is a block expression (the engine's `Block`) — a
 statement sequence whose value is its last statement — while a bare `{ … }`
-stays a set/dictionary. See [Blocks](/cortex/control-flow/#blocks).
+stays a set/dictionary. See [Blocks](/epsil/control-flow/#blocks).
 
-```cortex
+```epsil
 { one -> 1, two -> 2 }
 ```
 
@@ -1466,7 +1466,7 @@ Trailing commas are allowed in every collection form (lists, sets, tuples,
 dictionaries, and call/index argument lists) — friendly to notebook editing
 and diffs:
 
-```cortex
+```epsil
 [1, 2, 3,]    // same as [1, 2, 3]
 ```
 
@@ -1477,9 +1477,9 @@ diagnostic. `Sequence` is available only as an explicit call: `Sequence(1, 2,
 
 ## Round-trip and serialization normalizations
 
-`serializeCortex` and `parseCortex` are inverses over the MathJSON the grammar
+`serializeEpsil` and `parseEpsil` are inverses over the MathJSON the grammar
 can produce, up to a small set of documented normalizations.
-`parseCortex(serializeCortex(e))` is **structurally** equal to `e` after
+`parseEpsil(serializeEpsil(e))` is **structurally** equal to `e` after
 applying:
 
 - **Number formatting** — `2`, `{num: "2"}` and `"2"` are the same number;
@@ -1502,19 +1502,19 @@ applying:
   the same expression.
 
 Comments are **not** preserved by a round-trip — see
-[Comments](/cortex/comments/).
+[Comments](/epsil/comments/).
 
 `If` and `Match` have dedicated expression spellings. Other MathJSON heads that
 do not have a special surface form serialize as ordinary function calls.
 
 ## Relationship to the loose math parser
 
-Cortex is a **programming-language** syntax. The Compute Engine also ships a
+Epsil is a **programming-language** syntax. The Compute Engine also ships a
 *loose math parser* (`ce.parse(src, { canonical: false })`) that reads
 LaTeX/ASCII-math notation. The two share a few surface forms but are **not** the
 same language, and they overlap only partially:
 
-| Source     | Cortex `parseCortex`                | Loose `ce.parse` (non-canonical)              | Agree? |
+| Source     | Epsil `parseEpsil`                | Loose `ce.parse` (non-canonical)              | Agree? |
 | ---------- | ----------------------------------- | --------------------------------------------- | ------ |
 | `[1, 2, 3]` | `["List", 1, 2, 3]`                | `["List", 1, 2, 3]`                           | ✅ same |
 | `x^2`      | `["Power", "x", 2]`                  | `["Power", "x", 2]`                            | ✅ same |
@@ -1524,16 +1524,16 @@ same language, and they overlap only partially:
 | `sin`      | `"sin"` (a symbol)                  | `["InvisibleOperator", "s", "i", "n"]`         | ❌ diverge |
 | `2x`       | `["Multiply", 2, "x"]`             | `["InvisibleOperator", 2, "x"]`               | ❌ diverge |
 
-The remaining divergences are intentional: in Cortex a juxtaposed name is a
+The remaining divergences are intentional: in Epsil a juxtaposed name is a
 single identifier (`sin` is one symbol, not `s·i·n`), `f(x, y)` is a function
 call, and `**` is exponentiation. The two parsers do agree that `|>` produces
 `Pipe`. Do not rely on them agreeing except on the rows marked *same*.
 
 ---
 
-# Cortex Literals
+# Epsil Literals
 
-Source: https://mathlive.io/cortex/literals/
+Source: https://mathlive.io/epsil/literals/
 
 # Literals
 
@@ -1629,7 +1629,7 @@ a backslash, or characters with the **Pattern_Syntax** Unicode property
 Since the name cannot include a line break, a verbatim symbol must open and
 close on the same line.
 
-```cortex
+```epsil
 `new`
 `while`
 ```
@@ -1673,7 +1673,7 @@ integers and floats can be padded with extra zeros and can contain underscores
 to help with readability. Neither type of formatting affects the underlying
 value of the literal.
 
-```cortex
+```epsil
 +03.14_15_92_65
 ```
 
@@ -1713,9 +1713,9 @@ character:
 
 A multiline string is delimited by `"""` (three quotation marks).
 
-```cortex
+```epsil
 let message = """
-    Cortex supports
+    Epsil supports
     multiline strings.
     """
 ```
@@ -1746,14 +1746,14 @@ considered a continuation and the string will include neither the `\` nor the
 new line characters. Any whitespace between the backslash and the line break is
 also omitted. This continuation form applies to multiline strings.
 
-```cortex
+```epsil
 let hello = """
 Hello \
 World
 """ // Same as "Hello World"
 ```
 
-```cortex
+```epsil
 hello2 = """
 Hello
 World
@@ -1777,7 +1777,7 @@ but can’t contain an unescaped backslash, or a **new line character** (**U+000
 LINE FEED**, **U+000D CARRIAGE RETURN**, **U+2028 LINE SEPARATOR**, **U+2029
 PARAGRAPH SEPARATOR**)
 
-```cortex
+```epsil
 "1 2 3"
 "1 2 \("3")"
 "1 2 \(3)"
@@ -1790,7 +1790,7 @@ An extended string literal contains no escape sequences and is delimited by one
 or more `#` characters and a quotation mark. Extended strings are single-line;
 a line break before the matching delimiter is an error.
 
-```cortex
+```epsil
 #"There is no escaping now"#
 #"Using "quotation marks" and \ without escaping"#
 ##"As many # as one needs"##
@@ -1803,11 +1803,11 @@ or backslash that would otherwise need to be escaped, leading to the
 ## LaTeX Islands
 
 A `$…$` island is a primary expression whose contents are LaTeX rather than
-Cortex. The text between the delimiters is handed to an **injected** LaTeX
-parser, and the MathJSON it returns is spliced into the Cortex AST at that
+Epsil. The text between the delimiters is handed to an **injected** LaTeX
+parser, and the MathJSON it returns is spliced into the Epsil AST at that
 point, composing with the surrounding expression like any other primary:
 
-```cortex
+```epsil
 2 * $\frac{1}{2}$
 ```
 
@@ -1827,8 +1827,8 @@ point, composing with the surrounding expression like any other primary:
 ### Dialect
 
 The LaTeX dialect accepted inside an island is whatever the injected parser
-accepts — Cortex does not define or restrict it. In practice this is the
-Compute Engine's LaTeX parser (`ce.parse()`), but Cortex's own parser has no
+accepts — Epsil does not define or restrict it. In practice this is the
+Compute Engine's LaTeX parser (`ce.parse()`), but Epsil's own parser has no
 static dependency on it: the parser is passed in by the caller, the same way
 the engine itself injects `LatexSyntax` rather than importing it directly.
 Without an injected parser, a `$…$` island produces a
@@ -1836,16 +1836,16 @@ Without an injected parser, a `$…$` island produces a
 
 ### Why `$` is prohibited as a symbol's first character
 
-`$` cannot start a Cortex symbol name (see
+`$` cannot start an Epsil symbol name (see
 [Prohibited Symbol Characters](#prohibited-symbol-characters) above). This is
 what keeps the lexer unambiguous: seeing a `$` at the start of a primary
 always means "LaTeX island begins here," never "symbol reference."
 
 ---
 
-# Cortex Operators
+# Epsil Operators
 
-Source: https://mathlive.io/cortex/operators/
+Source: https://mathlive.io/epsil/operators/
 
 # Operators
 
@@ -1874,7 +1874,7 @@ spanning multiple lines without requiring a separator between expressions
 :::
 
 The implementation's source of truth for operator spelling, precedence, and
-associativity is `src/cortex/operators.ts`. Both the parser and serializer read
+associativity is `src/epsil/operators.ts`. Both the parser and serializer read
 that table. The reference table below mirrors it.
 
 ## Precedence
@@ -1926,7 +1926,7 @@ The conditional expression `a if c else b` is not an operator row either, but
 it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
 binds looser than every operator that computes and tighter than the forms that
 bind or pair (`=`, `|->`, `|>`, `->`). See
-[Control Flow](/cortex/control-flow/#the-conditional-expression-a-if-c-else-b).
+[Control Flow](/epsil/control-flow/#the-conditional-expression-a-if-c-else-b).
 
 ## The whitespace rule
 
@@ -1935,25 +1935,25 @@ side. A prefix operator must have **no** whitespace before its operand. These
 rules let a multi-line program parse deterministically without a separator
 between every expression:
 
-```cortex
+```epsil
 a + b     // infix Add: ["Add", "a", "b"]
 a+b       // same: whitespace on neither side
 ```
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 a +b
 ```
 
 Here `+` has whitespace before but not after: it is **not** treated as infix.
 The expression `a` ends there; `+b` is left over on the same line with no
 separator before it, which is a diagnostic (`unexpected-symbol`) rather than a
-silently-inferred sequence — see [Statements and Sequencing](/cortex/syntax/).
+silently-inferred sequence — see [Statements and Sequencing](/epsil/syntax/).
 On its own line (after a linebreak or `;`), `+b` is a valid new statement:
 unary `+` is the identity, so `a\n+b` parses as `["Block", "a", "b"]`.
 
-```cortex
+```epsil
 a+ b
 ```
 
@@ -1968,7 +1968,7 @@ more useful to the author than silently ending the statement.
 tier, right below `Assign` — looser than arithmetic, relational, and boolean
 operators (Elixir-style):
 
-```cortex
+```epsil
 a + b |> f       // (a + b) |> f
 a || b |> f      // (a || b) |> f
 x = a |> f       // x = (a |> f)
@@ -1980,7 +1980,7 @@ x = a |> f       // x = (a |> f)
 (`Missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
 evaluated when `a` is present.
 
-```cortex
+```epsil
 let timeout = config.timeout ?? 30
 let first = xs[1] ?? 0
 ```
@@ -1990,23 +1990,23 @@ is an error, not a missing value, and propagates.
 
 It is right-associative, so a chain falls through left to right:
 
-```cortex
+```epsil
 a ?? b ?? c      // Coalesce(a, Coalesce(b, c))
 ```
 
 Its precedence (18) sits between `|->` and `|>`, which fixes the two groupings
 that matter:
 
-```cortex
+```epsil
 xs |> f ?? 0     // (xs |> f) ?? 0 — the default is for the pipeline's RESULT
 x |-> x.a ?? 0   // x |-> (x.a ?? 0) — the default is inside the body
 ```
 
 Like `|>`, it is looser than `->`, so a dictionary value needs parentheses:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 {a -> 1, b -> x ?? 2}
 ```
 
@@ -2019,7 +2019,7 @@ Write `{a -> 1, b -> (x ?? 2)}` instead. It is also looser than `||` and `&&`
 same test a `match` type pattern performs, and lowers to the same
 `Element(value, type)` expression:
 
-```cortex
+```epsil
 x is integer
 x is string && y is boolean
 ```
@@ -2040,7 +2040,7 @@ back from MathJSON uses `in` for both.
 
 The mapsto operator constructs an anonymous function:
 
-```cortex
+```epsil
 x |-> x^2
 (x, y) |-> x + y
 ```
@@ -2050,7 +2050,7 @@ returns another function. It binds tighter than assignment but more loosely
 than the other expression operators, so `f = x |-> x + 1` assigns the complete
 function to `f`. Typed parameters can be written in parentheses:
 
-```cortex
+```epsil
 (x: integer) |-> x + 1
 ```
 
@@ -2061,7 +2061,7 @@ uses `Function`, not a `MapsTo` head.
 
 The range operator is a compact spelling of a two-argument `Range`:
 
-```cortex
+```epsil
 1..5          // Range(1, 5)
 1..n - 1      // Range(1, n - 1)
 k in 1..5     // k in Range(1, 5)
@@ -2078,7 +2078,7 @@ In a **call argument list** — and only there — a prefix `...` spreads a tupl
 into the call's arguments: the tuple's elements become ordinary positional
 arguments.
 
-```cortex
+```epsil
 f(...t)          // ["f", ["Spread", "t"]]
 f(1, ...t, q)    // splices between positional arguments
 g(...p, ...q)    // several spreads splice in order
@@ -2097,7 +2097,7 @@ list `...` is a diagnostic.
 `-` (`Negate`) and `!` (`Not`) are prefix operators. They must abut their
 operand with no whitespace:
 
-```cortex
+```epsil
 -x        // ["Negate", "x"]
 !a        // ["Not", "a"]
 !!a       // ["Not", ["Not", "a"]] — `!!` lexes as one token that peels into two Not's
@@ -2106,14 +2106,14 @@ operand with no whitespace:
 `Negate`/`Not` bind looser than `Power`, so a leading minus does not reach
 inside an exponent:
 
-```cortex
+```epsil
 -x^2      // -(x^2), i.e. ["Negate", ["Power", "x", 2]]
 ```
 
 A unary minus applied directly to a number literal folds into the literal
 rather than producing a `Negate` node:
 
-```cortex
+```epsil
 -2        // the literal -2, not ["Negate", 2]
 ```
 
@@ -2125,7 +2125,7 @@ Unary `+` is accepted the same way but is the identity: `+(2 + 1)` is
 `Power` is the tightest operator in the table and is **right-associative**.
 `**` is an accepted alias for `^` (same table row, same precedence):
 
-```cortex
+```epsil
 x^2       // ["Power", "x", 2]
 x**2      // ["Power", "x", 2]
 2^3^2     // ["Power", 2, ["Power", 3, 2]] — right-associative
@@ -2133,7 +2133,7 @@ x**2      // ["Power", "x", 2]
 
 Because `Power` binds tighter than `Multiply`/`Divide`:
 
-```cortex
+```epsil
 x^1/2     // (x^1)/2, i.e. ["Divide", ["Power", "x", 1], 2]
 ```
 
@@ -2142,7 +2142,7 @@ x^1/2     // (x^1)/2, i.e. ["Divide", ["Power", "x", 1], 2]
 `%` is `Mod`, an infix operator at the multiplicative tier (the same
 precedence as `*` and `/`), left-associative:
 
-```cortex
+```epsil
 a % b       // ["Mod", "a", "b"]
 a + b % c   // a + (b % c): ["Add", "a", ["Mod", "b", "c"]]
 a % b % c   // ["Mod", ["Mod", "a", "b"], "c"] — left-associative
@@ -2154,7 +2154,7 @@ a % b % c   // ["Mod", ["Mod", "a", "b"], "c"] — left-associative
 prefix `!` (`Not`): a `!` that abuts the preceding operand is a factorial
 (`x!`), while a `!` at the start of an operand is `Not` (`!x`).
 
-```cortex
+```epsil
 5!          // ["Factorial", 5]
 n!          // ["Factorial", "n"]
 !x          // ["Not", "x"] — prefix, unchanged
@@ -2163,7 +2163,7 @@ n!          // ["Factorial", "n"]
 `Factorial` binds tighter than `Power` (tier 110 vs. 100), so it reaches inside
 a `Power` operand, and a leading minus stays outside it:
 
-```cortex
+```epsil
 2^3!        // 2^(3!): ["Power", 2, ["Factorial", 3]]
 3! ^ 2      // (3!)^2: ["Power", ["Factorial", 3], 2]
 -3!         // -(3!): ["Negate", ["Factorial", 3]]
@@ -2171,7 +2171,7 @@ a `Power` operand, and a leading minus stays outside it:
 
 It also applies after a parenthesized expression, a call, or an index:
 
-```cortex
+```epsil
 (a + b)!    // ["Factorial", ["Add", "a", "b"]]
 f(x)!       // ["Factorial", ["f", "x"]]
 ```
@@ -2190,7 +2190,7 @@ directly followed by another operator character is not seen as a lone `!`
 A number literal immediately followed — with **no** whitespace — by a symbol
 or an opening parenthesis is read as an implicit `Multiply`:
 
-```cortex
+```epsil
 2x        // ["Multiply", 2, "x"]
 3x^3      // 3·(x^3): ["Multiply", 3, ["Power", "x", 3]]
 2i        // ["Multiply", 2, "i"] — `i` is the engine's ImaginaryUnit symbol
@@ -2201,7 +2201,7 @@ Note that a symbol immediately followed by `(` is a **function call**, not an
 invisible multiplication: `x(2+1)` is `["x", ["Add", 2, 1]]`, and a
 parenthesized (or otherwise compound) callee produces `Apply`:
 `(a+b)(2+1)` is `["Apply", ["Add", "a", "b"], ["Add", 2, 1]]`. See
-[Calls and Indexing](/cortex/syntax/).
+[Calls and Indexing](/epsil/syntax/).
 
 Whitespace between the number and the symbol suppresses invisible
 multiplication and is instead a statement boundary: `2 1/2` is a diagnostic
@@ -2213,13 +2213,13 @@ Relational operators (precedence tier 60) are **n-ary chainable**: a run of
 the *same* relational operator flattens into one node, matching how
 mathematicians write inequalities and how the engine already represents them:
 
-```cortex
+```epsil
 a < b < c     // ["Less", "a", "b", "c"]
 ```
 
 A *mix* of relational operators initially lowers as a left-associated tree:
 
-```cortex
+```epsil
 a < b <= c    // ["LessEqual", ["Less", "a", "b"], "c"]
 ```
 
@@ -2249,7 +2249,7 @@ Three spellings, two meanings:
 
 So a statement assigns:
 
-```cortex
+```epsil
 x = 5
 count = count + 1
 ```
@@ -2257,14 +2257,14 @@ count = count + 1
 …while the same `=` inside any larger expression is an equation, which is what
 a reader of mathematics expects:
 
-```cortex
+```epsil
 Solve(x^2 = 4, x)        // Equal — the equation, not an assignment
 if a = true { 1 } else { 2 }
 [a = 1, b = 2]
 ```
 
 This is why `=` needs no parentheses to be safe in a condition: `if a = true`
-cannot silently assign, and the C footgun does not exist in Cortex.
+cannot silently assign, and the C footgun does not exist in Epsil.
 
 As a comparison, `=` binds at the relational tier (60) like `==`, so
 `if x = 5 && y` groups as `(x = 5) && y`. As an assignment it binds loosest
@@ -2276,7 +2276,7 @@ Two consequences worth knowing:
 line is the equation, because `x^2` is not a name. A bare name always assigns,
 so write `==` when you mean the equation:
 
-```cortex
+```epsil
 y == 2 * x + 1           // the equation
 y = 2 * x + 1            // assigns to y
 ```
@@ -2284,20 +2284,37 @@ y = 2 * x + 1            // assigns to y
 **A chain is diagnosed.** `a = b = 5` would assign `a` the *boolean* `b == 5`,
 which is never what a chained assignment means:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 a = b = 5
 ```
 
 Write `a := b := 5` to chain the assignment, or `a = (b = 5)` if the comparison
 really was intended.
 
+**A tuple pattern with a bare `=` is diagnosed.** A parenthesized left side is
+not a binding target, so `(a, b) = (b, a)` is a *comparison* of two tuples
+whose result is discarded — the swap it looks like silently does nothing:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+(a, b) = (b, a)
+```
+
+Write `(a, b) := (b, a)` to
+[destructure](/epsil/declarations/#destructuring-assignment), or `==` if the
+comparison really was intended. The diagnostic is narrow: it fires only when
+the left side is shaped exactly like a destructuring pattern (bare names, `_`,
+nested tuples), so a genuine tuple equation with computed components —
+`(x + 1, y) = t` — stays silent.
+
 **An assignment in a condition is a warning.** `:=` is unconditional, so it
-reaches a condition where a bare `=` no longer can — and Cortex has no
+reaches a condition where a bare `=` no longer can — and Epsil has no
 `if init; cond` form, so the assigned value *is* the test:
 
-```cortex
+```epsil
 if flag := true { 1 }   // warning: assign-in-condition
 ```
 
@@ -2312,9 +2329,9 @@ comparison, never a bare `=` — so a round-trip is exact regardless of position
 
 ---
 
-# Cortex Control Flow
+# Epsil Control Flow
 
-Source: https://mathlive.io/cortex/control-flow/
+Source: https://mathlive.io/epsil/control-flow/
 
 # Control Flow
 
@@ -2325,7 +2342,7 @@ A function can be defined in two forms, both lowering to the same shape:
 
 The **math style** is a single expression:
 
-```cortex
+```epsil
 f(x) = x + 1
 ```
 
@@ -2333,7 +2350,7 @@ f(x) = x + 1
 ["DefineFunction", "f", ["Function", ["Add", "x", 1], "x"]]
 ```
 
-```cortex
+```epsil
 f(x, y) = x + y
 ```
 
@@ -2344,7 +2361,7 @@ f(x, y) = x + y
 The **block style** wraps the body in a statement block, whose value is its
 last expression:
 
-```cortex
+```epsil
 function f(x) { x + 1 }
 ```
 
@@ -2359,7 +2376,7 @@ the function is called. Return types are retained in the function signature;
 the current runtime does not validate the inferred type of every returned
 value against that annotation.
 
-```cortex
+```epsil
 f(x: real) = x + 1
 ```
 
@@ -2373,7 +2390,7 @@ f(x: real) = x + 1
 A definition can state the effects that calling it may perform. The specifier
 sits after the parameter list and before the return arrow:
 
-```cortex
+```epsil
 function roll(n) random -> integer { Random(n) }
 ```
 
@@ -2399,7 +2416,7 @@ The block form may omit the return annotation (`function f() random { … }`),
 in which case its declared result is `unknown`. In the math form, a written
 effect specifier must be followed by a return arrow:
 
-```cortex
+```epsil
 roll(n) random -> integer = Random(n)
 ```
 
@@ -2421,7 +2438,7 @@ its arguments (declaration order only breaks ties between equally specific
 clauses). A non-finite literal clause matches only itself — `f(NaN) = 0`
 handles exactly `NaN`; a `f(x: real)` clause never captures it:
 
-```cortex
+```epsil
 f(NaN) = 0
 f(Infinity) = 1
 f(x: number) = x + 1
@@ -2429,7 +2446,7 @@ f(Infinity) + f(NaN)
 // ➔ 1
 ```
 
-```cortex
+```epsil
 fib(0) = 0
 fib(1) = 1
 fib(n: integer) = fib(n - 1) + fib(n - 2)
@@ -2454,7 +2471,7 @@ If no clause matches the evaluated arguments, the call is a
 `no-matching-clause` error. To inspect the clause set of a function, use
 `About`:
 
-```cortex
+```epsil
 f(0) = 1
 f(n: integer) = n + 1
 About(f)
@@ -2470,7 +2487,7 @@ domain.
 An anonymous function uses the ASCII mapsto arrow `|->` (the engine's `↦`);
 `->` itself is taken by `KeyValuePair`, so this is a collision-free choice:
 
-```cortex
+```epsil
 x |-> x + 1
 ```
 
@@ -2478,7 +2495,7 @@ x |-> x + 1
 ["Function", ["Add", "x", 1], "x"]
 ```
 
-```cortex
+```epsil
 (x, y) |-> x + y
 ```
 
@@ -2489,7 +2506,7 @@ x |-> x + 1
 A mapsto binds loosely enough to sit on the right-hand side of an
 assignment:
 
-```cortex
+```epsil
 f = x |-> x + 1
 ```
 
@@ -2500,7 +2517,7 @@ f = x |-> x + 1
 A lambda can take **no** parameters — an empty parameter list `()` before the
 arrow:
 
-```cortex
+```epsil
 () |-> 42
 ```
 
@@ -2512,7 +2529,7 @@ arrow:
 
 `if`/`else` is an **expression**, not a statement — it evaluates to a value:
 
-```cortex
+```epsil
 if x > 0 { 1 } else { 2 }
 ```
 
@@ -2522,7 +2539,7 @@ if x > 0 { 1 } else { 2 }
 
 The `else` branch is optional:
 
-```cortex
+```epsil
 if x > 0 { 1 }
 ```
 
@@ -2532,7 +2549,7 @@ if x > 0 { 1 }
 
 `else if` chains nest into an `If` in `else` position:
 
-```cortex
+```epsil
 if x > 0 { 1 } else if x < 0 { 2 } else { 3 }
 ```
 
@@ -2553,7 +2570,7 @@ as a multi-statement program (see [Blocks](#blocks) below).
 When both branches are single expressions, the braces are noise. The
 conditional form spells the same `If` without them:
 
-```cortex
+```epsil
 let x = 5
 10 if x > 3 else 20
 // ➔ 10
@@ -2578,14 +2595,14 @@ that bind or pair — `=`, `|->`, `|>` and `->`.** So the whole conditional is t
 right-hand side of an assignment, the body of a function, or the value of a
 dictionary entry, and no parentheses are needed around a comparison:
 
-```cortex
+```epsil
 let scale = 2
 let tag = n |-> "big" if n * scale > 10 else "small"
 tag(6)
 // ➔ "big"
 ```
 
-```cortex
+```epsil
 let n = 7
 { "value" -> n, "parity" -> "odd" if n % 2 == 1 else "even" }
 // ➔ {"value" -> 7, "parity" -> "odd"}
@@ -2594,14 +2611,14 @@ let n = 7
 Going the other way — a conditional used as an operand — does need
 parentheses, since `1 if c else 2 + 3` reads as `1 if c else (2 + 3)`:
 
-```cortex
+```epsil
 (10 if 3 > 0 else 20) + 5
 // ➔ 15
 ```
 
 **Chains nest to the right,** so there is no `else if` spelling to learn:
 
-```cortex
+```epsil
 let n = 0
 "zero" if n == 0 else "negative" if n < 0 else "positive"
 // ➔ "zero"
@@ -2617,7 +2634,7 @@ a new `if`-statement, never a continuation of the line above.
 a sequence of `pattern => body` cases and evaluates to the body of the first
 matching case:
 
-```cortex
+```epsil
 match x {
   0 => "zero"
   _ => "other"
@@ -2647,7 +2664,7 @@ at that position — for *any* name, including ones that happen to name an
 engine constant (`e`, `i`, `Pi`). A pattern is parsed as an ordinary
 expression first, so this applies inside nested patterns too:
 
-```cortex
+```epsil
 match p {
   (x, e) => x + e
 }
@@ -2664,9 +2681,9 @@ matches unconditionally, a *non-final* case consisting of just a binding (or
 `match-irrefutable-case` diagnostic (a final catch-all is expected and not
 flagged):
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 match x {
   Pi => 1
   0 => 2
@@ -2685,7 +2702,7 @@ the constant, use a pin.
 the enclosing scope — this is how to test a symbolic constant or a runtime
 variable, since a bare identifier always binds instead:
 
-```cortex
+```epsil
 match x {
   == Pi => "is-pi"
   _ => "no"
@@ -2701,7 +2718,7 @@ match x {
 ]
 ```
 
-```cortex
+```epsil
 match x {
   == limit => 1
   _ => 0
@@ -2712,12 +2729,12 @@ match x {
 ["Match", "x", ["MatchCase", ["Pin", "limit"], 1], ["MatchCase", "_", 0]]
 ```
 
-The Cortex parser lowers **every** non-literal pinned expression to `Pin`,
+The Epsil parser lowers **every** non-literal pinned expression to `Pin`,
 whether it names a constant or a runtime variable — it cannot tell the two
 apart lexically, and only `Pin` resolution looks up the value at match time.
 A pin of a literal (`== 5`) drops the `Pin` head and matches structurally,
 same as writing the literal directly; `Infinity`/`NaN` are numeric literals in
-Cortex, so `== Infinity` is a literal pin too, with no binding trap to avoid.
+Epsil, so `== Infinity` is a literal pin too, with no binding trap to avoid.
 
 ### Or-alternatives
 
@@ -2725,7 +2742,7 @@ Cortex, so `== Infinity` is a literal pin too, with no binding trap to avoid.
 alternative matches; a guard, if present, applies after whichever alternative
 matched:
 
-```cortex
+```epsil
 match x {
   1 | 2 | == Pi => "small"
   _ => "big"
@@ -2753,7 +2770,7 @@ case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
 The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
 form keys on the operator, not on how it was written:
 
-```cortex
+```epsil
 match x {
   0..9 => "digit"
   10..99 => "two digits"
@@ -2780,7 +2797,7 @@ case.
 Bounds must be **numeric literals** — negated literals and `Infinity` /
 `-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
 
-```cortex
+```epsil
 match x {
   0..Infinity => "nonnegative"
   _ => "negative"
@@ -2803,9 +2820,9 @@ diagnostic; and a range whose lower bound exceeds its upper bound is a
 `range-pattern-empty` diagnostic (that case can never match). Use a guard when
 a bound is not a literal:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 match x {
   0..limit => "in"
   _ => "out"
@@ -2814,7 +2831,7 @@ match x {
 
 Write instead:
 
-```cortex
+```epsil
 match x {
   n if n >= 0 && n <= limit => "in"
   _ => "out"
@@ -2824,7 +2841,7 @@ match x {
 A range pattern binds nothing, so it is legal inside an or-alternative, and a
 guard on a range case can only reference names from the enclosing scope:
 
-```cortex
+```epsil
 match x {
   0..9 | 100..109 => "in"
   _ => "out"
@@ -2862,7 +2879,7 @@ in pattern position for this reason.
 `pattern if guard => body` adds a boolean condition, checked after the
 pattern matches and after its bindings are in scope:
 
-```cortex
+```epsil
 match n {
   n if n > 3 => "big"
   _ => "small"
@@ -2887,7 +2904,7 @@ whole expression inert.
 List, tuple, and dictionary patterns decompose the subject and bind their
 elements:
 
-```cortex
+```epsil
 match xs {
   [first, ...rest] => first
 }
@@ -2897,7 +2914,7 @@ match xs {
 ["Match", "xs", ["MatchCase", ["List", "_first", "___rest"], "first"]]
 ```
 
-```cortex
+```epsil
 match p {
   (x, y) => x
 }
@@ -2907,7 +2924,7 @@ match p {
 ["Match", "p", ["MatchCase", ["Tuple", "_x", "_y"], "x"]]
 ```
 
-```cortex
+```epsil
 match p {
   {x -> px, y -> py} => px + py
 }
@@ -2939,7 +2956,7 @@ patterns — bindings, literals, pins, or nested shapes. Dictionary matching is
 the named keys, each with a matching value; extra subject keys are ignored. A
 subject missing any named key falls through to the next case. So
 
-```cortex
+```epsil
 match {x -> 3, y -> 4, z -> 5} {
   {x -> px, y -> py} => px + py
   _ => 0
@@ -2954,7 +2971,7 @@ binds `px = 3` and `py = 4` (the extra `z` key is ignored) and evaluates to
 `name: type` binds like a bare identifier, plus an implicit type guard,
 conjoined with any explicit guard:
 
-```cortex
+```epsil
 match n {
   n: integer if n > 0 => "positive integer"
   _ => "other"
@@ -2982,7 +2999,7 @@ structure comes for free — a pattern like `a + b` dispatches on the `Add`
 operator and captures its operands, with the same commutative matching the
 rule system already uses for `Add`/`Multiply`:
 
-```cortex
+```epsil
 match z {
   a + b if a > 0 => a
   _ => 0
@@ -3007,10 +3024,10 @@ pattern fails closed, naming the offending pattern in the error.
 
 If no case matches, `match` evaluates to an `Error` value tagged
 `'match-no-case'` carrying the subject, rather than throwing or silently
-producing `Nothing` — errors are ordinary values in Cortex (see
-[Evaluation](/cortex/evaluation/)):
+producing `Nothing` — errors are ordinary values in Epsil (see
+[Evaluation](/epsil/evaluation/)):
 
-```cortex
+```epsil
 match 3 {
   0 => "zero"
 }
@@ -3033,7 +3050,7 @@ a loop statement.
 `while cond { … }` lowers to a `Loop` over a `Block` whose first statement
 breaks out when the condition becomes false:
 
-```cortex
+```epsil
 while x > 0 { x }
 ```
 
@@ -3048,7 +3065,7 @@ while x > 0 { x }
 loop variable's `in` is the engine's `Element` operator, doubling as the
 iterator clause:
 
-```cortex
+```epsil
 for x in xs { x }
 ```
 
@@ -3060,7 +3077,7 @@ for x in xs { x }
 clause. A second, later `in` in the collection expression is still the
 ordinary `Element` infix operator:
 
-```cortex
+```epsil
 for x in a in b { x }
 ```
 
@@ -3076,7 +3093,7 @@ distinct from the `{ … }` **collection** grammar (set/dictionary literals).
 A bare `{ … }` with no introducing keyword is always the
 collection grammar:
 
-```cortex
+```epsil
 { 1, 2 }
 ```
 
@@ -3087,7 +3104,7 @@ collection grammar:
 Each block pushes its own lexical scope. A block's value is its last
 expression; an empty block's value is `Nothing`:
 
-```cortex
+```epsil
 if a { }
 ```
 
@@ -3098,7 +3115,7 @@ if a { }
 Statements inside a block are separated the same way as top-level
 statements — a linebreak or a `;`:
 
-```cortex
+```epsil
 if a { 1; 2; 3 }
 ```
 
@@ -3108,7 +3125,7 @@ if a { 1; 2; 3 }
 
 Blocks nest freely:
 
-```cortex
+```epsil
 if a { if b { 1 } }
 ```
 
@@ -3125,7 +3142,7 @@ assignment right-hand side, a function argument. Its value is its last
 statement, and it pushes its own lexical scope, exactly like a keyword-led
 block:
 
-```cortex
+```epsil
 let y = do { let t = 3; t + 1 }
 ```
 
@@ -3139,7 +3156,7 @@ Because a lambda body is an ordinary expression, `x |-> do { … }` produces the
 same `Function(Block(…), x)` shape a named `function` body does — so a closure
 whose body runs several statements is written with `do`:
 
-```cortex
+```epsil
 counter |-> do { counter = counter + 1; counter }
 ```
 
@@ -3150,7 +3167,7 @@ A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.
 `break` leaves the innermost enclosing loop; `continue` skips to its next
 iteration. Both lower to the engine's `Break()` / `Continue()` primitives.
 
-```cortex
+```epsil
 for x in [1, 2, 3, 4] {
   if x > 3 { break }
   if x == 2 { continue }
@@ -3161,7 +3178,7 @@ for x in [1, 2, 3, 4] {
 They are valid anywhere inside a loop body — directly, or nested in an `if`, a
 `match` case, or a `do` block:
 
-```cortex
+```epsil
 for x in xs {
   match x {
     0 => continue
@@ -3172,9 +3189,9 @@ for x in xs {
 
 Outside a loop they are a `control-outside-loop` diagnostic:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 if x > 1 { break }
 ```
 
@@ -3182,9 +3199,9 @@ The loop context **resets at every function and lambda boundary**. A `break`
 written inside a function or lambda defined in a loop body does not target
 that loop — it is outside a loop, and diagnosed:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 for x in xs {
   function h() { break }
 }
@@ -3195,7 +3212,7 @@ This boundary is not a style rule. The engine's `Block` short-circuits on
 would otherwise transfer control to whatever loop happened to be running.
 
 Only the value-less forms are surface syntax. The engine's `Break(v)` — which
-makes the loop evaluate to `v` — has no Cortex spelling yet; it is bundled with
+makes the loop evaluate to `v` — has no Epsil spelling yet; it is bundled with
 the ruling on a general `return`.
 
 Serialized back from MathJSON, they appear in their call form (`Break()`,
@@ -3203,7 +3220,7 @@ Serialized back from MathJSON, they appear in their call form (`Break()`,
 
 ## `return`
 
-`return` is **not implemented**: Cortex's expression-oriented style (an `if` is
+`return` is **not implemented**: Epsil's expression-oriented style (an `if` is
 a value, a block's value is its last expression) doesn't need an explicit
 `return` yet. It is listed among the words the language reserves the right to
 claim later, but nothing claims it today — so `return` is an ordinary
@@ -3212,26 +3229,26 @@ diagnostic. Prefer not to use it as a name.
 
 ---
 
-# Cortex Declarations
+# Epsil Declarations
 
-Source: https://mathlive.io/cortex/declarations/
+Source: https://mathlive.io/epsil/declarations/
 
 # Declarations
 
-A declaration introduces a symbol into the current scope. Cortex has two
+A declaration introduces a symbol into the current scope. Epsil has two
 declaration keywords:
 
 - **`let`** declares a **mutable** symbol.
 - **`const`** declares an **immutable** symbol.
 
-```cortex
+```epsil
 let x = 5
 const c = 6.28
 ```
 
 A type annotation also **implies** a declaration, even without a keyword:
 
-```cortex
+```epsil
 x: real = 5
 ```
 
@@ -3244,7 +3261,7 @@ reassignment (see below).
 
 A `let` or `const` may bind the components of a **tuple** in one statement:
 
-```cortex
+```epsil
 divmod(a, b) = (Floor(a / b), a % b)
 let (q, r) = divmod(17, 5)
 (q, r)
@@ -3254,14 +3271,14 @@ let (q, r) = divmod(17, 5)
 The pattern is a parenthesized list of **at least two** elements, each a bare
 symbol, a `_` (which skips that position), or a nested tuple pattern:
 
-```cortex
+```epsil
 let ((a, b), _, c) = ((1, 2), 99, 5)
 a + b + c
 // ➔ 8
 ```
 
 The pattern is **irrefutable in form** — no literals, pins, or guards (use
-[`match`](/cortex/control-flow/) for conditional destructuring). The value is
+[`match`](/epsil/control-flow/) for conditional destructuring). The value is
 evaluated once; it must be a tuple of the same shape, otherwise the
 declaration yields an `incompatible-type` **error value** and binds nothing.
 With `const`, every bound name is a constant. An initializer is required, and
@@ -3272,12 +3289,64 @@ Destructuring lowers to the same `Declare` primitive with the pattern in the
 name position: `["Declare", ["Tuple", "q", "r"], ["Dictionary",
 ["KeyValuePair", "value", …]]]`.
 
+## Destructuring assignment
+
+The same pattern may appear on the left of an assignment, to write bindings
+that already exist instead of declaring new ones:
+
+```epsil
+let a = 1
+let b = 2
+(a, b) := (b, a)
+(a, b)
+// ➔ (2, 1)
+```
+
+The right side is evaluated **once, in full, before any target is written**,
+so a swap means what it reads — `(a, b) := (b, a)` exchanges the two values
+rather than assigning `b` to both. The same holds for a rotation
+(`(a, b, c) := (c, a, b)`) and for the pair-carrying loop step that is the
+usual reason to want this:
+
+```epsil
+let a = 0
+let b = 1
+for k in 1..10 {
+  (a, b) := (b, a + b)
+}
+a
+// ➔ 55
+```
+
+The pattern grammar is exactly the one above — at least two elements, each a
+bare symbol, a `_` skipping that position, or a nested tuple pattern — and a
+shape mismatch is the same `incompatible-type` error value, which writes
+**nothing**: the whole pattern is matched before any target is written, so a
+mismatch nested under a position that would have bound leaves that one alone
+too.
+
+The differences from a destructuring `let` are the ones assignment always has:
+the targets keep their identity and their declared type (a value that does not
+fit a target's type is an error value), and assigning to a `const` fails.
+Those two failures are found only by attempting the write, so unlike a shape
+mismatch they are **not** atomic — targets earlier in the pattern have already
+been written and stay written.
+
+The assignment operator must be spelled `:=`. A statement-leading `(a, b) = …`
+is a **comparison**, not an assignment — a parenthesized left side is not a
+binding target, so the bare `=` reads as `Equal`. Because that is almost
+always a typo for the destructuring assignment, it is
+[diagnosed](/epsil/operators/).
+
+Destructuring assignment lowers to `Assign` with the pattern in the target
+position: `["Assign", ["Tuple", "a", "b"], ["Tuple", "b", "a"]]`.
+
 ## Declaring a type
 
 A third declaration keyword, `type`, introduces a **type** name rather than a
 symbol — and, with it, a constructor of the same name:
 
-```cortex
+```epsil
 type point = tuple<x: number, y: number>
 type alias pair = tuple<number, number>
 let p = point(1, 2)
@@ -3288,14 +3357,14 @@ let a: pair = (1, 2)
 an existing one, and takes a type-parameter clause if it needs one
 (`type alias Pair<T> = tuple<T, T>`). Unlike `let` and `const`, `type` is not
 a reserved word — only these statement shapes claim it. See
-[Declaring a type](/cortex/types/#declaring-a-type) for the whole story.
+[Declaring a type](/epsil/types/#declaring-a-type) for the whole story.
 
 ## Reassignment vs. declaration
 
 A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
 declaration syntax: it is an **assignment** and lowers to `Assign`:
 
-```cortex
+```epsil
 x = 5
 ```
 
@@ -3308,10 +3377,10 @@ unbound symbol, but `let` is the explicit and idiomatic way to introduce a
 mutable binding.
 
 Reassigning a symbol that was declared `const` produces an
-[error value](/cortex/evaluation/#errors-are-values), not a parse error or a
+[error value](/epsil/evaluation/#errors-are-values), not a parse error or a
 thrown exception:
 
-```cortex
+```epsil
 const c = 1
 c = 2
 ```
@@ -3322,14 +3391,14 @@ at evaluation time, that rejects the assignment and produces an `["Error",
 
 ## Encoding
 
-Declarations lower to the engine's `Declare` operator — not a
-Cortex-specific `Let`/`Const` head. `Declare` takes the declared symbol, an
+Declarations lower to the engine's `Declare` operator — not an
+Epsil-specific `Let`/`Const` head. `Declare` takes the declared symbol, an
 optional type (positional, when present), and a trailing attributes
 `Dictionary` carrying `value` and, for `const`, `constant: True`. `const` is
 a **binding attribute** (`constant: True` → the engine's `isConstant`), not a
-type — the engine, not Cortex, enforces it.
+type — the engine, not Epsil, enforces it.
 
-```cortex
+```epsil
 let x = 5
 ```
 
@@ -3341,7 +3410,7 @@ The type is inferred (`integer`, here) when no annotation is given. With an
 annotation, the type appears as a positional argument before the attributes
 dictionary:
 
-```cortex
+```epsil
 let x: real = 5
 ```
 
@@ -3352,7 +3421,7 @@ let x: real = 5
 
 A declaration with no initializer omits the attributes dictionary entirely:
 
-```cortex
+```epsil
 let x: real
 ```
 
@@ -3360,7 +3429,7 @@ let x: real
 ["Declare", "x", {"str": "real"}]
 ```
 
-```cortex
+```epsil
 let x
 ```
 
@@ -3370,7 +3439,7 @@ let x
 
 `const` adds a `constant` key alongside `value`:
 
-```cortex
+```epsil
 const c = 6.28
 ```
 
@@ -3379,7 +3448,7 @@ const c = 6.28
 ```
 
 Because declarations lower directly to the engine's own `Declare`
-primitive, there is no separate Cortex-side declaration logic at execution
+primitive, there is no separate Epsil-side declaration logic at execution
 time — the program evaluates the `Declare` expression exactly like any other
 expression.
 
@@ -3392,32 +3461,32 @@ lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
 `let` and `const` are the binding keywords. There is currently no compound
-assignment (`+=`); destructuring declarations (`let (x, y) = t`) are
-described above.
+assignment (`+=`); destructuring declarations (`let (x, y) = t`) and
+destructuring assignments (`(x, y) := t`) are described above.
 
 ---
 
-# Cortex Evaluation
+# Epsil Evaluation
 
-Source: https://mathlive.io/cortex/evaluation/
+Source: https://mathlive.io/epsil/evaluation/
 
 # Evaluation
 
-`executeCortex(ce, source, options?)` parses a Cortex program and evaluates
+`executeEpsil(ce, source, options?)` parses an Epsil program and evaluates
 each top-level statement **sequentially**, in the engine's current scope —
 a notebook cell, or a chain of cells sharing one scope. The result is the
 **last statement's** value:
 
 ```ts
-const { value, diagnostics } = executeCortex(ce, 'let x = 5\nx = x + 3\nx');
+const { value, diagnostics } = executeEpsil(ce, 'let x = 5\nx = x + 3\nx');
 // value.re === 8
 ```
 
 No scope is pushed around the whole program: declarations persist across
 statements (and across cells, in a notebook that chains calls to
-`executeCortex` against the same engine), the same way variables persist
+`executeEpsil` against the same engine), the same way variables persist
 across cells in a REPL. Blocks and function bodies still push their own
-lexical scopes (see [Control Flow](/cortex/control-flow/)).
+lexical scopes (see [Control Flow](/epsil/control-flow/)).
 
 ## Symbolic by default
 
@@ -3425,7 +3494,7 @@ Evaluation follows the engine's ordinary exactness contract: a top-level
 expression evaluates the same way `ce.parse(latex).evaluate()` does. A
 transcendental of an exact argument stays symbolic —
 
-```cortex
+```epsil
 Ln(2)
 ```
 
@@ -3434,7 +3503,7 @@ evaluates to the symbolic `Ln(2)` (`ln(2)`), not a decimal approximation.
 **Numeric approximation is explicit**, via `N(expr)` — it is a function
 call, not a language mode:
 
-```cortex
+```epsil
 N(Ln(2))
 ```
 
@@ -3446,7 +3515,7 @@ A collection **literal** — a list `[…]`, set `{…}`, tuple `(…)`, or
 dictionary — evaluates its elements when the statement executes. Assigning
 one to a variable stores a snapshot of the element *values*:
 
-```cortex
+```epsil
 let xs = []
 for k in 1..3 { xs = Join(xs, [k]) }
 xs
@@ -3465,10 +3534,10 @@ operation (an aggregate, an index) at the point of definition.
 
 ## Errors are values
 
-Per [Principles](/cortex/principles/), "errors are values": a *runtime*
+Per [Principles](/epsil/principles/), "errors are values": a *runtime*
 problem — a type error, an out-of-domain argument, reassigning a `const` —
 flows as an embedded `["Error", …]` MathJSON value, not as a thrown
-exception. `executeCortex` never throws for a runtime problem; it catches
+exception. `executeEpsil` never throws for a runtime problem; it catches
 the underlying engine exception (for the handful of paths, like a `const`
 reassignment, that still throw internally) and returns an `Error` value in
 its place.
@@ -3492,61 +3561,61 @@ supported), or reassigning a `const` in the middle of a program.
 browser) at parse time. Because a notebook document can be shared or opened
 in an unfamiliar environment, both are **gated off by default**:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 #env("HOME")
 ```
 
 with the default options produces a `host-pragma-disabled` diagnostic and no
 host read — the pragma evaluates to `Nothing`. Passing
-`{ allowHostPragmas: true }` to `executeCortex` opts back in and lets `#env`/
-`#navigator` read the host as documented in [Pragmas](/cortex/pragmas/).
+`{ allowHostPragmas: true }` to `executeEpsil` opts back in and lets `#env`/
+`#navigator` read the host as documented in [Pragmas](/epsil/pragmas/).
 
 The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,
 `#time` — always work; they don't read anything sensitive from the host.
 
-`#error(...)` never throws a `FatalParsingError` out of `executeCortex`: it
+`#error(...)` never throws a `FatalParsingError` out of `executeEpsil`: it
 is converted to an `error-directive` diagnostic, so a single bad cell can't
 crash the host embedding it.
 
 ## Interruptibility
 
-A host can give a Cortex evaluation an explicit time budget by wrapping it in
+A host can give an Epsil evaluation an explicit time budget by wrapping it in
 the Compute Engine's `withTimeLimit()` span:
 
 ```ts
 const result = ce.withTimeLimit(
-  { ms: 500, label: "cortex-cell" },
-  () => executeCortex(ce, source, { parseLatex })
+  { ms: 500, label: "epsil-cell" },
+  () => executeEpsil(ce, source, { parseLatex })
 );
 ```
 
 The engine's `iterationLimit` and `recursionLimit` provide independent
-count-based bounds. `executeCortex()` converts a limit breach during execution
+count-based bounds. `executeEpsil()` converts a limit breach during execution
 into an error value (or an `evaluation-canceled` diagnostic when it occurs in a
 non-final statement).
 
 These limits are cooperative. A browser that evaluates untrusted or potentially
-unbounded programs should run Cortex in a Web Worker that the host can terminate
+unbounded programs should run Epsil in a Web Worker that the host can terminate
 from the outside. See
 [Execution Constraints](/compute-engine/guides/execution-constraints/) for the
 complete cancellation model.
 
 ---
 
-# Cortex Types
+# Epsil Types
 
-Source: https://mathlive.io/cortex/types/
+Source: https://mathlive.io/epsil/types/
 
 # Types
 
-Cortex does not have its own type system: it reuses the Compute Engine's
+Epsil does not have its own type system: it reuses the Compute Engine's
 type language, the same syntax accepted by
 `ce.declare("f", "(real) -> real")`. See the
 [Compute Engine type guide](/compute-engine/guides/types/) for the type
 language itself. This page covers where a type
-annotation is written in Cortex source and what it means, and how a program
+annotation is written in Epsil source and what it means, and how a program
 declares type names of its own; the type grammar
 includes unions, intersections, tuples, records, function signatures, and
 generic collection types.
@@ -3555,7 +3624,7 @@ generic collection types.
 
 A type annotation follows a `:` after a declaration target:
 
-```cortex
+```epsil
 x: real
 x: real = 5
 ```
@@ -3563,14 +3632,14 @@ x: real = 5
 Type-syntax tokens — `<`, `>`, `->`, `|`, `&` — are only meaningful **inside**
 a type annotation. They are never part of the general expression grammar:
 once the parser sees a leading `symbol :`, it hands the rest of the type
-expression to the type subparser and resumes parsing Cortex source exactly
+expression to the type subparser and resumes parsing Epsil source exactly
 where the type subparser stopped. An unrelated `:` that doesn't follow a
 declaration target at the start of a statement is not treated as an
 annotation at all.
 
 Function parameters and return values can also be annotated:
 
-```cortex
+```epsil
 f(x: real, n: integer) -> real = x^n
 function g(x: integer) -> integer { x + 1 }
 (x: integer) |-> x + 1
@@ -3584,12 +3653,12 @@ the annotation.
 Named functions can also declare their effects between the parameter list and
 the return type:
 
-```cortex
+```epsil
 function roll(n: integer) random -> integer { Random(n) }
 ```
 
 Effect labels are part of the function type. See
-[Effect specifiers](/cortex/control-flow/#effect-specifiers) for declaration
+[Effect specifiers](/epsil/control-flow/#effect-specifiers) for declaration
 syntax and the [function type guide](/compute-engine/guides/types/#function-types)
 for subtyping rules.
 
@@ -3599,7 +3668,7 @@ The parser holds a type annotation as a MathJSON string. A declaration places
 that string after the declared symbol. An initializer is stored in the
 declaration's attributes dictionary:
 
-```cortex
+```epsil
 x: real = 5
 ```
 
@@ -3608,7 +3677,7 @@ x: real = 5
   ["Dictionary", ["KeyValuePair", "value", 5]]]
 ```
 
-```cortex
+```epsil
 xs: list<integer>
 ```
 
@@ -3616,7 +3685,7 @@ xs: list<integer>
 ["Declare", "xs", {"str": "list<integer>"}]
 ```
 
-```cortex
+```epsil
 f: (real) -> real
 ```
 
@@ -3633,14 +3702,14 @@ expression grammar.
 ## Semantics
 
 An annotation uses the same engine type machinery as
-`ce.declare()`. Type checking is not a separate Cortex-side pass — it happens
+`ce.declare()`. Type checking is not a separate Epsil-side pass — it happens
 at canonicalization/evaluation time, the same way it does for any other
-declared symbol. Cortex does not add a second type checker on top of the
+declared symbol. Epsil does not add a second type checker on top of the
 engine's.
 
 Typed parameters are represented with `Typed` nodes:
 
-```cortex
+```epsil
 f(x: integer) -> real = x + 1
 ```
 
@@ -3659,11 +3728,11 @@ symbol. This includes the engine's existing convention that evaluating a
 bare symbol as a boolean operand (`And`/`Or`/`Xor`/`Not`) infers that symbol
 `boolean` for the lifetime of the engine; a later numeric use of the same
 symbol in the same scope will then error. This is engine behavior, not
-something specific to Cortex.
+something specific to Epsil.
 
 ## Absence values
 
-Cortex distinguishes three related kinds of absence:
+Epsil distinguishes three related kinds of absence:
 
 - `Nothing` means “no value here” and is removed from function arguments and
   collection literals.
@@ -3676,7 +3745,7 @@ value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
 first value that is not missing; if every argument is missing, it returns the
 last one unchanged.
 
-```cortex-live
+```epsil-live
 (Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
   Coalesce(Missing, 0), Missing + 1)
 // ➔ (3, True, True, 0, NaN)
@@ -3697,7 +3766,7 @@ There are two forms, and they mean different things.
 definition belongs to it: the definition describes how the type is built, not
 which values are already members of it.
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 let p = point(1, 2)
 p
@@ -3707,7 +3776,7 @@ p
 **`type alias` declares another name for an existing type.** Any value of
 that shape is a value of the alias — it is an abbreviation, not a new type.
 
-```cortex-live
+```epsil-live
 type alias pair = tuple<number, number>
 let a: pair = (1, 2)
 a
@@ -3725,7 +3794,7 @@ shapes `type name =`, `type name<`, `type alias name =` and
 ordinary identifier everywhere else — `type: integer = 4` still declares a
 variable named `type`:
 
-```cortex-live
+```epsil-live
 let type = 5
 type + 1
 // ➔ 6
@@ -3742,7 +3811,7 @@ name that builds values of the type. A `tuple` definition gives a constructor
 with one argument per field; any other definition gives a one-argument
 constructor:
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 type meters = number
 (point(1, 2), meters(5))
@@ -3754,7 +3823,7 @@ The arguments are checked against the definition, so `point(1)` and
 
 A value built this way carries its type with it, wherever it goes:
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 let ps = [point(1, 2), point(3, 4)]
 Type(ps)
@@ -3764,7 +3833,7 @@ Type(ps)
 An **alias** constructor is a checked cast instead of a tag: it validates the
 arguments against the definition and hands back the plain value.
 
-```cortex-live
+```epsil-live
 type alias pair = tuple<number, number>
 pair(1, 2)
 // ➔ (1, 2)
@@ -3785,7 +3854,7 @@ computes the *payload*: a value that must satisfy the type's definition
 type). The engine checks the payload and tags it; the result is a value of
 the type. This is how a `record`-bodied type gets its constructor:
 
-```cortex-live
+```epsil-live
 type circle = record<x: number, y: number, r: number>
 function circle(x, y, r) { {x -> x, y -> y, r -> r} }
 Type(circle(1, 2, 3))
@@ -3796,7 +3865,7 @@ Constructor functions are not record-specific: one may be written for any
 definition, replacing the automatic constructor — the *smart constructor*
 idiom of validating or normalizing on the way in:
 
-```cortex-live
+```epsil-live
 type frac = record<n: integer, d: integer>
 function frac(n: integer, d: integer) {
   {n -> n / GCD(n, d), d -> d / GCD(n, d)}
@@ -3831,7 +3900,7 @@ A `point` is not the tuple it is defined from — that is what makes it a new
 type. So a plain tuple is not accepted where a `point` is expected, and the
 operations that take a tuple apart do not reach inside one:
 
-```cortex
+```epsil
 type point = tuple<x: number, y: number>
 let q: point = (1, 2)   // error: a tuple is not a point
 let p = point(1, 2)
@@ -3840,14 +3909,14 @@ let (a, b) = p          // error
 ```
 
 Each of those lines parses: the rejection happens when the program runs, as
-an [error value](/cortex/evaluation/#errors-are-values), not as a parse
+an [error value](/epsil/evaluation/#errors-are-values), not as a parse
 error.
 
-To read the parts back, [`match`](/cortex/control-flow/#match) on the
+To read the parts back, [`match`](/epsil/control-flow/#match) on the
 constructor — a constructor pattern is an ordinary operator pattern, and
 binds one variable per field:
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 let p = point(3, 4)
 match p {
@@ -3860,7 +3929,7 @@ To read a single **named field**, use the `.` accessor. It works on values
 of a declared type whose definition has named fields — a record body or a
 named-tuple body — and on records and dictionaries generally:
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 let p = point(3, 4)
 p.x + p.y
@@ -3878,7 +3947,7 @@ multiplication.)
 An **alias** has none of this reserve — it *is* its definition, so an
 alias-typed value works anywhere the underlying shape works:
 
-```cortex-live
+```epsil-live
 type alias meters = number
 function height(m: meters) { m + 1 }
 height(2)
@@ -3891,7 +3960,7 @@ Two values built by the same constructor are equal when their arguments are.
 Values built by different constructors are never equal, and neither is a
 constructed value and a plain one of the same shape:
 
-```cortex-live
+```epsil-live
 type point = tuple<x: number, y: number>
 type polar = tuple<r: number, t: number>
 (point(1, 2) == point(1, 2), point(1, 2) == (1, 2), polar(1, 2) == point(1, 2))
@@ -3903,7 +3972,7 @@ type polar = tuple<r: number, t: number>
 A type declaration — both the type name and its constructor — lives in the
 current scope, like a `let`. One inside a block or a loop body stays there:
 
-```cortex-live
+```epsil-live
 let origin = 0
 do {
   type inner = tuple<number, number>
@@ -3930,7 +3999,7 @@ and expands **transparently** — `Pair<integer>` means exactly
 `tuple<integer, integer>`, and that expansion is what type displays and
 error messages show:
 
-```cortex
+```epsil
 type alias Pair<T> = tuple<T, T>
 let p: Pair<integer> = (1, 2)
 ```
@@ -3940,7 +4009,7 @@ applied — including application to another clause's type variable, which
 is admitted when the variable's own bound satisfies the parameter's. One
 alias may therefore be built out of another:
 
-```cortex
+```epsil
 type alias Keyed<T: number> = tuple<string, T>
 type alias Table<T: integer> = list<Keyed<T>>
 let rows: Table<integer> = [("a", 1), ("b", 2)]
@@ -3961,7 +4030,7 @@ takes it the same way. The difference is what an application means: a
 nominal type is **opaque**, so `tree<integer>` is never expanded, which is
 what lets its body be recursive.
 
-```cortex-live
+```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t = tree(1, [tree(2, [])])
 Type(t)
@@ -3973,15 +4042,26 @@ tree<T>` — so `T` is solved at each construction, from the arguments.
 Applying the type at the wrong arity — including a bare `tree` — is the same
 error as for an alias, and a parameter bound is enforced the same way.
 
-Reading a value reads the definition **instantiated at the application's
-arguments**, so a field or a `match` binding comes back at the type the
-application supplied, not at `T`:
+Reading a **field** reads the definition **instantiated at the application's
+arguments**, so it comes back at the type the application supplied, not at
+`T`:
 
-```cortex-live
+```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t: tree<number> = tree(1, [])
 Type(t.value)
 // ➔ "number"
+```
+
+`match` is not a projection of the annotation — it binds **values**, so each
+capture comes back at the matched value's *own* type, usually narrower than
+the annotation's:
+
+```epsil-live
+type tree<T> = tuple<value: T, children: list<tree<T>>>
+let t: tree<number> = tree(1, [])
+match t { tree(v, cs) => Type(v) }
+// ➔ "integer"
 ```
 
 **Variance.** A parameter may carry an `in`/`out`/`inout` marker saying how
@@ -3991,7 +4071,7 @@ where a `tree<number>` is expected, `in` (contravariant) reverses that, and
 contextual, claimed only inside a clause. An alias takes no marker — it
 expands rather than relates.
 
-```cortex
+```epsil
 type tree<out T> = tuple<value: T, children: list<tree<T>>>
 type sink<in T> = tuple<accept: (T) -> nothing>
 ```
@@ -4005,7 +4085,7 @@ position does not quietly change the type's subtyping contract — it is a
 `variance-violation` naming the offending occurrence and the markers that
 would verify:
 
-```cortex
+```epsil
 type events<T> = tuple<log: list<T>, notify: (T) -> nothing>
 ```
 
@@ -4024,12 +4104,41 @@ builds *is* a `tree<number>` under `out`. For an explicitly `inout` or `in`
 parameter that step is not available, so such a type can only be constructed
 at exactly its argument type.
 
+**Unions.** A type variable may stand in one arm of a union, which is what
+makes an optional payload expressible:
+
+```epsil-live
+type opt<T> = T | missing
+let a = opt(1)
+Type(a)
+// ➔ "opt<finite_integer>"
+```
+
+Each construction takes exactly one arm. Taking the **ground** arm says
+nothing about `T`, so `T` is solved to `never` — the narrowest member of the
+family, and (under `out`) a subtype of every other:
+
+```epsil-live
+type opt<T> = T | missing
+let b = opt(Missing)
+Type(b)
+// ➔ "opt<never>"
+```
+
+Only **one** arm may mention a variable: with two open arms nothing at the
+construction site says which arm a value took, so neither variable could be
+solved. `type both<T, U> = T | U` therefore declares nothing — it evaluates to
+an error value carrying an `unsupported-variable-position`. A variable may not
+stand in an intersection or a negation at all; an intersection is usually a
+constraint written in the wrong place, and the error says so — write a bound
+(`type box<T: number> = …`) instead of `T & number`.
+
 Generic **functions** are supported: a `function` definition takes a
 type-parameter clause between its name and its parameter list, and the
 quantified names scope over the definition's head (its parameters, effect
 specifier, and return type):
 
-```cortex
+```epsil
 function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
 swap(1, "a")
 ```
@@ -4045,7 +4154,7 @@ MathJSON mirror of `ce.declareType()`. The body is carried as the source text
 of the type. The bare form has no attributes; the `alias` form adds an
 attributes dictionary with `alias -> True`:
 
-```cortex
+```epsil
 type point = tuple<x: number, y: number>
 ```
 
@@ -4053,7 +4162,7 @@ type point = tuple<x: number, y: number>
 ["DeclareType", "point", {"str": "tuple<x: number, y: number>"}]
 ```
 
-```cortex
+```epsil
 type alias pair = tuple<number, number>
 ```
 
@@ -4065,7 +4174,7 @@ type alias pair = tuple<number, number>
 A type-parameter clause rides the same dictionary, as the text of the
 clause:
 
-```cortex
+```epsil
 type alias Pair<T> = tuple<T, T>
 ```
 
@@ -4078,7 +4187,7 @@ type alias Pair<T> = tuple<T, T>
 The clause is carried **without** its enclosing `<`/`>`, and a variance
 marker is simply part of that text — the bare form needs no other change:
 
-```cortex
+```epsil
 type tree<out T> = tuple<value: T, children: list<tree<T>>>
 ```
 
@@ -4099,9 +4208,9 @@ An invalid type inside an annotation position surfaces as a
 offending token within the type text (not at the `:` or the declaration
 target):
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 x: notatype
 ```
 
@@ -4109,9 +4218,9 @@ produces a `type-annotation-error` diagnostic pointing at `notatype`.
 
 ---
 
-# Cortex Comments
+# Epsil Comments
 
-Source: https://mathlive.io/cortex/comments/
+Source: https://mathlive.io/epsil/comments/
 
 # Comments
 
@@ -4124,7 +4233,7 @@ comments can be nested.
 **To indicate that a comment is part of the documentation and is formatted using
 markdown**, use `///` for single line comments and `/** */` for block comments.
 
-```cortex
+```epsil
 // This is a line comment
 
 /* This is a block comment */
@@ -4133,7 +4242,7 @@ markdown**, use `///` for single line comments and `/** */` for block comments.
 
 ## Documentation comments
 
-```cortex
+```epsil
 /// This is a documentation line comment
 
 /** This is a documentation block comment */
@@ -4144,7 +4253,7 @@ markdown**, use `///` for single line comments and `/** */` for block comments.
 
 The parser currently **discards** comments: they are not attached to the
 MathJSON of the following expression, and a round-trip
-(`parseCortex` → `serializeCortex`) does not reproduce them. Comments carry no
+(`parseEpsil` → `serializeEpsil`) does not reproduce them. Comments carry no
 semantic weight. The lexer recognizes the documentation-comment spellings, but
 the parser does not currently attach them to nodes.
 
@@ -4156,18 +4265,18 @@ field, but nothing on the parse side currently populates that field.)
 
 ---
 
-# Cortex Pragmas
+# Epsil Pragmas
 
-Source: https://mathlive.io/cortex/pragmas/
+Source: https://mathlive.io/epsil/pragmas/
 
 # Pragmas
 
-Pragmas are source forms evaluated by the Cortex parser. Their values are
+Pragmas are source forms evaluated by the Epsil parser. Their values are
 inserted into the produced MathJSON before ordinary program execution begins.
 
 ## Environment Variables
 
-Environment variables are defined in the host process when Cortex is parsed
+Environment variables are defined in the host process when Epsil is parsed
 under Node.js. In Unix, they are set using a
 shell-specific syntax (`export VARIABLE=value` in bash shells, for example).
 
@@ -4176,9 +4285,9 @@ browser.
 
 Use `#env()` to read an environment variable:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 #env("DEBUG")
 ```
 
@@ -4191,7 +4300,7 @@ Some common environment variables include:
 - `TEMP`: path to a temporary file directory
 
 `#env()` reads host state and is therefore disabled by default. Calling
-`parseCortex()` or `executeCortex()` without opting in produces a
+`parseEpsil()` or `executeEpsil()` without opting in produces a
 `host-pragma-disabled` diagnostic and the value `Nothing`. A trusted host can
 enable it with `{ allowHostPragmas: true }`.
 
@@ -4204,28 +4313,28 @@ Use `#navigator()` to read a property of the browser's `navigator` object. Like
 `{ allowHostPragmas: true }`. It returns `Nothing` when the browser property is
 not available.
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 #navigator("userAgent")
 ```
 
 ## Parser Messages
 
-`#error()` stops parsing. A direct call to `parseCortex()` throws a
-`FatalParsingError`; `executeCortex()` catches it and returns an
+`#error()` stops parsing. A direct call to `parseEpsil()` throws a
+`FatalParsingError`; `executeEpsil()` catches it and returns an
 `error-directive` diagnostic instead:
 
-<!-- cortex-test: expect-diagnostics -->
+<!-- epsil-test: expect-diagnostics -->
 
-```cortex
+```epsil
 #error("File cannot be compiled")
 ```
 
 `#warning()` does not write to the console and does not add a diagnostic. It
 evaluates at parse time to its message string, allowing parsing to continue:
 
-```cortex
+```epsil
 #warning("TODO: Implement function")
 ```
 
@@ -4235,28 +4344,28 @@ The following pragmas are replaced with the indicated value:
 
 - `#line`: the current source line number. The first line is line 1.
 - `#column`: the current column number. The first column is column 1.
-- `#url`: the source URL passed to `parseCortex()` or `executeCortex()`, or
+- `#url`: the source URL passed to `parseEpsil()` or `executeEpsil()`, or
   `Nothing` when none was supplied.
 - `#filename`: the final path component of the source URL, or `Nothing` when no
   URL was supplied.
 - `#date`: the current date in the `YYYY-MM-DD` format.
 - `#time`: the current time in the `HH:MM:SS` format.
 
-These six pragmas are always available. Cortex does not currently implement a
+These six pragmas are always available. Epsil does not currently implement a
 pragma for overriding the source location.
 
 ---
 
-# Cortex Examples
+# Epsil Examples
 
-Source: https://mathlive.io/cortex/examples/
+Source: https://mathlive.io/epsil/examples/
 
 # Examples
 
-Complete Cortex programs, from simple iteration to symbolic computation.
+Complete Epsil programs, from simple iteration to symbolic computation.
 Every example on this page is executable as written. The documentation test
-executes each code fence directly through `executeCortex`, while
-`test/cortex/programs.test.ts` provides deeper assertions for representative
+executes each code fence directly through `executeEpsil`, while
+`test/epsil/programs.test.ts` provides deeper assertions for representative
 results and runtime behavior.
 
 A few idioms these programs rely on:
@@ -4271,16 +4380,20 @@ A few idioms these programs rely on:
   `if c { a } else { b }`, without the braces.
 - Collection **literals** evaluate their elements; lazy **operators**
   (`Range`, `Map`, `Filter`) are generators that enumerate on demand (see
-  [Evaluation](/cortex/evaluation/)).
+  [Evaluation](/epsil/evaluation/)).
 - `a % b` is the remainder (`Mod`), and a postfix `!` is the factorial. The
   `!` must directly follow its operand (`n!`; `x != y` is still ≠).
+- A tuple pattern binds several names at once — `let (q, r) = …` declares
+  them, `(a, b) := …` writes ones that already exist. The right side is
+  evaluated before anything is written, so `(a, b) := (b, a)` swaps. It must
+  be spelled `:=` (see [declarations](/epsil/declarations/)).
 
 ## Iteration and Accumulation
 
 **Sum of the multiples of 3 or 5 below 100.** A `for` loop over a range,
 accumulating into a variable:
 
-```cortex
+```epsil
 let total = 0
 for k in 1..99 {
   if k % 3 == 0 || k % 5 == 0 { total = total + k }
@@ -4292,7 +4405,7 @@ total
 **FizzBuzz, as a value.** `if`/`else` is an expression, so the whole program
 is a single `Map` — no printing, no mutation:
 
-```cortex
+```epsil
 Map(1..15, k |->
   if k % 15 == 0 { "FizzBuzz" }
   else if k % 3 == 0 { "Fizz" }
@@ -4304,7 +4417,7 @@ Map(1..15, k |->
 **Collatz stopping time.** A `while` loop whose body chooses the next value
 with a conditional expression:
 
-```cortex
+```epsil
 let n = 27
 let steps = 0
 while n != 1 {
@@ -4315,16 +4428,15 @@ steps
 // ➔ 111
 ```
 
-**Euclid's algorithm.** The classic three-line GCD, with a block-scoped
-temporary:
+**Euclid's algorithm.** The classic GCD. The loop step rewrites the pair at
+once with a destructuring assignment, so no temporary is needed — the right
+side is fully evaluated before either name is written:
 
-```cortex
+```epsil
 let a = 1071
 let b = 462
 while b != 0 {
-  let t = a % b
-  a = b
-  b = t
+  (a, b) := (b, a % b)
 }
 a
 // ➔ 21
@@ -4333,22 +4445,21 @@ a
 **Collecting values in a loop.** A list accumulates through `Join`; each
 appended literal snapshots the loop variable's current value:
 
-```cortex
+```epsil
 let xs = []
 for k in 1..3 { xs = Join(xs, [k]) }
 xs
 // ➔ [1, 2, 3]
 ```
 
-**Iterative Fibonacci.**
+**Iterative Fibonacci.** The same pair-carrying step — `(a, b) := (b, a + b)`
+is the whole loop body:
 
-```cortex
+```epsil
 let a = 0
 let b = 1
 for k in 1..20 {
-  let t = a + b
-  a = b
-  b = t
+  (a, b) := (b, a + b)
 }
 a
 // ➔ 6765
@@ -4357,7 +4468,7 @@ a
 **A trial-division primality test.** A function with a typed parameter and a
 block body, used to count the primes below 100:
 
-```cortex
+```epsil
 isPrime(n: integer) = if n < 2 { False } else {
   let d = 2
   let prime = True
@@ -4378,7 +4489,7 @@ count
 loop re-runs in full for every pass of the outer one. Here Σ i·j over
 1 ≤ i, j ≤ 3 is (1+2+3)² = 36:
 
-```cortex
+```epsil
 let i = 1
 let total = 0
 while i <= 3 {
@@ -4393,7 +4504,7 @@ total
 **Chained comparisons.** A chain like `1 < x <= 4` reads as the conjunction
 `1 < x && x <= 4`:
 
-```cortex
+```epsil
 let x = 4
 let y = 5
 (1 < x <= 4, 1 < y <= 4)
@@ -4402,7 +4513,7 @@ let y = 5
 
 **A truth table**, as a `Map` over the four boolean pairs:
 
-```cortex
+```epsil
 Map([(True, True), (True, False), (False, True), (False, False)],
     p |-> p[1] && p[2])
 // ➔ [True, False, False, False]
@@ -4413,23 +4524,33 @@ Map([(True, True), (True, False), (False, True), (False, False)],
 **Modular exponentiation.** `a^b % m` is computed exactly, then reduced. By
 Fermat's little theorem 7¹² ≡ 1 (mod 13), and 222 = 18·12 + 6, so:
 
-```cortex
+```epsil
 (7^222) % 13
 // ➔ 12
 ```
 
 **gcd/lcm, factorization and divisors** of a number:
 
-```cortex
+```epsil
 (GCD(48, 36), LCM(48, 36), FactorInteger(360), Divisors(28))
 // ➔ (12, 144, [(2, 3), (3, 2), (5, 1)], [1, 2, 4, 7, 14, 28])
+```
+
+**Returning several values.** A function returns a tuple, and a destructuring
+declaration unpacks it into names in one statement:
+
+```epsil
+divmod(a: integer, b: integer) = (Floor(a / b), a % b)
+let (q, r) = divmod(2026, 7)
+(q, r)
+// ➔ (289, 3)
 ```
 
 **Arbitrary-precision integers.** The iterative Fibonacci, with the running
 pair carried in a two-element list literal, stays exact all the way to F(200)
 — far past the 2⁵³ limit of floating point:
 
-```cortex
+```epsil
 Fold((p, _) |-> [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
 // ➔ 280571172992510140037611932413038677189525
 ```
@@ -4441,9 +4562,9 @@ works, because the name is declared before the body is processed. Definition
 statements **accumulate**: repeating a name with a different parameter list
 adds a *clause*, and a call dispatches to the most specific clause that
 matches — so a base case is a literal-parameter clause rather than an `if`
-(see [Multiple clauses](/cortex/control-flow/#multiple-clauses-literal-parameters)):
+(see [Multiple clauses](/epsil/control-flow/#multiple-clauses-literal-parameters)):
 
-```cortex
+```epsil
 fact(0) = 1
 fact(n: integer) = n * fact(n - 1)
 fact(10)
@@ -4452,7 +4573,7 @@ fact(10)
 
 **Multi-clause Fibonacci**, with two base clauses:
 
-```cortex
+```epsil
 fib(0) = 0
 fib(1) = 1
 fib(n: integer) = fib(n - 1) + fib(n - 2)
@@ -4475,7 +4596,7 @@ functions. A `|->` lambda captures the variables in scope where it is created.
 both the function `f` and the step `h`. The central-difference estimate is
 computed *exactly* (as a rational):
 
-```cortex
+```epsil
 deriv(f, h) = x |-> (f(x + h) - f(x - h)) / (2h)
 g(x) = x^3
 let dg = deriv(g, 1/1000)
@@ -4486,7 +4607,7 @@ dg(2)
 Pipe the call into `N` for a floating-point value — numericization reaches
 through the user-function/closure call:
 
-```cortex
+```epsil
 deriv(f, h) = x |-> (f(x + h) - f(x - h)) / (2h)
 g(x) = x^3
 let dg = deriv(g, 1/1000)
@@ -4497,7 +4618,7 @@ dg(2) |> N
 **Function composition.** `compose` returns `f ∘ g`; the two orders give
 different results, confirming each lambda captures the right binding:
 
-```cortex
+```epsil
 compose(f, g) = x |-> f(g(x))
 inc(x) = x + 1
 sq(x) = x^2
@@ -4511,7 +4632,7 @@ let h = compose(sq, inc)
 yields the last one. The lambda closes over `count` and mutates it on each
 call:
 
-```cortex
+```epsil
 function makeCounter() {
   let count = 0
   () |-> do { count = count + 1; count }
@@ -4531,7 +4652,7 @@ parameters.
 Each `makeCounter()` call captures its own `count`, so counters are
 independent:
 
-```cortex
+```epsil
 function makeCounter() {
   let count = 0
   () |-> do { count = count + 1; count }
@@ -4547,7 +4668,7 @@ let b = makeCounter()
 **Newton's method for √2.** The iteration runs exactly (each `x` is a
 rational number); `N(…)` converts the final result to a float:
 
-```cortex
+```epsil
 let x = 1
 for k in 1..6 { x = (x + 2/x) / 2 }
 N(x)
@@ -4556,7 +4677,7 @@ N(x)
 
 **Trapezoidal integration** of x² over [0, 1]:
 
-```cortex
+```epsil
 g(x) = x^2
 let n = 100
 let h = 1/n
@@ -4568,7 +4689,7 @@ N(area * h)
 
 **Monte Carlo estimate of π.** `Random()` returns a uniform value in [0, 1):
 
-```cortex
+```epsil
 let inside = 0
 let total = 500
 for k in 1..total {
@@ -4585,7 +4706,7 @@ with a seeded random frame. The block replays exactly, while repeated draws
 *inside* it still differ (the n-th draw of a frame is `hash(seed, n)`). Frames
 nest, and the innermost one wins. Outside any frame, draws are live:
 
-```cortex
+```epsil
 let a = WithRandomSeed(7, [Random(1..100), Random(1..100)])
 let b = WithRandomSeed(7, [Random(1..100), Random(1..100)])
 a == b
@@ -4599,14 +4720,14 @@ The calculus operators work symbolically, keeping parameters exact.
 **Integration.** The work to stretch an ideal spring (force `F = kx`) from 0 to
 a displacement `d` is `∫₀ᵈ kx dx`:
 
-```cortex
+```epsil
 Integrate(k*x, (x, 0, d))
 // ➔ 1/2 * k * d^2
 ```
 
 A definite integral with numeric bounds evaluates exactly:
 
-```cortex
+```epsil
 Integrate(Sin(x), (x, 0, Pi))
 // ➔ 2
 ```
@@ -4614,7 +4735,7 @@ Integrate(Sin(x), (x, 0, Pi))
 **Limits.** The leading relative error of the small-angle approximation
 `sin x ≈ x` is governed by a limit at 0:
 
-```cortex
+```epsil
 Limit((Sin(x) - x)/x^3, x, 0)
 // ➔ -1/6
 ```
@@ -4622,7 +4743,7 @@ Limit((Sin(x) - x)/x^3, x, 0)
 **Series.** The Maclaurin expansion of sine, with a `BigO` tail marking the
 first dropped term:
 
-```cortex
+```epsil
 Series(Sin(x), x, 0)
 // ➔ x - 1/6 * x^3 + 1/120 * x^5 + BigO(x^7)
 ```
@@ -4634,7 +4755,7 @@ through the computation.
 
 **Unit conversion.** Convert a posted 30 km/h speed limit to SI m/s:
 
-```cortex
+```epsil
 N(UnitConvert($30\,\mathrm{km/h}$, $\mathrm{m/s}$))
 // ➔ 8.333333333333334 m/s
 ```
@@ -4644,7 +4765,7 @@ uncertainty that `*` propagates in quadrature. For a plot measured
 L = 10 ± 0.1 m by W = 20 ± 0.2 m, the area error is
 √(20²·0.1² + 10²·0.2²) = √8 ≈ 2.83:
 
-```cortex
+```epsil
 let L = Measurement(10, 0.1)
 let W = Measurement(20, 0.2)
 N(L * W)
@@ -4656,7 +4777,7 @@ N(L * W)
 The imaginary unit is `i`; complex arithmetic, `Conjugate` and `Abs` (the
 modulus) all work:
 
-```cortex
+```epsil
 ((2 + 3i) * (1 - i), Conjugate(2 + 3i), Abs(3 + 4i))
 // ➔ ((5 + i), (2 - 3i), 5)
 ```
@@ -4664,7 +4785,7 @@ modulus) all work:
 **Euler's formula stays exact.** `e^{iπ/3}` is assembled from the exact
 cos(π/3) = 1/2 and sin(π/3) = √3/2, without ever numericizing:
 
-```cortex
+```epsil
 $e^{i\pi/3}$
 // ➔ 1/2 + sqrt(3)/2i
 ```
@@ -4672,21 +4793,21 @@ $e^{i\pi/3}$
 **A product of complex numbers** taken over a mapped `Range` keeps its
 imaginary part: (1+i)(2+i)(3+i) = 10i:
 
-```cortex
+```epsil
 Product(Map(Range(1, 3), k |-> k + i))
 // ➔ 10i
 ```
 
 ## Exact and Symbolic Computation
 
-These examples show what sets Cortex apart from a conventional language: the
+These examples show what sets Epsil apart from a conventional language: the
 values flowing through a program are Compute Engine expressions, so
 arithmetic is exact and results can be symbolic.
 
 **Exact rationals.** The 20th harmonic number, accumulated in a loop, stays
 an exact rational — no floating-point drift:
 
-```cortex
+```epsil
 let h = 0
 for k in 1..20 { h = h + 1/k }
 h
@@ -4696,7 +4817,7 @@ h
 **The Basel problem.** An exact partial sum compared against the limit
 π²/6 — the difference is the tail of the series, ≈ 1/100:
 
-```cortex
+```epsil
 let s = Sum(1/k^2, (k, 1, 100))
 N(Pi^2 / 6 - s)
 // ➔ 0.00995016666333…
@@ -4704,7 +4825,7 @@ N(Pi^2 / 6 - s)
 
 **Symbolic differentiation** of a user-defined function:
 
-```cortex
+```epsil
 f(x) = (x^2 + 1) / x
 D(f(t), t)
 // ➔ (t^2 - 1)/t^2
@@ -4713,7 +4834,7 @@ D(f(t), t)
 **Solve, then verify.** Solve a quadratic and substitute the roots back into
 the polynomial:
 
-```cortex
+```epsil
 let roots = Solve(x^2 - 5x + 6 == 0, x)
 Map(roots, r |-> r^2 - 5r + 6)
 // ➔ [0, 0]
@@ -4721,7 +4842,7 @@ Map(roots, r |-> r^2 - 5r + 6)
 
 **A binomial coefficient**, with postfix factorials:
 
-```cortex
+```epsil
 10! / (3! * 7!)
 // ➔ 120
 ```
@@ -4730,7 +4851,7 @@ Map(roots, r |-> r^2 - 5r + 6)
 expression. Here, forty steps of the continued fraction 1 + 1/x against the
 closed form of the golden ratio:
 
-```cortex
+```epsil
 let x = 2
 for k in 1..40 { x = 1 + 1/x }
 let phi = $\frac{1 + \sqrt{5}}{2}$
@@ -4741,7 +4862,7 @@ N(Abs(x - phi))
 **Trailing zeros of 100!, two ways.** Legendre's formula counts the factors of
 5 in the factorial:
 
-```cortex
+```epsil
 let n = 100
 let p = 5
 let z = 0
@@ -4752,7 +4873,7 @@ z
 
 Cross-check by stripping factors of 10 off the *exact* 158-digit integer `100!`:
 
-```cortex
+```epsil
 let f = 100!
 let count = 0
 while f % 10 == 0 { f = f / 10; count = count + 1 }
@@ -4763,7 +4884,7 @@ count
 **Roots of unity.** The five 5th-roots of unity are the vertices of a regular
 pentagon on the unit circle; their vector sum is exactly zero:
 
-```cortex
+```epsil
 Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
 // ➔ 0
 ```
@@ -4773,14 +4894,14 @@ Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
 **An exact rational Fold.** Folding `1/k` over a range keeps the accumulator
 an exact rational — the 10th harmonic number:
 
-```cortex
+```epsil
 Fold((a, k) |-> a + 1/k, 0, 1..10)
 // ➔ 7381/2520
 ```
 
 **Closed-form sums.** A telescoping sum and a finite geometric sum, both exact:
 
-```cortex
+```epsil
 ($\sum_{k=1}^{100}(1/k - 1/(k+1))$, $\sum_{k=0}^{10}(1/2)^k$)
 // ➔ (100/101, 2047/1024)
 ```
@@ -4788,7 +4909,7 @@ Fold((a, k) |-> a + 1/k, 0, 1..10)
 **Exact trigonometric values.** Constructible angles evaluate to exact
 symbolic values, never floats:
 
-```cortex
+```epsil
 ($\sin(\pi/3)$, $\arctan(1)$, $\arcsin(1/2)$, $\tan(\pi/4)$)
 // ➔ (sqrt(3)/2, 1/4 * pi, 1/6 * pi, 1)
 ```
@@ -4796,7 +4917,7 @@ symbolic values, never floats:
 **Solving equations exactly.** `Solve` returns the exact solution set — for a
 cubic, an absolute-value equation and an exponential equation:
 
-```cortex
+```epsil
 (Solve($x^3 - 6x^2 + 11x - 6 = 0$, x), Solve($|x-3| = 5$, x), Solve($2^x = 8$, x))
 // ➔ ([1, 2, 3], [-2, 8], [3])
 ```
@@ -4806,7 +4927,7 @@ cubic, an absolute-value equation and an exponential equation:
 **String interpolation.** A `\( … )` escape splices any expression's value
 into a string:
 
-```cortex
+```epsil
 let x = 2^11 - 1
 "\(x) has type \(Type(x))"
 // ➔ "2047 has type integer"
@@ -4816,7 +4937,7 @@ let x = 2^11 - 1
 control characters. Build a table of `n`, `n²`, `n³` — one interpolated row
 per value, folded onto the header with `StringJoin` in a pipeline:
 
-```cortex
+```epsil
 let header = "n\tn^2\tn^3\n"
 1..5 |> Map(_, n |-> "\(n)\t\(n^2)\t\(n^3)\n") |> Fold(StringJoin, header, _)
 ```
@@ -4835,7 +4956,7 @@ n	n^2	n^3
 **Character frequencies.** `Characters` splits a string into user-perceived
 characters (grapheme clusters); `Tally` counts them:
 
-```cortex
+```epsil
 let freq = "mississippi" |> Characters |> Tally
 let d = DictionaryFrom(Zip(freq[1], freq[2]))
 (d["m"], d["i"], d["s"], d["p"])
@@ -4845,7 +4966,7 @@ let d = DictionaryFrom(Zip(freq[1], freq[2]))
 **Word counts.** `StringSplit` with no separator splits on runs of
 whitespace (with a separator string, it splits on each occurrence):
 
-```cortex
+```epsil
 let words = StringSplit("the quick brown fox the lazy dog the")
 (Length(words), Tally(words)[2])
 // ➔ (8, [3, 1, 1, 1, 1, 1])
@@ -4855,7 +4976,7 @@ let words = StringSplit("the quick brown fox the lazy dog the")
 into its code points, `Map` shifts each, and `StringFrom(…, "unicode-scalars")`
 rebuilds the string. Shifting back decodes, so the cipher round-trips:
 
-```cortex
+```epsil
 shift(s, k) = s |> UnicodeScalars |> Map(_, c |-> c + k) |> StringFrom(_, "unicode-scalars")
 (shift("hello", 3), shift(shift("hello", 3), -3))
 // ➔ ("khoor", "hello")
@@ -4865,7 +4986,7 @@ shift(s, k) = s |> UnicodeScalars |> Map(_, c |-> c + k) |> StringFrom(_, "unico
 characters agree; a word is a palindrome when its characters equal their
 reverse:
 
-```cortex
+```epsil
 let anagram = Sort(Characters("listen")) == Sort(Characters("silent"))
 let s = "racecar"
 let palindrome = Characters(s) == Reverse(Characters(s))
@@ -4878,7 +4999,7 @@ let palindrome = Characters(s) == Reverse(Characters(s))
 **Matrices.** Lists of lists are matrices; index with `m[i, j]` (chained
 `m[i][j]` also works):
 
-```cortex
+```epsil
 let m = [[2, 1], [1, 3]]
 let d = Determinant(m)
 let t = Transpose(m)
@@ -4888,7 +5009,7 @@ let t = Transpose(m)
 
 **Descriptive statistics**, exact:
 
-```cortex
+```epsil
 let xs = [4, 8, 15, 16, 23, 42]
 (Mean(xs), Median(xs), Max(xs), Variance(xs))
 // ➔ (18, 31/2, 42, 182)
@@ -4897,14 +5018,14 @@ let xs = [4, 8, 15, 16, 23, 42]
 **Filter and reduce** with anonymous functions, chained into a pipeline —
 `_` is the piped value:
 
-```cortex
+```epsil
 1..10 |> Filter(_, n |-> n % 2 == 0) |> Reduce(_, (acc, n) |-> acc + n)
 // ➔ 30
 ```
 
 **Chained indexing** into a nested list — both index forms agree:
 
-```cortex
+```epsil
 let m = [[1, 2], [3, 4]]
 (m[2][1], m[2, 1])
 // ➔ (3, 3)
@@ -4912,7 +5033,7 @@ let m = [[1, 2], [3, 4]]
 
 **Pipelines.** `x |> f` applies `f` to `x`:
 
-```cortex
+```epsil
 [4, 8, 15, 16, 23, 42] |> Mean
 // ➔ 18
 ```
@@ -4920,7 +5041,7 @@ let m = [[1, 2], [3, 4]]
 When a stage takes several arguments, `_` marks the slot the piped value
 fills. The primes below 100, counted:
 
-```cortex
+```epsil
 1..100 |> Filter(_, IsPrime) |> Length
 // ➔ 25
 ```
@@ -4928,7 +5049,7 @@ fills. The primes below 100, counted:
 **Spread arguments.** In a call argument list, `...t` splices the elements of
 the tuple `t` in as positional arguments; several spreads splice in order:
 
-```cortex
+```epsil
 dot(x1, y1, x2, y2) = x1*x2 + y1*y2
 let p = (1, 2)
 let q = (3, 4)
@@ -4939,7 +5060,7 @@ dot(...p, ...q)
 **Fold** threads an accumulator through a collection, starting from an
 explicit initial value:
 
-```cortex
+```epsil
 Fold((acc, n) |-> acc + n^2, 0, 1..5)
 // ➔ 55
 ```
@@ -4947,7 +5068,7 @@ Fold((acc, n) |-> acc + n^2, 0, 1..5)
 **Solve a linear system.** `LinearSolve(A, b)` solves `A·x = b`, exactly for
 exact input. Here `2x + y = 5`, `x + 3y = 10`:
 
-```cortex
+```epsil
 let A = [[2, 1], [1, 3]]
 let b = [5, 10]
 LinearSolve(A, b)
@@ -4958,7 +5079,7 @@ LinearSolve(A, b)
 each solution as a tuple of values in the order of the variable list —
 nonlinear systems may return several tuples:
 
-```cortex
+```epsil
 Solve([x^2 + y^2 == 25, x + y == 7], [x, y])
 // ➔ [(3, 4), (4, 3)]
 ```
@@ -4967,7 +5088,7 @@ Solve([x^2 + y^2 == 25, x + y == 7], [x, y])
 computation — it surfaces as `NaN` while the valid inputs still compute. Here
 `Sqrt` is mapped over a list containing a string:
 
-```cortex
+```epsil
 let inputs = [16, -4, "banana", 81]
 Map(inputs, x |-> Sqrt(x))
 // ➔ [4, 2i, NaN, 9]
@@ -4978,7 +5099,7 @@ Map(inputs, x |-> Sqrt(x))
 **Eigenvalues.** A symmetric matrix has real eigenvalues; a rotation matrix
 has complex ones:
 
-```cortex
+```epsil
 let A = [[2, 1], [1, 2]]
 let B = [[0, -1], [1, 0]]
 (Eigenvalues(A), Eigenvalues(B))
@@ -4988,7 +5109,7 @@ let B = [[0, -1], [1, 0]]
 **Vector products.** `Cross` is the 3-D cross product; `Dot` the inner
 product:
 
-```cortex
+```epsil
 (Cross([1, 0, 0], [0, 1, 0]), Dot([1, 2, 3], [4, 5, 6]))
 // ➔ ([0, 0, 1], 32)
 ```
@@ -5000,7 +5121,7 @@ A dictionary maps keys to values; index it with `d[key]`.
 **A lookup table.** Decode the Roman numeral MCMXCIV, using a dictionary as a
 symbol-value table and the subtractive rule:
 
-```cortex
+```epsil
 let value = {"I" -> 1, "V" -> 5, "X" -> 10, "L" -> 50, "C" -> 100, "D" -> 500, "M" -> 1000}
 let s = ["M","C","M","X","C","I","V"]
 let n = Length(s)
@@ -5017,7 +5138,7 @@ total
 `DictionaryFrom` builds the dictionary. This is the idiomatic build-then-read
 pattern (there is no in-place `d[k] = v` update):
 
-```cortex
+```epsil
 let words = ["red","blue","red","green","blue","red","blue"]
 let t = Tally(words)
 let freq = DictionaryFrom(Zip(t[1], t[2]))
@@ -5027,7 +5148,7 @@ let freq = DictionaryFrom(Zip(t[1], t[2]))
 
 **Enumerating a dictionary** with `Keys` and `Values`:
 
-```cortex
+```epsil
 let scores = {"alice" -> 90, "bob" -> 85, "carol" -> 95}
 (Keys(scores), Max(Values(scores)))
 // ➔ (["alice", "bob", "carol"], 95)
@@ -5036,7 +5157,7 @@ let scores = {"alice" -> 90, "bob" -> 85, "carol" -> 95}
 **A lookup in arithmetic.** A value read with `d[key]` is an ordinary number,
 usable directly in an expression — here summing the values over the keys:
 
-```cortex
+```epsil
 let d = {"a" -> 1, "b" -> 2, "c" -> 3}
 let s = 0
 for k in Keys(d) { s = s + d[k] }
@@ -5051,7 +5172,7 @@ s
 36 are the intersection of their divisor lists (equivalently, the divisors of
 gcd(48, 36) = 12):
 
-```cortex
+```epsil
 let d48 = [1, 2, 3, 4, 6, 8, 12, 16, 24, 48]
 let d36 = [1, 2, 3, 4, 6, 9, 12, 18, 36]
 Intersection(d48, d36)
@@ -5062,7 +5183,7 @@ Set equality compares by membership, not by how the set was produced: a
 computed set (an `Intersection` result, a filtered set…) equals a set literal
 with the same elements.
 
-```cortex
+```epsil
 let d48 = [1, 2, 3, 4, 6, 8, 12, 16, 24, 48]
 let d36 = [1, 2, 3, 4, 6, 9, 12, 18, 36]
 Intersection(d48, d36) == {1, 2, 3, 4, 6, 12}
@@ -5071,20 +5192,20 @@ Intersection(d48, d36) == {1, 2, 3, 4, 6, 12}
 
 ---
 
-# Cortex CLI
+# Epsil CLI
 
-Source: https://mathlive.io/cortex/cli/
+Source: https://mathlive.io/epsil/cli/
 
-# Cortex CLI
+# Epsil CLI
 
-The `@cortex-js/compute-engine` package installs a `cortex` command for
-evaluating Cortex source from a terminal. It can run a source file, evaluate an
+The `@cortex-js/compute-engine` package installs an `epsil` command for
+evaluating Epsil source from a terminal. It can run a source file, evaluate an
 inline program, read a program from standard input, or start an interactive
 REPL.
 
 :::warning
 
-Cortex and its command-line interface are experimental. Their syntax and
+Epsil and its command-line interface are experimental. Their syntax and
 behavior may change between releases.
 
 :::
@@ -5097,11 +5218,11 @@ Install the Compute Engine package in a project:
 npm install @cortex-js/compute-engine
 ```
 
-The package exposes `cortex` through npm's local executable directory. Run it
+The package exposes `epsil` through npm's local executable directory. Run it
 through `npx` or from a package script:
 
 ```shell
-npx cortex --version
+npx epsil --version
 ```
 
 ## Running Programs
@@ -5109,32 +5230,32 @@ npx cortex --version
 With a source file:
 
 ```shell
-npx cortex program.cx
+npx epsil program.epsil
 ```
 
 With an inline program:
 
 ```shell
-npx cortex --eval 'Simplify(2 + 2x)'
+npx epsil --eval 'Simplify(2 + 2x)'
 ```
 
 From standard input:
 
 ```shell
-printf '1/2 + 1\n' | npx cortex
+printf '1/2 + 1\n' | npx epsil
 ```
 
 Use `-` as the file name to explicitly read standard input:
 
 ```shell
-npx cortex - < program.cortex
+npx epsil - < program.epsil
 ```
 
-The conventional Cortex file extensions are `.cx` and `.cortex`. A source file
+The conventional Epsil file extension is `.epsil`. A source file
 can be made directly executable with a hashbang:
 
-```cortex
-#!/usr/bin/env cortex
+```epsil
+#!/usr/bin/env epsil
 
 let radius = 3
 Pi * radius^2
@@ -5144,21 +5265,21 @@ Pi * radius^2
 
 | Option | Description |
 |:--|:--|
-| `-e`, `--eval <source>` | Evaluate Cortex source supplied on the command line. |
+| `-e`, `--eval <source>` | Evaluate Epsil source supplied on the command line. |
 | `--json` | Write the result as formatted MathJSON. Finite lazy collections (`Range`, `Map` results, …) are materialized into their elements, up to 10,000. |
-| `--cortex` | Write the result as serialized Cortex source. |
+| `--epsil` | Write the result as serialized Epsil source. |
 | `--diagnostics <fmt>` | Write diagnostics as `text` (the default) or as a `json` array. |
 | `--time-limit <ms>` | Set the evaluation deadline in milliseconds. The default is `10000`; `0` disables it. |
 | `--no-color` | Disable color in diagnostics. The [`NO_COLOR`](https://no-color.org/) environment variable is also honored. |
 | `-h`, `--help` | Display command help. |
 | `-v`, `--version` | Display the package version. |
 
-`--json` and `--cortex` are mutually exclusive. With neither option, results
+`--json` and `--epsil` are mutually exclusive. With neither option, results
 use the Compute Engine's ordinary textual representation.
 
 ## Checking a Program Without Evaluating It
 
-`cortex check` parses a program and reports its diagnostics — syntax errors,
+`epsil check` parses a program and reports its diagnostics — syntax errors,
 malformed strings, invalid type annotations, `match` shape problems, and the
 trap lints (`=` inside a call argument, a literal index `0`, a `//` comment
 that reads as floor division) — without evaluating anything. It also
@@ -5170,8 +5291,8 @@ values. It accepts the same source forms as evaluation: a file,
 `--eval`, or standard input.
 
 ```shell
-npx cortex check program.cx
-npx cortex check --eval 'let x = 5; x +'
+npx epsil check program.epsil
+npx epsil check --eval 'let x = 5; x +'
 ```
 
 The exit status is `0` when there are no error diagnostics (warnings are
@@ -5179,7 +5300,7 @@ allowed) and `1` otherwise. With `--json`, a machine-readable envelope is
 written to standard output instead of formatted text on standard error:
 
 ```shell
-$ npx cortex check --eval 'a+ b' --json
+$ npx epsil check --eval 'a+ b' --json
 {
   "ok": true,
   "diagnostics": [
@@ -5209,17 +5330,17 @@ Those surface when the program runs.
 
 ## Looking Up Documentation
 
-`cortex doc` shows the definition of a library symbol — its kind, signature
+`epsil doc` shows the definition of a library symbol — its kind, signature
 or type, description, and keywords — or searches the library when the
 argument is not an exact name. Search matches identifiers, descriptions,
 curated keywords, and LaTeX commands:
 
 ```shell
-$ npx cortex doc Sin
+$ npx epsil doc Sin
 Sin (function) (number) -> number — Sine of an angle.
   keywords: sine
 
-$ npx cortex doc greatest common divisor
+$ npx epsil doc greatest common divisor
 GCD (function) (any*) -> number — Greatest Common Divisor
 ...
 ```
@@ -5230,18 +5351,18 @@ nothing matches.
 
 ## MCP Server
 
-`cortex mcp` starts a [Model Context Protocol](https://modelcontextprotocol.io)
+`epsil mcp` starts a [Model Context Protocol](https://modelcontextprotocol.io)
 server, giving AI agents structured access to the same operations as the CLI.
 The default transport is standard input/output:
 
 ```shell
-npx cortex mcp
+npx epsil mcp
 ```
 
 Use the native Streamable HTTP transport for clients that connect to a URL:
 
 ```shell
-npx cortex mcp --transport streamable-http
+npx epsil mcp --transport streamable-http
 ```
 
 The HTTP endpoint defaults to `http://127.0.0.1:8000/mcp`. Configure it with
@@ -5252,14 +5373,14 @@ from a non-local origin.
 
 | Tool        | Purpose                                                        |
 | :---------- | :------------------------------------------------------------- |
-| `evaluate`  | Run a complete program; returns the value as display text, Cortex source and MathJSON, plus diagnostics |
+| `evaluate`  | Run a complete program; returns the value as display text, Epsil source and MathJSON, plus diagnostics |
 | `check`     | Parse and report diagnostics without evaluating                |
 | `doc`       | Look up a library symbol, or search the library by keywords    |
-| `parse`     | Convert Cortex source to MathJSON                              |
-| `serialize` | Convert MathJSON to Cortex source                              |
+| `parse`     | Convert Epsil source to MathJSON                              |
+| `serialize` | Convert MathJSON to Epsil source                              |
 
 The server also exposes the agent-facing language card
-(`/cortex/for-agents/`) as the resource `cortex://docs/for-agents`.
+(`/epsil/for-agents/`) as the resource `epsil://docs/for-agents`.
 
 Each `evaluate` call runs in a fresh session: definitions do not persist
 between calls, so every program must be self-contained. The
@@ -5267,23 +5388,23 @@ between calls, so every program must be self-contained. The
 `evaluate` tool (default 10000; each call can override it with its
 `timeLimit` argument).
 
-<ReadMore path="/cortex/mcp/">
+<ReadMore path="/epsil/mcp/">
 See how to **connect ChatGPT, Claude Code, Claude Desktop, or another MCP
 client**, and what to expect once it is connected.
 </ReadMore>
 
 ## Interactive REPL
 
-Run `cortex` with no file or `--eval` while standard input is a terminal:
+Run `epsil` with no file or `--eval` while standard input is a terminal:
 
 ```text
-$ npx cortex
-Cortex 0.92.1
+$ npx epsil
+Epsil 0.92.1
 Type .help for more information.
 
-cortex> let x = 5
+epsil> let x = 5
 5
-cortex> x^2
+epsil> x^2
 25
 ```
 
@@ -5295,7 +5416,7 @@ Unclosed blocks, collections, strings, and expressions ending with an operator
 continue at a secondary prompt:
 
 ```text
-cortex> if x > 0 {
+epsil> if x > 0 {
 ...   x + 1
 ... }
 6
@@ -5307,7 +5428,7 @@ cortex> if x > 0 {
 |:--|:--|
 | `.help` | List the available REPL commands. |
 | `.clear` | Reset the session to a fresh `ComputeEngine`. |
-| `.load <file>` | Execute a Cortex source file in the current session. |
+| `.load <file>` | Execute an Epsil source file in the current session. |
 | `.ast` | Toggle MathJSON result output. |
 | `.time` | Toggle elapsed-time output. |
 | `.editor` | Enter Node's multiline editor mode. |
@@ -5315,8 +5436,8 @@ cortex> if x > 0 {
 | `.save <file>` | Save the entered REPL source to a file. |
 | `.exit` | Exit the REPL. |
 
-Command history is stored in `~/.cortex_history`. Set
-`CORTEX_REPL_HISTORY` to use a different path.
+Command history is stored in `~/.epsil_history`. Set
+`EPSIL_REPL_HISTORY` to use a different path.
 
 ## Results, Diagnostics, and Exit Status
 
@@ -5335,7 +5456,7 @@ The process exits with:
 - `1` for source, runtime, cancellation, or file errors;
 - `2` for invalid command-line usage.
 
-Evaluation is symbolic and exact by default, just like `executeCortex()`. Use
+Evaluation is symbolic and exact by default, just like `executeEpsil()`. Use
 `N(expr)` in the program when a numeric approximation is required.
 
 Host-state pragmas such as `#env` and `#navigator` remain disabled in the CLI.
@@ -5348,7 +5469,7 @@ runaway synchronous calculation from leaving an interactive session
 unresponsive:
 
 ```shell
-npx cortex --time-limit 30000 long-running.cx
+npx epsil --time-limit 30000 long-running.epsil
 ```
 
 Set `--time-limit 0` for no deadline. The Compute Engine's iteration and
@@ -5356,22 +5477,22 @@ recursion limits continue to apply independently.
 
 ---
 
-# Cortex MCP Server
+# Epsil MCP Server
 
-Source: https://mathlive.io/cortex/mcp/
+Source: https://mathlive.io/epsil/mcp/
 
-# Using Cortex with AI Assistants
+# Using Epsil with AI Assistants
 
 <Intro>
-The `cortex` command includes a [Model Context Protocol](https://modelcontextprotocol.io)
+The `epsil` command includes a [Model Context Protocol](https://modelcontextprotocol.io)
 (MCP) server. Connect it to ChatGPT, Claude Code, Claude Desktop, or another
-MCP client, and your AI assistant can evaluate Cortex programs — exact
+MCP client, and your AI assistant can evaluate Epsil programs — exact
 arithmetic, symbolic computation, calculus, linear algebra — instead of doing
 math "in its head".
 </Intro>
 
 :::warning[Experimental]
-Cortex is experimental. Its syntax and behavior may change between releases.
+Epsil is experimental. Its syntax and behavior may change between releases.
 :::
 
 ## Setup for Local MCP Clients
@@ -5379,7 +5500,7 @@ Cortex is experimental. Its syntax and behavior may change between releases.
 With **Claude Code**, register the server with a single command:
 
 ```shell
-claude mcp add cortex -- npx -y @cortex-js/compute-engine mcp
+claude mcp add epsil -- npx -y @cortex-js/compute-engine mcp
 ```
 
 For **Claude Desktop** and most other MCP clients, add the server to the
@@ -5388,7 +5509,7 @@ client's JSON configuration:
 ```json
 {
   "mcpServers": {
-    "cortex": {
+    "epsil": {
       "command": "npx",
       "args": ["-y", "@cortex-js/compute-engine", "mcp"]
     }
@@ -5397,10 +5518,10 @@ client's JSON configuration:
 ```
 
 If the Compute Engine package is already installed in your project, you can
-run the local copy instead of downloading one: use `npx cortex mcp` (that
-is, `"command": "npx", "args": ["cortex", "mcp"]`).
+run the local copy instead of downloading one: use `npx epsil mcp` (that
+is, `"command": "npx", "args": ["epsil", "mcp"]`).
 
-That's it. The next time you start the client, the Cortex tools are
+That's it. The next time you start the client, the Epsil tools are
 available to the assistant.
 
 ## Setup for ChatGPT
@@ -5409,7 +5530,7 @@ ChatGPT developer mode connects to a public HTTPS MCP endpoint using
 Streamable HTTP or to an
 [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels);
 it cannot start the local stdio command directly. A Secure MCP Tunnel is the
-recommended way to connect the local Cortex server without opening an inbound
+recommended way to connect the local Epsil server without opening an inbound
 port or making it public.
 
 1. In ChatGPT, open **Settings → Security and login** and enable
@@ -5418,12 +5539,12 @@ port or making it public.
 
 2. Create a tunnel in the
    [OpenAI Platform tunnel settings](https://platform.openai.com/settings/organization/tunnels),
-   associate it with the ChatGPT workspace that will use Cortex, and copy its
+   associate it with the ChatGPT workspace that will use Epsil, and copy its
    `tunnel_id`. Download `tunnel-client` from the link in those settings or
    from its
    [latest release](https://github.com/openai/tunnel-client/releases/latest).
 
-3. Configure `tunnel-client` to launch Cortex over stdio, validate the
+3. Configure `tunnel-client` to launch Epsil over stdio, validate the
    configuration, and run it:
 
    ```shell
@@ -5431,22 +5552,22 @@ port or making it public.
 
    tunnel-client init \
      --sample sample_mcp_stdio_local \
-     --profile cortex \
+     --profile epsil \
      --tunnel-id tunnel_0123456789abcdef0123456789abcdef \
      --mcp-command "npx -y @cortex-js/compute-engine mcp"
 
-   tunnel-client doctor --profile cortex --explain
-   tunnel-client run --profile cortex
+   tunnel-client doctor --profile epsil --explain
+   tunnel-client run --profile epsil
    ```
 
    Replace the example API key and tunnel ID with your own values. Keep
-   `tunnel-client run` running while using Cortex from ChatGPT.
+   `tunnel-client run` running while using Epsil from ChatGPT.
 
 4. In ChatGPT, open **Settings → Plugins**, select the plus button, choose
    **Tunnel** under **Connection**, and select the tunnel you created.
 
-5. Start a new conversation, add Cortex from the tools menu, and try one of
-   the prompts below. ChatGPT should discover the five Cortex tools and use
+5. Start a new conversation, add Epsil from the tools menu, and try one of
+   the prompts below. ChatGPT should discover the five Epsil tools and use
    `evaluate` for a computation.
 
 See OpenAI's
@@ -5455,7 +5576,7 @@ for current availability and interface details.
 
 ### Alternative: Public Development Endpoint
 
-You can instead start Cortex's native Streamable HTTP transport and expose it
+You can instead start Epsil's native Streamable HTTP transport and expose it
 through an HTTPS development tunnel.
 
 1. Start the local HTTP endpoint:
@@ -5486,7 +5607,7 @@ through an HTTPS development tunnel.
 :::warning[Development only]
 The public development URL is temporary and, unless you configure tunnel
 authentication, reachable by anyone who knows it while both processes are
-running. Stop the tunnel and Cortex server after testing. For shared or
+running. Stop the tunnel and Epsil server after testing. For shared or
 production use, use Secure MCP Tunnel or put the HTTP endpoint behind a stable
 HTTPS reverse proxy with appropriate authentication, rate limits, logging,
 and monitoring.
@@ -5496,28 +5617,28 @@ and monitoring.
 
 | Tool        | Purpose                                                        |
 | :---------- | :------------------------------------------------------------- |
-| `evaluate`  | Run a Cortex program and return its value — as display text, Cortex source, and MathJSON — along with any diagnostics |
+| `evaluate`  | Run an Epsil program and return its value — as display text, Epsil source, and MathJSON — along with any diagnostics |
 | `check`     | Validate a program's syntax without evaluating it              |
 | `doc`       | Look up a library function by name, or search the library by keywords |
-| `parse`     | Convert Cortex source to MathJSON                              |
-| `serialize` | Convert MathJSON to Cortex source                              |
+| `parse`     | Convert Epsil source to MathJSON                              |
+| `serialize` | Convert MathJSON to Epsil source                              |
 
-The server also publishes the [language card for AI agents](/cortex/for-agents/)
-as a resource (`cortex://docs/for-agents`), and its setup instructions tell
-the assistant to read it before writing Cortex — so the assistant learns the
+The server also publishes the [language card for AI agents](/epsil/for-agents/)
+as a resource (`epsil://docs/for-agents`), and its setup instructions tell
+the assistant to read it before writing Epsil — so the assistant learns the
 language's syntax and idioms on its own.
 
 ## Trying It Out
 
 Ask your assistant something that benefits from exact computation, and
-mention Cortex if it doesn't reach for the tools on its own:
+mention Epsil if it doesn't reach for the tools on its own:
 
-- _"Use Cortex to compute the exact value of the sum of 1/k² for k from 1
+- _"Use Epsil to compute the exact value of the sum of 1/k² for k from 1
   to 100."_
-- _"Solve x³ − 6x² + 11x − 6 = 0 exactly with Cortex."_
-- _"What does the Cortex function `Reduce` do?"_
+- _"Solve x³ − 6x² + 11x − 6 = 0 exactly with Epsil."_
+- _"What does the Epsil function `Reduce` do?"_
 
-The assistant writes a small Cortex program, runs it with the `evaluate`
+The assistant writes a small Epsil program, runs it with the `evaluate`
 tool, and reports the result — exact fractions, radicals, and symbolic
 constants included, with none of the rounding or slips of doing arithmetic
 token by token.
@@ -5528,11 +5649,11 @@ token by token.
   a fresh session; definitions do not carry over from one call to the next.
   The assistant knows this and writes self-contained programs.
 - **Evaluations have a deadline.** By default a program is canceled after
-  10 seconds. Start the server with `cortex mcp --time-limit <ms>` to change
+  10 seconds. Start the server with `epsil mcp --time-limit <ms>` to change
   the default (`0` disables it); the assistant can also adjust it per call.
 - **The computation runs locally by default.** The server is part of the npm
   package, and programs evaluate in the Node.js process that runs
-  `cortex mcp`. A ChatGPT connection still uses the configured Secure MCP
+  `epsil mcp`. A ChatGPT connection still uses the configured Secure MCP
   Tunnel or HTTPS endpoint to reach that process.
 - **The HTTP transport is local by default.** It binds to `127.0.0.1`, limits
   requests to 1 MiB, and rejects unapproved browser origins. Use `--host`,
@@ -5540,27 +5661,27 @@ token by token.
   `--allow-origin <origin>` for browser clients that run on another origin.
   Binding to a public interface does not add authentication or TLS.
 
-<ReadMore path="/cortex/cli/">
+<ReadMore path="/epsil/cli/">
 The same package also provides a **command-line interface and interactive
-REPL** for using Cortex yourself.
+REPL** for using Epsil yourself.
 </ReadMore>
 
 ---
 
-# Cortex for AI Agents
+# Epsil for AI Agents
 
-Source: https://mathlive.io/cortex/for-agents/
+Source: https://mathlive.io/epsil/for-agents/
 
-# Cortex for AI Agents
+# Epsil for AI Agents
 
-A condensed reference for language models and coding agents writing Cortex.
+A condensed reference for language models and coding agents writing Epsil.
 Every code fence on this page is executed by the test suite and its `// ➔`
-output verified — the examples cannot drift from the implementation. Cortex is
+output verified — the examples cannot drift from the implementation. Epsil is
 **experimental**: syntax and semantics may change between releases.
 
-## What Cortex Is
+## What Epsil Is
 
-Cortex is a programming language for scientific computing built on the Compute
+Epsil is a programming language for scientific computing built on the Compute
 Engine. It is **symbolic and exact by default**: `1/3` is the rational one
 third, not `0.333…`, and `Ln(2)` or `Sqrt(2)` stay symbolic. Ask for a decimal
 explicitly with `N(expr)`. A program is a sequence of statements (separated by
@@ -5570,14 +5691,14 @@ problems (a `const` reassignment, a type mismatch) become ordinary
 `Error(...)` **values**, not thrown exceptions; malformed source produces
 **diagnostics** with source locations.
 
-**Run it**: `npx cortex file.cx`, `npx cortex --eval 'expr'`, stdin, or a REPL
-(`npx cortex`). Diagnostics go to stderr; exit code 0 = success, 1 = error.
-**Validate without evaluating**: `npx cortex check file.cx --json` emits
+**Run it**: `npx epsil file.epsil`, `npx epsil --eval 'expr'`, stdin, or a REPL
+(`npx epsil`). Diagnostics go to stderr; exit code 0 = success, 1 = error.
+**Validate without evaluating**: `npx epsil check file.epsil --json` emits
 structured diagnostics (positions, fix-its). **Look up the library**:
-`npx cortex doc Mean`, or search by concept — `npx cortex doc "standard
+`npx epsil doc Mean`, or search by concept — `npx epsil doc "standard
 deviation"`. Add `--diagnostics json` to a run for machine-readable runtime
-diagnostics. Embed via `executeCortex(ce, source)` from
-`@cortex-js/compute-engine/cortex`. See [CLI](/cortex/cli/).
+diagnostics. Embed via `executeEpsil(ce, source)` from
+`@cortex-js/compute-engine/epsil`. See [CLI](/epsil/cli/).
 
 **Naming convention**: `Capitalized` names are library operators (`Sin`,
 `Map`, `Simplify`); `lowercase` names are your variables and functions.
@@ -5587,7 +5708,7 @@ name exists, e.g. `len` → `Length`).
 
 ## Core Syntax
 
-```cortex
+```epsil
 let x = 5                 // mutable declaration
 const tau = 6.28          // immutable; reassigning yields an Error value
 x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
@@ -5625,7 +5746,10 @@ g(x) + f(2)
 - **Destructuring**: `let (q, r) = divmod(17, 5)` binds a tuple's components
   (`const` makes them constants; `_` skips a position; patterns nest). Tuples
   only, ≥ 2 elements, initializer required; a shape mismatch is an Error
-  value. For conditional destructuring use `match`.
+  value. For conditional destructuring use `match`. The same pattern assigns
+  to EXISTING bindings with `:=`, evaluating the right side once before it
+  writes anything, so `(a, b) := (b, a)` swaps. It must be `:=` — a
+  statement-leading `(a, b) = …` is a comparison, and is diagnosed.
 - **Block in expression position**: `do { … }` (a bare `{ … }` in expression
   position is always a set/dictionary literal).
 - **LaTeX islands**: `$\frac{1}{2}$` splices parsed LaTeX into the expression
@@ -5641,10 +5765,10 @@ fixed tier: it binds like `:=` when it assigns and like `==` when it compares.
 
 ## If You Know Python or JavaScript
 
-Cortex deliberately diverges from these reflexes. **Wrong-by-instinct → what
+Epsil deliberately diverges from these reflexes. **Wrong-by-instinct → what
 actually happens → write instead:**
 
-| Reflex | What happens in Cortex | Write instead |
+| Reflex | What happens in Epsil | Write instead |
 |:--|:--|:--|
 | `xs[0]` for first element | **Silently** yields `NaN` — indexing is **1-based** | `xs[1]`; negative indices work: `xs[-1]` is the last element |
 | `7 // 2` floor division | **Silent wrong value**: `//` starts a comment, so this is just `7` | `Floor(7 / 2)` |
@@ -5679,7 +5803,7 @@ work; `2 in [1, 2, 3]` works; lowercase `true`/`false` are accepted
 
 Exactness and numeric approximation:
 
-```cortex
+```epsil
 let exact = 1/3 + 1/6      // stays the exact rational 1/2
 let sym = Sqrt(2) * Sqrt(2) // symbolic radicals reduce exactly
 "\(exact), \(sym), \(N(Pi, 10))"
@@ -5689,7 +5813,7 @@ let sym = Sqrt(2) * Sqrt(2) // symbolic radicals reduce exactly
 Functions, recursion (self-reference works in a one-step definition, with
 any number of recursive calls — `fib(n-1) + fib(n-2)` is fine), and closures:
 
-```cortex
+```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
 makeAdder(k) = x |-> x + k     // closures capture lexically
 let add10 = makeAdder(10)
@@ -5700,19 +5824,19 @@ add10(fact(5))
 Collections pipeline — `Map`/`Filter`/`Reduce` for value-producing iteration,
 `|>` to chain; `1..n` is an inclusive range:
 
-```cortex
+```epsil
 1..10 |> Filter(_, k |-> k % 2 == 0) |> Map(_, k |-> k^2)
 // ➔ [4, 16, 36, 64, 100]
 ```
 
-```cortex
+```epsil
 Reduce([1, 2, 3, 4], (acc, x) |-> acc + x, 0) + Sum(1..100)
 // ➔ 5060
 ```
 
 Loops are for effect — accumulate into a variable declared outside:
 
-```cortex
+```epsil
 let a = 1071
 let b = 462
 while b != 0 {
@@ -5726,7 +5850,7 @@ a
 
 Building a list in a loop (each `[k]` literal snapshots the current value):
 
-```cortex
+```epsil
 let xs = []
 for k in 1..3 { xs = Join(xs, [k * k]) }
 xs
@@ -5736,7 +5860,7 @@ xs
 Structural `match` (an expression; `_` is the wildcard; a bare name **binds**
 — use `== expr` to compare against a value):
 
-```cortex
+```epsil
 classify(n) = match n {
   0 => "zero"
   k if k > 0 => "positive"
@@ -5748,7 +5872,7 @@ classify(-5)
 
 Symbolic computation:
 
-```cortex
+```epsil
 let poly = Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 let roots = Solve(x^2 + x - 6 == 0, x)
 let deriv = D(x^3 + x, x)
@@ -5759,7 +5883,7 @@ let area = Integrate(Sin(x), (x, 0, Pi))
 
 Lists, slices, and common operators (all indexing is 1-based):
 
-```cortex
+```epsil
 let xs = [10, 20, 30, 40]
 (xs[1..2], First(xs), Last(xs), Sort([3, 1, 2]), IndexOf(xs, 30))
 // ➔ ([10,20], 10, 40, [1,2,3], 3)
@@ -5768,7 +5892,7 @@ let xs = [10, 20, 30, 40]
 Dictionaries (string keys; dot access is shorthand for identifier-shaped
 keys):
 
-```cortex
+```epsil
 let d = {one -> 1, two -> 2}
 (d.two, d["two"], IsMissing(d.missing), Coalesce(d.missing, 0))
 // ➔ (2, 2, True, 0)
@@ -5780,7 +5904,7 @@ An absent numeric field evaluates to `NaN`; an absent nonnumeric field remains
 ## Library Quick Roster
 
 Verified operator names, so you don't have to guess (search for more with
-`cortex doc <keywords>`):
+`epsil doc <keywords>`):
 
 - **Numbers**: `Abs`, `Floor`, `Ceil` (not `Ceiling`), `Round`, `Sqrt`,
   `Max`, `Min` (each takes a list or varargs), `Mod`, `GCD`, `LCM`,
@@ -5804,7 +5928,7 @@ Caution: `Head` and `Tail` exist but are **structural** operators
 (`Head([1,2,3])` is the *operator name* `"List"`, not the first element) —
 for elements use `First`/`Rest`.
 
-```cortex
+```epsil
 Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
 // ➔ [5,4,3,1,1]
 ```
@@ -5818,7 +5942,7 @@ Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
   materialization time**. Collection *literals* snapshot their element values
   immediately. To force work now, aggregate or index where you stand.
 - **Output is the engine's textual form**: strings and booleans print
-  *quoted* (`"True"`, `"xetroc"`) — that quoted `"True"` is a boolean, not a
+  *quoted* (`"True"`, `"florb"`) — that quoted `"True"` is a boolean, not a
   string. Derived collections (`Range`, `Map`/`Filter` results, loop-built
   lists) preview-elide above 10 elements (`[1,2,3,4,5,...,]`); the value is
   complete — the CLI's `--json` output materializes the full elements (up to
@@ -5843,96 +5967,96 @@ Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
   — it binds a new variable named `Pi`. Pin values with `==`:
   `match x { == Pi => … }`.
 
-For the full reference start at [Cortex](/cortex/), the complete grammar in
-[Syntax](/cortex/syntax/), and ~70 more verified programs in
-[Examples](/cortex/examples/).
+For the full reference start at [Epsil](/epsil/), the complete grammar in
+[Syntax](/epsil/syntax/), and ~70 more verified programs in
+[Examples](/epsil/examples/).
 
 ---
 
-# Cortex Source Code
+# Epsil Source Code
 
-Source: https://mathlive.io/cortex/source-code/
+Source: https://mathlive.io/epsil/source-code/
 
 # Source Code
 
 ## Encoding
 
-Cortex's JavaScript API accepts a string. A host reading a Cortex source file
+Epsil's JavaScript API accepts a string. A host reading an Epsil source file
 should decode it as UTF-8 and should write identifiers in
 [Unicode NFC form](https://www.unicode.org/reports/tr15/tr15-50.html), as
 required by the MathJSON symbol contract.
 
-The Cortex parser does not decode files or strip a byte-order mark. File I/O
+The Epsil parser does not decode files or strip a byte-order mark. File I/O
 and decoding are the responsibility of the host. Inside a string literal,
 Unicode code points can also be written with
-[escape sequences](/cortex/literals/#escape-sequence).
+[escape sequences](/epsil/literals/#escape-sequence).
 
 ## File Extension
 
-The conventional file extensions are `.cortex` and `.cx`.
+The conventional file extension is `.epsil`.
 
 ## MIME-type
 
-The project uses `text/cortex` as its media-type convention. It is not a
+The project uses `text/epsil` as its media-type convention. It is not a
 registered IANA media type.
 
 ## Command line
 
-Installing `@cortex-js/compute-engine` provides the `cortex` command:
+Installing `@cortex-js/compute-engine` provides the `epsil` command:
 
 ```shell
-cortex --eval "1 + 2"
-cortex program.cx
-cortex --json program.cortex
+epsil --eval "1 + 2"
+epsil program.epsil
+epsil --json program.epsil
 ```
 
-With no file or `--eval`, `cortex` starts an interactive REPL when standard
+With no file or `--eval`, `epsil` starts an interactive REPL when standard
 input is a terminal; otherwise it reads a program from standard input. The
 command applies a 10-second evaluation limit by default. Use
 `--time-limit <milliseconds>` to change it or `--time-limit 0` to disable it.
-Run `cortex --help` for the complete option list.
+Run `epsil --help` for the complete option list.
 
-See [Cortex CLI](/cortex/cli/) for installation, output modes, REPL commands,
+See [Epsil CLI](/epsil/cli/) for installation, output modes, REPL commands,
 diagnostics, and exit-status behavior.
 
 ## Hashbang Comment
 
 A hashbang comment can appear at the absolute start of the source and is ignored
-by the Cortex parser. It can be used to run an executable source file through
+by the Epsil parser. It can be used to run an executable source file through
 the installed command:
 
-```cortex
-#!/usr/bin/env cortex
+```epsil
+#!/usr/bin/env epsil
 ```
 
 ---
 
-# Inside Cortex
+# Inside Epsil
 
-Source: https://mathlive.io/cortex/implementation/
+Source: https://mathlive.io/epsil/implementation/
 
-# Inside Cortex
+# Inside Epsil
 
-Cortex uses MathJSON as its intermediate representation and the Compute Engine
+Epsil uses MathJSON as its intermediate representation and the Compute Engine
 as its runtime. The public language entry point exposes the three stages
 directly:
 
 ```js
 import {
   ComputeEngine,
-  executeCortex,
-  parseCortex,
-  serializeCortex,
-} from "@cortex-js/compute-engine/cortex";
+  executeEpsil,
+  parseEpsil,
+  serializeEpsil,
+} from "@cortex-js/compute-engine/epsil";
 ```
 
 ## Parsing
 
-`parseCortex(source, url?, options?)` returns a MathJSON expression and an
+`parseEpsil(source, url?, options?)` returns a MathJSON expression and an
 array of diagnostics:
 
 ```js
-const [expression, diagnostics] = parseCortex("2x + 1");
+const [expression, diagnostics] = parseEpsil("2x + 1");
 ```
 
 Ignoring source-location metadata, the expression is:
@@ -5947,7 +6071,7 @@ host can associate a diagnostic or expression with the original text.
 
 Common surface forms lower to ordinary MathJSON:
 
-```cortex
+```epsil
 "The solution is \(x)"
 ```
 
@@ -5955,7 +6079,7 @@ Common surface forms lower to ordinary MathJSON:
 ["String", {"str": "The solution is "}, "x"]
 ```
 
-```cortex
+```epsil
 let xs = [2, 7, 2, 4]
 ```
 
@@ -5965,7 +6089,7 @@ let xs = [2, 7, 2, 4]
     ["KeyValuePair", "value", ["List", 2, 7, 2, 4]]]]
 ```
 
-```cortex
+```epsil
 if x > 0 { x + 1 } else { x - 1 }
 ```
 
@@ -5979,14 +6103,14 @@ The examples omit the `sourceOffsets` fields for readability.
 
 ## Execution
 
-`executeCortex(ce, source, options?)` parses a program and evaluates its
+`executeEpsil(ce, source, options?)` parses a program and evaluates its
 top-level statements sequentially in the current scope of `ce`:
 
 ```js
 const ce = new ComputeEngine();
 
-const first = executeCortex(ce, "let x = 5");
-const second = executeCortex(ce, "x = x + 1\nx");
+const first = executeEpsil(ce, "let x = 5");
+const second = executeEpsil(ce, "x = x + 1\nx");
 // second.value.re === 6
 ```
 
@@ -6000,7 +6124,7 @@ To enable `$…$` LaTeX islands, inject the engine's LaTeX parser:
 
 ```js
 const parseLatex = (latex) => ce.parse(latex).json;
-const result = executeCortex(ce, "2 * $\\frac{1}{2}$", { parseLatex });
+const result = executeEpsil(ce, "2 * $\\frac{1}{2}$", { parseLatex });
 ```
 
 Host-state pragmas remain disabled unless
@@ -6008,10 +6132,10 @@ Host-state pragmas remain disabled unless
 
 ## Serialization
 
-`serializeCortex(expression, options?)` converts MathJSON back to Cortex:
+`serializeEpsil(expression, options?)` converts MathJSON back to Epsil:
 
 ```js
-serializeCortex(["Add", ["Multiply", 2, "x"], 1]);
+serializeEpsil(["Add", ["Multiply", 2, "x"], 1]);
 // ➔ "2 * x + 1"
 ```
 
