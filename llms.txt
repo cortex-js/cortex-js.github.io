@@ -113,6 +113,7 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Epsil Pragmas](https://mathlive.io/epsil/pragmas.md): Pragmas in Epsil: source forms the parser evaluates, injecting environment variables and other host values into MathJSON before the program runs.
 - [Epsil Examples](https://mathlive.io/epsil/examples.md): Complete, executable Epsil programs — from simple iteration to symbolic computation — each one verified by the documentation test suite.
 - [Epsil CLI](https://mathlive.io/epsil/cli.md): The epsil command-line interface: run files, evaluate inline programs, or start an interactive REPL.
+- [Epsil in Visual Studio Code](https://mathlive.io/epsil/vscode.md): The Epsil extension for Visual Studio Code: syntax highlighting, live diagnostics, and running programs from the editor.
 - [Epsil MCP Server](https://mathlive.io/epsil/mcp.md): Connect AI assistants to Epsil with the built-in Model Context Protocol server: exact arithmetic, symbolic computation, and library documentation as tools.
 - [Epsil for AI Agents](https://mathlive.io/epsil/for-agents.md): A condensed, machine-verified reference for AI agents writing Epsil: core semantics, syntax, and a table of the ways Epsil differs from Python and JavaScript reflexes.
 - [Epsil Source Code](https://mathlive.io/epsil/source-code.md): Source code requirements for Epsil: UTF-8 decoding, Unicode NFC normalization of identifiers, and how line terminators and whitespace are treated.
