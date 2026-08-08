@@ -1,6 +1,6 @@
 # MathLive
 
-> Scientific Web Computing. Documentation for MathLive (math input for the web), the Compute Engine (symbolic computation in JavaScript) and Epsil (a language for scientific computing).
+> Scientific Web Computing. Documentation for MathLive (math input for the web) and the Compute Engine (symbolic computation in JavaScript). The Epsil language is documented at https://epsil.dev.
 
 Every page below is also available as HTML at the same URL without the `.md` suffix.
 
@@ -91,33 +91,6 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Fungrim Identities — Combinatorial and integer sequences](https://mathlive.io/compute-engine/reference/fungrim-sequences.md): Part of the Fungrim Identities reference — 65 identities for combinatorial and integer sequences.
 - [Fungrim Identities — Zeta and L-functions](https://mathlive.io/compute-engine/reference/fungrim-zeta.md): Part of the Fungrim Identities reference — 80 identities for zeta and l-functions.
 - [Fungrim Identities](https://mathlive.io/compute-engine/reference/fungrim.md): The Compute Engine ships a library of special-function identities derived from the Fungrim "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation…
-
-## Epsil
-
-- [All Epsil documentation, concatenated](https://mathlive.io/llms-epsil.txt)
-- [Epsil](https://mathlive.io/epsil.md): Epsil is a programming language for scientific computing built on the Compute Engine.
-- [Getting Started with Epsil](https://mathlive.io/epsil/getting-started.md): Install Epsil, try the interactive REPL, run a source file, and embed the language in JavaScript.
-- [Epsil Goals](https://mathlive.io/epsil/goals.md): The goals guiding Epsil's design: ergonomic code that is easy to read and write, and familiarity with existing scientific and programming notation.
-- [Epsil Principles](https://mathlive.io/epsil/principles.md): The principles behind Epsil: an expression-oriented language where conditionals, matches and blocks produce values, while declarations remain statements.
-- [Epsil Naming](https://mathlive.io/epsil/naming.md): Naming conventions in Epsil: capitalized identifiers denote library and engine operators, lowercase identifiers denote user-defined variables and functions.
-- [Epsil for Python Users](https://mathlive.io/epsil/from-python.md): A translation guide from Python to Epsil: idiom-by-idiom mappings for variables, collections, control flow, math and strings, plus the reflexes that silently do the wrong thing.
-- [Epsil for Mathematica Users](https://mathlive.io/epsil/from-mathematica.md): A translation guide from the Wolfram Language to Epsil: idiom-by-idiom mappings for expressions, lists, iterators, pattern matching and calculus, plus the surface forms that look alike but differ.
-- [Epsil Syntax](https://mathlive.io/epsil/syntax.md): The complete Epsil grammar: the notation used for productions, and the syntactic categories covering expressions, statements, literals and operators.
-- [Epsil Literals](https://mathlive.io/epsil/literals.md): Literal forms in Epsil: symbols following the MathJSON Unicode UAX31 profile, numbers, strings and collections, and the MathJSON each produces.
-- [Epsil Operators](https://mathlive.io/epsil/operators.md): Operators in Epsil: infix, prefix and postfix forms, precedence and associativity, and the whitespace rules that govern how operands are parsed.
-- [Epsil Control Flow](https://mathlive.io/epsil/control-flow.md): Control flow in Epsil: function definitions in math and block style, conditionals, pattern matching and loops, and the MathJSON each form lowers to.
-- [Epsil Declarations](https://mathlive.io/epsil/declarations.md): Declare symbols in Epsil: let for mutable bindings, const for immutable ones, with optional type annotations and lexical scoping rules.
-- [Epsil Evaluation](https://mathlive.io/epsil/evaluation.md): How executeEpsil evaluates an Epsil program: top-level statements run sequentially in the engine's current scope, and the last statement's value is the result.
-- [Epsil Types](https://mathlive.io/epsil/types.md): Epsil has no type system of its own — it reuses the Compute Engine's type language, the same syntax accepted by ce.declare("f", "(real) -> real"), and adds a type statement to name new types.
-- [Epsil Comments](https://mathlive.io/epsil/comments.md): Line and nestable block comments in Epsil, documentation comments, and why comments are lossy — they do not survive the round trip through MathJSON.
-- [Epsil Pragmas](https://mathlive.io/epsil/pragmas.md): Pragmas in Epsil: source forms the parser evaluates, injecting environment variables and other host values into MathJSON before the program runs.
-- [Epsil Examples](https://mathlive.io/epsil/examples.md): Complete, executable Epsil programs — from simple iteration to symbolic computation — each one verified by the documentation test suite.
-- [Epsil CLI](https://mathlive.io/epsil/cli.md): The epsil command-line interface: run files, evaluate inline programs, or start an interactive REPL.
-- [Epsil in Visual Studio Code](https://mathlive.io/epsil/vscode.md): The Epsil extension for Visual Studio Code: syntax highlighting, live diagnostics, and running programs from the editor.
-- [Epsil MCP Server](https://mathlive.io/epsil/mcp.md): Connect AI assistants to Epsil with the built-in Model Context Protocol server: exact arithmetic, symbolic computation, and library documentation as tools.
-- [Epsil for AI Agents](https://mathlive.io/epsil/for-agents.md): A condensed, machine-verified reference for AI agents writing Epsil: core semantics, syntax, and a table of the ways Epsil differs from Python and JavaScript reflexes.
-- [Epsil Source Code](https://mathlive.io/epsil/source-code.md): Source code requirements for Epsil: UTF-8 decoding, Unicode NFC normalization of identifiers, and how line terminators and whitespace are treated.
-- [Inside Epsil](https://mathlive.io/epsil/implementation.md): Epsil uses MathJSON as its intermediate representation and the Compute Engine as its runtime. The public language entry point exposes the three stages …
 
 ## Tutorials
 
