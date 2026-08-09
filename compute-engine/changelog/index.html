@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.56b60f3c.js" defer="defer"></script>
-<script src="/assets/js/main.dafac8ff.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.6cb0ba37.js" defer="defer"></script>
+<script src="/assets/js/main.2af4d8c5.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -108,6 +108,83 @@ exact regardless of position — which means the formatter rewrites an authored
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Inline callback lambdas now infer their parameter type from the call
+site.</strong> An unannotated function literal passed directly as an argument is
+re-derived with its parameter typed, exactly as if you had annotated it by
+hand, in two situations: when the callee — user-defined functions
+included — declares a concrete function-typed parameter
+(<code>function apply2(f: (number) -&gt; number, x) { f(x) }</code> types the <code>n</code> of
+<code>apply2(n |-&gt; n + 1, 3)</code> as <code>number</code>), and when the callback of <code>Map</code> or
+<code>Filter</code> is applied to a collection whose element type is a provable
+<strong>composite</strong> (a tuple or a nested collection). The headline win:
+point-list predicates now compile without annotation —
+<code>Filter(points, pt |-&gt; pt == (0, 0))</code> with <code>points: list&lt;tuple&lt;number, number&gt;&gt;</code> lowers to the same element-wise code as the hand-annotated
+spelling, and the literal&#x27;s signature reflects the element type
+everywhere it is read.</p>
+<p>The inference is per-application and behaves exactly like a hand-written
+annotation, loud type errors included. It never touches a shared callback
+(a lambda bound to a name keeps its own typing at every call site), never
+overrides an explicit annotation, and does not fire for union element
+types of <code>Map</code>/<code>Filter</code> — heterogeneous &quot;errors are values&quot; programs keep
+their per-element behavior, and the vectorization default for
+evidence-free lambdas is unchanged. Polymorphic (<code>forall</code>) callees are
+excluded until generic instantiation lands; optional and variadic
+callback positions are covered.</p>
+</li>
+<li class="">
+<p><strong>Annotated lambda parameters no longer disable the Map fast paths.</strong> The
+Map-fusion and exact-compile gates previously required bare (unannotated)
+parameters, so the hand-annotated spelling of a mapping function paid an
+interpretation penalty. The gates now accept an annotated parameter
+whenever the source collection&#x27;s element type provably satisfies the
+annotation — the per-element type check is a no-op in that case, so the
+fused drain is unobservable — and still fall back to the enforcing path
+(loud error included) when the annotation is narrower than the elements
+or the source type is unknown. With this, the element-type inference
+above extends to scalar element types too: <code>Map(Range(1, 200), x |-&gt; Mod(x, 7))</code> infers <code>x: integer</code>, keeps fusion, and still compiles
+through the exact tier. A fused result is also re-validated when an
+inferred source type changes, so a collection that retracts to a wider
+element type raises the annotation error instead of reusing a stale
+fused pipeline.</p>
+<p>One consequence of the annotation contract to be aware of: an expression
+you <em>retain</em> (a lazy <code>Map</code>/<code>Filter</code> you hold and re-evaluate) keeps the
+parameter type it inferred when it was created. If the source collection
+is later reassigned to elements of a wider type (an inferred
+<code>list&lt;integer&gt;</code> becomes floats), re-evaluating the retained expression
+reports a per-element <code>incompatible-type</code> error — exactly as the
+hand-annotated spelling would — rather than silently adapting. Boxing
+the expression afresh after the reassignment infers the new element type
+and evaluates normally.</p>
+</li>
+<li class="">
+<p><strong>JavaScript target: string equality now compiles.</strong> Scalar
+<code>Equal</code>/<code>NotEqual</code> with a provably string participant — and no provably
+numeric one — lowers to a strict <code>===</code>/<code>!==</code>, the interpreter&#x27;s own string
+semantics, instead of failing closed. All-string collection equality keeps
+the <code>_SYS.eq</code>/<code>_SYS.neq</code> dispatch, whose scalar leaf gained a string
+branch, so <code>Equal([&quot;a&quot;,&quot;b&quot;], [&quot;a&quot;,&quot;b&quot;])</code> is <code>True</code> and
+<code>Equal([&quot;a&quot;,&quot;b&quot;], &quot;a&quot;)</code> is the element-wise <code>[True, False]</code>. A mixed
+provably-string/provably-number equality and the chained (n-ary) form
+still fail closed. The Python target mirrors the scalar rule with a
+structural <code>==</code>/<code>!=</code>. With this, character-scanner programs
+(<code>skipWs(cs, i) = skipWs(cs, i+1) if i &lt;= Length(cs) &amp;&amp; isWs(cs[i]) else i</code>
+over <code>Characters(text)</code>) compile end to end.</p>
+</li>
+<li class="">
+<p><strong>JavaScript target: <code>Characters</code>, <code>GraphemeClusters</code> and <code>StringJoin</code> now
+compile.</strong> <code>Characters</code> segments UAX #29 grapheme clusters through the
+same <code>Intl.Segmenter</code> the interpreter uses, so a combining sequence, a
+ZWJ emoji or a flag is one element — matching interpretation element for
+element (neither <code>[...s]</code> nor <code>split(&#x27;&#x27;)</code> is faithful; both are pinned as
+counter-examples). <code>StringJoin</code> compiles the variadic all-string form and
+the single string-collection form; shapes the interpreter leaves inert
+fail closed. Known accepted divergence: compiled comparisons do not
+Unicode-normalize a raw non-NFC string bound to a compiled parameter
+(the interpreter stores every string in NFC; literals and
+<code>Characters</code>/<code>StringJoin</code> results are normalized) — normalize at the host
+boundary if you feed unnormalized user input into compiled predicates.</p>
+</li>
+<li class="">
 <p><strong><code>broadcastable&lt;T&gt;</code> as a parameter declaration is now an elementwise
 contract.</strong> A parameter declared <code>broadcastable&lt;T&gt;</code> (e.g.
 <code>ce.declare(&#x27;f&#x27;, &#x27;(broadcastable&lt;number&gt;) -&gt; unknown&#x27;)</code>, or an Epsil
@@ -135,7 +212,10 @@ parameter over a possibly-collection argument fails closed with a
 diagnostic (interpreted evaluation handles it) instead of emitting scalar
 code that returned garbage on arrays — the compiled broadcast helper
 recurses into nested arrays, which is exactly the leaf descent the
-one-rank contract rules out.</p>
+one-rank contract rules out. The decline is per slot: an argument at a
+slot the declaration binds whole, an atomic tuple the element type admits,
+and a provably scalar argument all still compile. A multi-clause function
+with one broadcastable arm declines conservatively for the whole set.</p>
 </li>
 <li class="">
 <p><strong>Epsil debugging support in the engine.</strong> Two additions that let a
@@ -377,6 +457,71 @@ bare assignment target, a mapsto parameter, and a call&#x27;s callee did not, so
 position.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong>Membership queries on derived collections no longer answer a definite
+<code>False</code> when the underlying membership is undecidable.</strong> Nine collection
+<code>contains</code> handlers (<code>Filter</code>, <code>Join</code>, <code>Append</code>, <code>Reverse</code>, <code>RotateLeft</code>,
+<code>RotateRight</code>, <code>Cycle</code>, <code>CartesianProduct</code>, <code>PowerSet</code>) collapsed an
+undecided sub-query into <code>false</code> — so <code>Element((1, x), {1, 2} × ys)</code> with
+<code>ys</code> a symbolic set evaluated to <code>&quot;False&quot;</code> instead of staying symbolic.
+All nine are now three-valued: a definite refutation still answers
+<code>False</code> immediately, and only a genuinely undecidable membership is left
+undecided. In the same pass, a <code>Filter</code> whose predicate returns a
+non-boolean now reports the malformed predicate from a membership query
+exactly as it does from iteration, counting, and emptiness — it was the
+one silent facet.</p>
+</li>
+<li class="">
+<p><strong>An element that fails a callback&#x27;s declared parameter type is now loud
+everywhere.</strong> Previously it could surface as a nonsensical
+<code>Filter predicate must return &quot;True&quot; or &quot;False&quot;. Unknown symbol …</code>
+message (which spell-checked the lambda&#x27;s own parameter), be silently
+swallowed by <code>TakeWhile</code>/<code>DropWhile</code> (an Error treated as an ordinary
+&quot;stop&quot;), or be laundered into <code>NaN</code> by a fused <code>Map</code> pipeline doing
+arithmetic on the Error value. All three paths now surface the element&#x27;s
+own <code>incompatible-type</code> error: stream operators emit it in the element&#x27;s
+place, scalar operators (<code>CountIf</code>, <code>Find</code>, <code>Position</code>, <code>IndexWhere</code>,
+<code>Partition</code>) return it as their result, and fused pipelines propagate it
+exactly like the unfused evaluator.</p>
+</li>
+<li class="">
+<p><strong>Compiled collection callbacks no longer ignore parameter type
+annotations.</strong> On both the JavaScript and Python targets, a callback such
+as <code>(n: integer) |-&gt; n &gt; 0</code> compiled to a plain function with the
+annotation dropped, so compiled <code>Filter</code>/<code>Map</code>/<code>TakeWhile</code>/… could
+silently produce different values than the interpreter on elements that
+violate the annotation. Compilation now admits an annotated callback only
+when the collection&#x27;s element type provably satisfies the annotation —
+the same rule the evaluator&#x27;s fast paths use — and declines to compile
+otherwise, so the interpreter&#x27;s per-element errors are preserved. Applies
+to inline and named callbacks across all collection operators, including
+<code>Reduce</code>/<code>Scan</code> and <code>Tabulate</code>/<code>Fill</code>.</p>
+</li>
+<li class="">
+<p><strong>An ordering such as <code>j &lt;= Length(cs)</code> no longer declines to compile when
+the same local is also used as an index (<code>cs[j]</code>).</strong> <code>At</code>&#x27;s index slot is
+typed <code>boolean | indexed_collection | number | string</code> (a gather index may
+be a collection, a dictionary key a string), which permanently widened the
+local, and the <code>string</code> arm of that union was read as positive string
+evidence by the mixed-string ordering gate. A type that admits a string
+<em>and</em> a number <em>and</em> a boolean <em>and</em> an indexed collection — that exact
+four-armed shape — says no more than the top type does, and is no longer
+treated as evidence, so ordinary scanner loops
+(<code>while j &lt;= Length(cs) &amp;&amp; isWs(cs[j]) { … }</code>) compile again, on both the
+JavaScript and Python targets. A deliberately written union of scalar sorts
+(<code>string | number | boolean</code>) is still evidence, and genuinely mixed shapes
+(<code>Less(&quot;a&quot;, 1)</code>, a <code>number | string</code> participant, <code>Less(&quot;a&quot;, [1, 2])</code>) still
+fail closed.</p>
+</li>
+<li class="">
+<p><strong>An else-less <code>if</code> statement in a function body compiles (JavaScript
+target).</strong> <code>if cs[j] == &quot;-&quot; { sign = -1; j = j + 1 }</code> in statement position
+lowers to a bare <code>if (…) { … }</code> instead of failing with
+<code>If: wrong number of arguments</code>. Loop bodies already handled this; a plain
+block&#x27;s statements did not. An else-less <code>if</code> in <em>value</em> position still
+fails closed — it has no value. The Python, interval-JavaScript and GPU
+targets still decline the shape in a plain function body.</p>
+</li>
 <li class="">
 <p><strong>Iterating over a function parameter now counts as collection evidence.</strong> A
 parameter whose only use was <code>for c in cs</code> stayed untyped, so the lambda
@@ -913,6 +1058,25 @@ inexact. Integer and rational arguments were unaffected (they fold exactly),
 which is why only an irrational argument showed it. Poles
 (<code>\mathrm{B}(-1, 2) = \tilde\infty</code>), the finite negative cases
 (<code>\mathrm{B}(-2, 2) = 1/2</code>) and float arguments are unchanged.</p>
+</li>
+<li class="">
+<p><strong>A collection rebound to a <code>Map</code> over itself no longer overflows the
+stack.</strong> Assigning <code>xs</code> the value <code>Map(xs, f)</code> — the shape an accumulator
+loop produces — made any later query throw a raw
+<code>RangeError: Maximum call stack size exceeded</code> out of <code>evaluate()</code>, rather
+than being absorbed as an <code>Error</code> value; a host calling <code>evaluate()</code>
+directly saw a hard crash. The self-referential-binding guard was in place
+and firing (<code>xs.value</code> reads <code>undefined</code>, as designed), but <code>Map</code> is the one
+lazy collection operator that answers <code>isFinite</code>/<code>isEmpty</code> from its
+<strong>source</strong> rather than its own iterator, and that path reached the stored
+value through <code>evaluate()</code> instead of the guarded <code>value</code>. Each turn —
+<code>isFinite</code> → source resolution → <code>evaluate()</code> → <code>isFiniteCollection</code> →
+<code>isFinite</code> — completed its dereference before the next began, so the
+existing cycle guard, which is released when the dereference returns, never
+observed the re-entry. Such a source is now left unresolved, putting <code>Map</code>
+on the same symbolic residual that <code>Filter</code> and every other lazy operator
+already produced. Eager and broadcast sources (<code>Map(X - 1, f)</code>) still
+resolve exactly as before.</p>
 </li>
 </ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01020-2026-08-05">0.102.0 <em>2026-08-05</em><a href="#01020-2026-08-05" class="hash-link" aria-label="Direct link to 01020-2026-08-05" title="Direct link to 01020-2026-08-05" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features-1">New Features<a href="#new-features-1" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">

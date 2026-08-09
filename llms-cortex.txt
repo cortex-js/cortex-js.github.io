@@ -57,11 +57,19 @@ const answer = 42
 answer = 0
 ```
 
-## Start Here
+## Guide
+
+The guide explains the language through examples and decisions: not only what
+syntax means, but when a form is useful and why you might choose it.
+
+<ReadMore path="/tour/">
+Take **A Tour of Epsil** — a one-page, example-led introduction to exact
+math, functions, collections, control flow, and types.
+</ReadMore>
 
 <ReadMore path="/getting-started/">
-Follow the **five-minute getting-started guide** — try the REPL, run a source
-file, and embed Epsil in JavaScript.
+Follow **Getting Started** — install Epsil, try the REPL, run a source file,
+and embed the language in JavaScript.
 </ReadMore>
 
 <ReadMore path="/examples/">
@@ -83,6 +91,13 @@ Coming from **Mathematica**? Most of the mental model carries over; here is
 what changes.
 </ReadMore>
 
+<ReadMore path="/evaluation/">
+Understand **how Epsil evaluates** — exact values, mutable bindings, lazy
+collections, ordinary error values, and session scope.
+</ReadMore>
+
+## Tools and Integrations
+
 <ReadMore path="/for-agents/">
 Writing Epsil with an LLM? Give it the **language card for AI agents** — a
 condensed, machine-verified reference.
@@ -94,6 +109,9 @@ Connect ChatGPT, Claude, or another AI assistant to Epsil with the built-in
 </ReadMore>
 
 ## Language Reference
+
+The reference is organized by language feature. Use it when you know what you
+are looking for and need the complete rule, grammar, or edge case.
 
 <ReadMore path="/syntax/">
 Read more about the **formal syntax of Epsil** — statements, primaries,
@@ -113,7 +131,8 @@ calls and indexing.
 </ReadMore>
 
 <ReadMore path="/declarations/">
-**Declarations** — binding names with `let` and `const`.
+**Declarations** — names, `let`, `const`, destructuring, scopes, and named
+types.
 </ReadMore>
 
 <ReadMore path="/types/">
@@ -286,6 +305,11 @@ engine when you want an isolated program.
 
 ## Where to Go Next
 
+<ReadMore path="/tour/">
+Read **A Tour of Epsil** for a compact, example-led introduction to the
+language before diving into individual features.
+</ReadMore>
+
 <ReadMore path="/examples/">
 Study **complete programs** covering control flow, collections, symbolic
 calculus, linear algebra, strings, and reproducible randomness.
@@ -309,6 +333,209 @@ Already know **Python**? Start from the idiom-by-idiom translation guide.
 Already know **Mathematica**? Start from the Wolfram Language translation
 guide.
 </ReadMore>
+
+---
+
+# A Tour of Epsil
+
+Source: https://epsil.dev/tour/
+
+# A Tour of Epsil
+
+<Intro>
+In one page, write and read the Epsil programs you will use most often.
+</Intro>
+
+Epsil is a language for scientific computing built on the Compute Engine. Its
+most useful starting idea is that mathematical expressions retain their meaning:
+they stay exact and symbolic until you explicitly ask for an approximation.
+
+This tour is deliberately quick. It introduces the language through complete,
+executable snippets and points to the guide when a feature deserves a deeper
+explanation.
+
+## Exact mathematics, when it matters
+
+Ordinary arithmetic is exact. `1 / 3` is the rational number one third, not a
+rounded floating-point value; symbolic expressions also remain available for
+later manipulation:
+
+```epsil
+let share = 1 / 3
+Simplify(share + share + share)
+// ➔ 1
+```
+
+This is valuable when a formula needs to be transformed, compared, or carried
+through several steps without accumulating rounding error. Use `N()` at the
+point where a decimal is actually useful — for presentation, plotting, or a
+numerical algorithm:
+
+```epsil
+N(Sqrt(2))
+// ➔ 1.4142135623730951
+```
+
+Capitalized names such as `Simplify`, `Sqrt`, and `N` are Compute Engine
+operators. Lowercase names are normally the names you introduce.
+
+## Names describe values
+
+Use `let` for a name whose value will change, and `const` for one that should
+not. Values themselves are immutable; `let` makes the *binding* movable.
+
+```epsil
+const secondsPerMinute = 60
+let elapsed = 2
+elapsed = elapsed + 1
+elapsed * secondsPerMinute
+// ➔ 180
+```
+
+That distinction makes it clear which programs are stateful. A collection is
+never changed in place: an operation creates a new value, and you can choose
+whether to bind it to a new name or replace an old binding.
+
+```epsil
+let readings = [3, 1, 2]
+let sorted = Sort(readings)
+(readings, sorted)
+// ➔ ([3, 1, 2], [1, 2, 3])
+```
+
+Read [Declarations](/declarations/) for scopes, destructuring, and type
+annotations; [Evaluation](/evaluation/) explains the value-and-binding
+model in depth.
+
+## Functions read like formulas
+
+For a one-line mathematical definition, put parameters in parentheses and the
+formula after `=`:
+
+```epsil
+circleArea(r) = Pi * r^2
+circleArea(3)
+// ➔ 9π
+```
+
+For a function with local names or several steps, use a block. The last
+expression is the result, so there is no `return` ceremony:
+
+```epsil
+function hypotenuse(a, b) {
+  let squared = a^2 + b^2
+  Sqrt(squared)
+}
+hypotenuse(3, 4)
+// ➔ 5
+```
+
+Anonymous functions use `|->`. They are especially useful for a small
+transformation passed to a collection operator:
+
+```epsil
+Map(1..5, n |-> n^2)
+// ➔ [1, 4, 9, 16, 25]
+```
+
+Use a named function when its name explains the operation or the body needs
+room to grow; use a lambda when the transformation is local and obvious. More
+forms, including recursion and multiple clauses, are in
+[Control Flow](/control-flow/#functions).
+
+## Branches produce values
+
+`if` is an expression, not merely a way to choose which statements run. That
+means it naturally fits in a definition or assignment:
+
+```epsil
+sign(n) = "positive" if n > 0 else "not positive"
+sign(-7)
+// ➔ "not positive"
+```
+
+Choose the compact conditional when both outcomes are simple expressions. Use
+the block form when either branch needs local work:
+
+```epsil
+function describe(n) {
+  if n % 2 == 0 { "even" } else { "odd" }
+}
+describe(42)
+// ➔ "even"
+```
+
+The same expression-oriented style applies to `match` and blocks. It lets the
+shape of a computation stay close to the shape of the value it produces.
+
+## Transform collections in their natural order
+
+Lists are ordered and indexed from 1. Ranges such as `1..10` include both
+endpoints. Use a pipeline when data goes through several transformations:
+
+```epsil
+1..10
+  |> Filter(_, n |-> n % 2 == 0)
+  |> Map(_, n |-> n^2)
+  |> Sum
+// ➔ 220
+```
+
+Pipelines read from input to result, rather than inside out. The `_` marks the
+argument position filled by the piped value, which matters when `Map` or
+`Filter` has another argument as well.
+
+For work whose purpose is changing a binding — an accumulator, for example —
+use a loop:
+
+```epsil
+let total = 0
+for n in 1..100 { total = total + n }
+total
+// ➔ 5050
+```
+
+Use `Map`, `Filter`, and `Reduce` for value-producing iteration; use `for` and
+`while` when performing a sequence of updates is the clearest model.
+
+## Types document important boundaries
+
+Epsil infers types for ordinary code, so annotations are optional. Write one
+where it communicates an assumption that callers must meet:
+
+```epsil
+meanOfPair(a: real, b: real) -> real = (a + b) / 2
+meanOfPair(2, 7)
+// ➔ 9/2
+```
+
+Here the annotation is useful because the function models a numerical
+operation, not because every local calculation requires paperwork. It lets
+Epsil reject an unsuitable argument at the call boundary instead of leaving a
+surprising expression downstream.
+
+## Keep going
+
+The [Getting Started](/getting-started/) guide shows how to run Epsil in
+the REPL, from a file, and from JavaScript. Then choose a guide based on the
+problem in front of you:
+
+<ReadMore path="/examples/">
+Browse **complete programs** for calculus, statistics, linear algebra,
+strings, collections, and more.
+</ReadMore>
+
+<ReadMore path="/control-flow/">
+Learn **functions, pattern matching, loops, blocks, and pipelines** in depth.
+</ReadMore>
+
+<ReadMore path="/from-python/">
+Translate familiar **Python idioms**, including the differences that matter for
+exact arithmetic and 1-based indexing.
+</ReadMore>
+
+When you need a precise rule rather than a guided explanation, use the
+[Language Reference](/introduction/#language-reference).
 
 ---
 
@@ -1527,7 +1754,11 @@ let double = x |-> 2x
 | `collections.Counter(xs)` | `Tally(xs)` → a `(values, counts)` pair |
 
 Collections are **immutable values**. There is no in-place mutation: build a
-new collection and rebind the name.
+new collection and rebind the name. The values-are-immutable, bindings-are-not
+model is worth reading once in full — see
+[Values and bindings](/evaluation/#values-and-bindings) — because it also
+explains why a closure sees a later reassignment and why a function cannot
+modify its caller's variable.
 
 ```epsil
 let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
@@ -2585,8 +2816,9 @@ them as names.
 `await`, `begin`, `break`, `case`, `catch`, `class`, `const`, `continue`,
 `debugger`, `default`, `delete`, `dynamic`, `do`, `each`, `else`, `end`,
 `export`, `extern`, `false`, `finally`, `for`, `from`, `function`, `generator`,
-`get`, `global`, `goto`, `if`, `in`, `Infinity`, `inline`, `interface`, `internal`,
-`import`, `iterator`, `label`, `lazy`, `local`, `loop`, `match`, `module`,
+`get`, `global`, `goto`, `if`, `in`, `Infinity`, `inline`, `inout`, `interface`,
+`internal`, `import`, `iterator`, `label`, `lazy`, `local`, `loop`, `match`,
+`module`, `mutable`,
 `namespace`, `NaN`, `native`, `new`, `not`, `of`, `on`, `oo`, `optional`, `or`, `package`,
 `parallel`, `private`, `protected`, `protocol`, `public`, `repeat`, `return`,
 `self`, `set`, `static`, `super`, `switch`, `this`, `throw`, `to`, `true`,
@@ -2845,9 +3077,9 @@ spanning multiple lines without requiring a separator between expressions
 
 :::
 
-The implementation's source of truth for operator spelling, precedence, and
-associativity is `src/epsil/operators.ts`. Both the parser and serializer read
-that table. The reference table below mirrors it.
+The table below is the complete set of operators, with their spelling,
+precedence and associativity — if a symbol is not listed there, it is not an
+operator.
 
 ## Precedence
 
@@ -2936,15 +3168,39 @@ more useful to the author than silently ending the statement.
 
 ## Pipe: `|>` and `~>` {#pipe}
 
+`x |> f` is `f(x)`. Chained, it lets a sequence of transformations be read in
+the order they happen instead of inside-out:
+
+```epsil-live
+[3, 1, 2] |> Sort |> Reverse
+// ➔ [3, 2, 1]
+```
+
+A stage that takes more than one argument is written as a call, with `_` in the
+slot the piped value fills:
+
+```epsil-live
+1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(_, n |-> n^2) |> Sum
+// ➔ 165
+```
+
+The `_` is not optional. `xs |> Map(f)` pipes `xs` into the one-argument call
+`Map(f)` and quietly yields a symbolic expression rather than a list.
+
 `|>` and `~>` are aliases for `Pipe` and sit at the **loosest** precedence
 tier, right below `Assign` — looser than arithmetic, relational, and boolean
-operators (Elixir-style):
+operators (Elixir-style). It is left-associative, so `a |> f |> g` is `g(f(a))`:
 
 ```epsil
 a + b |> f       // (a + b) |> f
 a || b |> f      // (a || b) |> f
 x = a |> f       // x = (a |> f)
 ```
+
+<ReadMore path="/control-flow/#pipelines">
+When to reach for a **pipeline** — and when a nested call or a named
+intermediate reads better.
+</ReadMore>
 
 ## Absence coalescing: `??` {#absence-coalescing}
 
@@ -3331,6 +3587,24 @@ value against that annotation.
 ```epsil
 f(x: real) = x + 1
 ```
+
+### Which form to use
+
+The three spellings differ only in ergonomics, so pick by the shape of the
+body:
+
+- **Math style** (`f(x) = …`) for a formula that fits on one line. It is how
+  the definition would be written on paper, and it is the right default for
+  mathematical code.
+- **Block style** (`function f(x) { … }`) once the body needs more than an
+  expression — a local `let`, a `match`, a loop. It is also the only form that
+  carries a name *and* a multi-statement body.
+- **Anonymous** (`x |-> …`) when the function is an argument to another
+  function and a name would add nothing: `Map(xs, x |-> x^2)`.
+
+An anonymous function can have a multi-statement body too, by making that body
+a [`do` block](#do-block-expressions) — but at that point a named `function` is
+usually clearer.
 
 ### Effect specifiers
 
@@ -3809,6 +4083,42 @@ match 3 {
 
 Evaluating this expression yields `Error("match-no-case", 3)`.
 
+### `if`, `a if c else b`, or `match`? {#choosing-a-conditional}
+
+All three produce a value, so the choice is about what you are branching *on*.
+
+Branch on a **condition** — something that is true or false — with `if`. Use
+the block form when a branch needs more than one statement, and the
+[conditional expression](#the-conditional-expression-a-if-c-else-b) when both
+branches are single expressions and the braces are just noise:
+
+```epsil-live
+let n = -3
+"negative" if n < 0 else "zero" if n == 0 else "positive"
+// ➔ "negative"
+```
+
+Branch on the **shape** of a value — how it is built, and what is inside it —
+with `match`. It tests structure and binds the pieces in the same step, which
+an `if` chain cannot do without taking the value apart by hand:
+
+```epsil-live
+let v = [1, 2]
+match v {
+  [] => "empty"
+  [x] => "one item"
+  [_, ...] => "several items"
+}
+// ➔ "several items"
+```
+
+Two differences are worth remembering when the subject may be symbolic.
+`match` is **structural**: a symbolic `x` is not `0`, even though it might turn
+out to be zero, so it takes the wildcard case. And `match` is **total**: it
+always selects a case (or returns a `match-no-case` error), where an `if` on an
+undecidable condition can stay inert. When you want the semantic question —
+"is this actually zero?" — use `if`.
+
 ## Loops
 
 There is one loop keyword form for each of the two common shapes. Both are
@@ -3836,6 +4146,114 @@ value of `a in b`:
 ```epsil
 for x in a in b { x }
 ```
+
+## Pipelines
+
+`x |> f` means exactly `f(x)`. For a single call that is a wash — `Sqrt(2)`
+says it better than `2 |> Sqrt`. What the pipe buys you is **reading order**
+once several transformations are applied one after another.
+
+Here is the same computation — keep the passing scores, curve them, take the
+average — written three ways.
+
+Nested calls:
+
+```epsil-live
+let scores = [88, 42, 95, 61, 73]
+Mean(Map(Filter(scores, s |-> s >= 60), s |-> s + 5))
+// ➔ 337/4
+```
+
+Named intermediates:
+
+```epsil-live
+let scores = [88, 42, 95, 61, 73]
+let passing = Filter(scores, s |-> s >= 60)
+let curved = Map(passing, s |-> s + 5)
+Mean(curved)
+// ➔ 337/4
+```
+
+A pipeline:
+
+```epsil-live
+let scores = [88, 42, 95, 61, 73]
+scores |> Filter(_, s |-> s >= 60) |> Map(_, s |-> s + 5) |> Mean
+// ➔ 337/4
+```
+
+All three compute the same value. They differ in what the reader has to do.
+The nested form is written **inside-out**: to follow it you find `scores` in
+the middle and unwind outward, discovering only at the end that the last step
+is an average. The pipeline is written in the order the steps happen, and the
+subject comes first. The `let` version reads in that order too, at the price of
+naming two values that exist only to be handed to the next line.
+
+### The placeholder `_` {#pipe-placeholder}
+
+A stage that needs only the piped value is named bare:
+
+```epsil-live
+16 |> Sqrt |> N
+// ➔ 4
+```
+
+A stage that takes **more than one** argument is written as a call, with `_`
+marking the slot the piped value fills. It does not have to be the first
+argument:
+
+```epsil-live
+[3, 1, 2] |> Sort |> Take(_, 2)
+// ➔ [1, 2]
+```
+
+:::warning[The one trap]
+`xs |> Map(f)` does **not** partially apply `Map`. It pipes `xs` into the
+one-argument call `Map(f)`, which is not a computation Epsil knows how to
+perform — so the result is a symbolic `Map` expression, with no error to
+warn you. Whenever a stage is a call, write the `_`.
+
+```epsil
+[1, 2, 3] |> Map(_, n |-> n^2)      // ✅ [1, 4, 9]
+[1, 2, 3] |> Map(n |-> n^2)         // ❌ stays symbolic
+```
+
+:::
+
+### Choosing between a pipeline and a nested call
+
+Reach for a pipeline when:
+
+- there are **three or more** steps, and
+- each step consumes the whole result of the one before it, and
+- the intermediate values have no name worth inventing.
+
+Prefer a nested call when the expression is **mathematical** rather than a
+sequence of stages. `Sqrt(1 + x^2)` is how the formula is written on paper;
+`1 + x^2 |> Sqrt` is the same value spelled worse. One or two calls rarely
+benefit either way — `Mean(xs)` needs no pipe.
+
+Prefer named intermediates when a value is **used twice**, deserves a name that
+explains what it is, or is worth inspecting while you develop. A pipeline is a
+straight line: it cannot fork, so the moment a result feeds two places, give it
+a `let`.
+
+### Precedence
+
+`|>` sits at the loosest tier of all the computing operators, so a stage may be
+an arbitrary arithmetic or boolean expression without parentheses, and a
+pipeline is the whole right-hand side of an assignment:
+
+```epsil
+a + b |> f        // (a + b) |> f
+a || b |> f       // (a || b) |> f
+x = a |> f        // x = (a |> f)
+```
+
+It is left-associative, so `a |> f |> g` is `g(f(a))`, which is what reading it
+left to right suggests. `~>` is an alias for `|>`; the two are the same
+operator, and a program written back out uses `|>`. See
+[Operators](/operators/#pipe) for the table entry.
 
 ## Blocks
 
@@ -3969,6 +4387,11 @@ declaration keywords:
 let x = 5
 const c = 6.28
 ```
+
+Reach for `const` when the name stands for something fixed — a physical
+constant, a conversion factor, a lookup table — so that an accidental write is
+reported instead of quietly taking effect. Use `let` for anything that varies:
+accumulators, loop state, values you refine as you go.
 
 A type annotation also **implies** a declaration, even without a keyword:
 
@@ -4110,8 +4533,9 @@ let y
 Without an annotation, the type is inferred from the initializer — `let x = 5`
 declares `x` as an `integer`.
 
-Constness is a property of the **binding**, not of the type, and it is enforced
-by the runtime rather than by a separate Epsil-side check. See
+Constness is a property of the **binding**, not of the type: `const` says that
+*this name* will not be written again, and says nothing about the value it
+holds — there is no such thing as a constant type. See
 [Declarations](/implementation/#declarations) for the underlying
 representation.
 
@@ -4169,6 +4593,122 @@ N(Ln(2))
 ```
 
 evaluates to `0.6931471805599453…`.
+
+## Values and bindings
+
+Epsil keeps apart two things many languages blur together:
+
+- A **value** — a number, a string, a list, a dictionary, a function — is
+  **immutable**. Once it exists, nothing anywhere can change it.
+- A **binding** — the association between a name and a value — is the part
+  that changes. `let` introduces a binding you may reassign; `const` one you
+  may not. See [Declarations](/declarations/).
+
+Everything below follows from those two sentences.
+
+**There is no in-place modification.** A collection cannot be updated
+element by element:
+
+```epsil
+let xs = [1, 2, 3]
+xs[2] = 9
+// ➔ Error(ErrorCode("incompatible-type", "symbol", "number"))
+```
+
+Build the value you want and rebind the name:
+
+```epsil
+let xs = [1, 2, 3]
+xs = Join([xs[1]], [9], [xs[3]])
+xs
+// ➔ [1, 9, 3]
+```
+
+Operators never modify what you hand them — `Append`, `Sort`, `Join`,
+`Map`, `Filter` all return a **new** collection:
+
+```epsil
+let xs = [3, 1, 2]
+let ys = Sort(xs)
+(xs, ys)
+// ➔ ([3, 1, 2], [1, 2, 3])
+```
+
+**Reassigning one name never disturbs another.** Two names holding the same
+value are independent, because there is no way to reach a value *through* a
+name and alter it:
+
+```epsil
+let a = [1, 2, 3]
+let b = a
+a = [9, 9, 9]
+b
+// ➔ [1, 2, 3]
+```
+
+This is what makes a value safe to pass around: no function you call, and no
+name you assign to, can change a collection out from under you. There are no
+references, no aliasing and no object identity — two collections are the same
+when they have the same contents, and that is all `==` ever asks:
+
+```epsil
+[1, 2, 3] == [1, 2, 3]
+// ➔ True
+```
+
+**A parameter is a binding of its own.** A function may reassign its
+parameter; the caller's binding is untouched:
+
+```epsil
+function reset(v) {
+  v = 0
+  v
+}
+let n = 7
+let r = reset(n)
+(n, r)
+// ➔ (7, 0)
+```
+
+**A closure captures the binding, not a snapshot of its value.** This is the
+one place where the distinction is directly visible. A function that refers
+to an outer name reads that name's *current* value each time it runs:
+
+```epsil
+let x = 1
+f() = x
+x = 2
+f()
+// ➔ 2
+```
+
+Each call of an enclosing function creates fresh bindings, so closures made
+by separate calls have separate state, while closures made by the same call
+share it:
+
+```epsil
+function counter() {
+  let n = 0
+  function bump() { n = n + 1; n }
+  bump
+}
+let c1 = counter()
+let c2 = counter()
+(c1(), c1(), c2())
+// ➔ (1, 2, 1)
+```
+
+`c1` and `c2` count independently.
+
+Reach for `const` when a name should not move at all. Constness is a property
+of the *binding*, not of the value it holds — every value is immutable
+already — and writing to one yields an `Error` value rather than quietly
+taking effect:
+
+```epsil
+const c = 1
+c = 2
+```
 
 ## Collections: literals are values, pipelines are generators
 
@@ -4256,31 +4796,158 @@ Source: https://epsil.dev/types/
 
 # Types
 
-Epsil does not have its own type system: it uses the
-[Compute Engine type language](https://mathlive.io/compute-engine/guides/types/), which covers
-unions, intersections, tuples, records, function signatures, and generic
-collection types. See that guide for the type language itself. This page covers
-where a type annotation is written in Epsil source, what it means, and how a
-program declares type names of its own.
+A **type** is what Epsil knows about a value before it computes with it: that
+`3` is an integer, that `[1, 2, 3]` is a list of three integers, that `f` takes
+a real and returns a real.
 
-## Annotation positions
+You get three things out of that knowledge, and they are the reason to care
+about types at all:
 
-A type annotation follows a `:` after a declaration target:
+- **Mistakes are caught where you made them.** A function that declares
+  `mass: real` rejects a string at the call, instead of producing a puzzling
+  symbolic result twenty lines later.
+- **The right code runs.** Types choose between the clauses of a multi-clause
+  function, and let the engine pick an exact algorithm for an integer where it
+  would need a numeric one for a float.
+- **Your intent is written down.** A signature is documentation that cannot go
+  stale.
+
+Types come from the [Compute Engine type language](https://mathlive.io/compute-engine/guides/types/),
+so anything expressible there — unions, intersections, tuples, records,
+function signatures, generic collections — can be written in an Epsil
+annotation. This page is about using them.
+
+## Every value already has a type
+
+You never have to introduce types into a program: they are there from the
+start. `Type` reports the one a value has:
+
+```epsil-live
+(Type(42), Type(1/3), Type(2.5), Type("hi"), Type(True))
+// ➔ ("finite_integer", "finite_rational", "finite_real", "string", "boolean")
+```
+
+Collections carry the type of what is in them, and how many:
+
+```epsil-live
+(Type([1, 2, 3]), Type({1, 2}), Type((1, "a")), Type({x -> 1}))
+// ➔ ("vector<finite_integer^3>", "set<finite_integer>", "tuple<finite_integer, string>", "record<x: finite_integer>")
+```
+
+Numeric types form a tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` —
+and a value of a narrower type is accepted wherever a wider one is expected,
+with no conversion and no cast. An `integer` *is* a `real`, so a function
+declared `f(x: real)` takes `3` happily.
+
+## When to write an annotation
+
+**The default is not to.** Epsil infers the type of anything you declare, and
+for a value used near where it is defined the inferred type is the one you
+would have written:
+
+```epsil-live
+let radius = 2.5
+let area = Pi * radius^2
+Type(area)
+// ➔ "real"
+```
+
+Writing `let radius: real = 2.5` adds a word and no information — the
+initializer already said it. Reach for an annotation in the five situations
+where it does something.
+
+### 1. On the parameters of a function others will call
+
+This is the one that pays for itself. A parameter annotation is **enforced at
+every call**, so a wrong argument is reported at the boundary, naming both
+types:
+
+```epsil
+function bmi(mass: real, height: real) -> real { mass / height^2 }
+bmi("70", 1.8)
+```
+
+That call evaluates to `Error(ErrorCode("incompatible-type", "real",
+"string"))` — an [error value](/evaluation/#errors-are-values) pointing
+at the call site. Without the annotation the string would have flowed into the
+division and come back as something symbolic and mystifying.
+
+A **return** annotation (`-> real`) is a different kind of thing: it is
+recorded in the function's signature and shown by `About`, but the current
+runtime does not reject a returned value for disagreeing with it. Write it for
+the reader; don't rely on it as a check.
+
+### 2. To choose between clauses
+
+When a function has several clauses, parameter types are how a call finds the
+right one:
+
+```epsil-live
+describe(x: integer) = "an integer"
+describe(x: string) = "a string"
+describe(x: list) = "a list"
+(describe(3), describe("a"), describe([1, 2]))
+// ➔ ("an integer", "a string", "a list")
+```
+
+See [Multiple clauses](/control-flow/#multiple-clauses-literal-parameters)
+for how the most specific clause is selected.
+
+### 3. To hold a mutable binding to a contract
+
+An annotation on a `let` constrains not just the initial value but every later
+write to that name. This is how to say "this counter stays an integer":
+
+```epsil
+let count: integer = 0
+count = 2.5
+```
+
+The assignment produces an `incompatible-type` error value and `count` keeps
+its old value. Without the annotation, assigning `2.5` simply widens the
+binding to a real — inference follows the values, and asks no questions.
+
+### 4. When there is nothing to infer from
+
+An empty collection says nothing about what will go into it, so inference
+starts at the bottom of the lattice:
+
+```epsil-live
+let xs = []
+Type(xs)
+// ➔ "list<never>"
+```
+
+Say what you mean instead:
+
+```epsil-live
+let xs: list<integer> = []
+Type(xs)
+// ➔ "list<integer>"
+```
+
+The same applies to a name declared without an initializer (`let x: real`) and
+to a function parameter that the body never constrains.
+
+### 5. When the inferred type is not what you meant
+
+Inference is a guess from evidence, and a guess can be narrower or wider than
+your intent — a variable that happens to start at `0` but will hold a fraction,
+a parameter you intend as `complex` though the body only ever adds. An
+annotation is a commitment: it is never silently revised, so it pins the type
+where the guess would have drifted.
+
+## Where an annotation goes
+
+An annotation follows a `:` after the name being declared:
 
 ```epsil
 x: real
 x: real = 5
 ```
 
-Type-syntax tokens — `<`, `>`, `->`, `|`, `&` — are only meaningful **inside**
-a type annotation. They are never part of the general expression grammar:
-once the parser sees a leading `symbol :`, it hands the rest of the type
-expression to the type subparser and resumes parsing Epsil source exactly
-where the type subparser stopped. An unrelated `:` that doesn't follow a
-declaration target at the start of a statement is not treated as an
-annotation at all.
-
-Function parameters and return values can also be annotated:
+Function parameters and return values take one too, in all three function
+spellings:
 
 ```epsil
 f(x: real, n: integer) -> real = x^n
@@ -4288,184 +4955,87 @@ function g(x: integer) -> integer { x + 1 }
 (x: integer) |-> x + 1
 ```
 
-Parameter annotations are enforced when a function is called. A return-type
-annotation is recorded in the function's signature, but the current runtime
-does not reject a returned value merely because its inferred type differs from
-the annotation.
+Everything after the `:` is read as a **type**, not as an expression. That is
+why `<`, `>`, `|`, `&` and `->` mean something different there than they do in
+ordinary code — in `u: integer | boolean` the `|` is a union, not a logical
+or, and in `f: (real) -> real` the arrow is a function type, not a
+`KeyValuePair`:
 
-Named functions can also declare their effects between the parameter list and
-the return type:
+```epsil
+xs: list<integer>
+f: (real) -> real
+u: integer | boolean
+```
+
+A `:` that does not follow a declaration target is not an annotation at all, so
+this rule never reaches into the rest of your program.
+
+Named functions may also declare their **effects**, between the parameter list
+and the return type:
 
 ```epsil
 function roll(n: integer) random -> integer { Random(n) }
 ```
 
 Effect labels are part of the function type. See
-[Effect specifiers](/control-flow/#effect-specifiers) for declaration
-syntax and the [function type guide](https://mathlive.io/compute-engine/guides/types/#function-types)
-for subtyping rules.
+[Effect specifiers](/control-flow/#effect-specifiers) for the syntax and
+the [function type guide](https://mathlive.io/compute-engine/guides/types/#function-types) for how
+they affect subtyping.
 
-The whole of a type annotation is read by a dedicated type subparser, so `<`,
-`>`, `|`, `&`, and `->` inside it are consumed there and never reinterpreted by
-the surrounding expression grammar. In `u: integer | boolean`, the `|` is part
-of the type, not a logical operator:
+## When a type doesn't fit
 
-```epsil
-xs: list<integer>
-f: (real) -> real
-```
+Type checking happens as the program runs, not in a separate pass beforehand.
+The practical consequences are worth knowing:
 
-## Semantics
+- A type failure is an **error value**, not a thrown exception and not a refusal
+  to run. The statement that failed evaluates to an `Error`; the statements
+  around it still run.
+- A program with a type error still **parses**, so the formatter, the
+  serializer and the editor tooling keep working on it.
+- Because errors are values, they flow: an error handed to another function
+  usually comes back as an error, so the first genuine mismatch is the one to
+  read.
 
-Type checking is not a separate Epsil-side pass — it happens as the program is
-prepared and evaluated, the same way it does for any other declared symbol.
-Epsil does not add a second type checker on top of the runtime's.
+Only an annotation that is not a valid *type* is caught earlier — see
+[Diagnostics](#diagnostics) below.
 
-## Inference
+## How inference decides
 
-A symbol with no annotation gets its type inferred by the engine from how it
-is used — the same inference the engine already performs for any undeclared
-symbol. This includes the engine's existing convention that evaluating a
-bare symbol as a boolean operand (`And`/`Or`/`Xor`/`Not`) infers that symbol
-`boolean` for the lifetime of the engine; a later numeric use of the same
-symbol in the same scope will then error. This is engine behavior, not
-something specific to Epsil.
+A name with no annotation gets its type from how it is used. The engine does
+not solve equations; it **accumulates evidence** and moves through the type
+lattice as more arrives. Using a name as an argument narrows it toward the
+parameter's type; assigning a value widens it to cover that value. A name first
+seen in `x + 1` is provisionally a `number` — a working assumption, not a
+conclusion.
 
-## How the type system works
+Two consequences follow, and both are usually what you want:
 
-None of this section is needed to use Epsil — it is background for readers
-curious about what kind of type system this is and why it behaves the way
-it does.
+**Inferred types are revisable.** A guess incompatible with a later assignment
+is discarded in favor of the value's own type, and a function that referred to
+a name defined only later is re-derived once that definition appears — so the
+order you write your statements in does not change what the program means.
 
-### Types form a lattice
+**Annotated types are not.** What you write is a commitment; only guesses move.
 
-The foundation of the system is **subtyping**: types are arranged in a
-hierarchy, and most questions the engine asks are of the form "is this
-type a subtype of that one?". The numeric types form a tower —
-`integer ⊂ rational ⊂ real ⊂ complex ⊂ number` — so an `integer` is
-accepted anywhere a `real` is expected, with no conversion involved.
-Around that tower the type language adds unions (`integer | boolean`),
-range refinements (`integer<0..10>`), collections with element types
-(`list<integer>`, `set<string>`), tuples and records, and function
-signatures with effect labels.
+One inherited behavior can surprise you: evaluating a bare symbol as a boolean
+operand (`And`/`Or`/`Xor`/`Not`) infers that symbol `boolean` for the lifetime
+of the engine, and a later numeric use of the same name then errors. The
+convention is to keep boolean-only names distinct — uppercase `A`, `B`, `C` is
+the usual choice.
 
-Any two types have a **join** (the narrowest type that covers both — the
-join of `integer` and `real` is `real`) and a **meet** (the widest type
-inside both). Joins and meets are the workhorses of the whole system: the
-type of a mixed list is the join of its element types, and inference
-(below) is built out of these two moves.
+## Naming a type
 
-### It is not Hindley–Milner
+Once a shape shows up in more than one signature — or once two different things
+share a shape and must not be confused — it is worth giving it a name. A `type`
+statement does that. The name is usable by every annotation later in the
+program, and by later cells sharing the same engine.
 
-Languages in the ML family (OCaml, Haskell, Elm) use a different
-foundation, called Hindley–Milner: types are compared for *equality* and
-solved by unification, which buys two famous guarantees. Every expression
-has a **principal type** — a single most general type that every other
-valid type is a specialization of — and inference is **whole-program**:
-the compiler sees the finished program at once, and a use of a function
-far from its definition can determine the definition's type, with no
-annotations anywhere.
+There are two forms, and choosing between them is the main decision here.
 
-This system deliberately trades those guarantees away, for two reasons.
+### `type alias`: a shorter name for the same thing {#type-alias}
 
-First, subtyping and principal types pull against each other. In
-Hindley–Milner, `integer` and `real` simply fail to unify; here, a
-function declared `forall T. (T, T) -> T` called with an `integer` and a
-`real` succeeds, solving `T` to their join (a `real`). That is the
-behavior mathematics wants — but once many types are valid for an
-expression, "the single most general one" stops being the useful answer,
-and the engine makes pragmatic choices instead.
-
-Second, there is no "whole program" to infer over. A session is
-open-ended: definitions arrive one statement (or one cell) at a time, may
-refer to names defined later, and may be redefined. The engine therefore
-types what it has seen so far and refines as more arrives, rather than
-solving a closed program once.
-
-In character the system is closer to TypeScript or Go than to ML:
-subtyping at the base, generics that are explicitly declared rather than
-silently inferred, and types solved locally rather than globally.
-
-### Generics are explicit and solved per call
-
-A function is generic only when it is *declared* generic — with a
-`function f<T>(…)` clause or a `forall` annotation. Nothing is silently
-generalized: `x |-> x` is a function on some inferred type, not an
-implicit "for all T". At each call of a generic function, the engine
-collects what the arguments say about each type variable and solves the
-variables on the spot, by joining that evidence; the call's result type
-comes from substituting the solution into the signature.
-
-Subtyping also quietly absorbs a classic use of polymorphism: the empty
-list needs no "for all" type — it is simply `list<never>`, and since
-`never` is the bottom of the lattice (joining it with anything gives the
-other type back), `Join([], [1, 2])` comes out as `list<finite_integer>`
-with no quantifier anywhere.
-
-### Inference gathers evidence, and can change its mind
-
-When a symbol has no annotation, the engine does not solve equations to
-find its type — it accumulates **evidence** from how the symbol is used,
-moving through the lattice as evidence arrives. Using a symbol as an
-argument *narrows* its type toward the parameter's; assigning it a value
-*widens* its type to cover the value. A symbol first seen in `x + 1` is
-provisionally taken to be a `number` — a guess, not a theorem.
-
-Because they are evidence, inferred types are **revisable** in ways a
-Hindley–Milner type never is. A guess that turns out incompatible with a
-later assignment is discarded in favor of the value's own type, and a
-function that referred to a name defined only later is re-derived once the
-definition appears, so declaration order does not change what a program
-means. Only *inferred* types move: a type you annotate is a commitment,
-never silently revised — which is the practical takeaway. Annotations are
-never required, but where the inferred guess isn't what you meant, an
-annotation pins it.
-
-## Absence values
-
-Epsil distinguishes three related kinds of absence:
-
-- `Nothing` means “no value here” and is removed from function arguments and
-  collection literals.
-- `Missing` is a position-preserving missing value. Its type is `missing`.
-- `NaN` is the numeric form of an absent or undefined result. Numeric
-  operations and missing numeric fields generally normalize absence to `NaN`.
-
-`IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
-value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
-first value that is not missing; if every argument is missing, it returns the
-last one unchanged.
-
-```epsil-live
-(Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
-  Coalesce(Missing, 0), Missing + 1)
-// ➔ (3, True, True, 0, NaN)
-```
-
-A missing dictionary field follows the expected value domain: a numeric field
-produces `NaN`, while a string or other nonnumeric field produces `Missing`.
-Use `IsMissing` when the distinction between those representations is not
-important, and `Coalesce` to supply a fallback.
-
-## Declaring a type
-
-A `type` statement gives a name to a type. The name is usable by every
-annotation later in the program — and by later cells sharing the same engine.
-There are two forms, and they mean different things.
-
-**`type` declares a new, distinct type.** Nothing that merely *looks* like the
-definition belongs to it: the definition describes how the type is built, not
-which values are already members of it.
-
-```epsil-live
-type point = tuple<x: number, y: number>
-let p = point(1, 2)
-p
-// ➔ point(1, 2)
-```
-
-**`type alias` declares another name for an existing type.** Any value of
-that shape is a value of the alias — it is an abbreviation, not a new type.
+An alias is an **abbreviation**. `pair` and `tuple<number, number>` are the
+same type, spelled two ways, and values move between them freely:
 
 ```epsil-live
 type alias pair = tuple<number, number>
@@ -4474,16 +5044,77 @@ a
 // ➔ (1, 2)
 ```
 
-Reach for `type alias` to shorten a type you write often
-(`type alias grid = list<list<number>>`), and for `type` when the new type is
-meant to be its own thing — a `meters` that a bare number cannot be mistaken
-for.
+Use an alias when the only problem is that a type is long or repeated:
+
+```epsil
+type alias grid = list<list<number>>
+type alias handler = (string) -> nothing
+```
+
+### `type`: a new, distinct type {#nominal-type}
+
+The bare form declares a type that is **its own thing**. Nothing that merely
+looks like the definition belongs to it — the definition says how values are
+built, not which existing values qualify:
+
+```epsil-live
+type point = tuple<x: number, y: number>
+let p = point(1, 2)
+p
+// ➔ point(1, 2)
+```
+
+Use it when the distinction matters more than the convenience: two quantities
+with the same representation that must never be mixed up, or a value you want
+to construct through one checked entry point.
+
+Temperature scales are the canonical case. As nominal types, the units cannot
+be interchanged:
+
+```epsil-live
+type celsius = number
+type fahrenheit = number
+function toF(c: celsius) -> fahrenheit {
+  match c { celsius(v) => fahrenheit(v * 9 / 5 + 32) }
+}
+toF(celsius(100))
+// ➔ fahrenheit(212)
+```
+
+`toF(fahrenheit(212))` is an `incompatible-type` error — the mistake you wanted
+caught. The price is visible in the body: because a `celsius` is not a number,
+the arithmetic needs a [`match`](#values-of-a-new-type-are-opaque) to get at
+the value inside, and the result must be re-tagged on the way out.
+
+Written with aliases instead, the same program computes just as well and
+protects nothing:
+
+```epsil-live
+type alias celsius = number
+type alias fahrenheit = number
+function toF(c: celsius) -> fahrenheit { c * 9 / 5 + 32 }
+toF(100)
+// ➔ 212
+```
+
+Both spellings are legitimate. The question to ask is whether you are naming a
+shape for readability, or drawing a line the engine should enforce.
+
+|                            | `type alias X = …`      | `type X = …`                |
+| -------------------------- | ----------------------- | --------------------------- |
+| Relation to the definition | the same type           | a new, distinct type        |
+| A plain value of the shape | accepted                | rejected                    |
+| Constructor `X(…)`         | checked cast, no tag    | builds and tags a value     |
+| Reading the parts          | ordinary operations     | `match`, or `.field`        |
+| Prints as                  | the underlying value    | `X(…)`                      |
+| Reach for it when          | the type is long/repeated | two things must not mix   |
+
+### Declaring a type {#declaring-a-type}
 
 Neither `type` nor `alias` is a reserved word. Only the statement-position
-shapes `type name =`, `type name<`, `type alias name =` and
-`type alias name<` are read as a type declaration, so `type` remains an
-ordinary identifier everywhere else — `type: integer = 4` still declares a
-variable named `type`:
+shapes `type name =`, `type name<`, `type alias name =` and `type alias name<`
+are read as a type declaration, so `type` remains an ordinary identifier
+everywhere else — `type: integer = 4` still declares a variable named `type`:
 
 ```epsil-live
 let type = 5
@@ -4553,8 +5184,9 @@ Type(circle(1, 2, 3))
 ```
 
 Constructor functions are not record-specific: one may be written for any
-definition, replacing the automatic constructor — the *smart constructor*
-idiom of validating or normalizing on the way in:
+definition, replacing the automatic constructor. This is the *smart
+constructor* idiom — the single place a value of the type can come into
+existence, so validation or normalization written there cannot be bypassed:
 
 ```epsil-live
 type frac = record<n: integer, d: integer>
@@ -4588,8 +5220,9 @@ just an ordinary function: there is no tag to apply.
 ### Values of a new type are opaque
 
 A `point` is not the tuple it is defined from — that is what makes it a new
-type. So a plain tuple is not accepted where a `point` is expected, and the
-operations that take a tuple apart do not reach inside one:
+type, and what makes the mix-ups it prevents impossible. The same reserve means
+a plain tuple is not accepted where a `point` is expected, and the operations
+that take a tuple apart do not reach inside one:
 
 ```epsil
 type point = tuple<x: number, y: number>
@@ -4603,9 +5236,9 @@ Each of those lines parses: the rejection happens when the program runs, as
 an [error value](/evaluation/#errors-are-values), not as a parse
 error.
 
-To read the parts back, [`match`](/control-flow/#match) on the
-constructor — a constructor pattern is an ordinary operator pattern, and
-binds one variable per field:
+There are two ways in. To take the value apart all at once, use
+[`match`](/control-flow/#match) on the constructor — a constructor
+pattern is an ordinary operator pattern, and binds one variable per field:
 
 ```epsil-live
 type point = tuple<x: number, y: number>
@@ -4630,9 +5263,8 @@ p.x + p.y
 On a dictionary, `d.x` is exactly `d["x"]`, absent-key behavior included.
 The accessor reads one named field through the type's definition; it does
 not make the value a collection — `First(p)`, `p["x"]` and destructuring
-keep rejecting, and `match` remains the way to take the whole value apart
-at once. (The dot must touch the value it reads: `p.x` is a field access,
-`p .x` is not; and a number never takes a field — `2.x` is a
+keep rejecting. (The dot must touch the value it reads: `p.x` is a field
+access, `p .x` is not; and a number never takes a field — `2.x` is a
 multiplication.)
 
 An **alias** has none of this reserve — it *is* its definition, so an
@@ -4682,12 +5314,19 @@ that name *predating* the type, or a type declared by the host
 application — is not replaced: the statement reports an error value and
 declares nothing.
 
-### Type variables
+A `type` statement registers its name as the program is prepared, which is why
+the statements *after* it — in the same program or in a later cell — can
+annotate with it. A type the host declares on its own is visible to a program
+the same way, constructor and all.
 
-A generic **type alias** takes a type-parameter clause between its name
-and the `=`. The applied spelling is usable anywhere a type is written,
-and expands **transparently** — `Pair<integer>` means exactly
-`tuple<integer, integer>`, and that expansion is what type displays and
+## Types with parameters
+
+A type that is the same shape at several element types — a pair of *somethings*,
+a tree of *somethings* — takes a **type parameter** rather than being written
+out once per element type. The clause goes between the name and the `=`.
+
+For an **alias**, the application expands transparently: `Pair<integer>` means
+exactly `tuple<integer, integer>`, and that expansion is what type displays and
 error messages show:
 
 ```epsil
@@ -4716,10 +5355,9 @@ definitions it was built from: re-running the `type` statement for
 `Keyed` leaves `Table` as it was until `Table`'s own statement is re-run
 too — which re-running the cell does.
 
-A parameterized **nominal** type — the bare form — takes a clause too, and
-takes it the same way. The difference is what an application means: a
-nominal type is **opaque**, so `tree<integer>` is never expanded, which is
-what lets its body be recursive.
+A parameterized **nominal** type takes a clause the same way. The difference is
+what an application means: a nominal type is **opaque**, so `tree<integer>` is
+never expanded — which is exactly what lets its body mention itself:
 
 ```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
@@ -4755,12 +5393,13 @@ match t { tree(v, cs) => Type(v) }
 // ➔ "integer"
 ```
 
-**Variance.** A parameter may carry an `in`/`out`/`inout` marker saying how
-two applications relate: `out` (covariant) makes a `tree<integer>` usable
-where a `tree<number>` is expected, `in` (contravariant) reverses that, and
-`inout` (invariant) relates only identical arguments. The words are
-contextual, claimed only inside a clause. An alias takes no marker — it
-expands rather than relates.
+### Variance
+
+A parameter may carry an `in`/`out`/`inout` marker saying how two applications
+relate: `out` (covariant) makes a `tree<integer>` usable where a `tree<number>`
+is expected, `in` (contravariant) reverses that, and `inout` (invariant) relates
+only identical arguments. The words are contextual, claimed only inside a
+clause. An alias takes no marker — it expands rather than relates.
 
 ```epsil
 type tree<out T> = tuple<value: T, children: list<tree<T>>>
@@ -4795,8 +5434,10 @@ builds *is* a `tree<number>` under `out`. For an explicitly `inout` or `in`
 parameter that step is not available, so such a type can only be constructed
 at exactly its argument type.
 
-**Unions.** A type variable may stand in one arm of a union, which is what
-makes an optional payload expressible:
+### Optional payloads
+
+A type variable may stand in one arm of a union, which is what makes an
+optional payload expressible:
 
 ```epsil-live
 type opt<T> = T | missing
@@ -4824,10 +5465,11 @@ stand in an intersection or a negation at all; an intersection is usually a
 constraint written in the wrong place, and the error says so — write a bound
 (`type box<T: number> = …`) instead of `T & number`.
 
-Generic **functions** are supported: a `function` definition takes a
-type-parameter clause between its name and its parameter list, and the
-quantified names scope over the definition's head (its parameters, effect
-specifier, and return type):
+### Generic functions
+
+A `function` definition takes a type-parameter clause between its name and its
+parameter list, and the quantified names scope over the definition's head (its
+parameters, effect specifier, and return type):
 
 ```epsil
 function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
@@ -4838,14 +5480,103 @@ A type parameter may carry a ground bound (`function g<T: number>(x: T) -> T`),
 which is enforced at every call. The equivalent full-type spelling is a
 `forall` annotation — `let f: forall T. (T) -> T = x |-> x`.
 
-### When a type takes effect
+Note that a function is generic only when it is **declared** generic. Nothing
+is silently generalized: `x |-> x` is a function on some inferred type, not an
+implicit "for all `T`".
 
-A `type` statement registers its name as the program is prepared, which is why
-the statements *after* it — in the same program or in a later cell — can
-annotate with it. A type the host declares on its own is visible to a program
-the same way, constructor and all.
+## Absence values
 
-For the underlying representation, see
+Epsil distinguishes three related kinds of absence:
+
+- `Nothing` means “no value here” and is removed from function arguments and
+  collection literals.
+- `Missing` is a position-preserving missing value. Its type is `missing`.
+- `NaN` is the numeric form of an absent or undefined result. Numeric
+  operations and missing numeric fields generally normalize absence to `NaN`.
+
+`IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
+value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
+first value that is not missing; if every argument is missing, it returns the
+last one unchanged.
+
+```epsil-live
+(Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
+  Coalesce(Missing, 0), Missing + 1)
+// ➔ (3, True, True, 0, NaN)
+```
+
+A missing dictionary field follows the expected value domain: a numeric field
+produces `NaN`, while a string or other nonnumeric field produces `Missing`.
+Use `IsMissing` when the distinction between those representations is not
+important, and [`??`](/operators/#absence-coalescing) — the operator form
+of `Coalesce` — to supply a fallback.
+
+## Background: what kind of type system this is
+
+None of this section is needed to use Epsil — it is background for readers
+curious about why the system behaves the way it does.
+
+### Types form a lattice
+
+The foundation is **subtyping**: types are arranged in a hierarchy, and most
+questions the engine asks are of the form "is this type a subtype of that
+one?". The numeric tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` — is
+the familiar part. Around it the type language adds unions
+(`integer | boolean`), range refinements (`integer<0..10>`), collections with
+element types (`list<integer>`, `set<string>`), tuples and records, and
+function signatures with effect labels.
+
+Any two types have a **join** (the narrowest type that covers both — the
+join of `integer` and `real` is `real`) and a **meet** (the widest type
+inside both). Joins and meets are the workhorses of the whole system: the
+type of a mixed list is the join of its element types, and inference is built
+out of these two moves.
+
+### It is not Hindley–Milner
+
+Languages in the ML family (OCaml, Haskell, Elm) use a different
+foundation, called Hindley–Milner: types are compared for *equality* and
+solved by unification, which buys two famous guarantees. Every expression
+has a **principal type** — a single most general type that every other
+valid type is a specialization of — and inference is **whole-program**:
+the compiler sees the finished program at once, and a use of a function
+far from its definition can determine the definition's type, with no
+annotations anywhere.
+
+This system deliberately trades those guarantees away, for two reasons.
+
+First, subtyping and principal types pull against each other. In
+Hindley–Milner, `integer` and `real` simply fail to unify; here, a
+function declared `forall T. (T, T) -> T` called with an `integer` and a
+`real` succeeds, solving `T` to their join (a `real`). That is the
+behavior mathematics wants — but once many types are valid for an
+expression, "the single most general one" stops being the useful answer,
+and the engine makes pragmatic choices instead.
+
+Second, there is no "whole program" to infer over. A session is
+open-ended: definitions arrive one statement (or one cell) at a time, may
+refer to names defined later, and may be redefined. The engine therefore
+types what it has seen so far and refines as more arrives, rather than
+solving a closed program once.
+
+In character the system is closer to TypeScript or Go than to ML:
+subtyping at the base, generics that are explicitly declared rather than
+silently inferred, and types solved locally rather than globally.
+
+### Generics are solved per call
+
+At each call of a generic function, the engine collects what the arguments say
+about each type variable and solves the variables on the spot, by joining that
+evidence; the call's result type comes from substituting the solution into the
+signature.
+
+Subtyping also quietly absorbs a classic use of polymorphism: the empty
+list needs no "for all" type — it is simply `list<never>`, and since
+`never` is the bottom of the lattice (joining it with anything gives the
+other type back), `Join([], [1, 2])` comes out as `list<finite_integer>`
+with no quantifier anywhere.
+
+For the representation a type declaration lowers to, see
 [Type declarations](/implementation/#type-declarations).
 
 ## Diagnostics
