@@ -20,7 +20,7 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.788930a4.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.56b60f3c.js" defer="defer"></script>
 <script src="/assets/js/main.dafac8ff.js" defer="defer"></script>
 </head>
 <body>
@@ -107,6 +107,36 @@ exact regardless of position — which means the formatter rewrites an authored
 <code>=</code> to <code>:=</code> where it assigns.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
+<li class="">
+<p><strong><code>broadcastable&lt;T&gt;</code> as a parameter declaration is now an elementwise
+contract.</strong> A parameter declared <code>broadcastable&lt;T&gt;</code> (e.g.
+<code>ce.declare(&#x27;f&#x27;, &#x27;(broadcastable&lt;number&gt;) -&gt; unknown&#x27;)</code>, or an Epsil
+<code>function f(x: broadcastable&lt;number&gt;) { … }</code>) maps an indexed-collection
+argument element-wise — even when <code>T</code> would admit the collection whole
+(<code>broadcastable&lt;value&gt;</code>: the collection arm wins) — and the map descends
+exactly <strong>one</strong> rank: each element binds to the parameter whole, even a
+nested collection, unlike the unannotated default, which descends to the
+scalar leaves. <code>T</code> is checked per element (a violating element produces a
+loud per-element error carrying the broadcast context, and its siblings
+still evaluate), and a scalar argument binds directly with no list
+wrapper. Applications now also <strong>type</strong> like the inferred path — a
+definite collection argument gives <code>list&lt;R&gt;</code>, a possibly-collection
+argument <code>broadcastable&lt;R&gt;</code>, a scalar <code>R</code> — where the declared spelling
+previously typed the strictly weaker bare declared result (an explicitly
+<em>more</em> precise declaration yielded strictly <em>less</em> type information). A
+collection- or tuple-declared sibling slot still binds its argument
+whole, and the strict length-mismatch policy applies across the mapped
+slots only. The unannotated vectorization default is unchanged. Design
+record: <code>docs/plans/2026-08-08-broadcastable-param-semantics.md</code>.</p>
+</li>
+<li class="">
+<p>Compiling an application of a function with a declared <code>broadcastable&lt;T&gt;</code>
+parameter over a possibly-collection argument fails closed with a
+diagnostic (interpreted evaluation handles it) instead of emitting scalar
+code that returned garbage on arrays — the compiled broadcast helper
+recurses into nested arrays, which is exactly the leaf descent the
+one-rank contract rules out.</p>
+</li>
 <li class="">
 <p><strong>Epsil debugging support in the engine.</strong> Two additions that let a
 debugger (such as the VS Code Epsil extension&#x27;s DAP adapter) pause and
