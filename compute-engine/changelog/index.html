@@ -19,9 +19,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.c543519d.css">
-<script src="/assets/js/runtime~main.08d2ab40.js" defer="defer"></script>
-<script src="/assets/js/main.12527d8d.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
+<script src="/assets/js/runtime~main.788930a4.js" defer="defer"></script>
+<script src="/assets/js/main.dafac8ff.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -284,6 +284,29 @@ pattern already does. <code>is</code> is a contextual word — <code>let is = 5<
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements">Improvements<a href="#improvements" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Element-wise (broadcast) failures are now self-diagnosing.</strong> A user
+function with scalar parameters is automatically applied element-wise over
+an indexed-collection argument; when that fired unexpectedly, the resulting
+per-element failures gave no hint a broadcast was in flight — the
+motivating symptom read <code>Condition must evaluate to &quot;True&quot; or &quot;False&quot;</code>
+with nothing tying it to a mapping. An error produced inside a broadcast
+element now carries an <code>[&quot;ErrorBroadcast&quot;, name, index, length]</code> entry in
+its <code>ErrorTrace</code> breadcrumb, rendered as
+<code>(while applying &#x27;skipWs&#x27; element-wise over 4 elements (element 2))</code>; an
+error <strong>thrown</strong> out of an element (a non-boolean <code>if</code> condition, say) has
+the same context appended to its message. Every failing element is
+annotated with its own index. Errors that never went through a broadcast
+are byte-identical to before, successful broadcasts pay nothing, and Epsil
+<code>runtime-error</code> diagnostics report the context too.</p>
+</li>
+<li class="">
+<p><strong>The Epsil debugger&#x27;s variables pane marks broadcast behavior on function
+signatures</strong>: <code>(n: number) -&gt; number [elementwise]</code> versus
+<code>(xs: list&lt;number&gt;) -&gt; integer [binds whole]</code>, so the derived vectorization
+behavior is visible before anything runs. A function-typed (callback)
+parameter does not suppress the marker, matching the eligibility rule.</p>
+</li>
+<li class="">
 <p><strong>Membership in a value collection now types the tested function
 parameter.</strong> <code>Element(c, digits)</code> — Epsil <code>c in digits</code> — inside a function
 body narrows a not-yet-typed parameter to the collection&#x27;s element type
@@ -325,6 +348,35 @@ position.</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Iterating over a function parameter now counts as collection evidence.</strong> A
+parameter whose only use was <code>for c in cs</code> stayed untyped, so the lambda
+auto-broadcast mapped the function over the argument&#x27;s elements instead of
+binding the collection whole: a function that accumulated <code>t = t + c</code> over
+<code>for c in cs</code> and was applied to <code>[1, 2, 3]</code> returned <code>[0, 0, 0]</code> instead of
+<code>6</code>, and its inferred signature read <code>(unknown) -&gt; …</code>. The iterated operand of a
+<code>Loop</code>/<code>Comprehension</code> <code>Element</code> clause now narrows an as-yet-untyped symbol
+to <code>collection</code>, matching what <code>Length(cs)</code> and <code>cs[i]</code> already did. Scalar
+parameters are unaffected — <code>f(x) = x * 2</code> still broadcasts over a list.</p>
+</li>
+<li class="">
+<p><strong>A function forward-declared with the bare <code>function</code> wildcard
+(<code>ce.declare(&#x27;clean&#x27;, &#x27;function&#x27;)</code>) now participates in parameter
+collection-inference.</strong> Previously a caller such as
+<code>proc(cs) = clean(cs) + 1</code> learned nothing from <code>clean</code> in <strong>either</strong>
+definition order: the wildcard declaration carries no parameter types, and
+assigning a function literal deliberately leaves the declared type alone
+(so re-assignment at a different arity stays legal), leaving no signature
+to narrow from. The application site now reads the assigned literal&#x27;s own
+signature — for argument narrowing and for the application&#x27;s result type,
+which used to be broadcast-typed (<code>list&lt;unknown^3&gt;</code>) where the value was a
+scalar — and a caller canonicalized while the callee is still a bare
+wildcard registers for re-derivation, so the later assignment repairs it:
+<code>proc([10, 20, 30])</code> answers <code>11</code> instead of broadcasting into
+<code>[proc(10), proc(20), proc(30)]</code>. The wildcard remains a widening:
+re-assignment at a different arity or parameter type still works, and
+applications are still not validated against the assigned signature.</p>
+</li>
+<li class="">
 <p><strong>Compiled string comparisons fail closed instead of returning wrong
 values.</strong> The JavaScript compile target is numeric at heart: <code>Equal</code> and
 <code>NotEqual</code> lower to a tolerance test (<code>Math.abs(a - b) &lt;= tol</code>), which for
@@ -365,6 +417,75 @@ interpreter parity is pinned); nested all-string shapes decline. Numeric
 shapes keep byte-identical codegen. (The Python target has the same
 broadcast-route defect — <code>np.less(&quot;a&quot;, [1, 2])</code> — recorded as a known open
 hole, not yet fixed.)</p>
+</li>
+<li class="">
+<p><strong>The Python compile target now fails closed on the string and aggregate
+comparisons it miscompiled.</strong> Two shapes returned wrong values behind
+<code>success: true</code>: an ordering that mixes strings with numbers, where NumPy
+coerces the number to a string and compares as text
+(<code>Less([&quot;a&quot;, 10], [&quot;b&quot;, 9])</code> ran to <code>[True, True]</code>, while the interpreter
+answers <code>[&quot;True&quot;, &quot;False&quot;]</code> — <code>10 &lt; 9</code> is False), and equality with a
+<code>tuple</code> participant, where the tuple is looked inside instead of binding
+atomically (<code>Equal(Tuple(1, 2), List(1, 2))</code> ran to <code>True</code> against the
+interpreter&#x27;s <code>False</code>). Both now decline (D6) and the interpreter fallback
+answers correctly, as do <code>dictionary</code>/<code>record</code> comparisons (no positional
+lowering at all) and scalar string equality (<code>abs(&quot;a&quot; - &quot;a&quot;)</code> raises).
+Gating is at COMPILE time on static type evidence, not on the emitted code
+raising: several mixed shapes are loud on NumPy 2.x but historically
+returned a scalar <code>False</code> with a <code>FutureWarning</code>, and emitted code runs on
+the user&#x27;s NumPy. As on the JavaScript target, an <code>unknown</code>-typed operand is
+never string evidence, so numeric and plot comparisons compile
+byte-identically. What keeps compiling, each with executed-parity pins:
+all-string orderings (scalar, chained, list-vs-list, list-vs-scalar),
+tuple-vs-tuple equality, and — unlike the JavaScript target, whose kernels
+are numeric there — <code>IndexOf</code> in every shape (including a tuple needle in a
+point list) and all-string collection equality, both of which lower to
+Python&#x27;s own structural comparison and are faithful.</p>
+</li>
+<li class="">
+<p><strong>Compiled <code>IndexOf</code>&#x27;s element test is now EXACT and bool-aware, like the
+interpreter.</strong> <code>IndexOf([1, 2], True)</code> ran to <code>1</code> on both the JavaScript and
+Python targets, where the interpreter&#x27;s structural element test answers <code>0</code>
+(and symmetrically, <code>IndexOf([True], 1)</code> ran to <code>1</code>): Python&#x27;s <code>True == 1</code>
+is <code>True</code>, and <code>Math.abs(true - 1)</code> is <code>0</code>. Both targets now compare
+bool-ness first — Python through a new <code>_ce_indexof</code>/<code>_ce_same</code> runtime
+adapter, JavaScript through a strict <code>===</code> in the emitted element test. This
+is a runtime adapter, not a compile-time gate, so boolean <code>IndexOf</code> keeps
+compiling instead of declining. Both element tests also dropped their numeric
+TOLERANCE leaf: the interpreter&#x27;s number <code>.isSame()</code> is exact, so
+<code>IndexOf([0], 5e-11)</code> and <code>IndexOf([0.30000000000000004], 0.3)</code> answer <code>0</code>,
+where the compiled forms answered <code>1</code>. (The tolerance leaf came from a probe
+artifact — <code>IndexOf([0.3], Add(0.1, 0.2))</code> agrees only because <code>Add(0.1, 0.2)</code>
+evaluates to exactly <code>0.3</code> by exact decimal folding, so the element test never
+saw a near-miss float. The residual: a needle <em>computed</em> to a near-miss f64 at
+runtime is not found, which is the ordinary exactness loss of compiling to f64
+arithmetic.) The adapters also FIND a <code>NaN</code> needle, as the interpreter&#x27;s
+structural element test does: <code>IndexOf([NaN, 3], NaN)</code> ran to <code>0</code> on both
+targets (<code>nan == nan</code> is <code>False</code> in Python, and <code>Math.abs(NaN - NaN) &lt;= tol</code>
+is <code>false</code>) and now answers <code>1</code>. Otherwise unchanged: numbers still match
+across <code>int</code>/<code>float</code>, a tuple needle is still found in a point list, and a
+missing needle is still <code>0</code>. On the Python target an <code>np.ndarray</code> on either
+side is now normalized to a nested list, so a caller-supplied <code>(n, 2)</code> point
+matrix works instead of raising an ambiguous-truth-value error.</p>
+</li>
+<li class="">
+<p><strong>Compiled Python orderings over two collections now reject a length
+mismatch.</strong> The interpreter answers <code>Error(&quot;incompatible-dimensions&quot;, …)</code> for
+<code>Less([1, 2, 3], [1, 2])</code> <em>and</em> for <code>Less([1], [1, 2])</code>. NumPy only half
+agreed: it raises on 3-vs-2, but silently BROADCASTS 1-vs-n
+(<code>np.less([1], [1, 2])</code> → <code>[False, True]</code>) — a wrong answer behind a
+<code>success: true</code>. The ordering ufuncs are now emitted through a <code>_ce_ord</code>
+runtime shape guard that raises on any list-like-vs-list-like length
+mismatch, the 1-vs-n case included. Scalar-vs-collection broadcasting is
+unaffected.</p>
+</li>
+<li class="">
+<p><strong><code>compileLambda</code> (Python target) no longer emits references to undefined
+runtime helpers.</strong> It guarded only <code>_ce_bcast</code>; an <code>IndexOf</code> body, a
+collection/tuple <code>Equal</code> body, or a collection ordering produced a lambda
+referencing <code>_ce_indexof</code>/<code>_ce_eqcoll</code>/<code>_ce_ord</code>, which a bare lambda has no
+place to define — a <code>NameError</code> at call time. All four now fail closed with a
+message pointing at <code>compileFunction</code>.</p>
 </li>
 <li class="">
 <p><strong>A destructuring <code>Declare</code> with a positional initial value now binds
@@ -430,6 +551,37 @@ arguments even on that route;</li>
 <code>any</code> (<code>Length(5)</code> stays symbolic); it now treats a not-yet-typed symbol
 operand as collection evidence, like an indexed read does.</li>
 </ul>
+</li>
+<li class="">
+<p><strong>Collection evidence now survives definition order: a function defined
+before its callee is re-derived when the callee arrives.</strong> The narrowing
+described above — a callee&#x27;s collection parameter teaching the caller&#x27;s
+parameter — could only fire when the callee was already defined. Write the
+caller first (<code>process(cs) = clean(cs) + 1</code> before
+<code>clean(v: list&lt;number&gt;) = v[1]</code>) and <code>process</code> was canonicalized while
+<code>clean</code> was still unknown: <code>cs</code> learned nothing, so
+<code>process([10, 20, 30])</code> broadcast elementwise, handing <code>clean</code> one number
+at a time — each call then failed against the declared <code>list&lt;number&gt;</code>
+parameter, and the errored elements surfaced as inert
+<code>[process(10), process(20), process(30)]</code>. Definition order changed
+semantics, which the engine already refuses to accept for juxtaposition
+(<code>g(t) := 2a(t)</code> written before <code>a</code> is defined re-reads as an application
+when <code>a</code> arrives): the same repair machinery now covers forward-referenced
+calls. While a function literal&#x27;s body is canonicalized, a call whose
+callee is undefined — or known only by a guessed signature — registers the
+literal as a dependent of that name; when the name later gains a
+definition (assigned a body, or merely declared with a signature), the
+literal is re-derived from its raw operands and the parameter picks up the
+evidence, so the caller binds the collection whole and answers <code>11</code>.
+Helpers can now be written below their callers, and mutually recursive
+pairs work in either order. A <em>scalar</em> callee defined later leaves the
+caller vectorizing, exactly as if it had been defined first, and a
+self-recursive function skips the pointless re-derivation of itself.
+Chains repair transitively: re-deriving a forwarder is that forwarder&#x27;s own
+name gaining a definition, so <code>A → B → C</code> written in that order all bind
+correctly once <code>C</code> arrives — including diamonds, where the apex is rebuilt
+once, after every forwarder below it is current — and mutually recursive
+forward references terminate instead of chasing each other.</p>
 </li>
 <li class="">
 <p><strong>A <code>while</code> loop inside a zero-argument function now terminates.</strong>
