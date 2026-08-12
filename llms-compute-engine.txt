@@ -14938,6 +14938,7 @@ type(type): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15039,6 +15040,7 @@ createScope(bindings?, parent?): InspectableScope
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15135,6 +15137,7 @@ declareType(name, type, options?): void
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15198,6 +15201,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15217,6 +15221,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15245,6 +15250,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15265,6 +15271,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15286,6 +15293,7 @@ declare(id, def, scope?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -15303,6 +15311,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15331,6 +15340,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15351,6 +15361,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15372,6 +15383,7 @@ declare(id, def, scope?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
 
 ####### scope?
@@ -15404,6 +15416,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15423,6 +15436,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15451,6 +15465,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15471,6 +15486,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15492,6 +15508,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -15509,6 +15526,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15537,6 +15555,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15557,6 +15576,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -15578,6 +15598,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
 
 ####### arg3?
@@ -16430,6 +16451,16 @@ readonly isFiniteCollection: boolean | undefined;
 
 ```ts
 readonly isEmptyCollection: boolean | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### CollectionInterface.isEnumerableCollection
+
+```ts
+readonly isEnumerableCollection: boolean | undefined;
 ```
 
 </MemberCard>
@@ -17447,6 +17478,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   eq: (a, b, prover?) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
   collection: CollectionHandlers;
+  canEnumerate: (expr) => boolean | undefined;
 };
 ```
 
@@ -17726,6 +17758,40 @@ prover-tier work (sampling, expand/simplify, identity questions in the
 free variables) must decline — return `undefined` — when
 `prover === false`.
 
+#### OperatorDefinition.canEnumerate?
+
+```ts
+optional canEnumerate?: (expr) => boolean | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers (an EAGER producer — `Characters`, `Divisors`, `Eigenvalues`,
+…): can `evaluate()` produce the collection's elements in the current
+state?
+
+This is the operator's own decline test — the guard at the top of its
+`evaluate` handler — exposed so the enumerability facet
+(`isEnumerableCollection`) can answer without evaluating. Contract
+(see `docs/plans/2026-08-11-eager-collection-enumerability.md`):
+
+- MUST be O(1), evaluation-free and side-effect free. An impure
+  producer answers from its operands' facets, consuming no draws.
+- `false` means evaluation WOULD decline — callers stay inert without
+  paying for the evaluation.
+- `true` is a hard promise that evaluation produces the collection. An
+  operator whose success is not cheaply decidable (`Solve`,
+  `FindRoot`) must return `undefined`, never `true`.
+- The operand seen here is the CANONICAL operand, not the evaluated
+  one. An unevaluated compound operand (`Divisors(n + 1)`) whose value
+  cannot be read cheaply must yield `undefined` (undecidable), not
+  `false` — only a definitively unavailable operand (a valueless
+  symbol, a literal of the wrong kind) yields `false`. See
+  `canEnumerateOperand` (`collection-utils.ts`) for the shared
+  tri-state resolution.
+
+Ignored (never consulted) when the definition has `collection`
+handlers — those own enumerability via `collection.isEnumerable`.
+
 </MemberCard>
 
 ### BaseDefinition
@@ -17960,6 +18026,37 @@ optional isFinite?: (collection) => boolean | undefined;
 ```
 
 Optional flag to quickly check if the collection is finite, without having to count exactly how many elements it has (useful for lazy evaluation).
+
+</MemberCard>
+
+<MemberCard>
+
+##### BaseCollectionHandlers.isEnumerable?
+
+```ts
+optional isEnumerable?: (collection) => boolean | undefined;
+```
+
+Optional predicate answering whether `iterator()` will actually produce
+this collection's elements — the cheap way to tell an EMPTY collection
+from one that merely cannot be walked, which are otherwise
+indistinguishable (both yield nothing).
+
+Return `false` when the elements have no computable value in the current
+state: symbolic bounds (`Range(a, b)`, `Linspace(a, 1, 3)`, a symbolic
+repeat count), or a source that is itself not enumerable. Return
+`undefined` only when it cannot be decided without evaluating.
+
+Implementations must be O(1) and must NOT consult `count`, `isEmpty` or
+`isFinite` on themselves, nor walk the collection: a wrapper answers by
+reading its source's `isEnumerableCollection`, so a chain costs one call
+per level. (Reading the emptiness facets instead is exponential in the
+chain depth — each read re-enters the next `isEmpty` down.)
+
+Default when the handler is ABSENT: `true` (an operator with a
+`collection` block can enumerate its elements). A handler that IS declared
+owns all three states — returning `undefined` from it means "cannot tell
+cheaply" and does not fall back to the default.
 
 </MemberCard>
 
@@ -18608,6 +18705,7 @@ optional type?: (ops, options) =>
   | ExpressionType
   | NumericType
   | FunctionSignature
+  | CallbackType
   | ValueType
   | TypeVariable
   | TypeReference
@@ -18660,6 +18758,19 @@ See `OperatorDefinition.eq` for the meaning of `prover`.
 ```ts
 optional neq?: (a, b) => boolean | undefined;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.canEnumerate?
+
+```ts
+optional canEnumerate?: (expr) => boolean | undefined;
+```
+
+The eager producer's enumerability precondition — see the
+`canEnumerate` contract on [OperatorDefinition](#operatordefinition).
 
 </MemberCard>
 
@@ -23040,6 +23151,7 @@ type(type): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -23141,6 +23253,7 @@ createScope(bindings?, parent?): InspectableScope
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -23237,6 +23350,7 @@ declareType(name, type, options?): void
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -23300,6 +23414,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -23319,6 +23434,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23347,6 +23463,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23367,6 +23484,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23388,6 +23506,7 @@ declare(id, def, scope?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -23405,6 +23524,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23433,6 +23553,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23453,6 +23574,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23474,6 +23596,7 @@ declare(id, def, scope?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
 
 ####### scope?
@@ -23506,6 +23629,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -23525,6 +23649,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23553,6 +23678,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23573,6 +23699,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23594,6 +23721,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -23611,6 +23739,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23639,6 +23768,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23659,6 +23789,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
+     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -23680,6 +23811,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
  \}\>\>
 
 ####### arg3?
@@ -26398,6 +26530,39 @@ An empty collection has a size of 0.
 
 <MemberCard>
 
+##### Expression.isEnumerableCollection
+
+```ts
+isEnumerableCollection: boolean | undefined;
+```
+
+Whether `each()` yields this collection's actual elements.
+
+This is the cheap predicate that separates the two reasons `each()` can
+produce nothing:
+
+- `true`: the elements are enumerable, so a walk that yields nothing
+  means the collection is **empty**.
+- `false`: the elements cannot be produced in the current state, so a
+  walk that yields nothing means **nothing at all**. For example
+  `Range(a, b)` with free variables, `Repeat(3, n)` with a symbolic
+  count, or a wrapper over such a source (`Take(Range(a, b), 2)`).
+- `undefined`: undecidable without evaluating — an *eager* collection
+  operator (`Characters(s)`, `UnicodeScalars(s)`) has no collection
+  handlers until it is evaluated, yet `each()` walks it through the
+  materialize-then-iterate path.
+
+Independent of `count`: a collection can know its size and still not be
+enumerable (`Linspace(a, 1, 3)` has a count of 3 and no computable
+elements), and an enumerable collection can have an unknown size.
+
+Answered structurally, without evaluating: O(1) for a leaf, O(depth) for
+a chain of wrappers.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.at()
 
 ```ts
@@ -26872,6 +27037,7 @@ set type(type:
   | ExpressionType
   | NumericType
   | FunctionSignature
+  | CallbackType
   | ValueType
   | TypeVariable
   | TypeReference
@@ -28300,6 +28466,7 @@ new BoxedType(type, typeResolver?): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -28478,13 +28645,23 @@ type: Type;
 readonly isPolymorphic: boolean;
 ```
 
-True when this type is a **polytype**: a signature carrying a `forall`
+True when this type is a **polytype**: a signature carrying a `where`
 clause, or an overload set with at least one such arm.
 
 Computed ONCE, here, at construction: every per-call dispatch check
 (argument validation, result typing) reads this boolean and is O(1) — it
 must never become a tree walk. Polytypes are legal only as signatures, so
 the computation itself is a shallow field test.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.typeResolver
+
+The resolver this type was created with, so a DERIVED boxed type (a
+projection of this one) can be built without losing the ability to name a
+user-declared type.
 
 </MemberCard>
 
@@ -28575,7 +28752,7 @@ True when every value of this type is an `other`.
 **A polymorphic PATTERN is a consistent existential** (D12): the pattern's
 variables are solved against the subject and the match holds iff a
 consistent instantiation exists — so
-`ce.type('(number) -> number').matches('forall T. (T) -> T')` is `true`,
+`ce.type('(number) -> number').matches('(T) -> T where T')` is `true`,
 the probe users actually mean. `couldMatch` deliberately answers `false`
 on the same row (D6's bound-reading, contravariant `any`); the two
 predicates diverge by design.
@@ -28600,6 +28777,7 @@ polymorphic one.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -28631,6 +28809,7 @@ is(other): boolean
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -28676,6 +28855,7 @@ Throws if `other` is a string that is not a valid type.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -28737,10 +28917,41 @@ Throws if `other` is a string that is not a valid type.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
+  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.withDisplayString()
+
+```ts
+withDisplayString(display): BoxedType
+```
+
+A twin of this type that PRINTS as `display()` while remaining, in every
+other respect, byte-identical to this one — same `Type` object, same
+`isPolymorphic`, same subtype/`matches` answers.
+
+This is the whole seam of the R-D5 display projection (Design D §9 item 4):
+the projection is a property of the STRING a type shows a human, never of
+the type itself. Applying it to the `Type` instead — building a boxed type
+around the projected AST — made it semantics-visible: a callback-bearing
+overload set collapsed to `nothing` through `reduceType`, dropping the
+a `where` clause flipped `isPolymorphic` (and with it every `Ground <: Poly`
+answer), and re-validating the projected polytype could THROW out of a
+getter. Deferring to stringification makes all three impossible by
+construction.
+
+`display` is called at most once, on the first print.
+
+####### display
+
+() => `string`
 
 </MemberCard>
 
@@ -29157,7 +29368,7 @@ type TypeVariable = {
 A universally quantified type variable (rank-1).
 
 Only legal inside a function signature; declared and scoped by its arm's
-`forall` clause ([FunctionSignature.typeParams](#typeparams)). A variable is
+`where` clause ([FunctionSignature.typeParams](#typeparams)). A variable is
 **atomic and opaque**: it is never reduced, distributed or collapsed, and it
 is substituted away by instantiation at a call site.
 
@@ -29177,7 +29388,7 @@ How a parameterized NOMINAL type relates two of its applications
 Declared inside a type-parameter clause (`type tree<out T> = …`); the words
 are contextual there and are never reserved. Only a nominal declaration
 carries one — a transparent alias has no declaration-level variance, and a
-`forall` clause never does.
+`where` clause never does.
 
 </MemberCard>
 
@@ -29190,10 +29401,11 @@ type TypeParameter = {
   name: string;
   bound: Type;
   variance: TypeVariance;
+  protocols: string[];
 };
 ```
 
-One entry of a signature's `forall` clause, or of a declared type's
+One entry of a signature's `where` clause, or of a declared type's
 type-parameter clause: the variable's name and its optional declared upper
 bound.
 
@@ -29247,6 +29459,48 @@ type FunctionSignature = {
   result: Type;
 };
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+### CallbackType
+
+```ts
+type CallbackType = {
+  kind: "callback";
+  signature: FunctionSignature;
+};
+```
+
+A **contextual callback** parameter type, spelled `callback<(T) -> boolean>`.
+
+It is the primitive `function` for every admission and subtyping decision,
+and carries — for CONTEXTUAL TYPING only — the signature `S` an INLINE
+`Function` literal at that slot is stamped with
+(`docs/plans/2026-08-09-design-d-generic-callback-signatures.md` §4). Its
+five-clause contract:
+
+1. **Ordinary admission and subtyping see only `function`.** Every subtype
+   query, `.matches` and argument-validation decision treats `callback<S>`
+   as the primitive `function`; `S` plays NO role in admission, so a named
+   callback narrower (or broader) than `S` enters exactly as it does today
+   and errors — or not — per element at application time.
+2. **The contextual domain solve traverses only `S`'s PARAMETER types.**
+3. **Inference from the operand traverses only `S`'s RESULT type** — a named
+   callback's own parameter types must never constrain a type variable.
+4. **Free-variable discovery and substitution retain variables inside `S`**:
+   `callback<(T) -> U>` contributes `T` and `U` to its signature's `where`
+   accounting, and instantiation substitutes inside `S` normally.
+5. **Internal serialization preserves it** (`typeToString`/`parseType`
+   round-trip, dedup keys), even where user-facing display erases it.
+
+Intended for a signature PARAMETER, where it replaces the bare `function`
+primitive a builtin callback slot declares — that is the only position in
+which `S` can do anything, contextual typing being its whole purpose. The
+position is NOT enforced: written anywhere else (a result type, a value's
+declared type, a collection's element type) the constructor simply behaves
+as `function`, by clause 1, and stamps nothing.
 
 </MemberCard>
 
@@ -29509,6 +29763,7 @@ type Type =
   | NumericType
   | NumericPrimitiveType
   | FunctionSignature
+  | CallbackType
   | ValueType
   | TypeVariable
   | TypeReference;
@@ -29541,6 +29796,7 @@ Types are described using the following BNF grammar:
 <primary_type> ::=  <primitive>
                | <tuple_type>
                | <signature>
+               | <callback>
                | <list_type>
                | <set>
                | <broadcastable>
@@ -29617,6 +29873,16 @@ spelling that round-trips through serialization. See {@link EffectSet}.)
 <fixed_size> ::= <positive-integer_literal>
 
 <multi_dimensional_size> ::= <positive-integer_literal> "x" <positive-integer_literal> ("x" <positive-integer_literal>)*
+
+<callback> ::= "callback<" <signature> ">"
+
+(A contextual callback slot. Semantically the primitive `function`; the
+signature it wraps types an inline literal at that position. See
+{@link CallbackType}. Like every other constructor keyword — `list`, `set`,
+`tuple`, `collection`, … — `callback` is RESERVED in APPLIED position: a
+user-declared generic type of that name can be declared but never referenced,
+since `callback<…>` always parses as this production. The BARE spelling is
+unaffected, so `type alias callback = integer` remains usable.)
 
 <set> ::= "set<" <type> ">"
 

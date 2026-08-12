@@ -131,8 +131,8 @@ calls and indexing.
 </ReadMore>
 
 <ReadMore path="/declarations/">
-**Declarations** — names, `let`, `const`, destructuring, scopes, and named
-types.
+**Declarations** — names, `let`, `const`, destructuring, function-type
+annotations that bind their parameters, scopes, and named types.
 </ReadMore>
 
 <ReadMore path="/types/">
@@ -2542,10 +2542,12 @@ expression, so the math form does not take it
 
 _type-declaration_ → **`type`** **`alias`** _symbol_
 \[_type-parameter-clause_\] **`=`** _type_ |
-**`type`** _symbol_ **`=`** _type_
-&nbsp;&nbsp;&nbsp;&nbsp;— only the **`alias`** form takes a clause; the
-`<…>` slot of the bare (nominal) form is reserved and rejected. The clause
-names scope over the definition only, and each must be used in it
+**`type`** _symbol_ \[_type-parameter-clause_\] **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— both forms take a clause (a variance marker such
+as `out T` is legal only on the bare, nominal, form). The clause names scope
+over the definition only, and each must be used in it. Types are global, so
+a _type-declaration_ is only valid at the top level of a program — inside a
+block or function body it is the `type-declaration-not-top-level` error
 
 _while-statement_ → **`while`** _expression_ _block_
 
@@ -2803,7 +2805,7 @@ claims.
 **Words the grammar claims** — the only ones a plain symbol may not spell —
 are the literals `true`, `false`, `Infinity`, `oo`, `NaN`, and the active
 keywords and word operators `break`, `const`, `continue`, `do`, `else`, `for`,
-`function`, `if`, `in`, `match`, `while`.
+`function`, `if`, `in`, `match`, `protocol`, `while`.
 
 Every other reserved word listed below is an ordinary identifier today: it can
 name a binding, be assigned to, be a `|->` parameter, and be called. The words
@@ -2822,7 +2824,7 @@ them as names.
 `namespace`, `NaN`, `native`, `new`, `not`, `of`, `on`, `oo`, `optional`, `or`, `package`,
 `parallel`, `private`, `protected`, `protocol`, `public`, `repeat`, `return`,
 `self`, `set`, `static`, `super`, `switch`, `this`, `throw`, `to`, `true`,
-`try`, `union`, `until`, `using`, `var`, `variant`, `warn`, `when`, `where`,
+`try`, `union`, `until`, `using`, `var`, `variant`, `warn`, `when`,
 `while`, `with`, `xor`, `yield`.
 
 **To write a symbol with the _Verbatim Form_** , put a backtick **`` ` ``**
@@ -3285,6 +3287,11 @@ function to `f`. Typed parameters can be written in parentheses:
 The `MapsTo` name in the table is internal to parsing: it names the operator,
 not the function value the expression produces.
 
+A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
+`(n: integer) -> n^2`, `f = x -> x + 1` — is diagnosed as a wrong-arrow typo
+(with a fixit) and recovered as the intended function: `->` builds a
+`key -> value` pair, and none of those shapes is a valid key.
+
 ## Ranges: `..` {#ranges}
 
 The range operator is a compact spelling of a two-argument `Range`:
@@ -3716,6 +3723,14 @@ arrow:
 ```epsil
 () |-> 42
 ```
+
+Writing `->` where a function was meant — `(x, y) -> x + y`,
+`(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `|->` with a
+fixit and recovers as the intended function, so the program still runs. And
+when a declaration's annotation is a function type with named parameters, the
+lambda can be omitted entirely — `const f : (x: number) -> number = x^2 + 1`
+binds `x` from the annotation. See
+[Function-type annotations](/declarations/#function-type-annotations-bind-their-parameter-names).
 
 ## `if` / `else` {#if-else}
 
@@ -4499,6 +4514,43 @@ an existing one, and takes a type-parameter clause if it needs one
 a reserved word — only these statement shapes claim it. See
 [Declaring a type](/types/#declaring-a-type) for the whole story.
 
+## Function-type annotations bind their parameter names
+
+A parameter name **binds wherever it appears**. When a declaration's
+annotation is a function type written out at the declaration site with named
+parameters, those names become the parameters of the declared function — the
+initializer is its **body**:
+
+```epsil
+const f : (x: number) -> number = x^2 + 2x + 1
+f(3)
+// ➔ 16
+```
+
+This is the same function as `= (x) |-> x^2 + 2x + 1`, and the same as the
+definition form `f(x: number) -> number = x^2 + 2x + 1`. The initializer may
+instead be an explicit lambda; the annotation's names must then agree with the
+lambda's (a disagreement is a diagnostic, with a fixit) — or leave the
+annotation's parameters unnamed, and let the lambda name them:
+
+```epsil
+const g : (number) -> number = (x) |-> x + 1
+```
+
+So a name appears in **one** place (or in both, agreeing) — never with two
+meanings. When the annotation is named, the initializer is read as a pointwise
+*body*; when it is unnamed, the initializer must *be* a function value, as in
+`const h : (number) -> number = g`.
+
+The names bind only where they are **written**: an annotation through a
+`type alias` never binds (its names are documentation), a zero-parameter
+signature has nothing to bind (`const t : () -> number = makeCounter()` keeps
+meaning what it says), and for a curried signature only the **outermost**
+arrow binds — `const add : (x: number) -> (y: number) -> number = (y) |-> x + y`
+binds `x` around an explicit inner lambda. Generic (a `where` clause), effectful,
+optional/variadic, and partially named signatures do not bind either; give
+those an explicit lambda.
+
 ## Reassignment vs. declaration
 
 A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
@@ -4546,6 +4598,11 @@ chain of cells sharing one engine scope) declares at the top level; a block
 introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
 lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
+
+[Type declarations](/types/) are the exception: types (and their
+constructors) are **global** — a `type` statement is only allowed at the top
+level of a program, and the declared name means the same thing everywhere on
+the engine.
 
 `let` and `const` are the binding keywords. There is currently no compound
 assignment (`+=`); destructuring declarations (`let (x, y) = t`) and
@@ -4955,6 +5012,18 @@ function g(x: integer) -> integer { x + 1 }
 (x: integer) |-> x + 1
 ```
 
+A declaration whose annotation is a function type **written out with named
+parameters** binds those names too — the initializer is then the function's
+body, no `|->` needed:
+
+```epsil
+const f : (x: real) -> real = x^2 + 2x + 1
+```
+
+The names bind only when the signature is spelled at the declaration site
+(an alias never binds). See
+[Function-type annotations](/declarations/#function-type-annotations-bind-their-parameter-names).
+
 Everything after the `:` is read as a **type**, not as an expression. That is
 why `<`, `>`, `|`, `&` and `->` mean something different there than they do in
 ordinary code — in `u: integer | boolean` the `|` is a union, not a logical
@@ -5169,8 +5238,8 @@ declared, calling the name reports a `type-not-callable` warning.
 
 ### Constructor functions
 
-A `function` with a declared type's name — in the same scope, after the
-`type` statement — is that type's **constructor function**. The body
+A `function` bearing a declared type's name — after the `type` statement —
+is that type's **constructor function**. The body
 computes the *payload*: a value that must satisfy the type's definition
 (for a record, exactly the definition's keys, each field matching its
 type). The engine checks the payload and tags it; the result is a value of
@@ -5290,17 +5359,30 @@ type polar = tuple<r: number, t: number>
 // ➔ (True, False, False)
 ```
 
-### Scope, and re-running a cell
+### Types are global, and re-running a cell
 
-A type declaration — both the type name and its constructor — lives in the
-current scope, like a `let`. One inside a block or a loop body stays there:
+A type declaration — both the type name and its constructor — is **global**:
+it belongs to the whole program (and to later cells on the same engine), not
+to any block. A type name means the same thing everywhere it appears.
+Consequently a `type` statement is only allowed at the top level of a
+program. Inside a `do` block, a function body, an `if` branch or a loop body
+it is an error:
 
-```epsil-live
-let origin = 0
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
 do {
-  type inner = tuple<number, number>
+  type inner = tuple<number, number> // ✘ type-declaration-not-top-level
   inner(3, 4)
 }
+```
+
+Declare the type at the top level instead, and use it anywhere — inside
+blocks and function bodies included:
+
+```epsil-live
+type inner = tuple<number, number>
+do { inner(3, 4) }
 // ➔ inner(3, 4)
 ```
 
@@ -5366,8 +5448,8 @@ Type(t)
 // ➔ "tree<finite_integer>"
 ```
 
-The constructor is **quantified** — `tree: forall T. (T, list<tree<T>>) ->
-tree<T>` — so `T` is solved at each construction, from the arguments.
+The constructor is **quantified** — `tree: (T, list<tree<T>>) -> tree<T>
+where T` — so `T` is solved at each construction, from the arguments.
 Applying the type at the wrong arity — including a bare `tree` — is the same
 error as for an alias, and a parameter bound is enforced the same way.
 
@@ -5477,8 +5559,26 @@ swap(1, "a")
 ```
 
 A type parameter may carry a ground bound (`function g<T: number>(x: T) -> T`),
-which is enforced at every call. The equivalent full-type spelling is a
-`forall` annotation — `let f: forall T. (T) -> T = x |-> x`.
+which is enforced at every call.
+
+The same clause can be written as a trailing **`where` clause** instead of the
+`<…>` binder. The two spellings are synonyms, and the clause always comes last
+— after the effect specifier and after the return type:
+
+```epsil
+function swap(x: T, y: U) -> tuple<U, T> where T, U { (y, x) }
+function g(x: T) -> T where T: number { x }
+function f(x: T) where T { x }                 // return type inferred
+function tick(x: T) random -> T where T { x }  // with an effect specifier
+f(x: T) -> T where T = x + x                   // math definition form
+```
+
+A declaration has **one binding site**: it may carry a `<…>` clause or a
+`where` clause, never both. `function f<T>(x: T) -> T where T: number` is an
+error, not a bounded `<T: number>`.
+
+A full-type annotation has no binder slot, so it always uses the `where`
+clause — `let f: (T) -> T where T = x |-> x`.
 
 Note that a function is generic only when it is **declared** generic. Nothing
 is silently generalized: `x |-> x` is a function on some inferred type, not an
@@ -5547,7 +5647,7 @@ This system deliberately trades those guarantees away, for two reasons.
 
 First, subtyping and principal types pull against each other. In
 Hindley–Milner, `integer` and `real` simply fail to unify; here, a
-function declared `forall T. (T, T) -> T` called with an `integer` and a
+function declared `(T, T) -> T where T` called with an `integer` and a
 `real` succeeds, solving `T` to their join (a `real`). That is the
 behavior mathematics wants — but once many types are valid for an
 expression, "the single most general one" stops being the useful answer,
@@ -6371,6 +6471,7 @@ const tau = 6.28          // immutable; reassigning yields an Error value
 x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
 f(x) = x^2                // function definition, math style
 square = x |-> x^2        // anonymous function ("|->" is the lambda arrow)
+cube : (x: number) -> number = x^3   // a named function-type annotation binds x
 function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
   t * 2                   // a block's value is its last expression
@@ -6433,7 +6534,7 @@ actually happens → write instead:**
 | `range(1, 5)` excludes end | Inert call + did-you-mean; `Range(1, 5)` **includes** 5: `[1,2,3,4,5]` | `Range(1, n)` or `1..n` for 1…n inclusive |
 | `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
-| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
+| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics; `(x) -> …` is recovered with a did-you-mean-`\|->` fixit | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
 | `cond ? a : b` | Parse diagnostic | `a if cond else b`, or `if cond { a } else { b }` — both are expressions |
 | `elif` | Parse diagnostic | `else if` |
 | `return` | Reserved word, **not implemented** | A block's value is its last expression |
@@ -6900,6 +7001,24 @@ const c = 6.28
     ["KeyValuePair", "constant", "True"]]]
 ```
 
+A **named literal function-type annotation binds the initializer's
+parameters** (the "lambda lift" — see
+[Declarations](/declarations/#function-type-annotations-bind-their-parameter-names)):
+before lowering, the parser wraps a non-lambda initializer in a `Function`
+whose parameters come from the annotation, so the declared value is exactly
+what the explicit `|->` spelling produces:
+
+```epsil
+const f : (x: number) -> number = x + 1
+```
+
+```json
+["Declare", "f", {"str": "(x: number) -> number"},
+  ["Dictionary",
+    ["KeyValuePair", "value", ["Function", ["Add", "x", 1], "x"]],
+    ["KeyValuePair", "constant", "True"]]]
+```
+
 Because declarations lower directly to the engine's own `Declare` primitive,
 there is no separate Epsil-side declaration logic at execution time — the
 program evaluates the `Declare` expression exactly like any other expression.
@@ -6992,9 +7111,12 @@ f(x: integer) -> real = x + 1
 ### Type declarations
 
 A `type` statement lowers to the engine's `DeclareType` operator — the
-MathJSON mirror of `ce.declareType()`. The body is carried as the source text
-of the type. The bare form has no attributes; the `alias` form adds an
-attributes dictionary with `alias -> True`:
+MathJSON mirror of `ce.declareType()`. Types are global, so the statement is
+only legal at the top level of a program: the parser rejects a nested one
+(`type-declaration-not-top-level`), and the engine's `DeclareType` handler
+enforces the same rule for MathJSON built directly. The body is carried as
+the source text of the type. The bare form has no attributes; the `alias`
+form adds an attributes dictionary with `alias -> True`:
 
 ```epsil
 type point = tuple<x: number, y: number>
