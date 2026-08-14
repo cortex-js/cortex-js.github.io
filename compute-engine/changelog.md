@@ -9,6 +9,41 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Epsil
 
+- **Pipeline stages are more concise: implicit first argument, inline
+  lambdas, and implicit `Map`.** Three pipe-stage sugars make
+  `1..oo |> Take(10) |> _^2 |> Sum` (and the spelled-out
+  `… |> Take(_, 10) |> Map(_, _^2) |> Sum`) evaluate to 385:
+
+  - a call stage missing required arguments receives the piped value as
+    its implicit **first argument** (`xs |> Take(10)` ≡
+    `xs |> Take(_, 10)`); a complete call keeps its old meaning, and an
+    explicit `_` still marks the slot the piped value fills;
+  - a `|->` lambda may be written **inline after `|>`** without
+    parentheses — in stage position the arrow binds tighter than the
+    pipe, and the body ends at the next `|>` (so
+    `xs |> x |-> x^2 |> Sum` is `xs |> (x |-> x^2) |> Sum`; previously
+    a `symbol-expected` parse error);
+  - a **one-parameter lambda stage over a collection maps** each
+    element (implicit `Map`), and an operator-written placeholder
+    expression (`_^2`, `_ + 1`) is such a lambda. Named-function stages
+    (`xs |> Sum`), string topics, and lambdas whose authored parameter
+    annotation accepts the whole collection still apply to the whole
+    value; in a call stage `_` remains the piped value
+    (`xs |> Take(_, 3)`).
+
+  The first and third rules live in the engine's `Pipe` operator, so
+  they hold on the MathJSON route too; the lambda-reading of `_^2` is
+  an Epsil-surface (parser) rule.
+
+- **`otherwise` is accepted as the wildcard case of a `match`.** The
+  keyword is a synonym for a bare `_` pattern — `otherwise => "other"`,
+  with or without a guard (`otherwise if c => …`) — and lowers to the
+  same `_` node, so serialization and the irrefutable-non-final-case
+  diagnostic are unchanged. It is contextual, not reserved: recognized
+  only when the bare word is the entire pattern of a case, it remains an
+  ordinary identifier everywhere else (including inside structured
+  patterns, where a bare name binds).
+
 - **A named call to a `:=`-assigned callee no longer draws false static
   diagnostics.** `f := (x: number, y: string) |-> x + 3` followed by
   `f(y: "ok", x: 1)` runs correctly (the assignment pins a signature
@@ -165,6 +200,34 @@ import ChangeLog from '@site/src/components/ChangeLog';
   0.106.0 assignment-narrowing guards are unchanged: declared types are
   never touched, assignment-derived incumbents stay widen-only, and the D11
   incompatible-guess adoption keeps the value's raw type.
+
+### New Features
+
+- **Protocol dispatcher effects are now derived from the registered
+  conformers; a requirement's effect specifier is an opt-in ceiling.** A
+  protocol function requirement with a **bare** specifier no longer acts as
+  a pure ceiling: implementations may carry any effects, and the
+  dispatcher's effect set is the live union of the inferred effects of the
+  registered conforming implementations — pure while every conformer is
+  pure (calls through it stay cacheable and compile-eligible), widened the
+  moment a mutating or drawing conformance registers, with dependent
+  caches recomputing (a call boxed before the registration reports the new
+  effects, and an already-inferred user function whose body calls the
+  member re-derives). The dispatcher's serialized signature snapshots the
+  union as of serialization. A requirement **with** a specifier (including
+  the explicit `pure`) is a durable ceiling: a conformance whose
+  implementation *declares* or whose body *infers* effects beyond it is
+  rejected (`protocol-signature-mismatch` names the exceeded labels and
+  points at the ceiling as the fix site). Registering a conformance that
+  would widen a bare-requirement union past a standing **declared** effect
+  contract — a function annotated `pure` whose body dispatches through the
+  member — is itself rejected (`conformance-widens-declared-contract`,
+  naming every violated dependent and the exceeding labels) and leaves the
+  registry unchanged. Behavior change: an implementation declaring effects
+  against a bare requirement was previously rejected; it is now accepted,
+  by design (`docs/TYPE_SYSTEM_ROADMAP.md` Appendix B, "Changing a field
+  is an effect" — the bare-means-pure ceiling was explicitly rejected
+  there).
 
 ## 0.106.0 _2026-08-13_
 
