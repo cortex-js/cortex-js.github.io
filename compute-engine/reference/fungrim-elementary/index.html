@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.48da2cd8.js" defer="defer"></script>
-<script src="/assets/js/main.8eb58925.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.a471b80e.js" defer="defer"></script>
+<script src="/assets/js/main.1cdcd424.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -158,7 +158,7 @@ Used by the Compute Engine for expansion.
 <hr>
 <p><code class="language-math math-inline">\cos(\arctan(z))=\frac{1}{\sqrt{1+z^2}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/0b829e" target="_blank" rel="noopener noreferrer" class=""><code>0b829e</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\arctan(-z)=-\arctan(z)</code></p>
@@ -190,14 +190,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/268c9e" target="_blank" rel="noopener noreferrer" class=""><code>268c9e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arctan(z)=z\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -z^2)</code></p>
+<p><code class="language-math math-inline">\arctan(z)=z\mathrm{Hypergeometric2F1}(1, \frac{1}{2}, \frac{3}{2}, -z^2)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/34ff28" target="_blank" rel="noopener noreferrer" class=""><code>34ff28</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\arctan(z)^{\prime}(z)=\frac{(-1)^{n}(n-1)!(\frac{1}{(z+\imaginaryI)^{n}}-\frac{1}{(z-\imaginaryI)^{n}})}{2\imaginaryI}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/36171f" target="_blank" rel="noopener noreferrer" class=""><code>36171f</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\arctan(\frac{1}{\sqrt{3}})=\frac{\pi}{6}</code></p>
@@ -211,7 +211,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/47331d" target="_blank" rel="noopener noreferrer" class=""><code>47331d</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\arctan(z)=\frac{1}{2}(\imaginaryI\ln(\frac{1-\imaginaryI z}{1+\imaginaryI z}))</code></p>
@@ -339,7 +339,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\sin(\arctan(z))=\frac{z}{\sqrt{1+z^2}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/d4b0b6" target="_blank" rel="noopener noreferrer" class=""><code>d4b0b6</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\arctan(z)=\mathrm{Csgn}(z)\arccos(\frac{1}{\sqrt{1+z^2}})</code></p>
@@ -368,11 +368,11 @@ Used by the Compute Engine for simplification and equation solving.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/30bd5b" target="_blank" rel="noopener noreferrer" class=""><code>30bd5b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Map}(\rbrack-\infty, -\exponentialE^{-1}\lbrack, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\rbrack0, \pi\lbrack, y\mapsto y\imaginaryI-y\cot(y))</code></p>
+<p><code class="language-math math-inline">\mathrm{Map}(x\mapsto\operatorname{W}(x), \rbrack-\infty, -\exponentialE^{-1}\lbrack)=\mathrm{Map}(y\mapsto y\imaginaryI-y\cot(y), \rbrack0, \pi\lbrack)</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/44ad09" target="_blank" rel="noopener noreferrer" class=""><code>44ad09</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Map}(\lbrace-\exponentialE^{-1}\rbrace, x\mapsto\operatorname{W}(x))=\lbrace-1\rbrace</code></p>
+<p><code class="language-math math-inline">\mathrm{Map}(x\mapsto\operatorname{W}(x), \lbrace-\exponentialE^{-1}\rbrace)=\lbrace-1\rbrace</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/55498b" target="_blank" rel="noopener noreferrer" class=""><code>55498b</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -418,7 +418,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification and equation solving.
 <a href="https://fungrim.org/entry/ed7dac" target="_blank" rel="noopener noreferrer" class=""><code>ed7dac</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Map}(\rbrack-\exponentialE^{-1}, \infty\lbrack, x\mapsto\operatorname{W}(x))=\rbrack-1, \infty\lbrack</code></p>
+<p><code class="language-math math-inline">\mathrm{Map}(x\mapsto\operatorname{W}(x), \rbrack-\exponentialE^{-1}, \infty\lbrack)=\rbrack-1, \infty\lbrack</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ee86fb" target="_blank" rel="noopener noreferrer" class=""><code>ee86fb</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -485,15 +485,15 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/271314" target="_blank" rel="noopener noreferrer" class=""><code>271314</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(-(1/3), \frac{1}{3}, 1, 1))</code></p>
+<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F1}(-(1/3), \frac{1}{3}, 1, 1))</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/68b73d" target="_blank" rel="noopener noreferrer" class=""><code>68b73d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, -(1/2), 1, 1))</code></p>
+<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F1}(\frac{1}{2}, -(1/2), 1, 1))</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a7095f" target="_blank" rel="noopener noreferrer" class=""><code>a7095f</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(-(1/2), -(1/2), 1, 1))</code></p>
+<p><code class="language-math math-inline">\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F1}(-(1/2), -(1/2), 1, 1))</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c6c108" target="_blank" rel="noopener noreferrer" class=""><code>c6c108</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -515,7 +515,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">z^0=1</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/310f36" target="_blank" rel="noopener noreferrer" class=""><code>310f36</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">a^{b}=\exp(b\ln(a))</code></p>
@@ -572,7 +572,7 @@ Used by the Compute Engine for expansion.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/45740a" target="_blank" rel="noopener noreferrer" class=""><code>45740a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">z\mapsto\mathrm{sinc}(z)^{\prime}(z)=-(\frac{1}{3}(z\mathrm{Hypergeometric0F_1}(5/2, -(z^2/4))))</code></p>
+<p><code class="language-math math-inline">z\mapsto\mathrm{sinc}(z)^{\prime}(z)=-(\frac{1}{3}(z\mathrm{Hypergeometric0F1}(5/2, -(z^2/4))))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
@@ -583,7 +583,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/593e63" target="_blank" rel="noopener noreferrer" class=""><code>593e63</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\max(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=1</code></p>
+<p><code class="language-math math-inline">\max(\mathrm{Map}(x\mapsto\mathrm{sinc}(x), \R))=1</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/632d1c" target="_blank" rel="noopener noreferrer" class=""><code>632d1c</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -625,11 +625,11 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d5000a" target="_blank" rel="noopener noreferrer" class=""><code>d5000a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\min(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))</code></p>
+<p><code class="language-math math-inline">\min(\mathrm{Map}(x\mapsto\mathrm{sinc}(x), \R))=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/da7fb1" target="_blank" rel="noopener noreferrer" class=""><code>da7fb1</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{sinc}(z)=\mathrm{Hypergeometric0F_1}(\frac{3}{2}, -(\frac{z^2}{4}))</code></p>
+<p><code class="language-math math-inline">\mathrm{sinc}(z)=\mathrm{Hypergeometric0F1}(\frac{3}{2}, -(\frac{z^2}{4}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
@@ -637,7 +637,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\mathrm{sinc}(-z)=\mathrm{sinc}(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/f19e0a" target="_blank" rel="noopener noreferrer" class=""><code>f19e0a</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{sinc}(z)=\frac{\sin(z)}{z}</code></p>
@@ -682,7 +682,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\sin(\pi+z)=-\sin(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1c22f1" target="_blank" rel="noopener noreferrer" class=""><code>1c22f1</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\sin(z)^{\doubleprime}(z)+\sin(z)=0</code></p>
@@ -700,7 +700,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/244127" target="_blank" rel="noopener noreferrer" class=""><code>244127</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\min(\mathrm{Map}(\R, x\mapsto\sin(x)))=-1</code></p>
+<p><code class="language-math math-inline">\min(\mathrm{Map}(x\mapsto\sin(x), \R))=-1</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/27766c" target="_blank" rel="noopener noreferrer" class=""><code>27766c</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -721,7 +721,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\sin(z+\pi k)=(-1)^{k}\sin(z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land k\in\Z</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/393b62" target="_blank" rel="noopener noreferrer" class=""><code>393b62</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\sin(a+b\imaginaryI)=\sin(a)\cosh(b)+\imaginaryI\cos(a)\sinh(b)</code></p>
@@ -748,7 +748,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/508e2c" target="_blank" rel="noopener noreferrer" class=""><code>508e2c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\sin(z)=z\mathrm{Hypergeometric0F_1}(\frac{3}{2}, \frac{-z^2}{4})</code></p>
+<p><code class="language-math math-inline">\sin(z)=z\mathrm{Hypergeometric0F1}(\frac{3}{2}, \frac{-z^2}{4})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>Hypergeometric0F1</strong> — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
@@ -783,7 +783,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\sin(z)-\cos(z)=\sqrt{2}\sin(z-\frac{\pi}{4})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6c3ba9" target="_blank" rel="noopener noreferrer" class=""><code>6c3ba9</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\sin(3z)=3\sin(z)-4\sin(z)^3</code></p>
@@ -838,10 +838,10 @@ Used by the Compute Engine for expansion.
 <hr>
 <p><code class="language-math math-inline">\vert\sin(x+\imaginaryI y)\vert=\sqrt{\sin(x)^2+\sinh(y)^2}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/abaf91" target="_blank" rel="noopener noreferrer" class=""><code>abaf91</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n-1/2))</code></p>
+<p><code class="language-math math-inline">\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\mathrm{Map}(n\mapsto\pi(2n-1/2), \Z)</code></p>
 <p><strong>Symbols:</strong> <strong>ArgMin</strong> — Locations of minimum value.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ad04bd" target="_blank" rel="noopener noreferrer" class=""><code>ad04bd</code> · Fungrim entry ↗</a></p>
@@ -865,7 +865,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bae475" target="_blank" rel="noopener noreferrer" class=""><code>bae475</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\max(\mathrm{Map}(\R, x\mapsto\sin(x)))=1</code></p>
+<p><code class="language-math math-inline">\max(\mathrm{Map}(x\mapsto\sin(x), \R))=1</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/bfe28b" target="_blank" rel="noopener noreferrer" class=""><code>bfe28b</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -873,7 +873,7 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c52772" target="_blank" rel="noopener noreferrer" class=""><code>c52772</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n+\frac{1}{2}))</code></p>
+<p><code class="language-math math-inline">\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\mathrm{Map}(n\mapsto\pi(2n+\frac{1}{2}), \Z)</code></p>
 <p><strong>Symbols:</strong> <strong>ArgMax</strong> — Locations of maximum value.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c5bdcc" target="_blank" rel="noopener noreferrer" class=""><code>c5bdcc</code> · Fungrim entry ↗</a></p>
@@ -929,7 +929,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\sin(z)+\cos(z)=\sqrt{2}\sin(z+\frac{\pi}{4})</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/f183d0" target="_blank" rel="noopener noreferrer" class=""><code>f183d0</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\sin(a)^2-\cos(b)^2=-\cos(a+b)\cos(a-b)</code></p>
@@ -945,7 +945,7 @@ Used by the Compute Engine for simplification.
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="square-roots">Square roots<a href="#square-roots" class="hash-link" aria-label="Direct link to Square roots" title="Direct link to Square roots" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\sqrt{z}^2=z</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0984ef" target="_blank" rel="noopener noreferrer" class=""><code>0984ef</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\sqrt{\imaginaryI}=\frac{1+\imaginaryI}{\sqrt{2}}</code></p>
@@ -969,7 +969,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\arg(\sqrt{z})=\frac{\arg(z)}{2}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/22e0be" target="_blank" rel="noopener noreferrer" class=""><code>22e0be</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">z\mapsto\sqrt{z}^{\prime}(z)=\frac{1}{2\sqrt{z}}</code></p>

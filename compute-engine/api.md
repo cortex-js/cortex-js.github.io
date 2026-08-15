@@ -980,6 +980,7 @@ type(type): BoxedType
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -1082,6 +1083,7 @@ createScope(bindings?, parent?): InspectableScope
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -1179,6 +1181,7 @@ declareType(name, type, options?): void
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -1243,6 +1246,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -1263,6 +1267,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1292,6 +1297,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1313,6 +1319,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1354,6 +1361,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1383,6 +1391,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1404,6 +1413,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1460,6 +1470,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -1480,6 +1491,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1509,6 +1521,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1530,6 +1543,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1571,6 +1585,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1600,6 +1615,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -1621,6 +1637,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -2635,6 +2652,39 @@ engine expression terms.
 
 This is convenient when creating new expressions from portions
 of an existing `Expression` while avoiding unboxing and reboxing.
+
+</MemberCard>
+
+### ObjectInterface
+
+Narrowed interface for **object** expressions — the engine's one mutable
+value kind (a reference to a record whose stored fields can be changed in
+place).
+
+Obtained via `isObject()`. The instance IS the heap record: host reference
+identity of the expression is object identity, so every comparison tier
+(`isSame`, `isEqual`, `isIdenticallyEqual`) answers `a === b` for objects,
+and no code path may clone, rebuild or re-box one.
+
+The members below are engine-internal (they are how the property-access
+operators and the serialization walk reach the slots); user code reads and
+writes fields through the language's property syntax, not through these.
+
+Design: `docs/plans/2026-08-14-object-representation-decision.md`;
+semantics: `docs/TYPE_SYSTEM_ROADMAP.md` Appendix B.
+
+<MemberCard>
+
+##### ObjectInterface.typeName
+
+```ts
+readonly typeName: string;
+```
+
+The name of the nominal type this object was constructed with. The
+resolved type itself is pinned on the instance and returned by `.type`;
+this is the name that rides serialization (the `Object` provenance head
+and `CircularReference` markers).
 
 </MemberCard>
 
@@ -4653,6 +4703,7 @@ type OperatorDefinitionFlags = {
   scoped: boolean | BindingSiteSelector;
   broadcastable: boolean;
   inspectsErrors: boolean;
+  namedArgumentsRequired: boolean;
   missingBehavior: "reject" | "propagate" | "handle";
   missingStrip: "all" | number[];
   associative: boolean;
@@ -4834,6 +4885,7 @@ optional type?: (ops, options) =>
   | SetType
   | BroadcastableType
   | RecordType
+  | ObjectType
   | DictionaryType
   | TupleType
   | SymbolType
@@ -8593,6 +8645,7 @@ type ProtocolRecord = {
   members: Record<string, ProtocolMember>;
   conformances: ConformanceRecord[];
   declaredByStatement: boolean;
+  _declOrigin: DeclarationOrigin;
 };
 ```
 
@@ -9557,6 +9610,7 @@ type(type): BoxedType
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -9659,6 +9713,7 @@ createScope(bindings?, parent?): InspectableScope
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -9756,6 +9811,7 @@ declareType(name, type, options?): void
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -9820,6 +9876,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -9840,6 +9897,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -9869,6 +9927,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -9890,6 +9949,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -9931,6 +9991,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -9960,6 +10021,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -9981,6 +10043,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10037,6 +10100,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -10057,6 +10121,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10086,6 +10151,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10107,6 +10173,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10148,6 +10215,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10177,6 +10245,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -10198,6 +10267,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
+     \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
      \| [`SymbolType`](#symboltype)
@@ -13462,6 +13532,7 @@ set type(type:
   | SetType
   | BroadcastableType
   | RecordType
+  | ObjectType
   | DictionaryType
   | TupleType
   | SymbolType
@@ -14891,6 +14962,7 @@ new BoxedType(type, typeResolver?): BoxedType
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -15202,6 +15274,7 @@ polymorphic one.
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -15234,6 +15307,7 @@ is(other): boolean
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -15280,6 +15354,7 @@ Throws if `other` is a string that is not a valid type.
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -15342,6 +15417,7 @@ Throws if `other` is a string that is not a valid type.
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
   \| [`SymbolType`](#symboltype)
@@ -15618,6 +15694,7 @@ type PrimitiveType =
   | "set"
   | "dictionary"
   | "record"
+  | "object"
   | "tuple"
   | "value"
   | "scalar"
@@ -15741,6 +15818,7 @@ type EffectLabel =
   | "network"
   | "random"
   | "scope"
+  | "state"
   | "time";
 ```
 
@@ -15997,6 +16075,47 @@ subtyping). It may contain additional keys.
 
 <MemberCard>
 
+### ObjectType
+
+```ts
+type ObjectType = {
+  kind: "object";
+  elements: Record<string, Type>;
+};
+```
+
+The stored-field layout of an **object** type — the engine's one mutable
+value kind.
+
+Structurally this looks like [RecordType](#recordtype), and the two are read the
+same way (an ordered map from field name to field type), but they behave in
+opposite ways, and the difference is deliberate:
+
+- An object type is **nominal**. This shape is only ever the definition
+  (`def`) of a declared [TypeReference](#typereference): `type Person = object<…>`.
+  Two object types with identical layouts are unrelated, because a store
+  through one view would break the other's declared field types (write
+  `1.5` into an `object<count: integer>` viewed as `object<count: number>`).
+  The nominal reference is what supplies that opacity; this shape only
+  carries the layout.
+- Every field is a read/write position, so a field type is **invariant**:
+  two object layouts relate only when every field type is mutually equal,
+  and a type variable occurring in a field verifies only as `inout`.
+
+The bare primitive `'object'` means "any object" and is the one common
+bound every declared object type is a subtype of. It sits BESIDE `record`
+in the lattice and is disjoint from it — sibling categories, one
+immutable/structural, one mutable/nominal — and is deliberately not a
+collection.
+
+Spec: `docs/TYPE_SYSTEM_ROADMAP.md` Appendix B, "Declaring an object type",
+"No subtyping between object types", "Generic object types" (ruling B13),
+and the lattice bullet of "The rest of the system" (ruling B6).
+
+</MemberCard>
+
+<MemberCard>
+
 ### DictionaryType
 
 ```ts
@@ -16171,10 +16290,41 @@ type TypeReference = {
      name: string;
      typeParams: string[];
     }[];
+  _declOrigin: DeclarationOrigin;
 };
 ```
 
 Nominal typing
+
+</MemberCard>
+
+<MemberCard>
+
+### DeclarationOrigin
+
+```ts
+type DeclarationOrigin = {
+  batch: number;
+  statementId: unknown;
+  firstRange: [number, number];
+};
+```
+
+Which compilation unit and which declaring statement a registry record came
+from — the runtime half of the redefinition discipline
+(`docs/plans/2026-08-14-redefinition-discipline.md`, "Mechanics").
+
+A second declaration of a name with the SAME `batch` and a DIFFERENT
+`statementId` is a within-unit redefinition and is refused; the same
+`statementId` re-registering is the same statement declaring itself again
+(one statement registers up to three times per batch — the static pre-pass
+canonicalizes it, then the evaluation loop canonicalizes and evaluates it)
+and is accepted.
+
+`statementId` is an opaque IDENTITY token, compared with `!==` and never
+inspected: the raw (uncanonicalized) name operand the `Declare*` handlers
+thread from their canonical handler into their evaluate handler. It is typed
+`unknown` so this engine-free module needs no expression type.
 
 </MemberCard>
 
@@ -16192,6 +16342,7 @@ type Type =
   | SetType
   | BroadcastableType
   | RecordType
+  | ObjectType
   | DictionaryType
   | TupleType
   | SymbolType

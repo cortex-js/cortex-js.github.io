@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.48da2cd8.js" defer="defer"></script>
-<script src="/assets/js/main.8eb58925.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.a471b80e.js" defer="defer"></script>
+<script src="/assets/js/main.1cdcd424.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -43,7 +43,7 @@
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3b8c97" target="_blank" rel="noopener noreferrer" class=""><code>3b8c97</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))</code></p>
+<p><code class="language-math math-inline">\mathrm{DirichletGroup}(q)=\mathrm{Map}(\ell\mapsto\mathrm{DirichletCharacter}(q, \ell), \mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">q\in\N^*</code>.
 <strong>Symbols:</strong> <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DirichletGroup</strong> — Dirichlet characters with given modulus.
 Used by the Compute Engine for simplification.
@@ -55,7 +55,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4cf4e4" target="_blank" rel="noopener noreferrer" class=""><code>4cf4e4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\begin{cases}10&amp;p=40\,487\\7&amp;p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1))&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\begin{cases}10&amp;p=40\,487\\7&amp;p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1))&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}</code>.
 <strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
 Used by the Compute Engine for simplification.
@@ -67,7 +67,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/62f7d5" target="_blank" rel="noopener noreferrer" class=""><code>62f7d5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1\land\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p^2))=p(p-1)))</code></p>
+<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p(p-1)))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land p\ge3</code>.
 <strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
 Used by the Compute Engine for simplification.
@@ -220,7 +220,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5bdba2" target="_blank" rel="noopener noreferrer" class=""><code>5bdba2</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)/a^2</code></p>
+<p><code class="language-math math-inline">\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F2}(1, a, a, a+1, a+1, 1)/a^2</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\setminus\Z_{\le0}</code>.
 <strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -264,7 +264,7 @@ Used by the Compute Engine for simplification.
 <p><code class="language-math math-inline">\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=2^{s}(2^{s}-1)\Zeta(s)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C\land s\ne1</code>.
 <strong>Symbols:</strong> <strong>HurwitzZeta</strong> — Hurwitz zeta function.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/8bbb6f" target="_blank" rel="noopener noreferrer" class=""><code>8bbb6f</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{HurwitzZeta}(3, \frac{1}{2})=7\Zeta(3)</code></p>
@@ -473,7 +473,7 @@ Used by the Compute Engine for simplification.
 <p><code class="language-math math-inline">\mathrm{StieltjesGamma}(0, a)=-\mathrm{Digamma}(a)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\C\land a\notin\Z_{\le0}</code>.
 <strong>Symbols:</strong> <strong>StieltjesGamma</strong> — Stieltjes constant.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/b6808d" target="_blank" rel="noopener noreferrer" class=""><code>b6808d</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{KeiperLiLambda}(1)=(\frac{\operatorname{EulerGamma}}{2}+1)-\frac{\ln(4\pi)}{2}</code></p>

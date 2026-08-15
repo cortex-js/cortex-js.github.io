@@ -38,7 +38,7 @@ $$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-{(x^2-1)}^{1/
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`0cbe75` · Fungrim entry ↗](https://fungrim.org/entry/0cbe75)
 
 ---
@@ -97,7 +97,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, x)=\mathrm{Hypergeometric2F_1}(-n, n, \frac{1}{2}, \frac{1-x}{2})$$
+$$\mathrm{ChebyshevT}(n, x)=\mathrm{Hypergeometric2F1}(-n, n, \frac{1}{2}, \frac{1-x}{2})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -291,7 +291,7 @@ $$\mathrm{ChebyshevT}(-n, x)=\mathrm{ChebyshevT}(n, x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`9093a3` · Fungrim entry ↗](https://fungrim.org/entry/9093a3)
 
 ---
@@ -377,7 +377,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n, x)=(n+1)\mathrm{Hypergeometric2F_1}(-n, n+2, \frac{3}{2}, \frac{1-x}{2})$$
+$$\mathrm{ChebyshevU}(n, x)=(n+1)\mathrm{Hypergeometric2F1}(-n, n+2, \frac{3}{2}, \frac{1-x}{2})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -529,7 +529,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\frac{z-1}{2}^{n}\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})$$
+$$\mathrm{LegendrePolynomial}(n, z)=\frac{z-1}{2}^{n}\mathrm{Hypergeometric2F1}(-n, -n, 1, \frac{z+1}{z-1})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 Used by the Compute Engine for simplification.
@@ -570,7 +570,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, z)=\frac{(-1)^{n}\binom{2n}{n}\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, z)=\frac{(-1)^{n}\binom{2n}{n}\mathrm{Hypergeometric2F1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -578,7 +578,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{(-1)^{n}(2n+1)\binom{2n}{n}}{4^{n}}z\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)$$
+$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{(-1)^{n}(2n+1)\binom{2n}{n}}{4^{n}}z\mathrm{Hypergeometric2F1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -602,7 +602,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, n+1, 1, \frac{1-z}{2})$$
+$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F1}(-n, n+1, 1, \frac{1-z}{2})$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -613,7 +613,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LegendrePolynomial}(3, z)=\frac{1}{2}(5z^3-3z)$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`9b7f05` · Fungrim entry ↗](https://fungrim.org/entry/9b7f05)
 
 ---
@@ -658,7 +658,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\binom{2n}{n}\frac{z}{2}^{n}\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})$$
+$$\mathrm{LegendrePolynomial}(n, z)=\binom{2n}{n}\frac{z}{2}^{n}\mathrm{Hypergeometric2F1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.

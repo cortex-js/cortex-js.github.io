@@ -7,14 +7,13 @@ Source: https://epsil.dev/introduction/
 # Epsil
 
 <Intro>
-Epsil is a programming language for scientific computing, built on the
-Compute Engine.
+A programming language for scientific computing
 </Intro>
 
 :::warning[Experimental]
-Epsil is available as an **experimental** entry point. Its syntax and
-semantics may change between releases while the language is being exercised in
-notebooks and other applications.
+Epsil is still being developed. Its syntax and semantics may change between 
+releases while the language is being exercised by early adopters. Your feedback
+can help shape its direction.
 :::
 
 Epsil is embedded from JavaScript through the
@@ -159,18 +158,12 @@ lowers to. Not needed to write Epsil.
 
 ## Collections
 
-Epsil has literal syntax for lists, sets and dictionaries.
+Epsil has literal syntax for lists and dictionaries.
 
 **Lists** are ordered and 1-indexed with `xs[i]`:
 
 ```epsil-live
 [3, 5, 7, 11]
-```
-
-**Sets** are unordered collections of unique elements:
-
-```epsil-live
-{3, 5, 7, 11}
 ```
 
 **Dictionaries** are sets of key/value pairs. The empty dictionary is `{->}`:
@@ -252,7 +245,7 @@ Save this program as `squares.epsil`:
 
 ```epsil
 square(x) = x^2
-Map(1..5, square)
+Map(square, 1..5)
 ```
 
 Run it:
@@ -439,7 +432,7 @@ Anonymous functions use `|->`. They are especially useful for a small
 transformation passed to a collection operator:
 
 ```epsil
-Map(1..5, n |-> n^2)
+Map(n |-> n^2, 1..5)
 // ➔ [1, 4, 9, 16, 25]
 ```
 
@@ -481,7 +474,7 @@ endpoints. Use a pipeline when data goes through several transformations:
 ```epsil
 1..10
   |> Filter(_, n |-> n % 2 == 0)
-  |> Map(_, n |-> n^2)
+  |> Map(n |-> n^2, _)
   |> Sum
 // ➔ 220
 ```
@@ -563,7 +556,7 @@ A few idioms these programs rely on:
   `Map`/`Filter`/`Reduce` for value-producing iteration.
 - `1..n` is the **inclusive** range from 1 to n, and `x |> f` pipes a value
   into a function — when the function takes several arguments, `_` marks the
-  piped value's slot (`xs |> Map(_, f)`).
+  piped value's slot (`xs |> Map(f, _)`).
 - `a if c else b` is the conditional expression — the same `If` as
   `if c { a } else { b }`, without the braces.
 - Collection **literals** evaluate their elements; lazy **operators**
@@ -594,11 +587,12 @@ total
 is a single `Map` — no printing, no mutation:
 
 ```epsil
-Map(1..15, k |->
+Map(k |->
   if k % 15 == 0 { "FizzBuzz" }
   else if k % 3 == 0 { "Fizz" }
   else if k % 5 == 0 { "Buzz" }
-  else { k })
+  else { k },
+  1..15)
 // ➔ [1, 2, "Fizz", 4, "Buzz", "Fizz", 7, 8, "Fizz", "Buzz", 11, "Fizz", 13, 14, "FizzBuzz"]
 ```
 
@@ -702,8 +696,8 @@ let y = 5
 **A truth table**, as a `Map` over the four boolean pairs:
 
 ```epsil
-Map([(True, True), (True, False), (False, True), (False, False)],
-    p |-> p[1] && p[2])
+Map(p |-> p[1] && p[2],
+    [(True, True), (True, False), (False, True), (False, False)])
 // ➔ [True, False, False, False]
 ```
 
@@ -765,7 +759,7 @@ fact(10)
 fib(0) = 0
 fib(1) = 1
 fib(n: integer) = fib(n - 1) + fib(n - 2)
-Map(1..10, fib)
+Map(fib, 1..10)
 // ➔ [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
 ```
 
@@ -982,7 +976,7 @@ $e^{i\pi/3}$
 imaginary part: (1+i)(2+i)(3+i) = 10i:
 
 ```epsil
-Product(Map(Range(1, 3), k |-> k + i))
+Product(Map(k |-> k + i, Range(1, 3)))
 // ➔ 10i
 ```
 
@@ -1024,7 +1018,7 @@ the polynomial:
 
 ```epsil
 let roots = Solve(x^2 - 5x + 6 == 0, x)
-Map(roots, r |-> r^2 - 5r + 6)
+Map(r |-> r^2 - 5r + 6, roots)
 // ➔ [0, 0]
 ```
 
@@ -1127,7 +1121,7 @@ per value, folded onto the header with `StringJoin` in a pipeline:
 
 ```epsil
 let header = "n\tn^2\tn^3\n"
-1..5 |> Map(_, n |-> "\(n)\t\(n^2)\t\(n^3)\n") |> Fold(StringJoin, header, _)
+1..5 |> Map(n |-> "\(n)\t\(n^2)\t\(n^3)\n", _) |> Fold(StringJoin, header, _)
 ```
 
 produces (tabs aligned, newline-separated rows):
@@ -1165,7 +1159,7 @@ into its code points, `Map` shifts each, and `StringFrom(…, "unicode-scalars")
 rebuilds the string. Shifting back decodes, so the cipher round-trips:
 
 ```epsil
-shift(s, k) = s |> UnicodeScalars |> Map(_, c |-> c + k) |> StringFrom(_, "unicode-scalars")
+shift(s, k) = s |> UnicodeScalars |> Map(c |-> c + k, _) |> StringFrom(_, "unicode-scalars")
 (shift("hello", 3), shift(shift("hello", 3), -3))
 // ➔ ("khoor", "hello")
 ```
@@ -1234,6 +1228,23 @@ fills. The primes below 100, counted:
 // ➔ 25
 ```
 
+If the slot can be inferred based on the type of the previous argument, it can be left out:
+
+```epsil
+1..100 |> Filter(IsPrime) |> Length
+// ➔ 25
+```
+
+And a lambda is automatically converted to a map:
+
+```epsil
+1..100 |> x |-> x^2
+
+// Shorthand for:
+1..100 |> Map(x |-> x^2, _)
+```
+
+
 **Spread arguments.** In a call argument list, `...t` splices the elements of
 the tuple `t` in as positional arguments; several spreads splice in order:
 
@@ -1278,7 +1289,7 @@ computation — it surfaces as `NaN` while the valid inputs still compute. Here
 
 ```epsil
 let inputs = [16, -4, "banana", 81]
-Map(inputs, x |-> Sqrt(x))
+Map(x |-> Sqrt(x), inputs)
 // ➔ [4, 2i, NaN, 9]
 ```
 
@@ -1627,7 +1638,7 @@ identifiers denote user-defined variables and functions.
 ```epsil
 Sin(x)
 Simplify(2 + 3x^3)
-Map([1, 2, 3], x |-> x^2)
+Map(x |-> x^2, [1, 2, 3])
 ```
 
 `Sin`, `Simplify`, and `Map` are library operators; `x` is an ordinary user
@@ -1786,7 +1797,7 @@ sum(n**2 for n in range(1, 11) if n % 2 == 1)
 ```
 
 ```epsil
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(_, n |-> n^2) |> Sum
+1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
 // ➔ 165
 ```
 
@@ -1797,7 +1808,7 @@ time, so the same "late binding in a closure" surprise applies:
 
 ```epsil
 let n = 1
-let m = Map(1..3, k |-> k * n)
+let m = Map(k |-> k * n, 1..3)
 n = 10
 Sum(m)
 // ➔ 60
@@ -1849,7 +1860,7 @@ classify(n) = match n {
   k if k > 0 => "positive"
   _ => "negative"
 }
-Map([-2, 0, 5], classify)
+Map(classify, [-2, 0, 5])
 // ➔ ["negative", "zero", "positive"]
 ```
 
@@ -1900,7 +1911,7 @@ is the one numeric answer that differs on values you are likely to type:
 Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 
 ```epsil
-([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(1..4, k |-> k^2)))
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k |-> k^2, 1..4)))
 // ➔ ([2,3,4], [4,10,18], 30)
 ```
 
@@ -1937,7 +1948,7 @@ There are no exceptions. A runtime problem becomes an ordinary
 not abort the rest of the work:
 
 ```epsil
-Map([16, -4, "banana", 81], x |-> Sqrt(x))
+Map(x |-> Sqrt(x), [16, -4, "banana", 81])
 // ➔ [4, 2i, NaN, 9]
 ```
 
@@ -2102,7 +2113,7 @@ by exact value, so `0.5 === 1/2` is `True` too.
 | `Total[xs]` | `Sum(xs)` |
 | `Select[xs, f]` | `Filter(xs, f)` |
 | `Count[xs, v]`, `Count[xs, f]` | `Count(xs, v)`, `Count(xs, f)` — `Count(xs)` is the length |
-| `Map[f, xs]`, `f /@ xs` | `Map(xs, f)` — collection **first** |
+| `Map[f, xs]`, `f /@ xs` | `Map(f, xs)` — same order |
 | `Fold[f, init, xs]` | `Fold(f, init, xs)` |
 | `Apply[f, {a, b}]`, `f @@ t` | `Apply(f, (a, b))`, or spread: `f(...t)` |
 | `Position[xs, v]` | `IndexOf(xs, v)` |
@@ -2175,7 +2186,7 @@ you want an ordinary list, index it, aggregate it, or build it with `Map`:
 
 ```epsil
 let g = x |-> x^2 + 1
-(g(3), Sum(Map(1..4, g)))
+(g(3), Sum(Map(g, 1..4)))
 // ➔ (10, 34)
 ```
 
@@ -2203,7 +2214,7 @@ classify(z) = match z {
   n if n > 0 => "positive"
   _ => "negative"
 }
-Map([-2, 0, 5], classify)
+Map(classify, [-2, 0, 5])
 // ➔ ["negative", "zero", "positive"]
 ```
 
@@ -2511,7 +2522,7 @@ _parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
 
 _effect-label_ → **`console`** | **`entropy`** | **`environment`** |
 **`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
-**`scope`** | **`time`**
+**`scope`** | **`state`** | **`time`**
 
 _effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
 &nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
@@ -2637,7 +2648,8 @@ f()
 ```
 
 An argument may be prefixed with `...` to spread a tuple's elements into the
-call's arguments (valid only in call argument lists — see
+call's arguments (`...` is also valid in list, set, and dictionary
+literals, where it splices non-tuple collections — see
 [Spread](/operators/#spread)):
 
 ```epsil
@@ -3250,16 +3262,17 @@ A stage that takes more than one argument is written as a call, with `_` in the
 slot the piped value fills:
 
 ```epsil-live
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(_, n |-> n^2) |> Sum
+1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
 // ➔ 165
 ```
 
-The `_` may be left out when it would fill the **first** slot: a call stage
-that is missing required arguments receives the piped value as its implicit
-first argument, so `xs |> Take(10)` means `xs |> Take(_, 10)`. This only
-fills a hole — a call that is already complete keeps its ordinary meaning,
-and an explicit `_` anywhere in the call says exactly where the piped value
-goes.
+The `_` may be left out: a call stage that is missing required arguments
+receives the piped value in the first slot its type fits, so
+`xs |> Take(10)` means `xs |> Take(_, 10)` and `xs |> Map(f)` means
+`xs |> Map(f, _)` (the mapping function is `Map`'s first argument). This
+only fills a hole — a call that is already complete keeps its ordinary
+meaning, and an explicit `_` anywhere in the call says exactly where the
+piped value goes.
 
 A stage may also be a **lambda**, written inline without parentheses — after
 `|>` the arrow binds tighter than the pipe, and the lambda's body ends at the
@@ -3268,7 +3281,7 @@ is applied **to each element** (an implicit `Map`); `_^2` is shorthand for
 such a lambda. The following three pipelines are equivalent:
 
 ```epsil-live
-1..oo |> Take(_, 10) |> Map(_, _^2) |> Sum
+1..oo |> Take(_, 10) |> Map(_^2, _) |> Sum
 // ➔ 385
 ```
 
@@ -3404,9 +3417,14 @@ call `Range(a, b, step)`.
 
 ## Spread: `...` {#spread}
 
-In a **call argument list** — and only there — a prefix `...` spreads a tuple
-into the call's arguments: the tuple's elements become ordinary positional
-arguments.
+A prefix `...` splices a value's elements into the surrounding sequence. It
+is accepted in two positions — a **call argument list** and a **list
+literal** — and the three-dot token is distinct from the range operator
+`..`; anywhere else `...` is a diagnostic. (In a `match` pattern, `...rest`
+is the same idea in reverse: it *collects* the remaining elements.)
+
+In a **call argument list**, `...` spreads a tuple into the call's
+arguments: the tuple's elements become ordinary positional arguments.
 
 ```epsil
 f(...t)          // t's elements become f's arguments
@@ -3415,12 +3433,65 @@ g(...p, ...q)    // several spreads splice in order
 Max(...t)        // variadic built-ins accept spreads
 ```
 
-Only **tuples** spread — a `List` (or any other value) is an
-`incompatible-type` error. A literal tuple splices immediately; a symbolic
-argument is spliced when the call evaluates, and until then the call stays
-symbolic (the spread never binds positionally to a single parameter). The
-three-dot token is distinct from the range operator `..`; outside an argument
-list `...` is a diagnostic.
+In a call, only **tuples** spread — argument lists are tuple-shaped, so a
+`List` (or any other value) is an `incompatible-type` error. A literal tuple
+splices immediately; a symbolic argument is spliced when the call evaluates,
+and until then the call stays symbolic (the spread never binds positionally
+to a single parameter).
+
+In a **list or set literal**, `...` splices a collection — a list, a set, a
+range:
+
+```epsil-live
+let xs = [1, 2]
+[...xs, 3, ...(4..6)]
+// ➔ [1, 2, 3, 4, 5, 6]
+```
+
+```epsil-live
+let s = {2, 3}
+{1, ...s, ...[3, 4]}
+// ➔ Set(1, 2, 3, 4)
+```
+
+The splice happens at canonicalization: literal collections splice
+immediately, and a symbolic or lazy segment lowers to the equivalent
+`Join` expression — a lone spread `[...xs]` is `Join(xs)`, the list
+materialization of `xs`, and an infinite segment stays lazy
+(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
+usual.
+
+**Tuples do not spread here** — a tuple is a unit (a point, a pair), and
+splicing it would quietly discard that; spreading one is a `spread-tuple`
+error. To use a tuple's elements, convert explicitly:
+`[...ListFrom(t), 3]`. A scalar or string operand is an
+`incompatible-type` error (a string is a scalar, not a character
+collection). Note the mirror-image rule in calls: argument lists are
+tuple-shaped, so there exactly tuples spread.
+
+In a **dictionary literal**, `...` merges the entries of a dictionary.
+Entries combine left to right and a **later entry wins** on a key
+collision — so a literal entry after a spread overrides it, the usual
+defaults idiom:
+
+```epsil-live
+let defaults = {"verbose" -> false, "depth" -> 3}
+{...defaults, "verbose" -> true}
+// ➔ {"dict":{"verbose":true,"depth":3}}
+```
+
+(Duplicate **literal** keys are different: they are almost certainly typos,
+so they keep the literal rule — first wins, with a
+`duplicate-dictionary-key` diagnostic.)
+
+A brace of *only* spreads has nothing to mark it as a dictionary, so it is
+read as a **set**-spread. To write a pure merge, lead with the bare `->`
+marker (the same marker as the empty dictionary `{->}`):
+
+```epsil
+{...a, ...b}        // a SET containing the elements of a and b
+{->, ...d1, ...d2}  // a dictionary merge of d1 and d2
+```
 
 ## Unary prefix: `-` and `!` {#unary-prefix}
 
@@ -3710,7 +3781,7 @@ body:
   expression — a local `let`, a `match`, a loop. It is also the only form that
   carries a name *and* a multi-statement body.
 - **Anonymous** (`x |-> …`) when the function is an argument to another
-  function and a name would add nothing: `Map(xs, x |-> x^2)`.
+  function and a name would add nothing: `Map(x |-> x^2, xs)`.
 
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
@@ -3725,9 +3796,9 @@ sits after the parameter list and before the return arrow:
 function roll(n) random -> integer { Random(n) }
 ```
 
-The nine effect labels are `console`, `entropy`, `environment`, `fs_read`,
-`fs_write`, `network`, `random`, `scope`, and `time`. Several labels may be
-listed with spaces. `pure` explicitly promises no effects; `any` means the
+The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
+`fs_write`, `network`, `random`, `scope`, `state`, and `time`. Several
+labels may be listed with spaces. `pure` explicitly promises no effects; `any` means the
 effects are unknown. `pure` and `any` must appear alone.
 
 Without a specifier, effects are inferred from the body and may change when
@@ -4293,7 +4364,7 @@ Nested calls:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-Mean(Map(Filter(scores, s |-> s >= 60), s |-> s + 5))
+Mean(Map(s |-> s + 5, Filter(scores, s |-> s >= 60)))
 // ➔ 337/4
 ```
 
@@ -4302,7 +4373,7 @@ Named intermediates:
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
 let passing = Filter(scores, s |-> s >= 60)
-let curved = Map(passing, s |-> s + 5)
+let curved = Map(s |-> s + 5, passing)
 Mean(curved)
 // ➔ 337/4
 ```
@@ -4311,7 +4382,7 @@ A pipeline:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-scores |> Filter(_, s |-> s >= 60) |> Map(_, s |-> s + 5) |> Mean
+scores |> Filter(_, s |-> s >= 60) |> Map(s |-> s + 5, _) |> Mean
 // ➔ 337/4
 ```
 
@@ -4340,13 +4411,14 @@ argument:
 // ➔ [1, 2]
 ```
 
-When the piped value would fill the **first** slot, the `_` may be left out:
-a call that is missing required arguments receives the piped value as its
-implicit first argument, so these are the same pipeline:
+The `_` may be left out entirely: a call that is missing required arguments
+receives the piped value in the first slot its type fits — first for a
+collection piped into `Take(3)`, second for one piped into the
+callback-first `Map(f)` — so these are the same pipeline:
 
 ```epsil
-[1, 2, 3] |> Map(_, n |-> n^2)      // [1, 4, 9]
-[1, 2, 3] |> Map(n |-> n^2)         // [1, 4, 9] — implicit first argument
+[1, 2, 3] |> Map(n |-> n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> Map(n |-> n^2)         // [1, 4, 9] — implicit argument
 ```
 
 The implicit argument only fills a hole. A call that is already complete is
@@ -5986,7 +6058,7 @@ function is expected:
 protocol Negatable { function negated(self: Self) -> Self }
 type number is Negatable { function negated(self) -> number { -self } }
 
-Map([1, 2, 3], Negatable.negated)
+Map(Negatable.negated, [1, 2, 3])
 // ➔ [-1, -2, -3]
 ```
 
@@ -7008,7 +7080,7 @@ Collections pipeline — `Map`/`Filter`/`Reduce` for value-producing iteration,
 `|>` to chain; `1..n` is an inclusive range:
 
 ```epsil
-1..10 |> Filter(_, k |-> k % 2 == 0) |> Map(_, k |-> k^2)
+1..10 |> Filter(_, k |-> k % 2 == 0) |> Map(k |-> k^2, _)
 // ➔ [4, 16, 36, 64, 100]
 ```
 

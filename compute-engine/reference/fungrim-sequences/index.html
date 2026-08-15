@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.48da2cd8.js" defer="defer"></script>
-<script src="/assets/js/main.8eb58925.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.a471b80e.js" defer="defer"></script>
+<script src="/assets/js/main.1cdcd424.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -84,7 +84,7 @@ Used by the Compute Engine for simplification.
 <p><code class="language-math math-inline">\mathrm{BernoulliPolynomial}(n, 1-x)=(-1)^{n}\mathrm{BernoulliPolynomial}(n, x)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land x\in\C</code>.
 <strong>Symbols:</strong> <strong>BernoulliPolynomial</strong> — Bernoulli polynomial.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c2dcfa" target="_blank" rel="noopener noreferrer" class=""><code>c2dcfa</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">x\mapsto\mathrm{BernoulliPolynomial}(n, x)^{\prime}(x)=n\mathrm{BernoulliPolynomial}(n-1, x)</code></p>
@@ -125,7 +125,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/12b336" target="_blank" rel="noopener noreferrer" class=""><code>12b336</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=\frac{n\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, \frac{3}{2}, 5)}{2^{n-1}}</code></p>
+<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=\frac{n\mathrm{Hypergeometric2F1}(\frac{1-n}{2}, \frac{2-n}{2}, \frac{3}{2}, 5)}{2^{n-1}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z</code>.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="http://functions.wolfram.com/IntegerFunctions/Fibonacci/26/01/01/0007/" target="_blank" rel="noopener noreferrer" class="">functions.wolfram.com</a>
@@ -164,7 +164,7 @@ Used by the Compute Engine for simplification.
 <hr>
 <p><code class="language-math math-inline">\begin{pmatrix}\mathrm{Fibonacci}(n+m)\\ \mathrm{Fibonacci}((n+m)-1)\end{pmatrix}=\begin{pmatrix}1 &amp; 1\\ 1 &amp; 0\end{pmatrix}^{m}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land m\in\Z</code>.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3a9c67" target="_blank" rel="noopener noreferrer" class=""><code>3a9c67</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Count}(\mathrm{Filter}(\Z, k\mapsto n\mid\mathrm{Fibonacci}(k)))=\mathrm{Count}(\Z)</code></p>
@@ -212,12 +212,12 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8db61e" target="_blank" rel="noopener noreferrer" class=""><code>8db61e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, 1-n, -4)</code></p>
+<p><code class="language-math math-inline">\mathrm{Fibonacci}(n)=\mathrm{Hypergeometric2F1}(\frac{1-n}{2}, \frac{2-n}{2}, 1-n, -4)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/90c290" target="_blank" rel="noopener noreferrer" class=""><code>90c290</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Map}(\mathrm{Filter}(\N, n\mapsto\mathrm{Fibonacci}(n)^{1/2}\in\Z), n\mapsto\mathrm{Fibonacci}(n))=\lbrace\mathrm{Fibonacci}(0), \mathrm{Fibonacci}(1), \mathrm{Fibonacci}(2), \mathrm{Fibonacci}(12)\rbrace=\lbrace0, 1, 144\rbrace</code></p>
+<p><code class="language-math math-inline">\mathrm{Map}(n\mapsto\mathrm{Fibonacci}(n), \mathrm{Filter}(\N, n\mapsto\mathrm{Fibonacci}(n)^{1/2}\in\Z))=\lbrace\mathrm{Fibonacci}(0), \mathrm{Fibonacci}(1), \mathrm{Fibonacci}(2), \mathrm{Fibonacci}(12)\rbrace=\lbrace0, 1, 144\rbrace</code></p>
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/9d26d2" target="_blank" rel="noopener noreferrer" class=""><code>9d26d2</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -364,13 +364,13 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e84642" target="_blank" rel="noopener noreferrer" class=""><code>e84642</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="stirling-numbers">Stirling numbers<a href="#stirling-numbers" class="hash-link" aria-label="Direct link to Stirling numbers" title="Direct link to Stirling numbers" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{StirlingS_1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)</code></p>
+<p><code class="language-math math-inline">\mathrm{StirlingS1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land k\in\N</code>.
 <strong>Symbols:</strong> <strong>StirlingCycle</strong> — Unsigned Stirling number of the first kind; <strong>StirlingS1</strong> — Signed Stirling number of the first kind.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/071a94" target="_blank" rel="noopener noreferrer" class=""><code>071a94</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{StirlingS_1}(n+1, k)=\mathrm{StirlingS_1}(n, k-1)-n\mathrm{StirlingS_1}(n, k)</code></p>
+<p><code class="language-math math-inline">\mathrm{StirlingS1}(n+1, k)=\mathrm{StirlingS1}(n, k-1)-n\mathrm{StirlingS1}(n, k)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land k\in\N^*</code>.
 <strong>Symbols:</strong> <strong>StirlingS1</strong> — Signed Stirling number of the first kind.
 Used by the Compute Engine for simplification.
