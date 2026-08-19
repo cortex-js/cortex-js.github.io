@@ -74,7 +74,7 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Statistics](https://mathlive.io/compute-engine/reference/statistics.md): For the following functions, when the input is a collection, it can take the
 - [Combinatorics](https://mathlive.io/compute-engine/reference/combinatorics.md): Combinatorics functions in the Compute Engine provide essential tools for counting and enumerating discrete structures. These functions enable computation of binomial and multinomial coefficients,…
 - [Number Theory](https://mathlive.io/compute-engine/reference/number-theory.md): The functions in this section provide tools for number-theoretic computations:
-- [Strings and Text](https://mathlive.io/compute-engine/reference/strings.md): Strings and text in the Compute Engine: Unicode-aware operations over grapheme clusters, scalars and code points, and why strings are not collections.
+- [Strings and Text](https://mathlive.io/compute-engine/reference/strings.md): Strings and text in the Compute Engine: strings as indexed collections of characters, the character type, grapheme clusters, Unicode scalars and encodings.
 - [Trigonometry](https://mathlive.io/compute-engine/reference/trigonometry.md): Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return.
 - [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md): The Compute Engine provides a unit system for representing and computing with
 - [Extended Rules — Symbolic Integration](https://mathlive.io/compute-engine/guides/integration-rules.md): The Integration Rules library is an optional add-on that extends the

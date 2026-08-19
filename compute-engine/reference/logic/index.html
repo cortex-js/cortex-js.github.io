@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.a471b80e.js" defer="defer"></script>
-<script src="/assets/js/main.1cdcd424.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b8cf4556.js" defer="defer"></script>
+<script src="/assets/js/main.fd881ca3.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -35,6 +35,15 @@
 notations: it parses as
 <a class="" href="/compute-engine/reference/core/#IdenticallyEqual"><code>IdenticallyEqual</code></a>, the
 mathematical identity operator.</p>
+<p><code>And</code>, <code>Or</code>, <code>Nand</code>, <code>Nor</code> and <code>Implies</code> are <strong>short-circuit</strong> operators:
+their operands are evaluated left to right, in the order written, and
+evaluation stops at the first operand that decides the result — the first
+<code>False</code> for <code>And</code>/<code>Nand</code>, the first <code>True</code> for <code>Or</code>/<code>Nor</code>, a <code>False</code>
+antecedent for <code>Implies</code>; the remaining operands are not evaluated. For that
+reason their operands are not reordered at canonicalization. (<code>Xor</code> and
+<code>Equivalent</code> cannot short-circuit: every operand affects the result.) An element-wise application (some operand is a collection)
+is the exception: every operand is evaluated once and the result is a list.
+See the <a class="" href="/compute-engine/guides/logic/">Logic guide</a>.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="operator-precedence">Operator Precedence<a href="#operator-precedence" class="hash-link" aria-label="Direct link to Operator Precedence" title="Direct link to Operator Precedence" translate="no">​</a></h3>
 <p>Logical operators have lower precedence than comparison and arithmetic operators,
 so expressions parse naturally without requiring parentheses:</p>

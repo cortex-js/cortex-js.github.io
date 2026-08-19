@@ -428,11 +428,11 @@ hypotenuse(3, 4)
 // ➔ 5
 ```
 
-Anonymous functions use `|->`. They are especially useful for a small
+Anonymous functions use `=>`. They are especially useful for a small
 transformation passed to a collection operator:
 
 ```epsil
-Map(n |-> n^2, 1..5)
+Map(n => n^2, 1..5)
 // ➔ [1, 4, 9, 16, 25]
 ```
 
@@ -473,8 +473,8 @@ endpoints. Use a pipeline when data goes through several transformations:
 
 ```epsil
 1..10
-  |> Filter(_, n |-> n % 2 == 0)
-  |> Map(n |-> n^2, _)
+  |> Filter(n => n % 2 == 0)
+  |> n => n^2                         // Map(n => n^2, _)
   |> Sum
 // ➔ 220
 ```
@@ -587,12 +587,11 @@ total
 is a single `Map` — no printing, no mutation:
 
 ```epsil
-Map(k |->
+1..15 |> k =>
   if k % 15 == 0 { "FizzBuzz" }
   else if k % 3 == 0 { "Fizz" }
   else if k % 5 == 0 { "Buzz" }
-  else { k },
-  1..15)
+  else { k }
 // ➔ [1, 2, "Fizz", 4, "Buzz", "Fizz", 7, 8, "Fizz", "Buzz", 11, "Fizz", 13, 14, "FizzBuzz"]
 ```
 
@@ -696,8 +695,19 @@ let y = 5
 **A truth table**, as a `Map` over the four boolean pairs:
 
 ```epsil
-Map(p |-> p[1] && p[2],
-    [(True, True), (True, False), (False, True), (False, False)])
+[(True, True), (True, False), (False, True), (False, False)] 
+  |> p => p[1] && p[2]
+// ➔ [True, False, False, False]
+```
+
+The same table with a [tuple pattern
+parameter](/operators/#anonymous-functions), which names the two
+components instead of indexing them. The extra parentheses are what make it
+ONE parameter taking a pair, rather than two parameters:
+
+```epsil
+[(True, True), (True, False), (False, True), (False, False)]
+  |> Map(((p, q)) => p && q, _)
 // ➔ [True, False, False, False]
 ```
 
@@ -733,7 +743,7 @@ pair carried in a two-element list literal, stays exact all the way to F(200)
 — far past the 2⁵³ limit of floating point:
 
 ```epsil
-Fold((p, _) |-> [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
+Fold((p, _) => [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
 // ➔ 280571172992510140037611932413038677189525
 ```
 
@@ -765,21 +775,21 @@ Map(fib, 1..10)
 
 A single-clause spelling with a conditional is equivalent
 (`fact(n) = 1 if n <= 1 else n * fact(n - 1)`), as is the two-step form —
-declare with `let`, then assign a `|->` lambda. Note that *mutually*
+declare with `let`, then assign a `=>` lambda. Note that *mutually*
 recursive functions still require declaring all the names with `let` before
 defining any of them.
 
 ## Higher-Order Functions
 
 Functions are values: they can be passed as arguments and returned from other
-functions. A `|->` lambda captures the variables in scope where it is created.
+functions. A `=>` lambda captures the variables in scope where it is created.
 
 **A numeric-derivative factory.** `deriv` returns a lambda that closes over
 both the function `f` and the step `h`. The central-difference estimate is
 computed *exactly* (as a rational):
 
 ```epsil
-deriv(f, h) = x |-> (f(x + h) - f(x - h)) / (2h)
+deriv(f, h) = x => (f(x + h) - f(x - h)) / (2h)
 g(x) = x^3
 let dg = deriv(g, 1/1000)
 dg(2)
@@ -790,7 +800,7 @@ Pipe the call into `N` for a floating-point value — numericization reaches
 through the user-function/closure call:
 
 ```epsil
-deriv(f, h) = x |-> (f(x + h) - f(x - h)) / (2h)
+deriv(f, h) = x => (f(x + h) - f(x - h)) / (2h)
 g(x) = x^3
 let dg = deriv(g, 1/1000)
 dg(2) |> N
@@ -801,7 +811,7 @@ dg(2) |> N
 different results, confirming each lambda captures the right binding:
 
 ```epsil
-compose(f, g) = x |-> f(g(x))
+compose(f, g) = x => f(g(x))
 inc(x) = x + 1
 sq(x) = x^2
 let h = compose(sq, inc)
@@ -810,14 +820,14 @@ let h = compose(sq, inc)
 ```
 
 **A counter factory.** `makeCounter` returns a zero-parameter lambda
-(`() |-> …`) whose **block body** (`do { … }`) runs several statements and
+(`() => …`) whose **block body** (`do { … }`) runs several statements and
 yields the last one. The lambda closes over `count` and mutates it on each
 call:
 
 ```epsil
 function makeCounter() {
   let count = 0
-  () |-> do { count = count + 1; count }
+  () => do { count = count + 1; count }
 }
 let c = makeCounter()
 c()
@@ -828,7 +838,7 @@ c()
 
 `do { … }` opens a statement block in expression position: it evaluates its
 statements in order and its value is the final one (a bare `{ … }` there is a
-set/dictionary literal instead). `() |-> …` is a lambda that takes no
+set/dictionary literal instead). `() => …` is a lambda that takes no
 parameters.
 
 Each `makeCounter()` call captures its own `count`, so counters are
@@ -837,7 +847,7 @@ independent:
 ```epsil
 function makeCounter() {
   let count = 0
-  () |-> do { count = count + 1; count }
+  () => do { count = count + 1; count }
 }
 let a = makeCounter()
 let b = makeCounter()
@@ -976,7 +986,7 @@ $e^{i\pi/3}$
 imaginary part: (1+i)(2+i)(3+i) = 10i:
 
 ```epsil
-Product(Map(k |-> k + i, Range(1, 3)))
+Product(Map(k => k + i, Range(1, 3)))
 // ➔ 10i
 ```
 
@@ -1018,7 +1028,7 @@ the polynomial:
 
 ```epsil
 let roots = Solve(x^2 - 5x + 6 == 0, x)
-Map(r |-> r^2 - 5r + 6, roots)
+roots |> r => r^2 - 5r + 6
 // ➔ [0, 0]
 ```
 
@@ -1077,7 +1087,7 @@ Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
 an exact rational — the 10th harmonic number:
 
 ```epsil
-Fold((a, k) |-> a + 1/k, 0, 1..10)
+Fold((a, k) => a + 1/k, 0, 1..10)
 // ➔ 7381/2520
 ```
 
@@ -1117,11 +1127,13 @@ let x = 2^11 - 1
 
 **A formatted table.** `\t` and `\n` escapes in a string literal are real
 control characters. Build a table of `n`, `n²`, `n³` — one interpolated row
-per value, folded onto the header with `StringJoin` in a pipeline:
+per value, folded onto the header with `Join` in a pipeline (`Join` is the
+two-string concatenation; `StringJoin` joins one collection and would read the
+accumulator as its characters):
 
 ```epsil
 let header = "n\tn^2\tn^3\n"
-1..5 |> Map(n |-> "\(n)\t\(n^2)\t\(n^3)\n", _) |> Fold(StringJoin, header, _)
+1..5 |> n => "\(n)\t\(n^2)\t\(n^3)\n" |> Fold(Join, header)
 ```
 
 produces (tabs aligned, newline-separated rows):
@@ -1159,7 +1171,7 @@ into its code points, `Map` shifts each, and `StringFrom(…, "unicode-scalars")
 rebuilds the string. Shifting back decodes, so the cipher round-trips:
 
 ```epsil
-shift(s, k) = s |> UnicodeScalars |> Map(c |-> c + k, _) |> StringFrom(_, "unicode-scalars")
+shift(s, k) = s |> UnicodeScalars |> c => c + k |> StringFrom(_, "unicode-scalars")
 (shift("hello", 3), shift(shift("hello", 3), -3))
 // ➔ ("khoor", "hello")
 ```
@@ -1201,7 +1213,7 @@ let xs = [4, 8, 15, 16, 23, 42]
 `_` is the piped value:
 
 ```epsil
-1..10 |> Filter(_, n |-> n % 2 == 0) |> Reduce(_, (acc, n) |-> acc + n)
+1..10 |> Filter(n => n % 2 == 0) |> Reduce((acc, n) => acc + n)
 // ➔ 30
 ```
 
@@ -1238,10 +1250,10 @@ If the slot can be inferred based on the type of the previous argument, it can b
 And a lambda is automatically converted to a map:
 
 ```epsil
-1..100 |> x |-> x^2
+1..100 |> x => x^2
 
 // Shorthand for:
-1..100 |> Map(x |-> x^2, _)
+1..100 |> Map(x => x^2, _)
 ```
 
 
@@ -1260,7 +1272,7 @@ dot(...p, ...q)
 explicit initial value:
 
 ```epsil
-Fold((acc, n) |-> acc + n^2, 0, 1..5)
+Fold((acc, n) => acc + n^2, 0, 1..5)
 // ➔ 55
 ```
 
@@ -1289,7 +1301,7 @@ computation — it surfaces as `NaN` while the valid inputs still compute. Here
 
 ```epsil
 let inputs = [16, -4, "banana", 81]
-Map(x |-> Sqrt(x), inputs)
+inputs |> x => Sqrt(x)
 // ➔ [4, 2i, NaN, 9]
 ```
 
@@ -1413,18 +1425,18 @@ The program pulls together most of the language:
 type alias json = number | string | boolean | missing | list<json> | dictionary
 
 let digits = Characters("0123456789")
-isDigit(c: string | missing) = c in digits
-isWs(c: string | missing) = c == " " || c == "\n" || c == "\t" || c == "\r"
+isDigit(c: character | missing) = c in digits
+isWs(c: character | missing) = c == " " || c == "\n" || c == "\t" || c == "\r"
 
 // Index of the first non-whitespace character at or after i
-function skipWs(cs: list<string>, i: integer) -> integer {
+function skipWs(cs: list<character>, i: integer) -> integer {
   let j = i
   while j <= Length(cs) && isWs(cs[j]) { j = j + 1 }
   j
 }
 
 // A run of digits starting at i, as (value, indexAfter)
-function parseDigits(cs: list<string>, i: integer) -> tuple<integer, integer> {
+function parseDigits(cs: list<character>, i: integer) -> tuple<integer, integer> {
   let j = i
   let n = 0
   while j <= Length(cs) && isDigit(cs[j]) {
@@ -1435,7 +1447,7 @@ function parseDigits(cs: list<string>, i: integer) -> tuple<integer, integer> {
 }
 
 // Number: -?int(.frac)?((e|E)(+|-)?exp)? — kept exact, so 2.5e-1 is 1/4
-function parseNumber(cs: list<string>, i: integer) -> tuple<json, integer> {
+function parseNumber(cs: list<character>, i: integer) -> tuple<json, integer> {
   let j = i
   let sign = 1
   if cs[j] == "-" {
@@ -1466,7 +1478,7 @@ function parseNumber(cs: list<string>, i: integer) -> tuple<json, integer> {
 }
 
 // Characters of a string body from i up to the closing quote
-function scanString(cs: list<string>, i: integer) -> tuple<string, integer> {
+function scanString(cs: list<character>, i: integer) -> tuple<string, integer> {
   let j = i
   let out = []
   while cs[j] != "\"" {
@@ -1488,10 +1500,10 @@ function scanString(cs: list<string>, i: integer) -> tuple<string, integer> {
 }
 
 // String: cs[i] is the opening quote
-parseString(cs: list<string>, i: integer) = scanString(cs, i + 1)
+parseString(cs: list<character>, i: integer) = scanString(cs, i + 1)
 
 // Array: cs[i] is "[" — elements become a list
-function parseArray(cs: list<string>, i: integer) -> tuple<json, integer> {
+function parseArray(cs: list<character>, i: integer) -> tuple<json, integer> {
   let j = skipWs(cs, i + 1)
   let out = []
   if cs[j] == "]" { j = j + 1 }
@@ -1511,7 +1523,7 @@ function parseArray(cs: list<string>, i: integer) -> tuple<json, integer> {
 }
 
 // Object: cs[i] is "{" — key-value pairs become a dictionary
-function parseObject(cs: list<string>, i: integer) -> tuple<json, integer> {
+function parseObject(cs: list<character>, i: integer) -> tuple<json, integer> {
   let j = skipWs(cs, i + 1)
   let keys = []
   let vals = []
@@ -1536,7 +1548,7 @@ function parseObject(cs: list<string>, i: integer) -> tuple<json, integer> {
 }
 
 // Any JSON value, dispatched on its first character
-function parseValue(cs: list<string>, i: integer) -> tuple<json, integer> {
+function parseValue(cs: list<character>, i: integer) -> tuple<json, integer> {
   let j = skipWs(cs, i)
   match cs[j] {
     "\"" => parseString(cs, j)
@@ -1638,7 +1650,7 @@ identifiers denote user-defined variables and functions.
 ```epsil
 Sin(x)
 Simplify(2 + 3x^3)
-Map(x |-> x^2, [1, 2, 3])
+Map(x => x^2, [1, 2, 3])
 ```
 
 `Sin`, `Simplify`, and `Map` are library operators; `x` is an ordinary user
@@ -1725,8 +1737,8 @@ There is no `print`. A program's value is the value of its **last statement**.
 | `x: int = 4` | `let n: integer = 4` |
 | `def f(x): return x**2` | `f(x) = x^2` |
 | `def f(x):` with a body | `function f(x) { … }` — value is the last expression |
-| `lambda x: x*2` | `x \|-> 2x` |
-| `lambda: 42` | `() \|-> 42` |
+| `lambda x: x*2` | `x => 2x` |
+| `lambda: 42` | `() => 42` |
 | `def f(x: float) -> float:` | `f(x: real) -> real = x^2` |
 | `return` | *(no `return`)* — the last expression is the value |
 | `math.floor(x)`, `np.mean(xs)` | `Floor(x)`, `Mean(xs)` — no modules, no imports |
@@ -1738,7 +1750,7 @@ symbolic, with a did-you-mean warning when a close library name exists
 
 ```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
-let double = x |-> 2x
+let double = x => 2x
 (fact(5), double(21))
 // ➔ (120, 42)
 ```
@@ -1757,7 +1769,7 @@ let double = x |-> 2x
 | `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
 | `range(1, 6)` | `1..5` or `Range(1, 5)` — **inclusive** of the end |
 | `len(xs)` | `Length(xs)` |
-| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) \|-> a > b)` |
+| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) => a > b)` |
 | `sum`, `min`, `max`, `any`, `all` | `Sum`, `Min`, `Max`, `Any`, `All` |
 | `reversed(xs)` | `Reverse(xs)` |
 | `zip(a, b)` | `Zip(a, b)` |
@@ -1797,7 +1809,7 @@ sum(n**2 for n in range(1, 11) if n % 2 == 1)
 ```
 
 ```epsil
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
+1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
 // ➔ 165
 ```
 
@@ -1808,7 +1820,7 @@ time, so the same "late binding in a closure" surprise applies:
 
 ```epsil
 let n = 1
-let m = Map(k |-> k * n, 1..3)
+let m = Map(k => k * n, 1..3)
 n = 10
 Sum(m)
 // ➔ 60
@@ -1911,7 +1923,7 @@ is the one numeric answer that differs on values you are likely to type:
 Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 
 ```epsil
-([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k |-> k^2, 1..4)))
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k => k^2, 1..4)))
 // ➔ ([2,3,4], [4,10,18], 30)
 ```
 
@@ -1920,11 +1932,13 @@ Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 | Python | Epsil |
 |:--|:--|
 | `f"x is {x}"` | `"x is \(x)"` — works in any string literal |
-| `"a" + "b"` | `StringJoin("a", "b")` — `+` on strings is a **type error** |
-| `len(s)` | `Length(Characters(s))` — strings are not collections |
-| `s[0]` | `Characters(s)[1]` |
+| `"a" + "b"` | `Join("a", "b")` — `+` on strings is a **type error** |
+| `len(s)` | `Length(s)` — a string is a collection of its characters (grapheme clusters, not code points) |
+| `s[0]` | `s[1]` — 1-based; each element is a `character` |
+| `c in s` | `c in s` — character membership; substring search is a separate operation |
+| `"ab" in s` | `ContainsSequence(s, "ab")` — `in` never means substring |
 | `s.split()` / `s.split(",")` | `StringSplit(s)` / `StringSplit(s, ",")` |
-| `"".join(parts)` | `StringJoin(…)`, or `Fold` over the parts |
+| `"".join(parts)` / `sep.join(parts)` | `StringJoin(parts)` / `StringJoin(parts, sep)` |
 | `str(x)` | `String(x)` |
 | `"""…"""` | `"""…"""` — multi-line strings, same delimiter |
 | `r"raw\string"` | `#"raw\string"#` — extended string literal |
@@ -1932,14 +1946,33 @@ Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 ```epsil
 let name = "world"
 let parts = StringSplit("a b c")
-("hello \(name)", StringJoin("a", "b"), Length(Characters(name)), parts[2])
+("hello \(name)", Join("a", "b"), Length(name), parts[2])
 // ➔ ("hello world", "ab", 5, "b")
 ```
 
-There is no `.upper()`, `.replace()`, `.find()` or `.strip()`: the string
-library today is `Characters`, `GraphemeClusters`, `UnicodeScalars`,
-`StringSplit`, `StringJoin`, `StringFrom` and `String`. Decompose to a list of
-characters or code points, work there, and rebuild.
+`.upper()`, `.lower()`, `.replace()` and `.strip()` are `ToUpperCase`,
+`ToLowerCase`, `StringReplace(s, target, replacement)` and
+`Trim`/`TrimStart`/`TrimEnd`; `.zfill()`/`.rjust()` are `PadStart`/`PadEnd`,
+`s * n` is `StringRepeat(s, n)` and `float(s)`/`int(s)` are `NumberFrom(s)`
+(which answers an error value, never NaN, on text that is not a numeral).
+`.find()`/`.index()` is `RangeOf(s, needle)`, which answers the *span* of the
+first occurrence (a `range`) or `Nothing` — feed it straight to `Slice`;
+`needle in s` (substring) is `ContainsSequence(s, needle)`, and
+`.startswith()`/`.endswith()` are `StartsWith`/`EndsWith`. Note that Epsil's
+`c in s` is **character** membership, not substring search.
+
+`.casefold()` is `CaseFold(s)`, and `StringCompare(a, b)` gives the `-1/0/1`
+code-point ordering that `<` on two multi-character strings does not (it
+compares UTF-16 code units, which sorts the astral characters below
+U+E000–U+FFFF).
+
+A string is an indexed collection of `character`
+values, so the generic collection operators apply directly (`Length`,
+`Reverse`, `Filter`, `Sort`, `Contains`, `IndexOf`, `Map` — the
+element-preserving ones return a string, `Map` returns a list; rejoin with
+`String(...)`). For a specific decomposition use `Characters`,
+`UnicodeScalars`, `Utf8`/`Utf16`; `StringSplit`, `StringJoin`, `Join`,
+`StringFrom` and `String` round out the library.
 
 ## Errors
 
@@ -1948,7 +1981,7 @@ There are no exceptions. A runtime problem becomes an ordinary
 not abort the rest of the work:
 
 ```epsil
-Map(x |-> Sqrt(x), [16, -4, "banana", 81])
+Map(x => Sqrt(x), [16, -4, "banana", 81])
 // ➔ [4, 2i, NaN, 9]
 ```
 
@@ -2060,13 +2093,14 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 | `f[x]`, `Sin[x]` | `f(x)`, `Sin(x)` |
 | `x = 5` | `let x = 5` |
 | `f[x_] := x^2` | `f(x) = x^2` |
-| `f = Function[x, x^2]` | `f = x \|-> x^2` |
-| `#^2 &` | `x \|-> x^2` — no slot/`&` syntax |
+| `f = Function[x, x^2]` | `f = x => x^2` |
+| `#^2 &` | `x => x^2` — no slot/`&` syntax |
 | `expr /. x -> 3` | `ReplaceAll(expr, Rule(x, 3))` |
 | `a == b`, `SameQ[a, b]` | `a == b`, `a === b` — see below |
 | `expr // N` | `expr \|> N` (or `~>`) |
 | `N[expr]`, `N[expr, 25]` | `N(expr)`, `N(expr, 25)` |
 | `Hold[expr]` | `HoldValues(expr)` — evaluate with assigned symbols kept symbolic |
+| `SetAttributes[f, HoldAll]; f[e_] := …` | `hold f(e) = …` — the whole definition holds its arguments; there is no per-argument `HoldFirst`/`HoldRest` (read an argument once into a `let` to evaluate it) |
 | `Print[x]` | *(no printing)* — the program's value is its **last statement** |
 | `%`, `Out[3]` | *(no history)* — bind with `let` |
 | `(* comment *)` | `// comment` or `/* comment */` |
@@ -2133,7 +2167,7 @@ match, and a predicate:
 
 ```epsil
 let xs = [3, 1, 4, 1, 5, 1]
-(Count(xs), Count(xs, 1), Count(xs, k |-> k > 2))
+(Count(xs), Count(xs, 1), Count(xs, k => k > 2))
 // ➔ (6, 3, 3)
 ```
 
@@ -2185,7 +2219,7 @@ Sum(Table(k^2, (k, 1, 5)))
 you want an ordinary list, index it, aggregate it, or build it with `Map`:
 
 ```epsil
-let g = x |-> x^2 + 1
+let g = x => x^2 + 1
 (g(3), Sum(Map(g, 1..4)))
 // ➔ (10, 34)
 ```
@@ -2288,7 +2322,14 @@ Surface forms that look like Wolfram but behave differently.
 | `expr;` to suppress | `;` only separates statements | *(nothing to suppress)* |
 | `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Epsil operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
 | `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
-| `StringLength`, `ToUpperCase` | Inert — the string library is small | `Length(Characters(s))`; decompose and rebuild |
+| `StringLength` | `Length(s)` — a string is a collection of its characters | |
+| `ToUpperCase`, `ToLowerCase` | Same names, same meaning | *(nothing to change)* |
+| `StringReplace[s, t -> r]` | `StringReplace` takes positional arguments, not rules | `StringReplace(s, t, r)` |
+| `StringJoin["ab", "cd"]` | **Silently different.** `StringJoin` takes ONE collection plus an optional separator, and a string is a collection of its characters — so this reads as "join `"ab"`'s characters with the separator `"cd"`" and gives `"acdb"` | `Join("ab", "cd")`, or `"\(a)\(b)"` |
+| `StringRiffle[parts, sep]` | Unknown name: the call stays **symbolic and inert**. The collection-plus-separator form is `StringJoin`'s second argument | `StringJoin(parts, sep)` |
+| `StringPosition`, `StringContainsQ`, `StringStartsQ`, `StringEndsQ` | Unknown names: **inert**. The Epsil family is generic over indexed collections and character-wise on strings, and `RangeOf` answers one *span* (or `Nothing`), not a list of spans | `RangeOf(s, t)`, `ContainsSequence`, `StartsWith`, `EndsWith` |
+| `StringTrim`, `StringPadLeft`, `StringPadRight` | Unknown names: **inert** (`StringTrim` gets a did-you-mean warning) | `Trim`/`TrimStart`/`TrimEnd`, `PadStart`, `PadEnd` |
+| `ToExpression["3.14"]` | Unknown name: **inert**. Parsing a numeral is its own operator, and answers an error value (never `NaN`) on text that is not one | `NumberFrom("3.14")` |
 | `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(1..n)` |
 | `SameQ[1, 1.]` | `1 === 1.0` is `True` — the lexer folds `1.0` to `1` | *(nothing — but don't read `===` as type-aware)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
@@ -2332,493 +2373,47 @@ The **condensed language card** — the same material at reference density.
 
 ---
 
-# Epsil Syntax
+# Epsil Comments
 
-Source: https://epsil.dev/syntax/
+Source: https://epsil.dev/comments/
 
-# Epsil Syntax
+# Comments
 
-## Notation
+**Line Comments** start with `//`. Everything after a `//` is ignored until the
+end of the line.
 
-In the grammar below, the following notation is used:
-
-- An arrow (→) marks grammar productions and can be read as "can consist of"
-- Syntactic categories are written in lowercase italic (_newline_) on both sides
-  of a production rule.
-- Placeholders for recursive syntactic categories are indicated by _···_.
-- Literal words and punctuation are indicated in bold (**+**) or as a Unicode
-  codepoint (U+00A0) or as a Unicode codepoint range (U+2000-U+200A).
-- Alternatives are indicated by a vertical bar (|)
-- Optional elements are indicated in square brackets
-- Elements that can repeat 1 or more times are indicated by a trailing plus sign
-- Elements that can repeat 0 or more times are indicated by a trailing star sign
-- Elements that can repeat 0 or more times, separated by a another element are
-  indicated with a trailing hash sign, followed by the separator. If no
-  separator is provided, the comma (,) is implied.
-
-## Grammar overview
-
-The productions below describe the source forms accepted by the current
-parser. The Unicode identifier rules are described under
-[Symbols](/literals/#symbols), and the type following a `:` or return
-arrow is parsed using the
-[Compute Engine type language](https://mathlive.io/compute-engine/guides/types/). Detailed
-`match` patterns are documented under
-[Control Flow](/control-flow/#match).
-
-_quoted-text-item_ → U+0000-U+0009 U+000B-U+000C U+000E-U+0021 U+0023-U+2027
-U+202A-U+D7FF | U+E000-U+10FFFF
-
-_linebreak_ → (U+000A \[U+000D\]) | U+000D | U+2028 | U+2029
-
-_unicode-char_ → _quoted-text-item_ | _linebreak_ | U+0022
-
-_pattern-syntax_ → U+0021-U+002F | U+003A-U+0040 | U+005b-U+005E | U+0060 |
-U+007b-U+007e | U+00A1-U+00A7 | U+00A9 | U+00AB-U+00AC | U+00AE | U+00B0-U+00B1
-| U+00B6 | U+00BB | U+00BF | U+00D7 | U+00F7 | U+2010-U+203E | U+2041-U+2053 |
-U+2190-U+2775 | U+2794-U+27EF | U+3001-U+3003 | U+3008-U+3020 | U+3030 | U+FD3E
-| U+FD3F | U+FE45 | U+FE46
-
-_inline-space_ → U+0009 | U+0020
-
-_pattern-whitespace_ → _inline-space_ | U+000A | U+000B | U+000C | U+000D |
-U+0085 | U+200E | U+200F | U+2028 | U+2029
-
-_whitespace_ → _pattern-whitespace_ | U+0000 | U+00A0 | U+1680 | U+180E |
-U+2000-U+200A | U+202f | U+205f | U+3000
-
-_line-comment_ → **`//`** (_unicode-char_)\* _linebreak_)
-
-_block-comment_ → **`/*`** (((_unicode-char_)\* _linebreak_)) | _block-comment_)
-**`*/`**
-
-_digit_ → U+0030-U+0039 | U+FF10-U+FF19
-
-_hex-digit_ → _digit_ | U+0041-U+0046 | U+0061-U+0066 | U+FF21-FF26 |
-U+FF41-U+FF46
-
-_binary-digit_ → U+0030 | U+0031 | U+FF10 | U+FF11
-
-_numerical-constant_ → **`NaN`** | **`Infinity`** | **`+Infinity`** |
-**`-Infinity`** | **`oo`** | **`+oo`** | **`-oo`**
-
-(`oo` is an input alias for `Infinity`; the serializer always emits the
-canonical `Infinity` spelling.)
-
-_base-10-exponent_ → (**`e`** | **`E`**) \[_sign_\](_digit_)+
-
-_base-2-exponent_ → (**`p`** | **`P`**) \[_sign_\](_digit_)+
-
-_exponent_ → _base-10-exponent_ | _base-2-exponent_
-
-_binary-number_ → **`0b`** (_binary-digit_)+ \[**`.`** (_binary-digit_)+
-\]\[_exponent_\]
-
-_hexadecimal-number_ → **`0x`** (_hex-digit_)+ \[**`.`** (_hex-digit_)+
-\]\[_base-2-exponent_\]
-
-_decimal-number_ → (_digit_)+ \[**`.`** (_digit_)+ \]\[_exponent_\]
-
-The digit runs of a number literal may contain **`_`** grouping separators
-(`1_000`, `0xFF_FF`); an underscore is ignored and never begins or ends a
-run. A _hexadecimal-number_ takes only a _base-2-exponent_ because `e` and
-`E` are hexadecimal digits, so they cannot double as an exponent marker.
-
-_sign_ → **`+`** | **`-`**
-
-_signed-number_ → _numerical-constant_ | (\[_sign_\] (_binary-number_ |
-_hexadecimal-number_ | _decimal-number_))
-
-_symbol_ → _verbatim-symbol_ | _inline-symbol_
-
-_verbatim-symbol_ → **`` ` ``** _symbol-start_ (_symbol-continue_)\*
-**`` ` ``**
-
-The content of a _verbatim-symbol_ is taken literally: no escape sequences
-are applied, and it must still be a valid symbol name. The form exists to
-write symbols whose name is a reserved word, e.g. `` `while` ``.
-
-_inline-symbol_ → _symbol-start_ (_symbol-continue_)\*
-
-_symbol-start_ and _symbol-continue_ follow the Unicode profile described
-under [Symbols](/literals/#symbols). Reserved words are not accepted as
-_inline-symbol_; use the verbatim form.
-
-_escape-expression_ → **`\(`** _expression_ **`)`**
-
-_single-line-string_ → **`"`** (_escape-sequence_ | _escape-expression_ |
-_quoted-text-item_)\* **`"`**
-
-_multiline-string_ → **`"""`** _multiline-string-line_ **`"""`**
-
-_extended-string_ → (**`#`**)+ **`"`** (_unicode-char_)\* **`"`** (**`#`**)+
-
-The number of trailing **`#`** must match the number of leading **`#`** that
-opened the literal (`#"…"#`, `##"…"##`, …). No escape sequences are applied
-inside an extended string, so it can hold `"` and `\` literally.
-
-_string_ → _single-line-string_ | _multiline-string_ | _extended-string_
-
-String escapes, interpolation, multiline indentation and continuation are
-specified in [Literals](/literals/#strings).
-
-_parenthesized_ → **`(`** _expression_ **`)`**
-
-_list_ → **`[`** \[(_expression_)#**`,`**\] **`]`**
-
-_set_ → **`{`** \[(_expression_)#**`,`**\] **`}`**
-
-_dictionary_ → **`{`** \[(_key-value-pair_)#**`,`**\] **`}`** | **`{->}`**
-
-_key-value-pair_ → _expression_ **`->`** _expression_
-
-_block_ → **`{`** \[(_statement_)#_statement-separator_\] **`}`**
-
-_do-block_ → **`do`** _block_
-
-_latex-island_ → **`$`** (_unicode-char_ | **`\$`**)\* **`$`**
-
-_pragma_ → **`#line`** | **`#column`** | **`#url`** | **`#filename`** |
-**`#date`** | **`#time`** | _pragma-call_
-
-_pragma-call_ → (**`#env`** | **`#navigator`** | **`#warning`** |
-**`#error`**) **`(`** \[(_expression_)#**`,`**\] **`)`**
-
-_if-expression_ → **`if`** _expression_ _block_
-\[**`else`** (_block_ | _if-expression_)\]
-
-_match-expression_ → **`match`** _expression_ **`{`** _match-case_+ **`}`**
-
-_primary_ → _signed-number_ | _symbol_ | _string_ | _pragma_ |
-_latex-island_ | _parenthesized_ | _list_ | _set_ | _dictionary_ |
-_do-block_ | _if-expression_ | _match-expression_
-
-_call-clause_ → **`(`** \[(_argument_)#**`,`**\] **`)`**
-
-_argument_ → \[**`...`**\] _expression_
-
-_index-clause_ → **`[`** (_expression_)#**`,`** **`]`**
-
-_field-clause_ → **`.`** _symbol_
-&nbsp;&nbsp;&nbsp;&nbsp;— the `.` must abut the base; not after a number
-literal
-
-_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ |
-_field-clause_ | **`!`**)\*
-
-_expression_ → _primary_ | _prefix-expression_ | _infix-expression_ |
-_postfix-expression_
-
-_prefix-expression_ → (**`-`** | **`!`**) _expression_
-
-_infix-expression_ → _expression_ _operator_ _expression_
-
-_literal-parameter_ → _signed-number_ | _string_ | **`true`** | **`false`**
-&nbsp;&nbsp;&nbsp;&nbsp;— a string literal parameter cannot contain interpolation
-
-_parameter_ → _symbol_ \[**`:`** _type_\] | _literal-parameter_
-
-_parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
-
-_effect-label_ → **`console`** | **`entropy`** | **`environment`** |
-**`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
-**`scope`** | **`state`** | **`time`**
-
-_effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
-&nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
-**`pure`** and **`any`** cannot be combined with another word
-
-_declaration_ → (**`let`** | **`const`**) _symbol_
-\[**`:`** _type_\] \[**`=`** _expression_\] |
-(**`let`** | **`const`**) _tuple-pattern_ **`=`** _expression_ |
-_symbol_ **`:`** _type_ \[**`=`** _expression_\]
-
-_tuple-pattern_ → **`(`** (_symbol_ | _tuple-pattern_)#**`,`** **`)`**
-&nbsp;&nbsp;&nbsp;&nbsp;— at least two elements; `_` skips a position
-
-_math-function-signature_ → **`->`** _type_ |
-_effect-specifier_ **`->`** _type_
-
-_type-parameter_ → _symbol_ \[**`:`** _type_\]
-&nbsp;&nbsp;&nbsp;&nbsp;— the bound must be a ground type (it may not mention
-another type parameter)
-
-_type-parameter-clause_ → **`<`** (_type-parameter_)#**`,`** **`>`**
-&nbsp;&nbsp;&nbsp;&nbsp;— at least one parameter (`<>` is rejected); duplicate
-names are rejected; the names scope over the definition's HEAD only (its
-parameters, effect specifier, and return type), not over its body
-
-_function-definition_ → _symbol_ _parameters_
-\[_math-function-signature_\] **`=`** _expression_ |
-**`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
-\[_effect-specifier_\] \[**`->`** _type_\] _block_
-&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` clause is claimed only by the
-**`function`** form: `f<T>(x) = x` is genuinely ambiguous with a relational
-expression, so the math form does not take it
-
-_type-declaration_ → **`type`** **`alias`** _symbol_
-\[_type-parameter-clause_\] **`=`** _type_ |
-**`type`** _symbol_ \[_type-parameter-clause_\] **`=`** _type_
-&nbsp;&nbsp;&nbsp;&nbsp;— both forms take a clause (a variance marker such
-as `out T` is legal only on the bare, nominal, form). The clause names scope
-over the definition only, and each must be used in it. Types are global, so
-a _type-declaration_ is only valid at the top level of a program — inside a
-block or function body it is the `type-declaration-not-top-level` error
-
-_while-statement_ → **`while`** _expression_ _block_
-
-_for-statement_ → **`for`** _symbol_ **`in`** _expression_ _block_
-
-_statement_ → _declaration_ | _type-declaration_ | _function-definition_ |
-_while-statement_ | _for-statement_ | _expression_
-
-_statement-separator_ → **`;`** | _linebreak_
-
-_shebang_ → **`#!`** (unicode-char)\* (_linebreak | \_eof_)
-
-_epsil_ → (\[_shebang_\] (_statement_)#_statement-separator_ \[_eof_\])
-
-The Pratt (precedence-climbing) grammar for `_infix-expression_`,
-`_prefix-expression_`, and `_postfix-expression_` — the operator set, its
-precedence, and its associativity — is documented as a table in
-[Operators](/operators/) rather than spelled out production by
-production; the whitespace rule described there (an infix operator has
-whitespace on both sides or neither; a prefix operator has no whitespace after
-it, and a postfix operator none before it) is part of this grammar, not a
-separate lexical concern.
-
-## Statements and sequencing
-
-A program is a sequence of statements separated by a linebreak or a `;`. Two
-expressions on the same line with no separator between them is **not** a
-silent sequence — it is a diagnostic:
-
-<!-- epsil-test: expect-diagnostics -->
+**Block (multi-line) Comments** start with `/*` and end with `*/`. Block
+comments can be nested.
 
 ```epsil
-1 2
-```
+// This is a line comment
+
+/* This is a block comment */
 
 ```
-Error: unexpected-symbol "2"
-```
 
-A multi-statement program is a sequence, evaluated in order, whose value is the
-value of its last statement. `;` is interchangeable with a linebreak as a
-separator, so these two programs are identical:
+## Documentation comments
+
+**To indicate that a comment is part of the documentation and is formatted using
+markdown**, use `///` for single line comments and `/** */` for block comments.
+
 
 ```epsil
-a
-2
+/// This is a documentation line comment
+
+/** This is a documentation block comment */
+
 ```
+
+A documentation comment written **immediately before a function definition**
+is attached to it as the function's **description** — markers stripped, 
+`///` lines joined, the ` * ` gutter of a block removed. It is what `About(f)` 
+prints, what an editor hover shows. Markdown is the intended format.
 
 ```epsil
-a; 2
+/// Doubles its argument.
+twice(x) = 2x
 ```
-
-## Primary expressions
-
-A primary is the leaf of the expression grammar — the thing an operator or a
-call/index applies to. The primary forms are:
-
-- a number: `2`, `3.14`, `0x1F`, `0b101`
-- a symbol: `x`, `Add`
-- a verbatim symbol: `` `while` ``
-- a string: `"hello"`
-- a pragma: `#env("HOME")`
-- a parenthesized expression: `(2 + 3)`
-- a list: `[1, 2, 3]`
-- a set: `{1, 2, 3}`
-- a dictionary: `{one -> 1, two -> 2}`
-- a `do { … }` block expression: `do { let t = 3; t + 1 }`
-- a `$…$` LaTeX island: `$\frac{1}{2}$` — see
-  [LaTeX Islands](/literals/#latex-islands)
-- a function call: `f(x, y)`
-- an index expression: `xs[i]`
-- a field access: `p.x`
-
-## Calls, indexing and field access
-
-A call is a symbol (or another primary) immediately followed — with **no**
-whitespace — by a parenthesized, comma-separated argument list:
-
-```epsil
-f(x, y)
-f()
-```
-
-An argument may be prefixed with `...` to spread a tuple's elements into the
-call's arguments (`...` is also valid in list, set, and dictionary
-literals, where it splices non-tuple collections — see
-[Spread](/operators/#spread)):
-
-```epsil
-f(...p)
-f(1, ...p)
-```
-
-The callee does not have to be a bare symbol. A parenthesized expression, or
-the result of another call, can be called too:
-
-```epsil
-(getF())(x)
-(a + b)(2+1)
-```
-
-### Named arguments
-
-An argument can be passed by the name of the parameter it is for, written
-`name: value`. Named arguments may be given in any order, and may follow
-positional arguments — but never precede them:
-
-```epsil
-function interest(principal: number, rate: number) -> number {
-  principal * rate
-}
-
-interest(principal: 1000, rate: 0.05)   // ➔ 50
-interest(rate: 0.05, principal: 1000)   // ➔ 50 — order-free
-interest(1000, rate: 0.05)              // ➔ 50 — positional prefix is fine
-interest(rate: 0.05, 1000)              // ✘ positional after named
-```
-
-The names checked are the ones the callee's **declaration** carries — a
-`function` definition's parameters, a
-[named function-type annotation](/declarations/#function-type-annotations-bind-their-parameter-names),
-an annotated lambda (including one assigned to a name,
-`f := (x: number, y: string) |-> x + 3` then `f(y: "ok", x: 1)`), or a
-protocol member's requirement (both the bare call
-`compare(other: y, self: x)` and the qualified
-`Comparable.compare(other: y, self: x)`, which dispatch on `self`
-wherever it is written). An inline lambda applied directly reads its
-names from the expression itself — `((x: number) |-> x + 1)(x: 5)` is
-`6`, and unannotated parameters work there too,
-`((x, y) |-> x - y)(y: 2, x: 10)` is `8`.
-
-A parameter without a declared name is positional-only, and a callee
-whose parameter names the engine cannot read cannot take named
-arguments at all: a forward reference (a call *before* the statement
-that pins the callee's signature), a value typed only as `function`,
-or an **unannotated** lambda reached through a binding —
-`h := (x, y) |-> …` then `h(x: 1, y: 2)` declines, because type
-inference drops the parameter names; annotate the parameters to call
-it by name. A misspelled name gets a "did you mean" pointing at the
-closest declared one.
-
-A call that names any argument is a **complete** call: optional
-parameters may simply be omitted, but a missing required parameter is an
-error — a named call never turns into a partial application — and a
-variadic tail cannot be filled (nor can `...` spread arguments mix with
-names). Partial application and spreads remain available through purely
-positional calls.
-
-When a function has several clauses or overloads, a named argument is
-also a **branch selector**: a clause that does not declare the written
-name is never chosen, even if the argument's value would have selected
-it. With clauses `(z: 0)`, `(o: 1)` and `(n: integer)`, the call
-`f(n: 0)` runs the general `n` clause with the argument `0`, while
-`f(0)` runs the `z: 0` base clause. Among the clauses that do declare
-the written names, selection works exactly as for a positional call. If
-the surviving overloads read the same names in different orders and
-nothing else tells them apart, the call is an error asking you to be
-explicit — call it positionally.
-
-Note the disambiguations: `f(a := 1)` passes the *assignment* `a := 1`
-as an ordinary argument (the token is `:=`, not `:`), and each
-diagnostic these rules produce has an extended explanation under
-`epsil doc <code>` (e.g. `epsil doc argument-name-unknown`).
-
-Indexing is a primary immediately followed — with no whitespace — by a
-bracketed index expression. Indexing is **1-based** (`xs[1]` is the first
-element):
-
-```epsil
-xs[i]
-f(x)[0]
-```
-
-Field access is a primary immediately followed — with no whitespace — by a
-`.` and a symbol. Chains associate left, and a field value can be called like
-any other computed callee:
-
-```epsil
-p.x
-a.b.c
-p.x(2)
-```
-
-A number literal never takes a field: the lexer folds a trailing dot into
-the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
-range. See [Types](/types/#values-of-a-new-type-are-opaque) for what
-`p.x` means on values of declared types, records and dictionaries.
-
-In all three cases the `(`, `[` or `.` must directly abut the
-callee/indexed expression: whitespace before it means the form is a
-separate primary (or, for `.`, a diagnosed stray token), not a
-call/index/field — the same whitespace-sensitivity that governs operators.
-
-## Collections, tuples, and dictionaries
-
-- **List**: `[a, b]`; `[]` is the empty list.
-- **Set**: `{a, b}`; `{}` is the empty set.
-- **Tuple**: `(a, b)`. A single parenthesized element, `(a)`, is just the
-  parenthesized expression `a`, not a one-element tuple; `()` is a diagnostic
-  (`expression-expected`) — there is no empty tuple — **except** immediately
-  before a mapsto arrow, where `() |-> expr` is a zero-parameter lambda.
-- **Dictionary**: `{k -> v}`; an unquoted key becomes a string key. The empty
-  dictionary is spelled `{->}`, not `{}` (which is the empty set).
-
-`{ … }` is disambiguated by looking at the first element once it has been
-parsed: if it is followed by a top-level `->`, the whole `{ … }` is a
-dictionary and every subsequent element must also be a `key -> value` pair;
-otherwise `{ … }` is a set.
-
-A `{` in expression position is therefore **always** a collection literal (set
-or dictionary); to open a statement block in expression position, prefix it
-with `do`. `do { … }` is a block expression — a statement sequence whose value
-is its last statement — while a bare `{ … }` stays a set/dictionary. See
-[Blocks](/control-flow/#blocks).
-
-```epsil
-{ one -> 1, two -> 2 }
-```
-
-Trailing commas are allowed in every collection form (lists, sets, tuples,
-dictionaries, and call/index argument lists) — friendly to notebook editing
-and diffs:
-
-```epsil
-[1, 2, 3,]    // same as [1, 2, 3]
-```
-
-A bare, top-level comma-separated sequence with no enclosing delimiter (for
-example `1, 2, 3` on its own) is **not** a sequence literal — it is a
-diagnostic. A sequence is written only as an explicit call, `Sequence(1, 2, 3)`.
-
-## Round-trips
-
-Reading a program and writing it back out reproduces its meaning, but not
-necessarily its spelling. A few forms have one canonical rendering: numbers get
-a single spelling (with `_` digit grouping), a division is always written with
-an explicit `/`, `2x` keeps its juxtaposed form where that re-reads
-unambiguously (but `2(x+1)` and `(x+y)(3+4)` keep an explicit `*`, since a
-juxtaposed group would read as a call), and `is` is written as `in` — the two
-spell the same membership test.
-
-Comments are **not** preserved by a round-trip — see
-[Comments](/comments/). For the exact list of normalizations, see
-[Round-trip and serialization normalizations](/implementation/#round-trip-and-serialization-normalizations).
-
-## Relationship to the loose math parser
-
-Epsil is a **programming-language** syntax. The Compute Engine also ships a
-*loose math parser* that reads LaTeX/ASCII-math notation. The two share a few
-surface forms but are **not** the same language: in Epsil a juxtaposed name is
-a single identifier (`sin` is one symbol, not `s·i·n`), `f(x, y)` is a function
-call rather than a product, and `**` is exponentiation. Do not assume a snippet
-means the same thing to both. See
-[Relationship to the loose math parser](/implementation/#relationship-to-the-loose-math-parser)
-for a form-by-form comparison.
 
 ---
 
@@ -2888,10 +2483,10 @@ keywords and word operators `break`, `const`, `continue`, `do`, `else`, `for`,
 `function`, `if`, `in`, `match`, `protocol`, `while`.
 
 Every other reserved word listed below is an ordinary identifier today: it can
-name a binding, be assigned to, be a `|->` parameter, and be called. The words
+name a binding, be assigned to, be a `=>` parameter, and be called. The words
 are listed because the language reserves the right to claim them later, and
-because a future construct that can be recognized contextually — as `type` and
-`alias` already are — will not need to claim them at all. Prefer not to use
+because a future construct that can be recognized contextually — as `type`,
+`alias` and `hold` already are — will not need to claim them at all. Prefer not to use
 them as names.
 
 **Reserved words** are: `abstract`, `at`, `and`, `as`, `async`, `assert`,
@@ -3129,1922 +2724,6 @@ always means "LaTeX island begins here," never "symbol reference."
 
 ---
 
-# Epsil Operators
-
-Source: https://epsil.dev/operators/
-
-# Operators
-
-Most operators are infix operators: they have two operands, a left-hand side
-(lhs) operand and a right-hand side operand (rhs).
-
-An infix operator can either have whitespace before and after the operator or
-have no whitespace neither before nor after the operator.
-
-Infix operators have a precedence that indicate how strongly they bind to their
-operand and a left or right associativity.
-
-A few operators are prefix operators: they only have a right-hand side. Prefix
-operators are followed immediately by their operand: they cannot be separated by
-whitespace.
-
-A postfix operator (`!`, `Factorial`) has only a left-hand side and follows it
-immediately: like a prefix operator, it cannot be separated from its operand by
-whitespace.
-
-:::info
-
-The whitespace rules are necessary to support unambiguous parsing of expressions
-spanning multiple lines without requiring a separator between expressions
-
-:::
-
-The table below is the complete set of operators, with their spelling,
-precedence and associativity — if a symbol is not listed there, it is not an
-operator.
-
-## Precedence
-
-The operator at the root of the parse tree has the lowest precedence.
-
-Precedence tiers are numbered in gaps of 10, **loosest to tightest** — a
-higher number binds **tighter**. Operators in the same tier have the same
-precedence (for example `+` and `-`, or `*` and `/`).
-
-| Tier | Operator            | ASCII  | Fancy | Kind   | Associativity |
-| ---- | -------------------- | ------ | ----- | ------ | ------------- |
-| 10   | Assign                | `:=`   |       | infix  | right         |
-| —    | Assign _or_ Equal     | `=`    |       | infix  | positional    |
-| 15   | MapsTo                | `\|->` | `↦`   | infix  | right         |
-| 18   | Coalesce              | `??`   |       | infix  | right         |
-| 20   | Pipe                  | `\|>`  |       | infix  | left          |
-| 20   | Pipe                  | `~>`   |       | infix  | left          |
-| 30   | KeyValuePair          | `->`   | `→`   | infix  | left          |
-| 40   | Or                    | `\|\|` | `⋁`   | infix  | left          |
-| 50   | And                   | `&&`   | `⋀`   | infix  | left          |
-| 60   | Equal                 | `==`   |       | infix  | n-ary chain   |
-| 60   | Same                  | `===`  |       | infix  | n-ary chain   |
-| 60   | NotEqual              | `!=`   | `≠`   | infix  | n-ary chain   |
-| 60   | Less                  | `<`    |       | infix  | n-ary chain   |
-| 60   | Greater               | `>`    |       | infix  | n-ary chain   |
-| 60   | LessEqual             | `<=`   | `⩽`   | infix  | n-ary chain   |
-| 60   | GreaterEqual          | `>=`   | `⩾`   | infix  | n-ary chain   |
-| 60   | Element               | `in`   | `∈`   | infix  | n-ary chain   |
-| 60   | Element (type test)   | `is`   |       | infix  |               |
-| 60   | NotElement            | `!in`  | `∉`   | infix  | n-ary chain   |
-| 65   | Range                 | `..`   | `‥`   | infix  | left          |
-| 70   | Add                   | `+`    |       | infix  | left          |
-| 70   | Subtract              | `-`    | `−`   | infix  | left          |
-| 80   | Multiply              | `*`    | `×`   | infix   | left          |
-| 80   | Divide                | `/`    | `÷`   | infix   | left          |
-| 80   | Mod                   | `%`    |       | infix   | left          |
-| 90   | Negate                | `-`    | `−`   | prefix  |               |
-| 90   | Not                   | `!`    | `¬`   | prefix  |               |
-| 100  | Power                 | `^`    |       | infix   | right         |
-| 100  | Power                 | `**`   |       | infix   | right         |
-| 110  | Factorial             | `!`    |       | postfix |               |
-
-Postfix calls and indexing (`f(x)`, `xs[i]`) bind tighter than every entry in
-this table — they are handled directly by the parser rather than through the
-operator table, since they are not spelled with an operator symbol.
-
-The conditional expression `a if c else b` is not an operator row either, but
-it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
-binds looser than every operator that computes and tighter than the forms that
-bind or pair (`=`, `|->`, `|>`, `->`). See
-[Control Flow](/control-flow/#the-conditional-expression-a-if-c-else-b).
-
-## The whitespace rule
-
-An infix operator must have whitespace on **both** sides or on **neither**
-side. A prefix operator must have **no** whitespace before its operand. These
-rules let a multi-line program parse deterministically without a separator
-between every expression:
-
-```epsil
-a + b     // infix addition
-a+b       // same: whitespace on neither side
-```
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-a +b
-```
-
-Here `+` has whitespace before but not after: it is **not** treated as infix.
-The expression `a` ends there; `+b` is left over on the same line with no
-separator before it, which is a diagnostic (`unexpected-symbol`) rather than a
-silently-inferred sequence — see [Statements and Sequencing](/syntax/).
-On its own line (after a linebreak or `;`), `+b` is a valid new statement:
-unary `+` is the identity, so `a` and `+b` are simply two statements.
-
-```epsil
-a+ b
-```
-
-Here `+` has whitespace after but not before: an **asymmetric** case. The
-parser recovers as infix `Add` but reports an
-`asymmetric-operator-whitespace` diagnostic (with a fix-it), since this is
-more useful to the author than silently ending the statement.
-
-## Pipe: `|>` and `~>` {#pipe}
-
-`x |> f` is `f(x)`. Chained, it lets a sequence of transformations be read in
-the order they happen instead of inside-out:
-
-```epsil-live
-[3, 1, 2] |> Sort |> Reverse
-// ➔ [3, 2, 1]
-```
-
-A stage that takes more than one argument is written as a call, with `_` in the
-slot the piped value fills:
-
-```epsil-live
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
-// ➔ 165
-```
-
-The `_` may be left out: a call stage that is missing required arguments
-receives the piped value in the first slot its type fits, so
-`xs |> Take(10)` means `xs |> Take(_, 10)` and `xs |> Map(f)` means
-`xs |> Map(f, _)` (the mapping function is `Map`'s first argument). This
-only fills a hole — a call that is already complete keeps its ordinary
-meaning, and an explicit `_` anywhere in the call says exactly where the
-piped value goes.
-
-A stage may also be a **lambda**, written inline without parentheses — after
-`|>` the arrow binds tighter than the pipe, and the lambda's body ends at the
-next `|>`. When the piped value is a collection, a one-parameter lambda stage
-is applied **to each element** (an implicit `Map`); `_^2` is shorthand for
-such a lambda. The following three pipelines are equivalent:
-
-```epsil-live
-1..oo |> Take(_, 10) |> Map(_^2, _) |> Sum
-// ➔ 385
-```
-
-```epsil
-1..oo |> Take(10) |> x |-> x^2 |> Sum
-1..oo |> Take(10) |> _^2 |> Sum
-```
-
-Note the two readings of `_`: in a **call** stage it is the piped value
-(`Take(_, 10)`); in an **operator-written** stage (`_^2`, `_ + 1`) it is the
-element of the implicit lambda. A **named** function stage always receives
-the whole value — `xs |> Sum` sums the collection, it does not map — as does
-a lambda whose annotated parameter accepts it
-(`xs |> (l: list<number>) |-> Length(l)`).
-
-`|>` and `~>` are aliases for `Pipe` and sit at the **loosest** precedence
-tier, right below `Assign` — looser than arithmetic, relational, and boolean
-operators (Elixir-style). It is left-associative, so `a |> f |> g` is `g(f(a))`:
-
-```epsil
-a + b |> f       // (a + b) |> f
-a || b |> f      // (a || b) |> f
-x = a |> f       // x = (a |> f)
-```
-
-<ReadMore path="/control-flow/#pipelines">
-When to reach for a **pipeline** — and when a nested call or a named
-intermediate reads better.
-</ReadMore>
-
-## Absence coalescing: `??` {#absence-coalescing}
-
-`a ?? b` is `Coalesce(a, b)`: the value of `a` unless `a` is **absent**
-(`Missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
-evaluated when `a` is present.
-
-```epsil
-let timeout = config.timeout ?? 30
-let first = xs[1] ?? 0
-```
-
-`??` discharges **absence**. It does _not_ rescue an `Error`: an error operand
-is an error, not a missing value, and propagates.
-
-It is right-associative, so a chain falls through left to right:
-
-```epsil
-a ?? b ?? c      // Coalesce(a, Coalesce(b, c))
-```
-
-Its precedence (18) sits between `|->` and `|>`, which fixes the two groupings
-that matter:
-
-```epsil
-xs |> f ?? 0     // (xs |> f) ?? 0 — the default is for the pipeline's RESULT
-x |-> x.a ?? 0   // x |-> (x.a ?? 0) — the default is inside the body
-```
-
-Like `|>`, it is looser than `->`, so a dictionary value needs parentheses:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-{a -> 1, b -> x ?? 2}
-```
-
-Write `{a -> 1, b -> (x ?? 2)}` instead. It is also looser than `||` and `&&`
-(the C# position), so `a ?? b || c` is `a ?? (b || c)`.
-
-## Type test: `is`
-
-`x is integer` tests at runtime whether a value inhabits a type. It is the
-same test a `match` type pattern performs, and lowers to the same
-`Element(value, type)` expression:
-
-```epsil
-x is integer
-x is string && y is boolean
-```
-
-The right operand is a **type name**, not an expression, so a typo is a
-parse-time diagnostic rather than a comparison against an undeclared symbol.
-This first version resolves **simple named types** only: a compound type
-(`!error`, `integer | string`, `list<integer>`) parses but reports
-`type-pattern-unsupported`, exactly as the equivalent typed pattern does.
-
-`is` is a **contextual** word, not a reserved one — it is recognized only
-between an operand and a type name, so `let is = 5` and `f(is)` remain legal.
-
-Since `is` and `in` express the same membership test, a program written back
-out from its parsed form uses `in` for both.
-
-## Anonymous functions: `|->` {#anonymous-functions}
-
-The mapsto operator constructs an anonymous function:
-
-```epsil
-x |-> x^2
-(x, y) |-> x + y
-```
-
-It is right-associative, so `x |-> y |-> x + y` constructs a function that
-returns another function. It binds tighter than assignment but more loosely
-than the other expression operators, so `f = x |-> x + 1` assigns the complete
-function to `f`. Typed parameters can be written in parentheses:
-
-```epsil
-(x: integer) |-> x + 1
-```
-
-The `MapsTo` name in the table is internal to parsing: it names the operator,
-not the function value the expression produces.
-
-A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
-`(n: integer) -> n^2`, `f = x -> x + 1` — is diagnosed as a wrong-arrow typo
-(with a fixit) and recovered as the intended function: `->` builds a
-`key -> value` pair, and none of those shapes is a valid key.
-
-## Ranges: `..` {#ranges}
-
-The range operator is a compact spelling of a two-argument `Range`:
-
-```epsil
-1..5          // Range(1, 5)
-1..n - 1      // Range(1, n - 1)
-k in 1..5     // k in Range(1, 5)
-```
-
-It binds tighter than relational operators and more loosely than addition and
-subtraction. The Unicode two-dot leader `‥` is an input alias. Serialization
-uses `Range(a, b)`, and a stepped range continues to use the three-argument
-call `Range(a, b, step)`.
-
-## Spread: `...` {#spread}
-
-A prefix `...` splices a value's elements into the surrounding sequence. It
-is accepted in two positions — a **call argument list** and a **list
-literal** — and the three-dot token is distinct from the range operator
-`..`; anywhere else `...` is a diagnostic. (In a `match` pattern, `...rest`
-is the same idea in reverse: it *collects* the remaining elements.)
-
-In a **call argument list**, `...` spreads a tuple into the call's
-arguments: the tuple's elements become ordinary positional arguments.
-
-```epsil
-f(...t)          // t's elements become f's arguments
-f(1, ...t, q)    // splices between positional arguments
-g(...p, ...q)    // several spreads splice in order
-Max(...t)        // variadic built-ins accept spreads
-```
-
-In a call, only **tuples** spread — argument lists are tuple-shaped, so a
-`List` (or any other value) is an `incompatible-type` error. A literal tuple
-splices immediately; a symbolic argument is spliced when the call evaluates,
-and until then the call stays symbolic (the spread never binds positionally
-to a single parameter).
-
-In a **list or set literal**, `...` splices a collection — a list, a set, a
-range:
-
-```epsil-live
-let xs = [1, 2]
-[...xs, 3, ...(4..6)]
-// ➔ [1, 2, 3, 4, 5, 6]
-```
-
-```epsil-live
-let s = {2, 3}
-{1, ...s, ...[3, 4]}
-// ➔ Set(1, 2, 3, 4)
-```
-
-The splice happens at canonicalization: literal collections splice
-immediately, and a symbolic or lazy segment lowers to the equivalent
-`Join` expression — a lone spread `[...xs]` is `Join(xs)`, the list
-materialization of `xs`, and an infinite segment stays lazy
-(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
-usual.
-
-**Tuples do not spread here** — a tuple is a unit (a point, a pair), and
-splicing it would quietly discard that; spreading one is a `spread-tuple`
-error. To use a tuple's elements, convert explicitly:
-`[...ListFrom(t), 3]`. A scalar or string operand is an
-`incompatible-type` error (a string is a scalar, not a character
-collection). Note the mirror-image rule in calls: argument lists are
-tuple-shaped, so there exactly tuples spread.
-
-In a **dictionary literal**, `...` merges the entries of a dictionary.
-Entries combine left to right and a **later entry wins** on a key
-collision — so a literal entry after a spread overrides it, the usual
-defaults idiom:
-
-```epsil-live
-let defaults = {"verbose" -> false, "depth" -> 3}
-{...defaults, "verbose" -> true}
-// ➔ {"dict":{"verbose":true,"depth":3}}
-```
-
-(Duplicate **literal** keys are different: they are almost certainly typos,
-so they keep the literal rule — first wins, with a
-`duplicate-dictionary-key` diagnostic.)
-
-A brace of *only* spreads has nothing to mark it as a dictionary, so it is
-read as a **set**-spread. To write a pure merge, lead with the bare `->`
-marker (the same marker as the empty dictionary `{->}`):
-
-```epsil
-{...a, ...b}        // a SET containing the elements of a and b
-{->, ...d1, ...d2}  // a dictionary merge of d1 and d2
-```
-
-## Unary prefix: `-` and `!` {#unary-prefix}
-
-`-` (`Negate`) and `!` (`Not`) are prefix operators. They must abut their
-operand with no whitespace:
-
-```epsil
--x        // negation
-!a        // logical not
-!!a       // double negation — `!!` lexes as one token that peels into two
-```
-
-`Negate`/`Not` bind looser than `Power`, so a leading minus does not reach
-inside an exponent:
-
-```epsil
--x^2      // -(x^2), not (-x)^2
-```
-
-A unary minus applied directly to a number literal folds into the literal
-rather than becoming a negation:
-
-```epsil
--2        // the literal -2, not a negation of 2
-```
-
-Unary `+` is accepted the same way but is the identity: `+(2 + 1)` is just
-`2 + 1`.
-
-## Power: `^` and `**` {#power}
-
-`Power` is the tightest operator in the table and is **right-associative**.
-`**` is an accepted alias for `^` (same table row, same precedence):
-
-```epsil
-x^2       // exponentiation
-x**2      // the same
-2^3^2     // 2^(3^2) — right-associative
-```
-
-Because `Power` binds tighter than `Multiply`/`Divide`:
-
-```epsil
-x^1/2     // (x^1)/2, not x^(1/2)
-```
-
-## Modulo: `%` {#modulo}
-
-`%` is `Mod`, an infix operator at the multiplicative tier (the same
-precedence as `*` and `/`), left-associative:
-
-```epsil
-a % b       // remainder
-a + b % c   // a + (b % c)
-a % b % c   // (a % b) % c — left-associative
-```
-
-## Factorial: postfix `!` {#factorial}
-
-`!` in **postfix** position is `Factorial`. Position disambiguates it from the
-prefix `!` (`Not`): a `!` that abuts the preceding operand is a factorial
-(`x!`), while a `!` at the start of an operand is `Not` (`!x`).
-
-```epsil
-5!          // factorial
-n!          // factorial
-!x          // prefix not, unchanged
-```
-
-`Factorial` binds tighter than `Power` (tier 110 vs. 100), so it reaches inside
-a `Power` operand, and a leading minus stays outside it:
-
-```epsil
-2^3!        // 2^(3!)
-3! ^ 2      // (3!)^2
--3!         // -(3!)
-```
-
-It also applies after a parenthesized expression, a call, or an index:
-
-```epsil
-(a + b)!    // factorial of the sum
-f(x)!       // factorial of the result
-```
-
-Like a prefix operator, a postfix `!` must **abut** its operand: `x!` is a
-factorial, but `x !y` is not — the space before `!` ends the `x` expression,
-leaving `!y` (a prefix `Not`) with no separator, which is a diagnostic. Because
-the lexer maximal-munches a run of operator characters into one token, a `!`
-directly followed by another operator character is not seen as a lone `!`
-(write `3! ^ 2`, not `3!^2`; `x! + 1`, not `x!+1`). The `!=` (`NotEqual`) and
-`!in` (`NotElement`) operators are unaffected: the lexer keeps `!=` whole and
-`!in` is recognized as a compound before the postfix `!`.
-
-## Invisible multiplication
-
-A number literal immediately followed — with **no** whitespace — by a symbol
-or an opening parenthesis is read as an implicit `Multiply`:
-
-```epsil
-2x        // 2 * x
-3x^3      // 3·(x^3)
-2i        // 2 * i, where `i` is the imaginary unit
-2(2 + 1)  // 2 * (2 + 1)
-```
-
-Note that a **symbol** immediately followed by `(` is a **function call**, not
-an invisible multiplication: `x(2+1)` calls `x`, and `(a+b)(2+1)` calls the
-value of `a+b`. Only a *number* on the left means multiplication. See
-[Calls and Indexing](/syntax/).
-
-Whitespace between the number and the symbol suppresses invisible
-multiplication and is instead a statement boundary: `2 1/2` is a diagnostic
-(`unexpected-symbol`), not `2 * (1/2)`.
-
-## Chained relational operators
-
-Relational operators (precedence tier 60) are **chainable**, matching how
-mathematicians write inequalities: `a < b < c` means what it looks like, and so
-does a chain that mixes operators —
-
-```epsil
-a < b <= c
-```
-
-means `a < b && b <= c`. A mixed chain is rewritten into that pairwise
-conjunction before it is evaluated, so both kinds of chain have the usual
-mathematical chained-comparison semantics.
-
-## Logic operators
-
-- `&&` (`And`), `||` (`Or`), `!` (`Not`), with the fancy Unicode forms `⋀`,
-  `⋁`, `¬`.
-- `&&` binds tighter than `||`, matching the tiers above.
-
-The word forms `and`, `or`, and `not`, and the implication/equivalence infix
-operators `=>` and `<=>`, are reserved but not implemented. The token `=>` is
-used contextually to separate a `match` pattern from its result.
-
-## Assignment vs. equality
-
-Three spellings, two meanings:
-
-- **`:=` always assigns.**
-- **`==` always compares** (and `===` is `Same`, structural identity).
-  A third comparison tier asks the prover whether the two sides are equal
-  for **every** value of their free variables:
-  `IdenticallyEqual(Sin(t)^2 + Cos(t)^2, 1)` is `True`, where `==` leaves
-  the equation as an inert condition. It is deliberately spelled as a call,
-  never as an operator — the equivalence glyphs `≡`, `≢`, and `≣` are
-  rejected outright, because their bar counts cross the `=`-run lengths
-  (`≡` has three bars, `≣` four) and a visual transliteration would
-  silently land on the wrong tier.
-- **`=` is positional.** It assigns when it is the top-level operator of a
-  **statement** whose left side is a binding target — a name, or a field/index
-  path rooted at one. Everywhere else it compares.
-
-So a statement assigns:
-
-```epsil
-x = 5
-count = count + 1
-```
-
-…while the same `=` inside any larger expression is an equation, which is what
-a reader of mathematics expects:
-
-```epsil
-Solve(x^2 = 4, x)        // Equal — the equation, not an assignment
-if a = true { 1 } else { 2 }
-[a = 1, b = 2]
-```
-
-This is why `=` needs no parentheses to be safe in a condition: `if a = true`
-cannot silently assign, and the C footgun does not exist in Epsil.
-
-As a comparison, `=` binds at the relational tier (60) like `==`, so
-`if x = 5 && y` groups as `(x = 5) && y`. As an assignment it binds loosest
-(10), taking the whole right-hand side.
-
-Two consequences worth knowing:
-
-**A non-binding left side compares, even as a statement.** `x^2 = 4` on its own
-line is the equation, because `x^2` is not a name. A bare name always assigns,
-so write `==` when you mean the equation:
-
-```epsil
-y == 2 * x + 1           // the equation
-y = 2 * x + 1            // assigns to y
-```
-
-**A chain is diagnosed.** `a = b = 5` would assign `a` the *boolean* `b == 5`,
-which is never what a chained assignment means:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-a = b = 5
-```
-
-Write `a := b := 5` to chain the assignment, or `a = (b = 5)` if the comparison
-really was intended.
-
-**A tuple pattern with a bare `=` is diagnosed.** A parenthesized left side is
-not a binding target, so `(a, b) = (b, a)` is a *comparison* of two tuples
-whose result is discarded — the swap it looks like silently does nothing:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-(a, b) = (b, a)
-```
-
-Write `(a, b) := (b, a)` to
-[destructure](/declarations/#destructuring-assignment), or `==` if the
-comparison really was intended. The diagnostic is narrow: it fires only when
-the left side is shaped exactly like a destructuring pattern (bare names, `_`,
-nested tuples), so a genuine tuple equation with computed components —
-`(x + 1, y) = t` — stays silent.
-
-**An assignment in a condition is a warning.** `:=` is unconditional, so it
-reaches a condition where a bare `=` no longer can — and Epsil has no
-`if init; cond` form, so the assigned value *is* the test:
-
-```epsil
-if flag := true { 1 }   // warning: assign-in-condition
-```
-
-It is a warning rather than an error, since `:=` is the deliberate spelling.
-It fires only where a value is consumed as a boolean — an `if`/`while`
-condition — not for `f(a := 1)` or `[a := 1]`, which are unambiguous.
-
-**Serialization uses the explicit spellings.** An expression written back out
-by the formatter or serializer always uses `:=` for assignment and `==` for
-comparison, never a bare `=` — so a round-trip is exact regardless of position.
-`=` is an input convenience.
-
----
-
-# Epsil Control Flow
-
-Source: https://epsil.dev/control-flow/
-
-# Control Flow
-
-## Functions
-
-A function can be defined in two forms, which mean the same thing.
-
-The **math style** is a single expression:
-
-```epsil
-f(x) = x + 1
-```
-
-```epsil
-f(x, y) = x + y
-```
-
-The **block style** wraps the body in a statement block, whose value is its
-last expression:
-
-```epsil
-function f(x) { x + 1 }
-```
-
-Parameters can carry a type annotation (`f(x: real) = …`), and the block
-form accepts a return-type annotation in the unambiguous post-parameter-list
-position (`function f(x) -> real { … }`). Parameter types are enforced when
-the function is called. Return types are retained in the function signature;
-the current runtime does not validate the inferred type of every returned
-value against that annotation.
-
-```epsil
-f(x: real) = x + 1
-```
-
-### Which form to use
-
-The three spellings differ only in ergonomics, so pick by the shape of the
-body:
-
-- **Math style** (`f(x) = …`) for a formula that fits on one line. It is how
-  the definition would be written on paper, and it is the right default for
-  mathematical code.
-- **Block style** (`function f(x) { … }`) once the body needs more than an
-  expression — a local `let`, a `match`, a loop. It is also the only form that
-  carries a name *and* a multi-statement body.
-- **Anonymous** (`x |-> …`) when the function is an argument to another
-  function and a name would add nothing: `Map(x |-> x^2, xs)`.
-
-An anonymous function can have a multi-statement body too, by making that body
-a [`do` block](#do-block-expressions) — but at that point a named `function` is
-usually clearer.
-
-### Effect specifiers
-
-A definition can state the effects that calling it may perform. The specifier
-sits after the parameter list and before the return arrow:
-
-```epsil
-function roll(n) random -> integer { Random(n) }
-```
-
-The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
-`fs_write`, `network`, `random`, `scope`, `state`, and `time`. Several
-labels may be listed with spaces. `pure` explicitly promises no effects; `any` means the
-effects are unknown. `pure` and `any` must appear alone.
-
-Without a specifier, effects are inferred from the body and may change when
-the definition is replaced. A written specifier is a contract: the body's
-inferred effects must be a subset of it. A pure body may satisfy a broader
-contract, but a body that performs an undeclared effect is rejected.
-
-The block form may omit the return annotation (`function f() random { … }`),
-in which case its declared result is `unknown`. In the math form, a written
-effect specifier must be followed by a return arrow:
-
-```epsil
-roll(n) random -> integer = Random(n)
-```
-
-See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
-subtyping, callback checks, and the distinction between inferred and declared
-effects.
-
-### Multiple clauses (literal parameters)
-
-A parameter can be a **literal** — a number, string, boolean, `Infinity`,
-`-Infinity`, or `NaN` (the spellings that are literals in expression
-position; `oo` is an input alias for `Infinity`. A constant *name* like
-`Pi` is a symbol and stays a parameter name — writing `f(Pi) = …` binds a
-parameter named `Pi` and draws an advisory `parameter-shadows-constant`
-diagnostic). Definition statements **accumulate**: defining the same name again
-with a different parameter list adds a *clause* rather than replacing the
-function, and a call dispatches to the most specific clause that matches
-its arguments (declaration order only breaks ties between equally specific
-clauses). A non-finite literal clause matches only itself — `f(NaN) = 0`
-handles exactly `NaN`; a `f(x: real)` clause never captures it:
-
-```epsil
-f(NaN) = 0
-f(Infinity) = 1
-f(x: number) = x + 1
-f(Infinity) + f(NaN)
-// ➔ 1
-```
-
-```epsil
-fib(0) = 0
-fib(1) = 1
-fib(n: integer) = fib(n - 1) + fib(n - 2)
-fib(10)
-// ➔ 55
-```
-
-Redefining a clause with the *same* parameter list replaces just that
-clause — so re-running an edited definition behaves as expected. A plain
-assignment (`f = x |-> …`) still replaces the whole binding, clauses and
-all.
-
-A literal parameter behaves as an anonymous parameter constrained to that exact
-value — the clause is selected only when the argument *is* that value.
-
-If no clause matches the evaluated arguments, the call is a
-`no-matching-clause` error. To inspect the clause set of a function, use
-`About`:
-
-```epsil
-f(0) = 1
-f(n: integer) = n + 1
-About(f)
-```
-
-The listing shows one line per clause, in declaration order, and annotates
-clauses that overlap an earlier one of equal specificity as well as clauses
-made unreachable by more specific ones covering their whole (finite)
-domain.
-
-### Anonymous functions
-
-An anonymous function uses the ASCII mapsto arrow `|->` (the engine's `↦`);
-`->` itself is taken by `KeyValuePair`, so this is a collision-free choice:
-
-```epsil
-x |-> x + 1
-```
-
-```epsil
-(x, y) |-> x + y
-```
-
-A mapsto binds loosely enough to sit on the right-hand side of an
-assignment:
-
-```epsil
-f = x |-> x + 1
-```
-
-A lambda can take **no** parameters — an empty parameter list `()` before the
-arrow:
-
-```epsil
-() |-> 42
-```
-
-Writing `->` where a function was meant — `(x, y) -> x + y`,
-`(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `|->` with a
-fixit and recovers as the intended function, so the program still runs. And
-when a declaration's annotation is a function type with named parameters, the
-lambda can be omitted entirely — `const f : (x: number) -> number = x^2 + 1`
-binds `x` from the annotation. See
-[Function-type annotations](/declarations/#function-type-annotations-bind-their-parameter-names).
-
-## `if` / `else` {#if-else}
-
-`if`/`else` is an **expression**, not a statement — it evaluates to a value:
-
-```epsil
-if x > 0 { 1 } else { 2 }
-```
-
-The `else` branch is optional:
-
-```epsil
-if x > 0 { 1 }
-```
-
-`else if` chains nest, so an `if` in `else` position is just another
-conditional:
-
-```epsil
-if x > 0 { 1 } else if x < 0 { 2 } else { 3 }
-```
-
-A `{ }` block's value is its last expression — the same block semantics
-as a multi-statement program (see [Blocks](#blocks) below).
-
-### The conditional expression `a if c else b`
-
-When both branches are single expressions, the braces are noise. The
-conditional form spells the same conditional without them:
-
-```epsil
-let x = 5
-10 if x > 3 else 20
-// ➔ 10
-```
-
-It is the *same* conditional as `if`/`else` — only the branches differ: plain
-expressions instead of blocks, so it introduces no scope and no statement can
-appear in a branch.
-
-Three rules follow from where it sits in the grammar:
-
-**The `else` is required.** It is what ends the condition, and a missing branch
-would leave the false case with no value to name. `1 if c` is an error; use the
-block form (`if c { 1 }`) when there is nothing to return.
-
-**It binds looser than every operator that computes, but tighter than the four
-that bind or pair — `=`, `|->`, `|>` and `->`.** So the whole conditional is the
-right-hand side of an assignment, the body of a function, or the value of a
-dictionary entry, and no parentheses are needed around a comparison:
-
-```epsil
-let scale = 2
-let tag = n |-> "big" if n * scale > 10 else "small"
-tag(6)
-// ➔ "big"
-```
-
-```epsil
-let n = 7
-{ "value" -> n, "parity" -> "odd" if n % 2 == 1 else "even" }
-// ➔ {"value" -> 7, "parity" -> "odd"}
-```
-
-Going the other way — a conditional used as an operand — does need
-parentheses, since `1 if c else 2 + 3` reads as `1 if c else (2 + 3)`:
-
-```epsil
-(10 if 3 > 0 else 20) + 5
-// ➔ 15
-```
-
-**Chains nest to the right,** so there is no `else if` spelling to learn:
-
-```epsil
-let n = 0
-"zero" if n == 0 else "negative" if n < 0 else "positive"
-// ➔ "zero"
-```
-
-One layout rule: the `if` must be on the **same line** as the value before it.
-A line break separates statements, so an `if` that starts a line always begins
-a new `if`-statement, never a continuation of the line above.
-
-## `match`
-
-`match` is an **expression** that inspects the structure of a subject against
-a sequence of `pattern => body` cases and evaluates to the body of the first
-matching case:
-
-```epsil
-match x {
-  0 => "zero"
-  _ => "other"
-}
-```
-
-Unlike `if`/`Which`, `match` is **structural** and **total**: it always
-selects a case, it never stays inert. A literal pattern (`0`) matches
-structurally, and `_` is the anonymous wildcard, matching anything — with a
-symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
-is structurally not `0`, even though it *could* be zero semantically. Use
-`if`/`Which` when you want that kind of semantic case-split instead.
-
-The final catch-all may also be spelled `otherwise`, a synonym for a bare
-`_` pattern (it takes a guard the same way, and binds nothing):
-
-```epsil
-match x {
-  0 => "zero"
-  otherwise => "other"
-}
-```
-
-`otherwise` is contextual, not reserved: it means the wildcard only when it
-is the entire pattern of a case. Anywhere else — including inside a
-structured pattern like `[otherwise, 2]` — it is an ordinary identifier, and
-a bare identifier in a nested pattern position *binds* (next section).
-
-### Bindings
-
-A bare identifier in pattern position **binds** a new variable to the value
-at that position — for *any* name, including ones that happen to name an
-engine constant (`e`, `i`, `Pi`). A pattern is parsed as an ordinary
-expression first, so this applies inside nested patterns too:
-
-```epsil
-match p {
-  (x, e) => x + e
-}
-```
-
-Matching `(2, 7)` against this case binds `x` to `2` and `e` to `7` — the
-body's `e` is the captured value, not `ExponentialE`. Because a bare binding
-matches unconditionally, a *non-final* case consisting of just a binding (or
-`_`) makes every case after it unreachable; this is flagged as a
-`match-irrefutable-case` diagnostic (a final catch-all is expected and not
-flagged):
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-match x {
-  Pi => 1
-  0 => 2
-}
-```
-
-This does **not** match the constant π — `Pi` in pattern position binds a new
-variable named `Pi`, shadowing the constant, and the diagnostic is the safety
-net for that: it fires because the `Pi => 1` case is non-final and matches
-anything, not because `Pi` is a reserved name. To test against the value of
-the constant, use a pin.
-
-### Pins
-
-`== expr` matches the subject against the **value** of `expr`, evaluated in
-the enclosing scope — this is how to test a symbolic constant or a runtime
-variable, since a bare identifier always binds instead:
-
-```epsil
-match x {
-  == Pi => "is-pi"
-  _ => "no"
-}
-```
-
-```epsil
-match x {
-  == limit => 1
-  _ => 0
-}
-```
-
-A pin is resolved at match time, and a pinned name may equally be a constant or
-a runtime variable — the parser cannot tell the two apart lexically, and does
-not need to. A pin of a *literal* (`== 5`) simply matches structurally, the
-same as writing the literal directly; `Infinity`/`NaN` are numeric literals in
-Epsil, so `== Infinity` is a literal pin too, with no binding trap to avoid.
-
-### Or-alternatives
-
-`p₁ | p₂ | …` at the **top level** of a case pattern matches if any
-alternative matches; a guard, if present, applies after whichever alternative
-matched:
-
-```epsil
-match x {
-  1 | 2 | == Pi => "small"
-  _ => "big"
-}
-```
-
-Alternatives must be **binding-free** — `_` is fine (`[0, _] | [_, 0]`), but a
-named binding inside an alternative (`a | 2 => …`) is a
-`match-alternative-binding` diagnostic, since there is no single value for
-the body to bind `a` to when the alternatives disagree on shape.
-
-### Range patterns
-
-`lo..hi` in pattern position is an **inclusive numeric membership test**: the
-case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
-The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
-form keys on the operator, not on how it was written:
-
-```epsil
-match x {
-  0..9 => "digit"
-  10..99 => "two digits"
-  _ => "big"
-}
-```
-
-Both endpoints are included, and they are compared with the same tolerance
-`match` uses for every other number leaf, so a subject a hair outside an
-endpoint still selects the case. Only a **number** matches: a symbol, a
-collection, a string, a complex number and `NaN` all fall through to the next
-case.
-
-Bounds must be **numeric literals** — negated literals and `Infinity` /
-`-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
-
-```epsil
-match x {
-  0..Infinity => "nonnegative"
-  _ => "negative"
-}
-```
-
-A bound that is a bare identifier (which would otherwise *bind*, like any
-identifier in pattern position), a computed expression, or `NaN` is a
-`range-pattern-bounds` diagnostic; a stepped range is a `range-pattern-step`
-diagnostic; and a range whose lower bound exceeds its upper bound is a
-`range-pattern-empty` diagnostic (that case can never match). Use a guard when
-a bound is not a literal:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-match x {
-  0..limit => "in"
-  _ => "out"
-}
-```
-
-Write instead:
-
-```epsil
-match x {
-  n if n >= 0 && n <= limit => "in"
-  _ => "out"
-}
-```
-
-A range pattern binds nothing, so it is legal inside an or-alternative, and a
-guard on a range case can only reference names from the enclosing scope:
-
-```epsil
-match x {
-  0..9 | 100..109 => "in"
-  _ => "out"
-}
-```
-
-Two consequences worth knowing. First, this is a **carve-out**: a `Range`
-*value* can no longer be matched structurally in pattern position — write
-`== Range(1, 10)` (a pin) to compare against the range value itself. Second,
-a range nested inside a list, tuple or dictionary pattern keeps its ordinary
-structural meaning; membership applies at the top level of a case pattern (or
-of an or-alternative). A `Range` whose bounds are not literals is likewise
-still an ordinary structural pattern.
-
-Because a run of operator characters lexes as one token, a **negative upper
-bound needs a space**: write `0 .. -1`, not `0..-1` (the same maximal-munch
-rule that makes `3! ^ 2` require its space). The formatter always spaces `..`
-in pattern position for this reason.
-
-### Guards
-
-`pattern if guard => body` adds a boolean condition, checked after the
-pattern matches and after its bindings are in scope:
-
-```epsil
-match n {
-  n if n > 3 => "big"
-  _ => "small"
-}
-```
-
-If the guard is undecidable for a symbolic subject, the case falls through to
-the next one — consistent with `match`'s totality, a guard never leaves the
-whole expression inert.
-
-### Destructuring
-
-List, tuple, and dictionary patterns decompose the subject and bind their
-elements:
-
-```epsil
-match xs {
-  [first, ...rest] => first
-}
-```
-
-```epsil
-match p {
-  (x, y) => x
-}
-```
-
-```epsil
-match p {
-  {x -> px, y -> py} => px + py
-}
-```
-
-`...rest` (or bare `...`) captures the remaining elements of a list pattern;
-at most one rest is allowed per pattern — a second one is a
-`match-multiple-rest` diagnostic.
-
-Dictionary pattern keys are literal (not patternized); the values are full
-patterns — bindings, literals, pins, or nested shapes. Dictionary matching is
-**open**: a case matches when the subject is a dictionary that has *at least*
-the named keys, each with a matching value; extra subject keys are ignored. A
-subject missing any named key falls through to the next case. So
-
-```epsil
-match {x -> 3, y -> 4, z -> 5} {
-  {x -> px, y -> py} => px + py
-  _ => 0
-}
-```
-
-binds `px = 3` and `py = 4` (the extra `z` key is ignored) and evaluates to
-`7`.
-
-### Typed bindings
-
-`name: type` binds like a bare identifier, plus an implicit type guard,
-conjoined with any explicit guard:
-
-```epsil
-match n {
-  n: integer if n > 0 => "positive integer"
-  _ => "other"
-}
-```
-
-### Algebraic patterns
-
-Because a pattern is parsed as an ordinary expression, matching on operator
-structure comes for free — a pattern like `a + b` dispatches on the addition
-operator and captures its operands, with the same commutative matching the
-rule system already uses for sums and products:
-
-```epsil
-match z {
-  a + b if a > 0 => a
-  _ => 0
-}
-```
-
-This is symbolic destructuring, evaluated by the engine's general pattern
-matcher — it works when evaluating a `match` expression, but such patterns
-are not supported by `compile()`; compiling a `match` with an operator
-pattern fails closed, naming the offending pattern in the error.
-
-### No match
-
-If no case matches, `match` evaluates to an `Error` value tagged
-`'match-no-case'` carrying the subject, rather than throwing or silently
-producing `Nothing` — errors are ordinary values in Epsil (see
-[Evaluation](/evaluation/)):
-
-```epsil
-match 3 {
-  0 => "zero"
-}
-```
-
-Evaluating this expression yields `Error("match-no-case", 3)`.
-
-### `if`, `a if c else b`, or `match`? {#choosing-a-conditional}
-
-All three produce a value, so the choice is about what you are branching *on*.
-
-Branch on a **condition** — something that is true or false — with `if`. Use
-the block form when a branch needs more than one statement, and the
-[conditional expression](#the-conditional-expression-a-if-c-else-b) when both
-branches are single expressions and the braces are just noise:
-
-```epsil-live
-let n = -3
-"negative" if n < 0 else "zero" if n == 0 else "positive"
-// ➔ "negative"
-```
-
-Branch on the **shape** of a value — how it is built, and what is inside it —
-with `match`. It tests structure and binds the pieces in the same step, which
-an `if` chain cannot do without taking the value apart by hand:
-
-```epsil-live
-let v = [1, 2]
-match v {
-  [] => "empty"
-  [x] => "one item"
-  [_, ...] => "several items"
-}
-// ➔ "several items"
-```
-
-Two differences are worth remembering when the subject may be symbolic.
-`match` is **structural**: a symbolic `x` is not `0`, even though it might turn
-out to be zero, so it takes the wildcard case. And `match` is **total**: it
-always selects a case (or returns a `match-no-case` error), where an `if` on an
-undecidable condition can stay inert. When you want the semantic question —
-"is this actually zero?" — use `if`.
-
-## Loops
-
-There is one loop keyword form for each of the two common shapes. Both are
-evaluated **for effect**, not for their value — a loop's value is `Nothing`.
-Value-producing iteration over a collection belongs to the library functions
-`Map`/`Filter`/`Reduce`, not to a loop statement.
-
-`while cond { … }` repeats its body until the condition becomes false:
-
-```epsil
-while x > 0 { x }
-```
-
-`for x in xs { … }` binds the loop variable to each element in turn:
-
-```epsil
-for x in xs { x }
-```
-
-`in` is contextual: only the loop-variable `in` introduces the iterator
-clause. A second, later `in` in the collection expression is still the
-ordinary membership operator, so `for x in a in b { … }` iterates over the
-value of `a in b`:
-
-```epsil
-for x in a in b { x }
-```
-
-## Pipelines
-
-`x |> f` means exactly `f(x)`. For a single call that is a wash — `Sqrt(2)`
-says it better than `2 |> Sqrt`. What the pipe buys you is **reading order**
-once several transformations are applied one after another.
-
-Here is the same computation — keep the passing scores, curve them, take the
-average — written three ways.
-
-Nested calls:
-
-```epsil-live
-let scores = [88, 42, 95, 61, 73]
-Mean(Map(s |-> s + 5, Filter(scores, s |-> s >= 60)))
-// ➔ 337/4
-```
-
-Named intermediates:
-
-```epsil-live
-let scores = [88, 42, 95, 61, 73]
-let passing = Filter(scores, s |-> s >= 60)
-let curved = Map(s |-> s + 5, passing)
-Mean(curved)
-// ➔ 337/4
-```
-
-A pipeline:
-
-```epsil-live
-let scores = [88, 42, 95, 61, 73]
-scores |> Filter(_, s |-> s >= 60) |> Map(s |-> s + 5, _) |> Mean
-// ➔ 337/4
-```
-
-All three compute the same value. They differ in what the reader has to do.
-The nested form is written **inside-out**: to follow it you find `scores` in
-the middle and unwind outward, discovering only at the end that the last step
-is an average. The pipeline is written in the order the steps happen, and the
-subject comes first. The `let` version reads in that order too, at the price of
-naming two values that exist only to be handed to the next line.
-
-### The placeholder `_` {#pipe-placeholder}
-
-A stage that needs only the piped value is named bare:
-
-```epsil-live
-16 |> Sqrt |> N
-// ➔ 4
-```
-
-A stage that takes **more than one** argument is written as a call, with `_`
-marking the slot the piped value fills. It does not have to be the first
-argument:
-
-```epsil-live
-[3, 1, 2] |> Sort |> Take(_, 2)
-// ➔ [1, 2]
-```
-
-The `_` may be left out entirely: a call that is missing required arguments
-receives the piped value in the first slot its type fits — first for a
-collection piped into `Take(3)`, second for one piped into the
-callback-first `Map(f)` — so these are the same pipeline:
-
-```epsil
-[1, 2, 3] |> Map(n |-> n^2, _)      // [1, 4, 9]
-[1, 2, 3] |> Map(n |-> n^2)         // [1, 4, 9] — implicit argument
-```
-
-The implicit argument only fills a hole. A call that is already complete is
-never rewritten: `xs |> f(y)` applies the *value* of `f(y)` to `xs`, exactly
-as if the pipe were not there.
-
-A one-parameter **lambda** stage over a collection is applied to each
-element (an implicit `Map`), so the pipeline above can shed its `Map`
-entirely — `[1, 2, 3] |> n |-> n^2` and `[1, 2, 3] |> _^2` also produce
-`[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
-rules.
-
-### Choosing between a pipeline and a nested call
-
-Reach for a pipeline when:
-
-- there are **three or more** steps, and
-- each step consumes the whole result of the one before it, and
-- the intermediate values have no name worth inventing.
-
-Prefer a nested call when the expression is **mathematical** rather than a
-sequence of stages. `Sqrt(1 + x^2)` is how the formula is written on paper;
-`1 + x^2 |> Sqrt` is the same value spelled worse. One or two calls rarely
-benefit either way — `Mean(xs)` needs no pipe.
-
-Prefer named intermediates when a value is **used twice**, deserves a name that
-explains what it is, or is worth inspecting while you develop. A pipeline is a
-straight line: it cannot fork, so the moment a result feeds two places, give it
-a `let`.
-
-### Precedence
-
-`|>` sits at the loosest tier of all the computing operators, so a stage may be
-an arbitrary arithmetic or boolean expression without parentheses, and a
-pipeline is the whole right-hand side of an assignment:
-
-```epsil
-a + b |> f        // (a + b) |> f
-a || b |> f       // (a || b) |> f
-x = a |> f        // x = (a |> f)
-```
-
-It is left-associative, so `a |> f |> g` is `g(f(a))`, which is what reading it
-left to right suggests. `~>` is an alias for `|>`; the two are the same
-operator, and a program written back out uses `|>`. See
-[Operators](/operators/#pipe) for the table entry.
-
-## Blocks
-
-A `{ … }` that immediately follows a keyword (`function`/`if`/`else`/
-`while`/`for`) is a **statement block**, and is distinct from the `{ … }`
-**collection** grammar (set/dictionary literals). A bare `{ … }` with no
-introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
-is a set.
-
-Each block pushes its own lexical scope. A block's value is its last
-expression; an empty block's value is `Nothing`:
-
-```epsil
-if a { }
-```
-
-Statements inside a block are separated the same way as top-level
-statements — a linebreak or a `;`:
-
-```epsil
-if a { 1; 2; 3 }
-```
-
-Blocks nest freely:
-
-```epsil
-if a { if b { 1 } }
-```
-
-### `do { … }` block expressions {#do-block-expressions}
-
-To use a statement block **in expression position** — where a bare `{ … }`
-would be the collection grammar — prefix it with `do`. `do { … }` opens a
-statement block usable anywhere an expression can appear: a lambda body, an
-assignment right-hand side, a function argument. Its value is its last
-statement, and it pushes its own lexical scope, exactly like a keyword-led
-block:
-
-```epsil
-let y = do { let t = 3; t + 1 }
-```
-
-Because a lambda body is an ordinary expression, `x |-> do { … }` gives a
-lambda the same multi-statement body a named `function` has — so a closure
-whose body runs several statements is written with `do`:
-
-```epsil
-counter |-> do { counter = counter + 1; counter }
-```
-
-A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.
-
-## `break` and `continue`
-
-`break` leaves the innermost enclosing loop; `continue` skips to its next
-iteration.
-
-```epsil
-for x in [1, 2, 3, 4] {
-  if x > 3 { break }
-  if x == 2 { continue }
-  f(x)
-}
-```
-
-They are valid anywhere inside a loop body — directly, or nested in an `if`, a
-`match` case, or a `do` block:
-
-```epsil
-for x in xs {
-  match x {
-    0 => continue
-    _ => f(x)
-  }
-}
-```
-
-Outside a loop they are a `control-outside-loop` diagnostic:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-if x > 1 { break }
-```
-
-The loop context **resets at every function and lambda boundary**. A `break`
-written inside a function or lambda defined in a loop body does not target
-that loop — it is outside a loop, and diagnosed:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-for x in xs {
-  function h() { break }
-}
-```
-
-This boundary is not a style rule; it follows from how the engine propagates a
-break out of a block (see
-[Loops and control transfer](/implementation/#loops-and-control-transfer)).
-
-Only the value-less forms are surface syntax. A break that makes the loop
-evaluate to a value has no Epsil spelling yet; it is bundled with the ruling on
-a general `return`. Serialized back, `break` and `continue` appear in their
-call form (`Break()`, `Continue()`), like the loop they belong to.
-
-## `return`
-
-`return` is **not implemented**: Epsil's expression-oriented style (an `if` is
-a value, a block's value is its last expression) doesn't need an explicit
-`return` yet. It is listed among the words the language reserves the right to
-claim later, but nothing claims it today — so `return` is an ordinary
-identifier and carries no control-flow meaning at all, rather than producing a
-diagnostic. Prefer not to use it as a name.
-
----
-
-# Epsil Declarations
-
-Source: https://epsil.dev/declarations/
-
-# Declarations
-
-A declaration introduces a symbol into the current scope. Epsil has two
-declaration keywords:
-
-- **`let`** declares a **mutable** symbol.
-- **`const`** declares an **immutable** symbol.
-
-```epsil
-let x = 5
-const c = 6.28
-```
-
-Reach for `const` when the name stands for something fixed — a physical
-constant, a conversion factor, a lookup table — so that an accidental write is
-reported instead of quietly taking effect. Use `let` for anything that varies:
-accumulators, loop state, values you refine as you go.
-
-A type annotation also **implies** a declaration, even without a keyword:
-
-```epsil
-x: real = 5
-```
-
-is a declaration of `x` with type `real`, exactly as if it had been written
-`let x: real = 5`. The keyword is only mandatory for an **untyped**
-declaration — that's what distinguishes a declaration from a plain
-reassignment (see below).
-
-## Destructuring declarations
-
-A `let` or `const` may bind the components of a **tuple** in one statement:
-
-```epsil
-divmod(a, b) = (Floor(a / b), a % b)
-let (q, r) = divmod(17, 5)
-(q, r)
-// ➔ (3, 2)
-```
-
-The pattern is a parenthesized list of **at least two** elements, each a bare
-symbol, a `_` (which skips that position), or a nested tuple pattern:
-
-```epsil
-let ((a, b), _, c) = ((1, 2), 99, 5)
-a + b + c
-// ➔ 8
-```
-
-The pattern is **irrefutable in form** — no literals, pins, or guards (use
-[`match`](/control-flow/) for conditional destructuring). The value is
-evaluated once; it must be a tuple of the same shape, otherwise the
-declaration yields an `incompatible-type` **error value** and binds nothing.
-With `const`, every bound name is a constant. An initializer is required, and
-a type annotation is not accepted on a pattern. Duplicate names anywhere in
-one pattern are a diagnostic.
-
-## Destructuring assignment
-
-The same pattern may appear on the left of an assignment, to write bindings
-that already exist instead of declaring new ones:
-
-```epsil
-let a = 1
-let b = 2
-(a, b) := (b, a)
-(a, b)
-// ➔ (2, 1)
-```
-
-The right side is evaluated **once, in full, before any target is written**,
-so a swap means what it reads — `(a, b) := (b, a)` exchanges the two values
-rather than assigning `b` to both. The same holds for a rotation
-(`(a, b, c) := (c, a, b)`) and for the pair-carrying loop step that is the
-usual reason to want this:
-
-```epsil
-let a = 0
-let b = 1
-for k in 1..10 {
-  (a, b) := (b, a + b)
-}
-a
-// ➔ 55
-```
-
-The pattern grammar is exactly the one above — at least two elements, each a
-bare symbol, a `_` skipping that position, or a nested tuple pattern — and a
-shape mismatch is the same `incompatible-type` error value, which writes
-**nothing**: the whole pattern is matched before any target is written, so a
-mismatch nested under a position that would have bound leaves that one alone
-too.
-
-The differences from a destructuring `let` are the ones assignment always has:
-the targets keep their identity and their declared type (a value that does not
-fit a target's type is an error value), and assigning to a `const` fails.
-Those two failures are found only by attempting the write, so unlike a shape
-mismatch they are **not** atomic — targets earlier in the pattern have already
-been written and stay written.
-
-The assignment operator must be spelled `:=`. A statement-leading `(a, b) = …`
-is a **comparison**, not an assignment — a parenthesized left side is not a
-binding target, so the bare `=` reads as `Equal`. Because that is almost
-always a typo for the destructuring assignment, it is
-[diagnosed](/operators/).
-
-## Declaring a type
-
-A third declaration keyword, `type`, introduces a **type** name rather than a
-symbol — and, with it, a constructor of the same name:
-
-```epsil
-type point = tuple<x: number, y: number>
-type alias pair = tuple<number, number>
-let p = point(1, 2)
-let a: pair = (1, 2)
-```
-
-`type` declares a new, distinct type; `type alias` declares another name for
-an existing one, and takes a type-parameter clause if it needs one
-(`type alias Pair<T> = tuple<T, T>`). Unlike `let` and `const`, `type` is not
-a reserved word — only these statement shapes claim it. See
-[Declaring a type](/types/#declaring-a-type) for the whole story.
-
-## Function-type annotations bind their parameter names
-
-A parameter name **binds wherever it appears**. When a declaration's
-annotation is a function type written out at the declaration site with named
-parameters, those names become the parameters of the declared function — the
-initializer is its **body**:
-
-```epsil
-const f : (x: number) -> number = x^2 + 2x + 1
-f(3)
-// ➔ 16
-```
-
-This is the same function as `= (x) |-> x^2 + 2x + 1`, and the same as the
-definition form `f(x: number) -> number = x^2 + 2x + 1`. The initializer may
-instead be an explicit lambda; the annotation's names must then agree with the
-lambda's (a disagreement is a diagnostic, with a fixit) — or leave the
-annotation's parameters unnamed, and let the lambda name them:
-
-```epsil
-const g : (number) -> number = (x) |-> x + 1
-```
-
-So a name appears in **one** place (or in both, agreeing) — never with two
-meanings. These declared names are also what callers use to pass
-[named arguments](/syntax/#named-arguments) — `f(x: 3)` — so
-renaming a parameter is a visible change to the function's interface. When the annotation is named, the initializer is read as a pointwise
-*body*; when it is unnamed, the initializer must *be* a function value, as in
-`const h : (number) -> number = g`.
-
-The names bind only where they are **written**: an annotation through a
-`type alias` never binds (its names are documentation), a zero-parameter
-signature has nothing to bind (`const t : () -> number = makeCounter()` keeps
-meaning what it says), and for a curried signature only the **outermost**
-arrow binds — `const add : (x: number) -> (y: number) -> number = (y) |-> x + y`
-binds `x` around an explicit inner lambda. Generic (a `where` clause), effectful,
-optional/variadic, and partially named signatures do not bind either; give
-those an explicit lambda.
-
-## Reassignment vs. declaration
-
-A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
-declaration syntax: it is an **assignment**:
-
-```epsil
-x = 5
-```
-
-Assigning to a name that was never declared does establish it, but `let` is
-the explicit and idiomatic way to introduce a mutable binding.
-
-Reassigning a symbol that was declared `const` produces an
-[error value](/evaluation/#errors-are-values), not a parse error or a
-thrown exception:
-
-```epsil
-const c = 1
-c = 2
-```
-
-`c = 2` still parses as a perfectly ordinary assignment; the failure happens at
-evaluation time, and its result is an error value.
-
-A declaration with no initializer declares the name without giving it a value:
-
-```epsil
-let x: real
-let y
-```
-
-Without an annotation, the type is inferred from the initializer — `let x = 5`
-declares `x` as an `integer`.
-
-Constness is a property of the **binding**, not of the type: `const` says that
-*this name* will not be written again, and says nothing about the value it
-holds — there is no such thing as a constant type. See
-[Declarations](/implementation/#declarations) for the underlying
-representation.
-
-## Scoping
-
-Declarations live in the current scope. A program (a notebook cell or a
-chain of cells sharing one engine scope) declares at the top level; a block
-introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
-lexical scope, so a `let`/`const` inside a block does not leak into the
-enclosing scope.
-
-[Type declarations](/types/) are the exception: types (and their
-constructors) are **global** — a `type` statement is only allowed at the top
-level of a program, and the declared name means the same thing everywhere on
-the engine.
-
-`let` and `const` are the binding keywords. There is currently no compound
-assignment (`+=`); destructuring declarations (`let (x, y) = t`) and
-destructuring assignments (`(x, y) := t`) are described above.
-
----
-
-# Epsil Evaluation
-
-Source: https://epsil.dev/evaluation/
-
-# Evaluation
-
-A program's top-level statements are evaluated **sequentially**, and the
-program's value is the **last statement's** value:
-
-```epsil
-let x = 5
-x = x + 3
-x
-// ➔ 8
-```
-
-No scope is pushed around the whole program: declarations persist across
-statements, and across cells in a notebook or inputs in a REPL that share one
-session. Blocks and function bodies still push their own lexical scopes (see
-[Control Flow](/control-flow/)).
-
-## Symbolic by default
-
-Values stay **exact** unless you ask otherwise. A transcendental of an exact
-argument stays symbolic —
-
-```epsil
-Ln(2)
-```
-
-evaluates to the symbolic `Ln(2)` (`ln(2)`), not a decimal approximation.
-
-**Numeric approximation is explicit**, via `N(expr)` — it is a function
-call, not a language mode:
-
-```epsil
-N(Ln(2))
-```
-
-evaluates to `0.6931471805599453…`.
-
-## Values and bindings
-
-Epsil keeps apart two things many languages blur together:
-
-- A **value** — a number, a string, a list, a dictionary, a function — is
-  **immutable**. Once it exists, nothing anywhere can change it.
-- A **binding** — the association between a name and a value — is the part
-  that changes. `let` introduces a binding you may reassign; `const` one you
-  may not. See [Declarations](/declarations/).
-
-Everything below follows from those two sentences.
-
-**There is no in-place modification.** A collection cannot be updated
-element by element:
-
-```epsil
-let xs = [1, 2, 3]
-xs[2] = 9
-// ➔ Error(ErrorCode("incompatible-type", "symbol", "number"))
-```
-
-Build the value you want and rebind the name:
-
-```epsil
-let xs = [1, 2, 3]
-xs = Join([xs[1]], [9], [xs[3]])
-xs
-// ➔ [1, 9, 3]
-```
-
-Operators never modify what you hand them — `Append`, `Sort`, `Join`,
-`Map`, `Filter` all return a **new** collection:
-
-```epsil
-let xs = [3, 1, 2]
-let ys = Sort(xs)
-(xs, ys)
-// ➔ ([3, 1, 2], [1, 2, 3])
-```
-
-**Reassigning one name never disturbs another.** Two names holding the same
-value are independent, because there is no way to reach a value *through* a
-name and alter it:
-
-```epsil
-let a = [1, 2, 3]
-let b = a
-a = [9, 9, 9]
-b
-// ➔ [1, 2, 3]
-```
-
-This is what makes a value safe to pass around: no function you call, and no
-name you assign to, can change a collection out from under you. There are no
-references, no aliasing and no object identity — two collections are the same
-when they have the same contents, and that is all `==` ever asks:
-
-```epsil
-[1, 2, 3] == [1, 2, 3]
-// ➔ True
-```
-
-**A parameter is a binding of its own.** A function may reassign its
-parameter; the caller's binding is untouched:
-
-```epsil
-function reset(v) {
-  v = 0
-  v
-}
-let n = 7
-let r = reset(n)
-(n, r)
-// ➔ (7, 0)
-```
-
-**A closure captures the binding, not a snapshot of its value.** This is the
-one place where the distinction is directly visible. A function that refers
-to an outer name reads that name's *current* value each time it runs:
-
-```epsil
-let x = 1
-f() = x
-x = 2
-f()
-// ➔ 2
-```
-
-Each call of an enclosing function creates fresh bindings, so closures made
-by separate calls have separate state, while closures made by the same call
-share it:
-
-```epsil
-function counter() {
-  let n = 0
-  function bump() { n = n + 1; n }
-  bump
-}
-let c1 = counter()
-let c2 = counter()
-(c1(), c1(), c2())
-// ➔ (1, 2, 1)
-```
-
-`c1` and `c2` count independently.
-
-Reach for `const` when a name should not move at all. Constness is a property
-of the *binding*, not of the value it holds — every value is immutable
-already — and writing to one yields an `Error` value rather than quietly
-taking effect:
-
-```epsil
-const c = 1
-c = 2
-```
-
-## Collections: literals are values, pipelines are generators
-
-A collection **literal** — a list `[…]`, set `{…}`, tuple `(…)`, or
-dictionary — evaluates its elements when the statement executes. Assigning
-one to a variable stores a snapshot of the element *values*:
-
-```epsil
-let xs = []
-for k in 1..3 { xs = Join(xs, [k]) }
-xs
-// ➔ [1, 2, 3]
-```
-
-Lazy collection **operators** — `Range`, `Map`, `Filter`, `Take`, `Join` —
-are *generators*: their operands (bounds, sources, functions) are evaluated
-when the expression is, but enumeration is deferred until the collection is
-materialized (displayed, indexed, aggregated, or iterated). A deferred
-mapping function reads program state **at materialization time**, like a
-generator in Python — if it captures a variable that later changes, the
-materialized elements reflect the later value. To snapshot, force the work
-to happen where you stand: accumulate through a loop, or apply an eager
-operation (an aggregate, an index) at the point of definition.
-
-## Errors are values
-
-Per [Principles](/principles/), "errors are values": a *runtime*
-problem — a type error, an out-of-domain argument, reassigning a `const` —
-becomes an `Error` value embedded in the result, not a thrown exception. A
-program never throws to its host for a runtime problem.
-
-*Parse*-time problems are different: a malformed program surfaces as a
-**diagnostic**, not as a value. So do the few execution-time problems that are
-really about the source, not the computation — a gated host pragma, or an
-`#error` directive (see below).
-
-Because only the **last** statement's value is the program's result, an error
-value produced by an earlier statement would otherwise vanish silently. Each
-*non-final* statement that evaluates to an error value therefore also emits
-a `runtime-error` diagnostic — for example an indexed assignment
-(`xs[2] = 9`, which is rejected: element assignment is not supported), or
-reassigning a `const` in the middle of a program.
-
-## Pragma security
-
-`#env(...)` and `#navigator(...)` read state from the host process (or the
-browser) at parse time. Because a notebook document can be shared or opened
-in an unfamiliar environment, both are **gated off by default**:
-
-<!-- epsil-test: expect-diagnostics -->
-
-```epsil
-#env("HOME")
-```
-
-by default produces a `host-pragma-disabled` diagnostic and no host read — the
-pragma evaluates to `Nothing`. A host can opt back in and let `#env`/
-`#navigator` read as documented in [Pragmas](/pragmas/).
-
-The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,
-`#time` — always work; they don't read anything sensitive from the host.
-
-`#error(...)` never crashes the host embedding the program: it becomes an
-`error-directive` diagnostic, so a single bad cell is contained.
-
-## Interruptibility
-
-A host can give an evaluation an explicit time budget, and independent
-count-based bounds on iteration and recursion depth. A breached limit becomes
-an error value (or an `evaluation-canceled` diagnostic when it happens in a
-non-final statement) — see
-[Execution](/implementation/#execution) for how a host sets one.
-
-These limits are cooperative. A browser that evaluates untrusted or potentially
-unbounded programs should run Epsil in a Web Worker it can terminate from the
-outside. See
-[Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints/) for the
-complete cancellation model.
-
----
-
 # Epsil Types
 
 Source: https://epsil.dev/types/
@@ -5086,7 +2765,7 @@ Collections carry the type of what is in them, and how many:
 
 ```epsil-live
 (Type([1, 2, 3]), Type({1, 2}), Type((1, "a")), Type({x -> 1}))
-// ➔ ("vector<finite_integer^3>", "set<finite_integer>", "tuple<finite_integer, string>", "record<x: finite_integer>")
+// ➔ ("vector<finite_integer^3>", "set<finite_integer>", "tuple<finite_integer, string>", "record{x: finite_integer}")
 ```
 
 Numeric types form a tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` —
@@ -5207,12 +2886,12 @@ spellings:
 ```epsil
 f(x: real, n: integer) -> real = x^n
 function g(x: integer) -> integer { x + 1 }
-(x: integer) |-> x + 1
+(x: integer) => x + 1
 ```
 
 A declaration whose annotation is a function type **written out with named
 parameters** binds those names too — the initializer is then the function's
-body, no `|->` needed:
+body, no `=>` needed:
 
 ```epsil
 const f : (x: real) -> real = x^2 + 2x + 1
@@ -5444,7 +3123,7 @@ type). The engine checks the payload and tags it; the result is a value of
 the type. This is how a `record`-bodied type gets its constructor:
 
 ```epsil-live
-type circle = record<x: number, y: number, r: number>
+type circle = record{x: number, y: number, r: number}
 function circle(x, y, r) { {x -> x, y -> y, r -> r} }
 Type(circle(1, 2, 3))
 // ➔ "circle"
@@ -5456,7 +3135,7 @@ constructor* idiom — the single place a value of the type can come into
 existence, so validation or normalization written there cannot be bypassed:
 
 ```epsil-live
-type frac = record<n: integer, d: integer>
+type frac = record{n: integer, d: integer}
 function frac(n: integer, d: integer) {
   {n -> n / GCD(n, d), d -> d / GCD(n, d)}
 }
@@ -5776,10 +3455,10 @@ A declaration has **one binding site**: it may carry a `<…>` clause or a
 error, not a bounded `<T: number>`.
 
 A full-type annotation has no binder slot, so it always uses the `where`
-clause — `let f: (T) -> T where T = x |-> x`.
+clause — `let f: (T) -> T where T = x => x`.
 
 Note that a function is generic only when it is **declared** generic. Nothing
-is silently generalized: `x |-> x` is a function on some inferred type, not an
+is silently generalized: `x => x` is a function on some inferred type, not an
 implicit "for all `T`".
 
 ## Absence values
@@ -5891,6 +3570,2275 @@ x: notatype
 ```
 
 produces a `type-annotation-error` diagnostic pointing at `notatype`.
+
+---
+
+# Epsil Declarations
+
+Source: https://epsil.dev/declarations/
+
+# Declarations
+
+A declaration introduces a symbol into the current scope. Epsil has two
+declaration keywords:
+
+- **`let`** declares a **mutable** symbol.
+- **`const`** declares an **immutable** symbol.
+
+```epsil
+let x = 5
+const c = 6.28
+```
+
+Reach for `const` when the name stands for something fixed — a physical
+constant, a conversion factor, a lookup table — so that an accidental write is
+reported. Use `let` for anything that varies: accumulators, loop state, 
+values you refine as you go.
+
+A type annotation also **implies** a declaration, even without a keyword:
+
+```epsil
+x: real = 5
+```
+
+is a declaration of `x` with type `real`, exactly as if it had been written
+`let x: real = 5`. The keyword is only mandatory for an **untyped**
+declaration — that's what distinguishes a declaration from a plain
+reassignment (see below).
+
+## Destructuring declarations
+
+A `let` or `const` may bind the components of a **tuple** in one statement:
+
+```epsil
+divmod(a, b) = (Floor(a / b), a % b)
+let (q, r) = divmod(17, 5)
+(q, r)
+// ➔ (3, 2)
+```
+
+The pattern is a parenthesized list of **at least two** elements, each a bare
+symbol, a `_` (which skips that position), or a nested tuple pattern:
+
+```epsil
+let ((a, b), _, c) = ((1, 2), 99, 5)
+a + b + c
+// ➔ 8
+```
+
+The pattern is **irrefutable in form** — no literals, pins, or guards (use
+[`match`](/control-flow/) for conditional destructuring). The value is
+evaluated once; it must be a tuple of the same shape, otherwise the
+declaration yields an `incompatible-type` **error value** and binds nothing.
+With `const`, every bound name is a constant. An initializer is required, and
+a type annotation is not accepted on a pattern. Duplicate names anywhere in
+one pattern are a diagnostic.
+
+## Destructuring assignment
+
+The same pattern may appear on the left of an assignment, to write bindings
+that already exist instead of declaring new ones:
+
+```epsil
+let a = 1
+let b = 2
+(a, b) := (b, a)
+(a, b)
+// ➔ (2, 1)
+```
+
+The right side is evaluated **once, in full, before any target is written**,
+so a swap means what it reads — `(a, b) := (b, a)` exchanges the two values
+rather than assigning `b` to both. The same holds for a rotation
+(`(a, b, c) := (c, a, b)`) and for the pair-carrying loop step that is the
+usual reason to want this:
+
+```epsil
+let a = 0
+let b = 1
+for k in 1..10 {
+  (a, b) := (b, a + b)
+}
+a
+// ➔ 55
+```
+
+The pattern grammar is exactly the one above — at least two elements, each a
+bare symbol, a `_` skipping that position, or a nested tuple pattern — and a
+shape mismatch is the same `incompatible-type` error value, which writes
+**nothing**: the whole pattern is matched before any target is written, so a
+mismatch nested under a position that would have bound leaves that one alone
+too.
+
+The differences from a destructuring `let` are the ones assignment always has:
+the targets keep their identity and their declared type (a value that does not
+fit a target's type is an error value), and assigning to a `const` fails.
+Those two failures are found only by attempting the write, so unlike a shape
+mismatch they are **not** atomic — targets earlier in the pattern have already
+been written and stay written.
+
+The assignment operator must be spelled `:=`. A statement-leading `(a, b) = …`
+is a **comparison**, not an assignment — a parenthesized left side is not a
+binding target, so the bare `=` reads as `Equal`. Because that is almost
+always a typo for the destructuring assignment, it is
+[diagnosed](/operators/).
+
+## Declaring a type
+
+A third declaration keyword, `type`, introduces a **type** name rather than a
+symbol — and, with it, a constructor of the same name:
+
+```epsil
+type point = tuple<x: number, y: number>
+type alias pair = tuple<number, number>
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+`type` declares a new, distinct type; `type alias` declares another name for
+an existing one, and takes a type-parameter clause if it needs one
+(`type alias Pair<T> = tuple<T, T>`). Unlike `let` and `const`, `type` is not
+a reserved word — only these statement shapes claim it. See
+[Declaring a type](/types/#declaring-a-type) for the whole story.
+
+## Function-type annotations bind their parameter names
+
+A parameter name **binds wherever it appears**. When a declaration's
+annotation is a function type written out at the declaration site with named
+parameters, those names become the parameters of the declared function — the
+initializer is its **body**:
+
+```epsil
+const f : (x: number) -> number = x^2 + 2x + 1
+f(3)
+// ➔ 16
+```
+
+This is the same function as `= (x) => x^2 + 2x + 1`, and the same as the
+definition form `f(x: number) -> number = x^2 + 2x + 1`. The initializer may
+instead be an explicit lambda; the annotation's names must then agree with the
+lambda's (a disagreement is a diagnostic, with a fixit) — or leave the
+annotation's parameters unnamed, and let the lambda name them:
+
+```epsil
+const g : (number) -> number = (x) => x + 1
+```
+
+So a name appears in **one** place (or in both, agreeing) — never with two
+meanings. These declared names are also what callers use to pass
+[named arguments](/syntax/#named-arguments) — `f(x: 3)` — so
+renaming a parameter is a visible change to the function's interface. When the annotation is named, the initializer is read as a pointwise
+*body*; when it is unnamed, the initializer must *be* a function value, as in
+`const h : (number) -> number = g`.
+
+The names bind only where they are **written**: an annotation through a
+`type alias` never binds (its names are documentation), a zero-parameter
+signature has nothing to bind (`const t : () -> number = makeCounter()` keeps
+meaning what it says), and for a curried signature only the **outermost**
+arrow binds — `const add : (x: number) -> (y: number) -> number = (y) => x + y`
+binds `x` around an explicit inner lambda. Generic (a `where` clause), effectful,
+optional/variadic, and partially named signatures do not bind either; give
+those an explicit lambda.
+
+## Reassignment vs. declaration
+
+A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
+declaration syntax: it is an **assignment**:
+
+```epsil
+x = 5
+```
+
+Assigning to a name that was never declared does establish it, but `let` is
+the explicit and idiomatic way to introduce a mutable binding.
+
+Reassigning a symbol that was declared `const` produces an
+[error value](/evaluation/#errors-are-values), not a parse error or a
+thrown exception:
+
+```epsil
+const c = 1
+c = 2
+```
+
+`c = 2` still parses as a perfectly ordinary assignment; the failure happens at
+evaluation time, and its result is an error value.
+
+A declaration with no initializer declares the name without giving it a value:
+
+```epsil
+let x: real
+let y
+```
+
+Without an annotation, the type is inferred from the initializer — `let x = 5`
+declares `x` as an `integer`.
+
+Constness is a property of the **binding**, not of the type: `const` says that
+*this name* will not be written again, and says nothing about the value it
+holds — there is no such thing as a constant type. See
+[Declarations](/implementation/#declarations) for the underlying
+representation.
+
+## Scoping
+
+Declarations live in the current scope. A program (a notebook cell or a
+chain of cells sharing one engine scope) declares at the top level; a block
+introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
+lexical scope, so a `let`/`const` inside a block does not leak into the
+enclosing scope.
+
+[Type declarations](/types/) are the exception: types (and their
+constructors) are **global** — a `type` statement is only allowed at the top
+level of a program, and the declared name means the same thing everywhere on
+the engine.
+
+`let` and `const` are the binding keywords. There is currently no compound
+assignment (`+=`); destructuring declarations (`let (x, y) = t`) and
+destructuring assignments (`(x, y) := t`) are described above.
+
+---
+
+# Epsil Operators
+
+Source: https://epsil.dev/operators/
+
+# Operators
+
+Most operators are infix operators: they have two operands, a left-hand side
+(lhs) operand and a right-hand side operand (rhs).
+
+An infix operator can either have whitespace before and after the operator or
+have no whitespace neither before nor after the operator.
+
+Infix operators have a precedence that indicate how strongly they bind to their
+operand and a left or right associativity.
+
+A few operators are prefix operators: they only have a right-hand side. Prefix
+operators are followed immediately by their operand: they cannot be separated by
+whitespace.
+
+A postfix operator (`!`, `Factorial`) has only a left-hand side and follows it
+immediately: like a prefix operator, it cannot be separated from its operand by
+whitespace.
+
+:::info
+
+The whitespace rules are necessary to support unambiguous parsing of expressions
+spanning multiple lines without requiring a separator between expressions
+
+:::
+
+The table below is the complete set of operators, with their spelling,
+precedence and associativity — if a symbol is not listed there, it is not an
+operator.
+
+## Precedence
+
+The operator at the root of the parse tree has the lowest precedence.
+
+Precedence tiers are numbered in gaps of 10, **loosest to tightest** — a
+higher number binds **tighter**. Operators in the same tier have the same
+precedence (for example `+` and `-`, or `*` and `/`).
+
+| Tier | Operator            | ASCII  | Fancy | Kind   | Associativity |
+| ---- | -------------------- | ------ | ----- | ------ | ------------- |
+| 10   | Assign                | `:=`   |       | infix  | right         |
+| —    | Assign _or_ Equal     | `=`    |       | infix  | positional    |
+| 15   | MapsTo                | `=>`   | `⇒`   | infix  | right         |
+| 18   | Coalesce              | `??`   |       | infix  | right         |
+| 20   | Pipe                  | `\|>`  |       | infix  | left          |
+| 20   | Pipe                  | `~>`   |       | infix  | left          |
+| 30   | KeyValuePair          | `->`   | `→`   | infix  | left          |
+| 40   | Or                    | `\|\|` | `⋁`   | infix  | left          |
+| 50   | And                   | `&&`   | `⋀`   | infix  | left          |
+| 60   | Equal                 | `==`   |       | infix  | n-ary chain   |
+| 60   | Same                  | `===`  |       | infix  | n-ary chain   |
+| 60   | NotEqual              | `!=`   | `≠`   | infix  | n-ary chain   |
+| 60   | Less                  | `<`    |       | infix  | n-ary chain   |
+| 60   | Greater               | `>`    |       | infix  | n-ary chain   |
+| 60   | LessEqual             | `<=`   | `⩽`   | infix  | n-ary chain   |
+| 60   | GreaterEqual          | `>=`   | `⩾`   | infix  | n-ary chain   |
+| 60   | Element               | `in`   | `∈`   | infix  | n-ary chain   |
+| 60   | Element (type test)   | `is`   |       | infix  |               |
+| 60   | NotElement            | `!in`  | `∉`   | infix  | n-ary chain   |
+| 65   | Range                 | `..`   | `‥`   | infix  | left          |
+| 70   | Add                   | `+`    |       | infix  | left          |
+| 70   | Subtract              | `-`    | `−`   | infix  | left          |
+| 80   | Multiply              | `*`    | `×`   | infix   | left          |
+| 80   | Divide                | `/`    | `÷`   | infix   | left          |
+| 80   | Mod                   | `%`    |       | infix   | left          |
+| 90   | Negate                | `-`    | `−`   | prefix  |               |
+| 90   | Not                   | `!`    | `¬`   | prefix  |               |
+| 100  | Power                 | `^`    |       | infix   | right         |
+| 100  | Power                 | `**`   |       | infix   | right         |
+| 110  | Factorial             | `!`    |       | postfix |               |
+
+Postfix calls and indexing (`f(x)`, `xs[i]`) bind tighter than every entry in
+this table — they are handled directly by the parser rather than through the
+operator table, since they are not spelled with an operator symbol.
+
+The conditional expression `a if c else b` is not an operator row either, but
+it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
+binds looser than every operator that computes and tighter than the forms that
+bind or pair (`=`, `=>`, `|>`, `->`). See
+[Control Flow](/control-flow/#the-conditional-expression-a-if-c-else-b).
+
+## The whitespace rule
+
+An infix operator must have whitespace on **both** sides or on **neither**
+side. A prefix operator must have **no** whitespace before its operand. These
+rules let a multi-line program parse deterministically without a separator
+between every expression:
+
+```epsil
+a + b     // infix addition
+a+b       // same: whitespace on neither side
+```
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+a +b
+```
+
+Here `+` has whitespace before but not after: it is **not** treated as infix.
+The expression `a` ends there; `+b` is left over on the same line with no
+separator before it, which is a diagnostic (`unexpected-symbol`) rather than a
+silently-inferred sequence — see [Statements and Sequencing](/syntax/).
+On its own line (after a linebreak or `;`), `+b` is a valid new statement:
+unary `+` is the identity, so `a` and `+b` are simply two statements.
+
+```epsil
+a+ b
+```
+
+Here `+` has whitespace after but not before: an **asymmetric** case. The
+parser recovers as infix `Add` but reports an
+`asymmetric-operator-whitespace` diagnostic (with a fix-it), since this is
+more useful to the author than silently ending the statement.
+
+## Pipe: `|>` and `~>` {#pipe}
+
+`x |> f` is `f(x)`. Chained, it lets a sequence of transformations be read in
+the order they happen instead of inside-out:
+
+```epsil-live
+[3, 1, 2] |> Sort |> Reverse
+// ➔ [3, 2, 1]
+```
+
+A stage that takes more than one argument is written as a call, with `_` in the
+slot the piped value fills:
+
+```epsil-live
+1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
+// ➔ 165
+```
+
+The `_` may be left out: a call stage that is missing required arguments
+receives the piped value in the first slot its type fits, so
+`xs |> Take(10)` means `xs |> Take(_, 10)` and `xs |> Map(f)` means
+`xs |> Map(f, _)` (the mapping function is `Map`'s first argument). This
+only fills a hole — a call that is already complete keeps its ordinary
+meaning, and an explicit `_` anywhere in the call says exactly where the
+piped value goes.
+
+A stage may also be a **lambda**, written inline without parentheses — after
+`|>` the arrow binds tighter than the pipe, and the lambda's body ends at the
+next `|>`. When the piped value is a collection, a one-parameter lambda stage
+is applied **to each element** (an implicit `Map`); `_^2` is shorthand for
+such a lambda. The following three pipelines are equivalent:
+
+```epsil-live
+1..oo |> Take(_, 10) |> Map(_^2, _) |> Sum
+// ➔ 385
+```
+
+```epsil
+1..oo |> Take(10) |> x => x^2 |> Sum
+1..oo |> Take(10) |> _^2 |> Sum
+```
+
+Note the two readings of `_`: in a **call** stage it is the piped value
+(`Take(_, 10)`); in an **operator-written** stage (`_^2`, `_ + 1`) it is the
+element of the implicit lambda. A **named** function stage always receives
+the whole value — `xs |> Sum` sums the collection, it does not map — as does
+a lambda whose annotated parameter accepts it
+(`xs |> (l: list<number>) => Length(l)`).
+
+A pipe hands its stage exactly **one** value, so a stage that declares more
+than one parameter is a `pipe-stage-arity` error rather than a partial
+application — a leftover function is never what a pipeline was written to
+produce:
+
+```epsil
+[100, 200] |> (x, y, z) => x + y + z
+// ✘ A pipe passes its stage exactly 1 value; `(x, y, z) => …` declares 3
+```
+
+The fix is the **call** form above, with `_` marking the piped value's slot
+(`xs |> Fold(f, 0, _)`). The same applies to a named stage: `xs |> add` on a
+two-parameter `add` is this error, not a partially applied `add`.
+
+When the piped value is a collection whose elements are tuples and you want to
+name their components, use a **tuple pattern** parameter — the extra
+parentheses are what make it one parameter taking a pair:
+
+```epsil-live
+[(1, 2), (3, 4)] |> ((p, q)) => p + q
+// ➔ [3, 7]
+```
+
+`|>` and `~>` are aliases for `Pipe` and sit at the **loosest** precedence
+tier, right below `Assign` — looser than arithmetic, relational, and boolean
+operators (Elixir-style). It is left-associative, so `a |> f |> g` is `g(f(a))`:
+
+```epsil
+a + b |> f       // (a + b) |> f
+a || b |> f      // (a || b) |> f
+x = a |> f       // x = (a |> f)
+```
+
+<ReadMore path="/control-flow/#pipelines">
+When to reach for a **pipeline** — and when a nested call or a named
+intermediate reads better.
+</ReadMore>
+
+## Absence coalescing: `??` {#absence-coalescing}
+
+`a ?? b` is `Coalesce(a, b)`: the value of `a` unless `a` is **absent**
+(`Missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
+evaluated when `a` is present.
+
+```epsil
+let timeout = config.timeout ?? 30
+let first = xs[1] ?? 0
+```
+
+`??` discharges **absence**. It does _not_ rescue an `Error`: an error operand
+is an error, not a missing value, and propagates.
+
+It is right-associative, so a chain falls through left to right:
+
+```epsil
+a ?? b ?? c      // Coalesce(a, Coalesce(b, c))
+```
+
+Its precedence (18) sits between `=>` and `|>`, which fixes the two groupings
+that matter:
+
+```epsil
+xs |> f ?? 0     // (xs |> f) ?? 0 — the default is for the pipeline's RESULT
+x => x.a ?? 0   // x => (x.a ?? 0) — the default is inside the body
+```
+
+Like `|>`, it is looser than `->`, so a dictionary value needs parentheses:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+{a -> 1, b -> x ?? 2}
+```
+
+Write `{a -> 1, b -> (x ?? 2)}` instead. It is also looser than `||` and `&&`
+(the C# position), so `a ?? b || c` is `a ?? (b || c)`.
+
+## Type test: `is`
+
+`x is integer` tests at runtime whether a value inhabits a type. It is the
+same test a `match` type pattern performs, and lowers to the same
+`Element(value, type)` expression:
+
+```epsil
+x is integer
+x is string && y is boolean
+```
+
+The right operand is a **type name**, not an expression, so a typo is a
+parse-time diagnostic rather than a comparison against an undeclared symbol.
+This first version resolves **simple named types** only: a compound type
+(`!error`, `integer | string`, `list<integer>`) parses but reports
+`type-pattern-unsupported`, exactly as the equivalent typed pattern does.
+
+`is` is a **contextual** word, not a reserved one — it is recognized only
+between an operand and a type name, so `let is = 5` and `f(is)` remain legal.
+
+Since `is` and `in` express the same membership test, a program written back
+out from its parsed form uses `in` for both.
+
+## Anonymous functions: `=>` {#anonymous-functions}
+
+The mapsto operator constructs an anonymous function:
+
+```epsil
+x => x^2
+(x, y) => x + y
+```
+
+It is right-associative, so `x => y => x + y` constructs a function that
+returns another function. It binds tighter than assignment but more loosely
+than the other expression operators, so `f = x => x + 1` assigns the complete
+function to `f`. Typed parameters can be written in parentheses:
+
+```epsil
+(x: integer) => x + 1
+```
+
+A parameter can instead be a **tuple pattern**, written with a second pair of
+parentheses. It is still ONE parameter — it takes one argument, a tuple, and
+binds a name to each component:
+
+```epsil
+[(True, True), (True, False)] |> Map(((p, q)) => p && q, _)
+// ➔ [True, False]
+```
+
+The doubled parentheses are the whole difference: `(p, q) => p && q` is the
+two-parameter function it has always been, and `((p, q)) => p && q` is the
+one-parameter function that takes a pair apart. Patterns mix with plain
+parameters and nest, exactly as in
+[`let (a, b) = v`](/declarations/#destructuring-declarations) — bare
+names, `_` to skip a position, nested `(…)` patterns, and nothing else (a
+literal or a per-element type annotation is a diagnostic):
+
+```epsil
+(x, (p, q)) => x + p + q   // two parameters, the second destructured
+((a, (b, c))) => a + b + c // one parameter, nested
+((p, _)) => p              // one parameter, second component discarded
+```
+
+The argument must be a tuple of the pattern's shape; anything else yields an
+`incompatible-type` error value, the same one the destructuring `let`
+produces. A destructuring lambda is interpreted, never compiled: no compile
+target lowers the tuple match, so a compiled context falls back rather than
+emit code that binds the wrong names.
+
+**Callbacks and arity.** An ordinary call with too few arguments partially
+applies the function — `f(1)` on a two-parameter `f` is a function awaiting
+the second argument. Inside a collection operator that never happens: the
+operator decides how many arguments the callback receives (`Map` supplies
+one element per source collection, `Filter`/`Any`/`All`/`Count`/`TakeWhile`
+supply one, `Reduce`/`Fold` supply the accumulator and the element), and a
+lambda whose parameter count cannot match is a `callback-arity` error at
+parse/canonicalization time rather than a list of leftover closures. The
+message names both sides and, for the pair case, the fix:
+
+```epsil
+Map((p, q) => p + q, [(1, 2), (3, 4)])
+// error: Map calls its callback with 1 argument (each element of the
+// collection); `(p, q) => p + q` declares 2 parameters. To take a pair
+// apart, use a tuple pattern parameter: ((p, q)) => …
+```
+
+`Sort` (a key or a comparator) and `Iterate` (`f(previous)` or
+`f(index, previous)`) accept either of their two arities; a `() => …`
+literal is a constant and fits any slot. A callback whose arity is not
+statically known — a value typed `function` or `callback<…>`, a generic
+function — is not checked here and is applied as before.
+
+The `MapsTo` name in the table is internal to parsing: it names the operator,
+not the function value the expression produces.
+
+The same arrow separates a `match` case's pattern from its body
+(`pattern [if guard] => body`) — one glyph meaning "yields", in both places.
+Nothing is ambiguous: a case reserves the first `=>` at its own level for
+itself, so a pattern and a guard always end there, while a case BODY is an
+ordinary expression in which `=>` builds a lambda:
+
+```epsil
+match n {
+  0 => x => x + 1   // body is the lambda `x => x + 1`
+  n if n > 0 => n   // guard is `n > 0`, body is `n`
+}
+```
+
+A lambda genuinely wanted inside a pattern or a guard is parenthesized:
+`n if (f => f)(n) => n`.
+
+The Unicode arrows `⇒` (U+21D2) and `↦` (U+21A6) are both accepted as input
+aliases for `=>`. `⇒` is the one the serializer emits — for a lambda and for a
+`match` case alike — in its fancy-symbol mode; `↦`, the traditional
+mathematical mapsto glyph, is accepted but never produced.
+
+Earlier versions spelled this arrow `|->`. That spelling now reports the
+`mapsto-arrow-legacy` diagnostic, with a fixit rewriting it to `=>`; the
+expression is still parsed as the function it meant.
+
+A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
+`(n: integer) -> n^2`, `f = x -> x + 1` — is diagnosed as a wrong-arrow typo
+(with a fixit) and recovered as the intended function: `->` builds a
+`key -> value` pair, and none of those shapes is a valid key.
+
+## Ranges: `..` {#ranges}
+
+The range operator is a compact spelling of a two-argument `Range`:
+
+```epsil
+1..5          // Range(1, 5)
+1..n - 1      // Range(1, n - 1)
+k in 1..5     // k in Range(1, 5)
+```
+
+It binds tighter than relational operators and more loosely than addition and
+subtraction. The Unicode two-dot leader `‥` is an input alias. Serialization
+uses `Range(a, b)`, and a stepped range continues to use the three-argument
+call `Range(a, b, step)`.
+
+## Spread: `...` {#spread}
+
+A prefix `...` splices a value's elements into the surrounding sequence. It
+is accepted in two positions — a **call argument list** and a **list
+literal** — and the three-dot token is distinct from the range operator
+`..`; anywhere else `...` is a diagnostic. (In a `match` pattern, `...rest`
+is the same idea in reverse: it *collects* the remaining elements.)
+
+In a **call argument list**, `...` spreads a tuple into the call's
+arguments: the tuple's elements become ordinary positional arguments.
+
+```epsil
+f(...t)          // t's elements become f's arguments
+f(1, ...t, q)    // splices between positional arguments
+g(...p, ...q)    // several spreads splice in order
+Max(...t)        // variadic built-ins accept spreads
+```
+
+In a call, only **tuples** spread — argument lists are tuple-shaped, so a
+`List` (or any other value) is an `incompatible-type` error. A literal tuple
+splices immediately; a symbolic argument is spliced when the call evaluates,
+and until then the call stays symbolic (the spread never binds positionally
+to a single parameter).
+
+In a **list or set literal**, `...` splices a collection — a list, a set, a
+range:
+
+```epsil-live
+let xs = [1, 2]
+[...xs, 3, ...(4..6)]
+// ➔ [1, 2, 3, 4, 5, 6]
+```
+
+```epsil-live
+let s = {2, 3}
+{1, ...s, ...[3, 4]}
+// ➔ Set(1, 2, 3, 4)
+```
+
+The splice happens at canonicalization: literal collections splice
+immediately, and a symbolic or lazy segment lowers to the equivalent
+`Join` expression — a lone spread `[...xs]` is `Join(xs)`, the list
+materialization of `xs`, and an infinite segment stays lazy
+(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
+usual.
+
+**Tuples do not spread here** — a tuple is a unit (a point, a pair), and
+splicing it would quietly discard that; spreading one is a `spread-tuple`
+error. To use a tuple's elements, convert explicitly:
+`[...ListFrom(t), 3]`. A scalar or string operand is an
+`incompatible-type` error (a string is a scalar, not a character
+collection). Note the mirror-image rule in calls: argument lists are
+tuple-shaped, so there exactly tuples spread.
+
+In a **dictionary literal**, `...` merges the entries of a dictionary.
+Entries combine left to right and a **later entry wins** on a key
+collision — so a literal entry after a spread overrides it, the usual
+defaults idiom:
+
+```epsil-live
+let defaults = {"verbose" -> false, "depth" -> 3}
+{...defaults, "verbose" -> true}
+// ➔ {"verbose" -> "True", "depth" -> 3}
+```
+
+(Duplicate **literal** keys are different: they are almost certainly typos,
+so they keep the literal rule — first wins, with a
+`duplicate-dictionary-key` diagnostic.)
+
+A brace of *only* spreads has nothing to mark it as a dictionary, so it is
+read as a **set**-spread. To write a pure merge, lead with the bare `->`
+marker (the same marker as the empty dictionary `{->}`):
+
+```epsil
+{...a, ...b}        // a SET containing the elements of a and b
+{->, ...d1, ...d2}  // a dictionary merge of d1 and d2
+```
+
+## Unary prefix: `-` and `!` {#unary-prefix}
+
+`-` (`Negate`) and `!` (`Not`) are prefix operators. They must abut their
+operand with no whitespace:
+
+```epsil
+-x        // negation
+!a        // logical not
+!!a       // double negation — `!!` lexes as one token that peels into two
+```
+
+`Negate`/`Not` bind looser than `Power`, so a leading minus does not reach
+inside an exponent:
+
+```epsil
+-x^2      // -(x^2), not (-x)^2
+```
+
+A unary minus applied directly to a number literal folds into the literal
+rather than becoming a negation:
+
+```epsil
+-2        // the literal -2, not a negation of 2
+```
+
+Unary `+` is accepted the same way but is the identity: `+(2 + 1)` is just
+`2 + 1`.
+
+## Power: `^` and `**` {#power}
+
+`Power` is the tightest operator in the table and is **right-associative**.
+`**` is an accepted alias for `^` (same table row, same precedence):
+
+```epsil
+x^2       // exponentiation
+x**2      // the same
+2^3^2     // 2^(3^2) — right-associative
+```
+
+Because `Power` binds tighter than `Multiply`/`Divide`:
+
+```epsil
+x^1/2     // (x^1)/2, not x^(1/2)
+```
+
+## Modulo: `%` {#modulo}
+
+`%` is `Mod`, an infix operator at the multiplicative tier (the same
+precedence as `*` and `/`), left-associative:
+
+```epsil
+a % b       // remainder
+a + b % c   // a + (b % c)
+a % b % c   // (a % b) % c — left-associative
+```
+
+## Factorial: postfix `!` {#factorial}
+
+`!` in **postfix** position is `Factorial`. Position disambiguates it from the
+prefix `!` (`Not`): a `!` that abuts the preceding operand is a factorial
+(`x!`), while a `!` at the start of an operand is `Not` (`!x`).
+
+```epsil
+5!          // factorial
+n!          // factorial
+!x          // prefix not, unchanged
+```
+
+`Factorial` binds tighter than `Power` (tier 110 vs. 100), so it reaches inside
+a `Power` operand, and a leading minus stays outside it:
+
+```epsil
+2^3!        // 2^(3!)
+3! ^ 2      // (3!)^2
+-3!         // -(3!)
+```
+
+It also applies after a parenthesized expression, a call, or an index:
+
+```epsil
+(a + b)!    // factorial of the sum
+f(x)!       // factorial of the result
+```
+
+Like a prefix operator, a postfix `!` must **abut** its operand: `x!` is a
+factorial, but `x !y` is not — the space before `!` ends the `x` expression,
+leaving `!y` (a prefix `Not`) with no separator, which is a diagnostic. Because
+the lexer maximal-munches a run of operator characters into one token, a `!`
+directly followed by another operator character is not seen as a lone `!`
+(write `3! ^ 2`, not `3!^2`; `x! + 1`, not `x!+1`). The `!=` (`NotEqual`) and
+`!in` (`NotElement`) operators are unaffected: the lexer keeps `!=` whole and
+`!in` is recognized as a compound before the postfix `!`.
+
+## Invisible multiplication
+
+A number literal immediately followed — with **no** whitespace — by a symbol
+or an opening parenthesis is read as an implicit `Multiply`:
+
+```epsil
+2x        // 2 * x
+3x^3      // 3·(x^3)
+2i        // 2 * i, where `i` is the imaginary unit
+2(2 + 1)  // 2 * (2 + 1)
+```
+
+Note that a **symbol** immediately followed by `(` is a **function call**, not
+an invisible multiplication: `x(2+1)` calls `x`, and `(a+b)(2+1)` calls the
+value of `a+b`. Only a *number* on the left means multiplication. See
+[Calls and Indexing](/syntax/).
+
+Whitespace between the number and the symbol suppresses invisible
+multiplication and is instead a statement boundary: `2 1/2` is a diagnostic
+(`unexpected-symbol`), not `2 * (1/2)`.
+
+## Chained relational operators
+
+Relational operators (precedence tier 60) are **chainable**, matching how
+mathematicians write inequalities: `a < b < c` means what it looks like, and so
+does a chain that mixes operators —
+
+```epsil
+a < b <= c
+```
+
+means `a < b && b <= c`. A mixed chain is rewritten into that pairwise
+conjunction before it is evaluated, so both kinds of chain have the usual
+mathematical chained-comparison semantics. Both kinds also short-circuit like
+`&&`: the operands are evaluated left to right and evaluation stops at the
+first adjacent pair that is false, so in `a < b < c` the operand `c` is not
+evaluated when `a < b` is false.
+
+## Logic operators
+
+- `&&` (`And`), `||` (`Or`), `!` (`Not`), with the fancy Unicode forms `⋀`,
+  `⋁`, `¬`.
+- `&&` binds tighter than `||`, matching the tiers above.
+- Both **short-circuit**: the operands are evaluated left to right and
+  evaluation stops at the first operand that decides the result — the first
+  `false` for `&&`, the first `true` for `||`. The remaining operands do not
+  run, so `k <= n && xs[k] > 0` never reads `xs[k]` when `k` is out of range,
+  and `false && f()` never calls `f()`. Because the written order is
+  meaningful, `&&`/`||` operands are never reordered by canonicalization. The
+  exception is an element-wise application — an operand that is a list of
+  booleans (`[true, false] && xs`) makes the result a list, cell by cell, and
+  every operand is then evaluated once.
+
+The word forms `and`, `or`, and `not`, and the equivalence infix operator
+`<=>`, are reserved but not implemented. The token `=>` is not available as
+logical implication: it is the mapsto arrow (see
+[Anonymous functions](#anonymous-functions)), which is also what separates a
+`match` pattern from its result.
+
+## Assignment vs. equality
+
+Three spellings, two meanings:
+
+- **`:=` always assigns.**
+- **`==` always compares** (and `===` is `Same`, structural identity).
+  A third comparison tier asks the prover whether the two sides are equal
+  for **every** value of their free variables:
+  `IdenticallyEqual(Sin(t)^2 + Cos(t)^2, 1)` is `True`, where `==` leaves
+  the equation as an inert condition. It is deliberately spelled as a call,
+  never as an operator — the equivalence glyphs `≡`, `≢`, and `≣` are
+  rejected outright, because their bar counts cross the `=`-run lengths
+  (`≡` has three bars, `≣` four) and a visual transliteration would
+  silently land on the wrong tier.
+- **`=` is positional.** It assigns when it is the top-level operator of a
+  **statement** whose left side is a binding target — a name, or a field/index
+  path rooted at one. Everywhere else it compares.
+
+So a statement assigns:
+
+```epsil
+x = 5
+count = count + 1
+```
+
+…while the same `=` inside any larger expression is an equation, which is what
+a reader of mathematics expects:
+
+```epsil
+Solve(x^2 = 4, x)        // Equal — the equation, not an assignment
+if a = true { 1 } else { 2 }
+[a = 1, b = 2]
+```
+
+This is why `=` needs no parentheses to be safe in a condition: `if a = true`
+cannot silently assign, and the C footgun does not exist in Epsil.
+
+As a comparison, `=` binds at the relational tier (60) like `==`, so
+`if x = 5 && y` groups as `(x = 5) && y`. As an assignment it binds loosest
+(10), taking the whole right-hand side.
+
+Two consequences worth knowing:
+
+**A non-binding left side compares, even as a statement.** `x^2 = 4` on its own
+line is the equation, because `x^2` is not a name. A bare name always assigns,
+so write `==` when you mean the equation:
+
+```epsil
+y == 2 * x + 1           // the equation
+y = 2 * x + 1            // assigns to y
+```
+
+**A chain is diagnosed.** `a = b = 5` would assign `a` the *boolean* `b == 5`,
+which is never what a chained assignment means:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+a = b = 5
+```
+
+Write `a := b := 5` to chain the assignment, or `a = (b = 5)` if the comparison
+really was intended.
+
+**A tuple pattern with a bare `=` is diagnosed.** A parenthesized left side is
+not a binding target, so `(a, b) = (b, a)` is a *comparison* of two tuples
+whose result is discarded — the swap it looks like silently does nothing:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+(a, b) = (b, a)
+```
+
+Write `(a, b) := (b, a)` to
+[destructure](/declarations/#destructuring-assignment), or `==` if the
+comparison really was intended. The diagnostic is narrow: it fires only when
+the left side is shaped exactly like a destructuring pattern (bare names, `_`,
+nested tuples), so a genuine tuple equation with computed components —
+`(x + 1, y) = t` — stays silent.
+
+**An assignment in a condition is a warning.** `:=` is unconditional, so it
+reaches a condition where a bare `=` no longer can — and Epsil has no
+`if init; cond` form, so the assigned value *is* the test:
+
+```epsil
+if flag := true { 1 }   // warning: assign-in-condition
+```
+
+It is a warning rather than an error, since `:=` is the deliberate spelling.
+It fires only where a value is consumed as a boolean — an `if`/`while`
+condition — not for `f(a := 1)` or `[a := 1]`, which are unambiguous.
+
+**Serialization uses the explicit spellings.** An expression written back out
+by the formatter or serializer always uses `:=` for assignment and `==` for
+comparison, never a bare `=` — so a round-trip is exact regardless of position.
+`=` is an input convenience.
+
+---
+
+# Epsil Evaluation
+
+Source: https://epsil.dev/evaluation/
+
+# Evaluation
+
+A program's top-level statements are evaluated **sequentially**, and the
+program's value is the **last statement's** value:
+
+```epsil
+let x = 5
+x = x + 3
+x
+// ➔ 8
+```
+
+No scope is pushed around the whole program: declarations persist across
+statements, and across cells in a notebook or inputs in a REPL that share one
+session. Blocks and function bodies still push their own lexical scopes (see
+[Control Flow](/control-flow/)).
+
+## Symbolic by default
+
+Values stay **exact** unless you ask otherwise. A transcendental of an exact
+argument stays symbolic —
+
+```epsil
+Ln(2)
+```
+
+evaluates to the symbolic `Ln(2)` (`ln(2)`), not a decimal approximation.
+
+**Numeric approximation is explicit**, via `N(expr)` — it is a function
+call, not a language mode:
+
+```epsil
+N(Ln(2))
+```
+
+evaluates to `0.6931471805599453…`.
+
+## Values and bindings
+
+Epsil keeps apart two things many languages blur together:
+
+- A **value** — a number, a string, a list, a dictionary, a function — is
+  **immutable**. Once it exists, nothing anywhere can change it.
+- A **binding** — the association between a name and a value — is the part
+  that changes. `let` introduces a binding you may reassign; `const` one you
+  may not. See [Declarations](/declarations/).
+
+Everything below follows from those two sentences.
+
+**There is no in-place modification.** A collection cannot be updated
+element by element:
+
+```epsil
+let xs = [1, 2, 3]
+xs[2] = 9
+// ➔ Error(ErrorCode("incompatible-type", "symbol", "number"))
+```
+
+Build the value you want and rebind the name:
+
+```epsil
+let xs = [1, 2, 3]
+xs = Join([xs[1]], [9], [xs[3]])
+xs
+// ➔ [1, 9, 3]
+```
+
+Operators never modify what you hand them — `Append`, `Sort`, `Join`,
+`Map`, `Filter` all return a **new** collection:
+
+```epsil
+let xs = [3, 1, 2]
+let ys = Sort(xs)
+(xs, ys)
+// ➔ ([3, 1, 2], [1, 2, 3])
+```
+
+**Reassigning one name never disturbs another.** Two names holding the same
+value are independent, because there is no way to reach a value *through* a
+name and alter it:
+
+```epsil
+let a = [1, 2, 3]
+let b = a
+a = [9, 9, 9]
+b
+// ➔ [1, 2, 3]
+```
+
+This is what makes a value safe to pass around: no function you call, and no
+name you assign to, can change a collection out from under you. There are no
+references, no aliasing and no object identity — two collections are the same
+when they have the same contents, and that is all `==` ever asks:
+
+```epsil
+[1, 2, 3] == [1, 2, 3]
+// ➔ True
+```
+
+**A parameter is a binding of its own.** A function may reassign its
+parameter; the caller's binding is untouched:
+
+```epsil
+function reset(v) {
+  v = 0
+  v
+}
+let n = 7
+let r = reset(n)
+(n, r)
+// ➔ (7, 0)
+```
+
+**A closure captures the binding, not a snapshot of its value.** This is the
+one place where the distinction is directly visible. A function that refers
+to an outer name reads that name's *current* value each time it runs:
+
+```epsil
+let x = 1
+f() = x
+x = 2
+f()
+// ➔ 2
+```
+
+Each call of an enclosing function creates fresh bindings, so closures made
+by separate calls have separate state, while closures made by the same call
+share it:
+
+```epsil
+function counter() {
+  let n = 0
+  function bump() { n = n + 1; n }
+  bump
+}
+let c1 = counter()
+let c2 = counter()
+(c1(), c1(), c2())
+// ➔ (1, 2, 1)
+```
+
+`c1` and `c2` count independently.
+
+Reach for `const` when a name should not move at all. Constness is a property
+of the *binding*, not of the value it holds — every value is immutable
+already — and writing to one yields an `Error` value rather than quietly
+taking effect:
+
+```epsil
+const c = 1
+c = 2
+```
+
+## Arguments are values — unless the function holds them {#arguments-are-values-unless-the-function-holds-them}
+
+A call evaluates its arguments first and hands the function their values:
+with `let a = 3`, `f(a + 1)` receives `4`. A function declared with the
+`hold` prefix instead receives each argument **as written** — canonicalized
+and bound in the caller's scope, but not evaluated — and evaluates it only
+where its body reads it, so it can inspect the expression (`Head(e)`),
+transform it, or decide whether to evaluate it at all:
+
+```epsil
+let a = 3
+hold f(e) = Head(e)
+f(a + 1)
+// ➔ Add
+```
+
+Every parameter of a `hold` function is held (there is no per-parameter
+form), and a parameter read twice is evaluated twice — read it once into a
+`let` when that matters. See
+[Hold functions](/control-flow/#hold-functions).
+
+## Collections: literals are values, pipelines are generators
+
+A collection **literal** — a list `[…]`, set `{…}`, tuple `(…)`, or
+dictionary — evaluates its elements when the statement executes. Assigning
+one to a variable stores a snapshot of the element *values*:
+
+```epsil
+let xs = []
+for k in 1..3 { xs = Join(xs, [k]) }
+xs
+// ➔ [1, 2, 3]
+```
+
+Lazy collection **operators** — `Range`, `Map`, `Filter`, `Take`, `Join` —
+are *generators*: their operands (bounds, sources, functions) are evaluated
+when the expression is, but enumeration is deferred until the collection is
+materialized (displayed, indexed, aggregated, or iterated). A deferred
+mapping function reads program state **at materialization time**, like a
+generator in Python — if it captures a variable that later changes, the
+materialized elements reflect the later value. To snapshot, force the work
+to happen where you stand: accumulate through a loop, or apply an eager
+operation (an aggregate, an index) at the point of definition.
+
+## Errors are values
+
+Per [Principles](/principles/), "errors are values": a *runtime*
+problem — a type error, an out-of-domain argument, reassigning a `const` —
+becomes an `Error` value embedded in the result, not a thrown exception. A
+program never throws to its host for a runtime problem.
+
+*Parse*-time problems are different: a malformed program surfaces as a
+**diagnostic**, not as a value. So do the few execution-time problems that are
+really about the source, not the computation — a gated host pragma, or an
+`#error` directive (see below).
+
+Because only the **last** statement's value is the program's result, an error
+value produced by an earlier statement would otherwise vanish silently. Each
+*non-final* statement that evaluates to an error value therefore also emits
+a `runtime-error` diagnostic — for example an indexed assignment
+(`xs[2] = 9`, which is rejected: element assignment is not supported), or
+reassigning a `const` in the middle of a program.
+
+## Console input and output
+
+`print` writes its operands to the host console — the terminal for the
+command-line tools, the developer console in a browser — separated by
+spaces and followed by a newline. Strings print their content, without the
+quotes; every other value prints its ordinary textual form. It evaluates to
+`Nothing`:
+
+```epsil
+let x = 6
+print("x is", x * 7)
+// prints: x is 42
+```
+
+`input` reads one line of text and evaluates to it as a string, without the
+trailing newline. An optional operand is a prompt, displayed before
+reading. In a terminal it reads from the terminal (piped standard input
+works too); in a browser it opens the `prompt()` dialog. At end-of-input —
+or when the dialog is canceled — it evaluates to `Nothing`; on a host with
+no interactive input at all, the call stays symbolic.
+
+```text
+> let name = input("Who? ")
+Who? Arno
+> print("Hello,", name)
+Hello, Arno
+```
+
+`print` and `input` follow the lowercase command convention. They are
+ordinary library aliases for the `Print` and `Input` operators — not
+keywords — so a local declaration of `print` shadows the command like any
+other library name.
+
+## Pragma security
+
+`#env(...)` and `#navigator(...)` read state from the host process (or the
+browser) at parse time. Because a notebook document can be shared or opened
+in an unfamiliar environment, both are **gated off by default**:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+#env("HOME")
+```
+
+by default produces a `host-pragma-disabled` diagnostic and no host read — the
+pragma evaluates to `Nothing`. A host can opt back in and let `#env`/
+`#navigator` read as documented in [Pragmas](/pragmas/).
+
+The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,
+`#time` — always work; they don't read anything sensitive from the host.
+
+`#error(...)` never crashes the host embedding the program: it becomes an
+`error-directive` diagnostic, so a single bad cell is contained.
+
+## Interruptibility
+
+A host can give an evaluation an explicit time budget, and independent
+count-based bounds on iteration and recursion depth. A breached limit becomes
+an error value (or an `evaluation-canceled` diagnostic when it happens in a
+non-final statement) — see
+[Execution](/implementation/#execution) for how a host sets one.
+
+The two kinds of limit end differently:
+
+- An expired **time budget ends the program**. The budget is one deadline for
+  the whole run, so once it has passed no later statement could run either:
+  the statement that hit it becomes the last one executed, the program's
+  value is its `Error("Timeout exceeded", "timeout")`, and the statements
+  after it are not evaluated. Statements that completed before the expiry keep
+  their effects. The deadline is checked before every statement (and before
+  every statement of the static pass), so a program of many cheap statements
+  is bounded too, not only one whose single statement runs long.
+- A breached **count-based cap** (`iterationLimit`, `recursionLimit`) is
+  per-construct: the next statement gets a fresh allowance, so the program
+  continues past it. The statement that breached evaluates to the error value,
+  and — because a loop is imperative — whatever it assigned before the breach
+  stays assigned. A program that reads such a variable afterwards therefore
+  sees a *partial* result alongside the `evaluation-canceled` diagnostic:
+
+  <!-- epsil-test: expect-diagnostics -->
+
+  ```epsil
+  total = 0
+  for i in 1..5000 { total = total + i * 2 }   // stops at iterationLimit (1024)
+  total                                        // ➔ 1051650, not 25005000
+  ```
+
+  A host that displays `value` must also surface `diagnostics` (the loop's
+  breach is an `error`-severity `evaluation-canceled` there), or raise
+  `ce.iterationLimit` for programs expected to loop longer.
+
+These limits are cooperative. A browser that evaluates untrusted or potentially
+unbounded programs should run Epsil in a Web Worker it can terminate from the
+outside. See
+[Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints/) for the
+complete cancellation model.
+
+---
+
+# Epsil Control Flow
+
+Source: https://epsil.dev/control-flow/
+
+# Control Flow
+
+## Functions
+
+A function can be defined in two forms, which mean the same thing.
+
+The **math style** is a single expression:
+
+```epsil
+f(x) = x + 1
+```
+
+```epsil
+f(x, y) = x + y
+```
+
+The **block style** wraps the body in a statement block, whose value is its
+last expression:
+
+```epsil
+function f(x) { x + 1 }
+```
+
+Parameters can carry a type annotation (`f(x: real) = …`), and the block
+form accepts a return-type annotation after the parameter list 
+(`function f(x) -> real { … }`). Parameter types are enforced when
+the function is called. Return types are retained in the function signature;
+the current runtime does not validate the inferred type of every returned
+value against that annotation.
+
+```epsil
+f(x: real) = x + 1
+```
+
+### Which form to use
+
+The three spellings differ only in ergonomics, so pick by the shape of the
+body:
+
+- **Math style** (`f(x) = …`) for a formula that fits on one line. It is how
+  the definition would be written on paper, and it is the right default for
+  mathematical code.
+- **Block style** (`function f(x) { … }`) once the body needs more than an
+  expression — a local `let`, a `match`, a loop. It is also the only form that
+  carries a name *and* a multi-statement body.
+- **Anonymous** (`x => …`) when the function is an argument to another
+  function and a name would add nothing: `Map(x => x^2, xs)`.
+
+An anonymous function can have a multi-statement body too, by making that body
+a [`do` block](#do-block-expressions) — but at that point a named `function` is
+usually clearer.
+
+### Effect specifiers
+
+A definition can state the effects that calling it may perform. The specifier
+sits after the parameter list and before the return arrow:
+
+```epsil
+function roll(n) random -> integer { Random(n) }
+```
+
+The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
+`fs_write`, `network`, `random`, `scope`, `state`, and `time`. Several
+labels may be listed with spaces. `pure` explicitly promises no effects; `any` means the
+effects are unknown. `pure` and `any` must appear alone.
+
+Without a specifier, effects are inferred from the body and may change when
+the definition is replaced. A written specifier is a contract: the body's
+inferred effects must be a subset of it. A pure body may satisfy a broader
+contract, but a body that performs an undeclared effect is rejected.
+
+The block form may omit the return annotation (`function f() random { … }`),
+in which case its declared result is `unknown`. In the math form, a written
+effect specifier must be followed by a return arrow:
+
+```epsil
+roll(n) random -> integer = Random(n)
+```
+
+See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
+subtyping, callback checks, and the distinction between inferred and declared
+effects.
+
+### Multiple clauses (literal parameters)
+
+A parameter can be a **literal** — a number, string, boolean, `Infinity`,
+`-Infinity`, or `NaN` (the spellings that are literals in expression
+position; `oo` is an input alias for `Infinity`. A constant *name* like
+`Pi` is a symbol and stays a parameter name — writing `f(Pi) = …` binds a
+parameter named `Pi` and draws an advisory `parameter-shadows-constant`
+diagnostic). Definition statements **accumulate**: defining the same name again
+with a different parameter list adds a *clause* rather than replacing the
+function, and a call dispatches to the most specific clause that matches
+its arguments (declaration order only breaks ties between equally specific
+clauses). A non-finite literal clause matches only itself — `f(NaN) = 0`
+handles exactly `NaN`; a `f(x: real)` clause never captures it:
+
+```epsil
+f(NaN) = 0
+f(Infinity) = 1
+f(x: number) = x + 1
+f(Infinity) + f(NaN)
+// ➔ 1
+```
+
+```epsil
+fib(0) = 0
+fib(1) = 1
+fib(n: integer) = fib(n - 1) + fib(n - 2)
+fib(10)
+// ➔ 55
+```
+
+Redefining a clause with the *same* parameter list replaces just that
+clause — so re-running an edited definition behaves as expected. A plain
+assignment (`f = x => …`) still replaces the whole binding, clauses and
+all.
+
+A literal parameter behaves as an anonymous parameter constrained to that exact
+value — the clause is selected only when the argument *is* that value.
+
+If no clause matches the evaluated arguments, the call is a
+`no-matching-clause` error. To inspect the clause set of a function, use
+`About`:
+
+```epsil
+f(0) = 1
+f(n: integer) = n + 1
+About(f)
+```
+
+The listing shows one line per clause, in declaration order, and annotates
+clauses that overlap an earlier one of equal specificity as well as clauses
+made unreachable by more specific ones covering their whole (finite)
+domain.
+
+### Hold functions
+
+By default a call **evaluates its arguments first**, and the function sees
+their values: with `let a = 3`, `f(a + 1)` receives `4`. A function that
+needs to see what the caller *wrote* — the expression `a + 1`, to inspect it,
+transform it, serialize it, or decide whether to evaluate it at all — is
+declared with the `hold` prefix, in either form:
+
+```epsil
+hold f(e) = Head(e)
+hold function twice(e) { let v = e; v + v }
+```
+
+In a hold function every parameter is bound to its argument **as written**
+(canonicalized and bound in the caller's scope, but not evaluated — so
+`f(1 + 1)` receives the canonical `2`, while `f(a + 1)` receives `a + 1`).
+Reading
+the parameter in an ordinary position evaluates the argument *there*, so
+`hold twice(e) = e + e` computes `e` on each read (call-by-name); read it
+once into a local — `let v = e` — to evaluate once. A structural operator sees
+the expression itself:
+
+```epsil
+let a = 3
+hold f(e) = Head(e)
+f(a + 1)
+// ➔ Add          (an ordinary function would answer Integer: it receives 4)
+```
+
+Because the argument is never evaluated by the call, a hold function can
+decide whether it runs at all — here `Random()` draws only when the
+condition is false:
+
+```epsil
+hold unless(cond, body) = if !cond { body } else { Nothing }
+unless(a > 5, Random())
+```
+
+`hold` applies to the **whole definition** — every parameter is held — and
+it maps to the engine's `lazy` operator flag: the definition is installed as
+a `lazy` operator, and `DefineFunction` carries it as the attribute
+`{hold: True}`. Three consequences:
+
+- A hold function is **single-clause**: a literal parameter selects a clause
+  by an argument's *value*, which a hold function never has, so
+  `hold f(0) = …` is refused (`hold-literal-parameter`), and a second clause
+  of a hold function — hold or not — at a different parameter list is refused
+  (`hold-single-clause`). Redefining the lone clause replaces it as usual.
+- Parameter types are checked against the **argument expression's** type
+  (`hold k(e: integer) = …` admits `k(n + 1)` and refuses `k("s")`).
+- The effects of an argument are the caller's business: they contribute to
+  the call exactly as they would under an ordinary function, since the body
+  may evaluate the argument.
+
+`hold` is a contextual keyword, like `type`: it claims a statement only as
+the prefix of a function definition, and stays a legal identifier everywhere
+else (`let hold = 5`, `hold(2)`). Anonymous functions have no hold form.
+
+### Bound-variable parameters: `bind`
+
+A hold function can define its own **binder** — an operator like `Sum` or
+`D` that takes a variable to bind. Mark the parameter that receives the
+variable with `bind`:
+
+```epsil
+hold mySum(body, bind i, n) = Sum(body, (i, 1, n))
+mySum(k^2, k, 3)
+// ➔ 14
+```
+
+The caller passes a **symbol** at a `bind` position (anything else is a
+`bind-symbol-expected` error), and the function's parameter is *substituted*
+by that symbol throughout the body — including where the body's own binder
+uses it, so `Sum(body, (i, 1, n))` becomes `Sum(k^2, (k, 1, 3))` and the
+sum runs over the caller's `k`. The call declares that symbol in its own
+scope, exactly as `Sum` does with its index: a `let k = 5` outside the call
+does not leak in, and `mySum(k * j, j, 3)` with `k = 5` is `30`. `bind` is
+contextual (`f(bind) = …` declares an ordinary parameter named `bind`) and
+requires `hold` (`bind-requires-hold`): a bound variable can only be received
+unevaluated. Every parameter of the function is held; `bind` says which of
+them names a variable.
+
+The substitution is by **name**, and deliberately reaches inside the body's
+own binders (that is what ties `Sum`'s index to the caller's variable), so it
+also reaches any *other* use of that name in the body: do not reuse a `bind`
+parameter's name for an unrelated local or index inside the same function.
+
+### Algebraic properties
+
+A user-defined operator can declare the algebraic properties the engine
+uses when it canonicalizes a call, in the same slot as the effect specifier:
+
+```epsil
+function op(a, b) commutative associative -> number { a + b + 1 }
+op(2, op(1, 3))     // ➔ 8 — sorted, flattened to op(1, 2, 3), folded pairwise
+conj(z) involution -> number = -z
+conj(conj(w))       // ➔ w
+```
+
+- **`commutative`** — the operands of a call are sorted into canonical order.
+- **`associative`** — nested calls flatten (`op(a, op(b, c))` is `op(a, b,
+  c)`); the function is written binary and a longer call is folded from the
+  left, `op(op(a, b), c)`.
+- **`idempotent`** — `f(f(x))` is `f(x)`.
+- **`involution`** — `f(f(x))` is `x`.
+
+The words are contracts, not checks: declaring `commutative` on a body that
+is not commutative gives whatever the canonical order produces. In the math
+form the slot must be followed by a return arrow (`op(a, b) commutative ->
+number = …`), like an effect specifier. `commutative`/`associative` need at
+least two parameters (`associative` exactly two), `idempotent`/`involution`
+exactly one; a `hold` function cannot carry them (its calls are neither
+reordered nor flattened); every clause of a multi-clause function must state
+the same ones. `About(op)` lists them.
+
+### Documenting a function
+
+A **doc comment** — `///` lines or a `/** … */` block — written immediately
+before a definition becomes the function's *description*: it is shown by
+`About(f)`, by an editor hover, and it is the one comment that survives a
+serialization round trip (it comes back as `///` lines). Ordinary `//`
+comments are not attached.
+
+```epsil
+/// Doubles its argument.
+/// Accepts anything `*` accepts.
+twice(x) = 2x
+About(twice)
+```
+
+### Anonymous functions
+
+An anonymous function uses the ASCII mapsto arrow `=>` (`⇒` in fancy-symbol
+output, and `↦` is accepted as input too);
+`->` itself is taken by `KeyValuePair` and by function types in annotations,
+so the two arrows never collide. The same `=>` separates a `match` case from
+its body — one arrow, meaning "yields", in both places (see
+[Guards](#guards)):
+
+```epsil
+x => x + 1
+```
+
+```epsil
+(x, y) => x + y
+```
+
+A mapsto binds loosely enough to sit on the right-hand side of an
+assignment:
+
+```epsil
+f = x => x + 1
+```
+
+A lambda can take **no** parameters — an empty parameter list `()` before the
+arrow:
+
+```epsil
+() => 42
+```
+
+Writing `->` where a function was meant — `(x, y) -> x + y`,
+`(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `=>` with a
+fixit and recovers as the intended function, so the program still runs. And
+when a declaration's annotation is a function type with named parameters, the
+lambda can be omitted entirely — `const f : (x: number) -> number = x^2 + 1`
+binds `x` from the annotation. See
+[Function-type annotations](/declarations/#function-type-annotations-bind-their-parameter-names).
+
+## `if` / `else` {#if-else}
+
+`if`/`else` is an **expression**, not a statement — it evaluates to a value:
+
+```epsil
+if x > 0 { 1 } else { 2 }
+```
+
+The `else` branch is optional:
+
+```epsil
+if x > 0 { 1 }
+```
+
+`else if` chains nest, so an `if` in `else` position is just another
+conditional:
+
+```epsil
+if x > 0 { 1 } else if x < 0 { 2 } else { 3 }
+```
+
+A `{ }` block's value is its last expression — the same block semantics
+as a multi-statement program (see [Blocks](#blocks) below).
+
+### The conditional expression `a if c else b`
+
+When both branches are single expressions, the braces are noise. The
+conditional form spells the same conditional without them:
+
+```epsil
+let x = 5
+10 if x > 3 else 20
+// ➔ 10
+```
+
+It is the *same* conditional as `if`/`else` — only the branches differ: plain
+expressions instead of blocks, so it introduces no scope and no statement can
+appear in a branch.
+
+Three rules follow from where it sits in the grammar:
+
+**The `else` is required.** It is what ends the condition, and a missing branch
+would leave the false case with no value to name. `1 if c` is an error; use the
+block form (`if c { 1 }`) when there is nothing to return.
+
+**It binds looser than every operator that computes, but tighter than the four
+that bind or pair — `=`, `=>`, `|>` and `->`.** So the whole conditional is the
+right-hand side of an assignment, the body of a function, or the value of a
+dictionary entry, and no parentheses are needed around a comparison:
+
+```epsil
+let scale = 2
+let tag = n => "big" if n * scale > 10 else "small"
+tag(6)
+// ➔ "big"
+```
+
+```epsil
+let n = 7
+{ "value" -> n, "parity" -> "odd" if n % 2 == 1 else "even" }
+// ➔ {"value" -> 7, "parity" -> "odd"}
+```
+
+Going the other way — a conditional used as an operand — does need
+parentheses, since `1 if c else 2 + 3` reads as `1 if c else (2 + 3)`:
+
+```epsil
+(10 if 3 > 0 else 20) + 5
+// ➔ 15
+```
+
+**Chains nest to the right,** so there is no `else if` spelling to learn:
+
+```epsil
+let n = 0
+"zero" if n == 0 else "negative" if n < 0 else "positive"
+// ➔ "zero"
+```
+
+One layout rule: the `if` must be on the **same line** as the value before it.
+A line break separates statements, so an `if` that starts a line always begins
+a new `if`-statement, never a continuation of the line above.
+
+## `match`
+
+`match` is an **expression** that inspects the structure of a subject against
+a sequence of `pattern => body` cases and evaluates to the body of the first
+matching case:
+
+```epsil
+match x {
+  0 => "zero"
+  _ => "other"
+}
+```
+
+Unlike `if`/`Which`, `match` is **structural** and **total**: it always
+selects a case, it never stays inert. A literal pattern (`0`) matches
+structurally, and `_` is the anonymous wildcard, matching anything — with a
+symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
+is structurally not `0`, even though it *could* be zero semantically. Use
+`if`/`Which` when you want that kind of semantic case-split instead.
+
+The final catch-all may also be spelled `otherwise`, a synonym for a bare
+`_` pattern (it takes a guard the same way, and binds nothing):
+
+```epsil
+match x {
+  0 => "zero"
+  otherwise => "other"
+}
+```
+
+`otherwise` is contextual, not reserved: it means the wildcard only when it
+is the entire pattern of a case. Anywhere else — including inside a
+structured pattern like `[otherwise, 2]` — it is an ordinary identifier, and
+a bare identifier in a nested pattern position *binds* (next section).
+
+### Bindings
+
+A bare identifier in pattern position **binds** a new variable to the value
+at that position — for *any* name, including ones that happen to name an
+engine constant (`e`, `i`, `Pi`). A pattern is parsed as an ordinary
+expression first, so this applies inside nested patterns too:
+
+```epsil
+match p {
+  (x, e) => x + e
+}
+```
+
+Matching `(2, 7)` against this case binds `x` to `2` and `e` to `7` — the
+body's `e` is the captured value, not `ExponentialE`. Because a bare binding
+matches unconditionally, a *non-final* case consisting of just a binding (or
+`_`) makes every case after it unreachable; this is flagged as a
+`match-irrefutable-case` diagnostic (a final catch-all is expected and not
+flagged):
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+match x {
+  Pi => 1
+  0 => 2
+}
+```
+
+This does **not** match the constant π — `Pi` in pattern position binds a new
+variable named `Pi`, shadowing the constant, and the diagnostic is the safety
+net for that: it fires because the `Pi => 1` case is non-final and matches
+anything, not because `Pi` is a reserved name. To test against the value of
+the constant, use a pin.
+
+### Pins
+
+`== expr` matches the subject against the **value** of `expr`, evaluated in
+the enclosing scope — this is how to test a symbolic constant or a runtime
+variable, since a bare identifier always binds instead:
+
+```epsil
+match x {
+  == Pi => "is-pi"
+  _ => "no"
+}
+```
+
+```epsil
+match x {
+  == limit => 1
+  _ => 0
+}
+```
+
+A pin is resolved at match time, and a pinned name may equally be a constant or
+a runtime variable — the parser cannot tell the two apart lexically, and does
+not need to. A pin of a *literal* (`== 5`) simply matches structurally, the
+same as writing the literal directly; `Infinity`/`NaN` are numeric literals in
+Epsil, so `== Infinity` is a literal pin too, with no binding trap to avoid.
+
+### Or-alternatives
+
+`p₁ | p₂ | …` at the **top level** of a case pattern matches if any
+alternative matches; a guard, if present, applies after whichever alternative
+matched:
+
+```epsil
+match x {
+  1 | 2 | == Pi => "small"
+  _ => "big"
+}
+```
+
+Alternatives must be **binding-free** — `_` is fine (`[0, _] | [_, 0]`), but a
+named binding inside an alternative (`a | 2 => …`) is a
+`match-alternative-binding` diagnostic, since there is no single value for
+the body to bind `a` to when the alternatives disagree on shape.
+
+### Range patterns
+
+`lo..hi` in pattern position is an **inclusive numeric membership test**: the
+case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
+The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
+form keys on the operator, not on how it was written:
+
+```epsil
+match x {
+  0..9 => "digit"
+  10..99 => "two digits"
+  _ => "big"
+}
+```
+
+Both endpoints are included, and they are compared with the same tolerance
+`match` uses for every other number leaf, so a subject a hair outside an
+endpoint still selects the case. Only a **number** matches: a symbol, a
+collection, a string, a complex number and `NaN` all fall through to the next
+case.
+
+Bounds must be **numeric literals** — negated literals and `Infinity` /
+`-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
+
+```epsil
+match x {
+  0..Infinity => "nonnegative"
+  _ => "negative"
+}
+```
+
+A bound that is a bare identifier (which would otherwise *bind*, like any
+identifier in pattern position), a computed expression, or `NaN` is a
+`range-pattern-bounds` diagnostic; a stepped range is a `range-pattern-step`
+diagnostic; and a range whose lower bound exceeds its upper bound is a
+`range-pattern-empty` diagnostic (that case can never match). Use a guard when
+a bound is not a literal:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+match x {
+  0..limit => "in"
+  _ => "out"
+}
+```
+
+Write instead:
+
+```epsil
+match x {
+  n if n >= 0 && n <= limit => "in"
+  _ => "out"
+}
+```
+
+A range pattern binds nothing, so it is legal inside an or-alternative, and a
+guard on a range case can only reference names from the enclosing scope:
+
+```epsil
+match x {
+  0..9 | 100..109 => "in"
+  _ => "out"
+}
+```
+
+Two consequences worth knowing. First, this is a **carve-out**: a `Range`
+*value* can no longer be matched structurally in pattern position — write
+`== Range(1, 10)` (a pin) to compare against the range value itself. Second,
+a range nested inside a list, tuple or dictionary pattern keeps its ordinary
+structural meaning; membership applies at the top level of a case pattern (or
+of an or-alternative). A `Range` whose bounds are not literals is likewise
+still an ordinary structural pattern.
+
+Because a run of operator characters lexes as one token, a **negative upper
+bound needs a space**: write `0 .. -1`, not `0..-1` (the same maximal-munch
+rule that makes `3! ^ 2` require its space). The formatter always spaces `..`
+in pattern position for this reason.
+
+### Guards
+
+`pattern if guard => body` adds a boolean condition, checked after the
+pattern matches and after its bindings are in scope:
+
+```epsil
+match n {
+  n if n > 3 => "big"
+  _ => "small"
+}
+```
+
+If the guard is undecidable for a symbolic subject, the case falls through to
+the next one — consistent with `match`'s totality, a guard never leaves the
+whole expression inert.
+
+The case arrow `=>` is the same arrow that builds an anonymous function, so a
+guard ends at the first `=>` written at the case's own level: in
+`n if valid => n` the guard is `valid` and the body is `n`, never the lambda
+`valid => n`. A lambda genuinely wanted in a pattern or a guard is
+parenthesized — `n if (f => f)(n) => n` — which costs nothing, since a bare
+lambda as a guard is a function value and therefore always true. A case BODY
+has no such restriction: `0 => x => x + 1` is a case whose result is a lambda.
+
+### Destructuring
+
+List, tuple, and dictionary patterns decompose the subject and bind their
+elements:
+
+```epsil
+match xs {
+  [first, ...rest] => first
+}
+```
+
+```epsil
+match p {
+  (x, y) => x
+}
+```
+
+```epsil
+match p {
+  {x -> px, y -> py} => px + py
+}
+```
+
+`...rest` (or bare `...`) captures the remaining elements of a list pattern;
+at most one rest is allowed per pattern — a second one is a
+`match-multiple-rest` diagnostic.
+
+Dictionary pattern keys are literal (not patternized); the values are full
+patterns — bindings, literals, pins, or nested shapes. Dictionary matching is
+**open**: a case matches when the subject is a dictionary that has *at least*
+the named keys, each with a matching value; extra subject keys are ignored. A
+subject missing any named key falls through to the next case. So
+
+```epsil
+match {x -> 3, y -> 4, z -> 5} {
+  {x -> px, y -> py} => px + py
+  _ => 0
+}
+```
+
+binds `px = 3` and `py = 4` (the extra `z` key is ignored) and evaluates to
+`7`.
+
+### Typed bindings
+
+`name: type` binds like a bare identifier, plus an implicit type guard,
+conjoined with any explicit guard:
+
+```epsil
+match n {
+  n: integer if n > 0 => "positive integer"
+  _ => "other"
+}
+```
+
+### Algebraic patterns
+
+Because a pattern is parsed as an ordinary expression, matching on operator
+structure comes for free — a pattern like `a + b` dispatches on the addition
+operator and captures its operands, with the same commutative matching the
+rule system already uses for sums and products:
+
+```epsil
+match z {
+  a + b if a > 0 => a
+  _ => 0
+}
+```
+
+This is symbolic destructuring, evaluated by the engine's general pattern
+matcher — it works when evaluating a `match` expression, but such patterns
+are not supported by `compile()`; compiling a `match` with an operator
+pattern fails closed, naming the offending pattern in the error.
+
+### No match
+
+If no case matches, `match` evaluates to an `Error` value tagged
+`'match-no-case'` carrying the subject, rather than throwing or silently
+producing `Nothing` — errors are ordinary values in Epsil (see
+[Evaluation](/evaluation/)):
+
+```epsil
+match 3 {
+  0 => "zero"
+}
+```
+
+Evaluating this expression yields `Error("match-no-case", 3)`.
+
+### `if`, `a if c else b`, or `match`? {#choosing-a-conditional}
+
+All three produce a value, so the choice is about what you are branching *on*.
+
+Branch on a **condition** — something that is true or false — with `if`. Use
+the block form when a branch needs more than one statement, and the
+[conditional expression](#the-conditional-expression-a-if-c-else-b) when both
+branches are single expressions and the braces are just noise:
+
+```epsil-live
+let n = -3
+"negative" if n < 0 else "zero" if n == 0 else "positive"
+// ➔ "negative"
+```
+
+Branch on the **shape** of a value — how it is built, and what is inside it —
+with `match`. It tests structure and binds the pieces in the same step, which
+an `if` chain cannot do without taking the value apart by hand:
+
+```epsil-live
+let v = [1, 2]
+match v {
+  [] => "empty"
+  [x] => "one item"
+  [_, ...] => "several items"
+}
+// ➔ "several items"
+```
+
+Two differences are worth remembering when the subject may be symbolic.
+`match` is **structural**: a symbolic `x` is not `0`, even though it might turn
+out to be zero, so it takes the wildcard case. And `match` is **total**: it
+always selects a case (or returns a `match-no-case` error), where an `if` on an
+undecidable condition can stay inert. When you want the semantic question —
+"is this actually zero?" — use `if`.
+
+## Loops
+
+There is one loop keyword form for each of the two common shapes. Both are
+evaluated **for effect**, not for their value — a loop's value is `Nothing`.
+Value-producing iteration over a collection belongs to the library functions
+`Map`/`Filter`/`Reduce`, not to a loop statement.
+
+`while cond { … }` repeats its body until the condition becomes false:
+
+```epsil
+while x > 0 { x }
+```
+
+`for x in xs { … }` binds the loop variable to each element in turn:
+
+```epsil
+for x in xs { x }
+```
+
+The loop variable may be a **tuple pattern**, using the same grammar as
+[`let (a, b) = v`](/declarations/#destructuring-declarations) — bare
+names, `_` to skip a position, nested `(…)` patterns:
+
+```epsil
+let s = 0
+for (p, q) in [(1, 2), (3, 4)] { s = s + p * q }
+s
+// ➔ 14
+```
+
+Each element must be a tuple of the pattern's shape; one that is not stops
+the loop with the `incompatible-type` error value as its result, the same one
+the destructuring `let` produces.
+
+`in` is contextual: only the loop-variable `in` introduces the iterator
+clause. A second, later `in` in the collection expression is still the
+ordinary membership operator, so `for x in a in b { … }` iterates over the
+value of `a in b`:
+
+```epsil
+for x in a in b { x }
+```
+
+## Pipelines
+
+`x |> f` means exactly `f(x)`. For a single call that is a wash — `Sqrt(2)`
+says it better than `2 |> Sqrt`. What the pipe buys you is **reading order**
+once several transformations are applied one after another.
+
+Here is the same computation — keep the passing scores, curve them, take the
+average — written three ways.
+
+Nested calls:
+
+```epsil-live
+let scores = [88, 42, 95, 61, 73]
+Mean(Map(s => s + 5, Filter(scores, s => s >= 60)))
+// ➔ 337/4
+```
+
+Named intermediates:
+
+```epsil-live
+let scores = [88, 42, 95, 61, 73]
+let passing = Filter(scores, s => s >= 60)
+let curved = Map(s => s + 5, passing)
+Mean(curved)
+// ➔ 337/4
+```
+
+A pipeline:
+
+```epsil-live
+[88, 42, 95, 61, 73] |> Filter(s => s >= 60) |> s => s + 5 |> Mean
+// ➔ 337/4
+```
+
+All three compute the same value. They differ in what the reader has to do.
+The nested form is written **inside-out**: to follow it you find `scores` in
+the middle and unwind outward, discovering only at the end that the last step
+is an average. The pipeline is written in the order the steps happen, and the
+subject comes first. The `let` version reads in that order too, at the price of
+naming two values that exist only to be handed to the next line.
+
+### The placeholder `_` {#pipe-placeholder}
+
+A stage that needs only the piped value is named bare:
+
+```epsil-live
+16 |> Sqrt |> N
+// ➔ 4
+```
+
+A stage that takes **more than one** argument is written as a call, with `_`
+marking the slot the piped value fills. It does not have to be the first
+argument:
+
+```epsil-live
+[3, 1, 2] |> Sort |> Take(_, 2)
+// ➔ [1, 2]
+```
+
+The `_` may be left out entirely: a call that is missing required arguments
+receives the piped value in the first slot its type fits — first for a
+collection piped into `Take(3)`, second for one piped into the
+callback-first `Map(f)` — so these are the same pipeline:
+
+```epsil
+[1, 2, 3] |> Map(n => n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> Map(n => n^2)         // [1, 4, 9] — implicit argument
+```
+
+The implicit argument only fills a hole. A call that is already complete is
+never rewritten: `xs |> f(y)` applies the *value* of `f(y)` to `xs`, exactly
+as if the pipe were not there.
+
+A one-parameter **lambda** stage over a collection is applied to each
+element (an implicit `Map`), so the pipeline above can shed its `Map`
+entirely — `[1, 2, 3] |> n => n^2` and `[1, 2, 3] |> _^2` also produce
+`[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
+rules.
+
+### Choosing between a pipeline and a nested call
+
+Reach for a pipeline when:
+
+- there are **three or more** steps, and
+- each step consumes the whole result of the one before it, and
+- the intermediate values have no name worth inventing.
+
+Prefer a nested call when the expression is **mathematical** rather than a
+sequence of stages. `Sqrt(1 + x^2)` is how the formula is written on paper;
+`1 + x^2 |> Sqrt` is the same value spelled worse. One or two calls rarely
+benefit either way — `Mean(xs)` needs no pipe.
+
+Prefer named intermediates when a value is **used twice**, deserves a name that
+explains what it is, or is worth inspecting while you develop. A pipeline is a
+straight line: it cannot fork, so the moment a result feeds two places, give it
+a `let`.
+
+### Precedence
+
+`|>` sits at the loosest tier of all the computing operators, so a stage may be
+an arbitrary arithmetic or boolean expression without parentheses, and a
+pipeline is the whole right-hand side of an assignment:
+
+```epsil
+a + b |> f        // (a + b) |> f
+a || b |> f       // (a || b) |> f
+x = a |> f        // x = (a |> f)
+```
+
+It is left-associative, so `a |> f |> g` is `g(f(a))`, which is what reading it
+left to right suggests. `~>` is an alias for `|>`; the two are the same
+operator, and a program written back out uses `|>`. See
+[Operators](/operators/#pipe) for the table entry.
+
+## Blocks
+
+A `{ … }` that immediately follows a keyword (`function`/`if`/`else`/
+`while`/`for`) is a **statement block**, and is distinct from the `{ … }`
+**collection** grammar (set/dictionary literals). A bare `{ … }` with no
+introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
+is a set.
+
+Each block pushes its own lexical scope. A block's value is its last
+expression; an empty block's value is `Nothing`:
+
+```epsil
+if a { }
+```
+
+Statements inside a block are separated the same way as top-level
+statements — a linebreak or a `;`:
+
+```epsil
+if a { 1; 2; 3 }
+```
+
+Blocks nest freely:
+
+```epsil
+if a { if b { 1 } }
+```
+
+### `do { … }` block expressions {#do-block-expressions}
+
+To use a statement block **in expression position** — where a bare `{ … }`
+would be the collection grammar — prefix it with `do`. `do { … }` opens a
+statement block usable anywhere an expression can appear: a lambda body, an
+assignment right-hand side, a function argument. Its value is its last
+statement, and it pushes its own lexical scope, exactly like a keyword-led
+block:
+
+```epsil
+let y = do { let t = 3; t + 1 }
+```
+
+Because a lambda body is an ordinary expression, `x => do { … }` gives a
+lambda the same multi-statement body a named `function` has — so a closure
+whose body runs several statements is written with `do`:
+
+```epsil
+counter => do { counter = counter + 1; counter }
+```
+
+A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.
+
+## `break` and `continue`
+
+`break` leaves the innermost enclosing loop; `continue` skips to its next
+iteration.
+
+```epsil
+for x in [1, 2, 3, 4] {
+  if x > 3 { break }
+  if x == 2 { continue }
+  f(x)
+}
+```
+
+They are valid anywhere inside a loop body — directly, or nested in an `if`, a
+`match` case, or a `do` block:
+
+```epsil
+for x in xs {
+  match x {
+    0 => continue
+    _ => f(x)
+  }
+}
+```
+
+Outside a loop they are a `control-outside-loop` diagnostic:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+if x > 1 { break }
+```
+
+The loop context **resets at every function and lambda boundary**. A `break`
+written inside a function or lambda defined in a loop body does not target
+that loop — it is outside a loop, and diagnosed:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+for x in xs {
+  function h() { break }
+}
+```
+
+This boundary is not a style rule; it follows from how the engine propagates a
+break out of a block (see
+[Loops and control transfer](/implementation/#loops-and-control-transfer)).
+
+Only the value-less forms are surface syntax. A break that makes the loop
+evaluate to a value has no Epsil spelling yet; it is bundled with the ruling on
+a general `return`. Serialized back, `break` and `continue` appear in their
+call form (`Break()`, `Continue()`), like the loop they belong to.
+
+## `return`
+
+`return` is **not implemented**: Epsil's expression-oriented style (an `if` is
+a value, a block's value is its last expression) doesn't need an explicit
+`return` yet. It is listed among the words the language reserves the right to
+claim later, but nothing claims it today — so `return` is an ordinary
+identifier and carries no control-flow meaning at all, rather than producing a
+diagnostic. Prefer not to use it as a name.
 
 ---
 
@@ -6086,33 +6034,69 @@ x.sign
 ```
 
 A `get` implementation takes `self` and returns the property's type. A
-`set` implementation takes `self` and the new value, and **returns the
-updated value** — Epsil values are immutable, so assigning to a property is
-sugar for rebinding the variable to what the setter returns:
+`set` implementation takes `self` and the new value, stores it, and
+**returns the receiver**:
 
 ```epsil-live
 protocol Nameable { readwrite name: string }
 
-type Person = tuple<first: string, last: string> is Nameable {
+type Person = object{first: string, last: string} is Nameable {
   get name(self) -> string { "\(self.first) \(self.last)" }
-  set name(self, value: string) -> Person { Person(value, self.last) }
+  set name(self, value: string) -> Person {
+    self.first = value
+    self
+  }
 }
 
-let p = Person("Ada", "Lovelace")
-p.name = "Augusta"        // rebinds p to the Person the setter returned
+let p = Person(first: "Ada", last: "Lovelace")
+p.name = "Augusta"        // stores into p — every reference to it sees the change
 p.name
 // ➔ "Augusta Lovelace"
 ```
 
-Because the assignment rebinds, the left-hand side must be an assignable
-variable: assigning through a `const` binding is the ordinary
-cannot-assign-a-constant error, and a target that is not a variable at
-all (`xs[1].name = …` — there is no binding to rebind) is
-`property-assignment-target-invalid`. Providing a `set` for a `readonly`
-property is `protocol-property-readonly-set`.
+### The mutability gate
+
+`Person` above is an **object** type, and that is required rather than
+incidental: a writable property is meaningful only on a mutable object,
+so a protocol that can modify state — one with at least one `readwrite`
+property, or a function member whose declared effects include `state` —
+can be conformed to only by object types. A protocol with only
+`readonly` properties and no declared `state` can be conformed to by any
+type, as `Signed` is by `number` above.
+
+```epsil
+protocol Identifiable { readwrite id: string }
+type Badge = record{id: string} is Identifiable
+// ➔ protocol-requires-object: the `Identifiable` protocol has settable
+//   properties. `Badge` is a record, and records are immutable; declare
+//   `Badge` as an object type to conform.
+```
+
+A **bare** requirement never gates — its effects are derived from
+whatever conformers exist, so a record may conform to a bare-function
+protocol with a pure implementation — and an explicit `pure` member never
+gates either, since the empty effect set is not `state`.
+
+Assigning to a property is a **store**, and the assignment evaluates to
+the value assigned. The target does not have to be a variable: any
+expression that evaluates to an object can be stored into, so
+`xs[1].name = "Ada"` works when the list holds objects, and a `const`
+binding is no obstacle either — the store writes the object, never the
+binding. On a record, a tuple or any other immutable value it is
+`immutable-value-assignment`, which names the two ways forward: build an
+updated copy, or declare the type as `object{…}`. Providing a `set`
+implementation for a `readonly` property is
+`protocol-property-readonly-set`, and so is a write through the read-only
+protocol view — the qualified `p.(Named.name) = v`, or the unqualified
+`p.name = v` when `name` is a computed property. A `readonly` requirement
+that a stored FIELD satisfies is a different matter: `readonly` constrains
+that protocol's view of the field, not the object, so a holder of the object
+can still write the field directly. That asymmetry is deliberate for now and
+is under review (see the `readonly` entry in `ROADMAP.md`).
 
 If two protocols declare a property with the same name, the qualified
-form disambiguates: `person.(Nameable.name)`.
+form disambiguates, for reads and for writes alike:
+`person.(Nameable.name)` and `person.(Nameable.name) = "Ada"`.
 
 ## Conditional conformance
 
@@ -6126,7 +6110,7 @@ type integer is Summable { function total(self) -> number { self } }
 
 type list<T> is Summable where T is Summable {
   function total(self: list<T>) -> number {
-    Reduce(self, (acc, x) |-> acc + total(x), 0)
+    Reduce(self, (acc, x) => acc + total(x), 0)
   }
 }
 
@@ -6138,6 +6122,43 @@ type list<T> is Summable where T is Summable {
 unless `string` is made `Summable` too. The conformance is recursive for
 free — `list<list<integer>>` conforms because `list<integer>` does, as the
 second call shows.
+
+### No effect specifiers on a conditional member
+
+A member of a **conditional** conformance may not carry an
+[effect specifier](/control-flow/#effect-specifiers). Its effects are
+inferred from its body instead:
+
+```epsil
+protocol Summable { function total(self: Self) -> number }
+
+type list<T> is Summable where T: number {
+  function total(self: Self) pure -> number { Sum(self) }
+}
+```
+
+That is refused when the conformance is declared, with
+`protocol-conditional-member-effects`. Drop the `pure` and the same block
+works — and `total([1, 2, 3])` answers `6`.
+
+The restriction is specific to the conditional form. A conformance to a
+ground type accepts specifiers on every member:
+
+```epsil-live
+protocol Summable { function total(self: Self) -> number }
+
+type Box = object{n: integer} is Summable {
+  function total(self: Self) pure -> number { self.n }
+}
+
+total(Box(n: 5))
+// ➔ 5
+```
+
+The reason is that a conditional conformance's `Self` stands for a whole
+family of types (`list<T>`, not one type), and a specifier has to be recorded
+against a concrete receiver. The restriction is expected to lift; until then
+the failure is reported at the declaration rather than at the call.
 
 ## Requiring conformance in a signature
 
@@ -6183,58 +6204,17 @@ grouped by when they fire:
   `protocol-target-unknown`, `protocol-conformance-overlap`,
   `protocol-implementation-split` (an implementation block on a
   multi-protocol `is A & B` — provide one block per protocol),
+  `protocol-requires-object` (the mutability gate: a protocol that can
+  modify state, conformed to by a non-object type),
   `protocol-implementation-pending` (a warning).
 - **Implementing**: `protocol-implementation-missing`,
   `protocol-implementation-duplicate`, `protocol-member-unknown`,
-  `protocol-signature-mismatch`, `protocol-property-readonly-set`.
+  `protocol-signature-mismatch`, `protocol-property-readonly-set`,
+  `protocol-conditional-member-effects` (an effect specifier on a member of a
+  conditional conformance).
 - **Calling**: `protocol-call-ambiguous`, `protocol-property-ambiguous`,
   `protocol-constraint-unsatisfied`, `protocol-in-type-position`,
-  `property-assignment-target-invalid`.
-
----
-
-# Epsil Comments
-
-Source: https://epsil.dev/comments/
-
-# Comments
-
-**Line Comments** start with `//`. Everything after a `//` is ignored until the
-end of the line.
-
-**Block (multi-line) Comments** start with `/*` and end with `*/`. Block
-comments can be nested.
-
-**To indicate that a comment is part of the documentation and is formatted using
-markdown**, use `///` for single line comments and `/** */` for block comments.
-
-```epsil
-// This is a line comment
-
-/* This is a block comment */
-
-```
-
-## Documentation comments
-
-```epsil
-/// This is a documentation line comment
-
-/** This is a documentation block comment */
-
-```
-
-## Comments are lossy
-
-The parser currently **discards** comments: they are not attached to the
-expression that follows them, so reading a program and writing it back out
-does not reproduce them. Comments carry no semantic weight. The lexer
-recognizes the documentation-comment spellings, but the parser does not
-currently attach them to anything.
-
-This is a deliberate scope decision. Notebooks keep prose in dedicated
-markdown cells rather than in code comments, so comment preservation is not
-required for the notebook workflow.
+  `immutable-value-assignment` (a property store on a value).
 
 ---
 
@@ -6324,6 +6304,663 @@ The following pragmas are replaced with the indicated value:
 
 These six pragmas are always available. Epsil does not currently implement a
 pragma for overriding the source location.
+
+---
+
+# Epsil Syntax
+
+Source: https://epsil.dev/syntax/
+
+# Epsil Syntax
+
+## Notation
+
+In the grammar below, the following notation is used:
+
+- An arrow (→) marks grammar productions and can be read as "can consist of"
+- Syntactic categories are written in lowercase italic (_newline_) on both sides
+  of a production rule.
+- Placeholders for recursive syntactic categories are indicated by _···_.
+- Literal words and punctuation are indicated in bold (**+**) or as a Unicode
+  codepoint (U+00A0) or as a Unicode codepoint range (U+2000-U+200A).
+- Alternatives are indicated by a vertical bar (|)
+- Optional elements are indicated in square brackets
+- Elements that can repeat 1 or more times are indicated by a trailing plus sign
+- Elements that can repeat 0 or more times are indicated by a trailing star sign
+- Elements that can repeat 0 or more times, separated by a another element are
+  indicated with a trailing hash sign, followed by the separator. If no
+  separator is provided, the comma (,) is implied.
+
+## Grammar overview
+
+The productions below describe the source forms accepted by the current
+parser. The Unicode identifier rules are described under
+[Symbols](/literals/#symbols), and the type following a `:` or return
+arrow is parsed using the
+[Compute Engine type language](https://mathlive.io/compute-engine/guides/types/). Detailed
+`match` patterns are documented under
+[Control Flow](/control-flow/#match).
+
+_quoted-text-item_ → U+0000-U+0009 U+000B-U+000C U+000E-U+0021 U+0023-U+2027
+U+202A-U+D7FF | U+E000-U+10FFFF
+
+_linebreak_ → (U+000A \[U+000D\]) | U+000D | U+2028 | U+2029
+
+_unicode-char_ → _quoted-text-item_ | _linebreak_ | U+0022
+
+_pattern-syntax_ → U+0021-U+002F | U+003A-U+0040 | U+005b-U+005E | U+0060 |
+U+007b-U+007e | U+00A1-U+00A7 | U+00A9 | U+00AB-U+00AC | U+00AE | U+00B0-U+00B1
+| U+00B6 | U+00BB | U+00BF | U+00D7 | U+00F7 | U+2010-U+203E | U+2041-U+2053 |
+U+2190-U+2775 | U+2794-U+27EF | U+3001-U+3003 | U+3008-U+3020 | U+3030 | U+FD3E
+| U+FD3F | U+FE45 | U+FE46
+
+_inline-space_ → U+0009 | U+0020
+
+_pattern-whitespace_ → _inline-space_ | U+000A | U+000B | U+000C | U+000D |
+U+0085 | U+200E | U+200F | U+2028 | U+2029
+
+_whitespace_ → _pattern-whitespace_ | U+0000 | U+00A0 | U+1680 | U+180E |
+U+2000-U+200A | U+202f | U+205f | U+3000
+
+_line-comment_ → **`//`** (_unicode-char_)\* _linebreak_)
+
+_block-comment_ → **`/*`** (((_unicode-char_)\* _linebreak_)) | _block-comment_)
+**`*/`**
+
+_digit_ → U+0030-U+0039 | U+FF10-U+FF19
+
+_hex-digit_ → _digit_ | U+0041-U+0046 | U+0061-U+0066 | U+FF21-FF26 |
+U+FF41-U+FF46
+
+_binary-digit_ → U+0030 | U+0031 | U+FF10 | U+FF11
+
+_numerical-constant_ → **`NaN`** | **`Infinity`** | **`+Infinity`** |
+**`-Infinity`** | **`oo`** | **`+oo`** | **`-oo`**
+
+(`oo` is an input alias for `Infinity`; the serializer always emits the
+canonical `Infinity` spelling.)
+
+_base-10-exponent_ → (**`e`** | **`E`**) \[_sign_\](_digit_)+
+
+_base-2-exponent_ → (**`p`** | **`P`**) \[_sign_\](_digit_)+
+
+_exponent_ → _base-10-exponent_ | _base-2-exponent_
+
+_binary-number_ → **`0b`** (_binary-digit_)+ \[**`.`** (_binary-digit_)+
+\]\[_exponent_\]
+
+_hexadecimal-number_ → **`0x`** (_hex-digit_)+ \[**`.`** (_hex-digit_)+
+\]\[_base-2-exponent_\]
+
+_decimal-number_ → (_digit_)+ \[**`.`** (_digit_)+ \]\[_exponent_\]
+
+The digit runs of a number literal may contain **`_`** grouping separators
+(`1_000`, `0xFF_FF`); an underscore is ignored and never begins or ends a
+run. A _hexadecimal-number_ takes only a _base-2-exponent_ because `e` and
+`E` are hexadecimal digits, so they cannot double as an exponent marker.
+
+_sign_ → **`+`** | **`-`**
+
+_signed-number_ → _numerical-constant_ | (\[_sign_\] (_binary-number_ |
+_hexadecimal-number_ | _decimal-number_))
+
+_symbol_ → _verbatim-symbol_ | _inline-symbol_
+
+_verbatim-symbol_ → **`` ` ``** _symbol-start_ (_symbol-continue_)\*
+**`` ` ``**
+
+The content of a _verbatim-symbol_ is taken literally: no escape sequences
+are applied, and it must still be a valid symbol name. The form exists to
+write symbols whose name is a reserved word, e.g. `` `while` ``.
+
+_inline-symbol_ → _symbol-start_ (_symbol-continue_)\*
+
+_symbol-start_ and _symbol-continue_ follow the Unicode profile described
+under [Symbols](/literals/#symbols). Reserved words are not accepted as
+_inline-symbol_; use the verbatim form.
+
+_escape-expression_ → **`\(`** _expression_ **`)`**
+
+_single-line-string_ → **`"`** (_escape-sequence_ | _escape-expression_ |
+_quoted-text-item_)\* **`"`**
+
+_multiline-string_ → **`"""`** _multiline-string-line_ **`"""`**
+
+_extended-string_ → (**`#`**)+ **`"`** (_unicode-char_)\* **`"`** (**`#`**)+
+
+The number of trailing **`#`** must match the number of leading **`#`** that
+opened the literal (`#"…"#`, `##"…"##`, …). No escape sequences are applied
+inside an extended string, so it can hold `"` and `\` literally.
+
+_string_ → _single-line-string_ | _multiline-string_ | _extended-string_
+
+String escapes, interpolation, multiline indentation and continuation are
+specified in [Literals](/literals/#strings).
+
+_parenthesized_ → **`(`** _expression_ **`)`**
+
+_list_ → **`[`** \[(_expression_)#**`,`**\] **`]`**
+
+_set_ → **`{`** \[(_expression_)#**`,`**\] **`}`**
+
+_dictionary_ → **`{`** \[(_key-value-pair_)#**`,`**\] **`}`** | **`{->}`**
+
+_key-value-pair_ → _expression_ **`->`** _expression_
+
+_block_ → **`{`** \[(_statement_)#_statement-separator_\] **`}`**
+
+_do-block_ → **`do`** _block_
+
+_latex-island_ → **`$`** (_unicode-char_ | **`\$`**)\* **`$`**
+
+_pragma_ → **`#line`** | **`#column`** | **`#url`** | **`#filename`** |
+**`#date`** | **`#time`** | _pragma-call_
+
+_pragma-call_ → (**`#env`** | **`#navigator`** | **`#warning`** |
+**`#error`**) **`(`** \[(_expression_)#**`,`**\] **`)`**
+
+_if-expression_ → **`if`** _expression_ _block_
+\[**`else`** (_block_ | _if-expression_)\]
+
+_match-expression_ → **`match`** _expression_ **`{`** _match-case_+ **`}`**
+
+_primary_ → _signed-number_ | _symbol_ | _string_ | _pragma_ |
+_latex-island_ | _parenthesized_ | _list_ | _set_ | _dictionary_ |
+_do-block_ | _if-expression_ | _match-expression_
+
+_call-clause_ → **`(`** \[(_argument_)#**`,`**\] **`)`**
+
+_argument_ → \[**`...`**\] _expression_
+
+_index-clause_ → **`[`** (_expression_)#**`,`** **`]`**
+
+_field-clause_ → **`.`** _symbol_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `.` must abut the base; not after a number
+literal
+
+_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ |
+_field-clause_ | **`!`**)\*
+
+_expression_ → _primary_ | _prefix-expression_ | _infix-expression_ |
+_postfix-expression_
+
+_prefix-expression_ → (**`-`** | **`!`**) _expression_
+
+_infix-expression_ → _expression_ _operator_ _expression_
+
+_literal-parameter_ → _signed-number_ | _string_ | **`true`** | **`false`**
+&nbsp;&nbsp;&nbsp;&nbsp;— a string literal parameter cannot contain interpolation
+
+_parameter_ → _symbol_ \[**`:`** _type_\] | _literal-parameter_
+
+_parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
+
+_effect-label_ → **`console`** | **`entropy`** | **`environment`** |
+**`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
+**`scope`** | **`state`** | **`time`**
+
+_effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
+&nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
+**`pure`** and **`any`** cannot be combined with another word
+
+_declaration_ → (**`let`** | **`const`**) _symbol_
+\[**`:`** _type_\] \[**`=`** _expression_\] |
+(**`let`** | **`const`**) _tuple-pattern_ **`=`** _expression_ |
+_symbol_ **`:`** _type_ \[**`=`** _expression_\]
+
+_tuple-pattern_ → **`(`** (_symbol_ | _tuple-pattern_)#**`,`** **`)`**
+&nbsp;&nbsp;&nbsp;&nbsp;— at least two elements; `_` skips a position
+
+_math-function-signature_ → **`->`** _type_ |
+_effect-specifier_ **`->`** _type_
+
+_type-parameter_ → _symbol_ \[**`:`** _type_\]
+&nbsp;&nbsp;&nbsp;&nbsp;— the bound must be a ground type (it may not mention
+another type parameter)
+
+_type-parameter-clause_ → **`<`** (_type-parameter_)#**`,`** **`>`**
+&nbsp;&nbsp;&nbsp;&nbsp;— at least one parameter (`<>` is rejected); duplicate
+names are rejected; the names scope over the definition's HEAD only (its
+parameters, effect specifier, and return type), not over its body
+
+_function-definition_ → \[**`hold`**\] _symbol_ _parameters_
+\[_math-function-signature_\] **`=`** _expression_ |
+\[**`hold`**\] **`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
+\[_effect-specifier_\] \[**`->`** _type_\] _block_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` clause is claimed only by the
+**`function`** form: `f<T>(x) = x` is genuinely ambiguous with a relational
+expression, so the math form does not take it; the **`hold`** prefix
+(a contextual keyword — `hold` is an ordinary identifier elsewhere) makes a
+definition whose arguments are bound unevaluated, see
+[Hold functions](/control-flow/#hold-functions); it does not combine
+with a type-parameter clause or a literal parameter. A parameter of a `hold`
+definition may be marked **`bind`** (`hold mySum(body, bind i, n)`): it
+receives a symbol, the bound variable. The _effect-specifier_ slot also
+accepts the algebraic words **`commutative`**, **`associative`**,
+**`idempotent`**, **`involution`** (definition attributes, not effects). A
+doc comment (`///` lines or `/** … */`) immediately before a definition is
+its description
+
+_type-declaration_ → **`type`** **`alias`** _symbol_
+\[_type-parameter-clause_\] **`=`** _type_ |
+**`type`** _symbol_ \[_type-parameter-clause_\] **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— both forms take a clause (a variance marker such
+as `out T` is legal only on the bare, nominal, form). The clause names scope
+over the definition only, and each must be used in it. Types are global, so
+a _type-declaration_ is only valid at the top level of a program — inside a
+block or function body it is the `type-declaration-not-top-level` error
+
+_while-statement_ → **`while`** _expression_ _block_
+
+_for-statement_ → **`for`** _symbol_ **`in`** _expression_ _block_
+
+_statement_ → _declaration_ | _type-declaration_ | _function-definition_ |
+_while-statement_ | _for-statement_ | _expression_
+
+_statement-separator_ → **`;`** | _linebreak_
+
+_shebang_ → **`#!`** (unicode-char)\* (_linebreak | \_eof_)
+
+_epsil_ → (\[_shebang_\] (_statement_)#_statement-separator_ \[_eof_\])
+
+The Pratt (precedence-climbing) grammar for `_infix-expression_`,
+`_prefix-expression_`, and `_postfix-expression_` — the operator set, its
+precedence, and its associativity — is documented as a table in
+[Operators](/operators/) rather than spelled out production by
+production; the whitespace rule described there (an infix operator has
+whitespace on both sides or neither; a prefix operator has no whitespace after
+it, and a postfix operator none before it) is part of this grammar, not a
+separate lexical concern.
+
+## Statements and sequencing
+
+A program is a sequence of statements separated by a linebreak or a `;`. Two
+expressions on the same line with no separator between them is **not** a
+silent sequence — it is a diagnostic:
+
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
+1 2
+```
+
+```
+Error: unexpected-symbol "2"
+```
+
+A multi-statement program is a sequence, evaluated in order, whose value is the
+value of its last statement. `;` is interchangeable with a linebreak as a
+separator, so these two programs are identical:
+
+```epsil
+a
+2
+```
+
+```epsil
+a; 2
+```
+
+## Primary expressions
+
+A primary is the leaf of the expression grammar — the thing an operator or a
+call/index applies to. The primary forms are:
+
+- a number: `2`, `3.14`, `0x1F`, `0b101`
+- a symbol: `x`, `Add`
+- a verbatim symbol: `` `while` ``
+- a string: `"hello"`
+- a pragma: `#env("HOME")`
+- a parenthesized expression: `(2 + 3)`
+- a list: `[1, 2, 3]`
+- a set: `{1, 2, 3}`
+- a dictionary: `{one -> 1, two -> 2}`
+- a `do { … }` block expression: `do { let t = 3; t + 1 }`
+- a `$…$` LaTeX island: `$\frac{1}{2}$` — see
+  [LaTeX Islands](/literals/#latex-islands)
+- a function call: `f(x, y)`
+- an index expression: `xs[i]`
+- a field access: `p.x`
+
+## Calls, indexing and field access
+
+A call is a symbol (or another primary) immediately followed — with **no**
+whitespace — by a parenthesized, comma-separated argument list:
+
+```epsil
+f(x, y)
+f()
+```
+
+An argument may be prefixed with `...` to spread a tuple's elements into the
+call's arguments (`...` is also valid in list, set, and dictionary
+literals, where it splices non-tuple collections — see
+[Spread](/operators/#spread)):
+
+```epsil
+f(...p)
+f(1, ...p)
+```
+
+The callee does not have to be a bare symbol. A parenthesized expression, or
+the result of another call, can be called too:
+
+```epsil
+(getF())(x)
+(a + b)(2+1)
+```
+
+### Named arguments
+
+An argument can be passed by the name of the parameter it is for, written
+`name: value`. Named arguments may be given in any order, and may follow
+positional arguments — but never precede them:
+
+```epsil
+function interest(principal: number, rate: number) -> number {
+  principal * rate
+}
+
+interest(principal: 1000, rate: 0.05)   // ➔ 50
+interest(rate: 0.05, principal: 1000)   // ➔ 50 — order-free
+interest(1000, rate: 0.05)              // ➔ 50 — positional prefix is fine
+interest(rate: 0.05, 1000)              // ✘ positional after named
+```
+
+The names checked are the ones the callee's **declaration** carries — a
+`function` definition's parameters, a
+[named function-type annotation](/declarations/#function-type-annotations-bind-their-parameter-names),
+an annotated lambda (including one assigned to a name,
+`f := (x: number, y: string) => x + 3` then `f(y: "ok", x: 1)`), or a
+protocol member's requirement (both the bare call
+`compare(other: y, self: x)` and the qualified
+`Comparable.compare(other: y, self: x)`, which dispatch on `self`
+wherever it is written). An inline lambda applied directly reads its
+names from the expression itself — `((x: number) => x + 1)(x: 5)` is
+`6`, and unannotated parameters work there too,
+`((x, y) => x - y)(y: 2, x: 10)` is `8`.
+
+A parameter without a declared name is positional-only, and a callee
+whose parameter names the engine cannot read cannot take named
+arguments at all: a forward reference (a call *before* the statement
+that pins the callee's signature), a value typed only as `function`,
+or an **unannotated** lambda reached through a binding —
+`h := (x, y) => …` then `h(x: 1, y: 2)` declines, because type
+inference drops the parameter names; annotate the parameters to call
+it by name. A misspelled name gets a "did you mean" pointing at the
+closest declared one.
+
+A call that names any argument is a **complete** call: optional
+parameters may simply be omitted, but a missing required parameter is an
+error — a named call never turns into a partial application — and a
+variadic tail cannot be filled (nor can `...` spread arguments mix with
+names). Partial application and spreads remain available through purely
+positional calls.
+
+When a function has several clauses or overloads, a named argument is
+also a **branch selector**: a clause that does not declare the written
+name is never chosen, even if the argument's value would have selected
+it. With clauses `(z: 0)`, `(o: 1)` and `(n: integer)`, the call
+`f(n: 0)` runs the general `n` clause with the argument `0`, while
+`f(0)` runs the `z: 0` base clause. Among the clauses that do declare
+the written names, selection works exactly as for a positional call. If
+the surviving overloads read the same names in different orders and
+nothing else tells them apart, the call is an error asking you to be
+explicit — call it positionally.
+
+Note the disambiguations: `f(a := 1)` passes the *assignment* `a := 1`
+as an ordinary argument (the token is `:=`, not `:`), and each
+diagnostic these rules produce has an extended explanation under
+`epsil doc <code>` (e.g. `epsil doc argument-name-unknown`).
+
+Indexing is a primary immediately followed — with no whitespace — by a
+bracketed index expression. Indexing is **1-based** (`xs[1]` is the first
+element):
+
+```epsil
+xs[i]
+f(x)[0]
+```
+
+Field access is a primary immediately followed — with no whitespace — by a
+`.` and a symbol. Chains associate left, and a field value can be called like
+any other computed callee:
+
+```epsil
+p.x
+a.b.c
+p.x(2)
+```
+
+A number literal never takes a field: the lexer folds a trailing dot into
+the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
+range. See [Types](/types/#values-of-a-new-type-are-opaque) for what
+`p.x` means on values of declared types, records and dictionaries.
+
+In all three cases the `(`, `[` or `.` must directly abut the
+callee/indexed expression: whitespace before it means the form is a
+separate primary (or, for `.`, a diagnosed stray token), not a
+call/index/field — the same whitespace-sensitivity that governs operators.
+
+## Collections, tuples, and dictionaries
+
+- **List**: `[a, b]`; `[]` is the empty list.
+- **Set**: `{a, b}`; `{}` is the empty set.
+- **Tuple**: `(a, b)`. A single parenthesized element, `(a)`, is just the
+  parenthesized expression `a`, not a one-element tuple; `()` is a diagnostic
+  (`expression-expected`) — there is no empty tuple — **except** immediately
+  before a mapsto arrow, where `() => expr` is a zero-parameter lambda.
+- **Dictionary**: `{k -> v}`; an unquoted key becomes a string key. The empty
+  dictionary is spelled `{->}`, not `{}` (which is the empty set).
+
+`{ … }` is disambiguated by looking at the first element once it has been
+parsed: if it is followed by a top-level `->`, the whole `{ … }` is a
+dictionary and every subsequent element must also be a `key -> value` pair;
+otherwise `{ … }` is a set.
+
+A `{` in expression position is therefore **always** a collection literal (set
+or dictionary); to open a statement block in expression position, prefix it
+with `do`. `do { … }` is a block expression — a statement sequence whose value
+is its last statement — while a bare `{ … }` stays a set/dictionary. See
+[Blocks](/control-flow/#blocks).
+
+```epsil
+{ one -> 1, two -> 2 }
+```
+
+Trailing commas are allowed in every collection form (lists, sets, tuples,
+dictionaries, and call/index argument lists) — friendly to notebook editing
+and diffs:
+
+```epsil
+[1, 2, 3,]    // same as [1, 2, 3]
+```
+
+A bare, top-level comma-separated sequence with no enclosing delimiter (for
+example `1, 2, 3` on its own) is **not** a sequence literal — it is a
+diagnostic. A sequence is written only as an explicit call, `Sequence(1, 2, 3)`.
+
+## Round-trips
+
+Reading a program and writing it back out reproduces its meaning, but not
+necessarily its spelling. A few forms have one canonical rendering: numbers get
+a single spelling (with `_` digit grouping), a division is always written with
+an explicit `/`, `2x` keeps its juxtaposed form where that re-reads
+unambiguously (but `2(x+1)` and `(x+y)(3+4)` keep an explicit `*`, since a
+juxtaposed group would read as a call), and `is` is written as `in` — the two
+spell the same membership test.
+
+Comments are **not** preserved by a round-trip — see
+[Comments](/comments/). For the exact list of normalizations, see
+[Round-trip and serialization normalizations](/implementation/#round-trip-and-serialization-normalizations).
+
+## Relationship to the loose math parser
+
+Epsil is a **programming-language** syntax. The Compute Engine also ships a
+*loose math parser* that reads LaTeX/ASCII-math notation. The two share a few
+surface forms but are **not** the same language: in Epsil a juxtaposed name is
+a single identifier (`sin` is one symbol, not `s·i·n`), `f(x, y)` is a function
+call rather than a product, and `**` is exponentiation. Do not assume a snippet
+means the same thing to both. See
+[Relationship to the loose math parser](/implementation/#relationship-to-the-loose-math-parser)
+for a form-by-form comparison.
+
+---
+
+# Epsil Errors
+
+Source: https://epsil.dev/errors/
+
+# Epsil Errors
+
+Every Epsil diagnostic carries a stable, kebab-case code — `static-type-error`,
+`mapsto-arrow-expected` — shown after the message in the editor and by
+`epsil check`. The sections below are the extended explanations for the codes
+that have more to say than their message already does; they are the same text
+`epsil doc <code>` prints. In Visual Studio Code, clicking a
+diagnostic's code opens its section on this page.
+
+## `spread-tuple`
+
+A spread (`...x`) in a list or set literal was given a tuple. Tuples are units — a point, a pair — so they do not splice into a surrounding collection; the spread would silently do nothing, which is why it is rejected instead.
+
+To use a tuple's elements as list elements, convert explicitly: `ListFrom(t)` is the list of t's elements, so `[...ListFrom(t), 3]` splices them. (In a CALL argument list the rule is reversed: argument lists are tuple-shaped, so there `f(...t)` spreads exactly tuples.)
+
+## `incompatible-type`
+
+A value's type does not match what its context requires — a typed declaration (`let x: string = …`) whose initializer has a different type, an argument outside a function's signature, or a value that fails a type ascription.
+
+The message reads "expected `T`, got `U`": T is what the context requires, U is what the value actually has. A site may follow — "for argument 2" points at a position in a call, "at `x`" quotes the offending subexpression. A type like `list<string^5>` is a list of exactly 5 strings; `finite_integer` is an integer that is not infinite.
+
+The check runs twice by design: once statically, when the program is canonicalized (reported before anything runs), and again during evaluation, where the mismatch becomes an error value that propagates outward (see `epsil doc runtime-error`).
+
+## `missing`
+
+A function was called with fewer arguments than its signature requires; the error marks the position of the argument that was not provided.
+
+Check the signature with `epsil doc <FunctionName>`. Optional parameters never produce this error — only required ones do.
+
+## `unexpected-argument`
+
+A function was called with more arguments than its signature accepts; the quoted value is the first extra one.
+
+Check the signature with `epsil doc <FunctionName>`. A common cause is passing a collection's elements separately where the function expects the collection itself (or the reverse).
+
+## `callback-arity`
+
+A collection operator was given a callback that declares a different number of parameters than the operator passes it — `Map((p, q) => p + q, xs)`, where Map applies the callback to one element at a time.
+
+An ordinary call may supply fewer arguments than a function declares: `f(1)` on a two-parameter `f` is partial application, and yields a function awaiting the rest. Inside a collection operator that is never what was meant, because the OPERATOR decides how many arguments the callback receives — so `Map` would build a list of leftover functions rather than a list of results. The check is therefore specific to operator-owned callback slots; ordinary calls still curry.
+
+If the elements are pairs (or tuples) and the callback meant to take one apart, write the parameter as a tuple pattern: `Map(((p, q)) => p + q, pairs)` — the extra parentheses make it ONE parameter that is destructured, not two parameters.
+
+A few operators read the callback's arity as a choice between two modes and accept either: `Sort` takes a unary sort key or a binary comparator, and `Iterate` takes `f(previous)` or `f(index, previous)`. Those report this error only when the callback matches neither.
+
+A pipe stage is checked on the same grounds but reports `pipe-stage-arity`, because the remedy there is different.
+
+## `pipe-stage-arity`
+
+A pipe stage declares a number of parameters it can never be called with — `[100, 200] |> (x, y, z) => x + y + z`. A pipe passes its stage exactly one value, so only a stage that accepts one argument can be applied.
+
+As with a callback slot, an ordinary call may supply fewer arguments than a function declares — `f(1)` on a two-parameter `f` is partial application — but a pipe is not an ordinary call: the piped value is the whole argument list, so a leftover function is never the result the pipeline was written to produce.
+
+A stage that genuinely takes several arguments is written as a CALL, with `_` marking the slot the piped value fills: `xs |> Fold(f, 0, _)`. The `_` may be left out when the call is missing exactly one required argument, so `xs |> Take(10)` means `xs |> Take(_, 10)`.
+
+If the piped value is a collection whose elements are tuples and the stage meant to take one apart, write the parameter as a tuple pattern — `pairs |> ((p, q)) => p + q` — where the extra parentheses make it ONE parameter that is destructured.
+
+## `argument-name-unknown`
+
+A call passed an argument by name (`f(rate: 0.05)`), but the called function declares no parameter with that name; the message lists the names it does declare, and a "did you mean" points at the closest one.
+
+Only parameters that carry a name in the function's declaration can be addressed by name — an unnamed parameter is positional-only. Check the signature with `epsil doc <FunctionName>`.
+
+## `argument-order-invalid`
+
+In a call that mixes positional and named arguments, all positional arguments must come first: once one argument is named, every later argument must be named too.
+
+`f(1, rate: 0.05)` is fine; `f(rate: 0.05, 1)` is this error — after `rate:` there is no position left for a bare `1` to occupy unambiguously.
+
+## `argument-name-duplicate`
+
+The same parameter was supplied twice — either two named arguments used the same name, or a named argument repeats a parameter that an earlier positional argument already filled.
+
+In `f(1000, principal: 2000)` the first positional argument already occupies `principal`, so naming it again is this error, not an override.
+
+## `argument-names-unavailable`
+
+A call passed arguments by name, but the called function has no declaration the engine can read parameter names from — it is undefined, defined later in the program, or held in a value typed only as `function`.
+
+Named arguments are checked against the declaration the call resolves through; with no declaration visible there is nothing to check the names against. Call it positionally, or move the definition before the call.
+
+The same error covers an OVERLOADED function whose overloads accept the call but disagree about which argument fills which parameter — the names then pick an argument order rather than just an implementation, and the engine will not guess. Call it positionally, or give the overloads distinct parameter types.
+
+## `argument-names-required`
+
+The called function requires every argument to be written with its parameter's name (`Person(firstName: "Alan", age: 42)`); the message lists the names, in declaration order.
+
+Object-type constructors are the functions in this shape. An object type's fields are frequently several of the same type, so a positional call that transposed two of them would be accepted in silence and build a wrong object with no error anywhere. Because the arguments are named, their order does not matter.
+
+## `argument-optional-skipped`
+
+A named argument supplied an optional parameter while an optional parameter declared before it was left out.
+
+Arguments are matched to declared positions, and there is no way to leave a hole in the argument list — so an optional parameter can only be named when every optional parameter declared before it is also supplied (by position or by name). Supply the earlier optional too, or omit both.
+
+## `zero-index`
+
+Indexing is 1-based: `xs[1]` is the first element of a collection and `xs[n]` the n-th, so the literal index 0 never names an element (it yields NaN).
+
+The last element is `xs[-1]` — negative indices count from the end, which is usually what a 0-index habit is reaching for.
+
+## `mapsto-arrow-expected`
+
+`->` and `=>` are different operators: `->` pairs a key with a value (the key must be a string, as in a dictionary entry) and also writes function TYPES in annotations (`(number) -> number`), while `=>` is the mapsto arrow that builds a function value.
+
+So `(x) -> x^2` reads as a key-value pair with a malformed key, not a lambda. Write `(x) => x^2` for the function; the fixit in the diagnostic applies exactly that rewrite.
+
+## `mapsto-arrow-legacy`
+
+`|->` was the mapsto arrow in earlier versions of the language. It is now spelled `=>`, the same arrow a `match` case uses for its body — one glyph, meaning "yields", in both places.
+
+Write `x => x + 1`; the fixit in the diagnostic replaces the arrow for you. The expression was parsed as the function it was meant to be, so any other diagnostic reported here is a separate problem. (Function TYPES and dictionary entries are unaffected: they keep `->`, as in `(number) -> number` and `{k -> v}`.)
+
+## `chained-assignment`
+
+`a = b = 5` does not chain: `=` only assigns as a whole statement, so the OUTER `=` assigns and the inner one compares — `a` receives the boolean of `b = 5`.
+
+Write `a := b := 5` to actually chain the assignment, or `a := (b == 5)` if the comparison was the intent.
+
+## `assign-in-condition`
+
+Inside a condition, `:=` assigns — and the assigned value, not a comparison, becomes the test: `if flag := true { … }` sets flag and then tests `true`.
+
+Use `==` to compare, or perform the assignment on its own line before the condition. (A bare `=` in a condition already compares, so only an explicit `:=` reaches this diagnostic.)
+
+## `floor-division-comment`
+
+`//` starts a line comment, not floor division — everything after it on the line is ignored, which silently truncates an expression like `a // b`.
+
+Use `Floor(a / b)` for the integer quotient.
+
+## `control-outside-loop`
+
+`break` and `continue` are only valid directly inside a `while` or `for` body — and the loop context resets at every function and lambda boundary, so a `break` inside a lambda DEFINED in a loop is still outside the loop.
+
+To stop a pipeline early, restructure with a condition or a Take/Filter stage instead of breaking out of a callback.
+
+## `runtime-error`
+
+Runtime problems in Epsil are VALUES, not exceptions: a failing subexpression evaluates to an Error value, which propagates outward through the enclosing expressions. Nothing is thrown, and the rest of the program keeps running.
+
+The parenthesized chain in the message ("in Characters argument 1, in Map argument 2") is the propagation path, innermost first — where the error was born, then the calls it traveled through. The caret in the report points at the innermost location the source can show.
+
+Only the last statement's value is a program's result, so an error produced by an EARLIER statement would vanish silently; that is why it is reported as a diagnostic. The final statement's error simply is the program's value.
+
+## `static-type-error`
+
+This problem was detected before anything ran, when the program was canonicalized — the same analysis `epsil check` performs.
+
+A static diagnostic never suppresses evaluation: the program still runs exactly as written (errors are values — see `epsil doc runtime-error`), so the same mistake may be reported a second time by the run itself. The label distinguishes the tiers: "Type error"/"Static error" for the pre-run analysis, "Runtime error" for the run.
 
 ---
 
@@ -6967,12 +7604,16 @@ let x = 5                 // mutable declaration
 const tau = 6.28          // immutable; reassigning yields an Error value
 x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
 f(x) = x^2                // function definition, math style
-square = x |-> x^2        // anonymous function ("|->" is the lambda arrow)
+square = x => x^2        // anonymous function ("=>" is the lambda arrow)
 cube : (x: number) -> number = x^3   // a named function-type annotation binds x
 function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
   t * 2                   // a block's value is its last expression
 }
+hold h(e) = Head(e)       // hold: arguments arrive UNEVALUATED (h(x + 1) ➔ Add)
+hold mySum(body, bind i, n) = Sum(body, (i, 1, n))  // bind: a bound-variable slot; mySum(k^2, k, 3) ➔ 14
+function op(a, b) commutative associative -> number { a + b }  // algebraic words in the specifier slot
+/// A doc comment right before a definition is its description (About, hover)
 let parity = "even" if x % 2 == 0 else "odd"  // conditional expression; if is also an expression: if c { a } else { b }
 g(x) + f(2)
 // ➔ 22
@@ -7010,7 +7651,7 @@ g(x) + f(2)
 - **LaTeX islands**: `$\frac{1}{2}$` splices parsed LaTeX into the expression
   (available in the CLI and any host that injects a LaTeX parser).
 
-**Operator precedence**, loosest → tightest: `:=` · `|->` · `??` (coalesce) ·
+**Operator precedence**, loosest → tightest: `:=` · `=>` · `??` (coalesce) ·
 `|>` (pipe) · `->` (key-value) · `a if c else b` (conditional) · `||` · `&&` ·
 comparisons
 `== != < <= > >= === in !in is` (chainable: `1 < 2 < 3`) · `..` (range) ·
@@ -7031,15 +7672,15 @@ actually happens → write instead:**
 | `range(1, 5)` excludes end | Inert call + did-you-mean; `Range(1, 5)` **includes** 5: `[1,2,3,4,5]` | `Range(1, n)` or `1..n` for 1…n inclusive |
 | `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
-| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics; `(x) -> …` is recovered with a did-you-mean-`\|->` fixit | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
+| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics; `(x) -> …` is recovered with a did-you-mean-`=>` fixit | `f(x) = expr`, `x => expr`, or `function f(x) { … }` |
 | `cond ? a : b` | Parse diagnostic | `a if cond else b`, or `if cond { a } else { b }` — both are expressions |
 | `elif` | Parse diagnostic | `else if` |
 | `return` | Reserved word, **not implemented** | A block's value is its last expression |
 | `break` / `continue` | Work as expected inside a `while`/`for` body; the loop context resets at every function and lambda boundary | *(nothing to change)* |
 | `print(x)` | Inert unknown call; nothing prints | The program's value is its **last statement** |
 | `len(xs)` | Inert + did-you-mean | `Length(xs)` |
-| `s[i]` / `len(s)` on a string | Error value / inert — strings are **not** collections | `Characters(s)[i]`, `Length(Characters(s))` |
-| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `StringJoin(a, b)` |
+| `s[0]` / `len(s)` on a string | Works — a string is a collection of its characters (grapheme clusters), 1-based | `s[1]`, `Length(s)` |
+| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `Join(a, b)` |
 | `xs[2] = 9` | Runtime error value — no element assignment; collections are immutable values | Rebuild: `Map`, `Join(xs, [v])`, `Append(xs, v)` |
 | `and` / `or` / `not` | Parse diagnostics (reserved words) | `&&`, `\|\|`, `!` |
 | `x**0.5` habits: `x^1/2` | Parses as `(x^1)/2` — precedence, not a root | `Sqrt(x)` or `x^(1/2)` |
@@ -7070,7 +7711,7 @@ any number of recursive calls — `fib(n-1) + fib(n-2)` is fine), and closures:
 
 ```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
-makeAdder(k) = x |-> x + k     // closures capture lexically
+makeAdder(k) = x => x + k     // closures capture lexically
 let add10 = makeAdder(10)
 add10(fact(5))
 // ➔ 130
@@ -7080,12 +7721,12 @@ Collections pipeline — `Map`/`Filter`/`Reduce` for value-producing iteration,
 `|>` to chain; `1..n` is an inclusive range:
 
 ```epsil
-1..10 |> Filter(_, k |-> k % 2 == 0) |> Map(k |-> k^2, _)
+1..10 |> Filter(_, k => k % 2 == 0) |> Map(k => k^2, _)
 // ➔ [4, 16, 36, 64, 100]
 ```
 
 ```epsil
-Reduce([1, 2, 3, 4], (acc, x) |-> acc + x, 0) + Sum(1..100)
+Reduce([1, 2, 3, 4], (acc, x) => acc + x, 0) + Sum(1..100)
 // ➔ 5060
 ```
 
@@ -7169,8 +7810,17 @@ Verified operator names, so you don't have to guess (search for more with
   `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,
   `Count(xs)` / `Count(xs, v)` / `Count(xs, pred)`,
   `Reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
-- **Strings**: `Characters`, `StringJoin`, `StringSplit(s)` (splits on
-  whitespace by default), `String(x)`.
+- **Strings**: `Characters`, `StringSplit(s)` (splits on whitespace by
+  default), `String(x)`, `Join(a, b)` to concatenate strings,
+  `StringJoin(xs, sep?)` to join ONE collection with an optional separator
+  (a string subject means its characters, so `StringJoin("ab", "cd")` is
+  `"acdb"`, not `"abcd"` — use `Join` or `"\(a)\(b)"` to concatenate).
+  Substring search is `RangeOf(s, needle)` (a span, or `Nothing`),
+  `ContainsSequence`, `StartsWith`, `EndsWith` — `c in s` is *character*
+  membership. Also `StringReplace(s, target, replacement, count?)`,
+  `Trim`/`TrimStart`/`TrimEnd`, `StringRepeat`, `PadStart`/`PadEnd`,
+  `ToUpperCase`/`ToLowerCase`/`CaseFold`, `StringCompare(a, b)` (`-1/0/1`,
+  code-point order) and `NumberFrom(s, base?)`.
 - **Dictionaries**: `Keys`, `Values`.
 - **Absence**: `Missing` preserves a missing position; `Nothing` is omitted
   from arguments and collections; `IsMissing`, `Coalesce`.
@@ -7184,7 +7834,7 @@ Caution: `Head` and `Tail` exist but are **structural** operators
 for elements use `First`/`Rest`.
 
 ```epsil
-Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
+Sort([3, 1, 4, 1, 5], (a, b) => a > b)
 // ➔ [5,4,3,1,1]
 ```
 
@@ -7202,6 +7852,12 @@ Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
   lists) preview-elide above 10 elements (`[1,2,3,4,5,...,]`); the value is
   complete — the CLI's `--json` output materializes the full elements (up to
   10,000). Literals print in full.
+- **Arguments are evaluated before a call** — `f(a + 1)` receives the value
+  — except for a `hold` function (`hold f(e) = …`), which receives the
+  expression as written and evaluates it wherever the body reads it
+  (call-by-name: `hold twice(e) = e + e` evaluates `e` twice; `let v = e`
+  once). Every parameter of a hold function is held; there is no
+  per-parameter form.
 - **Binder variables stay symbolic**: `D(expr, x)` and `Integrate(expr, x)`
   treat `x` symbolically even if `x` has an assigned value; the *result*
   then evaluates with the value. So `let x = 2` followed by
@@ -7377,6 +8033,9 @@ const result = ce.withTimeLimit(
 );
 ```
 
+When the budget expires the program stops: `result.value` is the
+`Error("Timeout exceeded", "timeout")` of the statement that hit the deadline,
+`result.valueRange` points at that statement, and no later statement runs.
 See [Evaluation](/evaluation/#interruptibility) for the rest of the
 cancellation model.
 
@@ -7408,7 +8067,7 @@ parsed node carries.
 | `x = 5`, `(a, b) := t` | `Assign` |
 | `type p = …`, `type alias q = …` | `DeclareType` |
 | `f(x) = …`, `function f(x) { … }` | `DefineFunction` + `Function` |
-| `x \|-> …` | `Function` |
+| `x => …` | `Function` |
 | `x: real` (annotation on a parameter or body) | `Typed` |
 | `if c { … } else { … }`, `a if c else b` | `If` |
 | `match s { p => b }` | `Match` + `MatchCase` |
@@ -7433,7 +8092,7 @@ parsed node carries.
 | `"a\(b)c"` | `String` |
 | `Sequence(1, 2, 3)` | `Sequence` |
 
-Note that `MapsTo` — the name the operator table uses for `|->` — is internal
+Note that `MapsTo` — the name the operator table uses for `=>` — is internal
 to parsing. The resulting expression uses `Function`, not a `MapsTo` head.
 Likewise, `is` and `in` produce the same `Element` expression, which is why a
 serialized program spells both of them `in`.
@@ -7503,7 +8162,7 @@ parameters** (the "lambda lift" — see
 [Declarations](/declarations/#function-type-annotations-bind-their-parameter-names)):
 before lowering, the parser wraps a non-lambda initializer in a `Function`
 whose parameters come from the annotation, so the declared value is exactly
-what the explicit `|->` spelling produces:
+what the explicit `=>` spelling produces:
 
 ```epsil
 const f : (x: number) -> number = x + 1
@@ -7736,7 +8395,7 @@ fib(0) = 0
 ### Anonymous functions
 
 ```epsil
-x |-> x + 1
+x => x + 1
 ```
 
 ```json
@@ -7744,7 +8403,7 @@ x |-> x + 1
 ```
 
 ```epsil
-(x, y) |-> x + y
+(x, y) => x + y
 ```
 
 ```json
@@ -7752,11 +8411,11 @@ x |-> x + 1
 ```
 
 Because a mapsto binds loosely enough to sit on the right-hand side of an
-assignment, `f = x |-> x + 1` is an `Assign` of a `Function`, not a
+assignment, `f = x => x + 1` is an `Assign` of a `Function`, not a
 `DefineFunction`:
 
 ```epsil
-f = x |-> x + 1
+f = x => x + 1
 ```
 
 ```json
@@ -7766,7 +8425,7 @@ f = x |-> x + 1
 A zero-parameter lambda is a `Function` with only a body:
 
 ```epsil
-() |-> 42
+() => 42
 ```
 
 ```json
